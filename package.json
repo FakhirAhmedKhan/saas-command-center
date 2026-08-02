@@ -1,0 +1,31 @@
+{
+  "name": "saas-command-center",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.0.0",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=11.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm build:packages && concurrently -k --names API,WEB --prefix-colors cyan.bold,magenta.bold --prefix \"[{name}]\" \"pnpm --filter @command-center/api start:dev\" \"pnpm --filter @command-center/web dev\"",
+    "build:packages": "pnpm --filter @command-center/shared-types build && pnpm --filter @command-center/validation build",
+    "dev:api": "pnpm build:packages && pnpm --filter @command-center/api start:dev",
+    "dev:web": "pnpm build:packages && pnpm --filter @command-center/web dev",
+    "build": "pnpm build:packages && pnpm -r --if-present build",
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm build:packages && pnpm -r --if-present typecheck",
+    "test": "pnpm build:packages && pnpm -r --if-present test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:up": "docker compose -f infrastructure/docker-compose.yml up -d",
+    "db:down": "docker compose -f infrastructure/docker-compose.yml down",
+    "db:logs": "docker compose -f infrastructure/docker-compose.yml logs -f",
+    "db:status": "docker compose -f infrastructure/docker-compose.yml ps"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2"
+  }
+}
