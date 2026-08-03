@@ -1,0 +1,97 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  DEVELOPER
+  VIEWER
+}
+
+model User {
+  id              String    @id @default(uuid()) @db.Uuid
+  email           String    @unique @db.VarChar(320)
+  passwordHash    String    @map("password_hash") @db.VarChar(255)
+  displayName     String?   @map("display_name") @db.VarChar(120)
+  isActive        Boolean   @default(true) @map("is_active")
+  emailVerifiedAt DateTime? @map("email_verified_at")
+  lastLoginAt     DateTime? @map("last_login_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+
+  ownedWorkspaces Workspace[]       @relation("WorkspaceOwner")
+  memberships     WorkspaceMember[]
+  authSessions    AuthSession[]
+
+  @@index([deletedAt])
+  @@index([isActive])
+  @@map("users")
+}
+
+model Workspace {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String    @db.VarChar(120)
+  slug      String    @unique @db.VarChar(120)
+  ownerId   String    @map("owner_id") @db.Uuid
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  owner   User              @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  members WorkspaceMember[]
+
+  @@index([ownerId])
+  @@index([deletedAt])
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String        @id @default(uuid()) @db.Uuid
+  workspaceId String        @map("workspace_id") @db.Uuid
+  userId      String        @map("user_id") @db.Uuid
+  role        WorkspaceRole @default(VIEWER)
+  joinedAt    DateTime      @default(now()) @map("joined_at")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([userId])
+  @@index([workspaceId, role])
+  @@map("workspace_members")
+}
+
+model AuthSession {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  familyId         String    @default(uuid()) @map("family_id") @db.Uuid
+  refreshTokenHash String    @unique @map("refresh_token_hash") @db.VarChar(128)
+  parentSessionId  String?   @unique @map("parent_session_id") @db.Uuid
+  userAgent        String?   @map("user_agent") @db.VarChar(512)
+  ipAddress        String?   @map("ip_address") @db.VarChar(64)
+  expiresAt        DateTime  @map("expires_at")
+  lastUsedAt       DateTime? @map("last_used_at")
+  revokedAt        DateTime? @map("revoked_at")
+  revokeReason     String?   @map("revoke_reason") @db.VarChar(120)
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentSession  AuthSession? @relation("AuthSessionRotation", fields: [parentSessionId], references: [id], onDelete: SetNull)
+  rotatedSession AuthSession? @relation("AuthSessionRotation")
+
+  @@index([userId, revokedAt])
+  @@index([familyId])
+  @@index([expiresAt])
+  @@map("auth_sessions")
+}

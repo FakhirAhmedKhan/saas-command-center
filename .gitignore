@@ -11,3 +11,4 @@ coverage/
 .DS_Store
 .idea/
 .vscode/
+apps/api/src/generated/prisma/

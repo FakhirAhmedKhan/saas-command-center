@@ -24,10 +24,21 @@ export interface ApiErrorResponse {
   details?: unknown;
 }
 
+// export interface HealthResponse {
+//   status: 'ok';
+//   service: string;
+//   version: string;
+//   environment: string;
+//   timestamp: string;
+// }
 export interface HealthResponse {
-  status: 'ok';
+  status: 'ok' | 'error';
   service: string;
   version: string;
   environment: string;
   timestamp: string;
+  database: {
+    status: 'up' | 'down';
+    responseTimeMs: number;
+  };
 }

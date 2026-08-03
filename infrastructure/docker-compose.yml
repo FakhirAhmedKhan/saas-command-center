@@ -10,11 +10,15 @@ services:
       POSTGRES_PASSWORD: command_center_dev
       POSTGRES_DB: command_center
     ports:
-      - "5432:5432"
+      - "55432:5432"
     volumes:
       - command_center_postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U command_center -d command_center"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U command_center -d command_center",
+        ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -28,11 +32,15 @@ services:
       POSTGRES_PASSWORD: command_center_test
       POSTGRES_DB: command_center_test
     ports:
-       - "5434:5432"
+      - "5434:5432"
     tmpfs:
       - /var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U command_center_test -d command_center_test"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U command_center_test -d command_center_test",
+        ]
       interval: 5s
       timeout: 5s
       retries: 10
