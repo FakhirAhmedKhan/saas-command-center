@@ -1,3 +1,70 @@
+@import 'tailwindcss' source('../');
+
+/*
+  Scan the shared monorepo UI package.
+  Keep this only when the package exists at packages/ui/src.
+*/
+@source "../../../../packages/ui/src";
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --color-brand-50: #eef6ff;
+  --color-brand-100: #d9eaff;
+  --color-brand-200: #bcdbff;
+  --color-brand-300: #8ec5ff;
+  --color-brand-400: #59a5ff;
+  --color-brand-500: #347ff5;
+  --color-brand-600: #1f60d9;
+  --color-brand-700: #1b4caf;
+  --color-brand-800: #1b418a;
+  --color-brand-900: #1a386f;
+  --color-brand-950: #122348;
+
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8fafc;
+  --color-border-soft: #e2e8f0;
+
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px rgb(15 23 42 / 0.06);
+
+  --shadow-card-hover: 0 2px 4px rgb(15 23 42 / 0.04), 0 16px 36px rgb(15 23 42 / 0.1);
+}
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    min-height: 100%;
+    background: #f8fafc;
+  }
+
+  body {
+    min-height: 100vh;
+    margin: 0;
+    background: #f8fafc;
+    color: #0f172a;
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
 :root {
   --background: #f6f7f9;
   --surface: #ffffff;
@@ -23,9 +90,7 @@
   --radius: 12px;
   --radius-large: 18px;
 
-  --shadow:
-    0 1px 2px rgba(16, 24, 40, 0.04),
-    0 8px 24px rgba(16, 24, 40, 0.05);
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px rgba(16, 24, 40, 0.05);
 }
 
 * {
@@ -47,7 +112,7 @@ body {
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
-    "Segoe UI",
+    'Segoe UI',
     sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -89,12 +154,7 @@ p {
   justify-content: space-between;
   padding: 52px;
   background:
-    radial-gradient(
-      circle at top left,
-      rgba(255, 255, 255, 0.1),
-      transparent 34%
-    ),
-    #161618;
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.1), transparent 34%), #161618;
   color: #fff;
 }
 
@@ -233,8 +293,7 @@ p {
 .workspace-select:focus,
 .role-select:focus {
   border-color: #73737c;
-  box-shadow:
-    0 0 0 3px rgba(24, 24, 27, 0.08);
+  box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.08);
 }
 
 .field input:disabled {
@@ -538,8 +597,7 @@ p {
 
 .metric-grid {
   display: grid;
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -608,8 +666,7 @@ p {
 .workspace-grid,
 .action-grid {
   display: grid;
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 

@@ -19,9 +19,9 @@ import { AuthSessionsModule } from './modules/auth/module/auth-sessions.module';
 import { AuthModule } from './modules/auth/module/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { WorkspaceMembersModule } from './modules/workspace/modules/workspace-members.module';
-import { WorkspacesModule } from './modules/workspace/modules/workspaces.module';
 import { VersionModule } from './version/version.module';
-
+import { ApplicationsModule } from './modules/applications/applications.module';
+import { WorkspaceModule } from './modules/workspace/modules/workspaces.module';
 
 @Module({
   imports: [
@@ -38,10 +38,10 @@ import { VersionModule } from './version/version.module';
         limit: 100,
       },
     ]),
-
+    ApplicationsModule,
     DatabaseModule,
     UsersModule,
-    WorkspacesModule,
+    WorkspaceModule,
     WorkspaceMembersModule,
     AuthSessionsModule,
     AuthModule,

@@ -4,7 +4,6 @@ import { JwtModule } from '@nestjs/jwt';
 import {
     PassportModule,
 } from '@nestjs/passport';
-import { WorkspacesModule } from 'src/modules/workspace/modules/workspaces.module';
 import { AuthController } from '../controllers/auth.controller';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { AuthService } from '../services/auth.service';
@@ -13,6 +12,7 @@ import { TokenService } from '../services/token.service';
 import { JwtStrategy } from '../strategies/jwt.strategy';
 import { AuthSessionsModule } from './auth-sessions.module';
 import { UsersModule } from 'src/modules/users/users.module';
+import { WorkspaceModule } from 'src/modules/workspace/modules/workspaces.module';
 
 
 @Module({
@@ -22,7 +22,7 @@ import { UsersModule } from 'src/modules/users/users.module';
         }),
         JwtModule.register({}),
         UsersModule,
-        WorkspacesModule,
+        WorkspaceModule,
         AuthSessionsModule,
     ],
     controllers: [AuthController],

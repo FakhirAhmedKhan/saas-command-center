@@ -6,7 +6,8 @@ const API_URL =
 
 let accessToken: string | null = null;
 
-let refreshPromise: Promise<string | null> | null = null;
+let refreshPromise: Promise<string | null> | null =
+  null;
 
 interface ApiErrorBody {
   message?: string | string[];
@@ -33,7 +34,9 @@ async function readResponseBody(
   const contentType =
     response.headers.get('content-type');
 
-  if (contentType?.includes('application/json')) {
+  if (
+    contentType?.includes('application/json')
+  ) {
     return response.json();
   }
 
@@ -56,11 +59,15 @@ function resolveErrorMessage(
       return apiBody.message.join(', ');
     }
 
-    if (typeof apiBody.message === 'string') {
+    if (
+      typeof apiBody.message === 'string'
+    ) {
       return apiBody.message;
     }
 
-    if (typeof apiBody.error === 'string') {
+    if (
+      typeof apiBody.error === 'string'
+    ) {
       return apiBody.error;
     }
   }
@@ -83,7 +90,8 @@ async function refreshAccessToken(): Promise<
           method: 'POST',
           credentials: 'include',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type':
+              'application/json',
           },
           body: JSON.stringify({}),
         },
@@ -94,9 +102,10 @@ async function refreshAccessToken(): Promise<
         return null;
       }
 
-      const body = (await response.json()) as {
-        accessToken?: string;
-      };
+      const body =
+        (await response.json()) as {
+          accessToken?: string;
+        };
 
       if (!body.accessToken) {
         setAccessToken(null);
@@ -122,7 +131,9 @@ export async function apiRequest<T>(
   options: RequestInit = {},
   retryAfterUnauthorized = true,
 ): Promise<T> {
-  const headers = new Headers(options.headers);
+  const headers = new Headers(
+    options.headers,
+  );
 
   if (
     options.body &&
@@ -168,7 +179,8 @@ export async function apiRequest<T>(
     }
   }
 
-  const body = await readResponseBody(response);
+  const body =
+    await readResponseBody(response);
 
   if (!response.ok) {
     throw new ApiError(
@@ -183,3 +195,8 @@ export async function apiRequest<T>(
 
   return body as T;
 }
+
+/**
+ * Alias used by the Phase 5 application API.
+ */
+export const apiClient = apiRequest;

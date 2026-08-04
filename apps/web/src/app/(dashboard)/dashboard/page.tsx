@@ -2,117 +2,199 @@
 
 import Link from 'next/link';
 
+import {
+  ArrowRight,
+  Boxes,
+  Building2,
+  FolderKanban,
+  TriangleAlert,
+} from 'lucide-react';
+
 import { useAuth } from '@/features/auth/auth-provider';
 
 export default function DashboardPage() {
-  const {
-    user,
-    workspaces,
-  } = useAuth();
+  const { user, workspaces } = useAuth();
 
   return (
-    <div className="page-stack">
-      <section className="page-heading">
-        <div>
-          <p className="eyebrow">
-            Portfolio overview
-          </p>
+    <div className="space-y-8">
+      {/* Page heading */}
+      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-card sm:p-8">
+        <p className="text-sm font-semibold text-brand-600">
+          Portfolio overview
+        </p>
 
-          <h1>
-            Welcome back
-            {user?.displayName
-              ? `, ${user.displayName}`
-              : ''}
-          </h1>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+          Welcome back
+          {user?.displayName
+            ? `, ${user.displayName}`
+            : ''}
+        </h1>
 
-          <p>
-            Your workspace foundation is ready.
-            SaaS applications will be added in
-            the next phase.
-          </p>
-        </div>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">
+          Manage your workspaces and register
+          every SaaS application from one
+          command center.
+        </p>
       </section>
 
-      <section className="metric-grid">
-        <article className="metric-card">
-          <span>Workspaces</span>
-          <strong>{workspaces.length}</strong>
-          <p>Available to your account</p>
-        </article>
+      {/* Metrics */}
+      <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        <MetricCard
+          icon={
+            <Building2 className="size-5" />
+          }
+          label="Workspaces"
+          value={workspaces.length}
+          description="Available to your account"
+        />
 
-        <article className="metric-card">
-          <span>SaaS applications</span>
-          <strong>0</strong>
-          <p>Application registry comes next</p>
-        </article>
+        <MetricCard
+          icon={<Boxes className="size-5" />}
+          label="SaaS applications"
+          value={0}
+          description="Managed across your workspaces"
+        />
 
-        <article className="metric-card">
-          <span>Open blockers</span>
-          <strong>0</strong>
-          <p>Development tracking comes later</p>
-        </article>
+        <MetricCard
+          icon={
+            <TriangleAlert className="size-5" />
+          }
+          label="Open blockers"
+          value={0}
+          description="Development tracking comes later"
+        />
       </section>
 
-      <section className="section-card">
-        <div className="section-card-header">
-          <div>
-            <h2>Your workspaces</h2>
-            <p>
-              Open a workspace to manage its
-              settings and members.
-            </p>
-          </div>
+      {/* Workspaces */}
+      <section className="rounded-3xl border border-slate-200 bg-white shadow-card">
+        <div className="border-b border-slate-100 p-6 sm:p-8">
+          <h2 className="text-xl font-bold text-slate-950">
+            Your workspaces
+          </h2>
+
+          <p className="mt-2 text-sm leading-6 text-slate-500">
+            Open a workspace to manage its
+            applications, members, and settings.
+          </p>
         </div>
 
-        {workspaces.length === 0 ? (
-          <div className="empty-state">
-            <h3>No workspace found</h3>
-            <p>
-              Your account does not currently
-              belong to a workspace.
-            </p>
-          </div>
-        ) : (
-          <div className="workspace-grid">
-            {workspaces.map(
-              (workspace) => {
+        <div className="p-6 sm:p-8">
+          {workspaces.length === 0 ? (
+            <div className="flex min-h-64 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 text-center">
+              <div className="flex size-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
+                <Building2 className="size-6" />
+              </div>
+
+              <h3 className="mt-5 text-lg font-semibold text-slate-900">
+                No workspace found
+              </h3>
+
+              <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">
+                Your account does not currently
+                belong to any workspace.
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {workspaces.map((workspace) => {
                 const role =
                   workspace.members?.[0]
                     ?.role ?? 'VIEWER';
 
                 return (
-                  <Link
-                    className="workspace-card"
-                    href={`/workspaces/${workspace.id}`}
+                  <article
                     key={workspace.id}
+                    className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 transition duration-200 hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-card-hover"
                   >
-                    <div className="workspace-card-top">
-                      <div className="workspace-icon">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex size-12 items-center justify-center rounded-2xl bg-brand-50 text-lg font-bold text-brand-700">
                         {workspace.name
                           .charAt(0)
                           .toUpperCase()}
                       </div>
 
-                      <span className="badge">
+                      <span className="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
                         {role}
                       </span>
                     </div>
 
-                    <div>
-                      <h3>{workspace.name}</h3>
-                      <p>/{workspace.slug}</p>
+                    <div className="mt-5 flex-1">
+                      <h3 className="text-lg font-semibold text-slate-950">
+                        {workspace.name}
+                      </h3>
+
+                      <p className="mt-1 text-sm text-slate-400">
+                        /{workspace.slug}
+                      </p>
                     </div>
 
-                    <span className="card-link">
-                      Open workspace →
-                    </span>
-                  </Link>
+                    <div className="mt-6 grid gap-3">
+                      <Link
+                        href={`/workspaces/${workspace.id}/applications`}
+                        className="inline-flex h-11 items-center justify-between rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white transition hover:bg-brand-700"
+                      >
+                        <span className="inline-flex items-center gap-2">
+                          <FolderKanban className="size-4" />
+                          Applications
+                        </span>
+
+                        <ArrowRight className="size-4" />
+                      </Link>
+
+                      <Link
+                        href={`/workspaces/${workspace.id}`}
+                        className="inline-flex h-11 items-center justify-between rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                      >
+                        Open workspace
+
+                        <ArrowRight className="size-4" />
+                      </Link>
+                    </div>
+                  </article>
                 );
-              },
-            )}
-          </div>
-        )}
+              })}
+            </div>
+          )}
+        </div>
       </section>
     </div>
+  );
+}
+
+interface MetricCardProps {
+  icon: React.ReactNode;
+  label: string;
+  value: number;
+  description: string;
+}
+
+function MetricCard({
+  icon,
+  label,
+  value,
+  description,
+}: MetricCardProps) {
+  return (
+    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-sm font-medium text-slate-500">
+            {label}
+          </p>
+
+          <p className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
+            {value}
+          </p>
+        </div>
+
+        <div className="flex size-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+          {icon}
+        </div>
+      </div>
+
+      <p className="mt-4 text-sm text-slate-500">
+        {description}
+      </p>
+    </article>
   );
 }
