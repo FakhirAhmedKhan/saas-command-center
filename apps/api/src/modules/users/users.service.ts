@@ -1,11 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import {
-  Prisma,
-  type User,
-} from '../generated/prisma/client';
-import { PrismaService } from '../database/prisma.service';
+import { PrismaService } from 'src/database/prisma.service';
+import { Prisma, User } from 'src/generated/prisma/client';
 
-const publicUserSelect = {
+export const publicUserSelect = {
   id: true,
   email: true,
   displayName: true,
@@ -33,7 +30,7 @@ export interface UpdateUserProfileInput {
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(input: CreateUserInput): Promise<PublicUser> {
     return this.prisma.user.create({
@@ -65,7 +62,16 @@ export class UsersService {
 
     return user;
   }
-
+  async findActiveById(id: string): Promise<PublicUser | null> {
+    return this.prisma.user.findFirst({
+      where: {
+        id,
+        isActive: true,
+        deletedAt: null,
+      },
+      select: publicUserSelect,
+    });
+  }
   async findByEmail(email: string): Promise<PublicUser | null> {
     return this.prisma.user.findFirst({
       where: {
@@ -105,10 +111,10 @@ export class UsersService {
       data: {
         ...(input.displayName !== undefined
           ? {
-              displayName: this.normalizeDisplayName(
-                input.displayName,
-              ),
-            }
+            displayName: this.normalizeDisplayName(
+              input.displayName,
+            ),
+          }
           : {}),
       },
       select: publicUserSelect,

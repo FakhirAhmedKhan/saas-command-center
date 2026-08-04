@@ -2,12 +2,14 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
+
 import {
   Prisma,
   WorkspaceRole,
-} from '../generated/prisma/client';
-import { PrismaService } from '../database/prisma.service';
+} from '../../../generated/prisma/client';
+import { PrismaService } from '../../../database/prisma.service';
 
 const workspaceSummarySelect = {
   id: true,
@@ -41,7 +43,7 @@ export interface UpdateWorkspaceInput {
 
 @Injectable()
 export class WorkspacesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(
     input: CreateWorkspaceInput,
@@ -89,7 +91,99 @@ export class WorkspacesService {
       });
     });
   }
+  async transferOwnership(
+    workspaceId: string,
+    currentOwnerId: string,
+    newOwnerId: string,
+  ): Promise<WorkspaceSummary> {
+    if (currentOwnerId === newOwnerId) {
+      throw new BadRequestException(
+        'The selected user already owns the workspace',
+      );
+    }
 
+    return this.prisma.$transaction(
+      async (transaction) => {
+        const workspace =
+          await transaction.workspace.findFirst({
+            where: {
+              id: workspaceId,
+              deletedAt: null,
+            },
+          });
+
+        if (!workspace) {
+          throw new NotFoundException(
+            'Workspace not found',
+          );
+        }
+
+        if (
+          workspace.ownerId !== currentOwnerId
+        ) {
+          throw new ForbiddenException(
+            'Only the workspace owner can transfer ownership',
+          );
+        }
+
+        const newOwnerMembership =
+          await transaction.workspaceMember.findUnique({
+            where: {
+              workspaceId_userId: {
+                workspaceId,
+                userId: newOwnerId,
+              },
+            },
+          });
+
+        if (!newOwnerMembership) {
+          throw new BadRequestException(
+            'The new owner must already be a workspace member',
+          );
+        }
+
+        await transaction.workspace.update({
+          where: {
+            id: workspaceId,
+          },
+          data: {
+            ownerId: newOwnerId,
+          },
+        });
+
+        await transaction.workspaceMember.update({
+          where: {
+            workspaceId_userId: {
+              workspaceId,
+              userId: currentOwnerId,
+            },
+          },
+          data: {
+            role: WorkspaceRole.ADMIN,
+          },
+        });
+
+        await transaction.workspaceMember.update({
+          where: {
+            workspaceId_userId: {
+              workspaceId,
+              userId: newOwnerId,
+            },
+          },
+          data: {
+            role: WorkspaceRole.OWNER,
+          },
+        });
+
+        return transaction.workspace.findUniqueOrThrow({
+          where: {
+            id: workspaceId,
+          },
+          select: workspaceSummarySelect,
+        });
+      },
+    );
+  }
   async findById(id: string): Promise<WorkspaceSummary | null> {
     return this.prisma.workspace.findFirst({
       where: {
@@ -175,13 +269,13 @@ export class WorkspacesService {
       data: {
         ...(input.name !== undefined
           ? {
-              name: this.normalizeName(input.name),
-            }
+            name: this.normalizeName(input.name),
+          }
           : {}),
         ...(input.slug !== undefined
           ? {
-              slug: this.normalizeSlug(input.slug),
-            }
+            slug: this.normalizeSlug(input.slug),
+          }
           : {}),
       },
       select: workspaceSummarySelect,

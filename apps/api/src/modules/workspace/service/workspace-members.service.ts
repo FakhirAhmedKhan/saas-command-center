@@ -3,11 +3,11 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
 import {
   Prisma,
   WorkspaceRole,
-} from '../generated/prisma/client';
-import { PrismaService } from '../database/prisma.service';
+} from 'src/generated/prisma/client';
 
 const memberSelect = {
   id: true,
@@ -40,11 +40,17 @@ export interface AddWorkspaceMemberInput {
 
 @Injectable()
 export class WorkspaceMembersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async addMember(
     input: AddWorkspaceMemberInput,
   ): Promise<WorkspaceMemberDetails> {
+    if (input.role === WorkspaceRole.OWNER) {
+      throw new ConflictException(
+        'Use ownership transfer to assign the OWNER role.',
+      );
+    }
+
     return this.prisma.$transaction(async (transaction) => {
       const workspace = await transaction.workspace.findFirst({
         where: {
@@ -109,11 +115,16 @@ export class WorkspaceMembersService {
     workspaceId: string,
     userId: string,
   ): Promise<WorkspaceMemberDetails | null> {
-    return this.prisma.workspaceMember.findUnique({
+    return this.prisma.workspaceMember.findFirst({
       where: {
-        workspaceId_userId: {
-          workspaceId,
-          userId,
+        workspaceId,
+        userId,
+        workspace: {
+          deletedAt: null,
+        },
+        user: {
+          isActive: true,
+          deletedAt: null,
         },
       },
       select: memberSelect,
@@ -179,6 +190,15 @@ export class WorkspaceMembersService {
       ) {
         throw new ConflictException(
           'The workspace owner cannot be demoted. Transfer ownership first.',
+        );
+      }
+
+      if (
+        workspace.ownerId !== userId &&
+        role === WorkspaceRole.OWNER
+      ) {
+        throw new ConflictException(
+          'Use ownership transfer to assign the OWNER role.',
         );
       }
 

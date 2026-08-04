@@ -1,13 +1,27 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
-import { AuthSessionsModule } from './auth-sessions/auth-sessions.module';
-import { validateEnvironment } from './common/config/env.validation';
-import { DatabaseModule } from './database/database.module';
-import { HealthModule } from './health/health.module';
-import { UsersModule } from './users/users.module';
+import {
+  ThrottlerGuard,
+  ThrottlerModule,
+} from '@nestjs/throttler';
+
+import {
+  validateEnvironment,
+} from './common/config/env.validation';
+import {
+  DatabaseModule,
+} from './database/database.module';
+import {
+  HealthModule,
+} from './health/health.module';
+import { AuthSessionsModule } from './modules/auth/module/auth-sessions.module';
+import { AuthModule } from './modules/auth/module/auth.module';
+import { UsersModule } from './modules/users/users.module';
+import { WorkspaceMembersModule } from './modules/workspace/modules/workspace-members.module';
+import { WorkspacesModule } from './modules/workspace/modules/workspaces.module';
 import { VersionModule } from './version/version.module';
-import { WorkspaceMembersModule } from './workspace-members/workspace-members.module';
-import { WorkspacesModule } from './workspaces/workspaces.module';
+
 
 @Module({
   imports: [
@@ -18,15 +32,27 @@ import { WorkspacesModule } from './workspaces/workspaces.module';
       validate: validateEnvironment,
     }),
 
-    DatabaseModule,
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60_000,
+        limit: 100,
+      },
+    ]),
 
+    DatabaseModule,
     UsersModule,
     WorkspacesModule,
     WorkspaceMembersModule,
     AuthSessionsModule,
-
+    AuthModule,
     HealthModule,
     VersionModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule { }
