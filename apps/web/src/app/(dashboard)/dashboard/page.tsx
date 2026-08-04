@@ -8,6 +8,7 @@ import {
   Building2,
   FolderKanban,
   TriangleAlert,
+  Plus,
 } from 'lucide-react';
 
 import { useAuth } from '@/features/auth/auth-provider';
@@ -19,22 +20,33 @@ export default function DashboardPage() {
     <div className="space-y-8">
       {/* Page heading */}
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-card sm:p-8">
-        <p className="text-sm font-semibold text-brand-600">
-          Portfolio overview
-        </p>
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-brand-600">
+              Portfolio overview
+            </p>
 
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
-          Welcome back
-          {user?.displayName
-            ? `, ${user.displayName}`
-            : ''}
-        </h1>
+            <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+              Welcome back
+              {user?.displayName
+                ? `, ${user.displayName}`
+                : ''}
+            </h1>
 
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">
-          Manage your workspaces and register
-          every SaaS application from one
-          command center.
-        </p>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">
+              Manage your workspaces and SaaS
+              applications from one command center.
+            </p>
+          </div>
+
+          <Link
+            href="/workspaces/new"
+            className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700"
+          >
+            <Plus className="size-4" />
+            New workspace
+          </Link>
+        </div>
       </section>
 
       {/* Metrics */}
