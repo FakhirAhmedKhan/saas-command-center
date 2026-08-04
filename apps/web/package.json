@@ -7,8 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
-    "typecheck": "tsc --noEmit",
-    "test": "node --test"
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "node --test",
+    "test:e2e": "playwright test --config=playwright.config.ts",
+    "test:e2e:headed": "playwright test --config=playwright.config.ts --headed",
+    "test:e2e:debug": "playwright test --config=playwright.config.ts --debug",
+    "test:e2e:list": "playwright test --config=playwright.config.ts --list",
+    "test:phase4": "pnpm typecheck && pnpm build"
   },
   "dependencies": {
     "@command-center/shared-types": "workspace:*",
@@ -19,6 +24,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.34.0",
+    "@playwright/test": "^1.62.1",
     "@types/node": "^24.3.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
