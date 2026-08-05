@@ -102,6 +102,7 @@ export interface SaasApplication {
     _count?: {
         technologies: number;
         links: number;
+        activities: number;
     };
 }
 

@@ -45,6 +45,7 @@ import {
     formatApplicationDate,
     getErrorMessage,
 } from '@/features/applications/application-utils';
+import { ActivityFeed } from '@/features/activity/components/activity-feed';
 
 export default function ApplicationDetailsPage() {
     const params = useParams<{
@@ -347,6 +348,13 @@ export default function ApplicationDetailsPage() {
                     application.archivedAt,
                 )}
                 onChanged={reload}
+            />
+
+            <ActivityFeed
+                workspaceId={workspaceId}
+                applicationId={applicationId}
+                title="Application history"
+                description="Review how this application changed over time."
             />
         </div>
     );

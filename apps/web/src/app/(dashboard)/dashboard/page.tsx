@@ -9,9 +9,11 @@ import {
   FolderKanban,
   TriangleAlert,
   Plus,
+  Activity,
 } from 'lucide-react';
 
 import { useAuth } from '@/features/auth/auth-provider';
+// import { Activity } from 'react';
 
 export default function DashboardPage() {
   const { user, workspaces } = useAuth();
@@ -148,6 +150,18 @@ export default function DashboardPage() {
                         <span className="inline-flex items-center gap-2">
                           <FolderKanban className="size-4" />
                           Applications
+                        </span>
+
+                        <ArrowRight className="size-4" />
+                      </Link>
+
+                      <Link
+                        href={`/workspaces/${workspace.id}/activities`}
+                        className="inline-flex h-11 items-center justify-between rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                      >
+                        <span className="inline-flex items-center gap-2">
+                          <Activity className="size-4" />
+                          Activity history
                         </span>
 
                         <ArrowRight className="size-4" />
