@@ -102,6 +102,41 @@ export const ACTIVITY_BADGE_VARIANTS:
 
   LINK_REMOVED:
     'red',
+  WEBSITE_CREATED: 'green',
+  WEBSITE_UPDATED: 'blue',
+  WEBSITE_ENABLED: 'green',
+  WEBSITE_DISABLED: 'orange',
+  WEBSITE_ARCHIVED: 'slate',
+  WEBSITE_RESTORED: 'green',
+  WEBSITE_TRACKING_KEY_ROTATED: 'purple',
+  WEBSITE_CONNECTED: 'blue',
+  WEBSITE_DISCONNECTED: 'orange',
+  WEBSITE_CREATED:
+    'Website created',
+
+  WEBSITE_UPDATED:
+    'Website updated',
+
+  WEBSITE_ENABLED:
+    'Website enabled',
+
+  WEBSITE_DISABLED:
+    'Website disabled',
+
+  WEBSITE_ARCHIVED:
+    'Website archived',
+
+  WEBSITE_RESTORED:
+    'Website restored',
+
+  WEBSITE_TRACKING_KEY_ROTATED:
+    'Tracking key rotated',
+
+  WEBSITE_CONNECTED:
+    'Website connected',
+
+  WEBSITE_DISCONNECTED:
+    'Website disconnected',
 };
 
 export const ACTOR_TYPE_LABELS:

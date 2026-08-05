@@ -10,6 +10,7 @@ import {
   TriangleAlert,
   Plus,
   Activity,
+  Globe2,
 } from 'lucide-react';
 
 import { useAuth } from '@/features/auth/auth-provider';
@@ -172,6 +173,18 @@ export default function DashboardPage() {
                         className="inline-flex h-11 items-center justify-between rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
                       >
                         Open workspace
+
+                        <ArrowRight className="size-4" />
+                      </Link>
+
+                      <Link
+                        href={`/workspaces/${workspace.id}/websites`}
+                        className="inline-flex h-11 items-center justify-between rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                      >
+                        <span className="inline-flex items-center gap-2">
+                          <Globe2 className="size-4" />
+                          Websites
+                        </span>
 
                         <ArrowRight className="size-4" />
                       </Link>

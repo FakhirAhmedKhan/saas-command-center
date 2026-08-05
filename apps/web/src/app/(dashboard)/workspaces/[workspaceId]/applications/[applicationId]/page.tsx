@@ -14,7 +14,9 @@ import {
 import {
     ArrowLeft,
     CalendarDays,
+    Globe2,
     Pencil,
+    Plus,
     Settings,
 } from 'lucide-react';
 
@@ -233,6 +235,21 @@ export default function ApplicationDetailsPage() {
                         >
                             <Settings className="size-4" />
                             Settings
+                        </Link>
+                        <Link
+                            href={`/workspaces/${workspaceId}/websites`}
+                            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                        >
+                            <Globe2 className="size-4" />
+                            Websites
+                        </Link>
+
+                        <Link
+                            href={`/workspaces/${workspaceId}/websites/new?applicationId=${applicationId}`}
+                            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700"
+                        >
+                            <Plus className="size-4" />
+                            Connect website
                         </Link>
                     </div>
                 </div>

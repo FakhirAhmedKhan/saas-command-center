@@ -6,6 +6,7 @@ import {
   Code2,
   ExternalLink,
   FilePenLine,
+  Globe2,
   Link2,
   RefreshCcw,
   RotateCcw,
@@ -37,7 +38,7 @@ interface ActivityItemProps {
   workspaceId: string;
 
   activity:
-    ApplicationActivity;
+  ApplicationActivity;
 
   showApplication?: boolean;
 }
@@ -47,7 +48,7 @@ function getActivityIcon(
     ApplicationActivity,
 ) {
   switch (
-    activity.activityType
+  activity.activityType
   ) {
     case 'APPLICATION_CREATED':
       return Boxes;
@@ -82,7 +83,16 @@ function getActivityIcon(
       return FilePenLine;
   }
 }
-
+case 'WEBSITE_CREATED':
+case 'WEBSITE_UPDATED':
+case 'WEBSITE_ENABLED':
+case 'WEBSITE_DISABLED':
+case 'WEBSITE_ARCHIVED':
+case 'WEBSITE_RESTORED':
+case 'WEBSITE_TRACKING_KEY_ROTATED':
+case 'WEBSITE_CONNECTED':
+case 'WEBSITE_DISCONNECTED':
+return Globe2;
 export function ActivityItem({
   workspaceId,
   activity,
@@ -117,13 +127,13 @@ export function ActivityItem({
               <Badge
                 variant={
                   ACTIVITY_BADGE_VARIANTS[
-                    activity.activityType
+                  activity.activityType
                   ]
                 }
               >
                 {
                   ACTIVITY_TYPE_LABELS[
-                    activity.activityType
+                  activity.activityType
                   ]
                 }
               </Badge>
@@ -131,7 +141,7 @@ export function ActivityItem({
               <Badge variant="slate">
                 {
                   ENTITY_TYPE_LABELS[
-                    activity.entityType
+                  activity.entityType
                   ]
                 }
               </Badge>
