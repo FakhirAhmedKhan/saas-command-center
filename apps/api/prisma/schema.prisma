@@ -27,9 +27,10 @@ model User {
   updatedAt       DateTime  @updatedAt @map("updated_at")
   deletedAt       DateTime? @map("deleted_at")
 
-  ownedWorkspaces Workspace[]       @relation("WorkspaceOwner")
-  memberships     WorkspaceMember[]
-  authSessions    AuthSession[]
+  ownedWorkspaces       Workspace[]           @relation("WorkspaceOwner")
+  memberships           WorkspaceMember[]
+  authSessions          AuthSession[]
+  applicationActivities ApplicationActivity[] @relation("ApplicationActivityActor")
 
   @@index([deletedAt])
   @@index([isActive])
@@ -45,9 +46,10 @@ model Workspace {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  owner            User              @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Restrict)
-  members          WorkspaceMember[]
-  saasApplications SaasApplication[]
+  owner                 User                  @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  members               WorkspaceMember[]
+  saasApplications      SaasApplication[]
+  applicationActivities ApplicationActivity[]
 
   @@index([ownerId])
   @@index([deletedAt])
@@ -165,6 +167,7 @@ model SaasApplication {
   workspace    Workspace               @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   technologies ApplicationTechnology[]
   links        ApplicationLink[]
+  activities   ApplicationActivity[]
 
   @@unique([workspaceId, slug])
   @@index([workspaceId, archivedAt])
@@ -205,4 +208,60 @@ model ApplicationLink {
   @@unique([applicationId, url])
   @@index([applicationId, type])
   @@map("application_links")
+}
+
+enum ActivityActorType {
+  USER
+  SYSTEM
+}
+
+enum ActivityEntityType {
+  APPLICATION
+  TECHNOLOGY
+  LINK
+}
+
+enum ApplicationActivityType {
+  APPLICATION_CREATED
+  APPLICATION_UPDATED
+  APPLICATION_STATUS_CHANGED
+  APPLICATION_PRIORITY_CHANGED
+  APPLICATION_ARCHIVED
+  APPLICATION_RESTORED
+  APPLICATION_DELETED
+
+  TECHNOLOGY_ADDED
+  TECHNOLOGY_UPDATED
+  TECHNOLOGY_REMOVED
+
+  LINK_ADDED
+  LINK_UPDATED
+  LINK_REMOVED
+}
+
+model ApplicationActivity {
+  id              String                  @id @default(uuid()) @db.Uuid
+  workspaceId     String                  @map("workspace_id") @db.Uuid
+  applicationId   String?                 @map("application_id") @db.Uuid
+  applicationName String                  @map("application_name") @db.VarChar(160)
+  actorUserId     String?                 @map("actor_user_id") @db.Uuid
+  actorType       ActivityActorType       @default(USER) @map("actor_type")
+  activityType    ApplicationActivityType @map("activity_type")
+  entityType      ActivityEntityType      @map("entity_type")
+  entityId        String?                 @map("entity_id") @db.Uuid
+  title           String                  @db.VarChar(180)
+  description     String?                 @db.VarChar(500)
+  metadata        Json?
+  createdAt       DateTime                @default(now()) @map("created_at")
+
+  workspace   Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  application SaasApplication? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  actor       User?            @relation("ApplicationActivityActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId, createdAt])
+  @@index([applicationId, createdAt])
+  @@index([actorUserId, createdAt])
+  @@index([workspaceId, activityType, createdAt])
+  @@index([workspaceId, entityType, createdAt])
+  @@map("application_activities")
 }

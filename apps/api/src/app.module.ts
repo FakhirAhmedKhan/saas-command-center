@@ -22,6 +22,7 @@ import { WorkspaceMembersModule } from './modules/workspace/modules/workspace-me
 import { VersionModule } from './version/version.module';
 import { ApplicationsModule } from './modules/applications/applications.module';
 import { WorkspaceModule } from './modules/workspace/modules/workspaces.module';
+import { ActivityModule } from './modules/activity/activity.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { WorkspaceModule } from './modules/workspace/modules/workspaces.module';
     AuthModule,
     HealthModule,
     VersionModule,
+    ActivityModule,
   ],
   providers: [
     {
@@ -55,4 +57,4 @@ import { WorkspaceModule } from './modules/workspace/modules/workspaces.module';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}
