@@ -23,6 +23,7 @@ import { VersionModule } from './version/version.module';
 import { ApplicationsModule } from './modules/applications/applications.module';
 import { WorkspaceModule } from './modules/workspace/modules/workspaces.module';
 import { ActivityModule } from './modules/activity/activity.module';
+import { WebsitesModule } from './modules/websites/websites.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ActivityModule } from './modules/activity/activity.module';
     ApplicationsModule,
     DatabaseModule,
     UsersModule,
+    WebsitesModule,
     WorkspaceModule,
     WorkspaceMembersModule,
     AuthSessionsModule,
@@ -57,4 +59,4 @@ import { ActivityModule } from './modules/activity/activity.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }
