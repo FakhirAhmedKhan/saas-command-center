@@ -26,6 +26,7 @@ import { ActivityModule } from './modules/activity/activity.module';
 import { WebsitesModule } from './modules/websites/websites.module';
 import { DevelopmentModule } from './modules/development/development.module';
 import { AnalyticsIngestionModule } from './modules/analytics-ingestion/analytics-ingestion.module';
+import { AnalyticsEngineModule } from './modules/analytics-engine/analytics-engine.module';
 
 @Module({
   imports: [
@@ -55,7 +56,7 @@ import { AnalyticsIngestionModule } from './modules/analytics-ingestion/analytic
     ActivityModule,
     DevelopmentModule,
     AnalyticsIngestionModule,
-    
+    AnalyticsEngineModule,
   ],
   providers: [
     {

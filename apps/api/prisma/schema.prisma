@@ -295,9 +295,17 @@ model Website {
   createdAt            DateTime  @default(now()) @map("created_at")
   updatedAt            DateTime  @updatedAt @map("updated_at")
 
-  workspace   Workspace           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  application SaasApplication?    @relation(fields: [applicationId], references: [id], onDelete: SetNull)
-  rawEvents   RawAnalyticsEvent[]
+  workspace                Workspace                  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  application              SaasApplication?           @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  rawEvents                RawAnalyticsEvent[]
+  analyticsVisitors        AnalyticsVisitor[]
+  analyticsSessions        AnalyticsSession[]
+  analyticsEvents          AnalyticsEvent[]
+  analyticsPageViews       AnalyticsPageView[]
+  hourlyAggregates         AnalyticsHourlyAggregate[]
+  dailyAggregates          AnalyticsDailyAggregate[]
+  analyticsProcessingRuns  AnalyticsProcessingRun[]
+  analyticsProcessingState AnalyticsProcessingState?
 
   @@unique([workspaceId, domain])
   @@index([workspaceId, archivedAt])
@@ -306,6 +314,247 @@ model Website {
   @@index([applicationId])
   @@index([lastEventAt])
   @@map("websites")
+}
+
+model AnalyticsVisitor {
+  id                String   @id @default(uuid()) @db.Uuid
+  websiteId         String   @map("website_id") @db.Uuid
+  externalVisitorId String   @map("external_visitor_id") @db.VarChar(80)
+  firstSeenAt       DateTime @map("first_seen_at")
+  lastSeenAt        DateTime @map("last_seen_at")
+  sessionCount      Int      @default(0) @map("session_count")
+  pageViewCount     Int      @default(0) @map("page_view_count")
+  eventCount        Int      @default(0) @map("event_count")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  website   Website             @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  sessions  AnalyticsSession[]
+  events    AnalyticsEvent[]
+  pageViews AnalyticsPageView[]
+
+  @@unique([websiteId, externalVisitorId])
+  @@index([websiteId, firstSeenAt])
+  @@index([websiteId, lastSeenAt])
+  @@map("analytics_visitors")
+}
+
+model AnalyticsSession {
+  id                     String              @id @default(uuid()) @db.Uuid
+  websiteId              String              @map("website_id") @db.Uuid
+  visitorId              String              @map("visitor_id") @db.Uuid
+  externalSessionId      String              @map("external_session_id") @db.VarChar(80)
+  startedAt              DateTime            @map("started_at")
+  endedAt                DateTime            @map("ended_at")
+  lastEventAt            DateTime            @map("last_event_at")
+  durationMs             Int                 @default(0) @map("duration_ms")
+  engagedDurationMs      Int                 @default(0) @map("engaged_duration_ms")
+  pageViewCount          Int                 @default(0) @map("page_view_count")
+  eventCount             Int                 @default(0) @map("event_count")
+  customEventCount       Int                 @default(0) @map("custom_event_count")
+  bounced                Boolean             @default(true)
+  entryPath              String?             @map("entry_path") @db.VarChar(2048)
+  exitPath               String?             @map("exit_path") @db.VarChar(2048)
+  entryTitle             String?             @map("entry_title") @db.VarChar(512)
+  exitTitle              String?             @map("exit_title") @db.VarChar(512)
+  referrerUrl            String?             @map("referrer_url") @db.VarChar(2048)
+  sourceType             AnalyticsSourceType @default(UNKNOWN) @map("source_type")
+  sourceName             String              @default("Unknown") @map("source_name") @db.VarChar(160)
+  sourceDomain           String?             @map("source_domain") @db.VarChar(253)
+  countryCode            String?             @map("country_code") @db.Char(2)
+  deviceType             AnalyticsDeviceType @default(OTHER) @map("device_type")
+  browserName            String              @default("Unknown") @map("browser_name") @db.VarChar(100)
+  browserVersion         String?             @map("browser_version") @db.VarChar(50)
+  operatingSystem        String              @default("Unknown") @map("operating_system") @db.VarChar(100)
+  operatingSystemVersion String?             @map("operating_system_version") @db.VarChar(50)
+  createdAt              DateTime            @default(now()) @map("created_at")
+  updatedAt              DateTime            @updatedAt @map("updated_at")
+
+  website   Website             @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  visitor   AnalyticsVisitor    @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  events    AnalyticsEvent[]
+  pageViews AnalyticsPageView[]
+
+  @@unique([websiteId, externalSessionId])
+  @@index([websiteId, startedAt])
+  @@index([websiteId, endedAt])
+  @@index([websiteId, bounced, startedAt])
+  @@index([websiteId, sourceType, startedAt])
+  @@index([websiteId, countryCode, startedAt])
+  @@index([websiteId, deviceType, startedAt])
+  @@index([visitorId, startedAt])
+  @@map("analytics_sessions")
+}
+
+model AnalyticsEvent {
+  id                     String                @id @default(uuid()) @db.Uuid
+  websiteId              String                @map("website_id") @db.Uuid
+  visitorId              String                @map("visitor_id") @db.Uuid
+  sessionId              String                @map("session_id") @db.Uuid
+  rawEventId             String?               @unique @map("raw_event_id") @db.Uuid
+  sourceEventId          String                @map("source_event_id") @db.VarChar(80)
+  type                   RawAnalyticsEventType
+  eventName              String?               @map("event_name") @db.VarChar(100)
+  occurredAt             DateTime              @map("occurred_at")
+  receivedAt             DateTime              @map("received_at")
+  pageUrl                String                @map("page_url") @db.VarChar(2048)
+  normalizedPath         String                @map("normalized_path") @db.VarChar(2048)
+  pageTitle              String?               @map("page_title") @db.VarChar(512)
+  referrerUrl            String?               @map("referrer_url") @db.VarChar(2048)
+  properties             Json?
+  durationMs             Int?                  @map("duration_ms")
+  sourceType             AnalyticsSourceType   @default(UNKNOWN) @map("source_type")
+  sourceName             String                @default("Unknown") @map("source_name") @db.VarChar(160)
+  sourceDomain           String?               @map("source_domain") @db.VarChar(253)
+  countryCode            String?               @map("country_code") @db.Char(2)
+  deviceType             AnalyticsDeviceType   @default(OTHER) @map("device_type")
+  browserName            String                @default("Unknown") @map("browser_name") @db.VarChar(100)
+  browserVersion         String?               @map("browser_version") @db.VarChar(50)
+  operatingSystem        String                @default("Unknown") @map("operating_system") @db.VarChar(100)
+  operatingSystemVersion String?               @map("operating_system_version") @db.VarChar(50)
+  processedAt            DateTime              @default(now()) @map("processed_at")
+
+  website  Website            @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  visitor  AnalyticsVisitor   @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  session  AnalyticsSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  rawEvent RawAnalyticsEvent? @relation(fields: [rawEventId], references: [id], onDelete: SetNull)
+  pageView AnalyticsPageView?
+
+  @@unique([websiteId, sourceEventId])
+  @@index([websiteId, occurredAt])
+  @@index([websiteId, type, occurredAt])
+  @@index([websiteId, eventName, occurredAt])
+  @@index([sessionId, occurredAt])
+  @@index([visitorId, occurredAt])
+  @@map("analytics_events")
+}
+
+model AnalyticsPageView {
+  id               String              @id @default(uuid()) @db.Uuid
+  websiteId        String              @map("website_id") @db.Uuid
+  visitorId        String              @map("visitor_id") @db.Uuid
+  sessionId        String              @map("session_id") @db.Uuid
+  analyticsEventId String              @unique @map("analytics_event_id") @db.Uuid
+  occurredAt       DateTime            @map("occurred_at")
+  pageUrl          String              @map("page_url") @db.VarChar(2048)
+  normalizedPath   String              @map("normalized_path") @db.VarChar(2048)
+  title            String?             @db.VarChar(512)
+  referrerUrl      String?             @map("referrer_url") @db.VarChar(2048)
+  sourceType       AnalyticsSourceType @default(UNKNOWN) @map("source_type")
+  sourceName       String              @default("Unknown") @map("source_name") @db.VarChar(160)
+  sourceDomain     String?             @map("source_domain") @db.VarChar(253)
+  countryCode      String?             @map("country_code") @db.Char(2)
+  deviceType       AnalyticsDeviceType @default(OTHER) @map("device_type")
+  browserName      String              @default("Unknown") @map("browser_name") @db.VarChar(100)
+  operatingSystem  String              @default("Unknown") @map("operating_system") @db.VarChar(100)
+  isEntry          Boolean             @default(false) @map("is_entry")
+  isExit           Boolean             @default(false) @map("is_exit")
+  createdAt        DateTime            @default(now()) @map("created_at")
+
+  website Website          @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  visitor AnalyticsVisitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  session AnalyticsSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  event   AnalyticsEvent   @relation(fields: [analyticsEventId], references: [id], onDelete: Cascade)
+
+  @@index([websiteId, occurredAt])
+  @@index([websiteId, normalizedPath, occurredAt])
+  @@index([websiteId, sourceType, occurredAt])
+  @@index([websiteId, countryCode, occurredAt])
+  @@index([sessionId, occurredAt])
+  @@map("analytics_page_views")
+}
+
+model AnalyticsHourlyAggregate {
+  id              String                      @id @default(uuid()) @db.Uuid
+  websiteId       String                      @map("website_id") @db.Uuid
+  bucketStart     DateTime                    @map("bucket_start")
+  bucketEnd       DateTime                    @map("bucket_end")
+  timeZone        String                      @map("time_zone") @db.VarChar(64)
+  dimension       AnalyticsAggregateDimension
+  dimensionKey    String                      @map("dimension_key") @db.VarChar(64)
+  dimensionValue  String                      @map("dimension_value") @db.VarChar(2048)
+  dimensionLabel  String                      @map("dimension_label") @db.VarChar(256)
+  visitors        Int                         @default(0)
+  sessions        Int                         @default(0)
+  pageViews       Int                         @default(0) @map("page_views")
+  events          Int                         @default(0)
+  customEvents    Int                         @default(0) @map("custom_events")
+  bounces         Int                         @default(0)
+  totalDurationMs BigInt                      @default(0) @map("total_duration_ms")
+  generatedAt     DateTime                    @default(now()) @map("generated_at")
+  updatedAt       DateTime                    @updatedAt @map("updated_at")
+
+  website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@unique([websiteId, bucketStart, dimension, dimensionKey])
+  @@index([websiteId, dimension, bucketStart])
+  @@index([websiteId, bucketStart])
+  @@map("analytics_hourly_aggregates")
+}
+
+model AnalyticsDailyAggregate {
+  id              String                      @id @default(uuid()) @db.Uuid
+  websiteId       String                      @map("website_id") @db.Uuid
+  bucketStart     DateTime                    @map("bucket_start")
+  bucketEnd       DateTime                    @map("bucket_end")
+  timeZone        String                      @map("time_zone") @db.VarChar(64)
+  dimension       AnalyticsAggregateDimension
+  dimensionKey    String                      @map("dimension_key") @db.VarChar(64)
+  dimensionValue  String                      @map("dimension_value") @db.VarChar(2048)
+  dimensionLabel  String                      @map("dimension_label") @db.VarChar(256)
+  visitors        Int                         @default(0)
+  sessions        Int                         @default(0)
+  pageViews       Int                         @default(0) @map("page_views")
+  events          Int                         @default(0)
+  customEvents    Int                         @default(0) @map("custom_events")
+  bounces         Int                         @default(0)
+  totalDurationMs BigInt                      @default(0) @map("total_duration_ms")
+  generatedAt     DateTime                    @default(now()) @map("generated_at")
+  updatedAt       DateTime                    @updatedAt @map("updated_at")
+
+  website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@unique([websiteId, bucketStart, dimension, dimensionKey])
+  @@index([websiteId, dimension, bucketStart])
+  @@index([websiteId, bucketStart])
+  @@map("analytics_daily_aggregates")
+}
+
+model AnalyticsProcessingState {
+  websiteId               String                    @id @map("website_id") @db.Uuid
+  status                  AnalyticsProcessingStatus @default(COMPLETED)
+  lastStartedAt           DateTime?                 @map("last_started_at")
+  lastCompletedAt         DateTime?                 @map("last_completed_at")
+  lastFailedAt            DateTime?                 @map("last_failed_at")
+  lastProcessedReceivedAt DateTime?                 @map("last_processed_received_at")
+  lastError               String?                   @map("last_error") @db.Text
+  totalRawEventsProcessed BigInt                    @default(0) @map("total_raw_events_processed")
+  updatedAt               DateTime                  @updatedAt @map("updated_at")
+
+  website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@map("analytics_processing_states")
+}
+
+model AnalyticsProcessingRun {
+  id                 String                    @id @default(uuid()) @db.Uuid
+  websiteId          String                    @map("website_id") @db.Uuid
+  initiatedByUserId  String?                   @map("initiated_by_user_id") @db.Uuid
+  status             AnalyticsProcessingStatus @default(RUNNING)
+  rawEventsProcessed Int                       @default(0) @map("raw_events_processed")
+  sessionsRebuilt    Int                       @default(0) @map("sessions_rebuilt")
+  hourlyBuckets      Int                       @default(0) @map("hourly_buckets")
+  dailyBuckets       Int                       @default(0) @map("daily_buckets")
+  startedAt          DateTime                  @default(now()) @map("started_at")
+  completedAt        DateTime?                 @map("completed_at")
+  failedAt           DateTime?                 @map("failed_at")
+  errorMessage       String?                   @map("error_message") @db.Text
+
+  website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@index([websiteId, startedAt])
+  @@index([status, startedAt])
+  @@map("analytics_processing_runs")
 }
 
 model RawAnalyticsEvent {
@@ -335,7 +584,8 @@ model RawAnalyticsEvent {
   ipHash         String?               @map("ip_hash") @db.VarChar(64)
   sdkVersion     String                @map("sdk_version") @db.VarChar(32)
 
-  website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  website        Website         @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  analyticsEvent AnalyticsEvent?
 
   @@unique([websiteId, eventId])
   @@index([websiteId, receivedAt])
@@ -362,6 +612,44 @@ model ApplicationTechnology {
   @@index([applicationId, type])
   @@map("application_technologies")
 }
+
+enum AnalyticsDeviceType {
+  DESKTOP
+  MOBILE
+  TABLET
+  BOT
+  OTHER
+}
+
+enum AnalyticsSourceType {
+  DIRECT
+  INTERNAL
+  SEARCH
+  SOCIAL
+  REFERRAL
+  UNKNOWN
+}
+
+enum AnalyticsAggregateDimension {
+  OVERVIEW
+  PAGE
+  SOURCE
+  COUNTRY
+  DEVICE
+  BROWSER
+  OPERATING_SYSTEM
+  CUSTOM_EVENT
+}
+
+enum AnalyticsProcessingStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+//idk Add these fields to RawAnalyticsEvent:
+// countryCode   String?         @map("country_code") @db.Char(2)
+// analyticsEvent AnalyticsEvent?
 
 model ApplicationLink {
   id            String              @id @default(uuid()) @db.Uuid

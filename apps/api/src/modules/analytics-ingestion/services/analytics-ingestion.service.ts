@@ -50,6 +50,7 @@ interface CollectionContext {
     origin?: string;
     ipAddress?: string;
     userAgent?: string;
+    countryCode?: string;
 }
 
 interface ValidWebsite {
@@ -65,7 +66,10 @@ interface ValidWebsite {
 export class AnalyticsIngestionService {
     private readonly maxBodyLength =
         65_536;
-
+    private readonly trustCountryHeader =
+        process.env
+            .ANALYTICS_TRUST_COUNTRY_HEADER ===
+        'true';
     private readonly ipHashSalt =
         process.env
             .ANALYTICS_IP_HASH_SALT ??
@@ -75,9 +79,36 @@ export class AnalyticsIngestionService {
         process.env
             .ANALYTICS_ALLOW_ORIGINLESS ===
         'true';
-
+    countryCode:
+        this.normalizeCountryCode(
+            context.countryCode,
+        ),
     constructor(
-        private readonly prisma:
+        private readonly prisma:private normalizeCountryCode(
+  value?: string,
+): string | null {
+  if (
+    !this.trustCountryHeader ||
+    !value
+  ) {
+    return null;
+  }
+
+  const code =
+    value
+      .trim()
+      .toUpperCase();
+
+  if (
+    !/^[A-Z]{2}$/.test(code) ||
+    code === 'XX' ||
+    code === 'T1'
+  ) {
+    return null;
+  }
+
+  return code;
+}
             PrismaService,
 
         private readonly rateLimit:

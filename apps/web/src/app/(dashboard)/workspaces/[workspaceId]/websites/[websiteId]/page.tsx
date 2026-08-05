@@ -15,6 +15,7 @@ import {
     ArrowLeft,
     Clock3,
     Code2,
+    DatabaseZap,
     Globe2,
     KeyRound,
     Link2,
@@ -234,6 +235,13 @@ export default function WebsiteDetailsPage() {
                         >
                             <Radio className="size-4" />
                             Raw events
+                        </Link>
+                        <Link
+                            href={`${baseHref}/analytics-engine`}
+                            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white transition hover:bg-brand-700"
+                        >
+                            <DatabaseZap className="size-4" />
+                            Analytics engine
                         </Link>
                     </div>
                 </div>
