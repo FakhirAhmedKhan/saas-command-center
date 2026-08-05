@@ -35,6 +35,10 @@ import {
 } from '@/components/ui/spinner';
 
 import {
+    TrackingStatusPanel,
+} from '@/features/tracking/components/tracking-status-panel';
+
+import {
     getWebsite,
 } from '@/features/websites/website-api';
 
@@ -51,6 +55,11 @@ const TRACKER_SCRIPT_URL =
     process.env
         .NEXT_PUBLIC_TRACKER_SCRIPT_URL ??
     'http://localhost:3002/tracker.js';
+
+const INGESTION_URL =
+    process.env
+        .NEXT_PUBLIC_INGESTION_URL ??
+    'http://localhost:4000/api/v1/collect';
 
 export default function WebsiteInstallationPage() {
     const params =
@@ -86,7 +95,8 @@ export default function WebsiteInstallationPage() {
 
     const [copied, setCopied] =
         useState<
-            'key' | 'snippet' | null
+            'key' | 'snippet' | 'custom'
+            | null
         >(null);
 
     useEffect(() => {
@@ -113,6 +123,7 @@ export default function WebsiteInstallationPage() {
                         storedKey,
                     );
                     setError(null);
+                    setLoading(false);
                 }
             } catch (
             loadError: unknown
@@ -124,9 +135,7 @@ export default function WebsiteInstallationPage() {
                             'Unable to load installation configuration.',
                         ),
                     );
-                }
-            } finally {
-                if (!cancelled) {
+
                     setLoading(false);
                 }
             }
@@ -153,14 +162,30 @@ export default function WebsiteInstallationPage() {
   src="${TRACKER_SCRIPT_URL}"
   data-website-id="${websiteId}"
   data-tracking-key="${key}"
+  data-endpoint="${INGESTION_URL}"
+  data-respect-dnt="true"
+  data-require-consent="false"
 ></script>`;
         }, [
             trackingKey,
             websiteId,
         ]);
 
+    const customEventSnippet =
+        `window.CommandCenterAnalytics?.track(
+  'signup_completed',
+  {
+    plan: 'pro',
+    source: 'pricing_page'
+  }
+);`;
+
     async function copy(
-        type: 'key' | 'snippet',
+        type:
+            | 'key'
+            | 'snippet'
+            | 'custom',
+
         value: string,
     ): Promise<void> {
         await navigator.clipboard
@@ -172,7 +197,7 @@ export default function WebsiteInstallationPage() {
             () => {
                 setCopied(null);
             },
-            1500,
+            1_500,
         );
     }
 
@@ -217,12 +242,12 @@ export default function WebsiteInstallationPage() {
                         </h1>
 
                         <p className="mt-2 text-sm leading-6 text-slate-500">
-                            Add the tracker to{' '}
+                            Install the lightweight tracker
+                            on{' '}
                             <strong>
                                 {website.domain}
                             </strong>
-                            . Event ingestion will become
-                            active in Phase 9.
+                            .
                         </p>
                     </div>
                 </div>
@@ -230,23 +255,23 @@ export default function WebsiteInstallationPage() {
 
             {!trackingKey ? (
                 <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-900">
-                    The complete tracking key is shown
-                    only after website creation or key
-                    rotation. Open{' '}
+                    The complete key is shown only after
+                    website creation or key rotation.
+                    Open{' '}
                     <Link
                         href={`${baseHref}/settings`}
                         className="font-semibold underline"
                     >
                         Website Settings
                     </Link>{' '}
-                    and rotate the key to generate a new
-                    installation key.
+                    and rotate the key.
                 </div>
             ) : (
                 <Card>
                     <CardHeader>
                         <div className="flex items-center gap-2">
                             <KeyRound className="size-5 text-brand-600" />
+
                             <h2 className="font-semibold text-slate-950">
                                 Tracking key
                             </h2>
@@ -279,11 +304,6 @@ export default function WebsiteInstallationPage() {
                                     : 'Copy'}
                             </Button>
                         </div>
-
-                        <p className="mt-3 text-sm text-red-600">
-                            Store this key securely. Do not
-                            commit it to a public repository.
-                        </p>
                     </CardContent>
                 </Card>
             )}
@@ -296,7 +316,7 @@ export default function WebsiteInstallationPage() {
 
                     <p className="mt-1 text-sm text-slate-500">
                         Add this code before the closing
-                        body tag on your website.
+                        body tag.
                     </p>
                 </CardHeader>
 
@@ -317,13 +337,15 @@ export default function WebsiteInstallationPage() {
                             )
                         }
                     >
-                        {copied === 'snippet' ? (
+                        {copied ===
+                            'snippet' ? (
                             <Check className="size-4" />
                         ) : (
                             <Clipboard className="size-4" />
                         )}
 
-                        {copied === 'snippet'
+                        {copied ===
+                            'snippet'
                             ? 'Copied'
                             : 'Copy snippet'}
                     </Button>
@@ -333,23 +355,56 @@ export default function WebsiteInstallationPage() {
             <Card>
                 <CardHeader>
                     <h2 className="font-semibold text-slate-950">
-                        Allowed origins
+                        Custom events
                     </h2>
+
+                    <p className="mt-1 text-sm text-slate-500">
+                        Form values are never captured
+                        automatically. Send only safe,
+                        non-sensitive properties.
+                    </p>
                 </CardHeader>
 
-                <CardContent className="space-y-3">
-                    {website.allowedOrigins.map(
-                        (origin) => (
-                            <code
-                                key={origin}
-                                className="block rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-700"
-                            >
-                                {origin}
-                            </code>
-                        ),
-                    )}
+                <CardContent>
+                    <pre className="overflow-x-auto rounded-2xl bg-slate-950 p-5 text-sm leading-6 text-slate-100">
+                        <code>
+                            {customEventSnippet}
+                        </code>
+                    </pre>
+
+                    <Button
+                        className="mt-4"
+                        variant="outline"
+                        onClick={() =>
+                            void copy(
+                                'custom',
+                                customEventSnippet,
+                            )
+                        }
+                    >
+                        {copied ===
+                            'custom' ? (
+                            <Check className="size-4" />
+                        ) : (
+                            <Clipboard className="size-4" />
+                        )}
+
+                        {copied ===
+                            'custom'
+                            ? 'Copied'
+                            : 'Copy example'}
+                    </Button>
                 </CardContent>
             </Card>
+
+            <TrackingStatusPanel
+                workspaceId={
+                    workspaceId
+                }
+                websiteId={
+                    websiteId
+                }
+            />
         </div>
     );
 }

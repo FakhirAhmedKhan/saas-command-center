@@ -8,10 +8,7 @@
     "pnpm": ">=11.0.0"
   },
   "scripts": {
-    "dev": "pnpm build:packages && concurrently -k --names API,WEB --prefix-colors cyan.bold,magenta.bold --prefix \"[{name}]\" \"pnpm --filter @command-center/api start:dev\" \"pnpm --filter @command-center/web dev\"",
     "build:packages": "pnpm --filter @command-center/shared-types build && pnpm --filter @command-center/validation build",
-    "dev:api": "pnpm build:packages && pnpm --filter @command-center/api start:dev",
-    "dev:web": "pnpm build:packages && pnpm --filter @command-center/web dev",
     "build": "pnpm build:packages && pnpm -r --if-present build",
     "lint": "pnpm -r --if-present lint",
     "typecheck": "pnpm build:packages && pnpm -r --if-present typecheck",
@@ -21,7 +18,11 @@
     "db:up": "docker compose -f infrastructure/docker-compose.yml up -d",
     "db:down": "docker compose -f infrastructure/docker-compose.yml down",
     "db:logs": "docker compose -f infrastructure/docker-compose.yml logs -f",
-    "db:status": "docker compose -f infrastructure/docker-compose.yml ps"
+    "db:status": "docker compose -f infrastructure/docker-compose.yml ps",
+    "dev": "concurrently -k --names API,WEB,TRACKER --prefix-colors cyan.bold,magenta.bold,yellow.bold --prefix \"[{name}]\" \"pnpm run dev:api\" \"pnpm run dev:web\" \"pnpm run dev:tracker\"",
+    "dev:api": "pnpm --filter @command-center/api start:dev",
+    "dev:web": "pnpm --filter @command-center/web dev",
+    "dev:tracker": "pnpm --filter @command-center/tracker dev"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",

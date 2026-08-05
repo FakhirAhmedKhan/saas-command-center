@@ -295,8 +295,9 @@ model Website {
   createdAt            DateTime  @default(now()) @map("created_at")
   updatedAt            DateTime  @updatedAt @map("updated_at")
 
-  workspace   Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  application SaasApplication? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  workspace   Workspace           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  application SaasApplication?    @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  rawEvents   RawAnalyticsEvent[]
 
   @@unique([workspaceId, domain])
   @@index([workspaceId, archivedAt])
@@ -305,6 +306,45 @@ model Website {
   @@index([applicationId])
   @@index([lastEventAt])
   @@map("websites")
+}
+
+model RawAnalyticsEvent {
+  id             String                @id @default(uuid()) @db.Uuid
+  websiteId      String                @map("website_id") @db.Uuid
+  eventId        String                @map("event_id") @db.VarChar(80)
+  type           RawAnalyticsEventType
+  visitorId      String                @map("visitor_id") @db.VarChar(80)
+  sessionId      String                @map("session_id") @db.VarChar(80)
+  occurredAt     DateTime              @map("occurred_at")
+  receivedAt     DateTime              @default(now()) @map("received_at")
+  pageUrl        String                @map("page_url") @db.VarChar(2048)
+  pagePath       String                @map("page_path") @db.VarChar(2048)
+  pageTitle      String?               @map("page_title") @db.VarChar(512)
+  referrerUrl    String?               @map("referrer_url") @db.VarChar(2048)
+  eventName      String?               @map("event_name") @db.VarChar(100)
+  properties     Json?
+  screenWidth    Int?                  @map("screen_width")
+  screenHeight   Int?                  @map("screen_height")
+  viewportWidth  Int?                  @map("viewport_width")
+  viewportHeight Int?                  @map("viewport_height")
+  language       String?               @db.VarChar(35)
+  clientTimeZone String?               @map("client_time_zone") @db.VarChar(64)
+  durationMs     Int?                  @map("duration_ms")
+  origin         String                @db.VarChar(512)
+  userAgent      String?               @map("user_agent") @db.VarChar(512)
+  ipHash         String?               @map("ip_hash") @db.VarChar(64)
+  sdkVersion     String                @map("sdk_version") @db.VarChar(32)
+
+  website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@unique([websiteId, eventId])
+  @@index([websiteId, receivedAt])
+  @@index([websiteId, occurredAt])
+  @@index([websiteId, type, occurredAt])
+  @@index([websiteId, visitorId, occurredAt])
+  @@index([websiteId, sessionId, occurredAt])
+  @@index([eventName])
+  @@map("raw_analytics_events")
 }
 
 model ApplicationTechnology {
@@ -468,4 +508,10 @@ enum DevelopmentTemplateType {
   MOBILE
   API
   ECOMMERCE
+}
+
+enum RawAnalyticsEventType {
+  PAGE_VIEW
+  HEARTBEAT
+  CUSTOM
 }

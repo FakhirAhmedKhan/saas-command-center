@@ -19,6 +19,7 @@ import {
     KeyRound,
     Link2,
     Pencil,
+    Radio,
     Settings,
 } from 'lucide-react';
 
@@ -227,6 +228,13 @@ export default function WebsiteDetailsPage() {
                             <Settings className="size-4" />
                             Settings
                         </Link>
+                        <Link
+                            href={`${baseHref}/events`}
+                            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                        >
+                            <Radio className="size-4" />
+                            Raw events
+                        </Link>
                     </div>
                 </div>
             </header>
@@ -347,8 +355,8 @@ function DetailRow({
 
             <p
                 className={`mt-1 break-all text-sm font-semibold text-slate-800 ${mono
-                        ? 'font-mono'
-                        : ''
+                    ? 'font-mono'
+                    : ''
                     }`}
             >
                 {value}

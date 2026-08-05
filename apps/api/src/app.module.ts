@@ -25,6 +25,7 @@ import { WorkspaceModule } from './modules/workspace/modules/workspaces.module';
 import { ActivityModule } from './modules/activity/activity.module';
 import { WebsitesModule } from './modules/websites/websites.module';
 import { DevelopmentModule } from './modules/development/development.module';
+import { AnalyticsIngestionModule } from './modules/analytics-ingestion/analytics-ingestion.module';
 
 @Module({
   imports: [
@@ -53,6 +54,8 @@ import { DevelopmentModule } from './modules/development/development.module';
     VersionModule,
     ActivityModule,
     DevelopmentModule,
+    AnalyticsIngestionModule,
+    
   ],
   providers: [
     {
