@@ -24,6 +24,7 @@ import { ApplicationsModule } from './modules/applications/applications.module';
 import { WorkspaceModule } from './modules/workspace/modules/workspaces.module';
 import { ActivityModule } from './modules/activity/activity.module';
 import { WebsitesModule } from './modules/websites/websites.module';
+import { DevelopmentModule } from './modules/development/development.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { WebsitesModule } from './modules/websites/websites.module';
     HealthModule,
     VersionModule,
     ActivityModule,
+    DevelopmentModule,
   ],
   providers: [
     {

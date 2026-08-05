@@ -15,6 +15,7 @@ import {
     ArrowLeft,
     CalendarDays,
     Globe2,
+    ListChecks,
     Pencil,
     Plus,
     Settings,
@@ -242,6 +243,13 @@ export default function ApplicationDetailsPage() {
                         >
                             <Globe2 className="size-4" />
                             Websites
+                        </Link>
+                        <Link
+                            href={`${baseHref}/development`}
+                            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white transition hover:bg-brand-700"
+                        >
+                            <ListChecks className="size-4" />
+                            Development
                         </Link>
 
                         <Link

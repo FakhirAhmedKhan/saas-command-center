@@ -137,6 +137,31 @@ export const ACTIVITY_BADGE_VARIANTS:
 
   WEBSITE_DISCONNECTED:
     'Website disconnected',
+  MILESTONE_CREATED: 'Milestone created',
+  MILESTONE_UPDATED: 'Milestone updated',
+  MILESTONE_COMPLETED: 'Milestone completed',
+  MILESTONE_REOPENED: 'Milestone reopened',
+  MILESTONE_SKIPPED: 'Milestone skipped',
+  MILESTONE_DELETED: 'Milestone deleted',
+  MILESTONE_REORDERED: 'Milestones reordered',
+
+  TASK_CREATED: 'Task created',
+  TASK_UPDATED: 'Task updated',
+  TASK_STATUS_CHANGED: 'Task status changed',
+  TASK_COMPLETED: 'Task completed',
+  TASK_REOPENED: 'Task reopened',
+  TASK_SKIPPED: 'Task skipped',
+  TASK_MOVED: 'Task moved',
+  TASK_DELETED: 'Task deleted',
+  TASK_REORDERED: 'Tasks reordered',
+
+  BLOCKER_CREATED: 'Blocker created',
+  BLOCKER_UPDATED: 'Blocker updated',
+  BLOCKER_RESOLVED: 'Blocker resolved',
+  BLOCKER_REOPENED: 'Blocker reopened',
+  BLOCKER_DELETED: 'Blocker deleted',
+
+  DEVELOPMENT_TEMPLATE_APPLIED: 'Template applied',
 };
 
 export const ACTOR_TYPE_LABELS:
@@ -161,4 +186,7 @@ export const ENTITY_TYPE_LABELS:
 
   LINK:
     'Link',
+  MILESTONE: 'Milestone',
+  TASK: 'Task',
+  BLOCKER: 'Blocker',
 };
