@@ -18,7 +18,7 @@ import {
 
 import {
   processAnalytics,
-} from './helpers/analytics-engine';
+} from './helpers/analytics-engine-old';
 
 import {
   buildEventBatch,

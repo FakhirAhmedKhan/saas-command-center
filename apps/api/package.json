@@ -44,7 +44,12 @@
         "test:e2e:analytics-engine-processing": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-engine-processing.e2e-spec.ts",
         "test:e2e:analytics-visitors": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-visitors.e2e-spec.ts",
         "test:e2e:analytics-sessions": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-sessions.e2e-spec.ts",
-        "test:e2e:analytics-pageviews": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-pageviews.e2e-spec.ts"
+        "test:e2e:analytics-pageviews": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-pageviews.e2e-spec.ts",
+        "test:e2e:analytics-aggregates": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-aggregates.e2e-spec.ts",
+        "test:e2e:analytics-timezones": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-timezones.e2e-spec.ts",
+        "test:e2e:analytics-late-events": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-late-events.e2e-spec.ts",
+        "test:e2e:analytics-reprocessing": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-reprocessing.e2e-spec.ts",
+        "test:e2e:analytics-retention": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-retention.e2e-spec.ts"
     },
     "dependencies": {
         "@command-center/shared-types": "workspace:*",

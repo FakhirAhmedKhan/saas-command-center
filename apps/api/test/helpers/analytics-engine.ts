@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+import type { Server } from 'node:http';
+
 import type {
   INestApplication,
 } from '@nestjs/common';
@@ -9,15 +10,29 @@ import request, {
 
 import {
   asRecord,
+  recordString,
 } from './application';
 
 import {
   withBearer,
 } from './auth';
 
+import {
+  RawAnalyticsEventType,
+} from 'src/generated/prisma/enums';
+
+import {
+  PrismaService,
+} from 'src/database/prisma.service';
+
 import type {
   WorkspaceTestUser,
 } from './workspace';
+
+import {
+  type TrackedWebsite,
+  uniqueTrackerId,
+} from './analytics-ingestion';
 
 export const analyticsEngineRoutes = {
   root(
@@ -114,7 +129,7 @@ export async function getAnonymousAnalyticsEngineStatus(
   websiteId: string,
 ): Promise<Response> {
   return request(
-    app.getHttpServer(),
+    app.getHttpServer() as Server,
   ).get(
     analyticsEngineRoutes.status(
       workspaceId,
@@ -250,4 +265,269 @@ export function expectAnalyticsSuccess(
       ].join(' '),
     );
   }
+}
+
+
+export interface AnalyticsAggregateListBody {
+  period: string;
+  dimension: string;
+  data: Record<string, unknown>[];
+}
+
+export async function listAnalyticsAggregates(
+  actor: WorkspaceTestUser,
+  workspaceId: string,
+  websiteId: string,
+  query: Record<string, string | number> = {},
+): Promise<Response> {
+  return actor.agent
+    .get(
+      analyticsEngineRoutes.aggregates(
+        workspaceId,
+        websiteId,
+      ),
+    )
+    .set(
+      withBearer(
+        actor.accessToken,
+      ),
+    )
+    .query(query);
+}
+
+export async function getAnonymousAnalyticsAggregates(
+  app: INestApplication,
+  workspaceId: string,
+  websiteId: string,
+  query: Record<string, string | number> = {},
+): Promise<Response> {
+  return request(
+    app.getHttpServer() as Server,
+  )
+    .get(
+      analyticsEngineRoutes.aggregates(
+        workspaceId,
+        websiteId,
+      ),
+    )
+    .query(query);
+}
+
+export async function reprocessAnalytics(
+  actor: WorkspaceTestUser,
+  workspaceId: string,
+  websiteId: string,
+  body: Record<string, unknown>,
+): Promise<Response> {
+  return actor.agent
+    .post(
+      analyticsEngineRoutes.reprocess(
+        workspaceId,
+        websiteId,
+      ),
+    )
+    .set(
+      withBearer(
+        actor.accessToken,
+      ),
+    )
+    .send(body);
+}
+
+export async function runAnalyticsRetention(
+  actor: WorkspaceTestUser,
+  workspaceId: string,
+  websiteId: string,
+): Promise<Response> {
+  return actor.agent
+    .post(
+      analyticsEngineRoutes.retention(
+        workspaceId,
+        websiteId,
+      ),
+    )
+    .set(
+      withBearer(
+        actor.accessToken,
+      ),
+    );
+}
+
+export async function runAnonymousAnalyticsRetention(
+  app: INestApplication,
+  workspaceId: string,
+  websiteId: string,
+): Promise<Response> {
+  return request(
+    app.getHttpServer() as Server,
+  ).post(
+    analyticsEngineRoutes.retention(
+      workspaceId,
+      websiteId,
+    ),
+  );
+}
+
+export function readAnalyticsAggregateList(
+  response: Response,
+): AnalyticsAggregateListBody {
+  const body =
+    asRecord(
+      response.body,
+    );
+
+  const data =
+    Array.isArray(
+      body?.data,
+    )
+      ? body.data
+        .map(asRecord)
+        .filter(
+          (
+            item,
+          ): item is Record<
+            string,
+            unknown
+          > =>
+            item !== undefined,
+        )
+      : [];
+
+  if (
+    !body ||
+    typeof body.period !==
+      'string' ||
+    typeof body.dimension !==
+      'string'
+  ) {
+    throw new Error(
+      [
+        'Unexpected analytics aggregate response.',
+        `Received: ${JSON.stringify(
+          response.body,
+        )}`,
+      ].join(' '),
+    );
+  }
+
+  return {
+    period:
+      body.period,
+    dimension:
+      body.dimension,
+    data,
+  };
+}
+
+export function findAggregate(
+  data: Record<string, unknown>[],
+  dimensionValue: string,
+): Record<string, unknown> | undefined {
+  return data.find(
+    (item) =>
+      recordString(
+        item,
+        'dimensionValue',
+      ) === dimensionValue,
+  );
+}
+
+export interface RawAnalyticsEventOverrides {
+  eventId: string;
+  type: RawAnalyticsEventType;
+  visitorId: string;
+  sessionId: string;
+  occurredAt: Date;
+  receivedAt: Date;
+  pageUrl: string;
+  pageTitle: string | null;
+  referrerUrl: string | null;
+  eventName: string | null;
+  durationMs: number | null;
+  countryCode: string | null;
+  userAgent: string | null;
+  sdkVersion: string;
+}
+
+export async function createRawAnalyticsEvent(
+  prisma: PrismaService,
+  trackedWebsite: TrackedWebsite,
+  overrides: Partial<RawAnalyticsEventOverrides> = {},
+) {
+  const pageUrl =
+    overrides.pageUrl ??
+    `${trackedWebsite.origin}/dashboard`;
+
+  const parsedUrl =
+    new URL(pageUrl);
+
+  const type =
+    overrides.type ??
+    RawAnalyticsEventType.PAGE_VIEW;
+
+  const eventName =
+    overrides.eventName !== undefined
+      ? overrides.eventName
+      : type ===
+        RawAnalyticsEventType.CUSTOM
+        ? 'custom_event'
+        : null;
+
+  return prisma.rawAnalyticsEvent.create({
+    data: {
+      websiteId:
+        trackedWebsite.id,
+      eventId:
+        overrides.eventId ??
+        uniqueTrackerId(
+          'raw_event',
+        ),
+      type,
+      visitorId:
+        overrides.visitorId ??
+        uniqueTrackerId(
+          'raw_visitor',
+        ),
+      sessionId:
+        overrides.sessionId ??
+        uniqueTrackerId(
+          'raw_session',
+        ),
+      occurredAt:
+        overrides.occurredAt ??
+        new Date(),
+      receivedAt:
+        overrides.receivedAt ??
+        new Date(),
+      pageUrl,
+      pagePath:
+        `${parsedUrl.pathname}${parsedUrl.search}`,
+      pageTitle:
+        overrides.pageTitle !== undefined
+          ? overrides.pageTitle
+          : 'Analytics page',
+      referrerUrl:
+        overrides.referrerUrl !== undefined
+          ? overrides.referrerUrl
+          : null,
+      eventName,
+      durationMs:
+        overrides.durationMs !== undefined
+          ? overrides.durationMs
+          : null,
+      origin:
+        trackedWebsite.origin,
+      userAgent:
+        overrides.userAgent !== undefined
+          ? overrides.userAgent
+          : 'CommandCenter-E2E/1.0',
+      countryCode:
+        overrides.countryCode !== undefined
+          ? overrides.countryCode
+          : null,
+      sdkVersion:
+        overrides.sdkVersion ??
+        '1.0.0-e2e',
+    },
+  });
 }

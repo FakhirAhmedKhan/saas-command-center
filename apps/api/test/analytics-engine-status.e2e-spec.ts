@@ -24,7 +24,7 @@ import {
   getAnalyticsEngineStatus,
   getAnonymousAnalyticsEngineStatus,
   readAnalyticsEngineStatus,
-} from './helpers/analytics-engine';
+} from './helpers/analytics-engine-old';
 
 import {
   buildTrackerEvent,

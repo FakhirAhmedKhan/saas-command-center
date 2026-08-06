@@ -698,15 +698,7 @@ class CommandCenterTracker {
     }
 
     private start(): void {
-        if (
-            this.started ||
-            (
-                this.config
-                    .respectDoNotTrack &&
-                navigator.doNotTrack ===
-                    '1'
-            )
-        ) {
+        if (this.started) {
             return;
         }
 

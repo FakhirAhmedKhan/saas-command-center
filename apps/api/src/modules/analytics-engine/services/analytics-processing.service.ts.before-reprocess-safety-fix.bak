@@ -170,15 +170,7 @@ export class AnalyticsProcessingService {
             websiteId,
         );
 
-                if (
-            !website.enabled ||
-            website.archivedAt !== null
-        ) {
-            throw new ForbiddenException(
-                'Analytics processing requires an enabled, active website',
-            );
-        }
-const dateFrom = new Date(dto.dateFrom);
+        const dateFrom = new Date(dto.dateFrom);
         const dateTo = new Date(dto.dateTo);
 
         this.validateReprocessRange(dateFrom, dateTo);
