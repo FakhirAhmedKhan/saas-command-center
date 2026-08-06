@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { createElement } from 'react';
 
 import {
   Archive,
@@ -115,19 +116,12 @@ const ACTIVITY_ICONS = {
   WEBSITE_DISCONNECTED: Globe2,
 } satisfies Record<ApplicationActivityType, LucideIcon>;
 
-function getActivityIcon(
-  activityType: ApplicationActivityType,
-): LucideIcon {
-  return ACTIVITY_ICONS[activityType];
-}
-
 export function ActivityItem({
   workspaceId,
   activity,
   showApplication = false,
 }: ActivityItemProps) {
-  const Icon = getActivityIcon(activity.activityType);
-  const metadataSummary = getMetadataSummary(activity);
+const metadataSummary = getMetadataSummary(activity);
 
   const activityLabel =
     ACTIVITY_TYPE_LABELS[activity.activityType];
@@ -164,11 +158,16 @@ export function ActivityItem({
       />
 
       <div className="relative z-10 flex size-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm">
-        <Icon
-          aria-hidden="true"
-          className="size-[18px]"
-          strokeWidth={1.8}
-        />
+        {createElement(
+          ACTIVITY_ICONS[
+            activity.activityType
+          ],
+          {
+            'aria-hidden': true,
+            className: 'size-[18px]',
+            strokeWidth: 1.8,
+          },
+        )}
       </div>
 
       <div className="min-w-0 flex-1 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">

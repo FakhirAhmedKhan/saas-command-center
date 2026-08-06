@@ -12,9 +12,7 @@ import {
     CheckCircle2,
     Flag,
     ListChecks,
-    Plus,
-    RefreshCw,
-    Sparkles,
+    Plus,    Sparkles,
 } from 'lucide-react';
 
 import {
@@ -289,13 +287,21 @@ export function DevelopmentBoard({
             return;
         }
 
-        [
-            orderedIds[index],
-            orderedIds[targetIndex],
-        ] = [
-                orderedIds[targetIndex],
-                orderedIds[index],
-            ];
+        const currentId =
+            orderedIds[index];
+
+        const targetId =
+            orderedIds[targetIndex];
+
+        if (!currentId || !targetId) {
+            return;
+        }
+
+        orderedIds[index] =
+            targetId;
+
+        orderedIds[targetIndex] =
+            currentId;
 
         await run(() =>
             reorderMilestones(

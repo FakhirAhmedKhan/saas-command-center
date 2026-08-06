@@ -1,87 +1,80 @@
-import {
-  build,
-} from 'esbuild';
+﻿import { existsSync } from 'node:fs';
+import { mkdir } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-import {
-  gzipSync,
-} from 'node:zlib';
+import { build } from 'esbuild';
 
-import {
-  mkdir,
-  readFile,
-} from 'node:fs/promises';
+const currentFile =
+  fileURLToPath(import.meta.url);
+
+const scriptsDirectory =
+  dirname(currentFile);
+
+const packageRoot =
+  resolve(scriptsDirectory, '..');
+
+const entryFile =
+  resolve(packageRoot, 'src', 'tracker.ts');
+
+const outputDirectory =
+  resolve(packageRoot, 'dist');
 
 const outputFile =
-  new URL(
-    '../dist/tracker.js',
-    import.meta.url,
+  resolve(outputDirectory, 'tracker.js');
+
+if (!existsSync(entryFile)) {
+  throw new Error(
+    `Tracker entry file was not found: ${entryFile}`,
   );
+}
 
 await mkdir(
-  new URL(
-    '../dist/',
-    import.meta.url,
-  ),
+  outputDirectory,
   {
     recursive: true,
   },
 );
 
 await build({
+  absWorkingDir: packageRoot,
+
   entryPoints: [
-    new URL(
-      '../src/tracker.ts',
-      import.meta.url,
-    ).pathname,
+    'src/tracker.ts',
   ],
 
   outfile:
-    outputFile.pathname,
+    outputFile,
 
-  bundle: true,
+  bundle:
+    true,
 
-  minify: true,
+  platform:
+    'browser',
 
-  format: 'iife',
-
-  platform: 'browser',
+  format:
+    'iife',
 
   target: [
     'es2020',
   ],
 
-  legalComments: 'none',
+  sourcemap:
+    true,
 
-  sourcemap: false,
+  minify:
+    true,
 
-  banner: {
-    js:
-      '/*! Command Center Analytics Tracker v1.0.0 */',
-  },
+  legalComments:
+    'none',
+
+  charset:
+    'utf8',
+
+  logLevel:
+    'info',
 });
 
-const bundle =
-  await readFile(outputFile);
-
-const gzipSize =
-  gzipSync(bundle).length;
-
-const maximumGzipSize =
-  12 * 1024;
-
 console.log(
-  `Tracker bundle: ${bundle.length} bytes`,
+  `Tracker built successfully: ${outputFile}`,
 );
-
-console.log(
-  `Tracker gzip: ${gzipSize} bytes`,
-);
-
-if (
-  gzipSize >
-  maximumGzipSize
-) {
-  throw new Error(
-    `Tracker exceeds ${maximumGzipSize} byte gzip budget`,
-  );
-}

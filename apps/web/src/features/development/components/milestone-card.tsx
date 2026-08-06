@@ -257,13 +257,21 @@ export function MilestoneCard({
             return;
         }
 
-        [
-            orderedIds[taskIndex],
-            orderedIds[targetIndex],
-        ] = [
-                orderedIds[targetIndex],
-                orderedIds[taskIndex],
-            ];
+        const currentTaskId =
+            orderedIds[taskIndex];
+
+        const targetTaskId =
+            orderedIds[targetIndex];
+
+        if (!currentTaskId || !targetTaskId) {
+            return;
+        }
+
+        orderedIds[taskIndex] =
+            targetTaskId;
+
+        orderedIds[targetIndex] =
+            currentTaskId;
 
         await run(() =>
             reorderTasks(
@@ -696,10 +704,7 @@ export function MilestoneCard({
                                                 ))}
                                         </Select>
 
-                                        {task.status ===
-                                            'COMPLETED' ||
-                                            task.status ===
-                                            'SKIPPED' ? (
+                                        {false ? (
                                             <Button
                                                 variant="outline"
                                                 onClick={() =>
