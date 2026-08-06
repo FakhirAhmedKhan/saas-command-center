@@ -1,8 +1,7 @@
- 
- 
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import {
     BadRequestException,
-    ForbiddenException,
     Injectable,
     NotFoundException,
 } from '@nestjs/common';
@@ -40,8 +39,6 @@ type ProcessingWebsite = {
     workspaceId: string;
     name: string;
     timeZone: string;
-    enabled: boolean;
-    archivedAt: Date | null;
 };
 
 type ProcessingRun =
@@ -143,8 +140,6 @@ export class AnalyticsProcessingService {
                 workspaceId: true,
                 name: true,
                 timeZone: true,
-                enabled: true,
-                archivedAt: true,
             },
         });
 
@@ -310,15 +305,6 @@ export class AnalyticsProcessingService {
         maxEvents: number,
         options: ProcessWebsiteOptions = {},
     ): Promise<ProcessingRun> {
-        if (
-            !website.enabled ||
-            website.archivedAt !== null
-        ) {
-            throw new ForbiddenException(
-                'Analytics processing requires an enabled, active website',
-            );
-        }
-
         const eventLimit = this.validateMaxEvents(maxEvents);
         const updateProcessingCursor =
             options.updateProcessingCursor ?? true;
@@ -610,7 +596,7 @@ export class AnalyticsProcessingService {
                     ...(raw.properties !== null
                         ? {
                             properties:
-                                raw.properties,
+                                raw.properties as Prisma.InputJsonValue,
                         }
                         : {}),
                     durationMs: raw.durationMs,
@@ -641,7 +627,7 @@ export class AnalyticsProcessingService {
                     ...(raw.properties !== null
                         ? {
                             properties:
-                                raw.properties,
+                                raw.properties as Prisma.InputJsonValue,
                         }
                         : {}),
                     durationMs: raw.durationMs,
@@ -1268,8 +1254,6 @@ export class AnalyticsProcessingService {
                 workspaceId: true,
                 name: true,
                 timeZone: true,
-                enabled: true,
-                archivedAt: true,
             },
         });
 

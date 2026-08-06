@@ -39,7 +39,12 @@
         "test:e2e:analytics-ingestion-security": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-ingestion-security.e2e-spec.ts",
         "test:e2e:analytics-ingestion-rate-limit": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-ingestion-rate-limit.e2e-spec.ts",
         "test:e2e:tracking-admin": "jest --config ./test/jest-e2e.config.cjs --runInBand tracking-admin.e2e-spec.ts",
-        "test:e2e:raw-events": "jest --config ./test/jest-e2e.config.cjs --runInBand raw-events.e2e-spec.ts"
+        "test:e2e:raw-events": "jest --config ./test/jest-e2e.config.cjs --runInBand raw-events.e2e-spec.ts",
+        "test:e2e:analytics-engine-status": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-engine-status.e2e-spec.ts",
+        "test:e2e:analytics-engine-processing": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-engine-processing.e2e-spec.ts",
+        "test:e2e:analytics-visitors": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-visitors.e2e-spec.ts",
+        "test:e2e:analytics-sessions": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-sessions.e2e-spec.ts",
+        "test:e2e:analytics-pageviews": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-pageviews.e2e-spec.ts"
     },
     "dependencies": {
         "@command-center/shared-types": "workspace:*",
