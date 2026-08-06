@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+import { Public } from '../../auth/decorators/public.decorator';
+ 
 import {
     Body,
     Controller,
@@ -19,6 +20,7 @@ import { AnalyticsIngestionService } from 'src/modules/analytics-ingestion/servi
 
 
 @ApiExcludeController()
+@Public()
 @Controller('collect')
 export class AnalyticsIngestionController {
     constructor(

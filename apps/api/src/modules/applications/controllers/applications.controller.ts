@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -11,7 +13,6 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import type { Request } from 'express';
@@ -53,7 +54,7 @@ interface AuthenticatedRequest extends Request {
 @Controller('workspaces/:workspaceId/applications')
 @UseGuards(JwtAuthGuard, WorkspaceAccessGuard, WorkspaceRolesGuard)
 export class ApplicationsController {
-  constructor(private readonly applicationsService: ApplicationsService) {}
+  constructor(private readonly applicationsService: ApplicationsService) { }
 
   @Post()
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
@@ -123,7 +124,11 @@ export class ApplicationsController {
   }
 
   @Post(':applicationId/archive')
-  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  @WorkspaceRoles(
+    WorkspaceRole.OWNER,
+    WorkspaceRole.ADMIN,
+  )
   archive(
     @Req()
     request: AuthenticatedRequest,
@@ -134,11 +139,19 @@ export class ApplicationsController {
     @Param('applicationId', ParseUUIDPipe)
     applicationId: string,
   ) {
-    return this.applicationsService.archive(workspaceId, applicationId, request.user.id);
+    return this.applicationsService.archive(
+      workspaceId,
+      applicationId,
+      request.user.id,
+    );
   }
 
   @Post(':applicationId/restore')
-  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  @WorkspaceRoles(
+    WorkspaceRole.OWNER,
+    WorkspaceRole.ADMIN,
+  )
   restore(
     @Req()
     request: AuthenticatedRequest,
@@ -149,7 +162,11 @@ export class ApplicationsController {
     @Param('applicationId', ParseUUIDPipe)
     applicationId: string,
   ) {
-    return this.applicationsService.restore(workspaceId, applicationId, request.user.id);
+    return this.applicationsService.restore(
+      workspaceId,
+      applicationId,
+      request.user.id,
+    );
   }
 
   @Delete(':applicationId')

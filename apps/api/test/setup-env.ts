@@ -1,4 +1,4 @@
-﻿import {
+import {
     config,
 } from 'dotenv';
 
@@ -63,3 +63,5 @@ process.env.DATABASE_URL =
  */
 process.env.ANALYTICS_PROCESSOR_ENABLED =
     'false';
+
+process.env.ANALYTICS_ALLOW_ORIGINLESS = 'false';

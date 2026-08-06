@@ -1,3 +1,4 @@
+import { Public } from '../../auth/decorators/public.decorator';
 import {
     Body,
     Controller,
@@ -20,6 +21,7 @@ import {
 } from '../services/analytics-ingestion.service';
 
 @ApiExcludeController()
+@Public()
 @Controller('collect')
 export class AnalyticsIngestionController {
     constructor(

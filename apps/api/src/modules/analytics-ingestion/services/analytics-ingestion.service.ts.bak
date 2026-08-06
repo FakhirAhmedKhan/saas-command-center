@@ -79,11 +79,9 @@ export class AnalyticsIngestionService {
         );
 
         this.allowOriginless = this.isEnabled(
-            process.env
-                .ANALYTICS_ALLOW_ORIGINLESS ??
-                this.configService.get<string>(
-                    'ANALYTICS_ALLOW_ORIGINLESS',
-                ),
+            this.configService.get(
+                'ANALYTICS_ALLOW_ORIGINLESS',
+            ),
         );
 
         this.ipHashSalt =
@@ -97,21 +95,6 @@ export class AnalyticsIngestionService {
         rawBody: unknown,
         context: CollectionContext,
     ): Promise<CollectEventsResult> {
-        const suppliedOrigin =
-            context.origin?.trim();
-
-        if (
-            (
-                !suppliedOrigin ||
-                suppliedOrigin ===
-                    'null'
-            ) &&
-            !this.allowOriginless
-        ) {
-            throw new ForbiddenException(
-                'Tracking requests require a valid Origin header',
-            );
-        }
         const payload =
             await this.parseAndValidatePayload(rawBody);
 

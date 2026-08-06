@@ -26,26 +26,34 @@ import {
 
 function transformBoolean({
     value,
+    obj,
+    key,
 }: {
     value: unknown;
+    obj?: Record<string, unknown>;
+    key?: string;
 }): unknown {
+    const rawValue =
+        obj && key
+            ? obj[key]
+            : value;
+
     if (
-        value === true ||
-        value === 'true'
+        rawValue === true ||
+        rawValue === 'true'
     ) {
         return true;
     }
 
     if (
-        value === false ||
-        value === 'false'
+        rawValue === false ||
+        rawValue === 'false'
     ) {
         return false;
     }
 
-    return value;
+    return rawValue;
 }
-
 export class CreateWebsiteDto {
     @ApiProperty({
         example: 'SaaS Command Center',
