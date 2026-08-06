@@ -22,7 +22,8 @@
     "dev": "concurrently -k --names API,WEB,TRACKER --prefix-colors cyan.bold,magenta.bold,yellow.bold --prefix \"[{name}]\" \"pnpm run dev:api\" \"pnpm run dev:web\" \"pnpm run dev:tracker\"",
     "dev:api": "pnpm --filter @command-center/api start:dev",
     "dev:web": "pnpm --filter @command-center/web dev",
-    "dev:tracker": "pnpm --filter @command-center/tracker dev"
+    "dev:tracker": "pnpm --filter @command-center/tracker dev",
+    "test:full": "powershell -ExecutionPolicy Bypass -File scripts/test-full.ps1"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",

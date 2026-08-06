@@ -196,7 +196,7 @@ test.describe('Batch 10 application flows', () => {
 
     await page.locator('form').evaluate(
       (form) => {
-        (form as HTMLFormElement).noValidate = true;
+        form.noValidate = true;
       },
     );
 
