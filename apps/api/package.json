@@ -23,7 +23,9 @@
         "test:e2e:auth": "jest --config ./test/jest-e2e.json --runInBand auth.e2e-spec.ts",
         "test:e2e:workspaces": "jest --config ./test/jest-e2e.json --runInBand workspaces.e2e-spec.ts",
         "test:e2e:coverage": "jest --config ./test/jest-e2e.json --runInBand --coverage",
-        "lint:test": "eslint \"test/**/*.ts\" --max-warnings=0"
+        "lint:test": "eslint \"test/**/*.ts\" --max-warnings=0",
+        "test:e2e:members": "jest --config ./test/jest-e2e.json --runInBand workspace-members.e2e-spec.ts",
+        "test:e2e:roles": "jest --config ./test/jest-e2e.json --runInBand workspace-roles.e2e-spec.ts"
     },
     "dependencies": {
         "@command-center/shared-types": "workspace:*",
