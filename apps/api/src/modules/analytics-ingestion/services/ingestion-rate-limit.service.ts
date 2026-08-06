@@ -1,6 +1,6 @@
 import {
     Injectable,
-    TooManyRequestsException,
+    BadRequestException,
 } from '@nestjs/common';
 
 interface RateLimitBucket {
@@ -61,7 +61,7 @@ export class IngestionRateLimitService {
             eventCount >
             this.maxEvents
         ) {
-            throw new TooManyRequestsException(
+            throw new BadRequestException(
                 'Tracking rate limit exceeded',
             );
         }

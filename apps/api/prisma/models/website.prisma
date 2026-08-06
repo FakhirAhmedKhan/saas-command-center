@@ -1,0 +1,37 @@
+model Website {
+  id                   String    @id @default(uuid()) @db.Uuid
+  workspaceId          String    @map("workspace_id") @db.Uuid
+  applicationId        String?   @map("application_id") @db.Uuid
+  name                 String    @db.VarChar(160)
+  domain               String    @db.VarChar(253)
+  timeZone             String    @default("UTC") @map("time_zone") @db.VarChar(64)
+  enabled              Boolean   @default(true)
+  allowedOrigins       String[]  @default([]) @map("allowed_origins")
+  trackingKeyPrefix    String    @unique @map("tracking_key_prefix") @db.VarChar(32)
+  trackingKeyHash      String    @unique @map("tracking_key_hash") @db.VarChar(64)
+  trackingKeyRotatedAt DateTime  @default(now()) @map("tracking_key_rotated_at")
+  lastEventAt          DateTime? @map("last_event_at")
+  archivedAt           DateTime? @map("archived_at")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  workspace                Workspace                  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  application              SaasApplication?           @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  rawEvents                RawAnalyticsEvent[]
+  analyticsVisitors        AnalyticsVisitor[]
+  analyticsSessions        AnalyticsSession[]
+  analyticsEvents          AnalyticsEvent[]
+  analyticsPageViews       AnalyticsPageView[]
+  hourlyAggregates         AnalyticsHourlyAggregate[]
+  dailyAggregates          AnalyticsDailyAggregate[]
+  analyticsProcessingRuns  AnalyticsProcessingRun[]
+  analyticsProcessingState AnalyticsProcessingState?
+
+  @@unique([workspaceId, domain])
+  @@index([workspaceId, archivedAt])
+  @@index([workspaceId, enabled])
+  @@index([workspaceId, applicationId])
+  @@index([applicationId])
+  @@index([lastEventAt])
+  @@map("websites")
+}

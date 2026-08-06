@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import {
     Body,
     Controller,
@@ -14,10 +15,8 @@ import {
 import type {
     Request,
 } from 'express';
+import { AnalyticsIngestionService } from 'src/modules/analytics-ingestion/services/analytics-ingestion.service';
 
-import {
-    AnalyticsIngestionService,
-} from '../services/analytics-ingestion.service';
 
 @ApiExcludeController()
 @Controller('collect')

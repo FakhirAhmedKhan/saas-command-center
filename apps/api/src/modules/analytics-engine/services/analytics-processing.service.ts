@@ -1,16 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import {
     BadRequestException,
     Injectable,
     NotFoundException,
 } from '@nestjs/common';
 
-import {
-    createHash,
-} from 'node:crypto';
+import { createHash } from 'node:crypto';
 
-import {
-    Prisma,
-} from 'src/generated/prisma/client';
+import { Prisma } from 'src/generated/prisma/client';
 
 import {
     AnalyticsAggregateDimension,
@@ -19,18 +17,14 @@ import {
     RawAnalyticsEventType,
 } from 'src/generated/prisma/enums';
 
-import {
-    PrismaService,
-} from 'src/database/prisma.service';
+import { PrismaService } from 'src/database/prisma.service';
 
 import {
     AnalyticsAggregatePeriod,
     ReprocessAnalyticsDto,
 } from '../dto/analytics-engine.dto';
 
-import {
-    calculateSessionMetrics,
-} from '../utils/analytics-metrics';
+import { calculateSessionMetrics } from '../utils/analytics-metrics';
 
 import {
     normalizeAnalyticsPage,
@@ -38,9 +32,7 @@ import {
     parseUserAgent,
 } from '../utils/analytics-normalization';
 
-import {
-    getAnalyticsBucket,
-} from '../utils/analytics-time';
+import { getAnalyticsBucket } from '../utils/analytics-time';
 
 type ProcessingWebsite = {
     id: string;
@@ -49,68 +41,86 @@ type ProcessingWebsite = {
     timeZone: string;
 };
 
+type ProcessingRun =
+    Prisma.AnalyticsProcessingRunGetPayload<Record<string, never>>;
+
 type RawEvent =
     Prisma.RawAnalyticsEventGetPayload<Record<string, never>>;
+
+type AnalyticsSessionRecord =
+    Prisma.AnalyticsSessionGetPayload<Record<string, never>>;
+
+interface ProcessingRange {
+    dateFrom: Date;
+    dateTo: Date;
+}
+
+interface ProcessWebsiteOptions {
+    range?: ProcessingRange;
+    updateProcessingCursor?: boolean;
+    incrementProcessedTotal?: boolean;
+}
 
 interface BatchResult {
     processed: number;
     sessionIds: string[];
-    visitorIds: string[];
     hourlyBuckets: string[];
     dailyBuckets: string[];
-    lastReceivedAt:
-    Date | null;
+    lastReceivedAt: Date | null;
+}
+
+interface RebuiltSessionResult {
+    previousStartedAt: Date;
+    session: AnalyticsSessionRecord;
+}
+
+export interface RetentionResult {
+    rawEventsDeleted: number;
+    sessionsDeleted: number;
+    visitorsDeleted: number;
+    hourlyAggregatesDeleted: number;
+    dailyAggregatesDeleted: number;
 }
 
 interface MutableAggregate {
-    dimension:
-    AnalyticsAggregateDimension;
-
+    dimension: AnalyticsAggregateDimension;
     value: string;
-
     label: string;
-
-    visitors:
-    Set<string>;
-
-    sessions:
-    Set<string>;
-
+    visitors: Set<string>;
+    sessions: Set<string>;
     pageViews: number;
-
     events: number;
-
     customEvents: number;
-
     bounces: number;
-
     totalDurationMs: bigint;
 }
 
+const DEFAULT_MAX_EVENTS = 5_000;
+const MAX_PROCESSING_EVENTS = 100_000;
+const PROCESSING_BATCH_SIZE = 250;
+const MAX_REPROCESS_RANGE_MS = 31 * 24 * 60 * 60 * 1_000;
+const DEFAULT_RAW_RETENTION_DAYS = 30;
+const DEFAULT_NORMALIZED_RETENTION_DAYS = 400;
+const DEFAULT_AGGREGATE_RETENTION_DAYS = 730;
+const DAY_MS = 24 * 60 * 60 * 1_000;
+const MAX_ERROR_MESSAGE_LENGTH = 10_000;
+
 @Injectable()
 export class AnalyticsProcessingService {
-    private readonly batchSize =
-        250;
-
     constructor(
-        private readonly prisma:
-            PrismaService,
+        private readonly prisma: PrismaService,
     ) { }
 
     async processForWorkspace(
         workspaceId: string,
         websiteId: string,
-        initiatedByUserId:
-            | string
-            | null,
-
-        maxEvents = 5000,
-    ) {
-        const website =
-            await this.requireWebsite(
-                workspaceId,
-                websiteId,
-            );
+        initiatedByUserId: string | null,
+        maxEvents = DEFAULT_MAX_EVENTS,
+    ): Promise<ProcessingRun> {
+        const website = await this.requireWebsite(
+            workspaceId,
+            websiteId,
+        );
 
         return this.processWebsite(
             website,
@@ -121,27 +131,20 @@ export class AnalyticsProcessingService {
 
     async processWebsiteById(
         websiteId: string,
-        maxEvents = 5000,
-    ) {
-        const website =
-            await this.prisma
-                .website.findUnique({
-                    where: {
-                        id: websiteId,
-                    },
-
-                    select: {
-                        id: true,
-                        workspaceId: true,
-                        name: true,
-                        timeZone: true,
-                    },
-                });
+        maxEvents = DEFAULT_MAX_EVENTS,
+    ): Promise<ProcessingRun> {
+        const website = await this.prisma.website.findUnique({
+            where: { id: websiteId },
+            select: {
+                id: true,
+                workspaceId: true,
+                name: true,
+                timeZone: true,
+            },
+        });
 
         if (!website) {
-            throw new NotFoundException(
-                'Website not found',
-            );
+            throw new NotFoundException('Website not found');
         }
 
         return this.processWebsite(
@@ -156,1184 +159,703 @@ export class AnalyticsProcessingService {
         websiteId: string,
         dto: ReprocessAnalyticsDto,
         initiatedByUserId: string,
-    ) {
-        const website =
-            await this.requireWebsite(
-                workspaceId,
-                websiteId,
-            );
-
-        const dateFrom =
-            new Date(dto.dateFrom);
-
-        const dateTo =
-            new Date(dto.dateTo);
-
-        this.validateReprocessRange(
-            dateFrom,
-            dateTo,
+    ): Promise<ProcessingRun> {
+        const website = await this.requireWebsite(
+            workspaceId,
+            websiteId,
         );
 
-        await this.prisma
-            .$transaction(
-                async (transaction) => {
-                    await transaction
-                        .analyticsEvent
-                        .deleteMany({
-                            where: {
-                                websiteId,
+        const dateFrom = new Date(dto.dateFrom);
+        const dateTo = new Date(dto.dateTo);
 
-                                occurredAt: {
-                                    gte: dateFrom,
-                                    lt: dateTo,
-                                },
-                            },
-                        });
+        this.validateReprocessRange(dateFrom, dateTo);
+
+        const maxEvents = this.validateMaxEvents(
+            dto.maxEvents ?? DEFAULT_MAX_EVENTS,
+        );
+
+        const rawEventCount = await this.prisma.rawAnalyticsEvent.count({
+            where: {
+                websiteId,
+                occurredAt: {
+                    gte: dateFrom,
+                    lt: dateTo,
                 },
+            },
+        });
+
+        if (rawEventCount > maxEvents) {
+            throw new BadRequestException(
+                `The selected range contains ${rawEventCount} raw events, but maxEvents is ${maxEvents}`,
             );
+        }
+
+        /*
+         * Delete only normalized rows that still reference a raw event.
+         * Historical normalized rows whose raw source was already removed
+         * by retention must not be deleted because they cannot be rebuilt.
+         */
+        await this.prisma.analyticsEvent.deleteMany({
+            where: {
+                websiteId,
+                rawEventId: { not: null },
+                occurredAt: {
+                    gte: dateFrom,
+                    lt: dateTo,
+                },
+            },
+        });
 
         return this.processWebsite(
             website,
             initiatedByUserId,
-            dto.maxEvents,
+            maxEvents,
+            {
+                range: { dateFrom, dateTo },
+                updateProcessingCursor: false,
+                incrementProcessedTotal: false,
+            },
         );
     }
 
     async runRetention(
         workspaceId: string,
         websiteId: string,
-    ) {
-        await this.requireWebsite(
-            workspaceId,
-            websiteId,
+    ): Promise<RetentionResult> {
+        await this.requireWebsite(workspaceId, websiteId);
+
+        const rawRetentionDays = this.readPositiveInteger(
+            process.env.ANALYTICS_RAW_RETENTION_DAYS,
+            DEFAULT_RAW_RETENTION_DAYS,
         );
 
-        const rawRetentionDays =
-            this.readPositiveInteger(
-                process.env
-                    .ANALYTICS_RAW_RETENTION_DAYS,
-                30,
-            );
+        const normalizedRetentionDays = this.readPositiveInteger(
+            process.env.ANALYTICS_NORMALIZED_RETENTION_DAYS,
+            DEFAULT_NORMALIZED_RETENTION_DAYS,
+        );
 
-        const normalizedRetentionDays =
-            this.readPositiveInteger(
-                process.env
-                    .ANALYTICS_NORMALIZED_RETENTION_DAYS,
-                400,
-            );
+        const aggregateRetentionDays = this.readPositiveInteger(
+            process.env.ANALYTICS_AGGREGATE_RETENTION_DAYS,
+            DEFAULT_AGGREGATE_RETENTION_DAYS,
+        );
 
-        const aggregateRetentionDays =
-            this.readPositiveInteger(
-                process.env
-                    .ANALYTICS_AGGREGATE_RETENTION_DAYS,
-                730,
-            );
+        const now = Date.now();
+        const rawCutoff = new Date(now - rawRetentionDays * DAY_MS);
+        const normalizedCutoff = new Date(
+            now - normalizedRetentionDays * DAY_MS,
+        );
+        const aggregateCutoff = new Date(
+            now - aggregateRetentionDays * DAY_MS,
+        );
 
-        const now =
-            Date.now();
-
-        const rawCutoff =
-            new Date(
-                now -
-                rawRetentionDays *
-                86_400_000,
-            );
-
-        const normalizedCutoff =
-            new Date(
-                now -
-                normalizedRetentionDays *
-                86_400_000,
-            );
-
-        const aggregateCutoff =
-            new Date(
-                now -
-                aggregateRetentionDays *
-                86_400_000,
-            );
-
-        return this.prisma
-            .$transaction(
-                async (transaction) => {
-                    const raw =
-                        await transaction
-                            .rawAnalyticsEvent
-                            .deleteMany({
-                                where: {
-                                    websiteId,
-
-                                    receivedAt: {
-                                        lt: rawCutoff,
-                                    },
-
-                                    analyticsEvent: {
-                                        isNot: null,
-                                    },
-                                },
-                            });
-
-                    const sessions =
-                        await transaction
-                            .analyticsSession
-                            .deleteMany({
-                                where: {
-                                    websiteId,
-
-                                    endedAt: {
-                                        lt:
-                                            normalizedCutoff,
-                                    },
-                                },
-                            });
-
-                    const visitors =
-                        await transaction
-                            .analyticsVisitor
-                            .deleteMany({
-                                where: {
-                                    websiteId,
-
-                                    sessions: {
-                                        none: {},
-                                    },
-                                },
-                            });
-
-                    const hourly =
-                        await transaction
-                            .analyticsHourlyAggregate
-                            .deleteMany({
-                                where: {
-                                    websiteId,
-
-                                    bucketStart: {
-                                        lt:
-                                            aggregateCutoff,
-                                    },
-                                },
-                            });
-
-                    const daily =
-                        await transaction
-                            .analyticsDailyAggregate
-                            .deleteMany({
-                                where: {
-                                    websiteId,
-
-                                    bucketStart: {
-                                        lt:
-                                            aggregateCutoff,
-                                    },
-                                },
-                            });
-
-                    return {
-                        rawEventsDeleted:
-                            raw.count,
-
-                        sessionsDeleted:
-                            sessions.count,
-
-                        visitorsDeleted:
-                            visitors.count,
-
-                        hourlyAggregatesDeleted:
-                            hourly.count,
-
-                        dailyAggregatesDeleted:
-                            daily.count,
-                    };
+        return this.prisma.$transaction(async (transaction) => {
+            const raw = await transaction.rawAnalyticsEvent.deleteMany({
+                where: {
+                    websiteId,
+                    receivedAt: { lt: rawCutoff },
+                    analyticsEvent: { isNot: null },
                 },
-            );
+            });
+
+            const sessions = await transaction.analyticsSession.deleteMany({
+                where: {
+                    websiteId,
+                    endedAt: { lt: normalizedCutoff },
+                },
+            });
+
+            const visitors = await transaction.analyticsVisitor.deleteMany({
+                where: {
+                    websiteId,
+                    sessions: { none: {} },
+                    events: { none: {} },
+                    pageViews: { none: {} },
+                },
+            });
+
+            const hourly =
+                await transaction.analyticsHourlyAggregate.deleteMany({
+                    where: {
+                        websiteId,
+                        bucketStart: { lt: aggregateCutoff },
+                    },
+                });
+
+            const daily =
+                await transaction.analyticsDailyAggregate.deleteMany({
+                    where: {
+                        websiteId,
+                        bucketStart: { lt: aggregateCutoff },
+                    },
+                });
+
+            return {
+                rawEventsDeleted: raw.count,
+                sessionsDeleted: sessions.count,
+                visitorsDeleted: visitors.count,
+                hourlyAggregatesDeleted: hourly.count,
+                dailyAggregatesDeleted: daily.count,
+            };
+        });
     }
 
     private async processWebsite(
         website: ProcessingWebsite,
-        initiatedByUserId:
-            | string
-            | null,
-
+        initiatedByUserId: string | null,
         maxEvents: number,
-    ) {
-        const run =
-            await this.prisma
-                .analyticsProcessingRun
-                .create({
-                    data: {
-                        websiteId:
-                            website.id,
+        options: ProcessWebsiteOptions = {},
+    ): Promise<ProcessingRun> {
+        const eventLimit = this.validateMaxEvents(maxEvents);
+        const updateProcessingCursor =
+            options.updateProcessingCursor ?? true;
+        const incrementProcessedTotal =
+            options.incrementProcessedTotal ?? true;
 
-                        initiatedByUserId,
+        const run = await this.prisma.analyticsProcessingRun.create({
+            data: {
+                websiteId: website.id,
+                initiatedByUserId,
+                status: AnalyticsProcessingStatus.RUNNING,
+            },
+        });
 
-                        status:
-                            AnalyticsProcessingStatus.RUNNING,
-                    },
-                });
-
-        await this.prisma
-            .analyticsProcessingState
-            .upsert({
-                where: {
-                    websiteId:
-                        website.id,
-                },
-
-                create: {
-                    websiteId:
-                        website.id,
-
-                    status:
-                        AnalyticsProcessingStatus.RUNNING,
-
-                    lastStartedAt:
-                        run.startedAt,
-                },
-
-                update: {
-                    status:
-                        AnalyticsProcessingStatus.RUNNING,
-
-                    lastStartedAt:
-                        run.startedAt,
-
-                    lastError: null,
-                },
-            });
+        await this.prisma.analyticsProcessingState.upsert({
+            where: { websiteId: website.id },
+            create: {
+                websiteId: website.id,
+                status: AnalyticsProcessingStatus.RUNNING,
+                lastStartedAt: run.startedAt,
+            },
+            update: {
+                status: AnalyticsProcessingStatus.RUNNING,
+                lastStartedAt: run.startedAt,
+                lastError: null,
+            },
+        });
 
         let totalProcessed = 0;
-
-        const sessionIds =
-            new Set<string>();
-
-        const hourlyBuckets =
-            new Set<string>();
-
-        const dailyBuckets =
-            new Set<string>();
-
-        let lastReceivedAt:
-            Date | null = null;
+        const sessionIds = new Set<string>();
+        const hourlyBuckets = new Set<string>();
+        const dailyBuckets = new Set<string>();
+        let lastReceivedAt: Date | null = null;
 
         try {
-            while (
-                totalProcessed <
-                maxEvents
-            ) {
-                const remaining =
-                    maxEvents -
-                    totalProcessed;
+            while (totalProcessed < eventLimit) {
+                const remaining = eventLimit - totalProcessed;
 
-                const rawEvents =
-                    await this.prisma
-                        .rawAnalyticsEvent
-                        .findMany({
-                            where: {
-                                websiteId:
-                                    website.id,
-
-                                analyticsEvent:
-                                    null,
+                const where: Prisma.RawAnalyticsEventWhereInput = {
+                    websiteId: website.id,
+                    analyticsEvent: { is: null },
+                    ...(options.range
+                        ? {
+                            occurredAt: {
+                                gte: options.range.dateFrom,
+                                lt: options.range.dateTo,
                             },
+                        }
+                        : {}),
+                };
 
-                            orderBy: [
-                                {
-                                    receivedAt:
-                                        'asc',
-                                },
-                                {
-                                    id: 'asc',
-                                },
-                            ],
+                const rawEvents = await this.prisma.rawAnalyticsEvent.findMany({
+                    where,
+                    orderBy: [
+                        { receivedAt: 'asc' },
+                        { id: 'asc' },
+                    ],
+                    take: Math.min(PROCESSING_BATCH_SIZE, remaining),
+                });
 
-                            take:
-                                Math.min(
-                                    this.batchSize,
-                                    remaining,
-                                ),
-                        });
-
-                if (
-                    rawEvents.length === 0
-                ) {
+                if (rawEvents.length === 0) {
                     break;
                 }
 
-                const result =
-                    await this.prisma
-                        .$transaction(
-                            (transaction) =>
-                                this.processBatch(
-                                    transaction,
-                                    website,
-                                    rawEvents,
-                                ),
-                        );
-
-                totalProcessed +=
-                    result.processed;
-
-                result.sessionIds.forEach(
-                    (id) =>
-                        sessionIds.add(id),
+                const result = await this.prisma.$transaction((transaction) =>
+                    this.processBatch(transaction, website, rawEvents),
                 );
 
-                result.hourlyBuckets.forEach(
-                    (value) =>
-                        hourlyBuckets.add(
-                            value,
-                        ),
-                );
+                totalProcessed += result.processed;
 
-                result.dailyBuckets.forEach(
-                    (value) =>
-                        dailyBuckets.add(
-                            value,
-                        ),
-                );
-
-                if (
-                    result.lastReceivedAt
-                ) {
-                    lastReceivedAt =
-                        result.lastReceivedAt;
+                for (const id of result.sessionIds) {
+                    sessionIds.add(id);
                 }
 
-                if (
-                    result.processed === 0
-                ) {
+                for (const value of result.hourlyBuckets) {
+                    hourlyBuckets.add(value);
+                }
+
+                for (const value of result.dailyBuckets) {
+                    dailyBuckets.add(value);
+                }
+
+                if (result.lastReceivedAt) {
+                    lastReceivedAt = result.lastReceivedAt;
+                }
+
+                if (result.processed === 0) {
                     break;
                 }
             }
 
-            for (
-                const bucketValue
-                of hourlyBuckets
-            ) {
+            for (const bucketValue of hourlyBuckets) {
                 await this.rebuildBucket(
                     website,
                     AnalyticsAggregatePeriod.HOURLY,
-                    new Date(
-                        bucketValue,
-                    ),
+                    new Date(bucketValue),
                 );
             }
 
-            for (
-                const bucketValue
-                of dailyBuckets
-            ) {
+            for (const bucketValue of dailyBuckets) {
                 await this.rebuildBucket(
                     website,
                     AnalyticsAggregatePeriod.DAILY,
-                    new Date(
-                        bucketValue,
-                    ),
+                    new Date(bucketValue),
                 );
             }
 
-            const completedAt =
-                new Date();
+            const completedAt = new Date();
 
             const completedRun =
-                await this.prisma
-                    .analyticsProcessingRun
-                    .update({
-                        where: {
-                            id: run.id,
-                        },
-
-                        data: {
-                            status:
-                                AnalyticsProcessingStatus.COMPLETED,
-
-                            rawEventsProcessed:
-                                totalProcessed,
-
-                            sessionsRebuilt:
-                                sessionIds.size,
-
-                            hourlyBuckets:
-                                hourlyBuckets.size,
-
-                            dailyBuckets:
-                                dailyBuckets.size,
-
-                            completedAt,
-                        },
-                    });
-
-            await this.prisma
-                .analyticsProcessingState
-                .upsert({
-                    where: {
-                        websiteId:
-                            website.id,
-                    },
-
-                    create: {
-                        websiteId:
-                            website.id,
-
-                        status:
-                            AnalyticsProcessingStatus.COMPLETED,
-
-                        lastStartedAt:
-                            run.startedAt,
-
-                        lastCompletedAt:
-                            completedAt,
-
-                        lastProcessedReceivedAt:
-                            lastReceivedAt,
-
-                        totalRawEventsProcessed:
-                            totalProcessed,
-                    },
-
-                    update: {
-                        status:
-                            AnalyticsProcessingStatus.COMPLETED,
-
-                        lastCompletedAt:
-                            completedAt,
-
-                        lastProcessedReceivedAt:
-                            lastReceivedAt ??
-                            undefined,
-
-                        lastError: null,
-
-                        totalRawEventsProcessed: {
-                            increment:
-                                totalProcessed,
-                        },
+                await this.prisma.analyticsProcessingRun.update({
+                    where: { id: run.id },
+                    data: {
+                        status: AnalyticsProcessingStatus.COMPLETED,
+                        rawEventsProcessed: totalProcessed,
+                        sessionsRebuilt: sessionIds.size,
+                        hourlyBuckets: hourlyBuckets.size,
+                        dailyBuckets: dailyBuckets.size,
+                        completedAt,
                     },
                 });
 
+            await this.prisma.analyticsProcessingState.upsert({
+                where: { websiteId: website.id },
+                create: {
+                    websiteId: website.id,
+                    status: AnalyticsProcessingStatus.COMPLETED,
+                    lastStartedAt: run.startedAt,
+                    lastCompletedAt: completedAt,
+                    lastProcessedReceivedAt: updateProcessingCursor
+                        ? lastReceivedAt
+                        : null,
+                    totalRawEventsProcessed: incrementProcessedTotal
+                        ? totalProcessed
+                        : 0,
+                },
+                update: {
+                    status: AnalyticsProcessingStatus.COMPLETED,
+                    lastCompletedAt: completedAt,
+                    lastError: null,
+                    ...(updateProcessingCursor && lastReceivedAt
+                        ? { lastProcessedReceivedAt: lastReceivedAt }
+                        : {}),
+                    ...(incrementProcessedTotal && totalProcessed > 0
+                        ? {
+                            totalRawEventsProcessed: {
+                                increment: totalProcessed,
+                            },
+                        }
+                        : {}),
+                },
+            });
+
             return completedRun;
         } catch (error: unknown) {
-            const failedAt =
-                new Date();
-
+            const failedAt = new Date();
             const message =
                 error instanceof Error
                     ? error.message
                     : 'Analytics processing failed';
+            const safeMessage = message.slice(0, MAX_ERROR_MESSAGE_LENGTH);
 
-            await this.prisma
-                .$transaction([
-                    this.prisma
-                        .analyticsProcessingRun
-                        .update({
-                            where: {
-                                id: run.id,
-                            },
-
-                            data: {
-                                status:
-                                    AnalyticsProcessingStatus.FAILED,
-
-                                rawEventsProcessed:
-                                    totalProcessed,
-
-                                sessionsRebuilt:
-                                    sessionIds.size,
-
-                                failedAt,
-
-                                errorMessage:
-                                    message.slice(
-                                        0,
-                                        10_000,
-                                    ),
-                            },
-                        }),
-
-                    this.prisma
-                        .analyticsProcessingState
-                        .upsert({
-                            where: {
-                                websiteId:
-                                    website.id,
-                            },
-
-                            create: {
-                                websiteId:
-                                    website.id,
-
-                                status:
-                                    AnalyticsProcessingStatus.FAILED,
-
-                                lastStartedAt:
-                                    run.startedAt,
-
-                                lastFailedAt:
-                                    failedAt,
-
-                                lastError:
-                                    message.slice(
-                                        0,
-                                        10_000,
-                                    ),
-                            },
-
-                            update: {
-                                status:
-                                    AnalyticsProcessingStatus.FAILED,
-
-                                lastFailedAt:
-                                    failedAt,
-
-                                lastError:
-                                    message.slice(
-                                        0,
-                                        10_000,
-                                    ),
-                            },
-                        }),
-                ]);
+            await this.prisma.$transaction([
+                this.prisma.analyticsProcessingRun.update({
+                    where: { id: run.id },
+                    data: {
+                        status: AnalyticsProcessingStatus.FAILED,
+                        rawEventsProcessed: totalProcessed,
+                        sessionsRebuilt: sessionIds.size,
+                        hourlyBuckets: hourlyBuckets.size,
+                        dailyBuckets: dailyBuckets.size,
+                        failedAt,
+                        errorMessage: safeMessage,
+                    },
+                }),
+                this.prisma.analyticsProcessingState.upsert({
+                    where: { websiteId: website.id },
+                    create: {
+                        websiteId: website.id,
+                        status: AnalyticsProcessingStatus.FAILED,
+                        lastStartedAt: run.startedAt,
+                        lastFailedAt: failedAt,
+                        lastError: safeMessage,
+                    },
+                    update: {
+                        status: AnalyticsProcessingStatus.FAILED,
+                        lastFailedAt: failedAt,
+                        lastError: safeMessage,
+                    },
+                }),
+            ]);
 
             throw error;
         }
     }
 
     private async processBatch(
-        transaction:
-            Prisma.TransactionClient,
-
-        website:
-            ProcessingWebsite,
-
-        rawEvents:
-            RawEvent[],
+        transaction: Prisma.TransactionClient,
+        website: ProcessingWebsite,
+        rawEvents: RawEvent[],
     ): Promise<BatchResult> {
-        const affectedSessions =
-            new Set<string>();
-
-        const affectedVisitors =
-            new Set<string>();
-
-        const hourlyBuckets =
-            new Set<string>();
-
-        const dailyBuckets =
-            new Set<string>();
-
+        const affectedSessions = new Set<string>();
+        const affectedVisitors = new Set<string>();
+        const hourlyBuckets = new Set<string>();
+        const dailyBuckets = new Set<string>();
         let processed = 0;
 
         for (const raw of rawEvents) {
-            const page =
-                normalizeAnalyticsPage(
-                    raw.pageUrl,
-                );
+            const page = normalizeAnalyticsPage(raw.pageUrl);
+            const source = normalizeSource(raw.referrerUrl, page.origin);
+            const agent = parseUserAgent(raw.userAgent);
+            const rawCountryCode = this.readRawCountryCode(raw);
 
-            const source =
-                normalizeSource(
-                    raw.referrerUrl,
-                    page.origin,
-                );
-
-            const agent =
-                parseUserAgent(
-                    raw.userAgent,
-                );
-
-            let visitor =
-                await transaction
-                    .analyticsVisitor
-                    .findUnique({
-                        where: {
-                            websiteId_externalVisitorId:
-                            {
-                                websiteId:
-                                    website.id,
-
-                                externalVisitorId:
-                                    raw.visitorId,
-                            },
-                        },
-                    });
+            let visitor = await transaction.analyticsVisitor.findUnique({
+                where: {
+                    websiteId_externalVisitorId: {
+                        websiteId: website.id,
+                        externalVisitorId: raw.visitorId,
+                    },
+                },
+            });
 
             if (!visitor) {
-                visitor =
-                    await transaction
-                        .analyticsVisitor
-                        .create({
-                            data: {
-                                websiteId:
-                                    website.id,
-
-                                externalVisitorId:
-                                    raw.visitorId,
-
-                                firstSeenAt:
-                                    raw.occurredAt,
-
-                                lastSeenAt:
-                                    raw.occurredAt,
-                            },
-                        });
+                visitor = await transaction.analyticsVisitor.create({
+                    data: {
+                        websiteId: website.id,
+                        externalVisitorId: raw.visitorId,
+                        firstSeenAt: raw.occurredAt,
+                        lastSeenAt: raw.occurredAt,
+                    },
+                });
             }
 
-            let session =
-                await transaction
-                    .analyticsSession
-                    .findUnique({
-                        where: {
-                            websiteId_externalSessionId:
-                            {
-                                websiteId:
-                                    website.id,
+            let session = await transaction.analyticsSession.findUnique({
+                where: {
+                    websiteId_externalSessionId: {
+                        websiteId: website.id,
+                        externalSessionId: raw.sessionId,
+                    },
+                },
+            });
 
-                                externalSessionId:
-                                    raw.sessionId,
-                            },
-                        },
-                    });
+            if (session && session.visitorId !== visitor.id) {
+                throw new BadRequestException(
+                    'A session identifier cannot belong to multiple visitors',
+                );
+            }
 
             if (!session) {
-                session =
-                    await transaction
-                        .analyticsSession
-                        .create({
-                            data: {
-                                websiteId:
-                                    website.id,
-
-                                visitorId:
-                                    visitor.id,
-
-                                externalSessionId:
-                                    raw.sessionId,
-
-                                startedAt:
-                                    raw.occurredAt,
-
-                                endedAt:
-                                    raw.occurredAt,
-
-                                lastEventAt:
-                                    raw.occurredAt,
-
-                                referrerUrl:
-                                    raw.referrerUrl,
-
-                                sourceType:
-                                    source.sourceType,
-
-                                sourceName:
-                                    source.sourceName,
-
-                                sourceDomain:
-                                    source.sourceDomain,
-
-                                countryCode:
-                                    raw.countryCode,
-
-                                deviceType:
-                                    agent.deviceType,
-
-                                browserName:
-                                    agent.browserName,
-
-                                browserVersion:
-                                    agent.browserVersion,
-
-                                operatingSystem:
-                                    agent.operatingSystem,
-
-                                operatingSystemVersion:
-                                    agent.operatingSystemVersion,
-                            },
-                        });
+                session = await transaction.analyticsSession.create({
+                    data: {
+                        websiteId: website.id,
+                        visitorId: visitor.id,
+                        externalSessionId: raw.sessionId,
+                        startedAt: raw.occurredAt,
+                        endedAt: raw.occurredAt,
+                        lastEventAt: raw.occurredAt,
+                        referrerUrl: raw.referrerUrl,
+                        sourceType: source.sourceType,
+                        sourceName: source.sourceName,
+                        sourceDomain: source.sourceDomain,
+                        countryCode: rawCountryCode,
+                        deviceType: agent.deviceType,
+                        browserName: agent.browserName,
+                        browserVersion: agent.browserVersion,
+                        operatingSystem: agent.operatingSystem,
+                        operatingSystemVersion: agent.operatingSystemVersion,
+                    },
+                });
             }
 
-            const eventVisitorId =
-                session.visitorId;
+            const eventVisitorId = session.visitorId;
 
-            const analyticsEvent =
-                await transaction
-                    .analyticsEvent
-                    .upsert({
-                        where: {
-                            websiteId_sourceEventId:
-                            {
-                                websiteId:
-                                    website.id,
-
-                                sourceEventId:
-                                    raw.eventId,
-                            },
-                        },
-
-                        update: {
-                            receivedAt:
-                                raw.receivedAt,
-                        },
-
-                        create: {
-                            websiteId:
-                                website.id,
-
-                            visitorId:
-                                eventVisitorId,
-
-                            sessionId:
-                                session.id,
-
-                            rawEventId:
-                                raw.id,
-
-                            sourceEventId:
-                                raw.eventId,
-
-                            type:
-                                raw.type,
-
-                            eventName:
-                                raw.eventName,
-
-                            occurredAt:
-                                raw.occurredAt,
-
-                            receivedAt:
-                                raw.receivedAt,
-
-                            pageUrl:
-                                page.pageUrl,
-
-                            normalizedPath:
-                                page.normalizedPath,
-
-                            pageTitle:
-                                raw.pageTitle,
-
-                            referrerUrl:
-                                raw.referrerUrl,
-
-                            ...(raw.properties !==
-                                null
-                                ? {
-                                    properties:
-                                        raw.properties as Prisma.InputJsonValue,
-                                }
-                                : {}),
-
-                            durationMs:
-                                raw.durationMs,
-
-                            sourceType:
-                                source.sourceType,
-
-                            sourceName:
-                                source.sourceName,
-
-                            sourceDomain:
-                                source.sourceDomain,
-
-                            countryCode:
-                                raw.countryCode,
-
-                            deviceType:
-                                agent.deviceType,
-
-                            browserName:
-                                agent.browserName,
-
-                            browserVersion:
-                                agent.browserVersion,
-
-                            operatingSystem:
-                                agent.operatingSystem,
-
-                            operatingSystemVersion:
-                                agent.operatingSystemVersion,
-                        },
-                    });
+            const analyticsEvent = await transaction.analyticsEvent.upsert({
+                where: {
+                    websiteId_sourceEventId: {
+                        websiteId: website.id,
+                        sourceEventId: raw.eventId,
+                    },
+                },
+                update: {
+                    rawEventId: raw.id,
+                    receivedAt: raw.receivedAt,
+                    pageUrl: page.pageUrl,
+                    normalizedPath: page.normalizedPath,
+                    pageTitle: raw.pageTitle,
+                    referrerUrl: raw.referrerUrl,
+                    eventName: raw.eventName,
+                    ...(raw.properties !== null
+                        ? {
+                            properties:
+                                raw.properties as Prisma.InputJsonValue,
+                        }
+                        : {}),
+                    durationMs: raw.durationMs,
+                    sourceType: source.sourceType,
+                    sourceName: source.sourceName,
+                    sourceDomain: source.sourceDomain,
+                    countryCode: rawCountryCode,
+                    deviceType: agent.deviceType,
+                    browserName: agent.browserName,
+                    browserVersion: agent.browserVersion,
+                    operatingSystem: agent.operatingSystem,
+                    operatingSystemVersion: agent.operatingSystemVersion,
+                },
+                create: {
+                    websiteId: website.id,
+                    visitorId: eventVisitorId,
+                    sessionId: session.id,
+                    rawEventId: raw.id,
+                    sourceEventId: raw.eventId,
+                    type: raw.type,
+                    eventName: raw.eventName,
+                    occurredAt: raw.occurredAt,
+                    receivedAt: raw.receivedAt,
+                    pageUrl: page.pageUrl,
+                    normalizedPath: page.normalizedPath,
+                    pageTitle: raw.pageTitle,
+                    referrerUrl: raw.referrerUrl,
+                    ...(raw.properties !== null
+                        ? {
+                            properties:
+                                raw.properties as Prisma.InputJsonValue,
+                        }
+                        : {}),
+                    durationMs: raw.durationMs,
+                    sourceType: source.sourceType,
+                    sourceName: source.sourceName,
+                    sourceDomain: source.sourceDomain,
+                    countryCode: rawCountryCode,
+                    deviceType: agent.deviceType,
+                    browserName: agent.browserName,
+                    browserVersion: agent.browserVersion,
+                    operatingSystem: agent.operatingSystem,
+                    operatingSystemVersion: agent.operatingSystemVersion,
+                },
+            });
 
             if (
-                raw.type ===
-                RawAnalyticsEventType.PAGE_VIEW
+                analyticsEvent.sessionId !== session.id ||
+                analyticsEvent.visitorId !== eventVisitorId
             ) {
-                await transaction
-                    .analyticsPageView
-                    .upsert({
-                        where: {
-                            analyticsEventId:
-                                analyticsEvent.id,
-                        },
-
-                        update: {
-                            pageUrl:
-                                page.pageUrl,
-
-                            normalizedPath:
-                                page.normalizedPath,
-
-                            title:
-                                raw.pageTitle,
-                        },
-
-                        create: {
-                            websiteId:
-                                website.id,
-
-                            visitorId:
-                                eventVisitorId,
-
-                            sessionId:
-                                session.id,
-
-                            analyticsEventId:
-                                analyticsEvent.id,
-
-                            occurredAt:
-                                raw.occurredAt,
-
-                            pageUrl:
-                                page.pageUrl,
-
-                            normalizedPath:
-                                page.normalizedPath,
-
-                            title:
-                                raw.pageTitle,
-
-                            referrerUrl:
-                                raw.referrerUrl,
-
-                            sourceType:
-                                source.sourceType,
-
-                            sourceName:
-                                source.sourceName,
-
-                            sourceDomain:
-                                source.sourceDomain,
-
-                            countryCode:
-                                raw.countryCode,
-
-                            deviceType:
-                                agent.deviceType,
-
-                            browserName:
-                                agent.browserName,
-
-                            operatingSystem:
-                                agent.operatingSystem,
-                        },
-                    });
+                throw new BadRequestException(
+                    'An analytics event identifier cannot belong to multiple sessions or visitors',
+                );
             }
 
-            affectedSessions.add(
-                session.id,
-            );
+            if (raw.type === RawAnalyticsEventType.PAGE_VIEW) {
+                await transaction.analyticsPageView.upsert({
+                    where: { analyticsEventId: analyticsEvent.id },
+                    update: {
+                        visitorId: eventVisitorId,
+                        sessionId: session.id,
+                        occurredAt: raw.occurredAt,
+                        pageUrl: page.pageUrl,
+                        normalizedPath: page.normalizedPath,
+                        title: raw.pageTitle,
+                        referrerUrl: raw.referrerUrl,
+                        sourceType: source.sourceType,
+                        sourceName: source.sourceName,
+                        sourceDomain: source.sourceDomain,
+                        countryCode: rawCountryCode,
+                        deviceType: agent.deviceType,
+                        browserName: agent.browserName,
+                        operatingSystem: agent.operatingSystem,
+                    },
+                    create: {
+                        websiteId: website.id,
+                        visitorId: eventVisitorId,
+                        sessionId: session.id,
+                        analyticsEventId: analyticsEvent.id,
+                        occurredAt: raw.occurredAt,
+                        pageUrl: page.pageUrl,
+                        normalizedPath: page.normalizedPath,
+                        title: raw.pageTitle,
+                        referrerUrl: raw.referrerUrl,
+                        sourceType: source.sourceType,
+                        sourceName: source.sourceName,
+                        sourceDomain: source.sourceDomain,
+                        countryCode: rawCountryCode,
+                        deviceType: agent.deviceType,
+                        browserName: agent.browserName,
+                        operatingSystem: agent.operatingSystem,
+                    },
+                });
+            } else {
+                await transaction.analyticsPageView.deleteMany({
+                    where: { analyticsEventId: analyticsEvent.id },
+                });
+            }
 
-            affectedVisitors.add(
-                eventVisitorId,
-            );
+            affectedSessions.add(session.id);
+            affectedVisitors.add(eventVisitorId);
 
-            hourlyBuckets.add(
-                getAnalyticsBucket(
-                    raw.occurredAt,
-                    website.timeZone,
-                    AnalyticsAggregatePeriod.HOURLY,
-                ).start.toISOString(),
-            );
-
-            dailyBuckets.add(
-                getAnalyticsBucket(
-                    raw.occurredAt,
-                    website.timeZone,
-                    AnalyticsAggregatePeriod.DAILY,
-                ).start.toISOString(),
+            this.addAffectedBuckets(
+                hourlyBuckets,
+                dailyBuckets,
+                raw.occurredAt,
+                website.timeZone,
             );
 
             processed += 1;
         }
 
-        for (
-            const sessionId
-            of affectedSessions
-        ) {
-            const rebuilt =
-                await this.rebuildSession(
-                    transaction,
-                    sessionId,
-                );
-
-            hourlyBuckets.add(
-                getAnalyticsBucket(
-                    rebuilt.startedAt,
-                    website.timeZone,
-                    AnalyticsAggregatePeriod.HOURLY,
-                ).start.toISOString(),
+        for (const sessionId of affectedSessions) {
+            const rebuilt = await this.rebuildSession(
+                transaction,
+                sessionId,
             );
 
-            dailyBuckets.add(
-                getAnalyticsBucket(
-                    rebuilt.startedAt,
-                    website.timeZone,
-                    AnalyticsAggregatePeriod.DAILY,
-                ).start.toISOString(),
+            this.addAffectedBuckets(
+                hourlyBuckets,
+                dailyBuckets,
+                rebuilt.previousStartedAt,
+                website.timeZone,
+            );
+
+            this.addAffectedBuckets(
+                hourlyBuckets,
+                dailyBuckets,
+                rebuilt.session.startedAt,
+                website.timeZone,
             );
         }
 
-        for (
-            const visitorId
-            of affectedVisitors
-        ) {
-            await this.rebuildVisitor(
-                transaction,
-                visitorId,
-            );
+        for (const visitorId of affectedVisitors) {
+            await this.rebuildVisitor(transaction, visitorId);
         }
 
         return {
             processed,
-
-            sessionIds: [
-                ...affectedSessions,
-            ],
-
-            visitorIds: [
-                ...affectedVisitors,
-            ],
-
-            hourlyBuckets: [
-                ...hourlyBuckets,
-            ],
-
-            dailyBuckets: [
-                ...dailyBuckets,
-            ],
-
-            lastReceivedAt:
-                rawEvents.at(-1)
-                    ?.receivedAt ??
-                null,
+            sessionIds: [...affectedSessions],
+            hourlyBuckets: [...hourlyBuckets],
+            dailyBuckets: [...dailyBuckets],
+            lastReceivedAt: rawEvents.at(-1)?.receivedAt ?? null,
         };
     }
 
     private async rebuildSession(
-        transaction:
-            Prisma.TransactionClient,
-
+        transaction: Prisma.TransactionClient,
         sessionId: string,
-    ) {
-        const session =
-            await transaction
-                .analyticsSession
-                .findUniqueOrThrow({
-                    where: {
-                        id: sessionId,
-                    },
-                });
-
-        const events =
-            await transaction
-                .analyticsEvent
-                .findMany({
-                    where: {
-                        sessionId,
-                    },
-
-                    orderBy: [
-                        {
-                            occurredAt:
-                                'asc',
-                        },
-                        {
-                            id: 'asc',
-                        },
-                    ],
-                });
-
-        const pageViews =
-            await transaction
-                .analyticsPageView
-                .findMany({
-                    where: {
-                        sessionId,
-                    },
-
-                    orderBy: [
-                        {
-                            occurredAt:
-                                'asc',
-                        },
-                        {
-                            id: 'asc',
-                        },
-                    ],
-                });
-
-        if (events.length === 0) {
-            return session;
-        }
-
-        const metrics =
-            calculateSessionMetrics(
-                events,
-                pageViews,
-            );
-
-        const firstEvent =
-            events[0];
-
-        const firstPage =
-            pageViews[0] ??
-            null;
-
-        const lastPage =
-            pageViews.at(-1) ??
-            null;
-
-        await transaction
-            .analyticsPageView
-            .updateMany({
-                where: {
-                    sessionId,
-                },
-
-                data: {
-                    isEntry: false,
-                    isExit: false,
-                },
+    ): Promise<RebuiltSessionResult> {
+        const existingSession =
+            await transaction.analyticsSession.findUniqueOrThrow({
+                where: { id: sessionId },
             });
 
-        if (firstPage) {
-            await transaction
-                .analyticsPageView
-                .update({
-                    where: {
-                        id:
-                            firstPage.id,
-                    },
+        const events = await transaction.analyticsEvent.findMany({
+            where: { sessionId },
+            orderBy: [
+                { occurredAt: 'asc' },
+                { id: 'asc' },
+            ],
+        });
 
-                    data: {
-                        isEntry: true,
-                    },
-                });
+        const pageViews = await transaction.analyticsPageView.findMany({
+            where: { sessionId },
+            orderBy: [
+                { occurredAt: 'asc' },
+                { id: 'asc' },
+            ],
+        });
+
+        const firstEvent = events[0];
+
+        if (!firstEvent) {
+            return {
+                previousStartedAt: existingSession.startedAt,
+                session: existingSession,
+            };
         }
 
-        if (lastPage) {
-            await transaction
-                .analyticsPageView
-                .update({
-                    where: {
-                        id:
-                            lastPage.id,
-                    },
+        const metrics = calculateSessionMetrics(events, pageViews);
+        const firstPage = pageViews[0] ?? null;
+        const lastPage = pageViews.at(-1) ?? null;
+        const lastEvent = events.at(-1) ?? firstEvent;
 
-                    data: {
-                        isExit: true,
-                    },
-                });
-        }
+        await transaction.analyticsPageView.updateMany({
+            where: { sessionId },
+            data: {
+                isEntry: false,
+                isExit: false,
+            },
+        });
 
-        return transaction
-            .analyticsSession
-            .update({
-                where: {
-                    id: sessionId,
-                },
-
+        if (firstPage && lastPage && firstPage.id === lastPage.id) {
+            await transaction.analyticsPageView.update({
+                where: { id: firstPage.id },
                 data: {
-                    startedAt:
-                        metrics.startedAt,
-
-                    endedAt:
-                        metrics.endedAt,
-
-                    lastEventAt:
-                        events.at(-1)
-                            ?.occurredAt ??
-                        metrics.endedAt,
-
-                    durationMs:
-                        metrics.durationMs,
-
-                    engagedDurationMs:
-                        metrics.engagedDurationMs,
-
-                    eventCount:
-                        metrics.eventCount,
-
-                    pageViewCount:
-                        metrics.pageViewCount,
-
-                    customEventCount:
-                        metrics.customEventCount,
-
-                    bounced:
-                        metrics.bounced,
-
-                    entryPath:
-                        firstPage
-                            ?.normalizedPath ??
-                        null,
-
-                    exitPath:
-                        lastPage
-                            ?.normalizedPath ??
-                        null,
-
-                    entryTitle:
-                        firstPage?.title ??
-                        null,
-
-                    exitTitle:
-                        lastPage?.title ??
-                        null,
-
-                    referrerUrl:
-                        firstPage
-                            ?.referrerUrl ??
-                        firstEvent.referrerUrl,
-
-                    sourceType:
-                        firstPage
-                            ?.sourceType ??
-                        firstEvent.sourceType,
-
-                    sourceName:
-                        firstPage
-                            ?.sourceName ??
-                        firstEvent.sourceName,
-
-                    sourceDomain:
-                        firstPage
-                            ?.sourceDomain ??
-                        firstEvent.sourceDomain,
-
-                    countryCode:
-                        firstEvent.countryCode,
-
-                    deviceType:
-                        firstEvent.deviceType,
-
-                    browserName:
-                        firstEvent.browserName,
-
-                    browserVersion:
-                        firstEvent.browserVersion,
-
-                    operatingSystem:
-                        firstEvent.operatingSystem,
-
-                    operatingSystemVersion:
-                        firstEvent.operatingSystemVersion,
+                    isEntry: true,
+                    isExit: true,
                 },
             });
+        } else {
+            if (firstPage) {
+                await transaction.analyticsPageView.update({
+                    where: { id: firstPage.id },
+                    data: { isEntry: true },
+                });
+            }
+
+            if (lastPage) {
+                await transaction.analyticsPageView.update({
+                    where: { id: lastPage.id },
+                    data: { isExit: true },
+                });
+            }
+        }
+
+        const updatedSession = await transaction.analyticsSession.update({
+            where: { id: sessionId },
+            data: {
+                startedAt: metrics.startedAt,
+                endedAt: metrics.endedAt,
+                lastEventAt: lastEvent.occurredAt,
+                durationMs: metrics.durationMs,
+                engagedDurationMs: metrics.engagedDurationMs,
+                eventCount: metrics.eventCount,
+                pageViewCount: metrics.pageViewCount,
+                customEventCount: metrics.customEventCount,
+                bounced: metrics.bounced,
+                entryPath: firstPage?.normalizedPath ?? null,
+                exitPath: lastPage?.normalizedPath ?? null,
+                entryTitle: firstPage?.title ?? null,
+                exitTitle: lastPage?.title ?? null,
+                referrerUrl:
+                    firstPage?.referrerUrl ?? firstEvent.referrerUrl,
+                sourceType:
+                    firstPage?.sourceType ?? firstEvent.sourceType,
+                sourceName:
+                    firstPage?.sourceName ?? firstEvent.sourceName,
+                sourceDomain:
+                    firstPage?.sourceDomain ?? firstEvent.sourceDomain,
+                countryCode: firstEvent.countryCode,
+                deviceType: firstEvent.deviceType,
+                browserName: firstEvent.browserName,
+                browserVersion: firstEvent.browserVersion,
+                operatingSystem: firstEvent.operatingSystem,
+                operatingSystemVersion:
+                    firstEvent.operatingSystemVersion,
+            },
+        });
+
+        return {
+            previousStartedAt: existingSession.startedAt,
+            session: updatedSession,
+        };
     }
 
     private async rebuildVisitor(
-        transaction:
-            Prisma.TransactionClient,
-
+        transaction: Prisma.TransactionClient,
         visitorId: string,
     ): Promise<void> {
         const [
@@ -1341,499 +863,283 @@ export class AnalyticsProcessingService {
             sessionCount,
             pageViewCount,
             eventCount,
-        ] =
-            await Promise.all([
-                transaction
-                    .analyticsEvent
-                    .aggregate({
-                        where: {
-                            visitorId,
-                        },
+        ] = await Promise.all([
+            transaction.analyticsEvent.aggregate({
+                where: { visitorId },
+                _min: { occurredAt: true },
+                _max: { occurredAt: true },
+            }),
+            transaction.analyticsSession.count({
+                where: { visitorId },
+            }),
+            transaction.analyticsPageView.count({
+                where: { visitorId },
+            }),
+            transaction.analyticsEvent.count({
+                where: { visitorId },
+            }),
+        ]);
 
-                        _min: {
-                            occurredAt: true,
-                        },
+        const firstSeenAt = eventStats._min.occurredAt;
+        const lastSeenAt = eventStats._max.occurredAt;
 
-                        _max: {
-                            occurredAt: true,
-                        },
-                    }),
-
-                transaction
-                    .analyticsSession
-                    .count({
-                        where: {
-                            visitorId,
-                        },
-                    }),
-
-                transaction
-                    .analyticsPageView
-                    .count({
-                        where: {
-                            visitorId,
-                        },
-                    }),
-
-                transaction
-                    .analyticsEvent
-                    .count({
-                        where: {
-                            visitorId,
-                        },
-                    }),
-            ]);
-
-        if (
-            !eventStats._min
-                .occurredAt ||
-            !eventStats._max
-                .occurredAt
-        ) {
+        if (!firstSeenAt || !lastSeenAt) {
             return;
         }
 
-        await transaction
-            .analyticsVisitor
-            .update({
-                where: {
-                    id: visitorId,
-                },
-
-                data: {
-                    firstSeenAt:
-                        eventStats._min
-                            .occurredAt,
-
-                    lastSeenAt:
-                        eventStats._max
-                            .occurredAt,
-
-                    sessionCount,
-
-                    pageViewCount,
-
-                    eventCount,
-                },
-            });
+        await transaction.analyticsVisitor.update({
+            where: { id: visitorId },
+            data: {
+                firstSeenAt,
+                lastSeenAt,
+                sessionCount,
+                pageViewCount,
+                eventCount,
+            },
+        });
     }
 
     private async rebuildBucket(
-        website:
-            ProcessingWebsite,
-
-        period:
-            AnalyticsAggregatePeriod,
-
+        website: ProcessingWebsite,
+        period: AnalyticsAggregatePeriod,
         bucketStart: Date,
     ): Promise<void> {
-        const bucket =
-            getAnalyticsBucket(
-                bucketStart,
-                website.timeZone,
-                period,
-            );
+        const bucket = getAnalyticsBucket(
+            bucketStart,
+            website.timeZone,
+            period,
+        );
 
-        const [
-            events,
-            pageViews,
-            sessions,
-        ] =
-            await this.prisma
-                .$transaction([
-                    this.prisma
-                        .analyticsEvent
-                        .findMany({
-                            where: {
-                                websiteId:
-                                    website.id,
+        const [events, pageViews, sessions] =
+            await this.prisma.$transaction([
+                this.prisma.analyticsEvent.findMany({
+                    where: {
+                        websiteId: website.id,
+                        occurredAt: {
+                            gte: bucket.start,
+                            lt: bucket.end,
+                        },
+                    },
+                    select: {
+                        visitorId: true,
+                        sessionId: true,
+                        type: true,
+                        eventName: true,
+                    },
+                }),
+                this.prisma.analyticsPageView.findMany({
+                    where: {
+                        websiteId: website.id,
+                        occurredAt: {
+                            gte: bucket.start,
+                            lt: bucket.end,
+                        },
+                    },
+                    select: {
+                        visitorId: true,
+                        sessionId: true,
+                        normalizedPath: true,
+                        title: true,
+                    },
+                }),
+                this.prisma.analyticsSession.findMany({
+                    where: {
+                        websiteId: website.id,
+                        startedAt: {
+                            gte: bucket.start,
+                            lt: bucket.end,
+                        },
+                    },
+                    select: {
+                        id: true,
+                        visitorId: true,
+                        sourceName: true,
+                        countryCode: true,
+                        deviceType: true,
+                        browserName: true,
+                        operatingSystem: true,
+                        pageViewCount: true,
+                        eventCount: true,
+                        customEventCount: true,
+                        bounced: true,
+                        durationMs: true,
+                    },
+                }),
+            ]);
 
-                                occurredAt: {
-                                    gte:
-                                        bucket.start,
+        const aggregates = new Map<string, MutableAggregate>();
 
-                                    lt:
-                                        bucket.end,
-                                },
-                            },
-
-                            select: {
-                                visitorId: true,
-                                sessionId: true,
-                                type: true,
-                                eventName: true,
-                            },
-                        }),
-
-                    this.prisma
-                        .analyticsPageView
-                        .findMany({
-                            where: {
-                                websiteId:
-                                    website.id,
-
-                                occurredAt: {
-                                    gte:
-                                        bucket.start,
-
-                                    lt:
-                                        bucket.end,
-                                },
-                            },
-
-                            select: {
-                                visitorId: true,
-                                sessionId: true,
-                                normalizedPath:
-                                    true,
-                                title: true,
-                            },
-                        }),
-
-                    this.prisma
-                        .analyticsSession
-                        .findMany({
-                            where: {
-                                websiteId:
-                                    website.id,
-
-                                startedAt: {
-                                    gte:
-                                        bucket.start,
-
-                                    lt:
-                                        bucket.end,
-                                },
-                            },
-
-                            select: {
-                                id: true,
-                                visitorId: true,
-                                sourceName: true,
-                                countryCode: true,
-                                deviceType: true,
-                                browserName: true,
-                                operatingSystem:
-                                    true,
-                                pageViewCount:
-                                    true,
-                                eventCount: true,
-                                customEventCount:
-                                    true,
-                                bounced: true,
-                                durationMs: true,
-                            },
-                        }),
-                ]);
-
-        const aggregates =
-            new Map<
-                string,
-                MutableAggregate
-            >();
-
-        const overview =
-            this.getAggregate(
-                aggregates,
-                AnalyticsAggregateDimension.OVERVIEW,
-                'overview',
-                'Overview',
-            );
+        const overview = this.getAggregate(
+            aggregates,
+            AnalyticsAggregateDimension.OVERVIEW,
+            'overview',
+            'Overview',
+        );
 
         for (const event of events) {
-            overview.visitors.add(
-                event.visitorId,
-            );
-
-            overview.sessions.add(
-                event.sessionId,
-            );
-
+            overview.visitors.add(event.visitorId);
             overview.events += 1;
 
-            if (
-                event.type ===
-                RawAnalyticsEventType.CUSTOM
-            ) {
-                overview.customEvents +=
-                    1;
+            if (event.type === RawAnalyticsEventType.CUSTOM) {
+                overview.customEvents += 1;
 
-                const custom =
-                    this.getAggregate(
-                        aggregates,
-                        AnalyticsAggregateDimension.CUSTOM_EVENT,
-                        event.eventName ??
-                        'Unknown',
-
-                        event.eventName ??
-                        'Unknown',
-                    );
-
-                custom.visitors.add(
-                    event.visitorId,
+                const eventName = event.eventName ?? 'Unknown';
+                const custom = this.getAggregate(
+                    aggregates,
+                    AnalyticsAggregateDimension.CUSTOM_EVENT,
+                    eventName,
+                    eventName,
                 );
 
-                custom.sessions.add(
-                    event.sessionId,
-                );
-
+                custom.visitors.add(event.visitorId);
+                custom.sessions.add(event.sessionId);
                 custom.events += 1;
                 custom.customEvents += 1;
             }
         }
 
-        for (
-            const pageView
-            of pageViews
-        ) {
-            overview.pageViews +=
-                1;
+        for (const pageView of pageViews) {
+            overview.visitors.add(pageView.visitorId);
+            overview.pageViews += 1;
 
-            const page =
-                this.getAggregate(
-                    aggregates,
-                    AnalyticsAggregateDimension.PAGE,
-                    pageView.normalizedPath,
-                    pageView.title ??
-                    pageView.normalizedPath,
-                );
-
-            page.visitors.add(
-                pageView.visitorId,
+            const page = this.getAggregate(
+                aggregates,
+                AnalyticsAggregateDimension.PAGE,
+                pageView.normalizedPath,
+                pageView.title ?? pageView.normalizedPath,
             );
 
-            page.sessions.add(
-                pageView.sessionId,
-            );
-
+            page.visitors.add(pageView.visitorId);
+            page.sessions.add(pageView.sessionId);
             page.pageViews += 1;
             page.events += 1;
         }
 
-        for (
-            const session of sessions
-        ) {
-            overview.visitors.add(
-                session.visitorId,
-            );
-
-            overview.sessions.add(
-                session.id,
-            );
-
-            overview.bounces +=
-                session.bounced
-                    ? 1
-                    : 0;
-
-            overview.totalDurationMs +=
-                BigInt(
-                    session.durationMs,
-                );
+        for (const session of sessions) {
+            overview.visitors.add(session.visitorId);
+            overview.sessions.add(session.id);
+            overview.bounces += session.bounced ? 1 : 0;
+            overview.totalDurationMs += BigInt(session.durationMs);
 
             this.addSessionDimension(
                 aggregates,
                 AnalyticsAggregateDimension.SOURCE,
-                session.sourceName ||
-                'Unknown',
-                session.sourceName ||
-                'Unknown',
+                session.sourceName || 'Unknown',
+                session.sourceName || 'Unknown',
                 session,
             );
 
             this.addSessionDimension(
                 aggregates,
                 AnalyticsAggregateDimension.COUNTRY,
-                session.countryCode ??
-                'Unknown',
-                session.countryCode ??
-                'Unknown',
+                session.countryCode ?? 'Unknown',
+                session.countryCode ?? 'Unknown',
                 session,
             );
 
             this.addSessionDimension(
                 aggregates,
                 AnalyticsAggregateDimension.DEVICE,
-                session.deviceType ??
-                AnalyticsDeviceType.OTHER,
-                session.deviceType ??
-                'OTHER',
+                session.deviceType ?? AnalyticsDeviceType.OTHER,
+                session.deviceType ?? AnalyticsDeviceType.OTHER,
                 session,
             );
 
             this.addSessionDimension(
                 aggregates,
                 AnalyticsAggregateDimension.BROWSER,
-                session.browserName ||
-                'Unknown',
-                session.browserName ||
-                'Unknown',
+                session.browserName || 'Unknown',
+                session.browserName || 'Unknown',
                 session,
             );
 
             this.addSessionDimension(
                 aggregates,
                 AnalyticsAggregateDimension.OPERATING_SYSTEM,
-                session.operatingSystem ||
-                'Unknown',
-                session.operatingSystem ||
-                'Unknown',
+                session.operatingSystem || 'Unknown',
+                session.operatingSystem || 'Unknown',
                 session,
             );
         }
 
-        const data =
-            [...aggregates.values()]
-                .map((item) => ({
-                    websiteId:
-                        website.id,
+        const generatedAt = new Date();
 
-                    bucketStart:
-                        bucket.start,
+        const data = [...aggregates.values()].map((item) => ({
+            websiteId: website.id,
+            bucketStart: bucket.start,
+            bucketEnd: bucket.end,
+            timeZone: website.timeZone,
+            dimension: item.dimension,
+            dimensionKey: this.createDimensionKey(
+                item.dimension,
+                item.value,
+            ),
+            dimensionValue: item.value.slice(0, 2048),
+            dimensionLabel: item.label.slice(0, 256),
+            visitors: item.visitors.size,
+            sessions: item.sessions.size,
+            pageViews: item.pageViews,
+            events: item.events,
+            customEvents: item.customEvents,
+            bounces: item.bounces,
+            totalDurationMs: item.totalDurationMs,
+            generatedAt,
+        }));
 
-                    bucketEnd:
-                        bucket.end,
-
-                    timeZone:
-                        website.timeZone,
-
-                    dimension:
-                        item.dimension,
-
-                    dimensionKey:
-                        this.createDimensionKey(
-                            item.dimension,
-                            item.value,
-                        ),
-
-                    dimensionValue:
-                        item.value.slice(
-                            0,
-                            2048,
-                        ),
-
-                    dimensionLabel:
-                        item.label.slice(
-                            0,
-                            256,
-                        ),
-
-                    visitors:
-                        item.visitors.size,
-
-                    sessions:
-                        item.sessions.size,
-
-                    pageViews:
-                        item.pageViews,
-
-                    events:
-                        item.events,
-
-                    customEvents:
-                        item.customEvents,
-
-                    bounces:
-                        item.bounces,
-
-                    totalDurationMs:
-                        item.totalDurationMs,
-
-                    generatedAt:
-                        new Date(),
-                }));
-
-        if (
-            period ===
-            AnalyticsAggregatePeriod.HOURLY
-        ) {
-            await this.prisma
-                .$transaction(
-                    async (transaction) => {
-                        await transaction
-                            .analyticsHourlyAggregate
-                            .deleteMany({
-                                where: {
-                                    websiteId:
-                                        website.id,
-
-                                    bucketStart:
-                                        bucket.start,
-                                },
-                            });
-
-                        if (data.length > 0) {
-                            await transaction
-                                .analyticsHourlyAggregate
-                                .createMany({
-                                    data,
-                                });
-                        }
+        if (period === AnalyticsAggregatePeriod.HOURLY) {
+            await this.prisma.$transaction(async (transaction) => {
+                await transaction.analyticsHourlyAggregate.deleteMany({
+                    where: {
+                        websiteId: website.id,
+                        bucketStart: bucket.start,
                     },
-                );
+                });
+
+                if (data.length > 0) {
+                    await transaction.analyticsHourlyAggregate.createMany({
+                        data,
+                    });
+                }
+            });
 
             return;
         }
 
-        await this.prisma
-            .$transaction(
-                async (transaction) => {
-                    await transaction
-                        .analyticsDailyAggregate
-                        .deleteMany({
-                            where: {
-                                websiteId:
-                                    website.id,
-
-                                bucketStart:
-                                    bucket.start,
-                            },
-                        });
-
-                    if (data.length > 0) {
-                        await transaction
-                            .analyticsDailyAggregate
-                            .createMany({
-                                data,
-                            });
-                    }
+        await this.prisma.$transaction(async (transaction) => {
+            await transaction.analyticsDailyAggregate.deleteMany({
+                where: {
+                    websiteId: website.id,
+                    bucketStart: bucket.start,
                 },
-            );
+            });
+
+            if (data.length > 0) {
+                await transaction.analyticsDailyAggregate.createMany({
+                    data,
+                });
+            }
+        });
     }
 
     private getAggregate(
-        collection:
-            Map<
-                string,
-                MutableAggregate
-            >,
-
-        dimension:
-            AnalyticsAggregateDimension,
-
+        collection: Map<string, MutableAggregate>,
+        dimension: AnalyticsAggregateDimension,
         value: string,
-
         label: string,
     ): MutableAggregate {
-        const key =
-            `${dimension}:${value}`;
-
-        const existing =
-            collection.get(key);
+        const key = `${dimension}:${value}`;
+        const existing = collection.get(key);
 
         if (existing) {
             return existing;
         }
 
-        const created:
-            MutableAggregate = {
+        const created: MutableAggregate = {
             dimension,
             value,
             label,
-            visitors:
-                new Set<string>(),
-            sessions:
-                new Set<string>(),
+            visitors: new Set<string>(),
+            sessions: new Set<string>(),
             pageViews: 0,
             events: 0,
             customEvents: 0,
@@ -1841,121 +1147,118 @@ export class AnalyticsProcessingService {
             totalDurationMs: 0n,
         };
 
-        collection.set(
-            key,
-            created,
-        );
-
+        collection.set(key, created);
         return created;
     }
 
     private addSessionDimension(
-        collection:
-            Map<
-                string,
-                MutableAggregate
-            >,
-
-        dimension:
-            AnalyticsAggregateDimension,
-
+        collection: Map<string, MutableAggregate>,
+        dimension: AnalyticsAggregateDimension,
         value: string,
-
         label: string,
-
         session: {
             id: string;
             visitorId: string;
             pageViewCount: number;
             eventCount: number;
-            customEventCount:
-            number;
+            customEventCount: number;
             bounced: boolean;
             durationMs: number;
         },
     ): void {
-        const aggregate =
-            this.getAggregate(
-                collection,
-                dimension,
-                value,
-                label,
-            );
-
-        aggregate.visitors.add(
-            session.visitorId,
+        const aggregate = this.getAggregate(
+            collection,
+            dimension,
+            value,
+            label,
         );
 
-        aggregate.sessions.add(
-            session.id,
-        );
-
-        aggregate.pageViews +=
-            session.pageViewCount;
-
-        aggregate.events +=
-            session.eventCount;
-
-        aggregate.customEvents +=
-            session.customEventCount;
-
-        aggregate.bounces +=
-            session.bounced
-                ? 1
-                : 0;
-
-        aggregate.totalDurationMs +=
-            BigInt(
-                session.durationMs,
-            );
+        aggregate.visitors.add(session.visitorId);
+        aggregate.sessions.add(session.id);
+        aggregate.pageViews += session.pageViewCount;
+        aggregate.events += session.eventCount;
+        aggregate.customEvents += session.customEventCount;
+        aggregate.bounces += session.bounced ? 1 : 0;
+        aggregate.totalDurationMs += BigInt(session.durationMs);
     }
 
     private createDimensionKey(
-        dimension:
-            AnalyticsAggregateDimension,
-
+        dimension: AnalyticsAggregateDimension,
         value: string,
     ): string {
-        if (
-            dimension ===
-            AnalyticsAggregateDimension.OVERVIEW
-        ) {
+        if (dimension === AnalyticsAggregateDimension.OVERVIEW) {
             return 'overview';
         }
 
-        return createHash(
-            'sha256',
-        )
-            .update(
-                `${dimension}:${value}`,
-            )
+        return createHash('sha256')
+            .update(`${dimension}:${value}`)
             .digest('hex');
+    }
+
+    private addAffectedBuckets(
+        hourlyBuckets: Set<string>,
+        dailyBuckets: Set<string>,
+        occurredAt: Date,
+        timeZone: string,
+    ): void {
+        hourlyBuckets.add(
+            getAnalyticsBucket(
+                occurredAt,
+                timeZone,
+                AnalyticsAggregatePeriod.HOURLY,
+            ).start.toISOString(),
+        );
+
+        dailyBuckets.add(
+            getAnalyticsBucket(
+                occurredAt,
+                timeZone,
+                AnalyticsAggregatePeriod.DAILY,
+            ).start.toISOString(),
+        );
+    }
+
+    /**
+     * This compatibility reader compiles before and after the optional
+     * RawAnalyticsEvent.countryCode field is generated by Prisma.
+     */
+    private readRawCountryCode(
+        raw: RawEvent,
+    ): string | null {
+        const value = (
+            raw as RawEvent & { countryCode?: unknown }
+        ).countryCode;
+
+        if (typeof value !== 'string') {
+            return null;
+        }
+
+        const countryCode = value.trim().toUpperCase();
+
+        return /^[A-Z]{2}$/.test(countryCode)
+            ? countryCode
+            : null;
     }
 
     private async requireWebsite(
         workspaceId: string,
         websiteId: string,
     ): Promise<ProcessingWebsite> {
-        const website =
-            await this.prisma
-                .website.findFirst({
-                    where: {
-                        id: websiteId,
-                        workspaceId,
-                    },
-
-                    select: {
-                        id: true,
-                        workspaceId: true,
-                        name: true,
-                        timeZone: true,
-                    },
-                });
+        const website = await this.prisma.website.findFirst({
+            where: {
+                id: websiteId,
+                workspaceId,
+            },
+            select: {
+                id: true,
+                workspaceId: true,
+                name: true,
+                timeZone: true,
+            },
+        });
 
         if (!website) {
-            throw new NotFoundException(
-                'Website not found',
-            );
+            throw new NotFoundException('Website not found');
         }
 
         return website;
@@ -1966,33 +1269,23 @@ export class AnalyticsProcessingService {
         dateTo: Date,
     ): void {
         if (
-            Number.isNaN(
-                dateFrom.getTime(),
-            ) ||
-            Number.isNaN(
-                dateTo.getTime(),
-            )
+            Number.isNaN(dateFrom.getTime()) ||
+            Number.isNaN(dateTo.getTime())
         ) {
             throw new BadRequestException(
                 'Reprocessing dates are invalid',
             );
         }
 
-        if (
-            dateTo <= dateFrom
-        ) {
+        if (dateTo <= dateFrom) {
             throw new BadRequestException(
                 'dateTo must be after dateFrom',
             );
         }
 
-        const maximumRange =
-            31 * 86_400_000;
-
         if (
-            dateTo.getTime() -
-            dateFrom.getTime() >
-            maximumRange
+            dateTo.getTime() - dateFrom.getTime() >
+            MAX_REPROCESS_RANGE_MS
         ) {
             throw new BadRequestException(
                 'A reprocessing request cannot exceed 31 days',
@@ -2000,16 +1293,29 @@ export class AnalyticsProcessingService {
         }
     }
 
+    private validateMaxEvents(value: number): number {
+        if (!Number.isInteger(value) || value <= 0) {
+            throw new BadRequestException(
+                'maxEvents must be a positive integer',
+            );
+        }
+
+        if (value > MAX_PROCESSING_EVENTS) {
+            throw new BadRequestException(
+                `maxEvents cannot exceed ${MAX_PROCESSING_EVENTS}`,
+            );
+        }
+
+        return value;
+    }
+
     private readPositiveInteger(
         value: string | undefined,
         fallback: number,
     ): number {
-        const parsed =
-            Number(value);
+        const parsed = Number(value);
 
-        return Number.isInteger(
-            parsed,
-        ) && parsed > 0
+        return Number.isInteger(parsed) && parsed > 0
             ? parsed
             : fallback;
     }

@@ -5,35 +5,22 @@ import {
     PayloadTooLargeException,
     UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
-import {
-    plainToInstance,
-} from 'class-transformer';
-
-import {
-    validate,
-} from 'class-validator';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
 
 import {
     createHash,
     timingSafeEqual,
 } from 'node:crypto';
 
-import {
-    Prisma,
-} from 'src/generated/prisma/client';
+import { Prisma } from 'src/generated/prisma/client';
+import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
 
-import {
-    RawAnalyticsEventType,
-} from 'src/generated/prisma/enums';
+import { PrismaService } from 'src/database/prisma.service';
 
-import {
-    PrismaService,
-} from 'src/database/prisma.service';
-
-import {
-    CollectEventsDto,
-} from '../dto/collect-events.dto';
+import { CollectEventsDto } from '../dto/collect-events.dto';
 
 import {
     normalizeRequestOrigin,
@@ -42,11 +29,18 @@ import {
     sanitizeTrackedUrl,
 } from '../utils/ingestion-sanitizer';
 
-import {
-    IngestionRateLimitService,
-} from './ingestion-rate-limit.service';
+import { IngestionRateLimitService } from './ingestion-rate-limit.service';
 
-interface CollectionContext {
+const MAX_BODY_BYTES = 64 * 1024;
+const MAX_FUTURE_EVENT_AGE_MS = 5 * 60 * 1000;
+const MAX_PAST_EVENT_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
+const TRACKING_KEY_PATTERN =
+    /^cc_live_([a-f0-9]{16})_[A-Za-z0-9_-]{20,}$/;
+
+const SHA_256_HEX_PATTERN = /^[a-f0-9]{64}$/i;
+
+export interface CollectionContext {
     origin?: string;
     ipAddress?: string;
     userAgent?: string;
@@ -59,70 +53,50 @@ interface ValidWebsite {
     archivedAt: Date | null;
     allowedOrigins: string[];
     trackingKeyHash: string;
-    trackingKeyPrefix: string;
+}
+
+export interface CollectEventsResult {
+    accepted: number;
+    duplicates: number;
+    receivedAt: string;
 }
 
 @Injectable()
 export class AnalyticsIngestionService {
-    private readonly maxBodyLength =
-        65_536;
-    private readonly trustCountryHeader =
-        process.env
-            .ANALYTICS_TRUST_COUNTRY_HEADER ===
-        'true';
-    private readonly ipHashSalt =
-        process.env
-            .ANALYTICS_IP_HASH_SALT ??
-        'local-development-change-this';
+    private readonly trustCountryHeader: boolean;
+    private readonly allowOriginless: boolean;
+    private readonly ipHashSalt: string;
 
-    private readonly allowOriginless =
-        process.env
-            .ANALYTICS_ALLOW_ORIGINLESS ===
-        'true';
-    countryCode:
-        this.normalizeCountryCode(
-            context.countryCode,
-        ),
     constructor(
-        private readonly prisma:private normalizeCountryCode(
-  value?: string,
-): string | null {
-  if (
-    !this.trustCountryHeader ||
-    !value
-  ) {
-    return null;
-  }
+        private readonly prisma: PrismaService,
+        private readonly rateLimit: IngestionRateLimitService,
+        private readonly configService: ConfigService,
+    ) {
+        this.trustCountryHeader = this.isEnabled(
+            this.configService.get(
+                'ANALYTICS_TRUST_COUNTRY_HEADER',
+            ),
+        );
 
-  const code =
-    value
-      .trim()
-      .toUpperCase();
+        this.allowOriginless = this.isEnabled(
+            this.configService.get(
+                'ANALYTICS_ALLOW_ORIGINLESS',
+            ),
+        );
 
-  if (
-    !/^[A-Z]{2}$/.test(code) ||
-    code === 'XX' ||
-    code === 'T1'
-  ) {
-    return null;
-  }
-
-  return code;
-}
-            PrismaService,
-
-        private readonly rateLimit:
-            IngestionRateLimitService,
-    ) { }
+        this.ipHashSalt =
+            this.configService
+                .get<string>('ANALYTICS_IP_HASH_SALT')
+                ?.trim() ||
+            'local-development-change-this';
+    }
 
     async collect(
         rawBody: unknown,
         context: CollectionContext,
-    ) {
+    ): Promise<CollectEventsResult> {
         const payload =
-            await this.parseAndValidatePayload(
-                rawBody,
-            );
+            await this.parseAndValidatePayload(rawBody);
 
         const website =
             await this.authenticateWebsite(
@@ -130,9 +104,7 @@ export class AnalyticsIngestionService {
                 payload.trackingKey,
             );
 
-        this.ensureWebsiteAvailable(
-            website,
-        );
+        this.ensureWebsiteAvailable(website);
 
         const origin =
             this.resolveAndValidateOrigin(
@@ -140,200 +112,172 @@ export class AnalyticsIngestionService {
                 website.allowedOrigins,
             );
 
-        const ipHash =
-            context.ipAddress
-                ? this.hashIpAddress(
-                    context.ipAddress,
-                )
-                : null;
+        const normalizedIpAddress =
+            this.normalizeIpAddress(context.ipAddress);
+
+        const ipHash = normalizedIpAddress
+            ? this.hashIpAddress(normalizedIpAddress)
+            : null;
+
+        const countryCode =
+            this.normalizeCountryCode(
+                context.countryCode,
+            );
+
+        const rateLimitIdentifier =
+            ipHash ?? origin;
 
         const rateLimitKey =
-            `${website.id}:${ipHash ?? origin}`;
+            `${website.id}:${rateLimitIdentifier}`;
 
         this.rateLimit.consume(
             rateLimitKey,
             payload.events.length,
         );
 
-        const receivedAt =
-            new Date();
+        const receivedAt = new Date();
 
-        const data:
-            Prisma.RawAnalyticsEventCreateManyInput[] =
-            payload.events.map(
-                (event) => {
-                    const occurredAt =
-                        this.validateEventTime(
-                            event.timestamp,
-                        );
+        const sdkVersion =
+            payload.sdkVersion
+                .trim()
+                .slice(0, 32);
 
-                    const trackedUrl =
-                        sanitizeTrackedUrl(
-                            event.url,
-                            origin,
-                        );
+        if (!sdkVersion) {
+            throw new BadRequestException(
+                'SDK version is required',
+            );
+        }
 
-                    if (
-                        event.type ===
-                        RawAnalyticsEventType.CUSTOM &&
-                        !event.eventName
-                    ) {
-                        throw new BadRequestException(
-                            'Custom events require an event name',
-                        );
-                    }
+        const data: Prisma.RawAnalyticsEventCreateManyInput[] =
+            payload.events.map((event) => {
+                const occurredAt =
+                    this.validateEventTime(
+                        event.timestamp,
+                    );
 
-                    if (
-                        event.type !==
-                        RawAnalyticsEventType.CUSTOM &&
-                        event.eventName
-                    ) {
-                        throw new BadRequestException(
-                            'Only custom events may contain an event name',
-                        );
-                    }
-
-                    const properties =
-                        sanitizeEventProperties(
-                            event.properties,
-                        );
-
-                    return {
-                        websiteId:
-                            website.id,
-
-                        eventId:
-                            event.eventId,
-
-                        type:
-                            event.type,
-
-                        visitorId:
-                            event.visitorId,
-
-                        sessionId:
-                            event.sessionId,
-
-                        occurredAt,
-
-                        receivedAt,
-
-                        pageUrl:
-                            trackedUrl.url,
-
-                        pagePath:
-                            trackedUrl.path,
-
-                        pageTitle:
-                            event.title
-                                ?.trim()
-                                .slice(0, 512) ??
-                            null,
-
-                        referrerUrl:
-                            sanitizeReferrerUrl(
-                                event.referrer,
-                            ),
-
-                        eventName:
-                            event.eventName ??
-                            null,
-
-                        ...(properties
-                            ? {
-                                properties,
-                            }
-                            : {}),
-
-                        screenWidth:
-                            event.screenWidth ??
-                            null,
-
-                        screenHeight:
-                            event.screenHeight ??
-                            null,
-
-                        viewportWidth:
-                            event.viewportWidth ??
-                            null,
-
-                        viewportHeight:
-                            event.viewportHeight ??
-                            null,
-
-                        language:
-                            event.language
-                                ?.trim()
-                                .slice(0, 35) ??
-                            null,
-
-                        clientTimeZone:
-                            this.sanitizeTimeZone(
-                                event.timeZone,
-                            ),
-
-                        durationMs:
-                            event.durationMs ??
-                            null,
-
+                const trackedUrl =
+                    sanitizeTrackedUrl(
+                        event.url,
                         origin,
+                    );
 
-                        userAgent:
-                            context.userAgent
-                                ?.slice(0, 512) ??
-                            null,
+                const eventName =
+                    this.normalizeOptionalString(
+                        event.eventName,
+                        100,
+                    );
 
-                        ipHash,
+                this.validateEventName(
+                    event.type,
+                    eventName,
+                );
 
-                        sdkVersion:
-                            payload.sdkVersion
-                                .trim()
-                                .slice(0, 32),
-                    };
+                const properties =
+                    sanitizeEventProperties(
+                        event.properties,
+                    );
+
+                return {
+                    websiteId: website.id,
+                    eventId: event.eventId,
+                    type: event.type,
+                    visitorId: event.visitorId,
+                    sessionId: event.sessionId,
+                    occurredAt,
+                    receivedAt,
+
+                    pageUrl: trackedUrl.url,
+                    pagePath: trackedUrl.path,
+
+                    pageTitle:
+                        this.normalizeOptionalString(
+                            event.title,
+                            512,
+                        ),
+
+                    referrerUrl:
+                        sanitizeReferrerUrl(
+                            event.referrer,
+                        ),
+
+                    eventName,
+
+                    ...(properties
+                        ? {
+                            properties,
+                        }
+                        : {}),
+
+                    screenWidth:
+                        event.screenWidth ?? null,
+
+                    screenHeight:
+                        event.screenHeight ?? null,
+
+                    viewportWidth:
+                        event.viewportWidth ?? null,
+
+                    viewportHeight:
+                        event.viewportHeight ?? null,
+
+                    language:
+                        this.normalizeOptionalString(
+                            event.language,
+                            35,
+                        ),
+
+                    clientTimeZone:
+                        this.sanitizeTimeZone(
+                            event.timeZone,
+                        ),
+
+                    durationMs:
+                        event.durationMs ?? null,
+
+                    origin,
+
+                    userAgent:
+                        this.normalizeOptionalString(
+                            context.userAgent,
+                            512,
+                        ),
+
+                    ipHash,
+                    countryCode,
+                    sdkVersion,
+                };
+            });
+
+        const result =
+            await this.prisma.$transaction(
+                async (transaction) => {
+                    const created =
+                        await transaction
+                            .rawAnalyticsEvent
+                            .createMany({
+                                data,
+                                skipDuplicates: true,
+                            });
+
+                    if (created.count > 0) {
+                        await transaction.website.update({
+                            where: {
+                                id: website.id,
+                            },
+                            data: {
+                                lastEventAt: receivedAt,
+                            },
+                        });
+                    }
+
+                    return created;
                 },
             );
 
-        const result =
-            await this.prisma
-                .$transaction(
-                    async (transaction) => {
-                        const created =
-                            await transaction
-                                .rawAnalyticsEvent
-                                .createMany({
-                                    data,
-                                    skipDuplicates: true,
-                                });
-
-                        if (
-                            created.count > 0
-                        ) {
-                            await transaction
-                                .website.update({
-                                    where: {
-                                        id:
-                                            website.id,
-                                    },
-
-                                    data: {
-                                        lastEventAt:
-                                            receivedAt,
-                                    },
-                                });
-                        }
-
-                        return created;
-                    },
-                );
-
         return {
-            accepted:
-                result.count,
-
+            accepted: result.count,
             duplicates:
-                data.length -
-                result.count,
-
+                data.length - result.count,
             receivedAt:
                 receivedAt.toISOString(),
         };
@@ -342,31 +286,17 @@ export class AnalyticsIngestionService {
     private async parseAndValidatePayload(
         rawBody: unknown,
     ): Promise<CollectEventsDto> {
-        let parsed:
-            unknown;
+        const parsed =
+            this.parseRequestBody(rawBody);
 
         if (
-            typeof rawBody === 'string'
+            !parsed ||
+            typeof parsed !== 'object' ||
+            Array.isArray(parsed)
         ) {
-            if (
-                rawBody.length >
-                this.maxBodyLength
-            ) {
-                throw new PayloadTooLargeException(
-                    'Tracking payload exceeds 64 KB',
-                );
-            }
-
-            try {
-                parsed =
-                    JSON.parse(rawBody);
-            } catch {
-                throw new BadRequestException(
-                    'Tracking payload must contain valid JSON',
-                );
-            }
-        } else {
-            parsed = rawBody;
+            throw new BadRequestException(
+                'Tracking payload must be a JSON object',
+            );
         }
 
         const payload =
@@ -375,24 +305,134 @@ export class AnalyticsIngestionService {
                 parsed,
             );
 
-        const errors =
-            await validate(payload, {
+        const errors = await validate(
+            payload,
+            {
                 whitelist: true,
-                forbidNonWhitelisted:
-                    true,
-                stopAtFirstError:
-                    true,
-            });
+                forbidNonWhitelisted: true,
+                stopAtFirstError: true,
+            },
+        );
 
-        if (
-            errors.length > 0
-        ) {
-            throw new BadRequestException(
-                'Tracking payload validation failed',
-            );
+        if (errors.length > 0) {
+            throw new BadRequestException({
+                message:
+                    'Tracking payload validation failed',
+                errors: errors.map((error) => ({
+                    property: error.property,
+                    constraints:
+                        error.constraints ?? {},
+                })),
+            });
         }
 
         return payload;
+    }
+
+    private parseRequestBody(
+        rawBody: unknown,
+    ): unknown {
+        if (
+            typeof rawBody === 'string'
+        ) {
+            this.ensureBodySize(rawBody);
+
+            if (!rawBody.trim()) {
+                throw new BadRequestException(
+                    'Tracking payload cannot be empty',
+                );
+            }
+
+            try {
+                return JSON.parse(rawBody);
+            } catch {
+                throw new BadRequestException(
+                    'Tracking payload must contain valid JSON',
+                );
+            }
+        }
+
+        if (Buffer.isBuffer(rawBody)) {
+            if (
+                rawBody.byteLength >
+                MAX_BODY_BYTES
+            ) {
+                throw new PayloadTooLargeException(
+                    'Tracking payload exceeds 64 KB',
+                );
+            }
+
+            const body =
+                rawBody.toString('utf8');
+
+            if (!body.trim()) {
+                throw new BadRequestException(
+                    'Tracking payload cannot be empty',
+                );
+            }
+
+            try {
+                return JSON.parse(body);
+            } catch {
+                throw new BadRequestException(
+                    'Tracking payload must contain valid JSON',
+                );
+            }
+        }
+
+        this.ensureObjectBodySize(rawBody);
+
+        return rawBody;
+    }
+
+    private ensureBodySize(
+        body: string,
+    ): void {
+        const bodySize =
+            Buffer.byteLength(
+                body,
+                'utf8',
+            );
+
+        if (
+            bodySize >
+            MAX_BODY_BYTES
+        ) {
+            throw new PayloadTooLargeException(
+                'Tracking payload exceeds 64 KB',
+            );
+        }
+    }
+
+    private ensureObjectBodySize(
+        body: unknown,
+    ): void {
+        if (
+            body === undefined ||
+            body === null
+        ) {
+            return;
+        }
+
+        try {
+            const serializedBody =
+                JSON.stringify(body);
+
+            this.ensureBodySize(
+                serializedBody,
+            );
+        } catch (error) {
+            if (
+                error instanceof
+                PayloadTooLargeException
+            ) {
+                throw error;
+            }
+
+            throw new BadRequestException(
+                'Tracking payload could not be processed',
+            );
+        }
     }
 
     private async authenticateWebsite(
@@ -408,17 +448,14 @@ export class AnalyticsIngestionService {
             await this.prisma.website.findFirst({
                 where: {
                     id: websiteId,
-                    trackingKeyPrefix:
-                        prefix,
+                    trackingKeyPrefix: prefix,
                 },
-
                 select: {
                     id: true,
                     enabled: true,
                     archivedAt: true,
                     allowedOrigins: true,
                     trackingKeyHash: true,
-                    trackingKeyPrefix: true,
                 },
             });
 
@@ -450,9 +487,12 @@ export class AnalyticsIngestionService {
     private extractKeyPrefix(
         trackingKey: string,
     ): string {
+        const normalizedKey =
+            trackingKey.trim();
+
         const match =
-            /^cc_live_([a-f0-9]{16})_[A-Za-z0-9_-]{20,}$/.exec(
-                trackingKey,
+            TRACKING_KEY_PATTERN.exec(
+                normalizedKey,
             );
 
         if (!match?.[1]) {
@@ -465,31 +505,35 @@ export class AnalyticsIngestionService {
     }
 
     private safeHashEquals(
-        first: string,
-        second: string,
+        candidateHash: string,
+        storedHash: string,
     ): boolean {
-        const firstBuffer =
-            Buffer.from(
-                first,
-                'utf8',
-            );
-
-        const secondBuffer =
-            Buffer.from(
-                second,
-                'utf8',
-            );
-
         if (
-            firstBuffer.length !==
-            secondBuffer.length
+            !SHA_256_HEX_PATTERN.test(
+                candidateHash,
+            ) ||
+            !SHA_256_HEX_PATTERN.test(
+                storedHash,
+            )
         ) {
             return false;
         }
 
+        const candidateBuffer =
+            Buffer.from(
+                candidateHash,
+                'hex',
+            );
+
+        const storedBuffer =
+            Buffer.from(
+                storedHash,
+                'hex',
+            );
+
         return timingSafeEqual(
-            firstBuffer,
-            secondBuffer,
+            candidateBuffer,
+            storedBuffer,
         );
     }
 
@@ -497,7 +541,7 @@ export class AnalyticsIngestionService {
         website: ValidWebsite,
     ): void {
         if (
-            website.archivedAt ||
+            website.archivedAt !== null ||
             !website.enabled
         ) {
             throw new ForbiddenException(
@@ -510,32 +554,46 @@ export class AnalyticsIngestionService {
         rawOrigin: string | undefined,
         allowedOrigins: string[],
     ): string {
-        if (!rawOrigin) {
-            if (
-                this.allowOriginless
-            ) {
+        const suppliedOrigin =
+            rawOrigin?.trim();
+
+        if (
+            !suppliedOrigin ||
+            suppliedOrigin === 'null'
+        ) {
+            if (this.allowOriginless) {
                 return 'originless://request';
             }
 
             throw new ForbiddenException(
-                'Tracking requests require an Origin header',
+                'Tracking requests require a valid Origin header',
             );
         }
 
-        const origin =
+        const requestOrigin =
             normalizeRequestOrigin(
-                rawOrigin,
+                suppliedOrigin,
             );
 
-        const normalizedAllowed =
-            allowedOrigins.map(
-                (item) =>
-                    item.toLowerCase(),
+        const normalizedAllowedOrigins =
+            new Set(
+                allowedOrigins
+                    .map((allowedOrigin) =>
+                        this.tryNormalizeOrigin(
+                            allowedOrigin,
+                        ),
+                    )
+                    .filter(
+                        (
+                            allowedOrigin,
+                        ): allowedOrigin is string =>
+                            allowedOrigin !== null,
+                    ),
             );
 
         if (
-            !normalizedAllowed.includes(
-                origin,
+            !normalizedAllowedOrigins.has(
+                requestOrigin,
             )
         ) {
             throw new ForbiddenException(
@@ -543,17 +601,51 @@ export class AnalyticsIngestionService {
             );
         }
 
-        return origin;
+        return requestOrigin;
+    }
+
+    private tryNormalizeOrigin(
+        value: string,
+    ): string | null {
+        try {
+            return normalizeRequestOrigin(
+                value,
+            );
+        } catch {
+            return null;
+        }
+    }
+
+    private validateEventName(
+        eventType: RawAnalyticsEventType,
+        eventName: string | null,
+    ): void {
+        if (
+            eventType ===
+            RawAnalyticsEventType.CUSTOM &&
+            !eventName
+        ) {
+            throw new BadRequestException(
+                'Custom events require an event name',
+            );
+        }
+
+        if (
+            eventType !==
+            RawAnalyticsEventType.CUSTOM &&
+            eventName
+        ) {
+            throw new BadRequestException(
+                'Only custom events may contain an event name',
+            );
+        }
     }
 
     private validateEventTime(
         value: string,
     ): Date {
-        const date =
-            new Date(value);
-
-        const timestamp =
-            date.getTime();
+        const date = new Date(value);
+        const timestamp = date.getTime();
 
         if (
             Number.isNaN(timestamp)
@@ -563,24 +655,21 @@ export class AnalyticsIngestionService {
             );
         }
 
-        const now =
-            Date.now();
+        const currentTime = Date.now();
 
-        const maximumFuture =
-            now + 5 * 60_000;
+        const maximumFutureTime =
+            currentTime +
+            MAX_FUTURE_EVENT_AGE_MS;
 
-        const maximumPast =
-            now -
-            7 *
-            24 *
-            60 *
-            60_000;
+        const minimumPastTime =
+            currentTime -
+            MAX_PAST_EVENT_AGE_MS;
 
         if (
             timestamp >
-            maximumFuture ||
+            maximumFutureTime ||
             timestamp <
-            maximumPast
+            minimumPastTime
         ) {
             throw new BadRequestException(
                 'Event timestamp is outside the accepted range',
@@ -590,29 +679,98 @@ export class AnalyticsIngestionService {
         return date;
     }
 
-    private hashIpAddress(
-        ipAddress: string,
-    ): string {
-        return createHash(
-            'sha256',
-        )
-            .update(
-                `${this.ipHashSalt}:${ipAddress}`,
+    private normalizeCountryCode(
+        value?: string,
+    ): string | null {
+        if (
+            !this.trustCountryHeader ||
+            !value
+        ) {
+            return null;
+        }
+
+        const countryCode =
+            value
+                .trim()
+                .toUpperCase();
+
+        if (
+            !/^[A-Z]{2}$/.test(
+                countryCode,
             )
-            .digest('hex');
+        ) {
+            return null;
+        }
+
+        if (
+            countryCode === 'XX' ||
+            countryCode === 'T1'
+        ) {
+            return null;
+        }
+
+        return countryCode;
     }
 
-    private sanitizeTimeZone(
+    private normalizeIpAddress(
         value?: string,
     ): string | null {
         if (!value) {
             return null;
         }
 
-        const timeZone =
+        const normalized =
             value
                 .trim()
-                .slice(0, 64);
+                .replace(
+                    /^::ffff:/i,
+                    '',
+                );
+
+        return normalized || null;
+    }
+
+    private hashIpAddress(
+        ipAddress: string,
+    ): string {
+        return createHash('sha256')
+            .update(
+                `${this.ipHashSalt}:${ipAddress}`,
+            )
+            .digest('hex');
+    }
+
+    private normalizeOptionalString(
+        value: string | undefined,
+        maximumLength: number,
+    ): string | null {
+        if (!value) {
+            return null;
+        }
+
+        const normalized =
+            value
+                .trim()
+                .slice(
+                    0,
+                    maximumLength,
+                );
+
+        return normalized || null;
+    }
+
+    private sanitizeTimeZone(
+        value?: string,
+    ): string | null {
+        const timeZone =
+            this.normalizeOptionalString(
+                value,
+                64,
+            );
+
+        if (!timeZone) {
+            return null;
+        }
 
         try {
             new Intl.DateTimeFormat(
@@ -626,5 +784,21 @@ export class AnalyticsIngestionService {
         } catch {
             return null;
         }
+    }
+
+    private isEnabled(
+        value: unknown,
+    ): boolean {
+        if (value === true) {
+            return true;
+        }
+
+        return (
+            typeof value === 'string' &&
+            value
+                .trim()
+                .toLowerCase() ===
+            'true'
+        );
     }
 }

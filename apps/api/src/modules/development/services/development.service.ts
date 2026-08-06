@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import {
     BadRequestException,
     ConflictException,
@@ -222,17 +225,17 @@ export class DevelopmentService {
                         await transaction.applicationMilestone.create({
                             data: {
                                 applicationId,
-                                title: definition.title,
+                                title: definition!.title,
                                 description:
-                                    definition.description,
-                                weight: definition.weight,
+                                    definition!.description,
+                                weight: definition!.weight,
                                 position: milestoneIndex,
                             },
                         });
 
-                    if (definition.tasks.length > 0) {
+                    if (definition!.tasks.length > 0) {
                         await transaction.applicationTask.createMany({
-                            data: definition.tasks.map(
+                            data: definition!.tasks.map(
                                 (task, taskIndex) => ({
                                     milestoneId: milestone.id,
                                     title: task.title,
@@ -2705,7 +2708,7 @@ export class DevelopmentService {
         ) {
             await transaction.applicationMilestone.update({
                 where: {
-                    id: milestones[index].id,
+                    id: milestones[index]!.id,
                 },
                 data: {
                     position: index,
@@ -2738,7 +2741,7 @@ export class DevelopmentService {
         ) {
             await transaction.applicationTask.update({
                 where: {
-                    id: tasks[index].id,
+                    id: tasks[index]!.id,
                 },
                 data: {
                     position: index,

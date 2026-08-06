@@ -1,0 +1,147 @@
+model AnalyticsVisitor {
+  id                String   @id @default(uuid()) @db.Uuid
+  websiteId         String   @map("website_id") @db.Uuid
+  externalVisitorId String   @map("external_visitor_id") @db.VarChar(80)
+  firstSeenAt       DateTime @map("first_seen_at")
+  lastSeenAt        DateTime @map("last_seen_at")
+  sessionCount      Int      @default(0) @map("session_count")
+  pageViewCount     Int      @default(0) @map("page_view_count")
+  eventCount        Int      @default(0) @map("event_count")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  website   Website             @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  sessions  AnalyticsSession[]
+  events    AnalyticsEvent[]
+  pageViews AnalyticsPageView[]
+
+  @@unique([websiteId, externalVisitorId])
+  @@index([websiteId, firstSeenAt])
+  @@index([websiteId, lastSeenAt])
+  @@map("analytics_visitors")
+}
+
+model AnalyticsSession {
+  id                     String              @id @default(uuid()) @db.Uuid
+  websiteId              String              @map("website_id") @db.Uuid
+  visitorId              String              @map("visitor_id") @db.Uuid
+  externalSessionId      String              @map("external_session_id") @db.VarChar(80)
+  startedAt              DateTime            @map("started_at")
+  endedAt                DateTime            @map("ended_at")
+  lastEventAt            DateTime            @map("last_event_at")
+  durationMs             Int                 @default(0) @map("duration_ms")
+  engagedDurationMs      Int                 @default(0) @map("engaged_duration_ms")
+  pageViewCount          Int                 @default(0) @map("page_view_count")
+  eventCount             Int                 @default(0) @map("event_count")
+  customEventCount       Int                 @default(0) @map("custom_event_count")
+  bounced                Boolean             @default(true)
+  entryPath              String?             @map("entry_path") @db.VarChar(2048)
+  exitPath               String?             @map("exit_path") @db.VarChar(2048)
+  entryTitle             String?             @map("entry_title") @db.VarChar(512)
+  exitTitle              String?             @map("exit_title") @db.VarChar(512)
+  referrerUrl            String?             @map("referrer_url") @db.VarChar(2048)
+  sourceType             AnalyticsSourceType @default(UNKNOWN) @map("source_type")
+  sourceName             String              @default("Unknown") @map("source_name") @db.VarChar(160)
+  sourceDomain           String?             @map("source_domain") @db.VarChar(253)
+  countryCode            String?             @map("country_code") @db.Char(2)
+  deviceType             AnalyticsDeviceType @default(OTHER) @map("device_type")
+  browserName            String              @default("Unknown") @map("browser_name") @db.VarChar(100)
+  browserVersion         String?             @map("browser_version") @db.VarChar(50)
+  operatingSystem        String              @default("Unknown") @map("operating_system") @db.VarChar(100)
+  operatingSystemVersion String?             @map("operating_system_version") @db.VarChar(50)
+  createdAt              DateTime            @default(now()) @map("created_at")
+  updatedAt              DateTime            @updatedAt @map("updated_at")
+
+  website   Website             @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  visitor   AnalyticsVisitor    @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  events    AnalyticsEvent[]
+  pageViews AnalyticsPageView[]
+
+  @@unique([websiteId, externalSessionId])
+  @@index([websiteId, startedAt])
+  @@index([websiteId, endedAt])
+  @@index([websiteId, bounced, startedAt])
+  @@index([websiteId, sourceType, startedAt])
+  @@index([websiteId, countryCode, startedAt])
+  @@index([websiteId, deviceType, startedAt])
+  @@index([visitorId, startedAt])
+  @@map("analytics_sessions")
+}
+
+model AnalyticsEvent {
+  id                     String                @id @default(uuid()) @db.Uuid
+  websiteId              String                @map("website_id") @db.Uuid
+  visitorId              String                @map("visitor_id") @db.Uuid
+  sessionId              String                @map("session_id") @db.Uuid
+  rawEventId             String?               @unique @map("raw_event_id") @db.Uuid
+  sourceEventId          String                @map("source_event_id") @db.VarChar(80)
+  type                   RawAnalyticsEventType
+  eventName              String?               @map("event_name") @db.VarChar(100)
+  occurredAt             DateTime              @map("occurred_at")
+  receivedAt             DateTime              @map("received_at")
+  pageUrl                String                @map("page_url") @db.VarChar(2048)
+  normalizedPath         String                @map("normalized_path") @db.VarChar(2048)
+  pageTitle              String?               @map("page_title") @db.VarChar(512)
+  referrerUrl            String?               @map("referrer_url") @db.VarChar(2048)
+  properties             Json?
+  durationMs             Int?                  @map("duration_ms")
+  sourceType             AnalyticsSourceType   @default(UNKNOWN) @map("source_type")
+  sourceName             String                @default("Unknown") @map("source_name") @db.VarChar(160)
+  sourceDomain           String?               @map("source_domain") @db.VarChar(253)
+  countryCode            String?               @map("country_code") @db.Char(2)
+  deviceType             AnalyticsDeviceType   @default(OTHER) @map("device_type")
+  browserName            String                @default("Unknown") @map("browser_name") @db.VarChar(100)
+  browserVersion         String?               @map("browser_version") @db.VarChar(50)
+  operatingSystem        String                @default("Unknown") @map("operating_system") @db.VarChar(100)
+  operatingSystemVersion String?               @map("operating_system_version") @db.VarChar(50)
+  processedAt            DateTime              @default(now()) @map("processed_at")
+
+  website  Website            @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  visitor  AnalyticsVisitor   @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  session  AnalyticsSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  rawEvent RawAnalyticsEvent? @relation(fields: [rawEventId], references: [id], onDelete: SetNull)
+  pageView AnalyticsPageView?
+
+  @@unique([websiteId, sourceEventId])
+  @@index([websiteId, occurredAt])
+  @@index([websiteId, type, occurredAt])
+  @@index([websiteId, eventName, occurredAt])
+  @@index([sessionId, occurredAt])
+  @@index([visitorId, occurredAt])
+  @@map("analytics_events")
+}
+
+model AnalyticsPageView {
+  id               String              @id @default(uuid()) @db.Uuid
+  websiteId        String              @map("website_id") @db.Uuid
+  visitorId        String              @map("visitor_id") @db.Uuid
+  sessionId        String              @map("session_id") @db.Uuid
+  analyticsEventId String              @unique @map("analytics_event_id") @db.Uuid
+  occurredAt       DateTime            @map("occurred_at")
+  pageUrl          String              @map("page_url") @db.VarChar(2048)
+  normalizedPath   String              @map("normalized_path") @db.VarChar(2048)
+  title            String?             @db.VarChar(512)
+  referrerUrl      String?             @map("referrer_url") @db.VarChar(2048)
+  sourceType       AnalyticsSourceType @default(UNKNOWN) @map("source_type")
+  sourceName       String              @default("Unknown") @map("source_name") @db.VarChar(160)
+  sourceDomain     String?             @map("source_domain") @db.VarChar(253)
+  countryCode      String?             @map("country_code") @db.Char(2)
+  deviceType       AnalyticsDeviceType @default(OTHER) @map("device_type")
+  browserName      String              @default("Unknown") @map("browser_name") @db.VarChar(100)
+  operatingSystem  String              @default("Unknown") @map("operating_system") @db.VarChar(100)
+  isEntry          Boolean             @default(false) @map("is_entry")
+  isExit           Boolean             @default(false) @map("is_exit")
+  createdAt        DateTime            @default(now()) @map("created_at")
+
+  website Website          @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  visitor AnalyticsVisitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  session AnalyticsSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  event   AnalyticsEvent   @relation(fields: [analyticsEventId], references: [id], onDelete: Cascade)
+
+  @@index([websiteId, occurredAt])
+  @@index([websiteId, normalizedPath, occurredAt])
+  @@index([websiteId, sourceType, occurredAt])
+  @@index([websiteId, countryCode, occurredAt])
+  @@index([sessionId, occurredAt])
+  @@map("analytics_page_views")
+}

@@ -1,0 +1,36 @@
+model AnalyticsProcessingState {
+  websiteId               String                    @id @map("website_id") @db.Uuid
+  status                  AnalyticsProcessingStatus @default(COMPLETED)
+  lastStartedAt           DateTime?                 @map("last_started_at")
+  lastCompletedAt         DateTime?                 @map("last_completed_at")
+  lastFailedAt            DateTime?                 @map("last_failed_at")
+  lastProcessedReceivedAt DateTime?                 @map("last_processed_received_at")
+  lastError               String?                   @map("last_error") @db.Text
+  totalRawEventsProcessed BigInt                    @default(0) @map("total_raw_events_processed")
+  updatedAt               DateTime                  @updatedAt @map("updated_at")
+
+  website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@map("analytics_processing_states")
+}
+
+model AnalyticsProcessingRun {
+  id                 String                    @id @default(uuid()) @db.Uuid
+  websiteId          String                    @map("website_id") @db.Uuid
+  initiatedByUserId  String?                   @map("initiated_by_user_id") @db.Uuid
+  status             AnalyticsProcessingStatus @default(RUNNING)
+  rawEventsProcessed Int                       @default(0) @map("raw_events_processed")
+  sessionsRebuilt    Int                       @default(0) @map("sessions_rebuilt")
+  hourlyBuckets      Int                       @default(0) @map("hourly_buckets")
+  dailyBuckets       Int                       @default(0) @map("daily_buckets")
+  startedAt          DateTime                  @default(now()) @map("started_at")
+  completedAt        DateTime?                 @map("completed_at")
+  failedAt           DateTime?                 @map("failed_at")
+  errorMessage       String?                   @map("error_message") @db.Text
+
+  website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@index([websiteId, startedAt])
+  @@index([status, startedAt])
+  @@map("analytics_processing_runs")
+}

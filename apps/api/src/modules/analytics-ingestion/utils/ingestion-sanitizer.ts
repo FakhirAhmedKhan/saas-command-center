@@ -139,8 +139,10 @@ export function sanitizeEventProperties(
         return undefined;
     }
 
-    const sanitized:
-        Prisma.InputJsonObject = {};
+    const sanitized: Record<
+        string,
+        Prisma.InputJsonValue | null
+    > = {};
 
     const entries =
         Object.entries(properties)
@@ -172,8 +174,7 @@ export function sanitizeEventProperties(
         if (
             sanitizedValue !== undefined
         ) {
-            sanitized[key] =
-                sanitizedValue;
+            sanitized[key] = sanitizedValue;
         }
     }
 

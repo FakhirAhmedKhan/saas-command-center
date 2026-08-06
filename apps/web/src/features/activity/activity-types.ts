@@ -13,12 +13,14 @@ export const ACTIVITY_ENTITY_TYPES = [
     'MILESTONE',
     'TASK',
     'BLOCKER',
+    'WEBSITE',
 ] as const;
 
 export type ActivityEntityType =
     (typeof ACTIVITY_ENTITY_TYPES)[number];
 
 export const APPLICATION_ACTIVITY_TYPES = [
+    // Application
     'APPLICATION_CREATED',
     'APPLICATION_UPDATED',
     'APPLICATION_STATUS_CHANGED',
@@ -27,14 +29,17 @@ export const APPLICATION_ACTIVITY_TYPES = [
     'APPLICATION_RESTORED',
     'APPLICATION_DELETED',
 
+    // Technology
     'TECHNOLOGY_ADDED',
     'TECHNOLOGY_UPDATED',
     'TECHNOLOGY_REMOVED',
 
+    // Link
     'LINK_ADDED',
     'LINK_UPDATED',
     'LINK_REMOVED',
 
+    // Milestone
     'MILESTONE_CREATED',
     'MILESTONE_UPDATED',
     'MILESTONE_COMPLETED',
@@ -43,6 +48,7 @@ export const APPLICATION_ACTIVITY_TYPES = [
     'MILESTONE_DELETED',
     'MILESTONE_REORDERED',
 
+    // Task
     'TASK_CREATED',
     'TASK_UPDATED',
     'TASK_STATUS_CHANGED',
@@ -53,26 +59,17 @@ export const APPLICATION_ACTIVITY_TYPES = [
     'TASK_DELETED',
     'TASK_REORDERED',
 
+    // Blocker
     'BLOCKER_CREATED',
     'BLOCKER_UPDATED',
     'BLOCKER_RESOLVED',
     'BLOCKER_REOPENED',
     'BLOCKER_DELETED',
 
+    // Development template
     'DEVELOPMENT_TEMPLATE_APPLIED',
-    'APPLICATION_CREATED',
-    'APPLICATION_UPDATED',
-    'APPLICATION_STATUS_CHANGED',
-    'APPLICATION_PRIORITY_CHANGED',
-    'APPLICATION_ARCHIVED',
-    'APPLICATION_RESTORED',
-    'APPLICATION_DELETED',
-    'TECHNOLOGY_ADDED',
-    'TECHNOLOGY_UPDATED',
-    'TECHNOLOGY_REMOVED',
-    'LINK_ADDED',
-    'LINK_UPDATED',
-    'LINK_REMOVED',
+
+    // Website
     'WEBSITE_CREATED',
     'WEBSITE_UPDATED',
     'WEBSITE_ENABLED',
@@ -112,14 +109,10 @@ export interface ApplicationActivity {
     entityId: string | null;
     title: string;
     description: string | null;
-    metadata: Record<
-        string,
-        unknown
-    > | null;
+    metadata: Record<string, unknown> | null;
     createdAt: string;
     actor: ActivityActor | null;
-    application:
-    ActivityApplication | null;
+    application: ActivityApplication | null;
 }
 
 export interface ActivityPagination {
@@ -138,23 +131,12 @@ export interface ActivityListResponse {
 
 export interface ActivityListQuery {
     search?: string;
-
-    activityType?:
-    ApplicationActivityType;
-
-    actorType?:
-    ActivityActorType;
-
-    entityType?:
-    ActivityEntityType;
-
+    activityType?: ApplicationActivityType;
+    actorType?: ActivityActorType;
+    entityType?: ActivityEntityType;
     actorUserId?: string;
-
     dateFrom?: string;
-
     dateTo?: string;
-
     page?: number;
-
     limit?: number;
 }

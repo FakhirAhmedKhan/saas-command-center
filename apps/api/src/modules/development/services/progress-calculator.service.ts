@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import {
     Injectable,
     NotFoundException,
@@ -254,7 +256,7 @@ export class ProgressCalculatorService {
             progressPercent = 100;
         }
 
-        let derivedStatus =
+        let derivedStatus: MilestoneStatus =
             MilestoneStatus.PLANNED;
 
         if (

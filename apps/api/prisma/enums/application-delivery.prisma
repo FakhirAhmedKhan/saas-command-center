@@ -1,0 +1,26 @@
+enum MilestoneStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
+}
+
+enum ApplicationTaskStatus {
+  TODO
+  IN_PROGRESS
+  BLOCKED
+  COMPLETED
+  SKIPPED
+}
+
+enum WorkItemPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum BlockerStatus {
+  OPEN
+  RESOLVED
+}

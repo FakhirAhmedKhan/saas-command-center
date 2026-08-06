@@ -36,8 +36,7 @@ export const DEVELOPMENT_TEMPLATES: Record<
         milestones: [
             {
                 title: 'Product planning',
-                description:
-                    'Define users, problems, scope, requirements and success criteria.',
+                description: 'Define users, problems, scope, requirements and success criteria.',
                 weight: 15,
                 tasks: [
                     {
@@ -59,8 +58,7 @@ export const DEVELOPMENT_TEMPLATES: Record<
             },
             {
                 title: 'Technical foundation',
-                description:
-                    'Prepare repository, authentication, database and deployment foundations.',
+                description: 'Prepare repository, authentication, database and deployment foundations.',
                 weight: 25,
                 tasks: [
                     {
@@ -87,8 +85,7 @@ export const DEVELOPMENT_TEMPLATES: Record<
             },
             {
                 title: 'Core product',
-                description:
-                    'Build the primary user workflows and management interfaces.',
+                description: 'Build the primary user workflows and management interfaces.',
                 weight: 40,
                 tasks: [
                     {
@@ -115,8 +112,7 @@ export const DEVELOPMENT_TEMPLATES: Record<
             },
             {
                 title: 'Launch readiness',
-                description:
-                    'Prepare security, monitoring, documentation and production release.',
+                description: 'Prepare security, monitoring, documentation and production release.',
                 weight: 20,
                 tasks: [
                     {
@@ -147,8 +143,7 @@ export const DEVELOPMENT_TEMPLATES: Record<
         milestones: [
             {
                 title: 'AI product definition',
-                description:
-                    'Define the AI use case, limitations, data and evaluation criteria.',
+                description: 'Define the AI use case, limitations, data and evaluation criteria.',
                 weight: 15,
                 tasks: [
                     {
@@ -170,8 +165,7 @@ export const DEVELOPMENT_TEMPLATES: Record<
             },
             {
                 title: 'Data and model pipeline',
-                description:
-                    'Prepare datasets, model access, prompts and processing services.',
+                description: 'Prepare datasets, model access, prompts and processing services.',
                 weight: 30,
                 tasks: [
                     {
@@ -198,8 +192,7 @@ export const DEVELOPMENT_TEMPLATES: Record<
             },
             {
                 title: 'Product integration',
-                description:
-                    'Connect AI capabilities to secure backend and frontend workflows.',
+                description: 'Connect AI capabilities to secure backend and frontend workflows.',
                 weight: 35,
                 tasks: [
                     {
@@ -226,8 +219,7 @@ export const DEVELOPMENT_TEMPLATES: Record<
             },
             {
                 title: 'Evaluation and launch',
-                description:
-                    'Evaluate quality, latency, safety and production behavior.',
+                description: 'Evaluate quality, latency, safety and production behavior.',
                 weight: 20,
                 tasks: [
                     {
@@ -258,8 +250,7 @@ export const DEVELOPMENT_TEMPLATES: Record<
         milestones: [
             {
                 title: 'Product and UX',
-                description:
-                    'Define mobile user journeys, navigation and visual design.',
+                description: 'Define mobile user journeys, navigation and visual design.',
                 weight: 15,
                 tasks: [
                     {
@@ -281,8 +272,7 @@ export const DEVELOPMENT_TEMPLATES: Record<
             },
             {
                 title: 'Application foundation',
-                description:
-                    'Set up app architecture, networking, storage and authentication.',
+                description: 'Set up app architecture, networking, storage and authentication.',
                 weight: 25,
                 tasks: [
                     {
@@ -309,8 +299,7 @@ export const DEVELOPMENT_TEMPLATES: Record<
             },
             {
                 title: 'Core mobile features',
-                description:
-                    'Build the primary app workflows, notifications and device integrations.',
+                description: 'Build the primary app workflows, notifications and device integrations.',
                 weight: 40,
                 tasks: [
                     {
@@ -337,8 +326,7 @@ export const DEVELOPMENT_TEMPLATES: Record<
             },
             {
                 title: 'Release',
-                description:
-                    'Prepare store assets, release builds and production monitoring.',
+                description: 'Prepare store assets, release builds and production monitoring.',
                 weight: 20,
                 tasks: [
                     {
@@ -369,8 +357,7 @@ export const DEVELOPMENT_TEMPLATES: Record<
         milestones: [
             {
                 title: 'API contract',
-                description:
-                    'Define consumers, endpoints, errors, authentication and versioning.',
+                description: 'Define consumers, endpoints, errors, authentication and versioning.',
                 weight: 20,
                 tasks: [
                     {
@@ -392,8 +379,7 @@ export const DEVELOPMENT_TEMPLATES: Record<
             },
             {
                 title: 'Core implementation',
-                description:
-                    'Build database, business rules, validation and documentation.',
+                description: 'Build database, business rules, validation and documentation.',
                 weight: 40,
                 tasks: [
                     {
@@ -420,8 +406,7 @@ export const DEVELOPMENT_TEMPLATES: Record<
             },
             {
                 title: 'Reliability and security',
-                description:
-                    'Add tests, rate limits, logging, monitoring and abuse protection.',
+                description: 'Add tests, rate limits, logging, monitoring and abuse protection.',
                 weight: 25,
                 tasks: [
                     {
@@ -443,8 +428,7 @@ export const DEVELOPMENT_TEMPLATES: Record<
             },
             {
                 title: 'API launch',
-                description:
-                    'Deploy, verify compatibility and publish usage documentation.',
+                description: 'Deploy, verify compatibility and publish usage documentation.',
                 weight: 15,
                 tasks: [
                     {
@@ -475,8 +459,7 @@ export const DEVELOPMENT_TEMPLATES: Record<
         milestones: [
             {
                 title: 'Catalog foundation',
-                description:
-                    'Prepare products, categories, pricing, inventory and media.',
+                description: 'Prepare products, categories, pricing, inventory and media.',
                 weight: 25,
                 tasks: [
                     {
@@ -498,8 +481,7 @@ export const DEVELOPMENT_TEMPLATES: Record<
             },
             {
                 title: 'Commerce flow',
-                description:
-                    'Build cart, checkout, payment and order lifecycle.',
+                description: 'Build cart, checkout, payment and order lifecycle.',
                 weight: 40,
                 tasks: [
                     {
@@ -526,8 +508,7 @@ export const DEVELOPMENT_TEMPLATES: Record<
             },
             {
                 title: 'Operations',
-                description:
-                    'Prepare shipping, returns, administration and reporting.',
+                description: 'Prepare shipping, returns, administration and reporting.',
                 weight: 20,
                 tasks: [
                     {
@@ -549,8 +530,7 @@ export const DEVELOPMENT_TEMPLATES: Record<
             },
             {
                 title: 'Launch readiness',
-                description:
-                    'Verify security, payments, policies, analytics and production deployment.',
+                description: 'Verify security, payments, policies, analytics and production deployment.',
                 weight: 15,
                 tasks: [
                     {

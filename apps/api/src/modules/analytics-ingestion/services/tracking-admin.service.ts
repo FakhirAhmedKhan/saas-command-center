@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import {
     Injectable,
     NotFoundException,
@@ -86,9 +87,13 @@ export class TrackingAdminService {
                                 websiteId,
                             },
 
-                            _count: {
-                                _all: true,
-                            },
+                            orderBy: {
+                            type: 'asc',
+                        },
+
+                        _count: {
+                            id: true,
+                        },
                         }),
 
                     this.prisma
@@ -124,7 +129,10 @@ export class TrackingAdminService {
             const item of grouped
         ) {
             counts[item.type] =
-                item._count._all;
+                typeof item._count === 'object' &&
+                item._count !== null
+                    ? item._count.id ?? 0
+                    : 0;
         }
 
         return {
