@@ -1,4 +1,4 @@
-import {
+﻿import {
   mkdirSync,
   writeFileSync,
 } from 'node:fs';
@@ -8,7 +8,6 @@ import {
 
 import {
   request,
-  type FullConfig,
 } from '@playwright/test';
 
 import {
@@ -44,7 +43,6 @@ interface WebsiteResponse {
 }
 
 async function globalSetup(
-  _config: FullConfig,
 ): Promise<void> {
   const apiUrl =
     process.env.FULLSTACK_API_URL ??
@@ -314,3 +312,6 @@ async function globalSetup(
 }
 
 export default globalSetup;
+
+
+

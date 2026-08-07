@@ -13,6 +13,7 @@ import { JwtStrategy } from '../strategies/jwt.strategy';
 import { AuthSessionsModule } from './auth-sessions.module';
 import { UsersModule } from 'src/modules/users/users.module';
 import { WorkspaceModule } from 'src/modules/workspace/modules/workspaces.module';
+import { AuthCookieService } from '../services/auth-cookie.service';
 
 
 @Module({
@@ -24,6 +25,7 @@ import { WorkspaceModule } from 'src/modules/workspace/modules/workspaces.module
         UsersModule,
         WorkspaceModule,
         AuthSessionsModule,
+        AuthCookieService,
     ],
     controllers: [AuthController],
     providers: [
@@ -31,12 +33,14 @@ import { WorkspaceModule } from 'src/modules/workspace/modules/workspaces.module
         PasswordService,
         TokenService,
         JwtStrategy,
+        AuthCookieService,
         {
             provide: APP_GUARD,
             useClass: JwtAuthGuard,
         },
     ],
     exports: [
+        AuthCookieService,
         AuthService,
         TokenService,
     ],

@@ -1,20 +1,19 @@
-import type { ReactNode } from 'react';
+import type {
+  ReactNode,
+} from 'react';
 
-import { AuthenticatedOnly } from '@/components/auth/auth-gates';
-import { DashboardShell } from '@/components/layout/dashboard-shell';
-
-interface DashboardLayoutProps {
-  children: ReactNode;
-}
+import {
+  ProtectedRoute,
+} from '@/features/auth/protected-route';
 
 export default function DashboardLayout({
   children,
-}: DashboardLayoutProps) {
+}: Readonly<{
+  children: ReactNode;
+}>) {
   return (
-    <AuthenticatedOnly>
-      <DashboardShell>
-        {children}
-      </DashboardShell>
-    </AuthenticatedOnly>
+    <ProtectedRoute>
+      {children}
+    </ProtectedRoute>
   );
 }

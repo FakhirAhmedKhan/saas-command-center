@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { GuestOnly } from '@/components/auth/auth-gates';
+import { GuestOnly } from '@/features/auth/auth-gates';
 
 interface AuthLayoutProps {
   children: ReactNode;

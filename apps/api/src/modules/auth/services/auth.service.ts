@@ -125,7 +125,7 @@ export class AuthService {
       );
 
       const workspaces =
-        await this.workspacesService.listForUser(user.id as string);
+        await this.workspacesService.listForUser(user.id);
 
       return this.createAuthResult(
         tokens,
@@ -164,7 +164,7 @@ export class AuthService {
 
     const validPassword =
       await this.passwordService.verify(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+         
         user.passwordHash,
         dto.password,
       );
@@ -179,7 +179,7 @@ export class AuthService {
     const familyId = randomUUID();
 
     const tokens = await this.tokenService.issueTokenPair(
-      user.id as string,
+      user.id,
       sessionId,
       familyId,
     );
@@ -193,7 +193,7 @@ export class AuthService {
       await transaction.authSession.create({
         data: {
           id: sessionId,
-          userId: user.id as string,
+          userId: user.id,
           familyId,
           refreshTokenHash,
           expiresAt: tokens.refreshExpiresAt,
@@ -215,10 +215,10 @@ export class AuthService {
     });
 
     const publicUser =
-      await this.usersService.findByIdOrThrow(user.id as string);
+      await this.usersService.findByIdOrThrow(user.id);
 
     const workspaces =
-      await this.workspacesService.listForUser(user.id as string);
+      await this.workspacesService.listForUser(user.id);
 
     return this.createAuthResult(
       tokens,
@@ -297,7 +297,7 @@ export class AuthService {
     const newSessionId = randomUUID();
 
     const tokens = await this.tokenService.issueTokenPair(
-      user.id as string,
+      user.id,
       newSessionId,
       currentSession.familyId,
     );
@@ -328,7 +328,7 @@ export class AuthService {
     }
 
     const workspaces =
-      await this.workspacesService.listForUser(user.id as string);
+      await this.workspacesService.listForUser(user.id);
 
     return this.createAuthResult(
       tokens,

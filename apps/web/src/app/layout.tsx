@@ -1,32 +1,37 @@
-import type { Metadata } from 'next';
-import type { ReactNode } from 'react';
+import type {
+  Metadata,
+} from 'next';
 
-import { AppProviders } from '@/providers/app-providers';
+import type {
+  ReactNode,
+} from 'react';
+
+import {
+  Providers,
+} from './providers';
 
 import './globals.css';
 
-export const metadata: Metadata = {
-  title: {
-    default: 'SaaS Command Center',
-    template: '%s | SaaS Command Center',
-  },
-  description:
-    'Manage SaaS projects, workspaces and progress from one clean dashboard.',
-};
+export const metadata:
+  Metadata = {
+  title:
+    'SaaS Command Center',
 
-interface RootLayoutProps {
-  children: ReactNode;
-}
+  description:
+    'Manage applications, analytics, releases, and operational health.',
+};
 
 export default function RootLayout({
   children,
-}: RootLayoutProps) {
+}: Readonly<{
+  children: ReactNode;
+}>) {
   return (
     <html lang="en">
-      <body>
-        <AppProviders>
+      <body className="min-h-screen bg-slate-50 text-slate-950 antialiased">
+        <Providers>
           {children}
-        </AppProviders>
+        </Providers>
       </body>
     </html>
   );

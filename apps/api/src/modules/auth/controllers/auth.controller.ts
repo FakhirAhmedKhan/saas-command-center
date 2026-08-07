@@ -1,325 +1,320 @@
-import {
+﻿import {
   Body,
   Controller,
   Get,
-  HttpCode,
-  HttpStatus,
   Post,
   Req,
   Res,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+
 import {
   ApiBearerAuth,
-  ApiCreatedResponse,
-  ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { Throttle } from '@nestjs/throttler';
-import type { Request, Response } from 'express';
+
+import type {
+  Request,
+  Response,
+} from 'express';
 
 import {
-  REFRESH_TOKEN_COOKIE,
-} from '../auth.constants';
-// import { AuthService } from '../auth.service';
-import { CurrentUser } from '../decorators/current-user.decorator';
-import { Public } from '../decorators/public.decorator';
-import { LoginDto } from '../dto/login.dto';
-import { RefreshTokenDto } from '../dto/refresh-token.dto';
-import { RegisterDto } from '../dto/register.dto';
-import type { AuthenticatedUser } from '../interfaces/authenticated-user.interface';
-import { TokenService } from '../services/token.service';
-import { AuthService } from '../services/auth.service';
+  CurrentUser,
+} from '../decorators/current-user.decorator';
 
+import {
+  Public,
+} from '../decorators/public.decorator';
+
+import {
+  LoginDto,
+} from '../dto/login.dto';
+
+import {
+  RegisterDto,
+} from '../dto/register.dto';
+
+
+
+
+
+import {
+  AuthCookieService,
+} from '../services/auth-cookie.service';
+
+import {
+  AuthService,
+} from '../services/auth.service';
+import { AuthenticatedUser } from '../interfaces/authenticated-user.interface';
+
+
+type AuthSessionResult =
+  Awaited<
+    ReturnType<AuthService['login']>
+  >;
+
+type PublicAuthSession =
+  Omit<
+    AuthSessionResult,
+    'refreshToken'
+  >;
+
+type AuthRequestMetadata =
+  Parameters<
+    AuthService['login']
+  >[1];
+
+function getAuthRequestMetadata(
+  request: Request,
+): AuthRequestMetadata {
+  return {
+    userAgent:
+      request
+        .get('user-agent')
+        ?.slice(0, 512),
+
+    ipAddress:
+      request.ip ??
+      request.socket.remoteAddress,
+  };
+}
+
+function toPublicAuthSession(
+  result: AuthSessionResult,
+): PublicAuthSession {
+  const {
+    refreshToken,
+    ...publicSession
+  } = result;
+
+  void refreshToken;
+
+  return publicSession;
+}
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly authService: AuthService,
-    private readonly tokenService: TokenService,
-    private readonly configService: ConfigService,
-  ) { }
+    private readonly authService:
+      AuthService,
+
+    private readonly authCookieService:
+      AuthCookieService,
+  ) {}
 
   @Public()
   @Post('register')
-  @Throttle({
-    default: {
-      limit: 5,
-      ttl: 60_000,
-    },
-  })
   @ApiOperation({
-    summary: 'Register user and create owner workspace',
-  })
-  @ApiCreatedResponse({
-    description: 'User, workspace and session created successfully.',
+    summary:
+      'Register and create a user session',
   })
   async register(
-    @Body() dto: RegisterDto,
-    @Req() request: Request,
-    @Res({ passthrough: true }) response: Response,
-  ) {
-    const result = await this.authService.register(
-      dto,
-      this.getRequestMetadata(request),
+    @Body()
+    dto: RegisterDto,
+
+    @Req()
+    request: Request,
+
+    @Res({
+      passthrough: true,
+    })
+    response: Response,
+  ): Promise<PublicAuthSession> {
+    const result =
+      await this.authService
+      .register(
+        dto,
+        getAuthRequestMetadata(
+          request,
+        ),
+      );
+
+    this.authCookieService
+      .setRefreshToken(
+        response,
+        result.refreshToken,
+      );
+
+    return toPublicAuthSession(
+      result,
     );
-
-    this.setRefreshCookie(
-      response,
-      result.refreshToken,
-    );
-
-    const {
-      refreshToken: _refreshToken,
-      ...responseBody
-    } = result;
-
-    return responseBody;
   }
 
   @Public()
   @Post('login')
-  @HttpCode(HttpStatus.OK)
-  @Throttle({
-    default: {
-      limit: 10,
-      ttl: 60_000,
-    },
-  })
   @ApiOperation({
-    summary: 'Authenticate user',
-  })
-  @ApiOkResponse({
-    description: 'Login successful.',
+    summary:
+      'Authenticate and create a user session',
   })
   async login(
-    @Body() dto: LoginDto,
-    @Req() request: Request,
-    @Res({ passthrough: true }) response: Response,
-  ) {
-    const result = await this.authService.login(
-      dto,
-      this.getRequestMetadata(request),
+    @Body()
+    dto: LoginDto,
+
+    @Req()
+    request: Request,
+
+    @Res({
+      passthrough: true,
+    })
+    response: Response,
+  ): Promise<PublicAuthSession> {
+    const result =
+      await this.authService
+      .login(
+        dto,
+        getAuthRequestMetadata(
+          request,
+        ),
+      );
+
+    this.authCookieService
+      .setRefreshToken(
+        response,
+        result.refreshToken,
+      );
+
+    return toPublicAuthSession(
+      result,
     );
-
-    this.setRefreshCookie(
-      response,
-      result.refreshToken,
-    );
-
-    const {
-      refreshToken: _refreshToken,
-      ...responseBody
-    } = result;
-
-    return responseBody;
   }
 
   @Public()
   @Post('refresh')
-  @HttpCode(HttpStatus.OK)
-  @Throttle({
-    default: {
-      limit: 30,
-      ttl: 60_000,
-    },
-  })
   @ApiOperation({
-    summary: 'Rotate refresh token',
-  })
-  @ApiOkResponse({
-    description: 'Refresh token rotated successfully.',
+    summary:
+      'Rotate the current refresh session',
   })
   async refresh(
-    @Body() dto: RefreshTokenDto,
-    @Req() request: Request,
-    @Res({ passthrough: true }) response: Response,
-  ) {
-    const refreshToken = this.resolveRefreshToken(
-      request,
-      dto.refreshToken,
-    );
+    @Req()
+    request: Request,
+
+    @Res({
+      passthrough: true,
+    })
+    response: Response,
+  ): Promise<PublicAuthSession> {
+    const refreshToken =
+      this.authCookieService
+        .getRefreshToken(
+          request,
+        );
 
     if (!refreshToken) {
       throw new UnauthorizedException(
-        'Refresh token is required',
+        'Refresh token is missing.',
       );
     }
 
-    const result = await this.authService.refresh(
-      refreshToken,
-      this.getRequestMetadata(request),
+    const result =
+      await this.authService
+      .refresh(
+        refreshToken,
+        getAuthRequestMetadata(
+          request,
+        ),
+      );
+
+    this.authCookieService
+      .setRefreshToken(
+        response,
+        result.refreshToken,
+      );
+
+    return toPublicAuthSession(
+      result,
     );
-
-    this.setRefreshCookie(
-      response,
-      result.refreshToken,
-    );
-
-    const {
-      refreshToken: _refreshToken,
-      ...responseBody
-    } = result;
-
-    return responseBody;
   }
 
   @Public()
   @Post('logout')
-  @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Revoke the current refresh session',
-  })
-  @ApiOkResponse({
-    description: 'Logout successful.',
+    summary:
+      'Revoke the current user session',
   })
   async logout(
-    @Body() dto: RefreshTokenDto,
-    @Req() request: Request,
-    @Res({ passthrough: true }) response: Response,
-  ) {
-    const refreshToken = this.resolveRefreshToken(
-      request,
-      dto.refreshToken,
-    );
+    @Req()
+    request: Request,
 
-    await this.authService.logout(refreshToken);
+    @Res({
+      passthrough: true,
+    })
+    response: Response,
+  ): Promise<{
+    success: true;
+  }> {
+    const refreshToken =
+      this.authCookieService
+        .getRefreshToken(
+          request,
+        );
 
-    this.clearRefreshCookie(response);
+    try {
+      if (refreshToken) {
+        await this.authService
+          .logout(
+            refreshToken,
+          );
+      }
+    } finally {
+      this.authCookieService
+        .clearRefreshToken(
+          response,
+        );
+    }
 
     return {
-      message: 'Logged out successfully',
+      success: true,
     };
   }
 
+  @ApiBearerAuth()
   @Post('logout-all')
-  @HttpCode(HttpStatus.OK)
-  @ApiBearerAuth('access-token')
   @ApiOperation({
-    summary: 'Revoke every active user session',
-  })
-  @ApiOkResponse({
-    description: 'All sessions revoked successfully.',
+    summary:
+      'Revoke every user session',
   })
   async logoutAll(
-    @CurrentUser() user: AuthenticatedUser,
-    @Res({ passthrough: true }) response: Response,
-  ) {
-    const revokedSessions =
-      await this.authService.logoutAll(user.id);
+    @CurrentUser()
+    user:
+      AuthenticatedUser,
 
-    this.clearRefreshCookie(response);
+    @Res({
+      passthrough: true,
+    })
+    response: Response,
+  ): Promise<{
+    success: true;
+  }> {
+    await this.authService
+      .logoutAll(
+        user.id,
+      );
+
+    this.authCookieService
+      .clearRefreshToken(
+        response,
+      );
 
     return {
-      message: 'All sessions revoked',
-      revokedSessions,
+      success: true,
     };
   }
 
+  @ApiBearerAuth()
   @Get('me')
-  @ApiBearerAuth('access-token')
   @ApiOperation({
-    summary: 'Get current authenticated user',
+    summary:
+      'Return the active user',
   })
-  @ApiOkResponse({
-    description: 'Authenticated user returned successfully.',
-  })
-  getMe(
-    @CurrentUser() user: AuthenticatedUser,
-  ) {
-    return this.authService.getCurrentUser(
-      user.id,
-    );
-  }
-
-  private resolveRefreshToken(
-    request: Request,
-    bodyToken?: string,
-  ): string | undefined {
-    if (bodyToken?.trim()) {
-      return bodyToken.trim();
-    }
-
-    const cookieToken: unknown =
-      request.cookies?.[REFRESH_TOKEN_COOKIE];
-
-    return typeof cookieToken === 'string'
-      ? cookieToken
-      : undefined;
-  }
-
-  private setRefreshCookie(
-    response: Response,
-    token: string,
-  ): void {
-    const production =
-      this.configService.get<string>('NODE_ENV') ===
-      'production';
-
-    response.cookie(
-      REFRESH_TOKEN_COOKIE,
-      token,
-      {
-        httpOnly: true,
-        secure: production,
-        sameSite: production ? 'strict' : 'lax',
-        path: '/api/v1/auth',
-        maxAge:
-          this.tokenService.getRefreshCookieMaxAge(),
-      },
-    );
-  }
-
-  private clearRefreshCookie(
-    response: Response,
-  ): void {
-    const production =
-      this.configService.get<string>('NODE_ENV') ===
-      'production';
-
-    response.clearCookie(
-      REFRESH_TOKEN_COOKIE,
-      {
-        httpOnly: true,
-        secure: production,
-        sameSite: production ? 'strict' : 'lax',
-        path: '/api/v1/auth',
-      },
-    );
-  }
-
-  private getRequestMetadata(
-    request: Request,
-  ): {
-    userAgent: string | null;
-    ipAddress: string | null;
-  } {
-    const forwardedFor =
-      request.headers['x-forwarded-for'];
-
-    let forwardedIp: string | undefined;
-
-    if (typeof forwardedFor === 'string') {
-      const firstAddress =
-        forwardedFor.split(',').at(0);
-
-      forwardedIp = firstAddress?.trim();
-    } else if (Array.isArray(forwardedFor)) {
-      forwardedIp =
-        forwardedFor.at(0)?.trim();
-    }
-
-    return {
-      userAgent:
-        request.headers['user-agent'] ?? null,
-
-      ipAddress:
-        forwardedIp ||
-        request.ip ||
-        request.socket.remoteAddress ||
-        null,
-    };
+  getCurrentUser(
+    @CurrentUser()
+    user:
+      AuthenticatedUser,
+  ): Promise<unknown> {
+    return this.authService
+      .getCurrentUser(
+        user.id,
+      );
   }
 }

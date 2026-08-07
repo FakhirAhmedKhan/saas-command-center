@@ -1,41 +1,65 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import {
-  type FormEvent,
   useState,
 } from 'react';
 
-import { useAuth } from '@/features/auth/auth-provider';
+import type {
+  FormEvent,
+} from 'react';
+
+import Link from 'next/link';
+
+import {
+  useRouter,
+} from 'next/navigation';
+
+import {
+  useSession,
+} from '@/features/auth/use-session';
 import { getErrorMessage } from '@/features/lib/api/api-error';
 
 export default function RegisterPage() {
-  const router = useRouter();
+  const router =
+    useRouter();
 
-  const { register } = useAuth();
+  const {
+    register,
+  } = useSession();
 
-  const [displayName, setDisplayName] =
-    useState('');
+  const [
+    name,
+    setName,
+  ] = useState('');
 
-  const [email, setEmail] =
-    useState('');
+  const [
+    email,
+    setEmail,
+  ] = useState('');
 
-  const [password, setPassword] =
-    useState('');
+  const [
+    password,
+    setPassword,
+  ] = useState('');
 
-  const [workspaceName, setWorkspaceName] =
-    useState('');
+  const [
+    error,
+    setError,
+  ] = useState<
+    string | null
+  >(null);
 
-  const [error, setError] =
-    useState<string | null>(null);
-
-  const [submitting, setSubmitting] =
-    useState(false);
+  const [
+    submitting,
+    setSubmitting,
+  ] = useState(false);
 
   async function handleSubmit(
-    event: FormEvent<HTMLFormElement>,
-  ) {
+    event:
+      FormEvent<
+        HTMLFormElement
+      >,
+  ): Promise<void> {
     event.preventDefault();
 
     setError(null);
@@ -43,131 +67,163 @@ export default function RegisterPage() {
 
     try {
       await register({
-        displayName:
-          displayName.trim() || undefined,
+        name,
         email,
         password,
-        workspaceName,
+        workspaceName: ''
       });
 
-      router.replace('/dashboard');
-    } catch (caughtError) {
+      router.replace(
+        '/dashboard',
+      );
+    } catch (
+    caughtError
+    ) {
       setError(
-        getErrorMessage(caughtError),
+        getErrorMessage(
+          caughtError,
+        ),
       );
     } finally {
-      setSubmitting(false);
+      setSubmitting(
+        false,
+      );
     }
   }
 
   return (
-    <div className="auth-card">
-      <div className="auth-card-header">
-        <p className="eyebrow">
-          Create your workspace
+    <main className="flex min-h-screen items-center justify-center p-6">
+      <section className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
+        <h1 className="text-2xl font-bold">
+          Create your account
+        </h1>
+
+        <p className="mt-2 text-sm text-slate-600">
+          Start managing your
+          SaaS applications.
         </p>
 
-        <h2>Start with the essentials</h2>
-
-        <p>
-          Your first workspace is created
-          automatically with you as owner.
-        </p>
-      </div>
-
-      <form
-        className="form-stack"
-        onSubmit={handleSubmit}
-      >
-        {error && (
-          <div className="alert alert-error">
-            {error}
-          </div>
-        )}
-
-        <label className="field">
-          <span>Your name</span>
-
-          <input
-            autoComplete="name"
-            value={displayName}
-            onChange={(event) =>
-              setDisplayName(
-                event.target.value,
-              )
-            }
-            placeholder="Your display name"
-          />
-        </label>
-
-        <label className="field">
-          <span>Email address</span>
-
-          <input
-            autoComplete="email"
-            type="email"
-            value={email}
-            onChange={(event) =>
-              setEmail(event.target.value)
-            }
-            placeholder="you@example.com"
-            required
-          />
-        </label>
-
-        <label className="field">
-          <span>Password</span>
-
-          <input
-            autoComplete="new-password"
-            type="password"
-            value={password}
-            onChange={(event) =>
-              setPassword(event.target.value)
-            }
-            placeholder="At least 12 characters"
-            minLength={12}
-            required
-          />
-
-          <small>
-            Use at least 12 characters.
-          </small>
-        </label>
-
-        <label className="field">
-          <span>Workspace name</span>
-
-          <input
-            value={workspaceName}
-            onChange={(event) =>
-              setWorkspaceName(
-                event.target.value,
-              )
-            }
-            placeholder="My SaaS Portfolio"
-            minLength={2}
-            required
-          />
-        </label>
-
-        <button
-          className="button button-primary button-full"
-          disabled={submitting}
-          type="submit"
+        <form
+          className="mt-6 space-y-4"
+          onSubmit={
+            handleSubmit
+          }
         >
-          {submitting
-            ? 'Creating workspace…'
-            : 'Create account'}
-        </button>
-      </form>
+          <div>
+            <label
+              htmlFor="name"
+              className="text-sm font-medium"
+            >
+              Name
+            </label>
 
-      <p className="auth-switch">
-        Already have an account?{' '}
-        <Link href="/login">
-          Sign in
-        </Link>
-      </p>
-    </div>
+            <input
+              id="name"
+              type="text"
+              autoComplete="name"
+              required
+              minLength={2}
+              value={name}
+              onChange={(
+                event,
+              ) => {
+                setName(
+                  event.target
+                    .value,
+                );
+              }}
+              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-slate-950"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="email"
+              className="text-sm font-medium"
+            >
+              Email
+            </label>
+
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(
+                event,
+              ) => {
+                setEmail(
+                  event.target
+                    .value,
+                );
+              }}
+              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-slate-950"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="password"
+              className="text-sm font-medium"
+            >
+              Password
+            </label>
+
+            <input
+              id="password"
+              type="password"
+              autoComplete="new-password"
+              required
+              minLength={8}
+              value={
+                password
+              }
+              onChange={(
+                event,
+              ) => {
+                setPassword(
+                  event.target
+                    .value,
+                );
+              }}
+              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-slate-950"
+            />
+          </div>
+
+          {error ? (
+            <div
+              role="alert"
+              className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
+            >
+              {error}
+            </div>
+          ) : null}
+
+          <button
+            type="submit"
+            disabled={
+              submitting
+            }
+            className="w-full rounded-lg bg-slate-950 px-4 py-2.5 font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {submitting
+              ? 'Creating account…'
+              : 'Create account'}
+          </button>
+        </form>
+
+        <p className="mt-5 text-center text-sm text-slate-600">
+          Already registered?{' '}
+
+          <Link
+            href="/login"
+            className="font-medium text-slate-950 underline"
+          >
+            Sign in
+          </Link>
+        </p>
+      </section>
+    </main>
   );
 }

@@ -7,7 +7,7 @@ import {
   useRouter,
 } from 'next/navigation';
 
-import { FullPageLoader } from '@/components/auth/auth-gates';
+import { FullPageLoader } from '@/features/auth/auth-gates';
 import { useAuth } from '@/features/auth/auth-provider';
 
 export default function HomePage() {

@@ -6,9 +6,7 @@ import {
   ThrottlerModule,
 } from '@nestjs/throttler';
 
-import {
-  validateEnvironment,
-} from './common/config/env.validation';
+
 import {
   DatabaseModule,
 } from './database/database.module';
@@ -27,6 +25,7 @@ import { WebsitesModule } from './modules/websites/websites.module';
 import { DevelopmentModule } from './modules/development/development.module';
 import { AnalyticsIngestionModule } from './modules/analytics-ingestion/analytics-ingestion.module';
 import { AnalyticsEngineModule } from './modules/analytics-engine/analytics-engine.module';
+import { validateEnvironment } from './config/env.validation';
 
 @Module({
   imports: [
@@ -43,6 +42,7 @@ import { AnalyticsEngineModule } from './modules/analytics-engine/analytics-engi
         limit: 100,
       },
     ]),
+  
     ApplicationsModule,
     DatabaseModule,
     UsersModule,
