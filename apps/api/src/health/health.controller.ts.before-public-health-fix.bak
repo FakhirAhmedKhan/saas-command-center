@@ -12,10 +12,8 @@ import {
 } from '@nestjs/swagger';
 import type { HealthResponse } from '@command-center/shared-types';
 import type { Response } from 'express';
-import { Public } from '../modules/auth/decorators/public.decorator';
 import { HealthService } from './health.service';
 
-@Public()
 @ApiTags('System')
 @Controller('health')
 export class HealthController {

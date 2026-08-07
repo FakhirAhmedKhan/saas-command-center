@@ -23,7 +23,8 @@
     "dev:api": "pnpm --filter @command-center/api start:dev",
     "dev:web": "pnpm --filter @command-center/web dev",
     "dev:tracker": "pnpm --filter @command-center/tracker dev",
-    "test:full": "powershell -ExecutionPolicy Bypass -File scripts/test-full.ps1"
+    "test:full": "powershell -ExecutionPolicy Bypass -File scripts/test-full.ps1",
+    "test:e2e:fullstack": "powershell -ExecutionPolicy Bypass -File scripts/test-fullstack-e2e.ps1"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
