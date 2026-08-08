@@ -1,4 +1,4 @@
-﻿export const API_PREFIX = '/api/v1';
+export const API_PREFIX = '/api/v1';
 
 export const TEST_ROUTES = {
   auth: {
@@ -10,7 +10,13 @@ export const TEST_ROUTES = {
 
     logout: `${API_PREFIX}/auth/logout`,
 
+    logoutAll: `${API_PREFIX}/auth/logout-all`,
+
     me: `${API_PREFIX}/auth/me`,
+  },
+
+  system: {
+    health: `${API_PREFIX}/health`,
   },
 
   workspaces: {

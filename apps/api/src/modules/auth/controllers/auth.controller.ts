@@ -1,4 +1,14 @@
-﻿import { Body, Controller, Get, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+} from '@nestjs/common';
 
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -124,6 +134,7 @@ export class AuthController {
 
   @Public()
   @Post('logout')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Revoke the current user session',
   })
@@ -155,6 +166,7 @@ export class AuthController {
 
   @ApiBearerAuth()
   @Post('logout-all')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Revoke every user session',
   })

@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -57,6 +57,7 @@ export class TokenService {
         expiresIn: this.accessExpiresInSeconds,
         issuer: JWT_ISSUER,
         audience: JWT_AUDIENCE,
+        jwtid: randomUUID(),
       }),
 
       this.jwtService.signAsync(refreshPayload, {
