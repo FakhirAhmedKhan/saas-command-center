@@ -1,11 +1,7 @@
 'use client';
 
-import {
-  useEffect,
-} from 'react';
-import {
-  useRouter,
-} from 'next/navigation';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { FullPageLoader } from '@/features/auth/auth-gates';
 import { useAuth } from '@/features/auth/auth-provider';

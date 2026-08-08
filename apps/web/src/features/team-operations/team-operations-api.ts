@@ -1,5 +1,3 @@
-
-
 import { apiRequest } from '../auth/auth.types';
 import type {
   InvitationMutationResponse,
@@ -12,19 +10,13 @@ import type {
 export function getWorkspaceInvitations(
   workspaceId: string,
 
-  signal?:
-    AbortSignal,
-): Promise<
-  WorkspaceInvitation[]
-> {
-  return apiRequest<
-    WorkspaceInvitation[]
-  >(
+  signal?: AbortSignal,
+): Promise<WorkspaceInvitation[]> {
+  return apiRequest<WorkspaceInvitation[]>(
     `/workspaces/${workspaceId}/invitations`,
 
     {
-      method:
-        'GET',
+      method: 'GET',
 
       signal,
     },
@@ -38,20 +30,14 @@ export function createWorkspaceInvitation(
     email: string;
     role: WorkspaceRole;
   },
-): Promise<
-  InvitationMutationResponse
-> {
-  return apiRequest<
-    InvitationMutationResponse
-  >(
+): Promise<InvitationMutationResponse> {
+  return apiRequest<InvitationMutationResponse>(
     `/workspaces/${workspaceId}/invitations`,
 
     {
-      method:
-        'POST',
+      method: 'POST',
 
-      body:
-        input,
+      body: input,
     },
   );
 }
@@ -60,17 +46,12 @@ export function resendWorkspaceInvitation(
   workspaceId: string,
 
   invitationId: string,
-): Promise<
-  InvitationMutationResponse
-> {
-  return apiRequest<
-    InvitationMutationResponse
-  >(
+): Promise<InvitationMutationResponse> {
+  return apiRequest<InvitationMutationResponse>(
     `/workspaces/${workspaceId}/invitations/${invitationId}/resend`,
 
     {
-      method:
-        'POST',
+      method: 'POST',
     },
   );
 }
@@ -86,8 +67,7 @@ export function revokeWorkspaceInvitation(
     `/workspaces/${workspaceId}/invitations/${invitationId}/revoke`,
 
     {
-      method:
-        'POST',
+      method: 'POST',
     },
   );
 }
@@ -95,175 +75,124 @@ export function revokeWorkspaceInvitation(
 export function getInvitationPreview(
   token: string,
 
-  signal?:
-    AbortSignal,
-): Promise<
-  InvitationPreview
-> {
-  return apiRequest<
-    InvitationPreview
-  >(
-    `/invitations/${encodeURIComponent(
-      token,
-    )}`,
+  signal?: AbortSignal,
+): Promise<InvitationPreview> {
+  return apiRequest<InvitationPreview>(
+    `/invitations/${encodeURIComponent(token)}`,
 
     {
-      method:
-        'GET',
+      method: 'GET',
 
       signal,
 
-      skipAuthentication:
-        true,
+      skipAuthentication: true,
 
-      skipRefresh:
-        true,
+      skipRefresh: true,
     },
   );
 }
 
-export function acceptInvitation(
-  token: string,
-): Promise<{
+export function acceptInvitation(token: string): Promise<{
   success: true;
   workspaceId: string;
 }> {
   return apiRequest(
-    `/invitations/${encodeURIComponent(
-      token,
-    )}/accept`,
+    `/invitations/${encodeURIComponent(token)}/accept`,
 
     {
-      method:
-        'POST',
+      method: 'POST',
     },
   );
 }
 
-export function declineInvitation(
-  token: string,
-): Promise<{
+export function declineInvitation(token: string): Promise<{
   success: true;
 }> {
   return apiRequest(
-    `/invitations/${encodeURIComponent(
-      token,
-    )}/decline`,
+    `/invitations/${encodeURIComponent(token)}/decline`,
 
     {
-      method:
-        'POST',
+      method: 'POST',
     },
   );
 }
 
 export function getNotifications(
   options: {
-    unreadOnly?:
-      boolean;
+    unreadOnly?: boolean;
 
-    page?:
-      number;
+    page?: number;
 
-    limit?:
-      number;
+    limit?: number;
   } = {},
 
-  signal?:
-    AbortSignal,
+  signal?: AbortSignal,
 ) {
-  const params =
-    new URLSearchParams({
-      page:
-        String(
-          options.page ??
-          1,
-        ),
+  const params = new URLSearchParams({
+    page: String(options.page ?? 1),
 
-      limit:
-        String(
-          options.limit ??
-          20,
-        ),
-    });
+    limit: String(options.limit ?? 20),
+  });
 
-  if (
-    options.unreadOnly
-  ) {
-    params.set(
-      'unreadOnly',
-      'true',
-    );
+  if (options.unreadOnly) {
+    params.set('unreadOnly', 'true');
   }
 
   return apiRequest<{
-    items:
-      UserNotification[];
+    items: UserNotification[];
 
     pagination: {
       page: number;
       limit: number;
       total: number;
-      totalPages:
-        number;
+      totalPages: number;
     };
   }>(
     `/notifications?${params.toString()}`,
 
     {
-      method:
-        'GET',
+      method: 'GET',
 
       signal,
     },
   );
 }
 
-export function getUnreadNotificationCount(
-  signal?:
-    AbortSignal,
-): Promise<{
+export function getUnreadNotificationCount(signal?: AbortSignal): Promise<{
   count: number;
 }> {
   return apiRequest(
     '/notifications/unread-count',
 
     {
-      method:
-        'GET',
+      method: 'GET',
 
       signal,
     },
   );
 }
 
-export function markNotificationRead(
-  notificationId:
-    string,
-): Promise<{
+export function markNotificationRead(notificationId: string): Promise<{
   success: true;
 }> {
   return apiRequest(
     `/notifications/${notificationId}/read`,
 
     {
-      method:
-        'POST',
+      method: 'POST',
     },
   );
 }
 
-export function markAllNotificationsRead():
-  Promise<{
-    success: true;
-    updated: number;
-  }> {
+export function markAllNotificationsRead(): Promise<{
+  success: true;
+  updated: number;
+}> {
   return apiRequest(
     '/notifications/mark-all-read',
 
     {
-      method:
-        'POST',
+      method: 'POST',
     },
   );
 }

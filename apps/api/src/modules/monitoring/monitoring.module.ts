@@ -1,66 +1,42 @@
-import {
-    Module,
-} from '@nestjs/common';
+import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-members.module';
+import { Module } from '@nestjs/common';
 
-import {
-    DatabaseModule,
-} from '../../database/database.module';
+import { DatabaseModule } from '../../database/database.module';
 
-import {
-    PostgresAdvisoryLockService,
-} from '../../infrastructure/database/postgres-advisory-lock.service';
+import { PostgresAdvisoryLockService } from '../../infrastructure/database/postgres-advisory-lock.service';
 
-import {
-    MonitoringController,
-} from './controllers/monitoring.controller';
+import { MonitoringController } from './controllers/monitoring.controller';
 
-import {
-    HealthCheckRunnerService,
-} from './services/health-check-runner.service';
+import { HealthCheckRunnerService } from './services/health-check-runner.service';
 
-import {
-    HealthMonitoringSchedulerService,
-} from './services/health-monitoring-scheduler.service';
+import { HealthMonitoringSchedulerService } from './services/health-monitoring-scheduler.service';
 
-import {
-    MonitoringAccessService,
-} from './services/monitoring-access.service';
+import { MonitoringAccessService } from './services/monitoring-access.service';
 
-import {
-    MonitoringService,
-} from './services/monitoring.service';
+import { MonitoringService } from './services/monitoring.service';
 
-import {
-    SafeHttpClientService,
-} from './services/safe-http-client.service';
+import { SafeHttpClientService } from './services/safe-http-client.service';
 
 @Module({
-    imports: [
-        DatabaseModule,
-    ],
+  imports: [
+        WorkspaceMembersModule,DatabaseModule],
 
-    controllers: [
-        MonitoringController,
-    ],
+  controllers: [MonitoringController],
 
-    providers: [
-        PostgresAdvisoryLockService,
+  providers: [
+    PostgresAdvisoryLockService,
 
-        SafeHttpClientService,
+    SafeHttpClientService,
 
-        MonitoringAccessService,
+    MonitoringAccessService,
 
-        MonitoringService,
+    MonitoringService,
 
-        HealthCheckRunnerService,
+    HealthCheckRunnerService,
 
-        HealthMonitoringSchedulerService,
-    ],
+    HealthMonitoringSchedulerService,
+  ],
 
-    exports: [
-        MonitoringService,
-
-        HealthCheckRunnerService,
-    ],
+  exports: [MonitoringService, HealthCheckRunnerService],
 })
-export class MonitoringModule { }
+export class MonitoringModule {}

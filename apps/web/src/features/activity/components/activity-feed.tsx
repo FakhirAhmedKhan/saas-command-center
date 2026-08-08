@@ -1,61 +1,28 @@
 'use client';
 
-import {
-  useEffect,
-  useState,
-} from 'react';
+import { useEffect, useState } from 'react';
 
-import {
-  Activity,
-  ChevronLeft,
-  ChevronRight,
-  RefreshCw,
-} from 'lucide-react';
+import { Activity, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 
-import {
-  Button,
-} from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
-import {
-  EmptyState,
-} from '@/components/ui/empty-state';
+import { EmptyState } from '@/components/ui/empty-state';
 
-import {
-  Spinner,
-} from '@/components/ui/spinner';
+import { Spinner } from '@/components/ui/spinner';
 
-import {
-  getApplicationActivities,
-  getWorkspaceActivities,
-} from '../activity-api';
+import { getApplicationActivities, getWorkspaceActivities } from '../activity-api';
 
-import type {
-  ActivityListQuery,
-  ActivityPagination,
-  ApplicationActivity,
-} from '../activity-types';
+import type { ActivityListQuery, ActivityPagination, ApplicationActivity } from '../activity-types';
 
-import {
-  getActivityErrorMessage,
-} from '../activity-utils';
+import { getActivityErrorMessage } from '../activity-utils';
 
-import {
-  ActivityFilters,
-  type ActivityFilterValue,
-} from './activity-filters';
+import { ActivityFilters, type ActivityFilterValue } from './activity-filters';
 
-import {
-  ActivityItem,
-} from './activity-item';
+import { ActivityItem } from './activity-item';
 
-const DEFAULT_FILTERS:
-  ActivityFilterValue = {
+const DEFAULT_FILTERS: ActivityFilterValue = {
   search: '',
   activityType: '',
   actorType: '',
@@ -64,8 +31,7 @@ const DEFAULT_FILTERS:
   dateTo: '',
 };
 
-const DEFAULT_PAGINATION:
-  ActivityPagination = {
+const DEFAULT_PAGINATION: ActivityPagination = {
   page: 1,
   limit: 20,
   total: 0,
@@ -74,60 +40,35 @@ const DEFAULT_PAGINATION:
   hasPreviousPage: false,
 };
 
-function toIsoStartDate(
-  value: string,
-): string | undefined {
+function toIsoStartDate(value: string): string | undefined {
   if (!value) {
     return undefined;
   }
 
-  return new Date(
-    `${value}T00:00:00.000Z`,
-  ).toISOString();
+  return new Date(`${value}T00:00:00.000Z`).toISOString();
 }
 
-function toIsoEndDate(
-  value: string,
-): string | undefined {
+function toIsoEndDate(value: string): string | undefined {
   if (!value) {
     return undefined;
   }
 
-  return new Date(
-    `${value}T23:59:59.999Z`,
-  ).toISOString();
+  return new Date(`${value}T23:59:59.999Z`).toISOString();
 }
 
-function filtersToQuery(
-  filters:
-    ActivityFilterValue,
-): ActivityListQuery {
+function filtersToQuery(filters: ActivityFilterValue): ActivityListQuery {
   return {
-    search:
-      filters.search.trim() ||
-      undefined,
+    search: filters.search.trim() || undefined,
 
-    activityType:
-      filters.activityType ||
-      undefined,
+    activityType: filters.activityType || undefined,
 
-    actorType:
-      filters.actorType ||
-      undefined,
+    actorType: filters.actorType || undefined,
 
-    entityType:
-      filters.entityType ||
-      undefined,
+    entityType: filters.entityType || undefined,
 
-    dateFrom:
-      toIsoStartDate(
-        filters.dateFrom,
-      ),
+    dateFrom: toIsoStartDate(filters.dateFrom),
 
-    dateTo:
-      toIsoEndDate(
-        filters.dateTo,
-      ),
+    dateTo: toIsoEndDate(filters.dateTo),
 
     page: 1,
     limit: 20,
@@ -150,95 +91,47 @@ export function ActivityFeed({
   workspaceId,
   applicationId,
   title = 'Activity history',
-  description =
-    'Review important changes and the people who made them.',
+  description = 'Review important changes and the people who made them.',
   showApplication = false,
 }: ActivityFeedProps) {
-  const [
-    filterDraft,
-    setFilterDraft,
-  ] =
-    useState<ActivityFilterValue>(
-      DEFAULT_FILTERS,
-    );
+  const [filterDraft, setFilterDraft] = useState<ActivityFilterValue>(DEFAULT_FILTERS);
 
-  const [query, setQuery] =
-    useState<ActivityListQuery>(
-      filtersToQuery(
-        DEFAULT_FILTERS,
-      ),
-    );
+  const [query, setQuery] = useState<ActivityListQuery>(filtersToQuery(DEFAULT_FILTERS));
 
-  const [
-    activities,
-    setActivities,
-  ] = useState<
-    ApplicationActivity[]
-  >([]);
+  const [activities, setActivities] = useState<ApplicationActivity[]>([]);
 
-  const [
-    pagination,
-    setPagination,
-  ] =
-    useState<ActivityPagination>(
-      DEFAULT_PAGINATION,
-    );
+  const [pagination, setPagination] = useState<ActivityPagination>(DEFAULT_PAGINATION);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
 
-  const [error, setError] =
-    useState<string | null>(
-      null,
-    );
+  const [error, setError] = useState<string | null>(null);
 
-  const [
-    reloadKey,
-    setReloadKey,
-  ] = useState(0);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
 
     async function load(): Promise<void> {
       try {
-        const response =
-          applicationId
-            ? await getApplicationActivities(
-                workspaceId,
-                applicationId,
-                query,
-              )
-            : await getWorkspaceActivities(
-                workspaceId,
-                query,
-              );
+        const response = applicationId
+          ? await getApplicationActivities(workspaceId, applicationId, query)
+          : await getWorkspaceActivities(workspaceId, query);
 
         if (cancelled) {
           return;
         }
 
-        setActivities(
-          response.data,
-        );
+        setActivities(response.data);
 
-        setPagination(
-          response.meta,
-        );
+        setPagination(response.meta);
 
         setError(null);
-      } catch (
-        loadError: unknown
-      ) {
+      } catch (loadError: unknown) {
         if (cancelled) {
           return;
         }
 
-        setError(
-          getActivityErrorMessage(
-            loadError,
-          ),
-        );
+        setError(getActivityErrorMessage(loadError));
       } finally {
         if (!cancelled) {
           setLoading(false);
@@ -251,57 +144,35 @@ export function ActivityFeed({
     return () => {
       cancelled = true;
     };
-  }, [
-    workspaceId,
-    applicationId,
-    query,
-    reloadKey,
-  ]);
+  }, [workspaceId, applicationId, query, reloadKey]);
 
   function applyFilters(): void {
     setLoading(true);
 
-    setQuery(
-      filtersToQuery(
-        filterDraft,
-      ),
-    );
+    setQuery(filtersToQuery(filterDraft));
   }
 
   function resetFilters(): void {
-    setFilterDraft(
-      DEFAULT_FILTERS,
-    );
+    setFilterDraft(DEFAULT_FILTERS);
 
     setLoading(true);
 
-    setQuery(
-      filtersToQuery(
-        DEFAULT_FILTERS,
-      ),
-    );
+    setQuery(filtersToQuery(DEFAULT_FILTERS));
   }
 
-  function changePage(
-    page: number,
-  ): void {
+  function changePage(page: number): void {
     setLoading(true);
 
-    setQuery(
-      (currentQuery) => ({
-        ...currentQuery,
-        page,
-      }),
-    );
+    setQuery((currentQuery) => ({
+      ...currentQuery,
+      page,
+    }));
   }
 
   function refresh(): void {
     setLoading(true);
 
-    setReloadKey(
-      (currentValue) =>
-        currentValue + 1,
-    );
+    setReloadKey((currentValue) => currentValue + 1);
   }
 
   return (
@@ -313,20 +184,13 @@ export function ActivityFeed({
               <div className="flex items-center gap-2">
                 <Activity className="size-5 text-brand-600" />
 
-                <h2 className="text-lg font-semibold text-slate-950">
-                  {title}
-                </h2>
+                <h2 className="text-lg font-semibold text-slate-950">{title}</h2>
               </div>
 
-              <p className="mt-2 text-sm leading-6 text-slate-500">
-                {description}
-              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-500">{description}</p>
             </div>
 
-            <Button
-              variant="outline"
-              onClick={refresh}
-            >
+            <Button variant="outline" onClick={refresh}>
               <RefreshCw className="size-4" />
               Refresh
             </Button>
@@ -336,15 +200,9 @@ export function ActivityFeed({
         <CardContent>
           <ActivityFilters
             value={filterDraft}
-            onChange={
-              setFilterDraft
-            }
-            onApply={
-              applyFilters
-            }
-            onReset={
-              resetFilters
-            }
+            onChange={setFilterDraft}
+            onApply={applyFilters}
+            onReset={resetFilters}
           />
         </CardContent>
       </Card>
@@ -363,28 +221,18 @@ export function ActivityFeed({
               <Activity className="size-6" />
             </div>
 
-            <h3 className="mt-5 text-lg font-semibold text-slate-900">
-              Unable to load activity
-            </h3>
+            <h3 className="mt-5 text-lg font-semibold text-slate-900">Unable to load activity</h3>
 
-            <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">
-              {error}
-            </p>
+            <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">{error}</p>
 
-            <Button
-              className="mt-6"
-              variant="outline"
-              onClick={refresh}
-            >
+            <Button className="mt-6" variant="outline" onClick={refresh}>
               Try again
             </Button>
           </CardContent>
         </Card>
       ) : activities.length === 0 ? (
         <EmptyState
-          icon={
-            <Activity className="size-6" />
-          }
+          icon={<Activity className="size-6" />}
           title="No activity found"
           description="Important application changes will appear here."
         />
@@ -392,55 +240,27 @@ export function ActivityFeed({
         <Card>
           <CardContent className="p-5 sm:p-6">
             <div>
-              {activities.map(
-                (activity) => (
-                  <ActivityItem
-                    key={activity.id}
-                    workspaceId={
-                      workspaceId
-                    }
-                    activity={
-                      activity
-                    }
-                    showApplication={
-                      showApplication
-                    }
-                  />
-                ),
-              )}
+              {activities.map((activity) => (
+                <ActivityItem
+                  key={activity.id}
+                  workspaceId={workspaceId}
+                  activity={activity}
+                  showApplication={showApplication}
+                />
+              ))}
             </div>
 
-            {pagination.totalPages >
-            1 ? (
+            {pagination.totalPages > 1 ? (
               <div className="mt-6 flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-slate-500">
-                  Page{' '}
-                  {
-                    pagination.page
-                  }{' '}
-                  of{' '}
-                  {
-                    pagination.totalPages
-                  }{' '}
-                  ·{' '}
-                  {
-                    pagination.total
-                  }{' '}
-                  activities
+                  Page {pagination.page} of {pagination.totalPages} · {pagination.total} activities
                 </p>
 
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
-                    disabled={
-                      !pagination.hasPreviousPage
-                    }
-                    onClick={() =>
-                      changePage(
-                        pagination.page -
-                          1,
-                      )
-                    }
+                    disabled={!pagination.hasPreviousPage}
+                    onClick={() => changePage(pagination.page - 1)}
                   >
                     <ChevronLeft className="size-4" />
                     Previous
@@ -448,15 +268,8 @@ export function ActivityFeed({
 
                   <Button
                     variant="outline"
-                    disabled={
-                      !pagination.hasNextPage
-                    }
-                    onClick={() =>
-                      changePage(
-                        pagination.page +
-                          1,
-                      )
-                    }
+                    disabled={!pagination.hasNextPage}
+                    onClick={() => changePage(pagination.page + 1)}
                   >
                     Next
                     <ChevronRight className="size-4" />

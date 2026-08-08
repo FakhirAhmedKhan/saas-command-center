@@ -16,13 +16,9 @@ if (files.length === 0) {
   throw new Error('No tracker test files were found.');
 }
 
-const result = spawnSync(
-  process.execPath,
-  ['--test', ...files],
-  {
-    cwd: packageRoot,
-    stdio: 'inherit',
-  },
-);
+const result = spawnSync(process.execPath, ['--test', ...files], {
+  cwd: packageRoot,
+  stdio: 'inherit',
+});
 
 process.exit(result.status ?? 1);

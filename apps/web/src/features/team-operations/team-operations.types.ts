@@ -1,20 +1,8 @@
-export type WorkspaceRole =
-  | 'OWNER'
-  | 'ADMIN'
-  | 'DEVELOPER'
-  | 'VIEWER';
+export type WorkspaceRole = 'OWNER' | 'ADMIN' | 'DEVELOPER' | 'VIEWER';
 
-export type InvitationStatus =
-  | 'PENDING'
-  | 'ACCEPTED'
-  | 'DECLINED'
-  | 'REVOKED'
-  | 'EXPIRED';
+export type InvitationStatus = 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'REVOKED' | 'EXPIRED';
 
-export type InvitationDeliveryStatus =
-  | 'NOT_REQUESTED'
-  | 'SENT'
-  | 'FAILED';
+export type InvitationDeliveryStatus = 'NOT_REQUESTED' | 'SENT' | 'FAILED';
 
 export interface WorkspaceInvitation {
   id: string;
@@ -23,61 +11,47 @@ export interface WorkspaceInvitation {
   email: string;
   role: WorkspaceRole;
 
-  status:
-    InvitationStatus;
+  status: InvitationStatus;
 
-  deliveryStatus:
-    InvitationDeliveryStatus;
+  deliveryStatus: InvitationDeliveryStatus;
 
-  deliveryError:
-    string | null;
+  deliveryError: string | null;
 
   expiresAt: string;
-  acceptedAt:
-    string | null;
-  declinedAt:
-    string | null;
-  revokedAt:
-    string | null;
+  acceptedAt: string | null;
+  declinedAt: string | null;
+  revokedAt: string | null;
 
-  lastSentAt:
-    string | null;
+  lastSentAt: string | null;
 
-  sendCount:
-    number;
+  sendCount: number;
 
-  createdAt:
-    string;
+  createdAt: string;
 
   invitedBy: {
     id: string;
-    name:
-      string | null;
+    name: string | null;
     email: string;
   };
 
   acceptedBy: {
     id: string;
-    name:
-      string | null;
+    name: string | null;
     email: string;
   } | null;
 }
 
 export interface InvitationMutationResponse {
-  invitation:
-    WorkspaceInvitation;
+  invitation: WorkspaceInvitation;
 
-  invitationUrl:
-    string;
+  invitationUrl: string;
 }
 
 export interface InvitationPreview {
   id: string;
   email: string;
   role: WorkspaceRole;
-  status:
-    InvitationStatus;
+  status: InvitationStatus;
 
   workspace: {
     id: string;
@@ -85,51 +59,37 @@ export interface InvitationPreview {
   };
 
   invitedBy: {
-    name:
-      string | null;
+    name: string | null;
     email: string;
   };
 
-  expiresAt:
-    string;
+  expiresAt: string;
 }
 
-export type NotificationPriority =
-  | 'INFO'
-  | 'WARNING'
-  | 'CRITICAL';
+export type NotificationPriority = 'INFO' | 'WARNING' | 'CRITICAL';
 
 export interface UserNotification {
   id: string;
-  workspaceId:
-    string;
+  workspaceId: string;
 
-  applicationId:
-    string | null;
+  applicationId: string | null;
 
   type: string;
 
-  priority:
-    NotificationPriority;
+  priority: NotificationPriority;
 
   title: string;
   message: string;
 
-  resourceType:
-    string | null;
+  resourceType: string | null;
 
-  resourceId:
-    string | null;
+  resourceId: string | null;
 
-  actionUrl:
-    string | null;
+  actionUrl: string | null;
 
-  readAt:
-    string | null;
+  readAt: string | null;
 
-  expiresAt:
-    string | null;
+  expiresAt: string | null;
 
-  createdAt:
-    string;
+  createdAt: string;
 }

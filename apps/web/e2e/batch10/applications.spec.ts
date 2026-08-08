@@ -1,7 +1,4 @@
-import {
-  expect,
-  test,
-} from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import {
   APPLICATION_ID,
@@ -11,14 +8,10 @@ import {
 } from './fixtures/mock-api';
 
 test.describe('Batch 10 application flows', () => {
-  test('lists active applications with status, priority, and technology', async ({
-    page,
-  }) => {
+  test('lists active applications with status, priority, and technology', async ({ page }) => {
     await installMockApi(page);
 
-    await page.goto(
-      `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`,
-    );
+    await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}/applications`);
 
     await expect(
       page.getByRole('heading', {
@@ -38,24 +31,16 @@ test.describe('Batch 10 application flows', () => {
         })
         .first(),
     ).toBeVisible();
-    await expect(
-      page.getByText('High priority'),
-    ).toBeVisible();
-    await expect(
-      page.getByText('Next.js'),
-    ).toBeVisible();
+    await expect(page.getByText('High priority')).toBeVisible();
+    await expect(page.getByText('Next.js')).toBeVisible();
   });
 
-  test('shows the active empty state', async ({
-    page,
-  }) => {
+  test('shows the active empty state', async ({ page }) => {
     await installMockApi(page, {
       applications: [],
     });
 
-    await page.goto(
-      `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`,
-    );
+    await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}/applications`);
 
     await expect(
       page.getByRole('heading', {
@@ -69,21 +54,13 @@ test.describe('Batch 10 application flows', () => {
     ).toBeVisible();
   });
 
-  test('applies application search and status filters to the API request', async ({
-    page,
-  }) => {
+  test('applies application search and status filters to the API request', async ({ page }) => {
     const state = await installMockApi(page);
 
-    await page.goto(
-      `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`,
-    );
+    await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}/applications`);
 
-    await page
-      .getByLabel('Search applications')
-      .fill('PriceScout');
-    await page
-      .getByLabel('Status')
-      .selectOption('IN_DEVELOPMENT');
+    await page.getByLabel('Search applications').fill('PriceScout');
+    await page.getByLabel('Status').selectOption('IN_DEVELOPMENT');
     await page
       .getByRole('button', {
         name: 'Apply filters',
@@ -96,109 +73,69 @@ test.describe('Batch 10 application flows', () => {
       }),
     ).toBeVisible();
 
-    const latestListRequest =
-      state.requests
-        .filter(
-          (request) =>
-            request.method === 'GET' &&
-            request.path ===
-              `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`,
-        )
-        .at(-1);
+    const latestListRequest = state.requests
+      .filter(
+        (request) =>
+          request.method === 'GET' &&
+          request.path === `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`,
+      )
+      .at(-1);
 
-    expect(latestListRequest?.search).toContain(
-      'search=PriceScout',
-    );
-    expect(latestListRequest?.search).toContain(
-      'status=IN_DEVELOPMENT',
-    );
+    expect(latestListRequest?.search).toContain('search=PriceScout');
+    expect(latestListRequest?.search).toContain('status=IN_DEVELOPMENT');
   });
 
-  test('creates an application with normalized form values', async ({
-    page,
-  }) => {
+  test('creates an application with normalized form values', async ({ page }) => {
     const state = await installMockApi(page);
 
-    await page.goto(
-      `/workspaces/${PRIMARY_WORKSPACE_ID}/applications/new`,
-    );
-    await page
-      .getByLabel('Application name')
-      .fill('  MadadAI Portal  ');
-    await page
-      .getByLabel('Slug')
-      .fill('madadai-portal');
-    await page
-      .getByLabel('Short description')
-      .fill('  Emergency response portal  ');
-    await page
-      .getByLabel('Long description')
-      .fill('  Full incident workflow.  ');
-    await page
-      .getByLabel('Category')
-      .selectOption('AI');
-    await page
-      .getByLabel('Status')
-      .selectOption('PLANNING');
-    await page
-      .getByLabel('Priority')
-      .selectOption('CRITICAL');
-    await page
-      .getByLabel('Start date')
-      .fill('2026-08-01');
+    await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}/applications/new`);
+    await page.getByLabel('Application name').fill('  MadadAI Portal  ');
+    await page.getByLabel('Slug').fill('madadai-portal');
+    await page.getByLabel('Short description').fill('  Emergency response portal  ');
+    await page.getByLabel('Long description').fill('  Full incident workflow.  ');
+    await page.getByLabel('Category').selectOption('AI');
+    await page.getByLabel('Status').selectOption('PLANNING');
+    await page.getByLabel('Priority').selectOption('CRITICAL');
+    await page.getByLabel('Start date').fill('2026-08-01');
     await page
       .getByRole('button', {
         name: 'Create application',
       })
       .click();
 
-    await expect(page).toHaveURL(
-      /\/applications\/77777777-7777-4777-8777-777777777777$/,
-    );
+    await expect(page).toHaveURL(/\/applications\/77777777-7777-4777-8777-777777777777$/);
     await expect(
       page.getByRole('heading', {
         name: 'MadadAI Portal',
       }),
     ).toBeVisible();
 
-    const createRequest =
-      state.requests.find(
-        (request) =>
-          request.method === 'POST' &&
-          request.path ===
-            `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`,
-      );
+    const createRequest = state.requests.find(
+      (request) =>
+        request.method === 'POST' &&
+        request.path === `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`,
+    );
 
     expect(createRequest?.body).toMatchObject({
       name: 'MadadAI Portal',
       slug: 'madadai-portal',
-      shortDescription:
-        'Emergency response portal',
-      longDescription:
-        'Full incident workflow.',
+      shortDescription: 'Emergency response portal',
+      longDescription: 'Full incident workflow.',
       category: 'AI',
       status: 'PLANNING',
       priority: 'CRITICAL',
     });
   });
 
-  test('shows the custom short-name validation message', async ({
-    page,
-  }) => {
+  test('shows the custom short-name validation message', async ({ page }) => {
     await installMockApi(page);
 
-    await page.goto(
-      `/workspaces/${PRIMARY_WORKSPACE_ID}/applications/new`,
-    );
-    await page
-      .getByLabel('Application name')
-      .fill('A');
+    await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}/applications/new`);
+    await page.getByLabel('Application name').fill('A');
 
-    await page.locator('form').evaluate(
-      (form) => {
-        (form as HTMLFormElement).noValidate = true;
-      },
-    );
+    await page.locator('form').evaluate((form) => {
+      (form as HTMLFormElement).noValidate = true;
+    });
 
     await page
       .getByRole('button', {
@@ -206,16 +143,12 @@ test.describe('Batch 10 application flows', () => {
       })
       .click();
 
-    await expect(
-      page.locator('[role="alert"]:not(#__next-route-announcer__)'),
-    ).toContainText(
+    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toContainText(
       'Application name must contain at least two characters.',
     );
   });
 
-  test('shows an API error on application creation', async ({
-    page,
-  }) => {
+  test('shows an API error on application creation', async ({ page }) => {
     await installMockApi(page, {
       failures: {
         [`POST /workspaces/${PRIMARY_WORKSPACE_ID}/applications`]: {
@@ -225,31 +158,21 @@ test.describe('Batch 10 application flows', () => {
       },
     });
 
-    await page.goto(
-      `/workspaces/${PRIMARY_WORKSPACE_ID}/applications/new`,
-    );
-    await page
-      .getByLabel('Application name')
-      .fill('Duplicate Application');
-    await page
-      .getByLabel('Slug')
-      .fill('pricescout-ai');
+    await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}/applications/new`);
+    await page.getByLabel('Application name').fill('Duplicate Application');
+    await page.getByLabel('Slug').fill('pricescout-ai');
     await page
       .getByRole('button', {
         name: 'Create application',
       })
       .click();
 
-    await expect(
-      page.locator('[role="alert"]:not(#__next-route-announcer__)'),
-    ).toContainText(
+    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toContainText(
       'Application slug already exists',
     );
   });
 
-  test('opens an application detail page', async ({
-    page,
-  }) => {
+  test('opens an application detail page', async ({ page }) => {
     await installMockApi(page, {
       applications: [
         makeApplication({
@@ -258,9 +181,7 @@ test.describe('Batch 10 application flows', () => {
       ],
     });
 
-    await page.goto(
-      `/workspaces/${PRIMARY_WORKSPACE_ID}/applications/${APPLICATION_ID}`,
-    );
+    await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}/applications/${APPLICATION_ID}`);
 
     await expect(
       page.getByRole('heading', {
@@ -279,9 +200,7 @@ test.describe('Batch 10 application flows', () => {
     ).toBeVisible();
   });
 
-  test('renders a safe application load error', async ({
-    page,
-  }) => {
+  test('renders a safe application load error', async ({ page }) => {
     await installMockApi(page, {
       failures: {
         [`GET /workspaces/${PRIMARY_WORKSPACE_ID}/applications/${APPLICATION_ID}`]: {
@@ -291,17 +210,13 @@ test.describe('Batch 10 application flows', () => {
       },
     });
 
-    await page.goto(
-      `/workspaces/${PRIMARY_WORKSPACE_ID}/applications/${APPLICATION_ID}`,
-    );
+    await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}/applications/${APPLICATION_ID}`);
 
     await expect(
       page.getByRole('heading', {
         name: 'Unable to load application',
       }),
     ).toBeVisible();
-    await expect(
-      page.getByText('Application not found'),
-    ).toBeVisible();
+    await expect(page.getByText('Application not found')).toBeVisible();
   });
 });

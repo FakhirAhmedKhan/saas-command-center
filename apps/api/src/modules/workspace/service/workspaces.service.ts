@@ -5,10 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 
-import {
-  Prisma,
-  WorkspaceRole,
-} from '../../../generated/prisma/client';
+import { Prisma, WorkspaceRole } from '../../../generated/prisma/client';
 import { PrismaService } from '../../../database/prisma.service';
 
 const workspaceSummarySelect = {
@@ -43,11 +40,9 @@ export interface UpdateWorkspaceInput {
 
 @Injectable()
 export class WorkspacesService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
-  async create(
-    input: CreateWorkspaceInput,
-  ): Promise<WorkspaceSummary> {
+  async create(input: CreateWorkspaceInput): Promise<WorkspaceSummary> {
     const name = this.normalizeName(input.name);
     const slug = this.normalizeSlug(input.slug || name);
 
@@ -97,92 +92,78 @@ export class WorkspacesService {
     newOwnerId: string,
   ): Promise<WorkspaceSummary> {
     if (currentOwnerId === newOwnerId) {
-      throw new BadRequestException(
-        'The selected user already owns the workspace',
-      );
+      throw new BadRequestException('The selected user already owns the workspace');
     }
 
-    return this.prisma.$transaction(
-      async (transaction) => {
-        const workspace =
-          await transaction.workspace.findFirst({
-            where: {
-              id: workspaceId,
-              deletedAt: null,
-            },
-          });
+    return this.prisma.$transaction(async (transaction) => {
+      const workspace = await transaction.workspace.findFirst({
+        where: {
+          id: workspaceId,
+          deletedAt: null,
+        },
+      });
 
-        if (!workspace) {
-          throw new NotFoundException(
-            'Workspace not found',
-          );
-        }
+      if (!workspace) {
+        throw new NotFoundException('Workspace not found');
+      }
 
-        if (
-          workspace.ownerId !== currentOwnerId
-        ) {
-          throw new ForbiddenException(
-            'Only the workspace owner can transfer ownership',
-          );
-        }
+      if (workspace.ownerId !== currentOwnerId) {
+        throw new ForbiddenException('Only the workspace owner can transfer ownership');
+      }
 
-        const newOwnerMembership =
-          await transaction.workspaceMember.findUnique({
-            where: {
-              workspaceId_userId: {
-                workspaceId,
-                userId: newOwnerId,
-              },
-            },
-          });
-
-        if (!newOwnerMembership) {
-          throw new BadRequestException(
-            'The new owner must already be a workspace member',
-          );
-        }
-
-        await transaction.workspace.update({
-          where: {
-            id: workspaceId,
+      const newOwnerMembership = await transaction.workspaceMember.findUnique({
+        where: {
+          workspaceId_userId: {
+            workspaceId,
+            userId: newOwnerId,
           },
-          data: {
-            ownerId: newOwnerId,
-          },
-        });
+        },
+      });
 
-        await transaction.workspaceMember.update({
-          where: {
-            workspaceId_userId: {
-              workspaceId,
-              userId: currentOwnerId,
-            },
-          },
-          data: {
-            role: WorkspaceRole.ADMIN,
-          },
-        });
+      if (!newOwnerMembership) {
+        throw new BadRequestException('The new owner must already be a workspace member');
+      }
 
-        await transaction.workspaceMember.update({
-          where: {
-            workspaceId_userId: {
-              workspaceId,
-              userId: newOwnerId,
-            },
-          },
-          data: {
-            role: WorkspaceRole.OWNER,
-          },
-        });
+      await transaction.workspace.update({
+        where: {
+          id: workspaceId,
+        },
+        data: {
+          ownerId: newOwnerId,
+        },
+      });
 
-        return transaction.workspace.findUniqueOrThrow({
-          where: {
-            id: workspaceId,
+      await transaction.workspaceMember.update({
+        where: {
+          workspaceId_userId: {
+            workspaceId,
+            userId: currentOwnerId,
           },
-          select: workspaceSummarySelect,
-        });
-      },
-    );
+        },
+        data: {
+          role: WorkspaceRole.ADMIN,
+        },
+      });
+
+      await transaction.workspaceMember.update({
+        where: {
+          workspaceId_userId: {
+            workspaceId,
+            userId: newOwnerId,
+          },
+        },
+        data: {
+          role: WorkspaceRole.OWNER,
+        },
+      });
+
+      return transaction.workspace.findUniqueOrThrow({
+        where: {
+          id: workspaceId,
+        },
+        select: workspaceSummarySelect,
+      });
+    });
   }
   async findById(id: string): Promise<WorkspaceSummary | null> {
     return this.prisma.workspace.findFirst({
@@ -256,10 +237,7 @@ export class WorkspacesService {
     });
   }
 
-  async update(
-    id: string,
-    input: UpdateWorkspaceInput,
-  ): Promise<WorkspaceSummary> {
+  async update(id: string, input: UpdateWorkspaceInput): Promise<WorkspaceSummary> {
     await this.findByIdOrThrow(id);
 
     return this.prisma.workspace.update({
@@ -269,13 +247,13 @@ export class WorkspacesService {
       data: {
         ...(input.name !== undefined
           ? {
-            name: this.normalizeName(input.name),
-          }
+              name: this.normalizeName(input.name),
+            }
           : {}),
         ...(input.slug !== undefined
           ? {
-            slug: this.normalizeSlug(input.slug),
-          }
+              slug: this.normalizeSlug(input.slug),
+            }
           : {}),
       },
       select: workspaceSummarySelect,
@@ -300,15 +278,11 @@ export class WorkspacesService {
     const normalized = name.trim();
 
     if (normalized.length < 2) {
-      throw new BadRequestException(
-        'Workspace name must contain at least 2 characters',
-      );
+      throw new BadRequestException('Workspace name must contain at least 2 characters');
     }
 
     if (normalized.length > 120) {
-      throw new BadRequestException(
-        'Workspace name cannot exceed 120 characters',
-      );
+      throw new BadRequestException('Workspace name cannot exceed 120 characters');
     }
 
     return normalized;
@@ -326,9 +300,7 @@ export class WorkspacesService {
     }
 
     if (slug.length > 120) {
-      throw new BadRequestException(
-        'Workspace slug cannot exceed 120 characters',
-      );
+      throw new BadRequestException('Workspace slug cannot exceed 120 characters');
     }
 
     return slug;

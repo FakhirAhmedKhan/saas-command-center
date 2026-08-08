@@ -1,119 +1,63 @@
-import {
-    Logger,
-} from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 
-import type {
-    INestApplication,
-} from '@nestjs/common';
+import type { INestApplication } from '@nestjs/common';
 
-import {
-    ConfigService,
-} from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 
-import type {
-    TypedConfigService,
-} from '../config/runtime-config';
+import type { TypedConfigService } from '../config/runtime-config';
 
-import {
-    PrismaService,
-} from '../database/prisma.service';
+import { PrismaService } from '../database/prisma.service';
 
-const DATABASE_TIMEOUT_MS =
-    10_000;
+const DATABASE_TIMEOUT_MS = 10_000;
 
 async function withTimeout<T>(
-    promise: Promise<T>,
-    timeoutMs: number,
-    timeoutMessage: string,
+  promise: Promise<T>,
+  timeoutMs: number,
+  timeoutMessage: string,
 ): Promise<T> {
-    let timer:
-        | NodeJS.Timeout
-        | undefined;
+  let timer: NodeJS.Timeout | undefined;
 
-    const timeoutPromise =
-        new Promise<never>(
-            (
-                _resolve,
-                reject,
-            ) => {
-                timer = setTimeout(
-                    () => {
-                        reject(
-                            new Error(
-                                timeoutMessage,
-                            ),
-                        );
-                    },
-                    timeoutMs,
-                );
-            },
-        );
+  const timeoutPromise = new Promise<never>((_resolve, reject) => {
+    timer = setTimeout(() => {
+      reject(new Error(timeoutMessage));
+    }, timeoutMs);
+  });
 
-    try {
-        return await Promise.race([
-            promise,
-            timeoutPromise,
-        ]);
-    } finally {
-        if (timer) {
-            clearTimeout(timer);
-        }
+  try {
+    return await Promise.race([promise, timeoutPromise]);
+  } finally {
+    if (timer) {
+      clearTimeout(timer);
     }
+  }
 }
 
-export async function assertStartupRequirements(
-    app: INestApplication,
-): Promise<void> {
-    const logger =
-        new Logger(
-            'StartupChecks',
-        );
+export async function assertStartupRequirements(app: INestApplication): Promise<void> {
+  const logger = new Logger('StartupChecks');
 
-    const config =
-        app.get<
-            TypedConfigService
-        >(ConfigService);
+  const config = app.get<TypedConfigService>(ConfigService);
 
-    const prisma =
-        app.get(
-            PrismaService,
-        );
+  const prisma = app.get(PrismaService);
 
-    const nodeEnvironment =
-        config.get(
-            'NODE_ENV',
-            {
-                infer: true,
-            },
-        );
+  const nodeEnvironment = config.get('NODE_ENV', {
+    infer: true,
+  });
 
-    const cookieSecure =
-        config.get(
-            'COOKIE_SECURE',
-            {
-                infer: true,
-            },
-        );
+  const cookieSecure = config.get('COOKIE_SECURE', {
+    infer: true,
+  });
 
-    if (
-        nodeEnvironment ===
-        'production' &&
-        !cookieSecure
-    ) {
-        throw new Error(
-            'COOKIE_SECURE must be true in production.',
-        );
-    }
+  if (nodeEnvironment === 'production' && !cookieSecure) {
+    throw new Error('COOKIE_SECURE must be true in production.');
+  }
 
-    await withTimeout(
-        prisma.$queryRaw`
+  await withTimeout(
+    prisma.$queryRaw`
       SELECT 1
     `,
-        DATABASE_TIMEOUT_MS,
-        'Database startup check timed out.',
-    );
+    DATABASE_TIMEOUT_MS,
+    'Database startup check timed out.',
+  );
 
-    logger.log(
-        'Database startup check passed.',
-    );
+  logger.log('Database startup check passed.');
 }

@@ -1,3 +1,4 @@
+import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-members.module';
 import { Module } from '@nestjs/common';
 
 import {
@@ -11,7 +12,7 @@ import { ActivityWriterService } from './services/activity-writer.service';
 import { WorkspaceModule } from '../workspace/modules/workspaces.module';
 
 @Module({
-  imports: [WorkspaceModule],
+  imports: [WorkspaceMembersModule, WorkspaceModule],
 
   controllers: [WorkspaceActivityController, ApplicationActivityController],
 

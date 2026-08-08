@@ -1,13 +1,6 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
-import {
-  Prisma,
-  WorkspaceRole,
-} from 'src/generated/prisma/client';
+import { Prisma, WorkspaceRole } from 'src/generated/prisma/client';
 
 const memberSelect = {
   id: true,
@@ -27,10 +20,9 @@ const memberSelect = {
   },
 } satisfies Prisma.WorkspaceMemberSelect;
 
-export type WorkspaceMemberDetails =
-  Prisma.WorkspaceMemberGetPayload<{
-    select: typeof memberSelect;
-  }>;
+export type WorkspaceMemberDetails = Prisma.WorkspaceMemberGetPayload<{
+  select: typeof memberSelect;
+}>;
 
 export interface AddWorkspaceMemberInput {
   workspaceId: string;
@@ -40,15 +32,11 @@ export interface AddWorkspaceMemberInput {
 
 @Injectable()
 export class WorkspaceMembersService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
-  async addMember(
-    input: AddWorkspaceMemberInput,
-  ): Promise<WorkspaceMemberDetails> {
+  async addMember(input: AddWorkspaceMemberInput): Promise<WorkspaceMemberDetails> {
     if (input.role === WorkspaceRole.OWNER) {
-      throw new ConflictException(
-        'Use ownership transfer to assign the OWNER role.',
-      );
+      throw new ConflictException('Use ownership transfer to assign the OWNER role.');
     }
 
     return this.prisma.$transaction(async (transaction) => {
@@ -81,23 +69,20 @@ export class WorkspaceMembersService {
         throw new NotFoundException('User not found');
       }
 
-      const existingMembership =
-        await transaction.workspaceMember.findUnique({
-          where: {
-            workspaceId_userId: {
-              workspaceId: input.workspaceId,
-              userId: input.userId,
-            },
+      const existingMembership = await transaction.workspaceMember.findUnique({
+        where: {
+          workspaceId_userId: {
+            workspaceId: input.workspaceId,
+            userId: input.userId,
           },
-          select: {
-            id: true,
-          },
-        });
+        },
+        select: {
+          id: true,
+        },
+      });
 
       if (existingMembership) {
-        throw new ConflictException(
-          'User is already a workspace member',
-        );
+        throw new ConflictException('User is already a workspace member');
       }
 
       return transaction.workspaceMember.create({
@@ -131,9 +116,7 @@ export class WorkspaceMembersService {
     });
   }
 
-  async listMembers(
-    workspaceId: string,
-  ): Promise<WorkspaceMemberDetails[]> {
+  async listMembers(workspaceId: string): Promise<WorkspaceMemberDetails[]> {
     return this.prisma.workspaceMember.findMany({
       where: {
         workspaceId,
@@ -168,38 +151,27 @@ export class WorkspaceMembersService {
         throw new NotFoundException('Workspace not found');
       }
 
-      const membership =
-        await transaction.workspaceMember.findUnique({
-          where: {
-            workspaceId_userId: {
-              workspaceId,
-              userId,
-            },
+      const membership = await transaction.workspaceMember.findUnique({
+        where: {
+          workspaceId_userId: {
+            workspaceId,
+            userId,
           },
-        });
+        },
+      });
 
       if (!membership) {
-        throw new NotFoundException(
-          'Workspace membership not found',
-        );
+        throw new NotFoundException('Workspace membership not found');
       }
 
-      if (
-        workspace.ownerId === userId &&
-        role !== WorkspaceRole.OWNER
-      ) {
+      if (workspace.ownerId === userId && role !== WorkspaceRole.OWNER) {
         throw new ConflictException(
           'The workspace owner cannot be demoted. Transfer ownership first.',
         );
       }
 
-      if (
-        workspace.ownerId !== userId &&
-        role === WorkspaceRole.OWNER
-      ) {
-        throw new ConflictException(
-          'Use ownership transfer to assign the OWNER role.',
-        );
+      if (workspace.ownerId !== userId && role === WorkspaceRole.OWNER) {
+        throw new ConflictException('Use ownership transfer to assign the OWNER role.');
       }
 
       return transaction.workspaceMember.update({
@@ -217,10 +189,7 @@ export class WorkspaceMembersService {
     });
   }
 
-  async removeMember(
-    workspaceId: string,
-    userId: string,
-  ): Promise<void> {
+  async removeMember(workspaceId: string, userId: string): Promise<void> {
     await this.prisma.$transaction(async (transaction) => {
       const workspace = await transaction.workspace.findFirst({
         where: {
@@ -242,23 +211,20 @@ export class WorkspaceMembersService {
         );
       }
 
-      const membership =
-        await transaction.workspaceMember.findUnique({
-          where: {
-            workspaceId_userId: {
-              workspaceId,
-              userId,
-            },
+      const membership = await transaction.workspaceMember.findUnique({
+        where: {
+          workspaceId_userId: {
+            workspaceId,
+            userId,
           },
-          select: {
-            id: true,
-          },
-        });
+        },
+        select: {
+          id: true,
+        },
+      });
 
       if (!membership) {
-        throw new NotFoundException(
-          'Workspace membership not found',
-        );
+        throw new NotFoundException('Workspace membership not found');
       }
 
       await transaction.workspaceMember.delete({

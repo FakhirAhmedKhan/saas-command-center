@@ -1,175 +1,136 @@
-export type AnalyticsPreset =
-    | 'today'
-    | '7d'
-    | '30d'
-    | '90d';
+export type AnalyticsPreset = 'today' | '7d' | '30d' | '90d';
 
-export type AnalyticsReportTab =
-    | 'pages'
-    | 'sources'
-    | 'geography'
-    | 'technology'
-    | 'events';
+export type AnalyticsReportTab = 'pages' | 'sources' | 'geography' | 'technology' | 'events';
 
-export type TechnologyDimension =
-    | 'devices'
-    | 'browsers'
-    | 'operating-systems';
+export type TechnologyDimension = 'devices' | 'browsers' | 'operating-systems';
 
-export type AnalyticsDimension =
-    | 'sources'
-    | 'countries'
-    | TechnologyDimension;
+export type AnalyticsDimension = 'sources' | 'countries' | TechnologyDimension;
 
-export type SortDirection =
-    | 'asc'
-    | 'desc';
+export type SortDirection = 'asc' | 'desc';
 
 export interface Pagination {
-    page: number;
+  page: number;
 
-    limit: number;
+  limit: number;
 
-    total: number;
+  total: number;
 
-    totalPages: number;
+  totalPages: number;
 
-    hasPreviousPage:
-    boolean;
+  hasPreviousPage: boolean;
 
-    hasNextPage:
-    boolean;
+  hasNextPage: boolean;
 }
 
 export interface ReportRange {
-    from: string;
+  from: string;
 
-    to: string;
+  to: string;
 
-    timeZone: string;
+  timeZone: string;
 
-    days: number;
+  days: number;
 }
 
 export interface PageReportItem {
-    path: string;
+  path: string;
 
-    title: string;
+  title: string;
 
-    views: number;
+  views: number;
 
-    visitors: number;
+  visitors: number;
 
-    sessions: number;
+  sessions: number;
 
-    entrances: number;
+  entrances: number;
 
-    exits: number;
+  exits: number;
 
-    bounceRate: number;
+  bounceRate: number;
 
-    averageDurationSeconds:
-    number;
+  averageDurationSeconds: number;
 }
 
 export interface PageReportResponse {
-    items:
-    PageReportItem[];
+  items: PageReportItem[];
 
-    pagination:
-    Pagination;
+  pagination: Pagination;
 
-    range:
-    ReportRange;
+  range: ReportRange;
 }
 
 export interface EventReportItem {
-    name: string;
+  name: string;
 
-    events: number;
+  events: number;
 
-    visitors: number;
+  visitors: number;
 
-    sessions: number;
+  sessions: number;
 }
 
 export interface EventReportResponse {
-    items:
-    EventReportItem[];
+  items: EventReportItem[];
 
-    summary: {
-        totalEvents:
-        number;
+  summary: {
+    totalEvents: number;
 
-        uniqueVisitors:
-        number;
+    uniqueVisitors: number;
 
-        uniqueSessions:
-        number;
-    };
+    uniqueSessions: number;
+  };
 
-    pagination:
-    Pagination;
+  pagination: Pagination;
 
-    range:
-    ReportRange;
+  range: ReportRange;
 }
 
 export interface DimensionReportItem {
-    key: string;
+  key: string;
 
-    label: string;
+  label: string;
 
-    visitors: number;
+  visitors: number;
 
-    sessions: number;
+  sessions: number;
 
-    pageViews: number;
+  pageViews: number;
 
-    percentage: number;
+  percentage: number;
 }
 
 export interface DimensionReportResponse {
-    items:
-    DimensionReportItem[];
+  items: DimensionReportItem[];
 
-    pagination:
-    Pagination;
+  pagination: Pagination;
 
-    range:
-    ReportRange;
+  range: ReportRange;
 }
 
 export interface AnalyticsReportRequest {
-    workspaceId: string;
+  workspaceId: string;
 
-    websiteId: string;
+  websiteId: string;
 
-    tab:
-    AnalyticsReportTab;
+  tab: AnalyticsReportTab;
 
-    dimension:
-    TechnologyDimension;
+  dimension: TechnologyDimension;
 
-    preset:
-    AnalyticsPreset;
+  preset: AnalyticsPreset;
 
-    search: string;
+  search: string;
 
-    page: number;
+  page: number;
 
-    limit: number;
+  limit: number;
 
-    sortBy: string;
+  sortBy: string;
 
-    sortDirection:
-    SortDirection;
+  sortDirection: SortDirection;
 
-    signal?:
-    AbortSignal;
+  signal?: AbortSignal;
 }
 
 export type AnalyticsReportResponse =
-    | PageReportResponse
-    | EventReportResponse
-    | DimensionReportResponse;
+  PageReportResponse | EventReportResponse | DimensionReportResponse;

@@ -55,10 +55,7 @@ test('rejects empty and malformed custom event names', async () => {
 
 test('truncates custom event names to 100 characters', async () => {
   const harness = await createTrackerHarness();
-  const event = await collectCustomEvent(
-    harness,
-    `a${'b'.repeat(100)}`,
-  );
+  const event = await collectCustomEvent(harness, `a${'b'.repeat(100)}`);
 
   assert.equal(event.eventName.length, 100);
   assert.equal(event.eventName, `a${'b'.repeat(99)}`);
@@ -123,15 +120,14 @@ test('keeps at most 20 properties', async () => {
 test('sanitizes arrays and keeps at most 20 supported values', async () => {
   const harness = await createTrackerHarness();
   const event = await collectCustomEvent(harness, 'array_test', {
-    values: [
-      ...Array.from({ length: 25 }, (_, index) => index),
-      { invalid: true },
-      Number.NaN,
-    ],
+    values: [...Array.from({ length: 25 }, (_, index) => index), { invalid: true }, Number.NaN],
   });
 
   assert.equal(event.properties.values.length, 20);
-  assert.deepEqual(event.properties.values, Array.from({ length: 20 }, (_, index) => index));
+  assert.deepEqual(
+    event.properties.values,
+    Array.from({ length: 20 }, (_, index) => index),
+  );
 });
 
 test('uses the same visitor and session IDs for page views and custom events', async () => {

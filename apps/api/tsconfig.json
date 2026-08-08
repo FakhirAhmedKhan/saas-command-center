@@ -2,14 +2,21 @@
   "extends": "../../packages/tsconfig/node.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "emitDecoratorMetadata": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "incremental": true,
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
     "noEmitOnError": true,
-    "outDir": "dist",
-    "rootDir": "src",
-    "strictPropertyInitialization": false
+    "preserveWatchOutput": true,
+    "strictPropertyInitialization": false,
+    "sourceMap": true,
+    "inlineSources": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "types": ["node"]
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist", "coverage", "test", "**/*.spec.ts", "**/*.e2e-spec.ts"]
 }

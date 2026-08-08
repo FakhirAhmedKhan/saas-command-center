@@ -1,86 +1,44 @@
-import {
-  Injectable,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import {
-  createHmac,
-  timingSafeEqual,
-} from 'node:crypto';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 
-import {
-  WEBHOOK_SIGNATURE_VERSION,
-} from '../webhooks.constants';
+import { WEBHOOK_SIGNATURE_VERSION } from '../webhooks.constants';
 
 @Injectable()
 export class WebhookSignatureService {
   sign(
-    secret:
-      string,
+    secret: string,
 
-    timestamp:
-      string,
+    timestamp: string,
 
-    rawBody:
-      string,
+    rawBody: string,
   ): string {
-    const digest =
-      createHmac(
-        'sha256',
-        secret,
-      )
-        .update(
-          `${timestamp}.${rawBody}`,
-          'utf8',
-        )
-        .digest(
-          'hex',
-        );
+    const digest = createHmac('sha256', secret)
+      .update(`${timestamp}.${rawBody}`, 'utf8')
+      .digest('hex');
 
     return `${WEBHOOK_SIGNATURE_VERSION}=${digest}`;
   }
 
   verify(
-    secret:
-      string,
+    secret: string,
 
-    timestamp:
-      string,
+    timestamp: string,
 
-    rawBody:
-      string,
+    rawBody: string,
 
-    suppliedSignature:
-      string,
+    suppliedSignature: string,
   ): boolean {
-    const expected =
-      this.sign(
-        secret,
-        timestamp,
-        rawBody,
-      );
+    const expected = this.sign(secret, timestamp, rawBody);
 
-    const expectedBuffer =
-      Buffer.from(
-        expected,
-        'utf8',
-      );
+    const expectedBuffer = Buffer.from(expected, 'utf8');
 
-    const suppliedBuffer =
-      Buffer.from(
-        suppliedSignature,
-        'utf8',
-      );
+    const suppliedBuffer = Buffer.from(suppliedSignature, 'utf8');
 
-    if (
-      expectedBuffer.length !==
-      suppliedBuffer.length
-    ) {
+    if (expectedBuffer.length !== suppliedBuffer.length) {
       return false;
     }
 
-    return timingSafeEqual(
-      expectedBuffer,
-      suppliedBuffer,
-    );
+    return timingSafeEqual(expectedBuffer, suppliedBuffer);
   }
 }

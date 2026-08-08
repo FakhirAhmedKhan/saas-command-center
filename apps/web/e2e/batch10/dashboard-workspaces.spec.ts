@@ -1,7 +1,4 @@
-import {
-  expect,
-  test,
-} from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import {
   installMockApi,
@@ -11,16 +8,12 @@ import {
 } from './fixtures/mock-api';
 
 test.describe('Batch 10 dashboard and workspace flows', () => {
-  test('renders account identity, workspace cards, and roles', async ({
-    page,
-  }) => {
+  test('renders account identity, workspace cards, and roles', async ({ page }) => {
     await installMockApi(page);
 
     await page.goto('/dashboard');
 
-    await expect(
-      page.getByText('owner@example.com'),
-    ).toBeVisible();
+    await expect(page.getByText('owner@example.com')).toBeVisible();
     await expect(
       page.getByRole('heading', {
         name: 'Your workspaces',
@@ -48,9 +41,7 @@ test.describe('Batch 10 dashboard and workspace flows', () => {
     ).toBeVisible();
   });
 
-  test('renders the zero-workspace empty state', async ({
-    page,
-  }) => {
+  test('renders the zero-workspace empty state', async ({ page }) => {
     await installMockApi(page, {
       workspaces: [],
     });
@@ -62,29 +53,17 @@ test.describe('Batch 10 dashboard and workspace flows', () => {
         name: 'No workspace found',
       }),
     ).toBeVisible();
-    await expect(
-      page.getByLabel('Select workspace'),
-    ).toHaveCount(0);
+    await expect(page.getByLabel('Select workspace')).toHaveCount(0);
   });
 
-  test('switches workspaces using the top-bar selector', async ({
-    page,
-  }) => {
+  test('switches workspaces using the top-bar selector', async ({ page }) => {
     await installMockApi(page);
 
-    await page.goto(
-      `/workspaces/${PRIMARY_WORKSPACE_ID}`,
-    );
+    await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}`);
 
-    await page
-      .getByLabel('Select workspace')
-      .selectOption(SECONDARY_WORKSPACE_ID);
+    await page.getByLabel('Select workspace').selectOption(SECONDARY_WORKSPACE_ID);
 
-    await expect(page).toHaveURL(
-      new RegExp(
-        `/workspaces/${SECONDARY_WORKSPACE_ID}$`,
-      ),
-    );
+    await expect(page).toHaveURL(new RegExp(`/workspaces/${SECONDARY_WORKSPACE_ID}$`));
     await expect(
       page.getByRole('heading', {
         name: 'MadadAI Team',
@@ -92,35 +71,21 @@ test.describe('Batch 10 dashboard and workspace flows', () => {
     ).toBeVisible();
   });
 
-  test('shows a generated slug preview while creating a workspace', async ({
-    page,
-  }) => {
+  test('shows a generated slug preview while creating a workspace', async ({ page }) => {
     await installMockApi(page);
 
     await page.goto('/workspaces/new');
-    await page
-      .getByLabel('Workspace name')
-      .fill('My New SaaS Portfolio');
+    await page.getByLabel('Workspace name').fill('My New SaaS Portfolio');
 
-    await expect(
-      page.getByText(
-        'Workspace URL identifier: my-new-saas-portfolio',
-      ),
-    ).toBeVisible();
+    await expect(page.getByText('Workspace URL identifier: my-new-saas-portfolio')).toBeVisible();
   });
 
-  test('creates a workspace and opens its applications page', async ({
-    page,
-  }) => {
+  test('creates a workspace and opens its applications page', async ({ page }) => {
     const state = await installMockApi(page);
 
     await page.goto('/workspaces/new');
-    await page
-      .getByLabel('Workspace name')
-      .fill('Analytics Team');
-    await page
-      .getByLabel('Workspace slug')
-      .fill('analytics-team');
+    await page.getByLabel('Workspace name').fill('Analytics Team');
+    await page.getByLabel('Workspace slug').fill('analytics-team');
     await page
       .getByRole('button', {
         name: 'Create workspace',
@@ -132,9 +97,7 @@ test.describe('Batch 10 dashboard and workspace flows', () => {
     );
 
     const request = state.requests.find(
-      (item) =>
-        item.method === 'POST' &&
-        item.path === '/workspaces',
+      (item) => item.method === 'POST' && item.path === '/workspaces',
     );
 
     expect(request?.body).toEqual({
@@ -143,9 +106,7 @@ test.describe('Batch 10 dashboard and workspace flows', () => {
     });
   });
 
-  test('shows workspace creation errors returned by the API', async ({
-    page,
-  }) => {
+  test('shows workspace creation errors returned by the API', async ({ page }) => {
     await installMockApi(page, {
       failures: {
         'POST /workspaces': {
@@ -156,35 +117,23 @@ test.describe('Batch 10 dashboard and workspace flows', () => {
     });
 
     await page.goto('/workspaces/new');
-    await page
-      .getByLabel('Workspace name')
-      .fill('Duplicate Team');
-    await page
-      .getByLabel('Workspace slug')
-      .fill('duplicate-team');
+    await page.getByLabel('Workspace name').fill('Duplicate Team');
+    await page.getByLabel('Workspace slug').fill('duplicate-team');
     await page
       .getByRole('button', {
         name: 'Create workspace',
       })
       .click();
 
-    await expect(
-      page.locator('[role="alert"]:not(#__next-route-announcer__)'),
-    ).toContainText(
+    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toContainText(
       'Workspace slug already exists',
     );
-    await expect(page).toHaveURL(
-      /\/workspaces\/new$/,
-    );
+    await expect(page).toHaveURL(/\/workspaces\/new$/);
   });
 
-  test('shows a workspace load error without leaking another workspace', async ({
-    page,
-  }) => {
+  test('shows a workspace load error without leaking another workspace', async ({ page }) => {
     await installMockApi(page, {
-      workspaces: [
-        makeWorkspace(),
-      ],
+      workspaces: [makeWorkspace()],
       failures: {
         [`GET /workspaces/${PRIMARY_WORKSPACE_ID}`]: {
           status: 403,
@@ -193,13 +142,9 @@ test.describe('Batch 10 dashboard and workspace flows', () => {
       },
     });
 
-    await page.goto(
-      `/workspaces/${PRIMARY_WORKSPACE_ID}`,
-    );
+    await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}`);
 
-    await expect(
-      page.getByText('Workspace access denied'),
-    ).toBeVisible();
+    await expect(page.getByText('Workspace access denied')).toBeVisible();
     await expect(
       page.getByRole('heading', {
         name: 'Command Center Team',

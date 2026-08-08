@@ -1,9 +1,5 @@
 {
-  "moduleFileExtensions": [
-    "js",
-    "json",
-    "ts"
-  ],
+  "moduleFileExtensions": ["js", "json", "ts"],
   "rootDir": "..",
   "testEnvironment": "node",
   "testRegex": "test/.*\\.e2e-spec\\.ts$",
@@ -13,9 +9,7 @@
   "moduleNameMapper": {
     "^src/(.*)$": "<rootDir>/src/$1"
   },
-  "setupFiles": [
-    "<rootDir>/test/setup-env.ts"
-  ],
+  "setupFiles": ["<rootDir>/test/setup-env.ts"],
   "collectCoverageFrom": [
     "src/**/*.ts",
     "!src/**/*.spec.ts",

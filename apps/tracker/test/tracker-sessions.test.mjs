@@ -13,9 +13,7 @@ test('persists the visitor ID across tracker reloads for the same website', asyn
     localStorage: snapshot,
   });
 
-  const secondVisitor = second.storage.getItem(
-    'cc_visitor_11111111-1111-4111-8111-111111111111',
-  );
+  const secondVisitor = second.storage.getItem('cc_visitor_11111111-1111-4111-8111-111111111111');
 
   assert.equal(secondVisitor, firstVisitor);
 });
@@ -78,18 +76,10 @@ test('uses separate visitor and session storage per website', async () => {
     localStorage: first.storage.snapshot(),
   });
 
-  assert.ok(
-    second.storage.getItem('cc_visitor_11111111-1111-4111-8111-111111111111'),
-  );
-  assert.ok(
-    second.storage.getItem('cc_visitor_22222222-2222-4222-8222-222222222222'),
-  );
-  assert.ok(
-    second.storage.getItem('cc_session_11111111-1111-4111-8111-111111111111'),
-  );
-  assert.ok(
-    second.storage.getItem('cc_session_22222222-2222-4222-8222-222222222222'),
-  );
+  assert.ok(second.storage.getItem('cc_visitor_11111111-1111-4111-8111-111111111111'));
+  assert.ok(second.storage.getItem('cc_visitor_22222222-2222-4222-8222-222222222222'));
+  assert.ok(second.storage.getItem('cc_session_11111111-1111-4111-8111-111111111111'));
+  assert.ok(second.storage.getItem('cc_session_22222222-2222-4222-8222-222222222222'));
 });
 
 test('recovers from a corrupted stored session', async () => {
@@ -114,9 +104,7 @@ test('refreshes the session before enqueuing an event after timeout', async () =
   harness.advanceTime(1000);
   harness.api().track('session_rotated');
 
-  const custom = harness
-    .queuedEvents()
-    .find((event) => event.type === 'CUSTOM');
+  const custom = harness.queuedEvents().find((event) => event.type === 'CUSTOM');
 
   assert.notEqual(custom.sessionId, originalSessionId);
   assert.equal(custom.sessionId, harness.storedSession().id);

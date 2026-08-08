@@ -1,181 +1,109 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
-import {
-    useCallback,
-    useEffect,
-    useState,
-} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import {
-    getAnalyticsOverview,
-} from './analytics-overview-api';
+import { getAnalyticsOverview } from './analytics-overview-api';
 
-import type {
-    AnalyticsOverviewResponse,
-    AnalyticsPreset,
-} from './analytics-overview.types';
+import type { AnalyticsOverviewResponse, AnalyticsPreset } from './analytics-overview.types';
 
 interface UseAnalyticsOverviewInput {
-    workspaceId: string;
+  workspaceId: string;
 
-    websiteId: string;
+  websiteId: string;
 
-    preset:
-    AnalyticsPreset;
+  preset: AnalyticsPreset;
 
-    from?: string;
+  from?: string;
 
-    to?: string;
+  to?: string;
 }
 
 interface AnalyticsOverviewState {
-    data:
-    | AnalyticsOverviewResponse
-    | null;
+  data: AnalyticsOverviewResponse | null;
 
-    loading: boolean;
+  loading: boolean;
 
-    error:
-    | unknown
-    | null;
+  error: unknown | null;
 }
 
 export function useAnalyticsOverview({
-    workspaceId,
-    websiteId,
-    preset,
-    from,
-    to,
+  workspaceId,
+  websiteId,
+  preset,
+  from,
+  to,
 }: UseAnalyticsOverviewInput) {
-    const [
-        reloadKey,
-        setReloadKey,
-    ] = useState(0);
+  const [reloadKey, setReloadKey] = useState(0);
 
-    const [
-        state,
-        setState,
-    ] =
-        useState<AnalyticsOverviewState>(
-            {
-                data: null,
-                loading: true,
-                error: null,
-            },
-        );
+  const [state, setState] = useState<AnalyticsOverviewState>({
+    data: null,
+    loading: true,
+    error: null,
+  });
 
-    const reload =
-        useCallback(
-            () => {
-                setReloadKey(
-                    (
-                        current,
-                    ) =>
-                        current +
-                        1,
-                );
-            },
-            [],
-        );
+  const reload = useCallback(() => {
+    setReloadKey((current) => current + 1);
+  }, []);
 
-    useEffect(
-        () => {
-            if (
-                !workspaceId ||
-                !websiteId
-            ) {
-                return;
-            }
+  useEffect(() => {
+    if (!workspaceId || !websiteId) {
+      return;
+    }
 
-            const controller =
-                new AbortController();
+    const controller = new AbortController();
 
-            setState(
-                (
-                    previous,
-                ) => ({
-                    ...previous,
+    setState((previous) => ({
+      ...previous,
 
-                    loading:
-                        true,
+      loading: true,
 
-                    error:
-                        null,
-                }),
-            );
+      error: null,
+    }));
 
-            void getAnalyticsOverview(
-                {
-                    workspaceId,
+    void getAnalyticsOverview({
+      workspaceId,
 
-                    websiteId,
+      websiteId,
 
-                    preset,
+      preset,
 
-                    from,
+      from,
 
-                    to,
+      to,
 
-                    signal:
-                        controller
-                            .signal,
-                },
-            )
-                .then(
-                    (data) => {
-                        setState({
-                            data,
+      signal: controller.signal,
+    })
+      .then((data) => {
+        setState({
+          data,
 
-                            loading:
-                                false,
+          loading: false,
 
-                            error:
-                                null,
-                        });
-                    },
-                )
-                .catch(
-                    (
-                        error:
-                            unknown,
-                    ) => {
-                        if (
-                            controller
-                                .signal
-                                .aborted
-                        ) {
-                            return;
-                        }
+          error: null,
+        });
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) {
+          return;
+        }
 
-                        setState({
-                            data:
-                                null,
+        setState({
+          data: null,
 
-                            loading:
-                                false,
+          loading: false,
 
-                            error,
-                        });
-                    },
-                );
+          error,
+        });
+      });
 
-            return () => {
-                controller.abort();
-            };
-        },
-        [
-            workspaceId,
-            websiteId,
-            preset,
-            from,
-            to,
-            reloadKey,
-        ],
-    );
-
-    return {
-        ...state,
-        reload,
+    return () => {
+      controller.abort();
     };
+  }, [workspaceId, websiteId, preset, from, to, reloadKey]);
+
+  return {
+    ...state,
+    reload,
+  };
 }

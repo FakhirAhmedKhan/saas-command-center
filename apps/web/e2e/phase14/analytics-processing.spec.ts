@@ -1,263 +1,153 @@
-import {
-    expect,
-    test,
-} from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
-const workspaceId =
-    '11111111-1111-4111-8111-111111111111';
+const workspaceId = '11111111-1111-4111-8111-111111111111';
 
-const websiteId =
-    '22222222-2222-4222-8222-222222222222';
+const websiteId = '22222222-2222-4222-8222-222222222222';
 
-test.describe(
-    'Phase 14 analytics processing',
-    () => {
-        test.beforeEach(
-            async ({
-                page,
-            }) => {
-                await page.route(
-                    '**/auth/refresh',
-                    async (
-                        route,
-                    ) => {
-                        await route.fulfill({
-                            status:
-                                200,
+test.describe('Phase 14 analytics processing', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/auth/refresh', async (route) => {
+      await route.fulfill({
+        status: 200,
 
-                            contentType:
-                                'application/json',
+        contentType: 'application/json',
 
-                            body:
-                                JSON.stringify({
-                                    accessToken:
-                                        'phase-14-token',
+        body: JSON.stringify({
+          accessToken: 'phase-14-token',
 
-                                    user: {
-                                        id:
-                                            '33333333-3333-4333-8333-333333333333',
+          user: {
+            id: '33333333-3333-4333-8333-333333333333',
 
-                                        email:
-                                            'admin@example.com',
-                                    },
-                                }),
-                        });
-                    },
-                );
+            email: 'admin@example.com',
+          },
+        }),
+      });
+    });
 
-                await page.route(
-                    '**/analytics/processing/status',
-                    async (
-                        route,
-                    ) => {
-                        await route.fulfill({
-                            status:
-                                200,
+    await page.route('**/analytics/processing/status', async (route) => {
+      await route.fulfill({
+        status: 200,
 
-                            contentType:
-                                'application/json',
+        contentType: 'application/json',
 
-                            body:
-                                JSON.stringify({
-                                    canReprocess:
-                                        true,
+        body: JSON.stringify({
+          canReprocess: true,
 
-                                    pendingEvents:
-                                        42,
+          pendingEvents: 42,
 
-                                    unresolvedDeadLetters:
-                                        1,
+          unresolvedDeadLetters: 1,
 
-                                    activeRun:
-                                        null,
+          activeRun: null,
 
-                                    latestRun:
-                                        null,
+          latestRun: null,
 
-                                    lastSuccessfulRun: {
-                                        id:
-                                            'run-success',
+          lastSuccessfulRun: {
+            id: 'run-success',
 
-                                        status:
-                                            'SUCCEEDED',
+            status: 'SUCCEEDED',
 
-                                        trigger:
-                                            'SCHEDULED',
+            trigger: 'SCHEDULED',
 
-                                        rangeStart:
-                                            '2026-08-01T00:00:00.000Z',
+            rangeStart: '2026-08-01T00:00:00.000Z',
 
-                                        rangeEnd:
-                                            '2026-08-02T00:00:00.000Z',
+            rangeEnd: '2026-08-02T00:00:00.000Z',
 
-                                        retryCount:
-                                            0,
+            retryCount: 0,
 
-                                        maxRetries:
-                                            3,
+            maxRetries: 3,
 
-                                        processedEvents:
-                                            100,
+            processedEvents: 100,
 
-                                        failedEvents:
-                                            0,
+            failedEvents: 0,
 
-                                        errorMessage:
-                                            null,
+            errorMessage: null,
 
-                                        startedAt:
-                                            '2026-08-02T01:00:00.000Z',
+            startedAt: '2026-08-02T01:00:00.000Z',
 
-                                        finishedAt:
-                                            '2026-08-02T01:01:00.000Z',
+            finishedAt: '2026-08-02T01:01:00.000Z',
 
-                                        createdAt:
-                                            '2026-08-02T01:00:00.000Z',
-                                    },
+            createdAt: '2026-08-02T01:00:00.000Z',
+          },
 
-                                    recentRuns: [],
-                                }),
-                        });
-                    },
-                );
+          recentRuns: [],
+        }),
+      });
+    });
 
-                await page.route(
-                    '**/analytics/processing/reprocess',
-                    async (
-                        route,
-                    ) => {
-                        await route.fulfill({
-                            status:
-                                201,
+    await page.route('**/analytics/processing/reprocess', async (route) => {
+      await route.fulfill({
+        status: 201,
 
-                            contentType:
-                                'application/json',
+        contentType: 'application/json',
 
-                            body:
-                                JSON.stringify({
-                                    id:
-                                        'queued-run',
+        body: JSON.stringify({
+          id: 'queued-run',
 
-                                    status:
-                                        'QUEUED',
-                                }),
-                        });
-                    },
-                );
-            },
-        );
+          status: 'QUEUED',
+        }),
+      });
+    });
+  });
 
-        test(
-            'shows processing status',
-            async ({
-                page,
-            }) => {
-                await page.goto(
-                    `/workspaces/${workspaceId}/websites/${websiteId}/analytics/processing`,
-                );
+  test('shows processing status', async ({ page }) => {
+    await page.goto(`/workspaces/${workspaceId}/websites/${websiteId}/analytics/processing`);
 
-                await expect(
-                    page.getByRole(
-                        'heading',
-                        {
-                            name:
-                                'Processing status',
-                        },
-                    ),
-                ).toBeVisible();
+    await expect(
+      page.getByRole('heading', {
+        name: 'Processing status',
+      }),
+    ).toBeVisible();
 
-                await expect(
-                    page.getByText(
-                        '42',
-                        {
-                            exact:
-                                true,
-                        },
-                    ),
-                ).toBeVisible();
+    await expect(
+      page.getByText('42', {
+        exact: true,
+      }),
+    ).toBeVisible();
 
-                await expect(
-                    page.getByText(
-                        '1',
-                        {
-                            exact:
-                                true,
-                        },
-                    ),
-                ).toBeVisible();
+    await expect(
+      page.getByText('1', {
+        exact: true,
+      }),
+    ).toBeVisible();
 
-                await expect(
-                    page.getByRole(
-                        'button',
-                        {
-                            name:
-                                'Reprocess',
-                        },
-                    ),
-                ).toBeVisible();
-            },
-        );
+    await expect(
+      page.getByRole('button', {
+        name: 'Reprocess',
+      }),
+    ).toBeVisible();
+  });
 
-        test(
-            'hides management controls for viewers',
-            async ({
-                page,
-            }) => {
-                await page.route(
-                    '**/analytics/processing/status',
-                    async (
-                        route,
-                    ) => {
-                        await route.fulfill({
-                            status:
-                                200,
+  test('hides management controls for viewers', async ({ page }) => {
+    await page.route('**/analytics/processing/status', async (route) => {
+      await route.fulfill({
+        status: 200,
 
-                            contentType:
-                                'application/json',
+        contentType: 'application/json',
 
-                            body:
-                                JSON.stringify({
-                                    canReprocess:
-                                        false,
+        body: JSON.stringify({
+          canReprocess: false,
 
-                                    pendingEvents:
-                                        0,
+          pendingEvents: 0,
 
-                                    unresolvedDeadLetters:
-                                        0,
+          unresolvedDeadLetters: 0,
 
-                                    activeRun:
-                                        null,
+          activeRun: null,
 
-                                    latestRun:
-                                        null,
+          latestRun: null,
 
-                                    lastSuccessfulRun:
-                                        null,
+          lastSuccessfulRun: null,
 
-                                    recentRuns:
-                                        [],
-                                }),
-                        });
-                    },
-                );
+          recentRuns: [],
+        }),
+      });
+    });
 
-                await page.goto(
-                    `/workspaces/${workspaceId}/websites/${websiteId}/analytics/processing`,
-                );
+    await page.goto(`/workspaces/${workspaceId}/websites/${websiteId}/analytics/processing`);
 
-                await expect(
-                    page.getByRole(
-                        'button',
-                        {
-                            name:
-                                'Reprocess',
-                        },
-                    ),
-                ).toHaveCount(
-                    0,
-                );
-            },
-        );
-    },
-);
+    await expect(
+      page.getByRole('button', {
+        name: 'Reprocess',
+      }),
+    ).toHaveCount(0);
+  });
+});

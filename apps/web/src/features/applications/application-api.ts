@@ -14,63 +14,37 @@ import type {
   UpdateTechnologyPayload,
 } from './application-types';
 
-function buildQueryString(
-  query: ApplicationListQuery = {},
-): string {
+function buildQueryString(query: ApplicationListQuery = {}): string {
   const parameters = new URLSearchParams();
 
-  Object.entries(query).forEach(
-    ([key, value]) => {
-      if (
-        value === undefined ||
-        value === null ||
-        value === ''
-      ) {
-        return;
-      }
+  Object.entries(query).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === '') {
+      return;
+    }
 
-      parameters.set(key, String(value));
-    },
-  );
+    parameters.set(key, String(value));
+  });
 
   const queryString = parameters.toString();
 
-  return queryString
-    ? `?${queryString}`
-    : '';
+  return queryString ? `?${queryString}` : '';
 }
 
-export function getApplications(
-  workspaceId: string,
-  query?: ApplicationListQuery,
-) {
+export function getApplications(workspaceId: string, query?: ApplicationListQuery) {
   return apiRequest<ApplicationListResponse>(
-    `/workspaces/${workspaceId}/applications${buildQueryString(
-      query,
-    )}`,
+    `/workspaces/${workspaceId}/applications${buildQueryString(query)}`,
   );
 }
 
-export function getApplication(
-  workspaceId: string,
-  applicationId: string,
-) {
-  return apiRequest<SaasApplication>(
-    `/workspaces/${workspaceId}/applications/${applicationId}`,
-  );
+export function getApplication(workspaceId: string, applicationId: string) {
+  return apiRequest<SaasApplication>(`/workspaces/${workspaceId}/applications/${applicationId}`);
 }
 
-export function createApplication(
-  workspaceId: string,
-  payload: CreateApplicationPayload,
-) {
-  return apiRequest<SaasApplication>(
-    `/workspaces/${workspaceId}/applications`,
-    {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    },
-  );
+export function createApplication(workspaceId: string, payload: CreateApplicationPayload) {
+  return apiRequest<SaasApplication>(`/workspaces/${workspaceId}/applications`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
 }
 
 export function updateApplication(
@@ -78,19 +52,13 @@ export function updateApplication(
   applicationId: string,
   payload: UpdateApplicationPayload,
 ) {
-  return apiRequest<SaasApplication>(
-    `/workspaces/${workspaceId}/applications/${applicationId}`,
-    {
-      method: 'PATCH',
-      body: JSON.stringify(payload),
-    },
-  );
+  return apiRequest<SaasApplication>(`/workspaces/${workspaceId}/applications/${applicationId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
 }
 
-export function archiveApplication(
-  workspaceId: string,
-  applicationId: string,
-) {
+export function archiveApplication(workspaceId: string, applicationId: string) {
   return apiRequest<SaasApplication>(
     `/workspaces/${workspaceId}/applications/${applicationId}/archive`,
     {
@@ -99,10 +67,7 @@ export function archiveApplication(
   );
 }
 
-export function restoreApplication(
-  workspaceId: string,
-  applicationId: string,
-) {
+export function restoreApplication(workspaceId: string, applicationId: string) {
   return apiRequest<SaasApplication>(
     `/workspaces/${workspaceId}/applications/${applicationId}/restore`,
     {
@@ -111,18 +76,12 @@ export function restoreApplication(
   );
 }
 
-export function permanentlyDeleteApplication(
-  workspaceId: string,
-  applicationId: string,
-) {
+export function permanentlyDeleteApplication(workspaceId: string, applicationId: string) {
   return apiRequest<{
     message: string;
-  }>(
-    `/workspaces/${workspaceId}/applications/${applicationId}`,
-    {
-      method: 'DELETE',
-    },
-  );
+  }>(`/workspaces/${workspaceId}/applications/${applicationId}`, {
+    method: 'DELETE',
+  });
 }
 
 export function addApplicationTechnology(
@@ -161,12 +120,9 @@ export function removeApplicationTechnology(
 ) {
   return apiRequest<{
     message: string;
-  }>(
-    `/workspaces/${workspaceId}/applications/${applicationId}/technologies/${technologyId}`,
-    {
-      method: 'DELETE',
-    },
-  );
+  }>(`/workspaces/${workspaceId}/applications/${applicationId}/technologies/${technologyId}`, {
+    method: 'DELETE',
+  });
 }
 
 export function addApplicationLink(
@@ -198,17 +154,10 @@ export function updateApplicationLink(
   );
 }
 
-export function removeApplicationLink(
-  workspaceId: string,
-  applicationId: string,
-  linkId: string,
-) {
+export function removeApplicationLink(workspaceId: string, applicationId: string, linkId: string) {
   return apiRequest<{
     message: string;
-  }>(
-    `/workspaces/${workspaceId}/applications/${applicationId}/links/${linkId}`,
-    {
-      method: 'DELETE',
-    },
-  );
+  }>(`/workspaces/${workspaceId}/applications/${applicationId}/links/${linkId}`, {
+    method: 'DELETE',
+  });
 }

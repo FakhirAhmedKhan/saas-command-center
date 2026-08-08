@@ -1,74 +1,47 @@
 import { Public } from '../../auth/decorators/public.decorator';
- 
-import {
-    Body,
-    Controller,
-    Headers,
-    HttpCode,
-    Post,
-    Req,
-} from '@nestjs/common';
 
-import {
-    ApiExcludeController,
-} from '@nestjs/swagger';
+import { Body, Controller, Headers, HttpCode, Post, Req } from '@nestjs/common';
 
-import type {
-    Request,
-} from 'express';
+import { ApiExcludeController } from '@nestjs/swagger';
+
+import type { Request } from 'express';
 import { AnalyticsIngestionService } from 'src/modules/analytics-ingestion/services/analytics-ingestion.service';
-
 
 @ApiExcludeController()
 @Public()
 @Controller('collect')
 export class AnalyticsIngestionController {
-    constructor(
-        private readonly ingestionService:
-            AnalyticsIngestionService,
-    ) { }
+  constructor(private readonly ingestionService: AnalyticsIngestionService) {}
 
-    @Post()
-    @HttpCode(202)
-    collect(
-        @Body()
-        body: unknown,
+  @Post()
+  @HttpCode(202)
+  collect(
+    @Body()
+    body: unknown,
 
-        @Headers('origin')
-        origin:
-            string | undefined,
+    @Headers('origin')
+    origin: string | undefined,
 
-        @Headers('user-agent')
-        userAgent:
-            string | undefined,
+    @Headers('user-agent')
+    userAgent: string | undefined,
 
-        @Headers('cf-ipcountry')
-        cloudflareCountry:
-            string | undefined,
+    @Headers('cf-ipcountry')
+    cloudflareCountry: string | undefined,
 
-        @Headers(
-            'x-vercel-ip-country',
-        )
-        vercelCountry:
-            string | undefined,
+    @Headers('x-vercel-ip-country')
+    vercelCountry: string | undefined,
 
-        @Req()
-        request: Request,
-    ) {
-        return this.ingestionService
-            .collect(body, {
-                origin,
+    @Req()
+    request: Request,
+  ) {
+    return this.ingestionService.collect(body, {
+      origin,
 
-                userAgent,
+      userAgent,
 
-                countryCode:
-                    cloudflareCountry ??
-                    vercelCountry,
+      countryCode: cloudflareCountry ?? vercelCountry,
 
-                ipAddress:
-                    request.ip ??
-                    request.socket
-                        .remoteAddress,
-            });
-    }
+      ipAddress: request.ip ?? request.socket.remoteAddress,
+    });
+  }
 }

@@ -1,23 +1,12 @@
-import type {
-  INestApplication,
-} from '@nestjs/common';
+import type { INestApplication } from '@nestjs/common';
 
-import {
-  WorkspaceRole,
-  RawAnalyticsEventType,
-} from 'src/generated/prisma/enums';
+import { WorkspaceRole, RawAnalyticsEventType } from 'src/generated/prisma/enums';
 
-import {
-  PrismaService,
-} from 'src/database/prisma.service';
+import { PrismaService } from 'src/database/prisma.service';
 
-import {
-  AnalyticsProcessingService,
-} from 'src/modules/analytics-engine/services/analytics-processing.service';
+import { AnalyticsProcessingService } from 'src/modules/analytics-engine/services/analytics-processing.service';
 
-import {
-  recordString,
-} from './helpers/application';
+import { recordString } from './helpers/application';
 
 import {
   analyticsEngineRoutes,
@@ -34,13 +23,9 @@ import {
   uniqueTrackerId,
 } from './helpers/analytics-ingestion';
 
-import {
-  createTestApp,
-} from './helpers/create-test-app';
+import { createTestApp } from './helpers/create-test-app';
 
-import {
-  resetDatabase,
-} from './helpers/database';
+import { resetDatabase } from './helpers/database';
 
 import {
   addWorkspaceMember,
@@ -48,349 +33,163 @@ import {
   registerWorkspaceTestUser,
 } from './helpers/workspace';
 
-describe(
-  'Analytics Engine Status E2E',
-  () => {
-    let app:
-      INestApplication;
+describe('Analytics Engine Status E2E', () => {
+  let app: INestApplication;
 
-    let prisma:
-      PrismaService;
+  let prisma: PrismaService;
 
-    let processingService:
-      AnalyticsProcessingService;
+  let processingService: AnalyticsProcessingService;
 
-    beforeEach(
-      async () => {
-        app =
-          await createTestApp();
+  beforeEach(async () => {
+    app = await createTestApp();
 
-        prisma =
-          app.get(
-            PrismaService,
-          );
+    prisma = app.get(PrismaService);
 
-        processingService =
-          app.get(
-            AnalyticsProcessingService,
-          );
+    processingService = app.get(AnalyticsProcessingService);
 
-        await resetDatabase(
-          prisma,
-        );
-      },
+    await resetDatabase(prisma);
+  });
+
+  afterEach(async () => {
+    await app.close();
+  });
+
+  it('returns an empty status before analytics processing', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
+
+    const trackedWebsite = await createTrackedWebsite(owner);
+
+    const response = await getAnalyticsEngineStatus(owner, owner.workspaceId, trackedWebsite.id);
+
+    expect(response.status).toBe(200);
+
+    const status = readAnalyticsEngineStatus(response);
+
+    expect(recordString(status.website, 'id')).toBe(trackedWebsite.id);
+
+    expect(status.counts).toEqual({
+      rawEvents: 0,
+      pendingRawEvents: 0,
+      visitors: 0,
+      sessions: 0,
+      normalizedEvents: 0,
+      pageViews: 0,
+      hourlyAggregates: 0,
+      dailyAggregates: 0,
+    });
+
+    expect(status.processingState).toBeNull();
+
+    expect(status.latestRun).toBeNull();
+
+    expect(status.recentSessions).toEqual([]);
+  });
+
+  it('returns processed counts, latest run, and recent sessions', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
+
+    const trackedWebsite = await createTrackedWebsite(owner);
+
+    const visitorId = uniqueTrackerId('visitor');
+
+    const sessionId = uniqueTrackerId('session');
+
+    expectCollectionAccepted(
+      await collectEvents(app, trackedWebsite, [
+        buildTrackerEvent(trackedWebsite.origin, {
+          type: RawAnalyticsEventType.PAGE_VIEW,
+          visitorId,
+          sessionId,
+        }),
+      ]),
+      1,
     );
 
-    afterEach(
-      async () => {
-        await app.close();
-      },
+    await processingService.processForWorkspace(
+      owner.workspaceId,
+      trackedWebsite.id,
+      owner.userId,
+      100,
     );
 
-    it(
-      'returns an empty status before analytics processing',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+    const response = await getAnalyticsEngineStatus(owner, owner.workspaceId, trackedWebsite.id);
 
-        const trackedWebsite =
-          await createTrackedWebsite(
-            owner,
-          );
+    expect(response.status).toBe(200);
 
-        const response =
-          await getAnalyticsEngineStatus(
-            owner,
-            owner.workspaceId,
-            trackedWebsite.id,
-          );
+    const status = readAnalyticsEngineStatus(response);
 
-        expect(
-          response.status,
-        ).toBe(200);
+    expect(status.counts.rawEvents).toBe(1);
 
-        const status =
-          readAnalyticsEngineStatus(
-            response,
-          );
+    expect(status.counts.pendingRawEvents).toBe(0);
 
-        expect(
-          recordString(
-            status.website,
-            'id',
-          ),
-        ).toBe(
-          trackedWebsite.id,
-        );
+    expect(status.counts.visitors).toBe(1);
 
-        expect(
-          status.counts,
-        ).toEqual({
-          rawEvents: 0,
-          pendingRawEvents: 0,
-          visitors: 0,
-          sessions: 0,
-          normalizedEvents: 0,
-          pageViews: 0,
-          hourlyAggregates: 0,
-          dailyAggregates: 0,
-        });
+    expect(status.counts.sessions).toBe(1);
 
-        expect(
-          status.processingState,
-        ).toBeNull();
+    expect(status.counts.normalizedEvents).toBe(1);
 
-        expect(
-          status.latestRun,
-        ).toBeNull();
+    expect(status.counts.pageViews).toBe(1);
 
-        expect(
-          status.recentSessions,
-        ).toEqual([]);
-      },
+    expect(status.processingState).not.toBeNull();
+
+    expect(status.latestRun).not.toBeNull();
+
+    expect(status.recentSessions).toHaveLength(1);
+  });
+
+  it('allows a VIEWER to read analytics-engine status', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
+
+    const viewer = await registerWorkspaceTestUser(app, prisma);
+
+    const trackedWebsite = await createTrackedWebsite(owner);
+
+    expect([200, 201]).toContain(
+      (await addWorkspaceMember(owner, viewer, WorkspaceRole.VIEWER)).status,
     );
 
-    it(
-      'returns processed counts, latest run, and recent sessions',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+    const response = await getAnalyticsEngineStatus(viewer, owner.workspaceId, trackedWebsite.id);
 
-        const trackedWebsite =
-          await createTrackedWebsite(
-            owner,
-          );
+    expect(response.status).toBe(200);
+  });
 
-        const visitorId =
-          uniqueTrackerId(
-            'visitor',
-          );
+  it('prevents outsider and anonymous access', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
 
-        const sessionId =
-          uniqueTrackerId(
-            'session',
-          );
+    const outsider = await registerWorkspaceTestUser(app, prisma);
 
-        expectCollectionAccepted(
-          await collectEvents(
-            app,
-            trackedWebsite,
-            [
-              buildTrackerEvent(
-                trackedWebsite.origin,
-                {
-                  type:
-                    RawAnalyticsEventType.PAGE_VIEW,
-                  visitorId,
-                  sessionId,
-                },
-              ),
-            ],
-          ),
-          1,
-        );
+    const trackedWebsite = await createTrackedWebsite(owner);
 
-        await processingService
-          .processForWorkspace(
-            owner.workspaceId,
-            trackedWebsite.id,
-            owner.userId,
-            100,
-          );
-
-        const response =
-          await getAnalyticsEngineStatus(
-            owner,
-            owner.workspaceId,
-            trackedWebsite.id,
-          );
-
-        expect(
-          response.status,
-        ).toBe(200);
-
-        const status =
-          readAnalyticsEngineStatus(
-            response,
-          );
-
-        expect(
-          status.counts.rawEvents,
-        ).toBe(1);
-
-        expect(
-          status.counts.pendingRawEvents,
-        ).toBe(0);
-
-        expect(
-          status.counts.visitors,
-        ).toBe(1);
-
-        expect(
-          status.counts.sessions,
-        ).toBe(1);
-
-        expect(
-          status.counts.normalizedEvents,
-        ).toBe(1);
-
-        expect(
-          status.counts.pageViews,
-        ).toBe(1);
-
-        expect(
-          status.processingState,
-        ).not.toBeNull();
-
-        expect(
-          status.latestRun,
-        ).not.toBeNull();
-
-        expect(
-          status.recentSessions,
-        ).toHaveLength(1);
-      },
+    expectAccessDenied(
+      await getAnalyticsEngineStatus(outsider, owner.workspaceId, trackedWebsite.id),
     );
 
-    it(
-      'allows a VIEWER to read analytics-engine status',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+    expect(
+      (await getAnonymousAnalyticsEngineStatus(app, owner.workspaceId, trackedWebsite.id)).status,
+    ).toBe(401);
+  });
 
-        const viewer =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+  it('rejects malformed IDs and hides a foreign website', async () => {
+    const alpha = await registerWorkspaceTestUser(app, prisma);
 
-        const trackedWebsite =
-          await createTrackedWebsite(
-            owner,
-          );
+    const beta = await registerWorkspaceTestUser(app, prisma);
 
-        expect([
-          200,
-          201,
-        ]).toContain(
-          (
-            await addWorkspaceMember(
-              owner,
-              viewer,
-              WorkspaceRole.VIEWER,
-            )
-          ).status,
-        );
+    const betaWebsite = await createTrackedWebsite(beta);
 
-        const response =
-          await getAnalyticsEngineStatus(
-            viewer,
-            owner.workspaceId,
-            trackedWebsite.id,
-          );
+    expect(
+      (
+        await alpha.agent
+          .get(analyticsEngineRoutes.status('not-a-uuid', betaWebsite.id))
+          .set('Authorization', `Bearer ${alpha.accessToken}`)
+      ).status,
+    ).toBe(400);
 
-        expect(
-          response.status,
-        ).toBe(200);
-      },
+    const foreignResponse = await getAnalyticsEngineStatus(
+      alpha,
+      alpha.workspaceId,
+      betaWebsite.id,
     );
 
-    it(
-      'prevents outsider and anonymous access',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
-
-        const outsider =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
-
-        const trackedWebsite =
-          await createTrackedWebsite(
-            owner,
-          );
-
-        expectAccessDenied(
-          await getAnalyticsEngineStatus(
-            outsider,
-            owner.workspaceId,
-            trackedWebsite.id,
-          ),
-        );
-
-        expect(
-          (
-            await getAnonymousAnalyticsEngineStatus(
-              app,
-              owner.workspaceId,
-              trackedWebsite.id,
-            )
-          ).status,
-        ).toBe(401);
-      },
-    );
-
-    it(
-      'rejects malformed IDs and hides a foreign website',
-      async () => {
-        const alpha =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
-
-        const beta =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
-
-        const betaWebsite =
-          await createTrackedWebsite(
-            beta,
-          );
-
-        expect(
-          (
-            await alpha.agent
-              .get(
-                analyticsEngineRoutes.status(
-                  'not-a-uuid',
-                  betaWebsite.id,
-                ),
-              )
-              .set(
-                'Authorization',
-                `Bearer ${alpha.accessToken}`,
-              )
-          ).status,
-        ).toBe(400);
-
-        const foreignResponse =
-          await getAnalyticsEngineStatus(
-            alpha,
-            alpha.workspaceId,
-            betaWebsite.id,
-          );
-
-        expect(
-          foreignResponse.status,
-        ).toBe(404);
-      },
-    );
-  },
-);
+    expect(foreignResponse.status).toBe(404);
+  });
+});

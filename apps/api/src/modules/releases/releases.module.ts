@@ -1,49 +1,26 @@
-import {
-  Module,
-} from '@nestjs/common';
+import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-members.module';
+import { Module } from '@nestjs/common';
 
-import {
-  DatabaseModule,
-} from '../../database/database.module';
+import { DatabaseModule } from '../../database/database.module';
 
-import {
-  DeploymentsController,
-} from './controllers/deployments.controller';
+import { DeploymentsController } from './controllers/deployments.controller';
 
-import {
-  ReleasesController,
-} from './controllers/releases.controller';
+import { ReleasesController } from './controllers/releases.controller';
 
-import {
-  DeploymentTransitionService,
-} from './services/deployment-transition.service';
+import { DeploymentTransitionService } from './services/deployment-transition.service';
 
-import {
-  ReleaseAccessService,
-} from './services/release-access.service';
+import { ReleaseAccessService } from './services/release-access.service';
 
-import {
-  ReleaseDeploymentService,
-} from './services/release-deployment.service';
+import { ReleaseDeploymentService } from './services/release-deployment.service';
 
 @Module({
   imports: [
-    DatabaseModule,
-  ],
+        WorkspaceMembersModule,DatabaseModule],
 
-  controllers: [
-    ReleasesController,
-    DeploymentsController,
-  ],
+  controllers: [ReleasesController, DeploymentsController],
 
-  providers: [
-    ReleaseAccessService,
-    DeploymentTransitionService,
-    ReleaseDeploymentService,
-  ],
+  providers: [ReleaseAccessService, DeploymentTransitionService, ReleaseDeploymentService],
 
-  exports: [
-    ReleaseDeploymentService,
-  ],
+  exports: [ReleaseDeploymentService],
 })
 export class ReleasesModule {}

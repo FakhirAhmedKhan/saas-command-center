@@ -1,56 +1,43 @@
-﻿export const API_PREFIX =
-    '/api/v1';
+﻿export const API_PREFIX = '/api/v1';
 
 export const TEST_ROUTES = {
-    auth: {
-        register:
-            `${API_PREFIX}/auth/register`,
+  auth: {
+    register: `${API_PREFIX}/auth/register`,
 
-        login:
-            `${API_PREFIX}/auth/login`,
+    login: `${API_PREFIX}/auth/login`,
 
-        refresh:
-            `${API_PREFIX}/auth/refresh`,
+    refresh: `${API_PREFIX}/auth/refresh`,
 
-        logout:
-            `${API_PREFIX}/auth/logout`,
+    logout: `${API_PREFIX}/auth/logout`,
 
-        me:
-            `${API_PREFIX}/auth/me`,
+    me: `${API_PREFIX}/auth/me`,
+  },
+
+  workspaces: {
+    root: `${API_PREFIX}/workspaces`,
+
+    details(workspaceId: string): string {
+      return `${API_PREFIX}/workspaces/${workspaceId}`;
     },
 
-    workspaces: {
-        root:
-            `${API_PREFIX}/workspaces`,
-
-        details(
-            workspaceId: string,
-        ): string {
-            return `${API_PREFIX}/workspaces/${workspaceId}`;
-        },
-
-        applications(
-            workspaceId: string,
-        ): string {
-            return `${API_PREFIX}/workspaces/${workspaceId}/applications`;
-        },
+    applications(workspaceId: string): string {
+      return `${API_PREFIX}/workspaces/${workspaceId}/applications`;
     },
+  },
 } as const;
 
 export interface TestUserInput {
-    name: string;
-    email: string;
-    password: string;
-    workspaceName: string;
+  name: string;
+  email: string;
+  password: string;
+  workspaceName: string;
 }
 
 /*
  * If your RegisterDto uses `fullName`
  * instead of `name`, change it here only.
  */
-export function buildRegisterPayload(
-  user: TestUserInput,
-) {
+export function buildRegisterPayload(user: TestUserInput) {
   return {
     displayName: user.name,
     email: user.email.trim().toLowerCase(),
@@ -59,26 +46,16 @@ export function buildRegisterPayload(
   };
 }
 
-export function buildLoginPayload(
-    user: Pick<
-        TestUserInput,
-        'email' | 'password'
-    >,
-) {
-    return {
-        email:
-            user.email,
+export function buildLoginPayload(user: Pick<TestUserInput, 'email' | 'password'>) {
+  return {
+    email: user.email,
 
-        password:
-            user.password,
-    };
+    password: user.password,
+  };
 }
 
-export function buildWorkspacePayload(
-    name: string,
-) {
-    return {
-        name,
-    };
+export function buildWorkspacePayload(name: string) {
+  return {
+    name,
+  };
 }
-

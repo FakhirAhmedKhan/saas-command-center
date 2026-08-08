@@ -57,8 +57,7 @@ export function ApiHealthCard() {
         {state.kind === 'checking' && 'Checking the NestJS health endpoint…'}
         {state.kind === 'connected' &&
           `${state.data.service} is healthy in ${state.data.environment}.`}
-        {state.kind === 'unavailable' &&
-          `Start the API on port 4000. ${state.message}`}
+        {state.kind === 'unavailable' && `Start the API on port 4000. ${state.message}`}
       </p>
     </section>
   );

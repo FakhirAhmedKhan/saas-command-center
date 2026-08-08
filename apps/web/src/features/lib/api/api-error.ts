@@ -11,13 +11,8 @@ export class ApiError extends Error {
     this.name = 'ApiError';
   }
 
-  static fromResponse(
-    response: Response,
-  ): ApiError {
-    const requestId =
-      response.headers.get(
-        'x-request-id',
-      ) ?? undefined;
+  static fromResponse(response: Response): ApiError {
+    const requestId = response.headers.get('x-request-id') ?? undefined;
 
     return new ApiError(
       `Request failed with status ${response.status}.`,
@@ -28,9 +23,7 @@ export class ApiError extends Error {
   }
 }
 
-export function getErrorMessage(
-  error: unknown,
-): string {
+export function getErrorMessage(error: unknown): string {
   if (error instanceof ApiError) {
     return error.message;
   }

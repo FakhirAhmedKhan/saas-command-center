@@ -1,12 +1,6 @@
- 
+import type { INestApplication } from '@nestjs/common';
 
-import type {
-  INestApplication,
-} from '@nestjs/common';
-
-import {
-  PrismaService,
-} from 'src/database/prisma.service';
+import { PrismaService } from 'src/database/prisma.service';
 
 import {
   buildEventBatch,
@@ -16,359 +10,159 @@ import {
   expectCollectionAccepted,
 } from './helpers/analytics-ingestion';
 
-import {
-  createTestApp,
-} from './helpers/create-test-app';
+import { createTestApp } from './helpers/create-test-app';
 
-import {
-  resetDatabase,
-} from './helpers/database';
+import { resetDatabase } from './helpers/database';
 
-import {
-  registerWorkspaceTestUser,
-} from './helpers/workspace';
+import { registerWorkspaceTestUser } from './helpers/workspace';
 
-describe(
-  'Analytics Ingestion Rate Limit E2E',
-  () => {
-    let app:
-      INestApplication;
+describe('Analytics Ingestion Rate Limit E2E', () => {
+  let app: INestApplication;
 
-    let prisma:
-      PrismaService;
+  let prisma: PrismaService;
 
-    let originalMaxEvents:
-      string | undefined;
+  let originalMaxEvents: string | undefined;
 
-    let originalWindowMs:
-      string | undefined;
+  let originalWindowMs: string | undefined;
 
-    beforeEach(
-      async () => {
-        originalMaxEvents =
-          process.env
-            .ANALYTICS_RATE_MAX_EVENTS;
+  beforeEach(async () => {
+    originalMaxEvents = process.env.ANALYTICS_RATE_MAX_EVENTS;
 
-        originalWindowMs =
-          process.env
-            .ANALYTICS_RATE_WINDOW_MS;
+    originalWindowMs = process.env.ANALYTICS_RATE_WINDOW_MS;
 
-        process.env
-          .ANALYTICS_RATE_MAX_EVENTS =
-          '5';
+    process.env.ANALYTICS_RATE_MAX_EVENTS = '5';
 
-        process.env
-          .ANALYTICS_RATE_WINDOW_MS =
-          '60000';
+    process.env.ANALYTICS_RATE_WINDOW_MS = '60000';
 
-        app =
-          await createTestApp();
+    app = await createTestApp();
 
-        prisma =
-          app.get(
-            PrismaService,
-          );
+    prisma = app.get(PrismaService);
 
-        await resetDatabase(
-          prisma,
-        );
-      },
+    await resetDatabase(prisma);
+  });
+
+  afterEach(async () => {
+    await app.close();
+
+    if (originalMaxEvents === undefined) {
+      delete process.env.ANALYTICS_RATE_MAX_EVENTS;
+    } else {
+      process.env.ANALYTICS_RATE_MAX_EVENTS = originalMaxEvents;
+    }
+
+    if (originalWindowMs === undefined) {
+      delete process.env.ANALYTICS_RATE_WINDOW_MS;
+    } else {
+      process.env.ANALYTICS_RATE_WINDOW_MS = originalWindowMs;
+    }
+  });
+
+  it('accepts events up to the configured limit and rejects the next event', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
+
+    const trackedWebsite = await createTrackedWebsite(owner);
+
+    expectCollectionAccepted(
+      await collectEvents(app, trackedWebsite, buildEventBatch(trackedWebsite.origin, 3)),
+      3,
     );
 
-    afterEach(
-      async () => {
-        await app.close();
-
-        if (
-          originalMaxEvents ===
-          undefined
-        ) {
-          delete process.env
-            .ANALYTICS_RATE_MAX_EVENTS;
-        } else {
-          process.env
-            .ANALYTICS_RATE_MAX_EVENTS =
-            originalMaxEvents;
-        }
-
-        if (
-          originalWindowMs ===
-          undefined
-        ) {
-          delete process.env
-            .ANALYTICS_RATE_WINDOW_MS;
-        } else {
-          process.env
-            .ANALYTICS_RATE_WINDOW_MS =
-            originalWindowMs;
-        }
-      },
+    expectCollectionAccepted(
+      await collectEvents(app, trackedWebsite, buildEventBatch(trackedWebsite.origin, 2)),
+      2,
     );
 
-    it(
-      'accepts events up to the configured limit and rejects the next event',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+    const rejected = await collectEvents(app, trackedWebsite, [
+      buildTrackerEvent(trackedWebsite.origin),
+    ]);
 
-        const trackedWebsite =
-          await createTrackedWebsite(
-            owner,
-          );
+    expect(rejected.status).toBe(400);
 
-        expectCollectionAccepted(
-          await collectEvents(
-            app,
-            trackedWebsite,
-            buildEventBatch(
-              trackedWebsite.origin,
-              3,
-            ),
-          ),
-          3,
-        );
+    expect(JSON.stringify(rejected.body)).toContain('Tracking rate limit exceeded');
 
-        expectCollectionAccepted(
-          await collectEvents(
-            app,
-            trackedWebsite,
-            buildEventBatch(
-              trackedWebsite.origin,
-              2,
-            ),
-          ),
-          2,
-        );
+    expect(
+      await prisma.rawAnalyticsEvent.count({
+        where: {
+          websiteId: trackedWebsite.id,
+        },
+      }),
+    ).toBe(5);
+  });
 
-        const rejected =
-          await collectEvents(
-            app,
-            trackedWebsite,
-            [
-              buildTrackerEvent(
-                trackedWebsite.origin,
-              ),
-            ],
-          );
+  it('rejects a single request whose event count exceeds the limit', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
 
-        expect(
-          rejected.status,
-        ).toBe(400);
+    const trackedWebsite = await createTrackedWebsite(owner);
 
-        expect(
-          JSON.stringify(
-            rejected.body,
-          ),
-        ).toContain(
-          'Tracking rate limit exceeded',
-        );
-
-        expect(
-          await prisma
-            .rawAnalyticsEvent
-            .count({
-              where: {
-                websiteId:
-                  trackedWebsite.id,
-              },
-            }),
-        ).toBe(5);
-      },
+    const response = await collectEvents(
+      app,
+      trackedWebsite,
+      buildEventBatch(trackedWebsite.origin, 6),
     );
 
-    it(
-      'rejects a single request whose event count exceeds the limit',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+    /*
+     * The current limiter starts a new bucket with the supplied count.
+     * This test documents the intended safety contract: a first request
+     * must not exceed the configured maximum.
+     */
+    expect(response.status).toBe(400);
 
-        const trackedWebsite =
-          await createTrackedWebsite(
-            owner,
-          );
+    expect(
+      await prisma.rawAnalyticsEvent.count({
+        where: {
+          websiteId: trackedWebsite.id,
+        },
+      }),
+    ).toBe(0);
+  });
 
-        const response =
-          await collectEvents(
-            app,
-            trackedWebsite,
-            buildEventBatch(
-              trackedWebsite.origin,
-              6,
-            ),
-          );
+  it('maintains independent buckets for different websites', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
 
-        /*
-         * The current limiter starts a new bucket with the supplied count.
-         * This test documents the intended safety contract: a first request
-         * must not exceed the configured maximum.
-         */
-        expect(
-          response.status,
-        ).toBe(400);
+    const firstWebsite = await createTrackedWebsite(owner);
 
-        expect(
-          await prisma
-            .rawAnalyticsEvent
-            .count({
-              where: {
-                websiteId:
-                  trackedWebsite.id,
-              },
-            }),
-        ).toBe(0);
-      },
+    const secondWebsite = await createTrackedWebsite(owner);
+
+    expectCollectionAccepted(
+      await collectEvents(app, firstWebsite, buildEventBatch(firstWebsite.origin, 5)),
+      5,
     );
 
-    it(
-      'maintains independent buckets for different websites',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
-
-        const firstWebsite =
-          await createTrackedWebsite(
-            owner,
-          );
-
-        const secondWebsite =
-          await createTrackedWebsite(
-            owner,
-          );
-
-        expectCollectionAccepted(
-          await collectEvents(
-            app,
-            firstWebsite,
-            buildEventBatch(
-              firstWebsite.origin,
-              5,
-            ),
-          ),
-          5,
-        );
-
-        expectCollectionAccepted(
-          await collectEvents(
-            app,
-            secondWebsite,
-            buildEventBatch(
-              secondWebsite.origin,
-              5,
-            ),
-          ),
-          5,
-        );
-
-        expect(
-          (
-            await collectEvents(
-              app,
-              firstWebsite,
-              [
-                buildTrackerEvent(
-                  firstWebsite.origin,
-                ),
-              ],
-            )
-          ).status,
-        ).toBe(400);
-
-        expect(
-          (
-            await collectEvents(
-              app,
-              secondWebsite,
-              [
-                buildTrackerEvent(
-                  secondWebsite.origin,
-                ),
-              ],
-            )
-          ).status,
-        ).toBe(400);
-      },
+    expectCollectionAccepted(
+      await collectEvents(app, secondWebsite, buildEventBatch(secondWebsite.origin, 5)),
+      5,
     );
 
-    it(
-      'counts duplicate submissions toward the request rate',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+    expect(
+      (await collectEvents(app, firstWebsite, [buildTrackerEvent(firstWebsite.origin)])).status,
+    ).toBe(400);
 
-        const trackedWebsite =
-          await createTrackedWebsite(
-            owner,
-          );
+    expect(
+      (await collectEvents(app, secondWebsite, [buildTrackerEvent(secondWebsite.origin)])).status,
+    ).toBe(400);
+  });
 
-        const duplicateEvent =
-          buildTrackerEvent(
-            trackedWebsite.origin,
-          );
+  it('counts duplicate submissions toward the request rate', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
 
-        expectCollectionAccepted(
-          await collectEvents(
-            app,
-            trackedWebsite,
-            [
-              duplicateEvent,
-            ],
-          ),
-          1,
-        );
+    const trackedWebsite = await createTrackedWebsite(owner);
 
-        for (
-          let index = 0;
-          index < 4;
-          index += 1
-        ) {
-          expectCollectionAccepted(
-            await collectEvents(
-              app,
-              trackedWebsite,
-              [
-                duplicateEvent,
-              ],
-            ),
-            0,
-            1,
-          );
-        }
+    const duplicateEvent = buildTrackerEvent(trackedWebsite.origin);
 
-        expect(
-          (
-            await collectEvents(
-              app,
-              trackedWebsite,
-              [
-                duplicateEvent,
-              ],
-            )
-          ).status,
-        ).toBe(400);
+    expectCollectionAccepted(await collectEvents(app, trackedWebsite, [duplicateEvent]), 1);
 
-        expect(
-          await prisma
-            .rawAnalyticsEvent
-            .count({
-              where: {
-                websiteId:
-                  trackedWebsite.id,
-              },
-            }),
-        ).toBe(1);
-      },
-    );
-  },
-);
+    for (let index = 0; index < 4; index += 1) {
+      expectCollectionAccepted(await collectEvents(app, trackedWebsite, [duplicateEvent]), 0, 1);
+    }
+
+    expect((await collectEvents(app, trackedWebsite, [duplicateEvent])).status).toBe(400);
+
+    expect(
+      await prisma.rawAnalyticsEvent.count({
+        where: {
+          websiteId: trackedWebsite.id,
+        },
+      }),
+    ).toBe(1);
+  });
+});

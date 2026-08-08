@@ -1,32 +1,18 @@
-import {
-    Module,
-} from '@nestjs/common';
+import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-members.module';
+import { Module } from '@nestjs/common';
 
-import {
-    DatabaseModule,
-} from 'src/database/database.module';
+import { DatabaseModule } from 'src/database/database.module';
 
-
-import {
-    AnalyticsOverviewService,
-} from './services/analytics-overview.service';
+import { AnalyticsOverviewService } from './services/analytics-overview.service';
 import { AnalyticsOverviewController } from './services/controllers/analytics-overview.controller';
 
 @Module({
-    imports: [
-        DatabaseModule,
-    ],
+  imports: [WorkspaceMembersModule, DatabaseModule],
 
-    controllers: [
-        AnalyticsOverviewController,
-    ],
+  controllers: [AnalyticsOverviewController],
 
-    providers: [
-        AnalyticsOverviewService,
-    ],
+  providers: [AnalyticsOverviewService],
 
-    exports: [
-        AnalyticsOverviewService,
-    ],
+  exports: [AnalyticsOverviewService],
 })
-export class AnalyticsOverviewModule { }
+export class AnalyticsOverviewModule {}

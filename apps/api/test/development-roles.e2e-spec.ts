@@ -1,28 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 
-import type {
-  INestApplication,
-} from '@nestjs/common';
+import type { INestApplication } from '@nestjs/common';
 
 import request from 'supertest';
 
-import {
-  WorkspaceRole,
-} from 'src/generated/prisma/enums';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
 
-import {
-  PrismaService,
-} from 'src/database/prisma.service';
+import { PrismaService } from 'src/database/prisma.service';
 
-import {
-  archiveApplication,
-  createApplication,
-  inWorkspace,
-} from './helpers/application';
+import { archiveApplication, createApplication, inWorkspace } from './helpers/application';
 
-import {
-  createTestApp,
-} from './helpers/create-test-app';
+import { createTestApp } from './helpers/create-test-app';
 
 import {
   createBlocker,
@@ -37,9 +25,7 @@ import {
   updateMilestone,
 } from './helpers/development';
 
-import {
-  resetDatabase,
-} from './helpers/database';
+import { resetDatabase } from './helpers/database';
 
 import {
   addWorkspaceMember,
@@ -55,457 +41,180 @@ interface RoleMatrix {
   viewer: WorkspaceTestUser;
 }
 
-describe(
-  'Development Roles E2E',
-  () => {
-    let app:
-      INestApplication;
+describe('Development Roles E2E', () => {
+  let app: INestApplication;
 
-    let prisma:
-      PrismaService;
+  let prisma: PrismaService;
 
-    beforeEach(
-      async () => {
-        app =
-          await createTestApp();
+  beforeEach(async () => {
+    app = await createTestApp();
 
-        prisma =
-          app.get(
-            PrismaService,
-          );
+    prisma = app.get(PrismaService);
 
-        await resetDatabase(
-          prisma,
-        );
-      },
+    await resetDatabase(prisma);
+  });
+
+  afterEach(async () => {
+    await app.close();
+  });
+
+  async function createRoleMatrix(): Promise<RoleMatrix> {
+    const owner = await registerWorkspaceTestUser(app, prisma);
+
+    const rawAdmin = await registerWorkspaceTestUser(app, prisma);
+
+    const rawDeveloper = await registerWorkspaceTestUser(app, prisma);
+
+    const rawViewer = await registerWorkspaceTestUser(app, prisma);
+
+    expectDevelopmentSuccess(await addWorkspaceMember(owner, rawAdmin, WorkspaceRole.ADMIN));
+
+    expectDevelopmentSuccess(
+      await addWorkspaceMember(owner, rawDeveloper, WorkspaceRole.DEVELOPER),
     );
 
-    afterEach(
-      async () => {
-        await app.close();
-      },
-    );
+    expectDevelopmentSuccess(await addWorkspaceMember(owner, rawViewer, WorkspaceRole.VIEWER));
 
-    async function createRoleMatrix():
-      Promise<RoleMatrix> {
-      const owner =
-        await registerWorkspaceTestUser(
-          app,
-          prisma,
-        );
+    return {
+      owner,
 
-      const rawAdmin =
-        await registerWorkspaceTestUser(
-          app,
-          prisma,
-        );
+      admin: inWorkspace(rawAdmin, owner.workspaceId),
 
-      const rawDeveloper =
-        await registerWorkspaceTestUser(
-          app,
-          prisma,
-        );
+      developer: inWorkspace(rawDeveloper, owner.workspaceId),
 
-      const rawViewer =
-        await registerWorkspaceTestUser(
-          app,
-          prisma,
-        );
+      viewer: inWorkspace(rawViewer, owner.workspaceId),
+    };
+  }
 
-      expectDevelopmentSuccess(
-        await addWorkspaceMember(
-          owner,
-          rawAdmin,
-          WorkspaceRole.ADMIN,
-        ),
-      );
+  it('allows all workspace members to read templates, summary, milestones, and blockers', async () => {
+    const matrix = await createRoleMatrix();
 
-      expectDevelopmentSuccess(
-        await addWorkspaceMember(
-          owner,
-          rawDeveloper,
-          WorkspaceRole.DEVELOPER,
-        ),
-      );
+    const application = await createApplication(matrix.owner);
 
-      expectDevelopmentSuccess(
-        await addWorkspaceMember(
-          owner,
-          rawViewer,
-          WorkspaceRole.VIEWER,
-        ),
-      );
+    for (const actor of [matrix.owner, matrix.admin, matrix.developer, matrix.viewer]) {
+      expect((await listTemplates(actor)).status).toBe(200);
 
-      return {
-        owner,
+      expect((await getDevelopmentSummary(actor, application.id)).status).toBe(200);
 
-        admin:
-          inWorkspace(
-            rawAdmin,
-            owner.workspaceId,
-          ),
+      expect((await listMilestones(actor, application.id)).status).toBe(200);
 
-        developer:
-          inWorkspace(
-            rawDeveloper,
-            owner.workspaceId,
-          ),
-
-        viewer:
-          inWorkspace(
-            rawViewer,
-            owner.workspaceId,
-          ),
-      };
+      expect((await listBlockers(actor, application.id)).status).toBe(200);
     }
+  });
 
-    it(
-      'allows all workspace members to read templates, summary, milestones, and blockers',
-      async () => {
-        const matrix =
-          await createRoleMatrix();
+  it('allows OWNER, ADMIN, and DEVELOPER to mutate development data', async () => {
+    const matrix = await createRoleMatrix();
 
-        const application =
-          await createApplication(
-            matrix.owner,
-          );
+    const application = await createApplication(matrix.owner);
 
-        for (
-          const actor
-          of [
-            matrix.owner,
-            matrix.admin,
-            matrix.developer,
-            matrix.viewer,
-          ]
-        ) {
-          expect(
-            (
-              await listTemplates(
-                actor,
-              )
-            ).status,
-          ).toBe(200);
+    for (const actor of [matrix.owner, matrix.admin, matrix.developer]) {
+      const milestone = await createMilestone(actor, application.id);
 
-          expect(
-            (
-              await getDevelopmentSummary(
-                actor,
-                application.id,
-              )
-            ).status,
-          ).toBe(200);
+      await createTask(actor, application.id, milestone.id);
 
-          expect(
-            (
-              await listMilestones(
-                actor,
-                application.id,
-              )
-            ).status,
-          ).toBe(200);
+      await createBlocker(actor, application.id, {
+        milestoneId: milestone.id,
+      });
 
-          expect(
-            (
-              await listBlockers(
-                actor,
-                application.id,
-              )
-            ).status,
-          ).toBe(200);
-        }
-      },
+      expect(
+        (
+          await updateMilestone(actor, application.id, milestone.id, {
+            description: `Updated by ${actor.userId}`,
+          })
+        ).status,
+      ).toBe(200);
+    }
+  });
+
+  it('prevents VIEWER from all development mutations', async () => {
+    const matrix = await createRoleMatrix();
+
+    const application = await createApplication(matrix.owner);
+
+    const milestone = await createMilestone(matrix.owner, application.id);
+
+    const createMilestoneResponse = await matrix.viewer.agent
+      .post(developmentRoutes.milestones(matrix.viewer.workspaceId, application.id))
+      .set('Authorization', `Bearer ${matrix.viewer.accessToken}`)
+      .send({
+        title: 'Viewer Milestone',
+      });
+
+    expect(createMilestoneResponse.status).toBe(403);
+
+    const updateResponse = await updateMilestone(matrix.viewer, application.id, milestone.id, {
+      title: 'Viewer Update',
+    });
+
+    expect(updateResponse.status).toBe(403);
+
+    const taskResponse = await matrix.viewer.agent
+      .post(developmentRoutes.tasks(matrix.viewer.workspaceId, application.id, milestone.id))
+      .set('Authorization', `Bearer ${matrix.viewer.accessToken}`)
+      .send({
+        title: 'Viewer Task',
+      });
+
+    expect(taskResponse.status).toBe(403);
+
+    const blockerResponse = await matrix.viewer.agent
+      .post(developmentRoutes.blockers(matrix.viewer.workspaceId, application.id))
+      .set('Authorization', `Bearer ${matrix.viewer.accessToken}`)
+      .send({
+        title: 'Viewer Blocker',
+      });
+
+    expect(blockerResponse.status).toBe(403);
+  });
+
+  it('prevents outsider and anonymous access', async () => {
+    const matrix = await createRoleMatrix();
+
+    const application = await createApplication(matrix.owner);
+
+    const outsider = await registerWorkspaceTestUser(app, prisma);
+
+    const outsiderResponse = await outsider.agent
+      .get(developmentRoutes.summary(matrix.owner.workspaceId, application.id))
+      .set('Authorization', `Bearer ${outsider.accessToken}`);
+
+    expectAccessDenied(outsiderResponse);
+
+    const anonymousResponse = await request(app.getHttpServer()).get(
+      developmentRoutes.summary(matrix.owner.workspaceId, application.id),
     );
 
-    it(
-      'allows OWNER, ADMIN, and DEVELOPER to mutate development data',
-      async () => {
-        const matrix =
-          await createRoleMatrix();
+    expect(anonymousResponse.status).toBe(401);
+  });
 
-        const application =
-          await createApplication(
-            matrix.owner,
-          );
+  it('prevents development access through a foreign application ID', async () => {
+    const alphaOwner = await registerWorkspaceTestUser(app, prisma);
 
-        for (
-          const actor
-          of [
-            matrix.owner,
-            matrix.admin,
-            matrix.developer,
-          ]
-        ) {
-          const milestone =
-            await createMilestone(
-              actor,
-              application.id,
-            );
+    const betaOwner = await registerWorkspaceTestUser(app, prisma);
 
-          await createTask(
-            actor,
-            application.id,
-            milestone.id,
-          );
+    const betaApplication = await createApplication(betaOwner);
 
-          await createBlocker(
-            actor,
-            application.id,
-            {
-              milestoneId:
-                milestone.id,
-            },
-          );
+    const response = await getDevelopmentSummary(alphaOwner, betaApplication.id);
 
-          expect(
-            (
-              await updateMilestone(
-                actor,
-                application.id,
-                milestone.id,
-                {
-                  description:
-                    `Updated by ${actor.userId}`,
-                },
-              )
-            ).status,
-          ).toBe(200);
-        }
-      },
-    );
+    expect(response.status).toBe(404);
+  });
 
-    it(
-      'prevents VIEWER from all development mutations',
-      async () => {
-        const matrix =
-          await createRoleMatrix();
+  it('rejects development mutations on archived applications', async () => {
+    const matrix = await createRoleMatrix();
 
-        const application =
-          await createApplication(
-            matrix.owner,
-          );
+    const application = await createApplication(matrix.owner);
 
-        const milestone =
-          await createMilestone(
-            matrix.owner,
-            application.id,
-          );
+    expectDevelopmentSuccess(await archiveApplication(matrix.owner, application.id));
 
-        const createMilestoneResponse =
-          await matrix.viewer.agent
-            .post(
-              developmentRoutes.milestones(
-                matrix.viewer.workspaceId,
-                application.id,
-              ),
-            )
-            .set(
-              'Authorization',
-              `Bearer ${matrix.viewer.accessToken}`,
-            )
-            .send({
-              title:
-                'Viewer Milestone',
-            });
+    for (const actor of [matrix.owner, matrix.admin, matrix.developer]) {
+      const response = await actor.agent
+        .post(developmentRoutes.milestones(actor.workspaceId, application.id))
+        .set('Authorization', `Bearer ${actor.accessToken}`)
+        .send({
+          title: 'Archived Application Milestone',
+        });
 
-        expect(
-          createMilestoneResponse.status,
-        ).toBe(403);
-
-        const updateResponse =
-          await updateMilestone(
-            matrix.viewer,
-            application.id,
-            milestone.id,
-            {
-              title:
-                'Viewer Update',
-            },
-          );
-
-        expect(
-          updateResponse.status,
-        ).toBe(403);
-
-        const taskResponse =
-          await matrix.viewer.agent
-            .post(
-              developmentRoutes.tasks(
-                matrix.viewer.workspaceId,
-                application.id,
-                milestone.id,
-              ),
-            )
-            .set(
-              'Authorization',
-              `Bearer ${matrix.viewer.accessToken}`,
-            )
-            .send({
-              title:
-                'Viewer Task',
-            });
-
-        expect(
-          taskResponse.status,
-        ).toBe(403);
-
-        const blockerResponse =
-          await matrix.viewer.agent
-            .post(
-              developmentRoutes.blockers(
-                matrix.viewer.workspaceId,
-                application.id,
-              ),
-            )
-            .set(
-              'Authorization',
-              `Bearer ${matrix.viewer.accessToken}`,
-            )
-            .send({
-              title:
-                'Viewer Blocker',
-            });
-
-        expect(
-          blockerResponse.status,
-        ).toBe(403);
-      },
-    );
-
-    it(
-      'prevents outsider and anonymous access',
-      async () => {
-        const matrix =
-          await createRoleMatrix();
-
-        const application =
-          await createApplication(
-            matrix.owner,
-          );
-
-        const outsider =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
-
-        const outsiderResponse =
-          await outsider.agent
-            .get(
-              developmentRoutes.summary(
-                matrix.owner.workspaceId,
-                application.id,
-              ),
-            )
-            .set(
-              'Authorization',
-              `Bearer ${outsider.accessToken}`,
-            );
-
-        expectAccessDenied(
-          outsiderResponse,
-        );
-
-        const anonymousResponse =
-          await request(
-            app.getHttpServer(),
-          ).get(
-            developmentRoutes.summary(
-              matrix.owner.workspaceId,
-              application.id,
-            ),
-          );
-
-        expect(
-          anonymousResponse.status,
-        ).toBe(401);
-      },
-    );
-
-    it(
-      'prevents development access through a foreign application ID',
-      async () => {
-        const alphaOwner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
-
-        const betaOwner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
-
-        const betaApplication =
-          await createApplication(
-            betaOwner,
-          );
-
-        const response =
-          await getDevelopmentSummary(
-            alphaOwner,
-            betaApplication.id,
-          );
-
-        expect(
-          response.status,
-        ).toBe(404);
-      },
-    );
-
-    it(
-      'rejects development mutations on archived applications',
-      async () => {
-        const matrix =
-          await createRoleMatrix();
-
-        const application =
-          await createApplication(
-            matrix.owner,
-          );
-
-        expectDevelopmentSuccess(
-          await archiveApplication(
-            matrix.owner,
-            application.id,
-          ),
-        );
-
-        for (
-          const actor
-          of [
-            matrix.owner,
-            matrix.admin,
-            matrix.developer,
-          ]
-        ) {
-          const response =
-            await actor.agent
-              .post(
-                developmentRoutes.milestones(
-                  actor.workspaceId,
-                  application.id,
-                ),
-              )
-              .set(
-                'Authorization',
-                `Bearer ${actor.accessToken}`,
-              )
-              .send({
-                title:
-                  'Archived Application Milestone',
-              });
-
-          expect([
-            400,
-            403,
-            409,
-          ]).toContain(
-            response.status,
-          );
-        }
-      },
-    );
-  },
-);
+      expect([400, 403, 409]).toContain(response.status);
+    }
+  });
+});

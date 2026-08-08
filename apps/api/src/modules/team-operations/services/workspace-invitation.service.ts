@@ -1,6 +1,3 @@
- 
- 
- 
 import {
   BadRequestException,
   ConflictException,
@@ -16,41 +13,29 @@ import {
   WorkspaceInvitationStatus,
 } from '../../../generated/prisma/client';
 
-import {
-  PrismaService,
-} from '../../../database/prisma.service';
+import { PrismaService } from '../../../database/prisma.service';
 
 import type {
   CreateWorkspaceInvitationDto,
   InvitationListQueryDto,
 } from '../dto/workspace-invitation.dto';
 
-import {
-  InvitationMailer,
-} from './invitation-mailer.service';
+import { InvitationMailer } from './invitation-mailer.service';
 
-import {
-  InvitationTokenService,
-} from './invitation-token.service';
+import { InvitationTokenService } from './invitation-token.service';
 
-import {
-  NotificationService,
-} from './notification.service';
+import { NotificationService } from './notification.service';
 
 @Injectable()
 export class WorkspaceInvitationService {
   constructor(
-    private readonly prisma:
-      PrismaService,
+    private readonly prisma: PrismaService,
 
-    private readonly tokens:
-      InvitationTokenService,
+    private readonly tokens: InvitationTokenService,
 
-    private readonly mailer:
-      InvitationMailer,
+    private readonly mailer: InvitationMailer,
 
-    private readonly notifications:
-      NotificationService,
+    private readonly notifications: NotificationService,
   ) {}
 
   async create(
@@ -58,170 +43,109 @@ export class WorkspaceInvitationService {
 
     invitedById: string,
 
-    input:
-      CreateWorkspaceInvitationDto,
+    input: CreateWorkspaceInvitationDto,
   ) {
-    const email =
-      this.normalizeEmail(
-        input.email,
-      );
+    const email = this.normalizeEmail(input.email);
 
-    const [
-      workspace,
-      inviter,
-      existingUser,
-    ] = await Promise.all([
-      this.prisma
-        .workspace
-        .findUnique({
-          where: {
-            id:
-              workspaceId,
+    const [workspace, inviter, existingUser] = await Promise.all([
+      this.prisma.workspace.findUnique({
+        where: {
+          id: workspaceId,
+        },
+
+        select: {
+          id: true,
+          name: true,
+        },
+      }),
+
+      this.prisma.user.findUnique({
+        where: {
+          id: invitedById,
+        },
+
+        select: {
+          id: true,
+          displayName: true,
+          email: true,
+        },
+      }),
+
+      this.prisma.user.findFirst({
+        where: {
+          email: {
+            equals: email,
+
+            mode: 'insensitive',
           },
+        },
 
-          select: {
-            id: true,
-            name: true,
-          },
-        }),
-
-      this.prisma
-        .user
-        .findUnique({
-          where: {
-            id:
-              invitedById,
-          },
-
-          select: {
-            id: true,
-            displayName: true,
-            email: true,
-          },
-        }),
-
-      this.prisma
-        .user
-        .findFirst({
-          where: {
-            email: {
-              equals:
-                email,
-
-              mode:
-                'insensitive',
-            },
-          },
-
-          select: {
-            id: true,
-            email: true,
-          },
-        }),
+        select: {
+          id: true,
+          email: true,
+        },
+      }),
     ]);
 
-    if (
-      !workspace ||
-      !inviter
-    ) {
-      throw new NotFoundException(
-        'Workspace or inviter not found.',
-      );
+    if (!workspace || !inviter) {
+      throw new NotFoundException('Workspace or inviter not found.');
     }
 
-    if (
-      existingUser
-    ) {
-      const existingMember =
-        await this.prisma
-          .workspaceMember
-          .findFirst({
-            where: {
-              workspaceId,
+    if (existingUser) {
+      const existingMember = await this.prisma.workspaceMember.findFirst({
+        where: {
+          workspaceId,
 
-              userId:
-                existingUser.id,
-            },
+          userId: existingUser.id,
+        },
 
-            select: {
-              id: true,
-            },
-          });
+        select: {
+          id: true,
+        },
+      });
 
-      if (
-        existingMember
-      ) {
-        throw new ConflictException(
-          'This user is already a workspace member.',
-        );
+      if (existingMember) {
+        throw new ConflictException('This user is already a workspace member.');
       }
     }
 
-    await this.expirePendingInvitations(
-      workspaceId,
-      email,
-    );
+    await this.expirePendingInvitations(workspaceId, email);
 
-    const generated =
-      this.tokens.generate();
+    const generated = this.tokens.generate();
 
     let invitation;
 
     try {
-      invitation =
-        await this.prisma
-          .workspaceInvitation
-          .create({
-            data: {
-              workspaceId,
+      invitation = await this.prisma.workspaceInvitation.create({
+        data: {
+          workspaceId,
 
-              invitedById,
+          invitedById,
 
-              email,
+          email,
 
-              role:
-                input.role,
+          role: input.role,
 
-              tokenHash:
-                generated
-                  .tokenHash,
+          tokenHash: generated.tokenHash,
 
-              expiresAt:
-                this.tokens
-                  .getExpiresAt(),
+          expiresAt: this.tokens.getExpiresAt(),
 
-              sendCount:
-                1,
+          sendCount: 1,
 
-              lastSentAt:
-                new Date(),
-            },
+          lastSentAt: new Date(),
+        },
 
-            include:
-              this.invitationInclude(),
-          });
-    } catch (
-      error
-    ) {
-      if (
-        error instanceof
-          Prisma.PrismaClientKnownRequestError &&
-        error.code ===
-          'P2002'
-      ) {
-        throw new ConflictException(
-          'An active invitation already exists for this email.',
-        );
+        include: this.invitationInclude(),
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        throw new ConflictException('An active invitation already exists for this email.');
       }
 
       throw error;
     }
 
-    const invitationUrl =
-      this.tokens
-        .createInvitationUrl(
-          generated.rawToken,
-        );
+    const invitationUrl = this.tokens.createInvitationUrl(generated.rawToken);
 
     await this.deliverInvitation(
       invitation.id,
@@ -229,75 +153,50 @@ export class WorkspaceInvitationService {
       {
         email,
 
-        workspaceName:
-          workspace.name,
+        workspaceName: workspace.name,
 
-        inviterName:
-          inviter.displayName ??
-          inviter.email,
+        inviterName: inviter.displayName ?? inviter.email,
 
-        role:
-          invitation.role,
+        role: invitation.role,
 
         invitationUrl,
 
-        expiresAt:
-          invitation.expiresAt,
+        expiresAt: invitation.expiresAt,
       },
     );
 
-    if (
-      existingUser
-    ) {
-      await this.notifications
-        .createForUser({
-          workspaceId,
+    if (existingUser) {
+      await this.notifications.createForUser({
+        workspaceId,
 
-          userId:
-            existingUser.id,
+        userId: existingUser.id,
 
-          type:
-            NotificationType
-              .WORKSPACE_INVITATION,
+        type: NotificationType.WORKSPACE_INVITATION,
 
-          title:
-            `Invitation to ${workspace.name}`,
+        title: `Invitation to ${workspace.name}`,
 
-          message:
-            `${inviter.displayName ?? inviter.email} invited you as ${invitation.role}.`,
+        message: `${inviter.displayName ?? inviter.email} invited you as ${invitation.role}.`,
 
-          resourceType:
-            'WORKSPACE_INVITATION',
+        resourceType: 'WORKSPACE_INVITATION',
 
-          resourceId:
-            invitation.id,
+        resourceId: invitation.id,
 
-          actionUrl:
-            `/invitations/${generated.rawToken}`,
+        actionUrl: `/invitations/${generated.rawToken}`,
 
-          dedupeKey:
-            `workspace-invitation:${invitation.id}`,
-        });
+        dedupeKey: `workspace-invitation:${invitation.id}`,
+      });
     }
 
-    const updated =
-      await this.prisma
-        .workspaceInvitation
-        .findUniqueOrThrow({
-          where: {
-            id:
-              invitation.id,
-          },
+    const updated = await this.prisma.workspaceInvitation.findUniqueOrThrow({
+      where: {
+        id: invitation.id,
+      },
 
-          include:
-            this.invitationInclude(),
-        });
+      include: this.invitationInclude(),
+    });
 
     return {
-      invitation:
-        this.mapInvitation(
-          updated,
-        ),
+      invitation: this.mapInvitation(updated),
 
       invitationUrl,
     };
@@ -306,41 +205,27 @@ export class WorkspaceInvitationService {
   async list(
     workspaceId: string,
 
-    query:
-      InvitationListQueryDto,
+    query: InvitationListQueryDto,
   ) {
-    await this.expireAllWorkspaceInvitations(
-      workspaceId,
-    );
+    await this.expireAllWorkspaceInvitations(workspaceId);
 
-    const invitations =
-      await this.prisma
-        .workspaceInvitation
-        .findMany({
-          where: {
-            workspaceId,
+    const invitations = await this.prisma.workspaceInvitation.findMany({
+      where: {
+        workspaceId,
 
-            status:
-              query.status,
-          },
+        status: query.status,
+      },
 
-          include:
-            this.invitationInclude(),
+      include: this.invitationInclude(),
 
-          orderBy: {
-            createdAt:
-              'desc',
-          },
+      orderBy: {
+        createdAt: 'desc',
+      },
 
-          take: 200,
-        });
+      take: 200,
+    });
 
-    return invitations.map(
-      (invitation) =>
-        this.mapInvitation(
-          invitation,
-        ),
-    );
+    return invitations.map((invitation) => this.mapInvitation(invitation));
   }
 
   async resend(
@@ -348,113 +233,68 @@ export class WorkspaceInvitationService {
 
     invitationId: string,
   ) {
-    const invitation =
-      await this.requireInvitation(
-        workspaceId,
-        invitationId,
-      );
+    const invitation = await this.requireInvitation(workspaceId, invitationId);
 
-    if (
-      invitation.status !==
-      WorkspaceInvitationStatus
-        .PENDING
-    ) {
-      throw new ConflictException(
-        'Only pending invitations can be resent.',
-      );
+    if (invitation.status !== WorkspaceInvitationStatus.PENDING) {
+      throw new ConflictException('Only pending invitations can be resent.');
     }
 
-    const generated =
-      this.tokens.generate();
+    const generated = this.tokens.generate();
 
-    const updated =
-      await this.prisma
-        .workspaceInvitation
-        .update({
-          where: {
-            id:
-              invitation.id,
-          },
+    const updated = await this.prisma.workspaceInvitation.update({
+      where: {
+        id: invitation.id,
+      },
 
-          data: {
-            tokenHash:
-              generated
-                .tokenHash,
+      data: {
+        tokenHash: generated.tokenHash,
 
-            expiresAt:
-              this.tokens
-                .getExpiresAt(),
+        expiresAt: this.tokens.getExpiresAt(),
 
-            lastSentAt:
-              new Date(),
+        lastSentAt: new Date(),
 
-            sendCount: {
-              increment: 1,
-            },
+        sendCount: {
+          increment: 1,
+        },
 
-            deliveryStatus:
-              InvitationDeliveryStatus
-                .NOT_REQUESTED,
+        deliveryStatus: InvitationDeliveryStatus.NOT_REQUESTED,
 
-            deliveryError:
-              null,
-          },
+        deliveryError: null,
+      },
 
-          include:
-            this.invitationInclude(),
-        });
+      include: this.invitationInclude(),
+    });
 
-    const invitationUrl =
-      this.tokens
-        .createInvitationUrl(
-          generated.rawToken,
-        );
+    const invitationUrl = this.tokens.createInvitationUrl(generated.rawToken);
 
     await this.deliverInvitation(
       updated.id,
 
       {
-        email:
-          updated.email,
+        email: updated.email,
 
-        workspaceName:
-          updated.workspace
-            .name,
+        workspaceName: updated.workspace.name,
 
-        inviterName:
-          updated.invitedBy
-            .displayName ??
-          updated.invitedBy
-            .email,
+        inviterName: updated.invitedBy.displayName ?? updated.invitedBy.email,
 
-        role:
-          updated.role,
+        role: updated.role,
 
         invitationUrl,
 
-        expiresAt:
-          updated.expiresAt,
+        expiresAt: updated.expiresAt,
       },
     );
 
-    const result =
-      await this.prisma
-        .workspaceInvitation
-        .findUniqueOrThrow({
-          where: {
-            id:
-              updated.id,
-          },
+    const result = await this.prisma.workspaceInvitation.findUniqueOrThrow({
+      where: {
+        id: updated.id,
+      },
 
-          include:
-            this.invitationInclude(),
-        });
+      include: this.invitationInclude(),
+    });
 
     return {
-      invitation:
-        this.mapInvitation(
-          result,
-        ),
+      invitation: this.mapInvitation(result),
 
       invitationUrl,
     };
@@ -465,38 +305,24 @@ export class WorkspaceInvitationService {
 
     invitationId: string,
   ) {
-    const result =
-      await this.prisma
-        .workspaceInvitation
-        .updateMany({
-          where: {
-            id:
-              invitationId,
+    const result = await this.prisma.workspaceInvitation.updateMany({
+      where: {
+        id: invitationId,
 
-            workspaceId,
+        workspaceId,
 
-            status:
-              WorkspaceInvitationStatus
-                .PENDING,
-          },
+        status: WorkspaceInvitationStatus.PENDING,
+      },
 
-          data: {
-            status:
-              WorkspaceInvitationStatus
-                .REVOKED,
+      data: {
+        status: WorkspaceInvitationStatus.REVOKED,
 
-            revokedAt:
-              new Date(),
-          },
-        });
+        revokedAt: new Date(),
+      },
+    });
 
-    if (
-      result.count ===
-      0
-    ) {
-      throw new NotFoundException(
-        'Pending invitation not found.',
-      );
+    if (result.count === 0) {
+      throw new NotFoundException('Pending invitation not found.');
     }
 
     return {
@@ -504,54 +330,33 @@ export class WorkspaceInvitationService {
     };
   }
 
-  async preview(
-    rawToken: string,
-  ) {
-    const invitation =
-      await this.findByToken(
-        rawToken,
-      );
+  async preview(rawToken: string) {
+    const invitation = await this.findByToken(rawToken);
 
-    const status =
-      await this.resolveCurrentStatus(
-        invitation,
-      );
+    const status = await this.resolveCurrentStatus(invitation);
 
     return {
-      id:
-        invitation.id,
+      id: invitation.id,
 
-      email:
-        invitation.email,
+      email: invitation.email,
 
-      role:
-        invitation.role,
+      role: invitation.role,
 
       status,
 
       workspace: {
-        id:
-          invitation.workspace
-            .id,
+        id: invitation.workspace.id,
 
-        name:
-          invitation.workspace
-            .name,
+        name: invitation.workspace.name,
       },
 
       invitedBy: {
-        name:
-          invitation.invitedBy
-            .displayName,
+        name: invitation.invitedBy.displayName,
 
-        email:
-          invitation.invitedBy
-            .email,
+        email: invitation.invitedBy.email,
       },
 
-      expiresAt:
-        invitation.expiresAt
-          .toISOString(),
+      expiresAt: invitation.expiresAt.toISOString(),
     };
   }
 
@@ -560,175 +365,106 @@ export class WorkspaceInvitationService {
 
     userId: string,
   ) {
-    const invitation =
-      await this.findByToken(
-        rawToken,
-      );
+    const invitation = await this.findByToken(rawToken);
 
-    await this.assertUsable(
-      invitation,
-    );
+    await this.assertUsable(invitation);
 
-    const user =
-      await this.prisma
-        .user.findUnique({
-          where: {
-            id:
-              userId,
-          },
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
 
-          select: {
-            id: true,
-            email: true,
-            displayName: true,
-          },
-        });
+      select: {
+        id: true,
+        email: true,
+        displayName: true,
+      },
+    });
 
     if (!user) {
-      throw new NotFoundException(
-        'User not found.',
-      );
+      throw new NotFoundException('User not found.');
     }
 
-    if (
-      this.normalizeEmail(
-        user.email,
-      ) !==
-      this.normalizeEmail(
-        invitation.email,
-      )
-    ) {
-      throw new ForbiddenException(
-        'This invitation belongs to another email address.',
-      );
+    if (this.normalizeEmail(user.email) !== this.normalizeEmail(invitation.email)) {
+      throw new ForbiddenException('This invitation belongs to another email address.');
     }
 
-    await this.prisma
-      .$transaction(
-        async (
-          transaction,
-        ) => {
-          const consumed =
-            await transaction
-              .workspaceInvitation
-              .updateMany({
-                where: {
-                  id:
-                    invitation.id,
+    await this.prisma.$transaction(async (transaction) => {
+      const consumed = await transaction.workspaceInvitation.updateMany({
+        where: {
+          id: invitation.id,
 
-                  tokenHash:
-                    invitation
-                      .tokenHash,
+          tokenHash: invitation.tokenHash,
 
-                  status:
-                    WorkspaceInvitationStatus
-                      .PENDING,
+          status: WorkspaceInvitationStatus.PENDING,
 
-                  expiresAt: {
-                    gt:
-                      new Date(),
-                  },
-                },
-
-                data: {
-                  status:
-                    WorkspaceInvitationStatus
-                      .ACCEPTED,
-
-                  acceptedById:
-                    user.id,
-
-                  acceptedAt:
-                    new Date(),
-                },
-              });
-
-          if (
-            consumed.count !==
-            1
-          ) {
-            throw new ConflictException(
-              'Invitation is no longer available.',
-            );
-          }
-
-          const membership =
-            await transaction
-              .workspaceMember
-              .findFirst({
-                where: {
-                  workspaceId:
-                    invitation
-                      .workspaceId,
-
-                  userId:
-                    user.id,
-                },
-
-                select: {
-                  id: true,
-                },
-              });
-
-          if (
-            !membership
-          ) {
-            await transaction
-              .workspaceMember
-              .create({
-                data: {
-                  workspaceId:
-                    invitation
-                      .workspaceId,
-
-                  userId:
-                    user.id,
-
-                  role:
-                    invitation
-                      .role,
-                },
-              });
-          }
+          expiresAt: {
+            gt: new Date(),
+          },
         },
-      );
 
-    await this.notifications
-      .createForUser({
-        workspaceId:
-          invitation.workspaceId,
+        data: {
+          status: WorkspaceInvitationStatus.ACCEPTED,
 
-        userId:
-          invitation.invitedById,
+          acceptedById: user.id,
 
-        type:
-          NotificationType
-            .WORKSPACE_INVITATION_ACCEPTED,
-
-        title:
-          'Workspace invitation accepted',
-
-        message:
-          `${user.displayName ?? user.email} joined ${invitation.workspace.name}.`,
-
-        resourceType:
-          'WORKSPACE_INVITATION',
-
-        resourceId:
-          invitation.id,
-
-        actionUrl:
-          `/workspaces/${invitation.workspaceId}/settings/members`,
-
-        dedupeKey:
-          `workspace-invitation-accepted:${invitation.id}`,
+          acceptedAt: new Date(),
+        },
       });
+
+      if (consumed.count !== 1) {
+        throw new ConflictException('Invitation is no longer available.');
+      }
+
+      const membership = await transaction.workspaceMember.findFirst({
+        where: {
+          workspaceId: invitation.workspaceId,
+
+          userId: user.id,
+        },
+
+        select: {
+          id: true,
+        },
+      });
+
+      if (!membership) {
+        await transaction.workspaceMember.create({
+          data: {
+            workspaceId: invitation.workspaceId,
+
+            userId: user.id,
+
+            role: invitation.role,
+          },
+        });
+      }
+    });
+
+    await this.notifications.createForUser({
+      workspaceId: invitation.workspaceId,
+
+      userId: invitation.invitedById,
+
+      type: NotificationType.WORKSPACE_INVITATION_ACCEPTED,
+
+      title: 'Workspace invitation accepted',
+
+      message: `${user.displayName ?? user.email} joined ${invitation.workspace.name}.`,
+
+      resourceType: 'WORKSPACE_INVITATION',
+
+      resourceId: invitation.id,
+
+      actionUrl: `/workspaces/${invitation.workspaceId}/settings/members`,
+
+      dedupeKey: `workspace-invitation-accepted:${invitation.id}`,
+    });
 
     return {
       success: true,
 
-      workspaceId:
-        invitation.workspaceId,
+      workspaceId: invitation.workspaceId,
     };
   }
 
@@ -737,80 +473,46 @@ export class WorkspaceInvitationService {
 
     userId: string,
   ) {
-    const invitation =
-      await this.findByToken(
-        rawToken,
-      );
+    const invitation = await this.findByToken(rawToken);
 
-    await this.assertUsable(
-      invitation,
-    );
+    await this.assertUsable(invitation);
 
-    const user =
-      await this.prisma
-        .user.findUnique({
-          where: {
-            id:
-              userId,
-          },
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
 
-          select: {
-            email: true,
-          },
-        });
+      select: {
+        email: true,
+      },
+    });
 
-    if (
-      !user ||
-      this.normalizeEmail(
-        user.email,
-      ) !==
-        this.normalizeEmail(
-          invitation.email,
-        )
-    ) {
-      throw new ForbiddenException(
-        'This invitation belongs to another email address.',
-      );
+    if (!user || this.normalizeEmail(user.email) !== this.normalizeEmail(invitation.email)) {
+      throw new ForbiddenException('This invitation belongs to another email address.');
     }
 
-    const result =
-      await this.prisma
-        .workspaceInvitation
-        .updateMany({
-          where: {
-            id:
-              invitation.id,
+    const result = await this.prisma.workspaceInvitation.updateMany({
+      where: {
+        id: invitation.id,
 
-            tokenHash:
-              invitation.tokenHash,
+        tokenHash: invitation.tokenHash,
 
-            status:
-              WorkspaceInvitationStatus
-                .PENDING,
+        status: WorkspaceInvitationStatus.PENDING,
 
-            expiresAt: {
-              gt:
-                new Date(),
-            },
-          },
+        expiresAt: {
+          gt: new Date(),
+        },
+      },
 
-          data: {
-            status:
-              WorkspaceInvitationStatus
-                .DECLINED,
+      data: {
+        status: WorkspaceInvitationStatus.DECLINED,
 
-            declinedAt:
-              new Date(),
-          },
-        });
+        declinedAt: new Date(),
+      },
+    });
 
-    if (
-      result.count !==
-      1
-    ) {
-      throw new ConflictException(
-        'Invitation is no longer available.',
-      );
+    if (result.count !== 1) {
+      throw new ConflictException('Invitation is no longer available.');
     }
 
     return {
@@ -821,177 +523,96 @@ export class WorkspaceInvitationService {
   private async deliverInvitation(
     invitationId: string,
 
-    input:
-      Parameters<
-        InvitationMailer['send']
-      >[0],
+    input: Parameters<InvitationMailer['send']>[0],
   ): Promise<void> {
     try {
-      const result =
-        await this.mailer
-          .send(input);
+      const result = await this.mailer.send(input);
 
-      await this.prisma
-        .workspaceInvitation
-        .update({
-          where: {
-            id:
-              invitationId,
-          },
+      await this.prisma.workspaceInvitation.update({
+        where: {
+          id: invitationId,
+        },
 
-          data: {
-            deliveryStatus:
-              result.sent
-                ? InvitationDeliveryStatus
-                    .SENT
-                : InvitationDeliveryStatus
-                    .NOT_REQUESTED,
+        data: {
+          deliveryStatus: result.sent
+            ? InvitationDeliveryStatus.SENT
+            : InvitationDeliveryStatus.NOT_REQUESTED,
 
-            deliveryError:
-              null,
-          },
-        });
-    } catch (
-      error
-    ) {
-      await this.prisma
-        .workspaceInvitation
-        .update({
-          where: {
-            id:
-              invitationId,
-          },
+          deliveryError: null,
+        },
+      });
+    } catch (error) {
+      await this.prisma.workspaceInvitation.update({
+        where: {
+          id: invitationId,
+        },
 
-          data: {
-            deliveryStatus:
-              InvitationDeliveryStatus
-                .FAILED,
+        data: {
+          deliveryStatus: InvitationDeliveryStatus.FAILED,
 
-            deliveryError:
-              error instanceof
-                Error
-                ? error.message
-                    .slice(
-                      0,
-                      1_000,
-                    )
-                : 'Invitation email delivery failed.',
-          },
-        });
+          deliveryError:
+            error instanceof Error
+              ? error.message.slice(0, 1_000)
+              : 'Invitation email delivery failed.',
+        },
+      });
     }
   }
 
-  private async findByToken(
-    rawToken: string,
-  ) {
-    if (
-      rawToken.length <
-      20
-    ) {
-      throw new NotFoundException(
-        'Invitation not found.',
-      );
+  private async findByToken(rawToken: string) {
+    if (rawToken.length < 20) {
+      throw new NotFoundException('Invitation not found.');
     }
 
-    const invitation =
-      await this.prisma
-        .workspaceInvitation
-        .findUnique({
-          where: {
-            tokenHash:
-              this.tokens
-                .hash(
-                  rawToken,
-                ),
-          },
+    const invitation = await this.prisma.workspaceInvitation.findUnique({
+      where: {
+        tokenHash: this.tokens.hash(rawToken),
+      },
 
-          include:
-            this.invitationInclude(),
-        });
+      include: this.invitationInclude(),
+    });
 
     if (!invitation) {
-      throw new NotFoundException(
-        'Invitation not found.',
-      );
+      throw new NotFoundException('Invitation not found.');
     }
 
     return invitation;
   }
 
   private async assertUsable(
-    invitation:
-      Awaited<
-        ReturnType<
-          WorkspaceInvitationService[
-            'findByToken'
-          ]
-        >
-      >,
+    invitation: Awaited<ReturnType<WorkspaceInvitationService['findByToken']>>,
   ): Promise<void> {
-    const status =
-      await this.resolveCurrentStatus(
-        invitation,
-      );
+    const status = await this.resolveCurrentStatus(invitation);
 
-    if (
-      status ===
-      WorkspaceInvitationStatus
-        .EXPIRED
-    ) {
-      throw new ConflictException(
-        'Invitation has expired.',
-      );
+    if (status === WorkspaceInvitationStatus.EXPIRED) {
+      throw new ConflictException('Invitation has expired.');
     }
 
-    if (
-      status !==
-      WorkspaceInvitationStatus
-        .PENDING
-    ) {
-      throw new ConflictException(
-        `Invitation is ${status.toLowerCase()}.`,
-      );
+    if (status !== WorkspaceInvitationStatus.PENDING) {
+      throw new ConflictException(`Invitation is ${status.toLowerCase()}.`);
     }
   }
 
   private async resolveCurrentStatus(
-    invitation:
-      Awaited<
-        ReturnType<
-          WorkspaceInvitationService[
-            'findByToken'
-          ]
-        >
-      >,
+    invitation: Awaited<ReturnType<WorkspaceInvitationService['findByToken']>>,
   ) {
     if (
-      invitation.status ===
-        WorkspaceInvitationStatus
-          .PENDING &&
-      invitation.expiresAt <=
-        new Date()
+      invitation.status === WorkspaceInvitationStatus.PENDING &&
+      invitation.expiresAt <= new Date()
     ) {
-      await this.prisma
-        .workspaceInvitation
-        .updateMany({
-          where: {
-            id:
-              invitation.id,
+      await this.prisma.workspaceInvitation.updateMany({
+        where: {
+          id: invitation.id,
 
-            status:
-              WorkspaceInvitationStatus
-                .PENDING,
-          },
+          status: WorkspaceInvitationStatus.PENDING,
+        },
 
-          data: {
-            status:
-              WorkspaceInvitationStatus
-                .EXPIRED,
-          },
-        });
+        data: {
+          status: WorkspaceInvitationStatus.EXPIRED,
+        },
+      });
 
-      return WorkspaceInvitationStatus
-        .EXPIRED;
+      return WorkspaceInvitationStatus.EXPIRED;
     }
 
     return invitation.status;
@@ -1002,63 +623,45 @@ export class WorkspaceInvitationService {
 
     email: string,
   ): Promise<void> {
-    await this.prisma
-      .workspaceInvitation
-      .updateMany({
-        where: {
-          workspaceId,
+    await this.prisma.workspaceInvitation.updateMany({
+      where: {
+        workspaceId,
 
-          email: {
-            equals:
-              email,
+        email: {
+          equals: email,
 
-            mode:
-              'insensitive',
-          },
-
-          status:
-            WorkspaceInvitationStatus
-              .PENDING,
-
-          expiresAt: {
-            lte:
-              new Date(),
-          },
+          mode: 'insensitive',
         },
 
-        data: {
-          status:
-            WorkspaceInvitationStatus
-              .EXPIRED,
+        status: WorkspaceInvitationStatus.PENDING,
+
+        expiresAt: {
+          lte: new Date(),
         },
-      });
+      },
+
+      data: {
+        status: WorkspaceInvitationStatus.EXPIRED,
+      },
+    });
   }
 
-  private async expireAllWorkspaceInvitations(
-    workspaceId: string,
-  ): Promise<void> {
-    await this.prisma
-      .workspaceInvitation
-      .updateMany({
-        where: {
-          workspaceId,
+  private async expireAllWorkspaceInvitations(workspaceId: string): Promise<void> {
+    await this.prisma.workspaceInvitation.updateMany({
+      where: {
+        workspaceId,
 
-          status:
-            WorkspaceInvitationStatus
-              .PENDING,
+        status: WorkspaceInvitationStatus.PENDING,
 
-          expiresAt: {
-            lte:
-              new Date(),
-          },
+        expiresAt: {
+          lte: new Date(),
         },
+      },
 
-        data: {
-          status:
-            WorkspaceInvitationStatus
-              .EXPIRED,
-        },
-      });
+      data: {
+        status: WorkspaceInvitationStatus.EXPIRED,
+      },
+    });
   }
 
   private async requireInvitation(
@@ -1066,25 +669,18 @@ export class WorkspaceInvitationService {
 
     invitationId: string,
   ) {
-    const invitation =
-      await this.prisma
-        .workspaceInvitation
-        .findFirst({
-          where: {
-            id:
-              invitationId,
+    const invitation = await this.prisma.workspaceInvitation.findFirst({
+      where: {
+        id: invitationId,
 
-            workspaceId,
-          },
+        workspaceId,
+      },
 
-          include:
-            this.invitationInclude(),
-        });
+      include: this.invitationInclude(),
+    });
 
     if (!invitation) {
-      throw new NotFoundException(
-        'Invitation not found.',
-      );
+      throw new NotFoundException('Invitation not found.');
     }
 
     return invitation;
@@ -1118,90 +714,48 @@ export class WorkspaceInvitationService {
   }
 
   private mapInvitation(
-    invitation:
-      Awaited<
-        ReturnType<
-          WorkspaceInvitationService[
-            'requireInvitation'
-          ]
-        >
-      >,
+    invitation: Awaited<ReturnType<WorkspaceInvitationService['requireInvitation']>>,
   ) {
     return {
-      id:
-        invitation.id,
+      id: invitation.id,
 
-      workspaceId:
-        invitation.workspaceId,
+      workspaceId: invitation.workspaceId,
 
-      email:
-        invitation.email,
+      email: invitation.email,
 
-      role:
-        invitation.role,
+      role: invitation.role,
 
-      status:
-        invitation.status,
+      status: invitation.status,
 
-      deliveryStatus:
-        invitation
-          .deliveryStatus,
+      deliveryStatus: invitation.deliveryStatus,
 
-      deliveryError:
-        invitation
-          .deliveryError,
+      deliveryError: invitation.deliveryError,
 
-      expiresAt:
-        invitation.expiresAt
-          .toISOString(),
+      expiresAt: invitation.expiresAt.toISOString(),
 
-      acceptedAt:
-        invitation.acceptedAt
-          ?.toISOString() ??
-        null,
+      acceptedAt: invitation.acceptedAt?.toISOString() ?? null,
 
-      declinedAt:
-        invitation.declinedAt
-          ?.toISOString() ??
-        null,
+      declinedAt: invitation.declinedAt?.toISOString() ?? null,
 
-      revokedAt:
-        invitation.revokedAt
-          ?.toISOString() ??
-        null,
+      revokedAt: invitation.revokedAt?.toISOString() ?? null,
 
-      lastSentAt:
-        invitation.lastSentAt
-          ?.toISOString() ??
-        null,
+      lastSentAt: invitation.lastSentAt?.toISOString() ?? null,
 
-      sendCount:
-        invitation.sendCount,
+      sendCount: invitation.sendCount,
 
-      createdAt:
-        invitation.createdAt
-          .toISOString(),
+      createdAt: invitation.createdAt.toISOString(),
 
-      invitedBy:
-        invitation.invitedBy,
+      invitedBy: invitation.invitedBy,
 
-      acceptedBy:
-        invitation.acceptedBy,
+      acceptedBy: invitation.acceptedBy,
     };
   }
 
-  private normalizeEmail(
-    value: string,
-  ): string {
-    const normalized =
-      value
-        .trim()
-        .toLowerCase();
+  private normalizeEmail(value: string): string {
+    const normalized = value.trim().toLowerCase();
 
     if (!normalized) {
-      throw new BadRequestException(
-        'Email is required.',
-      );
+      throw new BadRequestException('Email is required.');
     }
 
     return normalized;

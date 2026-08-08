@@ -1,12 +1,8 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import {
-  useEffect,
-} from 'react';
-import {
-  useRouter,
-} from 'next/navigation';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { useAuth } from '@/features/auth/auth-provider';
 
@@ -14,9 +10,7 @@ interface GateProps {
   children: ReactNode;
 }
 
-export function GuestOnly({
-  children,
-}: GateProps) {
+export function GuestOnly({ children }: GateProps) {
   const router = useRouter();
 
   const { status } = useAuth();
@@ -38,9 +32,7 @@ export function GuestOnly({
   return children;
 }
 
-export function AuthenticatedOnly({
-  children,
-}: GateProps) {
+export function AuthenticatedOnly({ children }: GateProps) {
   const router = useRouter();
 
   const { status } = useAuth();

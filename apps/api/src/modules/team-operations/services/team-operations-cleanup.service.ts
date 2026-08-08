@@ -1,139 +1,88 @@
-import {
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 
-import {
-  Cron,
-  CronExpression,
-} from '@nestjs/schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
-import {
-  WorkspaceInvitationStatus,
-} from '../../../generated/prisma/client';
+import { WorkspaceInvitationStatus } from '../../../generated/prisma/client';
 
-import type {
-  TypedConfigService,
-} from '../../../config/runtime-config';
+import type { TypedConfigService } from '../../../config/runtime-config';
 
-import {
-  PrismaService,
-} from '../../../database/prisma.service';
+import { PrismaService } from '../../../database/prisma.service';
 
 @Injectable()
 export class TeamOperationsCleanupService {
-  private readonly logger =
-    new Logger(
-      TeamOperationsCleanupService.name,
-    );
+  private readonly logger = new Logger(TeamOperationsCleanupService.name);
 
   constructor(
-    private readonly prisma:
-      PrismaService,
+    private readonly prisma: PrismaService,
 
-    private readonly config:
-      TypedConfigService,
+    @Inject(ConfigService)
+    private readonly config: TypedConfigService,
   ) {}
 
-  @Cron(
-    CronExpression
-      .EVERY_DAY_AT_3AM,
-  )
-  async cleanup():
-    Promise<void> {
+  @Cron(CronExpression.EVERY_DAY_AT_3AM)
+  async cleanup(): Promise<void> {
     if (
-      !this.config.get(
-        'NOTIFICATION_CLEANUP_ENABLED',
-        {
-          infer: true,
-        },
-      )
+      !this.config.get('NOTIFICATION_CLEANUP_ENABLED', {
+        infer: true,
+      })
     ) {
       return;
     }
 
-    const now =
-      new Date();
+    const now = new Date();
 
-    const retentionDays =
-      this.config.get(
-        'NOTIFICATION_RETENTION_DAYS',
-        {
-          infer: true,
+    const retentionDays = this.config.get('NOTIFICATION_RETENTION_DAYS', {
+      infer: true,
+    });
+
+    const retentionCutoff = new Date(now.getTime() - retentionDays * 86_400_000);
+
+    const [expiredInvitations, expiredNotifications, oldReadNotifications] = await Promise.all([
+      this.prisma.workspaceInvitation.updateMany({
+        where: {
+          status: WorkspaceInvitationStatus.PENDING,
+
+          expiresAt: {
+            lte: now,
+          },
         },
-      );
 
-    const retentionCutoff =
-      new Date(
-        now.getTime() -
-          retentionDays *
-            86_400_000,
-      );
+        data: {
+          status: WorkspaceInvitationStatus.EXPIRED,
+        },
+      }),
 
-    const [
-      expiredInvitations,
-      expiredNotifications,
-      oldReadNotifications,
-    ] = await Promise.all([
-      this.prisma
-        .workspaceInvitation
-        .updateMany({
-          where: {
-            status:
-              WorkspaceInvitationStatus
-                .PENDING,
+      this.prisma.notification.deleteMany({
+        where: {
+          expiresAt: {
+            lte: now,
+          },
+        },
+      }),
 
-            expiresAt: {
-              lte: now,
-            },
+      this.prisma.notification.deleteMany({
+        where: {
+          readAt: {
+            not: null,
           },
 
-          data: {
-            status:
-              WorkspaceInvitationStatus
-                .EXPIRED,
+          createdAt: {
+            lt: retentionCutoff,
           },
-        }),
-
-      this.prisma
-        .notification
-        .deleteMany({
-          where: {
-            expiresAt: {
-              lte: now,
-            },
-          },
-        }),
-
-      this.prisma
-        .notification
-        .deleteMany({
-          where: {
-            readAt: {
-              not: null,
-            },
-
-            createdAt: {
-              lt:
-                retentionCutoff,
-            },
-          },
-        }),
+        },
+      }),
     ]);
 
     this.logger.log(
       JSON.stringify({
-        event:
-          'team_operations_cleanup',
+        event: 'team_operations_cleanup',
 
-        expiredInvitations:
-          expiredInvitations.count,
+        expiredInvitations: expiredInvitations.count,
 
-        expiredNotifications:
-          expiredNotifications.count,
+        expiredNotifications: expiredNotifications.count,
 
-        oldReadNotifications:
-          oldReadNotifications.count,
+        oldReadNotifications: oldReadNotifications.count,
       }),
     );
   }

@@ -1,142 +1,83 @@
-import {
-    apiRequest,
-} from '@/features/lib/api/api-client';
+import { apiRequest } from '@/features/lib/api/api-client';
 
 import type {
-    AnalyticsAggregateDimension,
-    AnalyticsAggregatePeriod,
-    AnalyticsAggregateResponse,
-    AnalyticsEngineStatus,
-    AnalyticsProcessingRun,
-    AnalyticsRetentionResult,
-    ReprocessAnalyticsPayload,
+  AnalyticsAggregateDimension,
+  AnalyticsAggregatePeriod,
+  AnalyticsAggregateResponse,
+  AnalyticsEngineStatus,
+  AnalyticsProcessingRun,
+  AnalyticsRetentionResult,
+  ReprocessAnalyticsPayload,
 } from './analytics-engine-types';
 
-function basePath(
-    workspaceId: string,
-    websiteId: string,
-): string {
-    return `/workspaces/${workspaceId}/websites/${websiteId}/analytics-engine`;
+function basePath(workspaceId: string, websiteId: string): string {
+  return `/workspaces/${workspaceId}/websites/${websiteId}/analytics-engine`;
 }
 
-export function getAnalyticsEngineStatus(
-    workspaceId: string,
-    websiteId: string,
-) {
-    return apiRequest<AnalyticsEngineStatus>(
-        `${basePath(
-            workspaceId,
-            websiteId,
-        )}/status`,
-    );
+export function getAnalyticsEngineStatus(workspaceId: string, websiteId: string) {
+  return apiRequest<AnalyticsEngineStatus>(`${basePath(workspaceId, websiteId)}/status`);
 }
 
 export function getAnalyticsAggregates(
-    workspaceId: string,
-    websiteId: string,
-    query: {
-        period:
-        AnalyticsAggregatePeriod;
+  workspaceId: string,
+  websiteId: string,
+  query: {
+    period: AnalyticsAggregatePeriod;
 
-        dimension:
-        AnalyticsAggregateDimension;
+    dimension: AnalyticsAggregateDimension;
 
-        dateFrom?: string;
+    dateFrom?: string;
 
-        dateTo?: string;
+    dateTo?: string;
 
-        limit?: number;
-    },
+    limit?: number;
+  },
 ) {
-    const parameters =
-        new URLSearchParams();
+  const parameters = new URLSearchParams();
 
-    Object.entries(query).forEach(
-        ([key, value]) => {
-            if (
-                value !== undefined &&
-                value !== ''
-            ) {
-                parameters.set(
-                    key,
-                    String(value),
-                );
-            }
-        },
-    );
+  Object.entries(query).forEach(([key, value]) => {
+    if (value !== undefined && value !== '') {
+      parameters.set(key, String(value));
+    }
+  });
 
-    return apiRequest<AnalyticsAggregateResponse>(
-        `${basePath(
-            workspaceId,
-            websiteId,
-        )}/aggregates?${parameters.toString()}`,
-    );
+  return apiRequest<AnalyticsAggregateResponse>(
+    `${basePath(workspaceId, websiteId)}/aggregates?${parameters.toString()}`,
+  );
 }
 
-export function processAnalytics(
-    workspaceId: string,
-    websiteId: string,
-    maxEvents = 5000,
-) {
-    return apiRequest<{
-        run:
-        AnalyticsProcessingRun;
+export function processAnalytics(workspaceId: string, websiteId: string, maxEvents = 5000) {
+  return apiRequest<{
+    run: AnalyticsProcessingRun;
 
-        status:
-        AnalyticsEngineStatus;
-    }>(
-        `${basePath(
-            workspaceId,
-            websiteId,
-        )}/process`,
-        {
-            method: 'POST',
+    status: AnalyticsEngineStatus;
+  }>(`${basePath(workspaceId, websiteId)}/process`, {
+    method: 'POST',
 
-            body:
-                JSON.stringify({
-                    maxEvents,
-                }),
-        },
-    );
+    body: JSON.stringify({
+      maxEvents,
+    }),
+  });
 }
 
 export function reprocessAnalytics(
-    workspaceId: string,
-    websiteId: string,
-    payload:
-        ReprocessAnalyticsPayload,
+  workspaceId: string,
+  websiteId: string,
+  payload: ReprocessAnalyticsPayload,
 ) {
-    return apiRequest<{
-        run:
-        AnalyticsProcessingRun;
+  return apiRequest<{
+    run: AnalyticsProcessingRun;
 
-        status:
-        AnalyticsEngineStatus;
-    }>(
-        `${basePath(
-            workspaceId,
-            websiteId,
-        )}/reprocess`,
-        {
-            method: 'POST',
+    status: AnalyticsEngineStatus;
+  }>(`${basePath(workspaceId, websiteId)}/reprocess`, {
+    method: 'POST',
 
-            body:
-                JSON.stringify(payload),
-        },
-    );
+    body: JSON.stringify(payload),
+  });
 }
 
-export function runAnalyticsRetention(
-    workspaceId: string,
-    websiteId: string,
-) {
-    return apiRequest<AnalyticsRetentionResult>(
-        `${basePath(
-            workspaceId,
-            websiteId,
-        )}/retention`,
-        {
-            method: 'POST',
-        },
-    );
+export function runAnalyticsRetention(workspaceId: string, websiteId: string) {
+  return apiRequest<AnalyticsRetentionResult>(`${basePath(workspaceId, websiteId)}/retention`, {
+    method: 'POST',
+  });
 }

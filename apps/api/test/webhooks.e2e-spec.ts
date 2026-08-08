@@ -1,192 +1,92 @@
-import type {
-    INestApplication,
-} from '@nestjs/common';
+import type { INestApplication } from '@nestjs/common';
 
 import request from 'supertest';
 
-import {
-    createTestApplication,
-} from './helpers/create-test-application';
+import { createTestApplication } from './helpers/create-test-application';
 
-describe(
-    'Phase 18 webhooks',
-    () => {
-        let app:
-            INestApplication;
+describe('Phase 18 webhooks', () => {
+  let app: INestApplication;
 
-        beforeAll(
-            async () => {
-                const testApplication =
-                    await createTestApplication();
+  beforeAll(async () => {
+    const testApplication = await createTestApplication();
 
-                app =
-                    testApplication.app;
+    app = testApplication.app;
 
-                /*
-                 * Create:
-                 * - workspace
-                 * - owner token
-                 * - viewer token
-                 * - second workspace
-                 */
-            },
-        );
+    /*
+     * Create:
+     * - workspace
+     * - owner token
+     * - viewer token
+     * - second workspace
+     */
+  });
 
-        afterAll(
-            async () => {
-                await app.close();
-            },
-        );
+  afterAll(async () => {
+    await app.close();
+  });
 
-        it(
-            'blocks unsafe destinations',
-            async () => {
-                await request(
-                    app.getHttpServer(),
-                )
-                    .post(
-                        `/api/v1/workspaces/${workspaceId}/integrations/webhooks`,
-                    )
-                    .set(
-                        'Authorization',
-                        `Bearer ${ownerToken}`,
-                    )
-                    .send({
-                        name:
-                            'Unsafe webhook',
+  it('blocks unsafe destinations', async () => {
+    await request(app.getHttpServer())
+      .post(`/api/v1/workspaces/${workspaceId}/integrations/webhooks`)
+      .set('Authorization', `Bearer ${ownerToken}`)
+      .send({
+        name: 'Unsafe webhook',
 
-                        url:
-                            'http://127.0.0.1:4000/internal',
+        url: 'http://127.0.0.1:4000/internal',
 
-                        eventTypes: [
-                            'DEPLOYMENT_FAILED',
-                        ],
-                    })
-                    .expect(400);
-            },
-        );
+        eventTypes: ['DEPLOYMENT_FAILED'],
+      })
+      .expect(400);
+  });
 
-        it(
-            'returns a secret only on creation',
-            async () => {
-                const created =
-                    await request(
-                        app.getHttpServer(),
-                    )
-                        .post(
-                            `/api/v1/workspaces/${workspaceId}/integrations/webhooks`,
-                        )
-                        .set(
-                            'Authorization',
-                            `Bearer ${ownerToken}`,
-                        )
-                        .send({
-                            name:
-                                'Production automation',
+  it('returns a secret only on creation', async () => {
+    const created = await request(app.getHttpServer())
+      .post(`/api/v1/workspaces/${workspaceId}/integrations/webhooks`)
+      .set('Authorization', `Bearer ${ownerToken}`)
+      .send({
+        name: 'Production automation',
 
-                            url:
-                                publicWebhookUrl,
+        url: publicWebhookUrl,
 
-                            eventTypes: [
-                                'DEPLOYMENT_FAILED',
-                            ],
-                        })
-                        .expect(201);
+        eventTypes: ['DEPLOYMENT_FAILED'],
+      })
+      .expect(201);
 
-                expect(
-                    created.body.secret,
-                ).toEqual(
-                    expect.any(
-                        String,
-                    ),
-                );
+    expect(created.body.secret).toEqual(expect.any(String));
 
-                const list =
-                    await request(
-                        app.getHttpServer(),
-                    )
-                        .get(
-                            `/api/v1/workspaces/${workspaceId}/integrations/webhooks`,
-                        )
-                        .set(
-                            'Authorization',
-                            `Bearer ${ownerToken}`,
-                        )
-                        .expect(200);
+    const list = await request(app.getHttpServer())
+      .get(`/api/v1/workspaces/${workspaceId}/integrations/webhooks`)
+      .set('Authorization', `Bearer ${ownerToken}`)
+      .expect(200);
 
-                expect(
-                    JSON.stringify(
-                        list.body,
-                    ),
-                ).not.toContain(
-                    created.body.secret,
-                );
+    expect(JSON.stringify(list.body)).not.toContain(created.body.secret);
 
-                expect(
-                    JSON.stringify(
-                        list.body,
-                    ),
-                ).not.toContain(
-                    'secretCiphertext',
-                );
-            },
-        );
+    expect(JSON.stringify(list.body)).not.toContain('secretCiphertext');
+  });
 
-        it(
-            'keeps viewers read-only',
-            async () => {
-                await request(
-                    app.getHttpServer(),
-                )
-                    .get(
-                        `/api/v1/workspaces/${workspaceId}/integrations/webhooks`,
-                    )
-                    .set(
-                        'Authorization',
-                        `Bearer ${viewerToken}`,
-                    )
-                    .expect(200);
+  it('keeps viewers read-only', async () => {
+    await request(app.getHttpServer())
+      .get(`/api/v1/workspaces/${workspaceId}/integrations/webhooks`)
+      .set('Authorization', `Bearer ${viewerToken}`)
+      .expect(200);
 
-                await request(
-                    app.getHttpServer(),
-                )
-                    .post(
-                        `/api/v1/workspaces/${workspaceId}/integrations/webhooks`,
-                    )
-                    .set(
-                        'Authorization',
-                        `Bearer ${viewerToken}`,
-                    )
-                    .send({
-                        name:
-                            'Blocked webhook',
+    await request(app.getHttpServer())
+      .post(`/api/v1/workspaces/${workspaceId}/integrations/webhooks`)
+      .set('Authorization', `Bearer ${viewerToken}`)
+      .send({
+        name: 'Blocked webhook',
 
-                        url:
-                            publicWebhookUrl,
+        url: publicWebhookUrl,
 
-                        eventTypes: [
-                            'DEPLOYMENT_FAILED',
-                        ],
-                    })
-                    .expect(403);
-            },
-        );
+        eventTypes: ['DEPLOYMENT_FAILED'],
+      })
+      .expect(403);
+  });
 
-        it(
-            'prevents cross-workspace access',
-            async () => {
-                await request(
-                    app.getHttpServer(),
-                )
-                    .get(
-                        `/api/v1/workspaces/${otherWorkspaceId}/integrations/webhooks`,
-                    )
-                    .set(
-                        'Authorization',
-                        `Bearer ${ownerToken}`,
-                    )
-                    .expect(403);
-            },
-        );
-    },
-);
+  it('prevents cross-workspace access', async () => {
+    await request(app.getHttpServer())
+      .get(`/api/v1/workspaces/${otherWorkspaceId}/integrations/webhooks`)
+      .set('Authorization', `Bearer ${ownerToken}`)
+      .expect(403);
+  });
+});

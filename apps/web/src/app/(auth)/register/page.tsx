@@ -1,65 +1,32 @@
 'use client';
 
-import {
-  useState,
-} from 'react';
+import { useState } from 'react';
 
-import type {
-  FormEvent,
-} from 'react';
+import type { FormEvent } from 'react';
 
 import Link from 'next/link';
 
-import {
-  useRouter,
-} from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
-import {
-  useSession,
-} from '@/features/auth/use-session';
+import { useSession } from '@/features/auth/use-session';
 import { getErrorMessage } from '@/features/lib/api/api-error';
 
 export default function RegisterPage() {
-  const router =
-    useRouter();
+  const router = useRouter();
 
-  const {
-    register,
-  } = useSession();
+  const { register } = useSession();
 
-  const [
-    name,
-    setName,
-  ] = useState('');
+  const [name, setName] = useState('');
 
-  const [
-    email,
-    setEmail,
-  ] = useState('');
+  const [email, setEmail] = useState('');
 
-  const [
-    password,
-    setPassword,
-  ] = useState('');
+  const [password, setPassword] = useState('');
 
-  const [
-    error,
-    setError,
-  ] = useState<
-    string | null
-  >(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const [
-    submitting,
-    setSubmitting,
-  ] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  async function handleSubmit(
-    event:
-      FormEvent<
-        HTMLFormElement
-      >,
-  ): Promise<void> {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
 
     setError(null);
@@ -70,50 +37,27 @@ export default function RegisterPage() {
         name,
         email,
         password,
-        workspaceName: ''
+        workspaceName: '',
       });
 
-      router.replace(
-        '/dashboard',
-      );
-    } catch (
-    caughtError
-    ) {
-      setError(
-        getErrorMessage(
-          caughtError,
-        ),
-      );
+      router.replace('/dashboard');
+    } catch (caughtError) {
+      setError(getErrorMessage(caughtError));
     } finally {
-      setSubmitting(
-        false,
-      );
+      setSubmitting(false);
     }
   }
 
   return (
     <main className="flex min-h-screen items-center justify-center p-6">
       <section className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
-        <h1 className="text-2xl font-bold">
-          Create your account
-        </h1>
+        <h1 className="text-2xl font-bold">Create your account</h1>
 
-        <p className="mt-2 text-sm text-slate-600">
-          Start managing your
-          SaaS applications.
-        </p>
+        <p className="mt-2 text-sm text-slate-600">Start managing your SaaS applications.</p>
 
-        <form
-          className="mt-6 space-y-4"
-          onSubmit={
-            handleSubmit
-          }
-        >
+        <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label
-              htmlFor="name"
-              className="text-sm font-medium"
-            >
+            <label htmlFor="name" className="text-sm font-medium">
               Name
             </label>
 
@@ -124,23 +68,15 @@ export default function RegisterPage() {
               required
               minLength={2}
               value={name}
-              onChange={(
-                event,
-              ) => {
-                setName(
-                  event.target
-                    .value,
-                );
+              onChange={(event) => {
+                setName(event.target.value);
               }}
               className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-slate-950"
             />
           </div>
 
           <div>
-            <label
-              htmlFor="email"
-              className="text-sm font-medium"
-            >
+            <label htmlFor="email" className="text-sm font-medium">
               Email
             </label>
 
@@ -150,23 +86,15 @@ export default function RegisterPage() {
               autoComplete="email"
               required
               value={email}
-              onChange={(
-                event,
-              ) => {
-                setEmail(
-                  event.target
-                    .value,
-                );
+              onChange={(event) => {
+                setEmail(event.target.value);
               }}
               className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-slate-950"
             />
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="text-sm font-medium"
-            >
+            <label htmlFor="password" className="text-sm font-medium">
               Password
             </label>
 
@@ -176,16 +104,9 @@ export default function RegisterPage() {
               autoComplete="new-password"
               required
               minLength={8}
-              value={
-                password
-              }
-              onChange={(
-                event,
-              ) => {
-                setPassword(
-                  event.target
-                    .value,
-                );
+              value={password}
+              onChange={(event) => {
+                setPassword(event.target.value);
               }}
               className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-slate-950"
             />
@@ -202,24 +123,16 @@ export default function RegisterPage() {
 
           <button
             type="submit"
-            disabled={
-              submitting
-            }
+            disabled={submitting}
             className="w-full rounded-lg bg-slate-950 px-4 py-2.5 font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {submitting
-              ? 'Creating account…'
-              : 'Create account'}
+            {submitting ? 'Creating account…' : 'Create account'}
           </button>
         </form>
 
         <p className="mt-5 text-center text-sm text-slate-600">
           Already registered?{' '}
-
-          <Link
-            href="/login"
-            className="font-medium text-slate-950 underline"
-          >
+          <Link href="/login" className="font-medium text-slate-950 underline">
             Sign in
           </Link>
         </p>

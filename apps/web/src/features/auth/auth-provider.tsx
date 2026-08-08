@@ -10,7 +10,6 @@ import {
   useState,
 } from 'react';
 
-
 import type {
   AuthResponse,
   CurrentUserResponse,
@@ -21,23 +20,16 @@ import type {
 } from './auth.types';
 import { setAccessToken, apiRequest } from '../lib/api/api-client';
 
-type AuthStatus =
-  | 'loading'
-  | 'authenticated'
-  | 'unauthenticated';
+type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
 
 interface AuthContextValue {
   status: AuthStatus;
   user: User | null;
   workspaces: Workspace[];
 
-  login: (
-    input: LoginInput,
-  ) => Promise<void>;
+  login: (input: LoginInput) => Promise<void>;
 
-  register: (
-    input: RegisterInput,
-  ) => Promise<void>;
+  register: (input: RegisterInput) => Promise<void>;
 
   logout: () => Promise<void>;
 
@@ -45,39 +37,28 @@ interface AuthContextValue {
 
   refreshCurrentUser: () => Promise<void>;
 
-  updateWorkspaceInState: (
-    workspace: Workspace,
-  ) => void;
+  updateWorkspaceInState: (workspace: Workspace) => void;
 }
 
-const AuthContext =
-  createContext<AuthContextValue | null>(null);
+const AuthContext = createContext<AuthContextValue | null>(null);
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
-export function AuthProvider({
-  children,
-}: AuthProviderProps) {
-  const [status, setStatus] =
-    useState<AuthStatus>('loading');
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [status, setStatus] = useState<AuthStatus>('loading');
 
-  const [user, setUser] =
-    useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
-  const [workspaces, setWorkspaces] =
-    useState<Workspace[]>([]);
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
 
-  const applyAuthResponse = useCallback(
-    (response: AuthResponse) => {
-      setAccessToken(response.accessToken);
-      setUser(response.user);
-      setWorkspaces(response.workspaces);
-      setStatus('authenticated');
-    },
-    [],
-  );
+  const applyAuthResponse = useCallback((response: AuthResponse) => {
+    setAccessToken(response.accessToken);
+    setUser(response.user);
+    setWorkspaces(response.workspaces);
+    setStatus('authenticated');
+  }, []);
 
   const clearSession = useCallback(() => {
     setAccessToken(null);
@@ -91,15 +72,14 @@ export function AuthProvider({
 
     async function restoreSession() {
       try {
-        const response =
-          await apiRequest<AuthResponse>(
-            '/auth/refresh',
-            {
-              method: 'POST',
-              body: JSON.stringify({}),
-            },
-            false,
-          );
+        const response = await apiRequest<AuthResponse>(
+          '/auth/refresh',
+          {
+            method: 'POST',
+            body: JSON.stringify({}),
+          },
+          false,
+        );
 
         if (!active) {
           return;
@@ -122,15 +102,14 @@ export function AuthProvider({
 
   const login = useCallback(
     async (input: LoginInput) => {
-      const response =
-        await apiRequest<AuthResponse>(
-          '/auth/login',
-          {
-            method: 'POST',
-            body: JSON.stringify(input),
-          },
-          false,
-        );
+      const response = await apiRequest<AuthResponse>(
+        '/auth/login',
+        {
+          method: 'POST',
+          body: JSON.stringify(input),
+        },
+        false,
+      );
 
       applyAuthResponse(response);
     },
@@ -139,15 +118,14 @@ export function AuthProvider({
 
   const register = useCallback(
     async (input: RegisterInput) => {
-      const response =
-        await apiRequest<AuthResponse>(
-          '/auth/register',
-          {
-            method: 'POST',
-            body: JSON.stringify(input),
-          },
-          false,
-        );
+      const response = await apiRequest<AuthResponse>(
+        '/auth/register',
+        {
+          method: 'POST',
+          body: JSON.stringify(input),
+        },
+        false,
+      );
 
       applyAuthResponse(response);
     },
@@ -171,45 +149,33 @@ export function AuthProvider({
 
   const logoutAll = useCallback(async () => {
     try {
-      await apiRequest(
-        '/auth/logout-all',
-        {
-          method: 'POST',
-        },
-      );
+      await apiRequest('/auth/logout-all', {
+        method: 'POST',
+      });
     } finally {
       clearSession();
     }
   }, [clearSession]);
 
-  const refreshCurrentUser =
-    useCallback(async () => {
-      const response =
-        await apiRequest<CurrentUserResponse>(
-          '/auth/me',
-        );
+  const refreshCurrentUser = useCallback(async () => {
+    const response = await apiRequest<CurrentUserResponse>('/auth/me');
 
-      setUser(response.user);
-      setWorkspaces(response.workspaces);
-    }, []);
+    setUser(response.user);
+    setWorkspaces(response.workspaces);
+  }, []);
 
-  const updateWorkspaceInState =
-    useCallback(
-      (updatedWorkspace: Workspace) => {
-        setWorkspaces((current) =>
-          current.map((workspace) =>
-            workspace.id ===
-            updatedWorkspace.id
-              ? {
-                  ...workspace,
-                  ...updatedWorkspace,
-                }
-              : workspace,
-          ),
-        );
-      },
-      [],
+  const updateWorkspaceInState = useCallback((updatedWorkspace: Workspace) => {
+    setWorkspaces((current) =>
+      current.map((workspace) =>
+        workspace.id === updatedWorkspace.id
+          ? {
+              ...workspace,
+              ...updatedWorkspace,
+            }
+          : workspace,
+      ),
     );
+  }, []);
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -236,20 +202,14 @@ export function AuthProvider({
     ],
   );
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth(): AuthContextValue {
   const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error(
-      'useAuth must be used inside AuthProvider',
-    );
+    throw new Error('useAuth must be used inside AuthProvider');
   }
 
   return context;

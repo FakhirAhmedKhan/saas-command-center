@@ -1,4 +1,3 @@
- 
 import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
@@ -13,11 +12,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
-import {
-  ApiProperty,
-  ApiPropertyOptional,
-  PartialType,
-} from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 
 import {
   ApplicationCategory,
@@ -54,8 +49,7 @@ export class CreateApplicationDto {
   @IsString()
   @Length(2, 160)
   @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
-    message:
-      'slug can contain lowercase letters, numbers and hyphens only',
+    message: 'slug can contain lowercase letters, numbers and hyphens only',
   })
   slug?: string;
 
@@ -121,9 +115,7 @@ export class CreateApplicationDto {
   launchedAt?: string | null;
 }
 
-export class UpdateApplicationDto extends PartialType(
-  CreateApplicationDto,
-) {}
+export class UpdateApplicationDto extends PartialType(CreateApplicationDto) {}
 
 export class ApplicationListQueryDto {
   @ApiPropertyOptional()

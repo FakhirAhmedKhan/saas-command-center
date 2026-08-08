@@ -1,103 +1,57 @@
-
 import { apiRequest } from '../auth/auth.types';
 import type {
-    AnalyticsProcessingStatus,
-    ProcessingRun,
-    ReprocessAnalyticsInput,
+  AnalyticsProcessingStatus,
+  ProcessingRun,
+  ReprocessAnalyticsInput,
 } from './analytics-processing.types';
 
 function createBasePath(
-    workspaceId:
-        string,
+  workspaceId: string,
 
-    websiteId:
-        string,
+  websiteId: string,
 ): string {
-    return [
-        '/workspaces',
-        workspaceId,
-        'websites',
-        websiteId,
-        'analytics',
-        'processing',
-    ].join('/');
+  return ['/workspaces', workspaceId, 'websites', websiteId, 'analytics', 'processing'].join('/');
 }
 
 export function getAnalyticsProcessingStatus(
-    workspaceId:
-        string,
+  workspaceId: string,
 
-    websiteId:
-        string,
+  websiteId: string,
 
-    signal?:
-        AbortSignal,
-): Promise<
-    AnalyticsProcessingStatus
-> {
-    return apiRequest<
-        AnalyticsProcessingStatus
-    >(
-        `${createBasePath(
-            workspaceId,
-            websiteId,
-        )}/status`,
-        {
-            method:
-                'GET',
+  signal?: AbortSignal,
+): Promise<AnalyticsProcessingStatus> {
+  return apiRequest<AnalyticsProcessingStatus>(`${createBasePath(workspaceId, websiteId)}/status`, {
+    method: 'GET',
 
-            signal,
-        },
-    );
+    signal,
+  });
 }
 
 export function queueAnalyticsReprocessing(
-    workspaceId:
-        string,
+  workspaceId: string,
 
-    websiteId:
-        string,
+  websiteId: string,
 
-    input:
-        ReprocessAnalyticsInput,
+  input: ReprocessAnalyticsInput,
 ): Promise<ProcessingRun> {
-    return apiRequest<
-        ProcessingRun
-    >(
-        `${createBasePath(
-            workspaceId,
-            websiteId,
-        )}/reprocess`,
-        {
-            method:
-                'POST',
+  return apiRequest<ProcessingRun>(`${createBasePath(workspaceId, websiteId)}/reprocess`, {
+    method: 'POST',
 
-            body:
-                input,
-        },
-    );
+    body: input,
+  });
 }
 
 export function retryAnalyticsProcessingRun(
-    workspaceId:
-        string,
+  workspaceId: string,
 
-    websiteId:
-        string,
+  websiteId: string,
 
-    runId:
-        string,
+  runId: string,
 ): Promise<ProcessingRun> {
-    return apiRequest<
-        ProcessingRun
-    >(
-        `${createBasePath(
-            workspaceId,
-            websiteId,
-        )}/runs/${runId}/retry`,
-        {
-            method:
-                'POST',
-        },
-    );
+  return apiRequest<ProcessingRun>(
+    `${createBasePath(workspaceId, websiteId)}/runs/${runId}/retry`,
+    {
+      method: 'POST',
+    },
+  );
 }

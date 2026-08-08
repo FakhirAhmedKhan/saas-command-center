@@ -1,74 +1,43 @@
-import {
-    ValidationPipe,
-    type INestApplication,
-} from '@nestjs/common';
+import { ValidationPipe, type INestApplication } from '@nestjs/common';
 
-import {
-    Test,
-} from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 
-import {
-    type NestExpressApplication,
-} from '@nestjs/platform-express';
+import { type NestExpressApplication } from '@nestjs/platform-express';
 
 import cookieParser from 'cookie-parser';
 
-import {
-    AppModule,
-} from '../../src/app.module';
+import { AppModule } from '../../src/app.module';
 
-export async function createTestApp():
-    Promise<INestApplication> {
-    const testingModule =
-        await Test
-            .createTestingModule({
-                imports: [
-                    AppModule,
-                ],
-            })
-            .compile();
+export async function createTestApp(): Promise<INestApplication> {
+  const testingModule = await Test.createTestingModule({
+    imports: [AppModule],
+  }).compile();
 
-    const app =
-        testingModule
-            .createNestApplication<
-                NestExpressApplication
-            >();
+  const app = testingModule.createNestApplication<NestExpressApplication>();
 
-    const expressInstance =
-        app
-            .getHttpAdapter()
-            .getInstance();
+  const expressInstance = app.getHttpAdapter().getInstance();
 
-    expressInstance.set(
-        'trust proxy',
-        1,
-    );
+  expressInstance.set('trust proxy', 1);
 
-    app.use(
-        cookieParser(),
-    );
+  app.use(cookieParser());
 
-    app.setGlobalPrefix(
-        'api/v1',
-    );
+  app.setGlobalPrefix('api/v1');
 
-    app.useGlobalPipes(
-        new ValidationPipe({
-            whitelist: true,
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
 
-            forbidNonWhitelisted:
-                true,
+      forbidNonWhitelisted: true,
 
-            transform: true,
+      transform: true,
 
-            transformOptions: {
-                enableImplicitConversion:
-                    true,
-            },
-        }),
-    );
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    }),
+  );
 
-    await app.init();
+  await app.init();
 
-    return app;
+  return app;
 }

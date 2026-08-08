@@ -1,4 +1,5 @@
 # SaaS Analytics and Portfolio Command Center
+
 ## Detailed End-to-End Implementation Plan
 
 ---
@@ -95,22 +96,22 @@ saas-command-center/
 
 ## Technology stack
 
-| Area | Recommended technology |
-|---|---|
-| Monorepo | pnpm workspaces |
-| Backend | NestJS modular monolith |
-| Frontend | Next.js |
-| Database | PostgreSQL |
-| ORM | Prisma |
-| Authentication | JWT access tokens and rotating hashed refresh tokens |
-| Real-time | Socket.IO |
-| Tracker | Lightweight TypeScript/JavaScript bundle |
-| Validation | class-validator; optional browser-safe Zod schemas |
-| Background work | NestJS scheduler first; BullMQ and Redis when needed |
-| API docs | Swagger |
-| Tests | Jest, Vitest, Testing Library, Playwright |
-| CI/CD | GitHub Actions |
-| Local infrastructure | Docker Compose |
+| Area                 | Recommended technology                               |
+| -------------------- | ---------------------------------------------------- |
+| Monorepo             | pnpm workspaces                                      |
+| Backend              | NestJS modular monolith                              |
+| Frontend             | Next.js                                              |
+| Database             | PostgreSQL                                           |
+| ORM                  | Prisma                                               |
+| Authentication       | JWT access tokens and rotating hashed refresh tokens |
+| Real-time            | Socket.IO                                            |
+| Tracker              | Lightweight TypeScript/JavaScript bundle             |
+| Validation           | class-validator; optional browser-safe Zod schemas   |
+| Background work      | NestJS scheduler first; BullMQ and Redis when needed |
+| API docs             | Swagger                                              |
+| Tests                | Jest, Vitest, Testing Library, Playwright            |
+| CI/CD                | GitHub Actions                                       |
+| Local infrastructure | Docker Compose                                       |
 
 ## Main relationship model
 
@@ -150,31 +151,31 @@ Workspace
 
 # Overall Roadmap
 
-| Order | Phase | Main outcome |
-|---:|---|---|
-| 1 | Phase 0 | Product Blueprint Approved |
-| 2 | Phase 1 | Development Workspace Ready |
-| 3 | Phase 2 | API Foundation Stable |
-| 4 | Phase 3 | Database Foundation Ready |
-| 5 | Phase 4 | Secure Workspace Access |
-| 6 | Phase 5 | All Applications Registered |
-| 7 | Phase 6 | Project History Available |
-| 8 | Phase 7 | Development Status Visible |
-| 9 | Phase 8 | Websites Connected |
-| 10 | Phase 9 | Real Tracking Working |
-| 11 | Phase 10 | Analytics Engine Accurate |
-| 12 | Phase 11 | Analytics Reports Usable |
-| 13 | Phase 12 | Live Visitors Visible |
-| 14 | Phase 13 | Deployment State Visible |
-| 15 | Phase 14 | Production Health Visible |
-| 16 | Phase 15 | Command Center Usable |
-| 17 | Phase 16 | Repositories Connected |
-| 18 | Phase 17 | Operating Costs Visible |
-| 19 | Phase 18 | Project Knowledge Preserved |
-| 20 | Phase 19 | Important Problems Delivered |
-| 21 | Phase 20 | AI Answers from Real Data |
-| 22 | Phase 21 | Release Candidate Approved |
-| 23 | Phase 22 | Production Launch |
+| Order | Phase    | Main outcome                 |
+| ----: | -------- | ---------------------------- |
+|     1 | Phase 0  | Product Blueprint Approved   |
+|     2 | Phase 1  | Development Workspace Ready  |
+|     3 | Phase 2  | API Foundation Stable        |
+|     4 | Phase 3  | Database Foundation Ready    |
+|     5 | Phase 4  | Secure Workspace Access      |
+|     6 | Phase 5  | All Applications Registered  |
+|     7 | Phase 6  | Project History Available    |
+|     8 | Phase 7  | Development Status Visible   |
+|     9 | Phase 8  | Websites Connected           |
+|    10 | Phase 9  | Real Tracking Working        |
+|    11 | Phase 10 | Analytics Engine Accurate    |
+|    12 | Phase 11 | Analytics Reports Usable     |
+|    13 | Phase 12 | Live Visitors Visible        |
+|    14 | Phase 13 | Deployment State Visible     |
+|    15 | Phase 14 | Production Health Visible    |
+|    16 | Phase 15 | Command Center Usable        |
+|    17 | Phase 16 | Repositories Connected       |
+|    18 | Phase 17 | Operating Costs Visible      |
+|    19 | Phase 18 | Project Knowledge Preserved  |
+|    20 | Phase 19 | Important Problems Delivered |
+|    21 | Phase 20 | AI Answers from Real Data    |
+|    22 | Phase 21 | Release Candidate Approved   |
+|    23 | Phase 22 | Production Launch            |
 
 ---
 
@@ -1635,31 +1636,31 @@ Build Phase 20 only after the portfolio records are reliable and current.
 
 # Progress Milestones
 
-| Milestone | Outcome |
-|---|---|
-| 0 | Product Blueprint Approved |
-| 1 | Development Workspace Ready |
-| 2 | API Foundation Stable |
-| 3 | Database Foundation Ready |
-| 4 | Secure Workspace Access |
-| 5 | All Applications Registered |
-| 6 | Project History Available |
-| 7 | Development Status Visible |
-| 8 | Websites Connected |
-| 9 | Real Tracking Working |
-| 10 | Analytics Engine Accurate |
-| 11 | Analytics Reports Usable |
-| 12 | Live Visitors Visible |
-| 13 | Deployment State Visible |
-| 14 | Production Health Visible |
-| 15 | Command Center Usable |
-| 16 | Repositories Connected |
-| 17 | Operating Costs Visible |
-| 18 | Project Knowledge Preserved |
-| 19 | Important Problems Delivered |
-| 20 | AI Answers from Real Data |
-| 21 | Release Candidate Approved |
-| 22 | Production Launch |
+| Milestone | Outcome                      |
+| --------- | ---------------------------- |
+| 0         | Product Blueprint Approved   |
+| 1         | Development Workspace Ready  |
+| 2         | API Foundation Stable        |
+| 3         | Database Foundation Ready    |
+| 4         | Secure Workspace Access      |
+| 5         | All Applications Registered  |
+| 6         | Project History Available    |
+| 7         | Development Status Visible   |
+| 8         | Websites Connected           |
+| 9         | Real Tracking Working        |
+| 10        | Analytics Engine Accurate    |
+| 11        | Analytics Reports Usable     |
+| 12        | Live Visitors Visible        |
+| 13        | Deployment State Visible     |
+| 14        | Production Health Visible    |
+| 15        | Command Center Usable        |
+| 16        | Repositories Connected       |
+| 17        | Operating Costs Visible      |
+| 18        | Project Knowledge Preserved  |
+| 19        | Important Problems Delivered |
+| 20        | AI Answers from Real Data    |
+| 21        | Release Candidate Approved   |
+| 22        | Production Launch            |
 
 ## Recommended task statuses
 

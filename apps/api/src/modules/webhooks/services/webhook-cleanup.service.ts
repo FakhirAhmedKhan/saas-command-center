@@ -1,125 +1,78 @@
-import {
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 
-import {
-  Cron,
-  CronExpression,
-} from '@nestjs/schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
-import {
-  WebhookDeliveryStatus,
-} from '../../../generated/prisma/client';
+import { WebhookDeliveryStatus } from '../../../generated/prisma/client';
 
-import type {
-  TypedConfigService,
-} from '../../../config/runtime-config';
+import type { TypedConfigService } from '../../../config/runtime-config';
 
-import {
-  PrismaService,
-} from '../../../database/prisma.service';
+import { PrismaService } from '../../../database/prisma.service';
 
 @Injectable()
 export class WebhookCleanupService {
-  private readonly logger =
-    new Logger(
-      WebhookCleanupService.name,
-    );
+  private readonly logger = new Logger(WebhookCleanupService.name);
 
   constructor(
-    private readonly prisma:
-      PrismaService,
+    private readonly prisma: PrismaService,
 
-    private readonly config:
-      TypedConfigService,
+    @Inject(ConfigService)
+    private readonly config: TypedConfigService,
   ) {}
 
-  @Cron(
-    CronExpression
-      .EVERY_DAY_AT_4AM,
-  )
-  async cleanup():
-    Promise<void> {
+  @Cron(CronExpression.EVERY_DAY_AT_4AM)
+  async cleanup(): Promise<void> {
     if (
-      !this.config.get(
-        'WEBHOOK_CLEANUP_ENABLED',
-        {
-          infer:
-            true,
-        },
-      )
+      !this.config.get('WEBHOOK_CLEANUP_ENABLED', {
+        infer: true,
+      })
     ) {
       return;
     }
 
-    const retentionDays =
-      this.config.get(
-        'WEBHOOK_RETENTION_DAYS',
-        {
-          infer:
-            true,
+    const retentionDays = this.config.get('WEBHOOK_RETENTION_DAYS', {
+      infer: true,
+    });
+
+    const cutoff = new Date(Date.now() - retentionDays * 86_400_000);
+
+    const deliveries = await this.prisma.webhookDelivery.deleteMany({
+      where: {
+        createdAt: {
+          lt: cutoff,
         },
-      );
 
-    const cutoff =
-      new Date(
-        Date.now() -
-          retentionDays *
-            86_400_000,
-      );
+        status: {
+          in: [
+            WebhookDeliveryStatus.SUCCEEDED,
 
-    const deliveries =
-      await this.prisma
-        .webhookDelivery
-        .deleteMany({
-          where: {
-            createdAt: {
-              lt:
-                cutoff,
-            },
+            WebhookDeliveryStatus.DEAD_LETTERED,
 
-            status: {
-              in: [
-                WebhookDeliveryStatus
-                  .SUCCEEDED,
+            WebhookDeliveryStatus.CANCELLED,
+          ],
+        },
+      },
+    });
 
-                WebhookDeliveryStatus
-                  .DEAD_LETTERED,
+    const events = await this.prisma.webhookEvent.deleteMany({
+      where: {
+        createdAt: {
+          lt: cutoff,
+        },
 
-                WebhookDeliveryStatus
-                  .CANCELLED,
-              ],
-            },
-          },
-        });
-
-    const events =
-      await this.prisma
-        .webhookEvent
-        .deleteMany({
-          where: {
-            createdAt: {
-              lt:
-                cutoff,
-            },
-
-            deliveries: {
-              none: {},
-            },
-          },
-        });
+        deliveries: {
+          none: {},
+        },
+      },
+    });
 
     this.logger.log(
       JSON.stringify({
-        event:
-          'webhook_retention_cleanup',
+        event: 'webhook_retention_cleanup',
 
-        removedDeliveries:
-          deliveries.count,
+        removedDeliveries: deliveries.count,
 
-        removedEvents:
-          events.count,
+        removedEvents: events.count,
       }),
     );
   }

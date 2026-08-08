@@ -33,12 +33,12 @@ The MVP must answer:
 
 ## Roles
 
-| Role | Intended authority |
-|---|---|
-| OWNER | Full workspace control, ownership transfer, and permanent deletion |
-| ADMIN | Manage members and application data except owner-only actions |
-| DEVELOPER | Manage application development records |
-| VIEWER | Read-only access |
+| Role      | Intended authority                                                 |
+| --------- | ------------------------------------------------------------------ |
+| OWNER     | Full workspace control, ownership transfer, and permanent deletion |
+| ADMIN     | Manage members and application data except owner-only actions      |
+| DEVELOPER | Manage application development records                             |
+| VIEWER    | Read-only access                                                   |
 
 Authorization must be enforced in the backend. Hiding frontend controls is not authorization.
 

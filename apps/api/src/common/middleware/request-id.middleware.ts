@@ -1,40 +1,23 @@
-import {
-  randomUUID,
-} from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 
-import type {
-  NextFunction,
-  Request,
-  Response,
-} from 'express';
+import type { NextFunction, Request, Response } from 'express';
 
-export const REQUEST_ID_HEADER =
-  'x-request-id';
+export const REQUEST_ID_HEADER = 'x-request-id';
 
-export interface RequestWithId
-  extends Request {
+export interface RequestWithId extends Request {
   requestId: string;
 }
 
-function getExistingRequestId(
-  value:
-    | string
-    | string[]
-    | undefined,
-): string | undefined {
+function getExistingRequestId(value: string | string[] | undefined): string | undefined {
   if (Array.isArray(value)) {
-    const firstValue =
-      value[0]?.trim();
+    const firstValue = value[0]?.trim();
 
-    return firstValue ||
-      undefined;
+    return firstValue || undefined;
   }
 
-  const normalizedValue =
-    value?.trim();
+  const normalizedValue = value?.trim();
 
-  return normalizedValue ||
-    undefined;
+  return normalizedValue || undefined;
 }
 
 export function requestIdMiddleware(
@@ -42,25 +25,13 @@ export function requestIdMiddleware(
   response: Response,
   next: NextFunction,
 ): void {
-  const existingRequestId =
-    getExistingRequestId(
-      request.headers[
-        REQUEST_ID_HEADER
-      ],
-    );
+  const existingRequestId = getExistingRequestId(request.headers[REQUEST_ID_HEADER]);
 
-  const requestId =
-    existingRequestId ??
-    randomUUID();
+  const requestId = existingRequestId ?? randomUUID();
 
-  (
-    request as RequestWithId
-  ).requestId = requestId;
+  (request as RequestWithId).requestId = requestId;
 
-  response.setHeader(
-    REQUEST_ID_HEADER,
-    requestId,
-  );
+  response.setHeader(REQUEST_ID_HEADER, requestId);
 
   next();
 }

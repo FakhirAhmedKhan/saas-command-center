@@ -1,13 +1,5 @@
-﻿import {
-  ApiProperty,
-  PartialType,
-} from '@nestjs/swagger';
-import {
-  IsEnum,
-  IsString,
-  IsUrl,
-  Length,
-} from 'class-validator';
+﻿import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { IsEnum, IsString, IsUrl, Length } from 'class-validator';
 
 import { ApplicationLinkType } from 'src/generated/prisma/enums';
 
@@ -41,6 +33,4 @@ export class CreateApplicationLinkDto {
   url!: string;
 }
 
-export class UpdateApplicationLinkDto extends PartialType(
-  CreateApplicationLinkDto,
-) {}
+export class UpdateApplicationLinkDto extends PartialType(CreateApplicationLinkDto) {}

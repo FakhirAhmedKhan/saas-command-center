@@ -1,26 +1,15 @@
-import {
-  Injectable,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import {
-  Prisma,
-} from 'src/generated/prisma/client';
+import { Prisma } from 'src/generated/prisma/client';
 
-import {
-  calculateSessionMetrics,
-} from '../utils/analytics-metrics';
+import { calculateSessionMetrics } from '../utils/analytics-metrics';
 
-import {
-  PageViewRebuilderService,
-} from './page-view-rebuilder.service';
+import { PageViewRebuilderService } from './page-view-rebuilder.service';
 import { DefaultArgs } from '@prisma/client/runtime/client';
 import { PrismaClient } from 'src/generated/prisma/internal/class';
 import { ProcessAnalyticsRangeInput } from 'src/modules/analytics-processing/services/analytics-range-processor.service';
 
-type AnalyticsSessionRecord =
-  Prisma.AnalyticsSessionGetPayload<
-    Record<string, never>
-  >;
+type AnalyticsSessionRecord = Prisma.AnalyticsSessionGetPayload<Record<string, never>>;
 
 export interface RebuiltSessionResult {
   previousStartedAt: Date;
@@ -29,198 +18,119 @@ export interface RebuiltSessionResult {
 
 @Injectable()
 export class SessionRebuilderService {
-  rebuildRange(transaction: Omit<PrismaClient<never, Prisma.GlobalOmitConfig | undefined, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$use" | "$extends">, input: ProcessAnalyticsRangeInput) {
+  rebuildRange(
+    transaction: Omit<
+      PrismaClient<never, Prisma.GlobalOmitConfig | undefined, DefaultArgs>,
+      '$connect' | '$disconnect' | '$on' | '$use' | '$extends'
+    >,
+    input: ProcessAnalyticsRangeInput,
+  ) {
     throw new Error('Method not implemented.');
   }
-  constructor(
-    private readonly pageViews:
-      PageViewRebuilderService,
-  ) { }
+  constructor(private readonly pageViews: PageViewRebuilderService) {}
 
   async rebuild(
     transaction: Prisma.TransactionClient,
     sessionId: string,
   ): Promise<RebuiltSessionResult> {
-    const existingSession =
-      await transaction
-        .analyticsSession
-        .findUniqueOrThrow({
-          where: {
-            id:
-              sessionId,
-          },
-        });
+    const existingSession = await transaction.analyticsSession.findUniqueOrThrow({
+      where: {
+        id: sessionId,
+      },
+    });
 
-    const events =
-      await transaction
-        .analyticsEvent
-        .findMany({
-          where: {
-            sessionId,
-          },
+    const events = await transaction.analyticsEvent.findMany({
+      where: {
+        sessionId,
+      },
 
-          orderBy: [
-            {
-              occurredAt:
-                'asc',
-            },
-            {
-              id:
-                'asc',
-            },
-          ],
-        });
+      orderBy: [
+        {
+          occurredAt: 'asc',
+        },
+        {
+          id: 'asc',
+        },
+      ],
+    });
 
-    const {
-      pageViews,
-      firstPage,
-      lastPage,
-    } =
-      await this.pageViews
-        .rebuildForSession(
-          transaction,
-          sessionId,
-        );
+    const { pageViews, firstPage, lastPage } = await this.pageViews.rebuildForSession(
+      transaction,
+      sessionId,
+    );
 
-    const firstEvent =
-      events[0];
+    const firstEvent = events[0];
 
     if (!firstEvent) {
       return {
-        previousStartedAt:
-          existingSession
-            .startedAt,
+        previousStartedAt: existingSession.startedAt,
 
-        session:
-          existingSession,
+        session: existingSession,
       };
     }
 
-    const metrics =
-      calculateSessionMetrics(
-        events,
-        pageViews,
-      );
+    const metrics = calculateSessionMetrics(events, pageViews);
 
-    const lastEvent =
-      events.at(-1) ??
-      firstEvent;
+    const lastEvent = events.at(-1) ?? firstEvent;
 
-    const updatedSession =
-      await transaction
-        .analyticsSession
-        .update({
-          where: {
-            id:
-              sessionId,
-          },
+    const updatedSession = await transaction.analyticsSession.update({
+      where: {
+        id: sessionId,
+      },
 
-          data: {
-            startedAt:
-              metrics.startedAt,
+      data: {
+        startedAt: metrics.startedAt,
 
-            endedAt:
-              metrics.endedAt,
+        endedAt: metrics.endedAt,
 
-            lastEventAt:
-              lastEvent
-                .occurredAt,
+        lastEventAt: lastEvent.occurredAt,
 
-            durationMs:
-              metrics.durationMs,
+        durationMs: metrics.durationMs,
 
-            engagedDurationMs:
-              metrics
-                .engagedDurationMs,
+        engagedDurationMs: metrics.engagedDurationMs,
 
-            eventCount:
-              metrics.eventCount,
+        eventCount: metrics.eventCount,
 
-            pageViewCount:
-              metrics.pageViewCount,
+        pageViewCount: metrics.pageViewCount,
 
-            customEventCount:
-              metrics
-                .customEventCount,
+        customEventCount: metrics.customEventCount,
 
-            bounced:
-              metrics.bounced,
+        bounced: metrics.bounced,
 
-            entryPath:
-              firstPage
-                ?.normalizedPath ??
-              null,
+        entryPath: firstPage?.normalizedPath ?? null,
 
-            exitPath:
-              lastPage
-                ?.normalizedPath ??
-              null,
+        exitPath: lastPage?.normalizedPath ?? null,
 
-            entryTitle:
-              firstPage?.title ??
-              null,
+        entryTitle: firstPage?.title ?? null,
 
-            exitTitle:
-              lastPage?.title ??
-              null,
+        exitTitle: lastPage?.title ?? null,
 
-            referrerUrl:
-              firstPage
-                ?.referrerUrl ??
-              firstEvent
-                .referrerUrl,
+        referrerUrl: firstPage?.referrerUrl ?? firstEvent.referrerUrl,
 
-            sourceType:
-              firstPage
-                ?.sourceType ??
-              firstEvent
-                .sourceType,
+        sourceType: firstPage?.sourceType ?? firstEvent.sourceType,
 
-            sourceName:
-              firstPage
-                ?.sourceName ??
-              firstEvent
-                .sourceName,
+        sourceName: firstPage?.sourceName ?? firstEvent.sourceName,
 
-            sourceDomain:
-              firstPage
-                ?.sourceDomain ??
-              firstEvent
-                .sourceDomain,
+        sourceDomain: firstPage?.sourceDomain ?? firstEvent.sourceDomain,
 
-            countryCode:
-              firstEvent
-                .countryCode,
+        countryCode: firstEvent.countryCode,
 
-            deviceType:
-              firstEvent
-                .deviceType,
+        deviceType: firstEvent.deviceType,
 
-            browserName:
-              firstEvent
-                .browserName,
+        browserName: firstEvent.browserName,
 
-            browserVersion:
-              firstEvent
-                .browserVersion,
+        browserVersion: firstEvent.browserVersion,
 
-            operatingSystem:
-              firstEvent
-                .operatingSystem,
+        operatingSystem: firstEvent.operatingSystem,
 
-            operatingSystemVersion:
-              firstEvent
-                .operatingSystemVersion,
-          },
-        });
+        operatingSystemVersion: firstEvent.operatingSystemVersion,
+      },
+    });
 
     return {
-      previousStartedAt:
-        existingSession
-          .startedAt,
+      previousStartedAt: existingSession.startedAt,
 
-      session:
-        updatedSession,
+      session: updatedSession,
     };
   }
 
@@ -228,32 +138,17 @@ export class SessionRebuilderService {
     transaction: Prisma.TransactionClient,
     sessionId: string,
   ): Promise<RebuiltSessionResult> {
-    return this.rebuild(
-      transaction,
-      sessionId,
-    );
+    return this.rebuild(transaction, sessionId);
   }
 
   async rebuildMany(
     transaction: Prisma.TransactionClient,
     sessionIds: readonly string[],
-  ): Promise<
-    RebuiltSessionResult[]
-  > {
-    const results:
-      RebuiltSessionResult[] =
-      [];
+  ): Promise<RebuiltSessionResult[]> {
+    const results: RebuiltSessionResult[] = [];
 
-    for (
-      const sessionId
-      of sessionIds
-    ) {
-      results.push(
-        await this.rebuild(
-          transaction,
-          sessionId,
-        ),
-      );
+    for (const sessionId of sessionIds) {
+      results.push(await this.rebuild(transaction, sessionId));
     }
 
     return results;

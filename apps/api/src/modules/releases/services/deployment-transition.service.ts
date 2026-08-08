@@ -1,96 +1,38 @@
-import {
-    BadRequestException,
-    Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
-import {
-    DeploymentStatus,
-} from '../../../generated/prisma/client';
+import { DeploymentStatus } from '../../../generated/prisma/client';
 
-const TRANSITIONS:
-    Record<
-        DeploymentStatus,
-        readonly DeploymentStatus[]
-    > = {
-    DRAFT: [
-        DeploymentStatus
-            .SCHEDULED,
+const TRANSITIONS: Record<DeploymentStatus, readonly DeploymentStatus[]> = {
+  DRAFT: [DeploymentStatus.SCHEDULED, DeploymentStatus.IN_PROGRESS],
 
-        DeploymentStatus
-            .IN_PROGRESS,
-    ],
+  SCHEDULED: [DeploymentStatus.DRAFT, DeploymentStatus.IN_PROGRESS],
 
-    SCHEDULED: [
-        DeploymentStatus
-            .DRAFT,
+  IN_PROGRESS: [DeploymentStatus.SUCCESSFUL, DeploymentStatus.FAILED],
 
-        DeploymentStatus
-            .IN_PROGRESS,
-    ],
+  SUCCESSFUL: [DeploymentStatus.ROLLED_BACK],
 
-    IN_PROGRESS: [
-        DeploymentStatus
-            .SUCCESSFUL,
+  FAILED: [DeploymentStatus.IN_PROGRESS, DeploymentStatus.ROLLED_BACK],
 
-        DeploymentStatus
-            .FAILED,
-    ],
-
-    SUCCESSFUL: [
-        DeploymentStatus
-            .ROLLED_BACK,
-    ],
-
-    FAILED: [
-        DeploymentStatus
-            .IN_PROGRESS,
-
-        DeploymentStatus
-            .ROLLED_BACK,
-    ],
-
-    ROLLED_BACK: [],
+  ROLLED_BACK: [],
 };
 
 @Injectable()
 export class DeploymentTransitionService {
-    getAllowedTransitions(
-        status:
-            DeploymentStatus,
-    ): DeploymentStatus[] {
-        return [
-            ...TRANSITIONS[
-            status
-            ],
-        ];
+  getAllowedTransitions(status: DeploymentStatus): DeploymentStatus[] {
+    return [...TRANSITIONS[status]];
+  }
+
+  assertTransition(
+    current: DeploymentStatus,
+
+    target: DeploymentStatus,
+  ): void {
+    if (current === target) {
+      throw new BadRequestException(`Deployment is already ${target}.`);
     }
 
-    assertTransition(
-        current:
-            DeploymentStatus,
-
-        target:
-            DeploymentStatus,
-    ): void {
-        if (
-            current ===
-            target
-        ) {
-            throw new BadRequestException(
-                `Deployment is already ${target}.`,
-            );
-        }
-
-        if (
-            !TRANSITIONS[
-                current
-            ].includes(
-                target,
-            )
-        ) {
-            throw new BadRequestException(
-                `Deployment cannot transition from ${current} to ${target}.`,
-            );
-        }
+    if (!TRANSITIONS[current].includes(target)) {
+      throw new BadRequestException(`Deployment cannot transition from ${current} to ${target}.`);
     }
+  }
 }

@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { Prisma } from 'src/generated/prisma/client';
 
-
 const safeSessionSelect = {
   id: true,
   userId: true,
@@ -18,10 +17,9 @@ const safeSessionSelect = {
   updatedAt: true,
 } satisfies Prisma.AuthSessionSelect;
 
-export type SafeAuthSession =
-  Prisma.AuthSessionGetPayload<{
-    select: typeof safeSessionSelect;
-  }>;
+export type SafeAuthSession = Prisma.AuthSessionGetPayload<{
+  select: typeof safeSessionSelect;
+}>;
 
 export interface RotateSessionInput {
   currentSessionId: string;
@@ -36,9 +34,7 @@ export interface RotateSessionInput {
 export class AuthSessionsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findByTokenHash(
-    refreshTokenHash: string,
-  ): Promise<SafeAuthSession | null> {
+  async findByTokenHash(refreshTokenHash: string): Promise<SafeAuthSession | null> {
     return this.prisma.authSession.findUnique({
       where: {
         refreshTokenHash,
@@ -47,16 +43,13 @@ export class AuthSessionsService {
     });
   }
 
-  async rotateSession(
-    input: RotateSessionInput,
-  ): Promise<SafeAuthSession | null> {
+  async rotateSession(input: RotateSessionInput): Promise<SafeAuthSession | null> {
     return this.prisma.$transaction(async (transaction) => {
-      const currentSession =
-        await transaction.authSession.findUnique({
-          where: {
-            id: input.currentSessionId,
-          },
-        });
+      const currentSession = await transaction.authSession.findUnique({
+        where: {
+          id: input.currentSessionId,
+        },
+      });
 
       if (!currentSession) {
         return null;
@@ -64,21 +57,20 @@ export class AuthSessionsService {
 
       const now = new Date();
 
-      const updated =
-        await transaction.authSession.updateMany({
-          where: {
-            id: currentSession.id,
-            revokedAt: null,
-            expiresAt: {
-              gt: now,
-            },
+      const updated = await transaction.authSession.updateMany({
+        where: {
+          id: currentSession.id,
+          revokedAt: null,
+          expiresAt: {
+            gt: now,
           },
-          data: {
-            revokedAt: now,
-            revokeReason: 'ROTATED',
-            lastUsedAt: now,
-          },
-        });
+        },
+        data: {
+          revokedAt: now,
+          revokeReason: 'ROTATED',
+          lastUsedAt: now,
+        },
+      });
 
       if (updated.count !== 1) {
         return null;
@@ -100,10 +92,7 @@ export class AuthSessionsService {
     });
   }
 
-  async revokeSession(
-    sessionId: string,
-    reason = 'LOGOUT',
-  ): Promise<number> {
+  async revokeSession(sessionId: string, reason = 'LOGOUT'): Promise<number> {
     const result = await this.prisma.authSession.updateMany({
       where: {
         id: sessionId,
@@ -149,10 +138,7 @@ export class AuthSessionsService {
     return result.count;
   }
 
-  async revokeAllForUser(
-    userId: string,
-    reason = 'LOGOUT_ALL',
-  ): Promise<number> {
+  async revokeAllForUser(userId: string, reason = 'LOGOUT_ALL'): Promise<number> {
     const result = await this.prisma.authSession.updateMany({
       where: {
         userId,
@@ -167,9 +153,7 @@ export class AuthSessionsService {
     return result.count;
   }
 
-  private normalize(
-    value?: string | null,
-  ): string | null {
+  private normalize(value?: string | null): string | null {
     if (!value) {
       return null;
     }

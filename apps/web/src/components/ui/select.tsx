@@ -1,44 +1,24 @@
-import {
-  forwardRef,
-  type SelectHTMLAttributes,
-} from 'react';
+import { forwardRef, type SelectHTMLAttributes } from 'react';
 
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/features/lib/api/cn';
 
-
-export interface SelectProps
-  extends SelectHTMLAttributes<HTMLSelectElement> {
+export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   error?: string;
   hint?: string;
 }
 
-export const Select = forwardRef<
-  HTMLSelectElement,
-  SelectProps
->(function Select(
-  {
-    className,
-    label,
-    error,
-    hint,
-    id,
-    children,
-    ...props
-  },
+export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
+  { className, label, error, hint, id, children, ...props },
   ref,
 ) {
-  const selectId =
-    id ?? props.name ?? undefined;
+  const selectId = id ?? props.name ?? undefined;
 
   return (
     <div className="space-y-1.5">
       {label ? (
-        <label
-          htmlFor={selectId}
-          className="block text-sm font-medium text-slate-700"
-        >
+        <label htmlFor={selectId} className="block text-sm font-medium text-slate-700">
           {label}
         </label>
       ) : null}
@@ -69,13 +49,9 @@ export const Select = forwardRef<
       </div>
 
       {error ? (
-        <p className="text-sm text-red-600">
-          {error}
-        </p>
+        <p className="text-sm text-red-600">{error}</p>
       ) : hint ? (
-        <p className="text-sm text-slate-500">
-          {hint}
-        </p>
+        <p className="text-sm text-slate-500">{hint}</p>
       ) : null}
     </div>
   );

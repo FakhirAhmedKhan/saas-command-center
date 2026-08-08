@@ -1,9 +1,4 @@
-import {
-  Controller,
-  Get,
-  HttpStatus,
-  Res,
-} from '@nestjs/common';
+import { Controller, Get, HttpStatus, Res } from '@nestjs/common';
 import {
   ApiOkResponse,
   ApiOperation,
@@ -31,9 +26,7 @@ export class HealthController {
   @ApiServiceUnavailableResponse({
     description: 'The API is running but the database is unavailable.',
   })
-  async getHealth(
-    @Res({ passthrough: true }) response: Response,
-  ): Promise<HealthResponse> {
+  async getHealth(@Res({ passthrough: true }) response: Response): Promise<HealthResponse> {
     const health = await this.healthService.getHealth();
 
     if (health.status === 'error') {

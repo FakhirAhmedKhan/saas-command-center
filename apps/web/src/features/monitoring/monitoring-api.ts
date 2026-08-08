@@ -1,216 +1,143 @@
 import { apiRequest } from '../auth/auth.types';
 import type {
-    HealthCheck,
-    HealthCheckHistory,
-    HealthIncident,
-    MonitoringSummary,
-    MonitoringTarget,
-    SaveHealthCheckInput,
+  HealthCheck,
+  HealthCheckHistory,
+  HealthIncident,
+  MonitoringSummary,
+  MonitoringTarget,
+  SaveHealthCheckInput,
 } from './monitoring.types';
 
-function createBasePath(
-    workspaceId:
-        string,
-): string {
-    return `/workspaces/${workspaceId}/monitoring`;
+function createBasePath(workspaceId: string): string {
+  return `/workspaces/${workspaceId}/monitoring`;
 }
 
 export async function getMonitoringSummary(
-    workspaceId:
-        string,
+  workspaceId: string,
 
-    signal?:
-        AbortSignal,
-): Promise<
-    MonitoringSummary
-> {
-    return apiRequest<
-        MonitoringSummary
-    >(
-        `${createBasePath(
-            workspaceId,
-        )}/summary`,
+  signal?: AbortSignal,
+): Promise<MonitoringSummary> {
+  return apiRequest<MonitoringSummary>(
+    `${createBasePath(workspaceId)}/summary`,
 
-        {
-            method:
-                'GET',
+    {
+      method: 'GET',
 
-            signal,
-        },
-    );
+      signal,
+    },
+  );
 }
 
 export async function getMonitoringTargets(
-    workspaceId:
-        string,
+  workspaceId: string,
 
-    signal?:
-        AbortSignal,
-): Promise<
-    MonitoringTarget[]
-> {
-    return apiRequest<
-        MonitoringTarget[]
-    >(
-        `${createBasePath(
-            workspaceId,
-        )}/targets`,
+  signal?: AbortSignal,
+): Promise<MonitoringTarget[]> {
+  return apiRequest<MonitoringTarget[]>(
+    `${createBasePath(workspaceId)}/targets`,
 
-        {
-            method:
-                'GET',
+    {
+      method: 'GET',
 
-            signal,
-        },
-    );
+      signal,
+    },
+  );
 }
 
 export async function getHealthChecks(
-    workspaceId:
-        string,
+  workspaceId: string,
 
-    signal?:
-        AbortSignal,
-): Promise<
-    HealthCheck[]
-> {
-    return apiRequest<
-        HealthCheck[]
-    >(
-        `${createBasePath(
-            workspaceId,
-        )}/checks`,
+  signal?: AbortSignal,
+): Promise<HealthCheck[]> {
+  return apiRequest<HealthCheck[]>(
+    `${createBasePath(workspaceId)}/checks`,
 
-        {
-            method:
-                'GET',
+    {
+      method: 'GET',
 
-            signal,
-        },
-    );
+      signal,
+    },
+  );
 }
 
 export async function getHealthCheckHistory(
-    workspaceId:
-        string,
+  workspaceId: string,
 
-    checkId:
-        string,
+  checkId: string,
 
-    signal?:
-        AbortSignal,
-): Promise<
-    HealthCheckHistory[]
-> {
-    return apiRequest<
-        HealthCheckHistory[]
-    >(
-        `${createBasePath(
-            workspaceId,
-        )}/checks/${checkId}/history`,
+  signal?: AbortSignal,
+): Promise<HealthCheckHistory[]> {
+  return apiRequest<HealthCheckHistory[]>(
+    `${createBasePath(workspaceId)}/checks/${checkId}/history`,
 
-        {
-            method:
-                'GET',
+    {
+      method: 'GET',
 
-            signal,
-        },
-    );
+      signal,
+    },
+  );
 }
 
 export async function getHealthIncidents(
-    workspaceId:
-        string,
+  workspaceId: string,
 
-    signal?:
-        AbortSignal,
-): Promise<
-    HealthIncident[]
-> {
-    return apiRequest<
-        HealthIncident[]
-    >(
-        `${createBasePath(
-            workspaceId,
-        )}/incidents`,
+  signal?: AbortSignal,
+): Promise<HealthIncident[]> {
+  return apiRequest<HealthIncident[]>(
+    `${createBasePath(workspaceId)}/incidents`,
 
-        {
-            method:
-                'GET',
+    {
+      method: 'GET',
 
-            signal,
-        },
-    );
+      signal,
+    },
+  );
 }
 
 export async function createHealthCheck(
-    workspaceId:
-        string,
+  workspaceId: string,
 
-    input:
-        SaveHealthCheckInput,
+  input: SaveHealthCheckInput,
 ): Promise<HealthCheck> {
-    return apiRequest<
-        HealthCheck
-    >(
-        `${createBasePath(
-            workspaceId,
-        )}/checks`,
+  return apiRequest<HealthCheck>(
+    `${createBasePath(workspaceId)}/checks`,
 
-        {
-            method:
-                'POST',
+    {
+      method: 'POST',
 
-            body:
-                input,
-        },
-    );
+      body: input,
+    },
+  );
 }
 
 export async function updateHealthCheck(
-    workspaceId:
-        string,
+  workspaceId: string,
 
-    checkId:
-        string,
+  checkId: string,
 
-    input:
-        Partial<
-            SaveHealthCheckInput
-        >,
+  input: Partial<SaveHealthCheckInput>,
 ): Promise<HealthCheck> {
-    return apiRequest<
-        HealthCheck
-    >(
-        `${createBasePath(
-            workspaceId,
-        )}/checks/${checkId}`,
+  return apiRequest<HealthCheck>(
+    `${createBasePath(workspaceId)}/checks/${checkId}`,
 
-        {
-            method:
-                'PATCH',
+    {
+      method: 'PATCH',
 
-            body:
-                input,
-        },
-    );
+      body: input,
+    },
+  );
 }
 
 export async function runHealthCheckNow(
-    workspaceId:
-        string,
+  workspaceId: string,
 
-    checkId:
-        string,
+  checkId: string,
 ): Promise<void> {
-    await apiRequest(
-        `${createBasePath(
-            workspaceId,
-        )}/checks/${checkId}/run`,
+  await apiRequest(
+    `${createBasePath(workspaceId)}/checks/${checkId}/run`,
 
-        {
-            method:
-                'POST',
-        },
-    );
+    {
+      method: 'POST',
+    },
+  );
 }

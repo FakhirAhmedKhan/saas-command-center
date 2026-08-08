@@ -2,9 +2,7 @@ interface PageLoadingProps {
   label?: string;
 }
 
-export function PageLoading({
-  label = 'Loading…',
-}: PageLoadingProps) {
+export function PageLoading({ label = 'Loading…' }: PageLoadingProps) {
   return (
     <div className="flex min-h-[240px] items-center justify-center p-6">
       <div
@@ -17,9 +15,7 @@ export function PageLoading({
           aria-hidden="true"
         />
 
-        <span>
-          {label}
-        </span>
+        <span>{label}</span>
       </div>
     </div>
   );

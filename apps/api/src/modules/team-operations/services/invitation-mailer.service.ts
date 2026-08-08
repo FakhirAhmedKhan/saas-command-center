@@ -1,6 +1,4 @@
-import {
-  Injectable,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 export interface SendInvitationEmailInput {
   email: string;
@@ -18,20 +16,12 @@ export interface InvitationMailResult {
 }
 
 export abstract class InvitationMailer {
-  abstract send(
-    input:
-      SendInvitationEmailInput,
-  ): Promise<InvitationMailResult>;
+  abstract send(input: SendInvitationEmailInput): Promise<InvitationMailResult>;
 }
 
 @Injectable()
-export class DisabledInvitationMailer
-  implements InvitationMailer
-{
-  async send(
-    _input:
-      SendInvitationEmailInput,
-  ): Promise<InvitationMailResult> {
+export class DisabledInvitationMailer implements InvitationMailer {
+  async send(_input: SendInvitationEmailInput): Promise<InvitationMailResult> {
     return {
       sent: false,
       skipped: true,

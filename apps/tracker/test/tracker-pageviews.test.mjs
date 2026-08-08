@@ -41,10 +41,7 @@ test('sorts non-sensitive query parameters for stable page identity', async () =
     href: 'https://app.example.com/page?z=9&a=1&m=5',
   });
 
-  assert.equal(
-    harness.payloads()[0].events[0].url,
-    'https://app.example.com/page?a=1&m=5&z=9',
-  );
+  assert.equal(harness.payloads()[0].events[0].url, 'https://app.example.com/page?a=1&m=5&z=9');
 });
 
 test('truncates the document title to 512 characters', async () => {

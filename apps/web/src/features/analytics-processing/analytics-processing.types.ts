@@ -1,77 +1,52 @@
 export type ProcessingRunStatus =
-    | 'QUEUED'
-    | 'RUNNING'
-    | 'SUCCEEDED'
-    | 'DEAD_LETTERED'
-    | 'CANCELLED';
+  'QUEUED' | 'RUNNING' | 'SUCCEEDED' | 'DEAD_LETTERED' | 'CANCELLED';
 
 export interface ProcessingRun {
-    id: string;
+  id: string;
 
-    status:
-    ProcessingRunStatus;
+  status: ProcessingRunStatus;
 
-    trigger:
-    'SCHEDULED'
-    | 'MANUAL'
-    | 'RETRY';
+  trigger: 'SCHEDULED' | 'MANUAL' | 'RETRY';
 
-    rangeStart:
-    string;
+  rangeStart: string;
 
-    rangeEnd:
-    string;
+  rangeEnd: string;
 
-    retryCount:
-    number;
+  retryCount: number;
 
-    maxRetries:
-    number;
+  maxRetries: number;
 
-    processedEvents:
-    number;
+  processedEvents: number;
 
-    failedEvents:
-    number;
+  failedEvents: number;
 
-    errorMessage:
-    string | null;
+  errorMessage: string | null;
 
-    startedAt:
-    string | null;
+  startedAt: string | null;
 
-    finishedAt:
-    string | null;
+  finishedAt: string | null;
 
-    createdAt:
-    string;
+  createdAt: string;
 }
 
 export interface AnalyticsProcessingStatus {
-    canReprocess:
-    boolean;
+  canReprocess: boolean;
 
-    pendingEvents:
-    number;
+  pendingEvents: number;
 
-    unresolvedDeadLetters:
-    number;
+  unresolvedDeadLetters: number;
 
-    activeRun:
-    ProcessingRun | null;
+  activeRun: ProcessingRun | null;
 
-    latestRun:
-    ProcessingRun | null;
+  latestRun: ProcessingRun | null;
 
-    lastSuccessfulRun:
-    ProcessingRun | null;
+  lastSuccessfulRun: ProcessingRun | null;
 
-    recentRuns:
-    ProcessingRun[];
+  recentRuns: ProcessingRun[];
 }
 
 export interface ReprocessAnalyticsInput {
-    from: string;
+  from: string;
 
-    to: string;
+  to: string;
 }

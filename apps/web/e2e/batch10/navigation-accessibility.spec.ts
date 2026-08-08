@@ -1,17 +1,9 @@
-import {
-  expect,
-  test,
-} from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
-import {
-  installMockApi,
-  PRIMARY_WORKSPACE_ID,
-} from './fixtures/mock-api';
+import { installMockApi, PRIMARY_WORKSPACE_ID } from './fixtures/mock-api';
 
 test.describe('Batch 10 navigation, responsiveness, and accessibility', () => {
-  test('restores an authenticated session from the public root', async ({
-    page,
-  }) => {
+  test('restores an authenticated session from the public root', async ({ page }) => {
     await installMockApi(page);
 
     await page.goto('/');
@@ -24,16 +16,12 @@ test.describe('Batch 10 navigation, responsiveness, and accessibility', () => {
     ).toBeVisible();
   });
 
-  test('exposes meaningful navigation landmarks and links', async ({
-    page,
-  }) => {
+  test('exposes meaningful navigation landmarks and links', async ({ page }) => {
     await installMockApi(page);
 
     await page.goto('/dashboard');
 
-    await expect(
-      page.getByRole('navigation'),
-    ).toBeVisible();
+    await expect(page.getByRole('navigation')).toBeVisible();
     await expect(
       page.getByRole('link', {
         name: 'Overview',
@@ -44,14 +32,10 @@ test.describe('Batch 10 navigation, responsiveness, and accessibility', () => {
         name: 'Command Center Team',
       }),
     ).toBeVisible();
-    await expect(
-      page.getByLabel('Select workspace'),
-    ).toBeVisible();
+    await expect(page.getByLabel('Select workspace')).toBeVisible();
   });
 
-  test('keeps the dashboard inside the mobile viewport', async ({
-    page,
-  }) => {
+  test('keeps the dashboard inside the mobile viewport', async ({ page }) => {
     await page.setViewportSize({
       width: 390,
       height: 844,
@@ -60,37 +44,24 @@ test.describe('Batch 10 navigation, responsiveness, and accessibility', () => {
 
     await page.goto('/dashboard');
 
-    const hasHorizontalOverflow =
-      await page.evaluate(
-        () =>
-          document.documentElement.scrollWidth >
-          window.innerWidth,
-      );
+    const hasHorizontalOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > window.innerWidth,
+    );
 
     expect(hasHorizontalOverflow).toBe(false);
-    await expect(
-      page.getByLabel('Select workspace'),
-    ).toBeVisible();
-    await expect(
-      page.locator('.sidebar-nav'),
-    ).toBeHidden();
+    await expect(page.getByLabel('Select workspace')).toBeVisible();
+    await expect(page.locator('.sidebar-nav')).toBeHidden();
   });
 
-  test('provides accessible names for authentication controls', async ({
-    page,
-  }) => {
+  test('provides accessible names for authentication controls', async ({ page }) => {
     await installMockApi(page, {
       authenticated: false,
     });
 
     await page.goto('/login');
 
-    await expect(
-      page.getByLabel('Email address'),
-    ).toHaveAttribute('type', 'email');
-    await expect(
-      page.getByLabel('Password'),
-    ).toHaveAttribute('type', 'password');
+    await expect(page.getByLabel('Email address')).toHaveAttribute('type', 'email');
+    await expect(page.getByLabel('Password')).toHaveAttribute('type', 'password');
     await expect(
       page.getByRole('button', {
         name: 'Sign in',
@@ -103,17 +74,12 @@ test.describe('Batch 10 navigation, responsiveness, and accessibility', () => {
     ).toBeVisible();
   });
 
-  test('supports keyboard submission of the application filter form', async ({
-    page,
-  }) => {
+  test('supports keyboard submission of the application filter form', async ({ page }) => {
     const state = await installMockApi(page);
 
-    await page.goto(
-      `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`,
-    );
+    await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}/applications`);
 
-    const search =
-      page.getByLabel('Search applications');
+    const search = page.getByLabel('Search applications');
 
     await search.fill('PriceScout');
     await search.press('Enter');
@@ -128,13 +94,10 @@ test.describe('Batch 10 navigation, responsiveness, and accessibility', () => {
       .filter(
         (request) =>
           request.method === 'GET' &&
-          request.path ===
-            `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`,
+          request.path === `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`,
       )
       .at(-1);
 
-    expect(latestRequest?.search).toContain(
-      'search=PriceScout',
-    );
+    expect(latestRequest?.search).toContain('search=PriceScout');
   });
 });

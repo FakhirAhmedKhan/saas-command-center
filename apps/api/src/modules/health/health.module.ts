@@ -1,29 +1,15 @@
-import {
-    Module,
-} from '@nestjs/common';
+import { Module } from '@nestjs/common';
 
+import { HealthController } from './health.controller';
 
-
-import {
-    HealthController,
-} from './health.controller';
-
-import {
-    HealthService,
-} from './health.service';
+import { HealthService } from './health.service';
 import { DatabaseModule } from 'src/database/database.module';
 
 @Module({
-    imports: [
-        DatabaseModule,
-    ],
+  imports: [DatabaseModule],
 
-    controllers: [
-        HealthController,
-    ],
+  controllers: [HealthController],
 
-    providers: [
-        HealthService,
-    ],
+  providers: [HealthService],
 })
-export class HealthModule { }
+export class HealthModule {}

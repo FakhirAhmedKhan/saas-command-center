@@ -1,11 +1,7 @@
-﻿import { publicEnv } from "config/public-env";
+﻿import { publicEnv } from 'config/public-env';
 import { ApiError } from '../lib/api/api-error';
 
-export type WorkspaceRole =
-  | 'OWNER'
-  | 'ADMIN'
-  | 'DEVELOPER'
-  | 'VIEWER';
+export type WorkspaceRole = 'OWNER' | 'ADMIN' | 'DEVELOPER' | 'VIEWER';
 
 export interface User {
   id: string;
@@ -92,205 +88,105 @@ export interface RegisterInput {
   workspaceSlug?: string;
 }
 
-
-interface RequestOptions
-  extends Omit<
-    RequestInit,
-    'body'
-  > {
+interface RequestOptions extends Omit<RequestInit, 'body'> {
   body?: unknown;
 
-  skipAuthentication?:
-  boolean;
+  skipAuthentication?: boolean;
 
-  skipRefresh?:
-  boolean;
+  skipRefresh?: boolean;
 }
 
 interface RefreshResponse {
   accessToken: string;
 }
 
-let accessToken:
-  | string
-  | null = null;
+let accessToken: string | null = null;
 
-let refreshPromise:
-  | Promise<string>
-  | null = null;
+let refreshPromise: Promise<string> | null = null;
 
-let unauthorizedHandler:
-  | (() => void)
-  | null = null;
+let unauthorizedHandler: (() => void) | null = null;
 
-export function setAccessToken(
-  token:
-    | string
-    | null,
-): void {
+export function setAccessToken(token: string | null): void {
   accessToken = token;
 }
 
-export function setUnauthorizedHandler(
-  handler:
-    | (() => void)
-    | null,
-): void {
-  unauthorizedHandler =
-    handler;
+export function setUnauthorizedHandler(handler: (() => void) | null): void {
+  unauthorizedHandler = handler;
 }
 
-function buildUrl(
-  path: string,
-): string {
-  if (
-    path.startsWith(
-      'http://',
-    ) ||
-    path.startsWith(
-      'https://',
-    )
-  ) {
+function buildUrl(path: string): string {
+  if (path.startsWith('http://') || path.startsWith('https://')) {
     return path;
   }
 
-  const normalizedPath =
-    path.replace(
-      /^\/+/,
-      '',
-    );
+  const normalizedPath = path.replace(/^\/+/, '');
 
   return `${publicEnv.apiBaseUrl}/${normalizedPath}`;
 }
 
-function serializeBody(
-  body: unknown,
-): BodyInit | undefined {
-  if (
-    body === undefined
-  ) {
+function serializeBody(body: unknown): BodyInit | undefined {
+  if (body === undefined) {
     return undefined;
   }
 
   if (
-    body instanceof
-    FormData ||
+    body instanceof FormData ||
     body instanceof Blob ||
-    body instanceof
-    URLSearchParams ||
-    typeof body ===
-    'string'
+    body instanceof URLSearchParams ||
+    typeof body === 'string'
   ) {
     return body;
   }
 
-  return JSON.stringify(
-    body,
-  );
+  return JSON.stringify(body);
 }
 
-function buildHeaders(
-  options: RequestOptions,
-): Headers {
-  const headers =
-    new Headers(
-      options.headers,
-    );
+function buildHeaders(options: RequestOptions): Headers {
+  const headers = new Headers(options.headers);
 
-  if (
-    options.body !==
-    undefined &&
-    !(
-      options.body instanceof
-      FormData
-    )
-  ) {
-    headers.set(
-      'Content-Type',
-      'application/json',
-    );
+  if (options.body !== undefined && !(options.body instanceof FormData)) {
+    headers.set('Content-Type', 'application/json');
   }
 
-  headers.set(
-    'Accept',
-    'application/json',
-  );
+  headers.set('Accept', 'application/json');
 
-  if (
-    !options
-      .skipAuthentication &&
-    accessToken
-  ) {
-    headers.set(
-      'Authorization',
-      `Bearer ${accessToken}`,
-    );
+  if (!options.skipAuthentication && accessToken) {
+    headers.set('Authorization', `Bearer ${accessToken}`);
   }
 
   return headers;
 }
 
-async function refreshAccessToken():
-  Promise<string> {
+async function refreshAccessToken(): Promise<string> {
   if (refreshPromise) {
     return refreshPromise;
   }
 
-  refreshPromise = (
-    async () => {
-      const response =
-        await fetch(
-          buildUrl(
-            '/auth/refresh',
-          ),
-          {
-            method:
-              'POST',
+  refreshPromise = (async () => {
+    const response = await fetch(buildUrl('/auth/refresh'), {
+      method: 'POST',
 
-            credentials:
-              'include',
+      credentials: 'include',
 
-            headers: {
-              Accept:
-                'application/json',
-            },
-          },
-        );
+      headers: {
+        Accept: 'application/json',
+      },
+    });
 
-      if (!response.ok) {
-        throw await ApiError
-          .fromResponse(
-            response,
-          );
-      }
-
-      const payload =
-        await response
-          .json() as
-        RefreshResponse;
-
-      if (
-        typeof payload
-          .accessToken !==
-        'string' ||
-        payload
-          .accessToken
-          .length === 0
-      ) {
-        throw new ApiError(
-          'Refresh response did not contain an access token.',
-          500,
-        );
-      }
-
-      setAccessToken(
-        payload.accessToken,
-      );
-
-      return payload
-        .accessToken;
+    if (!response.ok) {
+      throw await ApiError.fromResponse(response);
     }
-  )();
+
+    const payload = (await response.json()) as RefreshResponse;
+
+    if (typeof payload.accessToken !== 'string' || payload.accessToken.length === 0) {
+      throw new ApiError('Refresh response did not contain an access token.', 500);
+    }
+
+    setAccessToken(payload.accessToken);
+
+    return payload.accessToken;
+  })();
 
   try {
     return await refreshPromise;
@@ -301,78 +197,44 @@ async function refreshAccessToken():
 
     throw error;
   } finally {
-    refreshPromise =
-      null;
+    refreshPromise = null;
   }
 }
 
-export async function apiRequest<T>(
-  path: string,
-  options:
-    RequestOptions = {},
-): Promise<T> {
-  const {
-    body,
-    skipAuthentication,
-    skipRefresh,
-    ...requestInit
-  } = options;
+export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const { body, skipAuthentication, skipRefresh, ...requestInit } = options;
 
-  const execute =
-    async (): Promise<Response> =>
-      fetch(
-        buildUrl(path),
-        {
-          ...requestInit,
+  const execute = async (): Promise<Response> =>
+    fetch(buildUrl(path), {
+      ...requestInit,
 
-          body:
-            serializeBody(
-              body,
-            ),
+      body: serializeBody(body),
 
-          headers:
-            buildHeaders({
-              ...options,
-              body,
-              skipAuthentication,
-              skipRefresh,
-            }),
+      headers: buildHeaders({
+        ...options,
+        body,
+        skipAuthentication,
+        skipRefresh,
+      }),
 
-          credentials:
-            'include',
-        },
-      );
+      credentials: 'include',
+    });
 
-  let response =
-    await execute();
+  let response = await execute();
 
-  if (
-    response.status ===
-    401 &&
-    !skipAuthentication &&
-    !skipRefresh
-  ) {
+  if (response.status === 401 && !skipAuthentication && !skipRefresh) {
     await refreshAccessToken();
 
-    response =
-      await execute();
+    response = await execute();
   }
 
   if (!response.ok) {
-    throw await ApiError
-      .fromResponse(
-        response,
-      );
+    throw await ApiError.fromResponse(response);
   }
 
-  if (
-    response.status ===
-    204
-  ) {
+  if (response.status === 204) {
     return undefined as T;
   }
 
-  return await response
-    .json() as T;
+  return (await response.json()) as T;
 }
-

@@ -1,13 +1,7 @@
 'use client';
 
-import {
-  useParams,
-} from 'next/navigation';
-import {
-  type FormEvent,
-  useEffect,
-  useState,
-} from 'react';
+import { useParams } from 'next/navigation';
+import { type FormEvent, useEffect, useState } from 'react';
 
 import { useAuth } from '@/features/auth/auth-provider';
 import type { Workspace } from '@/features/auth/auth.types';
@@ -19,40 +13,28 @@ export default function WorkspaceSettingsPage() {
     workspaceId: string;
   }>();
 
-  const workspaceId =
-    params.workspaceId;
+  const workspaceId = params.workspaceId;
 
-  const {
-    updateWorkspaceInState,
-  } = useAuth();
+  const { updateWorkspaceInState } = useAuth();
 
-  const [workspace, setWorkspace] =
-    useState<Workspace | null>(null);
+  const [workspace, setWorkspace] = useState<Workspace | null>(null);
 
-  const [name, setName] =
-    useState('');
+  const [name, setName] = useState('');
 
-  const [slug, setSlug] =
-    useState('');
+  const [slug, setSlug] = useState('');
 
-  const [error, setError] =
-    useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const [success, setSuccess] =
-    useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
-  const [submitting, setSubmitting] =
-    useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     let active = true;
 
     async function loadWorkspace() {
       try {
-        const response =
-          await apiRequest<Workspace>(
-            `/workspaces/${workspaceId}`,
-          );
+        const response = await apiRequest<Workspace>(`/workspaces/${workspaceId}`);
 
         if (!active) {
           return;
@@ -63,9 +45,7 @@ export default function WorkspaceSettingsPage() {
         setSlug(response.slug);
       } catch (caughtError) {
         if (active) {
-          setError(
-            getErrorMessage(caughtError),
-          );
+          setError(getErrorMessage(caughtError));
         }
       }
     }
@@ -77,9 +57,7 @@ export default function WorkspaceSettingsPage() {
     };
   }, [workspaceId]);
 
-  async function handleSubmit(
-    event: FormEvent<HTMLFormElement>,
-  ) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     setError(null);
@@ -87,30 +65,20 @@ export default function WorkspaceSettingsPage() {
     setSubmitting(true);
 
     try {
-      const updatedWorkspace =
-        await apiRequest<Workspace>(
-          `/workspaces/${workspaceId}`,
-          {
-            method: 'PATCH',
-            body: JSON.stringify({
-              name,
-              slug,
-            }),
-          },
-        );
+      const updatedWorkspace = await apiRequest<Workspace>(`/workspaces/${workspaceId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          name,
+          slug,
+        }),
+      });
 
       setWorkspace(updatedWorkspace);
-      updateWorkspaceInState(
-        updatedWorkspace,
-      );
+      updateWorkspaceInState(updatedWorkspace);
 
-      setSuccess(
-        'Workspace updated successfully.',
-      );
+      setSuccess('Workspace updated successfully.');
     } catch (caughtError) {
-      setError(
-        getErrorMessage(caughtError),
-      );
+      setError(getErrorMessage(caughtError));
     } finally {
       setSubmitting(false);
     }
@@ -125,53 +93,30 @@ export default function WorkspaceSettingsPage() {
     );
   }
 
-  const role =
-    workspace?.members?.[0]?.role ??
-    'VIEWER';
+  const role = workspace?.members?.[0]?.role ?? 'VIEWER';
 
-  const canEdit =
-    role === 'OWNER' ||
-    role === 'ADMIN';
+  const canEdit = role === 'OWNER' || role === 'ADMIN';
 
   return (
     <div className="page-stack narrow">
       <section className="page-heading">
         <div>
-          <p className="eyebrow">
-            Workspace settings
-          </p>
+          <p className="eyebrow">Workspace settings</p>
 
           <h1>General information</h1>
 
-          <p>
-            Keep the workspace name and URL
-            identifier clear and consistent.
-          </p>
+          <p>Keep the workspace name and URL identifier clear and consistent.</p>
         </div>
       </section>
 
       <section className="section-card">
-        <form
-          className="form-stack"
-          onSubmit={handleSubmit}
-        >
-          {error && (
-            <div className="alert alert-error">
-              {error}
-            </div>
-          )}
+        <form className="form-stack" onSubmit={handleSubmit}>
+          {error && <div className="alert alert-error">{error}</div>}
 
-          {success && (
-            <div className="alert alert-success">
-              {success}
-            </div>
-          )}
+          {success && <div className="alert alert-success">{success}</div>}
 
           {!canEdit && (
-            <div className="alert">
-              Your role has read-only access to
-              workspace settings.
-            </div>
+            <div className="alert">Your role has read-only access to workspace settings.</div>
           )}
 
           <label className="field">
@@ -180,9 +125,7 @@ export default function WorkspaceSettingsPage() {
             <input
               disabled={!canEdit}
               value={name}
-              onChange={(event) =>
-                setName(event.target.value)
-              }
+              onChange={(event) => setName(event.target.value)}
               minLength={2}
               required
             />
@@ -195,35 +138,19 @@ export default function WorkspaceSettingsPage() {
               disabled={!canEdit}
               value={slug}
               onChange={(event) =>
-                setSlug(
-                  event.target.value
-                    .toLowerCase()
-                    .replace(
-                      /[^a-z0-9-]/g,
-                      '',
-                    ),
-                )
+                setSlug(event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))
               }
               minLength={2}
               required
             />
 
-            <small>
-              Lowercase letters, numbers and
-              hyphens only.
-            </small>
+            <small>Lowercase letters, numbers and hyphens only.</small>
           </label>
 
           {canEdit && (
             <div className="form-actions">
-              <button
-                className="button button-primary"
-                disabled={submitting}
-                type="submit"
-              >
-                {submitting
-                  ? 'Saving…'
-                  : 'Save changes'}
+              <button className="button button-primary" disabled={submitting} type="submit">
+                {submitting ? 'Saving…' : 'Save changes'}
               </button>
             </div>
           )}

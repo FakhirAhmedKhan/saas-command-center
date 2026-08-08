@@ -49,43 +49,43 @@ The target is **100% feature and requirement coverage**, not an artificial claim
 
 Recommended automated code-coverage gates:
 
-| Area | Minimum Target |
-|---|---:|
-| Overall backend statements/lines | 85% |
-| Overall backend branches | 80% |
-| Authentication and authorization services | 95% |
-| Workspace isolation guards | 100% decision-branch coverage |
-| Progress calculation | 100% rule coverage |
-| Tracking validation and sanitization | 95% |
-| Analytics session and aggregation rules | 95% |
-| Frontend feature components | 80% |
-| Critical E2E user flows | 100% automated |
-| API endpoint feature coverage | 100% |
+| Area                                      |                Minimum Target |
+| ----------------------------------------- | ----------------------------: |
+| Overall backend statements/lines          |                           85% |
+| Overall backend branches                  |                           80% |
+| Authentication and authorization services |                           95% |
+| Workspace isolation guards                | 100% decision-branch coverage |
+| Progress calculation                      |            100% rule coverage |
+| Tracking validation and sanitization      |                           95% |
+| Analytics session and aggregation rules   |                           95% |
+| Frontend feature components               |                           80% |
+| Critical E2E user flows                   |                100% automated |
+| API endpoint feature coverage             |                          100% |
 
 ## 3. Test Levels
 
-| Test Level | Purpose | Recommended Tooling |
-|---|---|---|
-| Static validation | Catch type, lint, schema, and build failures | TypeScript, ESLint, Prisma |
-| Unit testing | Test isolated rules and utilities | Jest |
-| Component testing | Test frontend UI behavior and states | Testing Library |
-| API integration | Test controllers, guards, services, and real test DB | Jest + Supertest |
-| Database integration | Validate constraints, transactions, cascades, and indexes | Prisma + PostgreSQL |
-| E2E browser testing | Validate complete user workflows | Playwright |
-| Tracker browser testing | Validate SDK inside real host pages | Playwright |
-| Contract testing | Validate API request/response compatibility | OpenAPI schema checks |
-| Accessibility testing | Validate keyboard, labels, focus, contrast, and semantics | axe-core + manual checks |
-| Performance testing | Validate response time, throughput, stability, and resource usage | k6 or equivalent |
-| Security testing | Validate OWASP, authorization, cookies, CORS, abuse, and secrets | ZAP/manual/security tests |
+| Test Level              | Purpose                                                           | Recommended Tooling        |
+| ----------------------- | ----------------------------------------------------------------- | -------------------------- |
+| Static validation       | Catch type, lint, schema, and build failures                      | TypeScript, ESLint, Prisma |
+| Unit testing            | Test isolated rules and utilities                                 | Jest                       |
+| Component testing       | Test frontend UI behavior and states                              | Testing Library            |
+| API integration         | Test controllers, guards, services, and real test DB              | Jest + Supertest           |
+| Database integration    | Validate constraints, transactions, cascades, and indexes         | Prisma + PostgreSQL        |
+| E2E browser testing     | Validate complete user workflows                                  | Playwright                 |
+| Tracker browser testing | Validate SDK inside real host pages                               | Playwright                 |
+| Contract testing        | Validate API request/response compatibility                       | OpenAPI schema checks      |
+| Accessibility testing   | Validate keyboard, labels, focus, contrast, and semantics         | axe-core + manual checks   |
+| Performance testing     | Validate response time, throughput, stability, and resource usage | k6 or equivalent           |
+| Security testing        | Validate OWASP, authorization, cookies, CORS, abuse, and secrets  | ZAP/manual/security tests  |
 
 ## 4. Test Environments
 
-| Environment | Purpose | Data Policy |
-|---|---|---|
-| Local | Developer validation | Disposable seed data |
-| Test/CI | Unit, integration, E2E | Recreated per pipeline |
-| Staging | Production-like acceptance | Synthetic data only |
-| Production | Smoke and monitoring only | No destructive tests |
+| Environment | Purpose                    | Data Policy            |
+| ----------- | -------------------------- | ---------------------- |
+| Local       | Developer validation       | Disposable seed data   |
+| Test/CI     | Unit, integration, E2E     | Recreated per pipeline |
+| Staging     | Production-like acceptance | Synthetic data only    |
+| Production  | Smoke and monitoring only  | No destructive tests   |
 
 Required services:
 
@@ -101,14 +101,14 @@ Test host:   Static and SPA pages used to validate tracker behavior
 
 Create deterministic fixtures:
 
-| Fixture | Workspace | Role | Purpose |
-|---|---|---|---|
-| owner.alpha@example.test | Alpha | OWNER | Full permissions |
-| admin.alpha@example.test | Alpha | ADMIN | Administrative actions |
-| developer.alpha@example.test | Alpha | DEVELOPER | Development actions |
-| viewer.alpha@example.test | Alpha | VIEWER | Read-only access |
-| owner.beta@example.test | Beta | OWNER | Cross-tenant isolation |
-| outsider@example.test | None | None | Unauthorized-access checks |
+| Fixture                      | Workspace | Role      | Purpose                    |
+| ---------------------------- | --------- | --------- | -------------------------- |
+| owner.alpha@example.test     | Alpha     | OWNER     | Full permissions           |
+| admin.alpha@example.test     | Alpha     | ADMIN     | Administrative actions     |
+| developer.alpha@example.test | Alpha     | DEVELOPER | Development actions        |
+| viewer.alpha@example.test    | Alpha     | VIEWER    | Read-only access           |
+| owner.beta@example.test      | Beta      | OWNER     | Cross-tenant isolation     |
+| outsider@example.test        | None      | None      | Unauthorized-access checks |
 
 Use two workspaces with overlapping resource names to catch accidental name-based rather than ID-based authorization.
 
@@ -177,12 +177,12 @@ A release candidate is acceptable when:
 
 ## 9. Defect Severity
 
-| Severity | Definition |
-|---|---|
+| Severity | Definition                                                                                           |
+| -------- | ---------------------------------------------------------------------------------------------------- |
 | Critical | Data leak, authentication bypass, production startup failure, data corruption, tracking-key exposure |
-| High | Core workflow unusable, wrong authorization, major analytics inaccuracy, migration failure |
-| Medium | Feature partially broken with workaround, incorrect validation, important UI issue |
-| Low | Cosmetic issue, minor text/layout inconsistency, non-blocking usability issue |
+| High     | Core workflow unusable, wrong authorization, major analytics inaccuracy, migration failure           |
+| Medium   | Feature partially broken with workaround, incorrect validation, important UI issue                   |
+| Low      | Cosmetic issue, minor text/layout inconsistency, non-blocking usability issue                        |
 
 ## 10. Automation Priorities
 
@@ -369,18 +369,18 @@ Beacon/no-cors delivery
 
 ## Phase 1 — Monorepo and Development Foundation
 
-| ID | Type | Scenario | Expected Result |
-|---|---|---|---|
-| P1-001 | Build | Install from clean checkout with frozen lockfile | All dependencies install without modifying lockfile |
-| P1-002 | Functional | Run root `pnpm dev` | API, web, and tracker start with correct workspace filters |
-| P1-003 | Failure | Required port already occupied | Process fails clearly without leaving child processes |
-| P1-004 | Build | Build packages before apps | Shared packages compile and apps resolve them |
-| P1-005 | Config | Missing `.env` values | API fails fast with explicit variable names |
-| P1-006 | Production | Start compiled API | Correct compiled entry point loads and all direct dependencies resolve |
-| P1-007 | Shutdown | Send SIGTERM to API | Server stops and Prisma disconnects cleanly |
-| P1-008 | Windows | Run scripts in PowerShell | Quoting and workspace filters work on Windows |
-| P1-009 | Failure | Kill one concurrently managed service | Root process terminates remaining services as configured |
-| P1-010 | Hygiene | Search repository for committed secrets | No real secrets or production credentials exist |
+| ID     | Type       | Scenario                                         | Expected Result                                                        |
+| ------ | ---------- | ------------------------------------------------ | ---------------------------------------------------------------------- |
+| P1-001 | Build      | Install from clean checkout with frozen lockfile | All dependencies install without modifying lockfile                    |
+| P1-002 | Functional | Run root `pnpm dev`                              | API, web, and tracker start with correct workspace filters             |
+| P1-003 | Failure    | Required port already occupied                   | Process fails clearly without leaving child processes                  |
+| P1-004 | Build      | Build packages before apps                       | Shared packages compile and apps resolve them                          |
+| P1-005 | Config     | Missing `.env` values                            | API fails fast with explicit variable names                            |
+| P1-006 | Production | Start compiled API                               | Correct compiled entry point loads and all direct dependencies resolve |
+| P1-007 | Shutdown   | Send SIGTERM to API                              | Server stops and Prisma disconnects cleanly                            |
+| P1-008 | Windows    | Run scripts in PowerShell                        | Quoting and workspace filters work on Windows                          |
+| P1-009 | Failure    | Kill one concurrently managed service            | Root process terminates remaining services as configured               |
+| P1-010 | Hygiene    | Search repository for committed secrets          | No real secrets or production credentials exist                        |
 
 ### Verification Checklist
 
@@ -394,20 +394,20 @@ Beacon/no-cors delivery
 
 ## Phase 2 — Backend and Frontend Infrastructure
 
-| ID | Type | Scenario | Expected Result |
-|---|---|---|---|
-| P2-001 | API | Request Swagger document | Valid OpenAPI document is returned |
-| P2-002 | API | Request unknown endpoint | Consistent 404 response |
-| P2-003 | Validation | Send unknown DTO fields | Request rejected when whitelist/forbid mode requires it |
-| P2-004 | Error | Throw known service exception | Correct status and safe message returned |
-| P2-005 | Error | Trigger unexpected exception | Generic 500 with no stack/secret leak |
-| P2-006 | Frontend | API client receives 401 | One refresh attempt occurs, then original request retries once |
-| P2-007 | Frontend | Refresh also fails | Session clears and user is sent to login |
-| P2-008 | Frontend | Two requests receive 401 simultaneously | Refresh requests are coordinated; no refresh storm |
-| P2-009 | UI | Render Button variants and loading states | Correct size, disabled state, and accessible name |
-| P2-010 | UI | Render Input/Select/Textarea errors | Label, hint, error, and focus behavior are correct |
-| P2-011 | UI | Render empty/loading/error components | Layout and semantics are consistent |
-| P2-012 | Accessibility | Tab through common UI components | Visible focus and logical order |
+| ID     | Type          | Scenario                                  | Expected Result                                                |
+| ------ | ------------- | ----------------------------------------- | -------------------------------------------------------------- |
+| P2-001 | API           | Request Swagger document                  | Valid OpenAPI document is returned                             |
+| P2-002 | API           | Request unknown endpoint                  | Consistent 404 response                                        |
+| P2-003 | Validation    | Send unknown DTO fields                   | Request rejected when whitelist/forbid mode requires it        |
+| P2-004 | Error         | Throw known service exception             | Correct status and safe message returned                       |
+| P2-005 | Error         | Trigger unexpected exception              | Generic 500 with no stack/secret leak                          |
+| P2-006 | Frontend      | API client receives 401                   | One refresh attempt occurs, then original request retries once |
+| P2-007 | Frontend      | Refresh also fails                        | Session clears and user is sent to login                       |
+| P2-008 | Frontend      | Two requests receive 401 simultaneously   | Refresh requests are coordinated; no refresh storm             |
+| P2-009 | UI            | Render Button variants and loading states | Correct size, disabled state, and accessible name              |
+| P2-010 | UI            | Render Input/Select/Textarea errors       | Label, hint, error, and focus behavior are correct             |
+| P2-011 | UI            | Render empty/loading/error components     | Layout and semantics are consistent                            |
+| P2-012 | Accessibility | Tab through common UI components          | Visible focus and logical order                                |
 
 ### Verification Checklist
 
@@ -419,20 +419,20 @@ Beacon/no-cors delivery
 
 ## Phase 3 — PostgreSQL and Prisma Foundation
 
-| ID | Type | Scenario | Expected Result |
-|---|---|---|---|
-| P3-001 | Migration | Apply all migrations to empty DB | Success with expected tables/enums/indexes |
-| P3-002 | Migration | Run migration deploy again | No duplicate or destructive changes |
-| P3-003 | Schema | Validate generated Prisma client | Client imports and queries successfully |
-| P3-004 | DB | Create user with duplicate unique email | Unique constraint rejects duplicate |
-| P3-005 | DB | Create duplicate workspace membership | Composite unique constraint rejects duplicate |
-| P3-006 | DB | Delete workspace | Defined child relations cascade or preserve data exactly as specified |
-| P3-007 | DB | Delete user referenced by optional actor/assignee fields | Relations use expected SetNull/Restrict behavior |
-| P3-008 | Transaction | Force failure halfway through multi-write operation | All writes roll back |
-| P3-009 | Seed | Run seed twice | Idempotent or fails with an explicit safe message |
-| P3-010 | Performance | Explain common workspace-scoped queries | Relevant indexes are used |
-| P3-011 | Backup | Backup and restore test DB | Restored DB passes integrity checks |
-| P3-012 | Isolation | Reuse same resource name in two workspaces | Both records coexist and remain isolated |
+| ID     | Type        | Scenario                                                 | Expected Result                                                       |
+| ------ | ----------- | -------------------------------------------------------- | --------------------------------------------------------------------- |
+| P3-001 | Migration   | Apply all migrations to empty DB                         | Success with expected tables/enums/indexes                            |
+| P3-002 | Migration   | Run migration deploy again                               | No duplicate or destructive changes                                   |
+| P3-003 | Schema      | Validate generated Prisma client                         | Client imports and queries successfully                               |
+| P3-004 | DB          | Create user with duplicate unique email                  | Unique constraint rejects duplicate                                   |
+| P3-005 | DB          | Create duplicate workspace membership                    | Composite unique constraint rejects duplicate                         |
+| P3-006 | DB          | Delete workspace                                         | Defined child relations cascade or preserve data exactly as specified |
+| P3-007 | DB          | Delete user referenced by optional actor/assignee fields | Relations use expected SetNull/Restrict behavior                      |
+| P3-008 | Transaction | Force failure halfway through multi-write operation      | All writes roll back                                                  |
+| P3-009 | Seed        | Run seed twice                                           | Idempotent or fails with an explicit safe message                     |
+| P3-010 | Performance | Explain common workspace-scoped queries                  | Relevant indexes are used                                             |
+| P3-011 | Backup      | Backup and restore test DB                               | Restored DB passes integrity checks                                   |
+| P3-012 | Isolation   | Reuse same resource name in two workspaces               | Both records coexist and remain isolated                              |
 
 ### Verification Checklist
 
@@ -446,38 +446,38 @@ Beacon/no-cors delivery
 
 ### Functional and API Test Cases
 
-| ID | Scenario | Role | Expected Result |
-|---|---|---|---|
-| AUTH-001 | Register valid user | Public | User and initial workspace/membership created |
-| AUTH-002 | Register duplicate email | Public | 409/validation error; no duplicate user |
-| AUTH-003 | Register malformed email | Public | 400 with field validation |
-| AUTH-004 | Register weak/short password | Public | 400 according to password policy |
-| AUTH-005 | Login valid credentials | Public | Access token returned/set as designed; refresh cookie created |
-| AUTH-006 | Login invalid password | Public | Generic unauthorized response; no user enumeration |
-| AUTH-007 | Login unknown email | Public | Same observable response as invalid password |
-| AUTH-008 | Refresh valid session | Auth cookie | New access token and rotated refresh session |
-| AUTH-009 | Reuse old refresh token after rotation | Auth cookie | Rejected; reuse handling follows policy |
-| AUTH-010 | Refresh expired token | Auth cookie | 401 and cookie cleared where appropriate |
-| AUTH-011 | Logout current session | Authenticated | Session revoked and cookie cleared |
-| AUTH-012 | Use access token after logout | Authenticated | Behavior matches token lifetime policy; refresh remains revoked |
-| AUTH-013 | Request `/auth/me` | Authenticated | User and workspace memberships returned correctly |
-| AUTH-014 | Request protected route without JWT | Public | 401 |
-| AUTH-015 | Use malformed JWT | Public | 401 without stack leak |
-| AUTH-016 | Use token signed with wrong secret | Public | 401 |
-| AUTH-017 | Create additional workspace | Authenticated | Creator receives OWNER membership |
-| AUTH-018 | Create workspace with duplicate name | Authenticated | Allowed or rejected according to defined rule |
-| AUTH-019 | List workspaces | Authenticated | Only memberships for current user are returned |
-| AUTH-020 | Access workspace without membership | Outsider | 404 or 403 consistently; no metadata leak |
-| AUTH-021 | List members | VIEWER | Read allowed if designed |
-| AUTH-022 | Add member | OWNER/ADMIN | Membership created |
-| AUTH-023 | Add member | DEVELOPER/VIEWER | Forbidden |
-| AUTH-024 | Update role | OWNER/ADMIN | Role changes according to hierarchy rules |
-| AUTH-025 | Demote only OWNER | OWNER | Rejected to avoid ownerless workspace |
-| AUTH-026 | Remove self as only OWNER | OWNER | Rejected |
-| AUTH-027 | Remove member | OWNER/ADMIN | Membership removed; access immediately blocked |
-| AUTH-028 | Add same member twice | OWNER/ADMIN | Duplicate rejected |
-| AUTH-029 | Concurrent workspace creation | Authenticated | Both transactions remain valid and isolated |
-| AUTH-030 | Cookie attributes in production | Authenticated | HttpOnly, Secure, correct SameSite and Path |
+| ID       | Scenario                               | Role             | Expected Result                                                 |
+| -------- | -------------------------------------- | ---------------- | --------------------------------------------------------------- |
+| AUTH-001 | Register valid user                    | Public           | User and initial workspace/membership created                   |
+| AUTH-002 | Register duplicate email               | Public           | 409/validation error; no duplicate user                         |
+| AUTH-003 | Register malformed email               | Public           | 400 with field validation                                       |
+| AUTH-004 | Register weak/short password           | Public           | 400 according to password policy                                |
+| AUTH-005 | Login valid credentials                | Public           | Access token returned/set as designed; refresh cookie created   |
+| AUTH-006 | Login invalid password                 | Public           | Generic unauthorized response; no user enumeration              |
+| AUTH-007 | Login unknown email                    | Public           | Same observable response as invalid password                    |
+| AUTH-008 | Refresh valid session                  | Auth cookie      | New access token and rotated refresh session                    |
+| AUTH-009 | Reuse old refresh token after rotation | Auth cookie      | Rejected; reuse handling follows policy                         |
+| AUTH-010 | Refresh expired token                  | Auth cookie      | 401 and cookie cleared where appropriate                        |
+| AUTH-011 | Logout current session                 | Authenticated    | Session revoked and cookie cleared                              |
+| AUTH-012 | Use access token after logout          | Authenticated    | Behavior matches token lifetime policy; refresh remains revoked |
+| AUTH-013 | Request `/auth/me`                     | Authenticated    | User and workspace memberships returned correctly               |
+| AUTH-014 | Request protected route without JWT    | Public           | 401                                                             |
+| AUTH-015 | Use malformed JWT                      | Public           | 401 without stack leak                                          |
+| AUTH-016 | Use token signed with wrong secret     | Public           | 401                                                             |
+| AUTH-017 | Create additional workspace            | Authenticated    | Creator receives OWNER membership                               |
+| AUTH-018 | Create workspace with duplicate name   | Authenticated    | Allowed or rejected according to defined rule                   |
+| AUTH-019 | List workspaces                        | Authenticated    | Only memberships for current user are returned                  |
+| AUTH-020 | Access workspace without membership    | Outsider         | 404 or 403 consistently; no metadata leak                       |
+| AUTH-021 | List members                           | VIEWER           | Read allowed if designed                                        |
+| AUTH-022 | Add member                             | OWNER/ADMIN      | Membership created                                              |
+| AUTH-023 | Add member                             | DEVELOPER/VIEWER | Forbidden                                                       |
+| AUTH-024 | Update role                            | OWNER/ADMIN      | Role changes according to hierarchy rules                       |
+| AUTH-025 | Demote only OWNER                      | OWNER            | Rejected to avoid ownerless workspace                           |
+| AUTH-026 | Remove self as only OWNER              | OWNER            | Rejected                                                        |
+| AUTH-027 | Remove member                          | OWNER/ADMIN      | Membership removed; access immediately blocked                  |
+| AUTH-028 | Add same member twice                  | OWNER/ADMIN      | Duplicate rejected                                              |
+| AUTH-029 | Concurrent workspace creation          | Authenticated    | Both transactions remain valid and isolated                     |
+| AUTH-030 | Cookie attributes in production        | Authenticated    | HttpOnly, Secure, correct SameSite and Path                     |
 
 ### UI/E2E Test Cases
 
@@ -498,32 +498,32 @@ Beacon/no-cors delivery
 
 ### Application CRUD
 
-| ID | Scenario | Expected Result |
-|---|---|---|
-| APP-001 | Create application with all valid fields | Application appears in active list |
-| APP-002 | Create with only required fields | Defaults are applied correctly |
-| APP-003 | Submit empty/whitespace name | Rejected |
-| APP-004 | Submit name at maximum length | Accepted |
-| APP-005 | Submit name above maximum | Rejected |
-| APP-006 | Create duplicate slug/name if unique rule exists | Defined conflict behavior |
-| APP-007 | Get application by valid ID | Complete detail returned |
-| APP-008 | Get application from another workspace | Not found/forbidden without leakage |
-| APP-009 | Update status | Status changes and activity record is written |
-| APP-010 | Update priority | Priority changes and activity record is written |
-| APP-011 | Update nullable dates to null | Values clear correctly |
-| APP-012 | Send invalid enum | 400 |
-| APP-013 | Archive application | Hidden from active list; archivedAt set |
-| APP-014 | Update archived application | Rejected unless explicitly permitted |
-| APP-015 | Restore application | Returns to active list |
-| APP-016 | Permanent delete as OWNER | Application and defined children are removed |
-| APP-017 | Permanent delete as ADMIN/DEVELOPER/VIEWER | Forbidden |
-| APP-018 | List with pagination | Stable page size and metadata |
-| APP-019 | Search case-insensitively | Matching applications returned |
-| APP-020 | Combine status/category/priority filters | Correct intersection |
-| APP-021 | Sort by supported columns | Deterministic order |
-| APP-022 | Unsupported sort field | Rejected or ignored safely |
-| APP-023 | Page below 1 or limit above max | Validation error |
-| APP-024 | Empty result | Correct empty response and UI |
+| ID      | Scenario                                         | Expected Result                                 |
+| ------- | ------------------------------------------------ | ----------------------------------------------- |
+| APP-001 | Create application with all valid fields         | Application appears in active list              |
+| APP-002 | Create with only required fields                 | Defaults are applied correctly                  |
+| APP-003 | Submit empty/whitespace name                     | Rejected                                        |
+| APP-004 | Submit name at maximum length                    | Accepted                                        |
+| APP-005 | Submit name above maximum                        | Rejected                                        |
+| APP-006 | Create duplicate slug/name if unique rule exists | Defined conflict behavior                       |
+| APP-007 | Get application by valid ID                      | Complete detail returned                        |
+| APP-008 | Get application from another workspace           | Not found/forbidden without leakage             |
+| APP-009 | Update status                                    | Status changes and activity record is written   |
+| APP-010 | Update priority                                  | Priority changes and activity record is written |
+| APP-011 | Update nullable dates to null                    | Values clear correctly                          |
+| APP-012 | Send invalid enum                                | 400                                             |
+| APP-013 | Archive application                              | Hidden from active list; archivedAt set         |
+| APP-014 | Update archived application                      | Rejected unless explicitly permitted            |
+| APP-015 | Restore application                              | Returns to active list                          |
+| APP-016 | Permanent delete as OWNER                        | Application and defined children are removed    |
+| APP-017 | Permanent delete as ADMIN/DEVELOPER/VIEWER       | Forbidden                                       |
+| APP-018 | List with pagination                             | Stable page size and metadata                   |
+| APP-019 | Search case-insensitively                        | Matching applications returned                  |
+| APP-020 | Combine status/category/priority filters         | Correct intersection                            |
+| APP-021 | Sort by supported columns                        | Deterministic order                             |
+| APP-022 | Unsupported sort field                           | Rejected or ignored safely                      |
+| APP-023 | Page below 1 or limit above max                  | Validation error                                |
+| APP-024 | Empty result                                     | Correct empty response and UI                   |
 
 ### Technologies
 
@@ -570,26 +570,26 @@ Checklist:
 
 ## Phase 6 — Activity and Audit History
 
-| ID | Scenario | Expected Result |
-|---|---|---|
-| ACT-001 | Create application | `APPLICATION_CREATED` record |
-| ACT-002 | Update application | `APPLICATION_UPDATED` with changed fields |
-| ACT-003 | Change status | Previous/current status in metadata |
-| ACT-004 | Change priority | Previous/current priority in metadata |
-| ACT-005 | Archive/restore | Correct activity type |
-| ACT-006 | Add/update/remove technology | Correct entity type and ID |
-| ACT-007 | Add/update/remove link | Correct entity type and ID |
-| ACT-008 | Development action | Correct milestone/task/blocker activity |
-| ACT-009 | Website action | Correct website activity |
-| ACT-010 | Failed business operation | No false activity record |
-| ACT-011 | Transaction rollback | Activity and business write both roll back |
-| ACT-012 | Actor deleted later | History remains readable with nullable actor |
-| ACT-013 | Filter by type/entity/user/date | Correct results |
-| ACT-014 | Paginate history | Stable chronological ordering |
-| ACT-015 | Cross-workspace query | No leaked activity |
-| ACT-016 | Metadata contains secrets | Tokens, cookies, and full tracking keys are absent |
-| ACT-017 | Very long description/metadata | Safely limited or accepted within DB constraints |
-| ACT-018 | UI displays unknown/new activity type | Safe fallback rendering |
+| ID      | Scenario                              | Expected Result                                    |
+| ------- | ------------------------------------- | -------------------------------------------------- |
+| ACT-001 | Create application                    | `APPLICATION_CREATED` record                       |
+| ACT-002 | Update application                    | `APPLICATION_UPDATED` with changed fields          |
+| ACT-003 | Change status                         | Previous/current status in metadata                |
+| ACT-004 | Change priority                       | Previous/current priority in metadata              |
+| ACT-005 | Archive/restore                       | Correct activity type                              |
+| ACT-006 | Add/update/remove technology          | Correct entity type and ID                         |
+| ACT-007 | Add/update/remove link                | Correct entity type and ID                         |
+| ACT-008 | Development action                    | Correct milestone/task/blocker activity            |
+| ACT-009 | Website action                        | Correct website activity                           |
+| ACT-010 | Failed business operation             | No false activity record                           |
+| ACT-011 | Transaction rollback                  | Activity and business write both roll back         |
+| ACT-012 | Actor deleted later                   | History remains readable with nullable actor       |
+| ACT-013 | Filter by type/entity/user/date       | Correct results                                    |
+| ACT-014 | Paginate history                      | Stable chronological ordering                      |
+| ACT-015 | Cross-workspace query                 | No leaked activity                                 |
+| ACT-016 | Metadata contains secrets             | Tokens, cookies, and full tracking keys are absent |
+| ACT-017 | Very long description/metadata        | Safely limited or accepted within DB constraints   |
+| ACT-018 | UI displays unknown/new activity type | Safe fallback rendering                            |
 
 Frontend checklist:
 
@@ -605,15 +605,15 @@ Frontend checklist:
 
 ### Development Templates
 
-| ID | Scenario | Expected Result |
-|---|---|---|
-| DEV-001 | List templates | All five templates returned |
-| DEV-002 | Apply template to empty application | Milestones and tasks created in order |
-| DEV-003 | Apply template when milestones exist without replace | Conflict |
-| DEV-004 | Apply with replace confirmation | Existing milestones/tasks/blockers replaced atomically |
-| DEV-005 | Apply template to archived application | Rejected |
-| DEV-006 | Apply invalid template enum | 400 |
-| DEV-007 | Template failure mid-transaction | No partial milestones/tasks |
+| ID      | Scenario                                             | Expected Result                                        |
+| ------- | ---------------------------------------------------- | ------------------------------------------------------ |
+| DEV-001 | List templates                                       | All five templates returned                            |
+| DEV-002 | Apply template to empty application                  | Milestones and tasks created in order                  |
+| DEV-003 | Apply template when milestones exist without replace | Conflict                                               |
+| DEV-004 | Apply with replace confirmation                      | Existing milestones/tasks/blockers replaced atomically |
+| DEV-005 | Apply template to archived application               | Rejected                                               |
+| DEV-006 | Apply invalid template enum                          | 400                                                    |
+| DEV-007 | Template failure mid-transaction                     | No partial milestones/tasks                            |
 
 ### Milestones
 
@@ -667,11 +667,11 @@ Frontend checklist:
 
 Use deterministic fixtures:
 
-| Milestone | Weight | Tasks | Expected Progress |
-|---|---:|---|---:|
-| A | 20 | 2/2 completed | 100% |
-| B | 30 | 1 of 2 equal-weight completed | 50% |
-| C | 50 | skipped | excluded |
+| Milestone | Weight | Tasks                         | Expected Progress |
+| --------- | -----: | ----------------------------- | ----------------: |
+| A         |     20 | 2/2 completed                 |              100% |
+| B         |     30 | 1 of 2 equal-weight completed |               50% |
+| C         |     50 | skipped                       |          excluded |
 
 Expected application progress:
 
@@ -710,33 +710,33 @@ Checklist:
 
 ### Website CRUD and Validation
 
-| ID | Scenario | Expected Result |
-|---|---|---|
-| WEB-001 | Create valid production domain | Website created and key returned once |
-| WEB-002 | Create `localhost:3000` | Accepted for local testing |
-| WEB-003 | Create domain with protocol | Normalized to hostname[:port] |
-| WEB-004 | Create domain with path/query/hash | Rejected |
-| WEB-005 | Create wildcard domain | Rejected |
-| WEB-006 | Duplicate domain in same workspace | Conflict |
-| WEB-007 | Same domain in different workspace | Allowed |
-| WEB-008 | Valid IANA time zone | Accepted |
-| WEB-009 | Invalid time zone | Rejected |
-| WEB-010 | Blank allowed origins | Default origin generated |
-| WEB-011 | Valid multiple origins | Normalized and deduplicated |
-| WEB-012 | Origin with path or credentials | Rejected |
-| WEB-013 | More than maximum origins | Rejected |
-| WEB-014 | Connect to same-workspace active application | Connected |
-| WEB-015 | Connect to foreign workspace application | Not found/forbidden |
-| WEB-016 | Connect to archived application | Rejected |
-| WEB-017 | Disconnect | applicationId cleared |
-| WEB-018 | Disable | New events rejected |
-| WEB-019 | Enable active website | New events accepted |
-| WEB-020 | Archive | disabled and archivedAt set |
-| WEB-021 | Modify archived website | Rejected |
-| WEB-022 | Restore | archivedAt cleared; remains disabled |
-| WEB-023 | Rotate key | New key returned; old key invalid immediately |
-| WEB-024 | Retrieve website detail | Full key is never returned |
-| WEB-025 | Search/filter/paginate | Correct results and metadata |
+| ID      | Scenario                                     | Expected Result                               |
+| ------- | -------------------------------------------- | --------------------------------------------- |
+| WEB-001 | Create valid production domain               | Website created and key returned once         |
+| WEB-002 | Create `localhost:3000`                      | Accepted for local testing                    |
+| WEB-003 | Create domain with protocol                  | Normalized to hostname[:port]                 |
+| WEB-004 | Create domain with path/query/hash           | Rejected                                      |
+| WEB-005 | Create wildcard domain                       | Rejected                                      |
+| WEB-006 | Duplicate domain in same workspace           | Conflict                                      |
+| WEB-007 | Same domain in different workspace           | Allowed                                       |
+| WEB-008 | Valid IANA time zone                         | Accepted                                      |
+| WEB-009 | Invalid time zone                            | Rejected                                      |
+| WEB-010 | Blank allowed origins                        | Default origin generated                      |
+| WEB-011 | Valid multiple origins                       | Normalized and deduplicated                   |
+| WEB-012 | Origin with path or credentials              | Rejected                                      |
+| WEB-013 | More than maximum origins                    | Rejected                                      |
+| WEB-014 | Connect to same-workspace active application | Connected                                     |
+| WEB-015 | Connect to foreign workspace application     | Not found/forbidden                           |
+| WEB-016 | Connect to archived application              | Rejected                                      |
+| WEB-017 | Disconnect                                   | applicationId cleared                         |
+| WEB-018 | Disable                                      | New events rejected                           |
+| WEB-019 | Enable active website                        | New events accepted                           |
+| WEB-020 | Archive                                      | disabled and archivedAt set                   |
+| WEB-021 | Modify archived website                      | Rejected                                      |
+| WEB-022 | Restore                                      | archivedAt cleared; remains disabled          |
+| WEB-023 | Rotate key                                   | New key returned; old key invalid immediately |
+| WEB-024 | Retrieve website detail                      | Full key is never returned                    |
+| WEB-025 | Search/filter/paginate                       | Correct results and metadata                  |
 
 ### Tracking-Key Security
 
@@ -777,38 +777,38 @@ Checklist:
 
 ## Tracker SDK Functional Cases
 
-| ID | Scenario | Expected Result |
-|---|---|---|
-| TRK-001 | Load script asynchronously | Host page remains interactive |
-| TRK-002 | First load | One page-view event queued/sent |
-| TRK-003 | Reload page | Same visitor, valid session according to timeout |
-| TRK-004 | Inactivity beyond timeout | New session ID |
-| TRK-005 | SPA `pushState` navigation | New page view |
-| TRK-006 | SPA `replaceState` navigation | New page view when URL changes |
-| TRK-007 | Browser back/forward | New page view |
-| TRK-008 | Hash navigation | Defined page-view behavior |
-| TRK-009 | Same URL notified repeatedly | Duplicate route view suppressed as designed |
-| TRK-010 | Visible page heartbeat | Heartbeat sent with bounded duration |
-| TRK-011 | Hidden tab | No repeated visible heartbeat inflation |
-| TRK-012 | `pagehide` | Beacon/keepalive flush attempted |
-| TRK-013 | Custom event valid name | CUSTOM event sent |
-| TRK-014 | Invalid custom-event name | Ignored safely |
-| TRK-015 | Sensitive property keys | Removed |
-| TRK-016 | Arrays/strings above limits | Truncated |
-| TRK-017 | Local storage unavailable | Tracker fails silently or uses safe fallback |
-| TRK-018 | Browser offline | Events remain queued |
-| TRK-019 | Browser returns online | Queue flushes |
-| TRK-020 | Queue above max | Oldest events dropped according to policy |
-| TRK-021 | Batch reaches threshold | Flush occurs |
-| TRK-022 | Network endpoint fails | Host page remains unaffected |
-| TRK-023 | DNT enabled | No tracking by default |
-| TRK-024 | Consent required and not granted | No tracking |
-| TRK-025 | Consent granted | Tracking starts |
-| TRK-026 | Consent denied after grant | Tracking stops and queue clears |
-| TRK-027 | Script included twice | Tracker initializes once |
-| TRK-028 | Invalid/missing data attributes | Tracker exits without host error |
-| TRK-029 | Host has strict CSP | Document required CSP integration behavior |
-| TRK-030 | Ad blocker blocks tracker | Host application continues normally |
+| ID      | Scenario                         | Expected Result                                  |
+| ------- | -------------------------------- | ------------------------------------------------ |
+| TRK-001 | Load script asynchronously       | Host page remains interactive                    |
+| TRK-002 | First load                       | One page-view event queued/sent                  |
+| TRK-003 | Reload page                      | Same visitor, valid session according to timeout |
+| TRK-004 | Inactivity beyond timeout        | New session ID                                   |
+| TRK-005 | SPA `pushState` navigation       | New page view                                    |
+| TRK-006 | SPA `replaceState` navigation    | New page view when URL changes                   |
+| TRK-007 | Browser back/forward             | New page view                                    |
+| TRK-008 | Hash navigation                  | Defined page-view behavior                       |
+| TRK-009 | Same URL notified repeatedly     | Duplicate route view suppressed as designed      |
+| TRK-010 | Visible page heartbeat           | Heartbeat sent with bounded duration             |
+| TRK-011 | Hidden tab                       | No repeated visible heartbeat inflation          |
+| TRK-012 | `pagehide`                       | Beacon/keepalive flush attempted                 |
+| TRK-013 | Custom event valid name          | CUSTOM event sent                                |
+| TRK-014 | Invalid custom-event name        | Ignored safely                                   |
+| TRK-015 | Sensitive property keys          | Removed                                          |
+| TRK-016 | Arrays/strings above limits      | Truncated                                        |
+| TRK-017 | Local storage unavailable        | Tracker fails silently or uses safe fallback     |
+| TRK-018 | Browser offline                  | Events remain queued                             |
+| TRK-019 | Browser returns online           | Queue flushes                                    |
+| TRK-020 | Queue above max                  | Oldest events dropped according to policy        |
+| TRK-021 | Batch reaches threshold          | Flush occurs                                     |
+| TRK-022 | Network endpoint fails           | Host page remains unaffected                     |
+| TRK-023 | DNT enabled                      | No tracking by default                           |
+| TRK-024 | Consent required and not granted | No tracking                                      |
+| TRK-025 | Consent granted                  | Tracking starts                                  |
+| TRK-026 | Consent denied after grant       | Tracking stops and queue clears                  |
+| TRK-027 | Script included twice            | Tracker initializes once                         |
+| TRK-028 | Invalid/missing data attributes  | Tracker exits without host error                 |
+| TRK-029 | Host has strict CSP              | Document required CSP integration behavior       |
+| TRK-030 | Ad blocker blocks tracker        | Host application continues normally              |
 
 ## Public Ingestion API Cases
 
@@ -818,43 +818,43 @@ Expected route:
 POST /api/v1/collect
 ```
 
-| ID | Scenario | Expected Result |
-|---|---|---|
-| ING-001 | Valid batch | 202 with accepted count |
-| ING-002 | Duplicate event IDs | Duplicates counted/ignored |
-| ING-003 | Invalid website UUID | 400 |
-| ING-004 | Unknown website | Unauthorized or not found per policy |
-| ING-005 | Invalid key format | 401 |
-| ING-006 | Valid prefix, wrong secret | 401 |
-| ING-007 | Old rotated key | 401 |
-| ING-008 | Disabled website | 403 |
-| ING-009 | Archived website | 403 |
-| ING-010 | Missing Origin | Rejected unless originless mode enabled |
-| ING-011 | Allowed Origin | Accepted |
-| ING-012 | Disallowed Origin | 403 |
-| ING-013 | URL origin differs from request Origin | 400 |
-| ING-014 | Payload over body limit | 413 |
-| ING-015 | More than 25 events | 400 |
-| ING-016 | Zero events | 400 |
-| ING-017 | Unknown fields | Rejected |
-| ING-018 | Future timestamp beyond tolerance | 400 |
-| ING-019 | Timestamp older than accepted window | 400 |
-| ING-020 | CUSTOM without eventName | 400 |
-| ING-021 | PAGE_VIEW with eventName | 400 |
-| ING-022 | Invalid screen dimensions | 400 |
-| ING-023 | Invalid time zone | Stored as null, not a request failure if designed |
-| ING-024 | Sensitive URL query parameters | Removed before persistence |
-| ING-025 | URL fragment and credentials | Removed |
-| ING-026 | Sensitive custom properties | Removed |
-| ING-027 | `__proto__`/`constructor` properties | Ignored; no prototype pollution |
-| ING-028 | Rate limit exceeded | 429 |
-| ING-029 | Same event IDs concurrently | Exactly one stored |
-| ING-030 | DB unavailable | Safe 5xx; no request data leaked |
-| ING-031 | User-agent above limit | Truncated |
-| ING-032 | IP address | Only salted hash stored |
-| ING-033 | Untrusted geo headers in development | Country remains null |
-| ING-034 | Trusted proxy geo header enabled | Valid ISO code stored |
-| ING-035 | Invalid geo code | Ignored |
+| ID      | Scenario                               | Expected Result                                   |
+| ------- | -------------------------------------- | ------------------------------------------------- |
+| ING-001 | Valid batch                            | 202 with accepted count                           |
+| ING-002 | Duplicate event IDs                    | Duplicates counted/ignored                        |
+| ING-003 | Invalid website UUID                   | 400                                               |
+| ING-004 | Unknown website                        | Unauthorized or not found per policy              |
+| ING-005 | Invalid key format                     | 401                                               |
+| ING-006 | Valid prefix, wrong secret             | 401                                               |
+| ING-007 | Old rotated key                        | 401                                               |
+| ING-008 | Disabled website                       | 403                                               |
+| ING-009 | Archived website                       | 403                                               |
+| ING-010 | Missing Origin                         | Rejected unless originless mode enabled           |
+| ING-011 | Allowed Origin                         | Accepted                                          |
+| ING-012 | Disallowed Origin                      | 403                                               |
+| ING-013 | URL origin differs from request Origin | 400                                               |
+| ING-014 | Payload over body limit                | 413                                               |
+| ING-015 | More than 25 events                    | 400                                               |
+| ING-016 | Zero events                            | 400                                               |
+| ING-017 | Unknown fields                         | Rejected                                          |
+| ING-018 | Future timestamp beyond tolerance      | 400                                               |
+| ING-019 | Timestamp older than accepted window   | 400                                               |
+| ING-020 | CUSTOM without eventName               | 400                                               |
+| ING-021 | PAGE_VIEW with eventName               | 400                                               |
+| ING-022 | Invalid screen dimensions              | 400                                               |
+| ING-023 | Invalid time zone                      | Stored as null, not a request failure if designed |
+| ING-024 | Sensitive URL query parameters         | Removed before persistence                        |
+| ING-025 | URL fragment and credentials           | Removed                                           |
+| ING-026 | Sensitive custom properties            | Removed                                           |
+| ING-027 | `__proto__`/`constructor` properties   | Ignored; no prototype pollution                   |
+| ING-028 | Rate limit exceeded                    | 429                                               |
+| ING-029 | Same event IDs concurrently            | Exactly one stored                                |
+| ING-030 | DB unavailable                         | Safe 5xx; no request data leaked                  |
+| ING-031 | User-agent above limit                 | Truncated                                         |
+| ING-032 | IP address                             | Only salted hash stored                           |
+| ING-033 | Untrusted geo headers in development   | Country remains null                              |
+| ING-034 | Trusted proxy geo header enabled       | Valid ISO code stored                             |
+| ING-035 | Invalid geo code                       | Ignored                                           |
 
 ## Raw Event Admin APIs
 
@@ -892,23 +892,23 @@ Checklist:
 
 ## Session Processing
 
-| ID | Scenario | Expected Result |
-|---|---|---|
-| ANA-001 | Single page view, no engagement | Bounce |
-| ANA-002 | Single page view + 15s heartbeat | Not bounce |
-| ANA-003 | Two page views | Not bounce |
-| ANA-004 | One page + custom event | Not bounce |
-| ANA-005 | Multiple heartbeats | Engaged duration sums within cap |
-| ANA-006 | Wall duration greater than heartbeat | Duration uses greater defined value |
-| ANA-007 | Heartbeat duration above cap | Duration capped |
-| ANA-008 | Late earlier event | Session start/entry rebuilt |
-| ANA-009 | Late later event | Session end/exit rebuilt |
-| ANA-010 | Events arrive out of order | Session ordered by occurredAt |
-| ANA-011 | Same external session ID in another website | Separate session |
-| ANA-012 | Bot user agent | Device BOT |
-| ANA-013 | Unknown user agent | Defined OTHER/UNKNOWN behavior |
-| ANA-014 | No page view, custom event only | Session still valid with null entry/exit |
-| ANA-015 | One page is both first and last | isEntry and isExit both true |
+| ID      | Scenario                                    | Expected Result                          |
+| ------- | ------------------------------------------- | ---------------------------------------- |
+| ANA-001 | Single page view, no engagement             | Bounce                                   |
+| ANA-002 | Single page view + 15s heartbeat            | Not bounce                               |
+| ANA-003 | Two page views                              | Not bounce                               |
+| ANA-004 | One page + custom event                     | Not bounce                               |
+| ANA-005 | Multiple heartbeats                         | Engaged duration sums within cap         |
+| ANA-006 | Wall duration greater than heartbeat        | Duration uses greater defined value      |
+| ANA-007 | Heartbeat duration above cap                | Duration capped                          |
+| ANA-008 | Late earlier event                          | Session start/entry rebuilt              |
+| ANA-009 | Late later event                            | Session end/exit rebuilt                 |
+| ANA-010 | Events arrive out of order                  | Session ordered by occurredAt            |
+| ANA-011 | Same external session ID in another website | Separate session                         |
+| ANA-012 | Bot user agent                              | Device BOT                               |
+| ANA-013 | Unknown user agent                          | Defined OTHER/UNKNOWN behavior           |
+| ANA-014 | No page view, custom event only             | Session still valid with null entry/exit |
+| ANA-015 | One page is both first and last             | isEntry and isExit both true             |
 
 ## URL and Source Normalization
 
@@ -927,26 +927,26 @@ Checklist:
 
 ## Aggregation
 
-| ID | Scenario | Expected Result |
-|---|---|---|
-| AGG-001 | Build hourly overview | Counts match normalized fixture |
-| AGG-002 | Build daily overview | Counts match fixture |
-| AGG-003 | Build PAGE dimension | Per-path values correct |
-| AGG-004 | Build SOURCE dimension | Per-source values correct |
-| AGG-005 | Build COUNTRY dimension | Null mapped to Unknown |
-| AGG-006 | Build DEVICE dimension | Device totals correct |
-| AGG-007 | Build BROWSER dimension | Browser totals correct |
-| AGG-008 | Build OS dimension | OS totals correct |
-| AGG-009 | Build CUSTOM_EVENT dimension | Event-name totals correct |
-| AGG-010 | Rebuild same bucket twice | No metric inflation |
-| AGG-011 | Late event in old bucket | Old bucket rebuilt |
-| AGG-012 | Website time zone UTC | Correct UTC boundaries |
-| AGG-013 | Website time zone Asia/Dubai | Correct local-day boundaries |
-| AGG-014 | DST spring-forward day | Correct shortened local day |
-| AGG-015 | DST fall-back hour | Correct repeated-hour handling |
-| AGG-016 | Empty bucket | Existing stale aggregate removed or remains absent |
-| AGG-017 | Large duration stored as BigInt | API serialization is safe |
-| AGG-018 | Exact unique visitors across buckets | UI/docs do not incorrectly sum bucket uniques |
+| ID      | Scenario                             | Expected Result                                    |
+| ------- | ------------------------------------ | -------------------------------------------------- |
+| AGG-001 | Build hourly overview                | Counts match normalized fixture                    |
+| AGG-002 | Build daily overview                 | Counts match fixture                               |
+| AGG-003 | Build PAGE dimension                 | Per-path values correct                            |
+| AGG-004 | Build SOURCE dimension               | Per-source values correct                          |
+| AGG-005 | Build COUNTRY dimension              | Null mapped to Unknown                             |
+| AGG-006 | Build DEVICE dimension               | Device totals correct                              |
+| AGG-007 | Build BROWSER dimension              | Browser totals correct                             |
+| AGG-008 | Build OS dimension                   | OS totals correct                                  |
+| AGG-009 | Build CUSTOM_EVENT dimension         | Event-name totals correct                          |
+| AGG-010 | Rebuild same bucket twice            | No metric inflation                                |
+| AGG-011 | Late event in old bucket             | Old bucket rebuilt                                 |
+| AGG-012 | Website time zone UTC                | Correct UTC boundaries                             |
+| AGG-013 | Website time zone Asia/Dubai         | Correct local-day boundaries                       |
+| AGG-014 | DST spring-forward day               | Correct shortened local day                        |
+| AGG-015 | DST fall-back hour                   | Correct repeated-hour handling                     |
+| AGG-016 | Empty bucket                         | Existing stale aggregate removed or remains absent |
+| AGG-017 | Large duration stored as BigInt      | API serialization is safe                          |
+| AGG-018 | Exact unique visitors across buckets | UI/docs do not incorrectly sum bucket uniques      |
 
 ## Processing Scheduler and Manual Controls
 
@@ -1014,17 +1014,17 @@ Test every controller with:
 
 For every protected endpoint, execute the role matrix:
 
-| Endpoint Type | OWNER | ADMIN | DEVELOPER | VIEWER | Outsider | Anonymous |
-|---|---:|---:|---:|---:|---:|---:|
-| Read workspace resource | Allow | Allow | Allow | Allow | Deny | 401 |
-| Create/update application | Allow | Allow | Allow | Deny | Deny | 401 |
-| Archive/restore application | Allow | Allow | Defined | Deny | Deny | 401 |
-| Permanent delete | Allow | Deny | Deny | Deny | Deny | 401 |
-| Manage members | Allow | Allow with hierarchy rules | Deny | Deny | Deny | 401 |
-| Manage websites | Allow | Allow | Allow where designed | Deny | Deny | 401 |
-| Rotate tracking key | Allow | Allow | Deny if admin-only | Deny | Deny | 401 |
-| Analytics process | Allow | Allow | Allow where designed | Deny | Deny | 401 |
-| Reprocess/retention | Allow | Allow | Deny | Deny | Deny | 401 |
+| Endpoint Type               | OWNER |                      ADMIN |            DEVELOPER | VIEWER | Outsider | Anonymous |
+| --------------------------- | ----: | -------------------------: | -------------------: | -----: | -------: | --------: |
+| Read workspace resource     | Allow |                      Allow |                Allow |  Allow |     Deny |       401 |
+| Create/update application   | Allow |                      Allow |                Allow |   Deny |     Deny |       401 |
+| Archive/restore application | Allow |                      Allow |              Defined |   Deny |     Deny |       401 |
+| Permanent delete            | Allow |                       Deny |                 Deny |   Deny |     Deny |       401 |
+| Manage members              | Allow | Allow with hierarchy rules |                 Deny |   Deny |     Deny |       401 |
+| Manage websites             | Allow |                      Allow | Allow where designed |   Deny |     Deny |       401 |
+| Rotate tracking key         | Allow |                      Allow |   Deny if admin-only |   Deny |     Deny |       401 |
+| Analytics process           | Allow |                      Allow | Allow where designed |   Deny |     Deny |       401 |
+| Reprocess/retention         | Allow |                      Allow |                 Deny |   Deny |     Deny |       401 |
 
 ## Service-Level Transaction Tests
 
@@ -1612,20 +1612,20 @@ Validate production responses:
 
 These are initial acceptance targets and should be calibrated against production infrastructure.
 
-| Operation | Proposed Target |
-|---|---:|
-| Login API p95 | < 500 ms |
-| Standard authenticated CRUD p95 | < 400 ms |
-| Paginated list p95 with realistic data | < 700 ms |
-| Public collect API p95 | < 150 ms |
-| Public collect API p99 | < 400 ms |
-| Tracker gzipped bundle | ≤ 12 KB |
-| Tracker main-thread blocking | < 50 ms on mid-tier device |
-| Raw-event admin query p95 | < 1 s |
-| 30-day aggregate query p95 | < 1 s |
-| Process 5,000 events | < 30 s on staging baseline |
-| Frontend LCP on dashboard | < 2.5 s on standard test profile |
-| Frontend CLS | < 0.1 |
+| Operation                              |                  Proposed Target |
+| -------------------------------------- | -------------------------------: |
+| Login API p95                          |                         < 500 ms |
+| Standard authenticated CRUD p95        |                         < 400 ms |
+| Paginated list p95 with realistic data |                         < 700 ms |
+| Public collect API p95                 |                         < 150 ms |
+| Public collect API p99                 |                         < 400 ms |
+| Tracker gzipped bundle                 |                          ≤ 12 KB |
+| Tracker main-thread blocking           |       < 50 ms on mid-tier device |
+| Raw-event admin query p95              |                            < 1 s |
+| 30-day aggregate query p95             |                            < 1 s |
+| Process 5,000 events                   |       < 30 s on staging baseline |
+| Frontend LCP on dashboard              | < 2.5 s on standard test profile |
+| Frontend CLS                           |                            < 0.1 |
 
 ## API Load Profiles
 
@@ -1709,13 +1709,13 @@ Run 4–8 hours:
 
 ## Browser Matrix
 
-| Platform | Browser |
-|---|---|
-| Windows 11 | Chrome, Edge, Firefox |
-| macOS | Safari, Chrome |
-| iOS | Mobile Safari |
-| Android | Chrome |
-| CI | Chromium, Firefox, WebKit |
+| Platform   | Browser                   |
+| ---------- | ------------------------- |
+| Windows 11 | Chrome, Edge, Firefox     |
+| macOS      | Safari, Chrome            |
+| iOS        | Mobile Safari             |
+| Android    | Chrome                    |
+| CI         | Chromium, Firefox, WebKit |
 
 ## Viewport Matrix
 
@@ -2057,25 +2057,25 @@ Merge must be blocked when:
 
 # Known Risks
 
-| Risk | Impact | Required Mitigation/Test |
-|---|---|---|
-| No full repository audit was available for this plan | Route/file mismatch | Reconcile with Swagger and route tree before implementation |
-| Automated E2E was previously deferred | Regressions may be undetected | Implement critical Playwright suite first |
-| In-memory ingestion rate limiter | Incorrect limits in multi-instance deployment | Replace with shared Redis limiter before scaling |
-| In-process analytics scheduler | Duplicate processing across instances | Dedicated worker or distributed lock |
-| Refresh-token concurrency | Multiple refreshes/revocations | Add simultaneous-401 test |
-| Complex role hierarchy | Authorization gaps | Full endpoint × role matrix |
-| Tracker blocked by browser/privacy tools | Missing analytics | Test silent failure and document expected loss |
-| localStorage restrictions | Visitor/session instability | Private-mode and blocked-storage tests |
-| Time-zone/DST calculations | Wrong daily analytics | Fixture tests across DST and local midnight |
-| Late events | Aggregate mismatch | Rebuild and idempotency tests |
-| Large raw-event tables | Slow queries/retention | Explain plans, load tests, partitioning review |
-| Raw event privacy | Accidental sensitive data | Sanitization, logging, and manual privacy audit |
-| Key shown in frontend session storage | Exposure on shared browser | Threat-model and UX review |
-| Production startup path/dependencies | Deployment failure | Build-and-run smoke in CI |
-| Cascade deletes | Unexpected data loss | Raw SQL FK/cascade verification |
-| Polling status every five seconds | Excess API load | Multi-user load test and pause on hidden tab |
-| Manual retention endpoint | Destructive action risk | Role test, confirmation, backup, dry-run consideration |
+| Risk                                                 | Impact                                        | Required Mitigation/Test                                    |
+| ---------------------------------------------------- | --------------------------------------------- | ----------------------------------------------------------- |
+| No full repository audit was available for this plan | Route/file mismatch                           | Reconcile with Swagger and route tree before implementation |
+| Automated E2E was previously deferred                | Regressions may be undetected                 | Implement critical Playwright suite first                   |
+| In-memory ingestion rate limiter                     | Incorrect limits in multi-instance deployment | Replace with shared Redis limiter before scaling            |
+| In-process analytics scheduler                       | Duplicate processing across instances         | Dedicated worker or distributed lock                        |
+| Refresh-token concurrency                            | Multiple refreshes/revocations                | Add simultaneous-401 test                                   |
+| Complex role hierarchy                               | Authorization gaps                            | Full endpoint × role matrix                                 |
+| Tracker blocked by browser/privacy tools             | Missing analytics                             | Test silent failure and document expected loss              |
+| localStorage restrictions                            | Visitor/session instability                   | Private-mode and blocked-storage tests                      |
+| Time-zone/DST calculations                           | Wrong daily analytics                         | Fixture tests across DST and local midnight                 |
+| Late events                                          | Aggregate mismatch                            | Rebuild and idempotency tests                               |
+| Large raw-event tables                               | Slow queries/retention                        | Explain plans, load tests, partitioning review              |
+| Raw event privacy                                    | Accidental sensitive data                     | Sanitization, logging, and manual privacy audit             |
+| Key shown in frontend session storage                | Exposure on shared browser                    | Threat-model and UX review                                  |
+| Production startup path/dependencies                 | Deployment failure                            | Build-and-run smoke in CI                                   |
+| Cascade deletes                                      | Unexpected data loss                          | Raw SQL FK/cascade verification                             |
+| Polling status every five seconds                    | Excess API load                               | Multi-user load test and pause on hidden tab                |
+| Manual retention endpoint                            | Destructive action risk                       | Role test, confirmation, backup, dry-run consideration      |
 
 ---
 
@@ -2085,56 +2085,56 @@ Use the following report after execution.
 
 ## Release Information
 
-| Field | Value |
-|---|---|
-| Release/Commit | |
-| Environment | |
-| Test Start | |
-| Test End | |
-| QA Owner | |
-| Backend Version | |
-| Frontend Version | |
-| Tracker Version | |
-| Database Migration | |
+| Field              | Value |
+| ------------------ | ----- |
+| Release/Commit     |       |
+| Environment        |       |
+| Test Start         |       |
+| Test End           |       |
+| QA Owner           |       |
+| Backend Version    |       |
+| Frontend Version   |       |
+| Tracker Version    |       |
+| Database Migration |       |
 
 ## Execution Summary
 
-| Test Type | Planned | Passed | Failed | Blocked | Not Run |
-|---|---:|---:|---:|---:|---:|
-| Static/build | | | | | |
-| Unit | | | | | |
-| API integration | | | | | |
-| Database | | | | | |
-| Frontend component | | | | | |
-| Browser E2E | | | | | |
-| Tracker | | | | | |
-| Security | | | | | |
-| Performance | | | | | |
-| Accessibility | | | | | |
+| Test Type          | Planned | Passed | Failed | Blocked | Not Run |
+| ------------------ | ------: | -----: | -----: | ------: | ------: |
+| Static/build       |         |        |        |         |         |
+| Unit               |         |        |        |         |         |
+| API integration    |         |        |        |         |         |
+| Database           |         |        |        |         |         |
+| Frontend component |         |        |        |         |         |
+| Browser E2E        |         |        |        |         |         |
+| Tracker            |         |        |        |         |         |
+| Security           |         |        |        |         |         |
+| Performance        |         |        |        |         |         |
+| Accessibility      |         |        |        |         |         |
 
 ## Phase Status
 
-| Phase | Status | Blocking Defects | Notes |
-|---|---|---:|---|
-| Phase 1 | NOT TESTED | | |
-| Phase 2 | NOT TESTED | | |
-| Phase 3 | NOT TESTED | | |
-| Phase 4 | NOT TESTED | | |
-| Phase 5 | NOT TESTED | | |
-| Phase 6 | NOT TESTED | | |
-| Phase 7 | NOT TESTED | | |
-| Phase 8 | NOT TESTED | | |
-| Phase 9 | NOT TESTED | | |
-| Phase 10 | NOT TESTED | | |
+| Phase    | Status     | Blocking Defects | Notes |
+| -------- | ---------- | ---------------: | ----- |
+| Phase 1  | NOT TESTED |                  |       |
+| Phase 2  | NOT TESTED |                  |       |
+| Phase 3  | NOT TESTED |                  |       |
+| Phase 4  | NOT TESTED |                  |       |
+| Phase 5  | NOT TESTED |                  |       |
+| Phase 6  | NOT TESTED |                  |       |
+| Phase 7  | NOT TESTED |                  |       |
+| Phase 8  | NOT TESTED |                  |       |
+| Phase 9  | NOT TESTED |                  |       |
+| Phase 10 | NOT TESTED |                  |       |
 
 ## Defect Summary
 
 | Severity | Open | Closed | Accepted Risk |
-|---|---:|---:|---:|
-| Critical | | | |
-| High | | | |
-| Medium | | | |
-| Low | | | |
+| -------- | ---: | -----: | ------------: |
+| Critical |      |        |               |
+| High     |      |        |               |
+| Medium   |      |        |               |
+| Low      |      |        |               |
 
 ## Security Result
 

@@ -5,76 +5,50 @@ import { fileURLToPath } from 'node:url';
 
 import { build } from 'esbuild';
 
-const currentFile =
-  fileURLToPath(import.meta.url);
+const currentFile = fileURLToPath(import.meta.url);
 
-const scriptsDirectory =
-  dirname(currentFile);
+const scriptsDirectory = dirname(currentFile);
 
-const packageRoot =
-  resolve(scriptsDirectory, '..');
+const packageRoot = resolve(scriptsDirectory, '..');
 
-const entryFile =
-  resolve(packageRoot, 'src', 'tracker.ts');
+const entryFile = resolve(packageRoot, 'src', 'tracker.ts');
 
-const outputDirectory =
-  resolve(packageRoot, 'dist');
+const outputDirectory = resolve(packageRoot, 'dist');
 
-const outputFile =
-  resolve(outputDirectory, 'tracker.js');
+const outputFile = resolve(outputDirectory, 'tracker.js');
 
 if (!existsSync(entryFile)) {
-  throw new Error(
-    `Tracker entry file was not found: ${entryFile}`,
-  );
+  throw new Error(`Tracker entry file was not found: ${entryFile}`);
 }
 
-await mkdir(
-  outputDirectory,
-  {
-    recursive: true,
-  },
-);
+await mkdir(outputDirectory, {
+  recursive: true,
+});
 
 await build({
   absWorkingDir: packageRoot,
 
-  entryPoints: [
-    'src/tracker.ts',
-  ],
+  entryPoints: ['src/tracker.ts'],
 
-  outfile:
-    outputFile,
+  outfile: outputFile,
 
-  bundle:
-    true,
+  bundle: true,
 
-  platform:
-    'browser',
+  platform: 'browser',
 
-  format:
-    'iife',
+  format: 'iife',
 
-  target: [
-    'es2020',
-  ],
+  target: ['es2020'],
 
-  sourcemap:
-    true,
+  sourcemap: true,
 
-  minify:
-    true,
+  minify: true,
 
-  legalComments:
-    'none',
+  legalComments: 'none',
 
-  charset:
-    'utf8',
+  charset: 'utf8',
 
-  logLevel:
-    'info',
+  logLevel: 'info',
 });
 
-console.log(
-  `Tracker built successfully: ${outputFile}`,
-);
+console.log(`Tracker built successfully: ${outputFile}`);

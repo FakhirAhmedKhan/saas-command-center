@@ -1,24 +1,15 @@
-import type {
-  Metadata,
-} from 'next';
+import type { Metadata } from 'next';
 
-import type {
-  ReactNode,
-} from 'react';
+import type { ReactNode } from 'react';
 
-import {
-  Providers,
-} from './providers';
+import { Providers } from './providers';
 
 import './globals.css';
 
-export const metadata:
-  Metadata = {
-  title:
-    'SaaS Command Center',
+export const metadata: Metadata = {
+  title: 'SaaS Command Center',
 
-  description:
-    'Manage applications, analytics, releases, and operational health.',
+  description: 'Manage applications, analytics, releases, and operational health.',
 };
 
 export default function RootLayout({
@@ -29,9 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-slate-50 text-slate-950 antialiased">
-        <Providers>
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

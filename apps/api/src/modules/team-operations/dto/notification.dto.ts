@@ -1,39 +1,17 @@
-import {
-  ApiPropertyOptional,
-} from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
-import {
-  Transform,
-  Type,
-} from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
-import {
-  IsBoolean,
-  IsEnum,
-  IsInt,
-  IsOptional,
-  Max,
-  Min,
-} from 'class-validator';
+import { IsBoolean, IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
 
-import {
-  NotificationType,
-} from '../../../generated/prisma/client';
+import { NotificationType } from '../../../generated/prisma/client';
 
-function parseBoolean(
-  value: unknown,
-): unknown {
-  if (
-    value === true ||
-    value === 'true'
-  ) {
+function parseBoolean(value: unknown): unknown {
+  if (value === true || value === 'true') {
     return true;
   }
 
-  if (
-    value === false ||
-    value === 'false'
-  ) {
+  if (value === false || value === 'false') {
     return false;
   }
 
@@ -43,10 +21,7 @@ function parseBoolean(
 export class NotificationListQueryDto {
   @ApiPropertyOptional()
   @IsOptional()
-  @Transform(
-    ({ value }: { value: unknown }) =>
-      parseBoolean(value),
-  )
+  @Transform(({ value }: { value: unknown }) => parseBoolean(value))
   @IsBoolean()
   unreadOnly?: boolean;
 

@@ -1,62 +1,42 @@
 ﻿const fs = require('node:fs');
 const path = require('node:path');
 
-const buildScript = path.join(
-  process.cwd(),
-  'apps/tracker/scripts/build.mjs',
-);
+const buildScript = path.join(process.cwd(), 'apps/tracker/scripts/build.mjs');
 
 if (!fs.existsSync(buildScript)) {
-  throw new Error(
-    `Build script not found: ${buildScript}`,
-  );
+  throw new Error(`Build script not found: ${buildScript}`);
 }
 
-const backupPath =
-  `${buildScript}.windows-path-backup`;
+const backupPath = `${buildScript}.windows-path-backup`;
 
 if (!fs.existsSync(backupPath)) {
-  fs.copyFileSync(
-    buildScript,
-    backupPath,
-  );
+  fs.copyFileSync(buildScript, backupPath);
 
-  console.log(
-    `Backup created: ${backupPath}`,
-  );
+  console.log(`Backup created: ${backupPath}`);
 }
 
-let content =
-  fs.readFileSync(
-    buildScript,
-    'utf8',
-  );
+let content = fs.readFileSync(buildScript, 'utf8');
 
 /*
  * Add fileURLToPath import.
  */
-const nodeUrlImport =
-  /import\s*\{([^}]*)\}\s*from\s*['"]node:url['"];?/m;
+const nodeUrlImport = /import\s*\{([^}]*)\}\s*from\s*['"]node:url['"];?/m;
 
 if (nodeUrlImport.test(content)) {
-  content = content.replace(
-    nodeUrlImport,
-    (fullMatch, imports) => {
-      if (
-        imports
-          .split(',')
-          .map((item) => item.trim())
-          .includes('fileURLToPath')
-      ) {
-        return fullMatch;
-      }
+  content = content.replace(nodeUrlImport, (fullMatch, imports) => {
+    if (
+      imports
+        .split(',')
+        .map((item) => item.trim())
+        .includes('fileURLToPath')
+    ) {
+      return fullMatch;
+    }
 
-      return `import { ${imports.trim()}, fileURLToPath } from 'node:url';`;
-    },
-  );
+    return `import { ${imports.trim()}, fileURLToPath } from 'node:url';`;
+  });
 } else {
-  content =
-    `import { fileURLToPath } from 'node:url';\n${content}`;
+  content = `import { fileURLToPath } from 'node:url';\n${content}`;
 }
 
 /*
@@ -82,14 +62,11 @@ content = content.replace(
  *
  * new URL(import.meta.url).pathname
  */
-content = content.replace(
-  /new\s+URL\(\s*import\.meta\.url\s*\)\.pathname/g,
-  () => {
-    replacements += 1;
+content = content.replace(/new\s+URL\(\s*import\.meta\.url\s*\)\.pathname/g, () => {
+  replacements += 1;
 
-    return 'fileURLToPath(import.meta.url)';
-  },
-);
+  return 'fileURLToPath(import.meta.url)';
+});
 
 /*
  * Fix:
@@ -98,39 +75,24 @@ content = content.replace(
  *
  * This is uncommon, but included for safety.
  */
-content = content.replace(
-  /import\.meta\.url\.pathname/g,
-  () => {
-    replacements += 1;
+content = content.replace(/import\.meta\.url\.pathname/g, () => {
+  replacements += 1;
 
-    return 'fileURLToPath(import.meta.url)';
-  },
-);
+  return 'fileURLToPath(import.meta.url)';
+});
 
 if (replacements === 0) {
   console.log('');
-  console.log(
-    'No direct URL pathname pattern was found.',
-  );
-  console.log(
-    'Showing the current build script:',
-  );
+  console.log('No direct URL pathname pattern was found.');
+  console.log('Showing the current build script:');
   console.log('');
   console.log(content);
 
   process.exitCode = 2;
 } else {
-  fs.writeFileSync(
-    buildScript,
-    content,
-    'utf8',
-  );
+  fs.writeFileSync(buildScript, content, 'utf8');
 
-  console.log(
-    `Fixed ${replacements} Windows path conversion occurrence(s).`,
-  );
+  console.log(`Fixed ${replacements} Windows path conversion occurrence(s).`);
 
-  console.log(
-    `Updated: ${buildScript}`,
-  );
+  console.log(`Updated: ${buildScript}`);
 }

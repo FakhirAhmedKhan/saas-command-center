@@ -1,30 +1,18 @@
-import type {
-  Page,
-  Route,
-} from '@playwright/test';
+import type { Page, Route } from '@playwright/test';
 
-export const API_BASE_URL =
-  'http://localhost:4000/api/v1';
+export const API_BASE_URL = 'http://localhost:4000/api/v1';
 
-export const PRIMARY_WORKSPACE_ID =
-  '11111111-1111-4111-8111-111111111111';
+export const PRIMARY_WORKSPACE_ID = '11111111-1111-4111-8111-111111111111';
 
-export const SECONDARY_WORKSPACE_ID =
-  '22222222-2222-4222-8222-222222222222';
+export const SECONDARY_WORKSPACE_ID = '22222222-2222-4222-8222-222222222222';
 
-export const APPLICATION_ID =
-  '33333333-3333-4333-8333-333333333333';
+export const APPLICATION_ID = '33333333-3333-4333-8333-333333333333';
 
-export const WEBSITE_ID =
-  '44444444-4444-4444-8444-444444444444';
+export const WEBSITE_ID = '44444444-4444-4444-8444-444444444444';
 
 const NOW = '2026-08-07T00:00:00.000Z';
 
-export type WorkspaceRole =
-  | 'OWNER'
-  | 'ADMIN'
-  | 'DEVELOPER'
-  | 'VIEWER';
+export type WorkspaceRole = 'OWNER' | 'ADMIN' | 'DEVELOPER' | 'VIEWER';
 
 export interface MockWorkspace {
   id: string;
@@ -50,27 +38,9 @@ export interface MockApplication {
   slug: string;
   shortDescription: string | null;
   longDescription: string | null;
-  category:
-    | 'SAAS'
-    | 'AI'
-    | 'MOBILE'
-    | 'ECOMMERCE'
-    | 'API'
-    | 'INTERNAL_TOOL'
-    | 'OTHER';
-  status:
-    | 'IDEA'
-    | 'PLANNING'
-    | 'IN_DEVELOPMENT'
-    | 'TESTING'
-    | 'LIVE'
-    | 'MAINTENANCE'
-    | 'PAUSED';
-  priority:
-    | 'LOW'
-    | 'MEDIUM'
-    | 'HIGH'
-    | 'CRITICAL';
+  category: 'SAAS' | 'AI' | 'MOBILE' | 'ECOMMERCE' | 'API' | 'INTERNAL_TOOL' | 'OTHER';
+  status: 'IDEA' | 'PLANNING' | 'IN_DEVELOPMENT' | 'TESTING' | 'LIVE' | 'MAINTENANCE' | 'PAUSED';
+  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   startedAt: string | null;
   targetLaunchAt: string | null;
   launchedAt: string | null;
@@ -82,14 +52,7 @@ export interface MockApplication {
     id: string;
     applicationId: string;
     name: string;
-    type:
-      | 'FRONTEND'
-      | 'BACKEND'
-      | 'DATABASE'
-      | 'MOBILE'
-      | 'AI'
-      | 'INFRASTRUCTURE'
-      | 'OTHER';
+    type: 'FRONTEND' | 'BACKEND' | 'DATABASE' | 'MOBILE' | 'AI' | 'INFRASTRUCTURE' | 'OTHER';
     version: string | null;
     createdAt: string;
     updatedAt: string;
@@ -98,14 +61,7 @@ export interface MockApplication {
     id: string;
     applicationId: string;
     label: string;
-    type:
-      | 'PRODUCTION'
-      | 'STAGING'
-      | 'REPOSITORY'
-      | 'DOCUMENTATION'
-      | 'DESIGN'
-      | 'API'
-      | 'OTHER';
+    type: 'PRODUCTION' | 'STAGING' | 'REPOSITORY' | 'DOCUMENTATION' | 'DESIGN' | 'API' | 'OTHER';
     url: string;
     createdAt: string;
     updatedAt: string;
@@ -171,15 +127,12 @@ export interface MockApiState {
   trackingKey: string;
 }
 
-export function makeWorkspace(
-  overrides: Partial<MockWorkspace> = {},
-): MockWorkspace {
+export function makeWorkspace(overrides: Partial<MockWorkspace> = {}): MockWorkspace {
   return {
     id: PRIMARY_WORKSPACE_ID,
     name: 'Command Center Team',
     slug: 'command-center-team',
-    ownerId:
-      'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+    ownerId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
     createdAt: NOW,
     updatedAt: NOW,
     deletedAt: null,
@@ -196,24 +149,19 @@ export function makeWorkspace(
   };
 }
 
-export function makeApplication(
-  overrides: Partial<MockApplication> = {},
-): MockApplication {
+export function makeApplication(overrides: Partial<MockApplication> = {}): MockApplication {
   return {
     id: APPLICATION_ID,
     workspaceId: PRIMARY_WORKSPACE_ID,
     name: 'PriceScout AI',
     slug: 'pricescout-ai',
-    shortDescription:
-      'AI-powered product price comparison.',
-    longDescription:
-      'Compare product prices across multiple providers.',
+    shortDescription: 'AI-powered product price comparison.',
+    longDescription: 'Compare product prices across multiple providers.',
     category: 'AI',
     status: 'IN_DEVELOPMENT',
     priority: 'HIGH',
     startedAt: '2026-07-01T00:00:00.000Z',
-    targetLaunchAt:
-      '2026-09-01T00:00:00.000Z',
+    targetLaunchAt: '2026-09-01T00:00:00.000Z',
     launchedAt: null,
     lastActivityAt: NOW,
     archivedAt: null,
@@ -221,8 +169,7 @@ export function makeApplication(
     updatedAt: NOW,
     technologies: [
       {
-        id:
-          '55555555-5555-4555-8555-555555555555',
+        id: '55555555-5555-4555-8555-555555555555',
         applicationId: APPLICATION_ID,
         name: 'Next.js',
         type: 'FRONTEND',
@@ -241,9 +188,7 @@ export function makeApplication(
   };
 }
 
-export function makeWebsite(
-  overrides: Partial<MockWebsite> = {},
-): MockWebsite {
+export function makeWebsite(overrides: Partial<MockWebsite> = {}): MockWebsite {
   return {
     id: WEBSITE_ID,
     workspaceId: PRIMARY_WORKSPACE_ID,
@@ -252,10 +197,7 @@ export function makeWebsite(
     domain: 'command-center.example.com',
     timeZone: 'Asia/Dubai',
     enabled: true,
-    allowedOrigins: [
-      'https://command-center.example.com',
-      'http://localhost:3000',
-    ],
+    allowedOrigins: ['https://command-center.example.com', 'http://localhost:3000'],
     trackingKeyPrefix: 'cc_live_ab12',
     trackingKeyRotatedAt: NOW,
     lastEventAt: NOW,
@@ -294,33 +236,18 @@ export async function installMockApi(
   });
 
   const state: MockApiState = {
-    authenticated:
-      options.authenticated ?? true,
+    authenticated: options.authenticated ?? true,
     requests: [],
-    workspaces:
-      options.workspaces ?? [
-        primaryWorkspace,
-        secondaryWorkspace,
-      ],
-    applications:
-      options.applications ?? [
-        makeApplication(),
-      ],
-    websites:
-      options.websites ?? [
-        makeWebsite(),
-      ],
-    trackingKey:
-      'cc_live_abcdefghijklmnopqrstuvwxyz123456',
+    workspaces: options.workspaces ?? [primaryWorkspace, secondaryWorkspace],
+    applications: options.applications ?? [makeApplication()],
+    websites: options.websites ?? [makeWebsite()],
+    trackingKey: 'cc_live_abcdefghijklmnopqrstuvwxyz123456',
   };
 
   const user = {
-    id:
-      'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
-    email:
-      options.email ?? 'owner@example.com',
-    displayName:
-      options.displayName ?? 'Frontend Owner',
+    id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+    email: options.email ?? 'owner@example.com',
+    displayName: options.displayName ?? 'Frontend Owner',
     isActive: true,
     emailVerifiedAt: NOW,
     lastLoginAt: NOW,
@@ -337,651 +264,382 @@ export async function installMockApi(
     workspaces: state.workspaces,
   });
 
-  await page.route(
-    `${API_BASE_URL}/**`,
-    async (route) => {
-      const request = route.request();
-      const method = request.method();
-      const url = new URL(request.url());
-      const path = url.pathname.replace(
-        '/api/v1',
-        '',
-      );
+  await page.route(`${API_BASE_URL}/**`, async (route) => {
+    const request = route.request();
+    const method = request.method();
+    const url = new URL(request.url());
+    const path = url.pathname.replace('/api/v1', '');
 
-      if (method === 'OPTIONS') {
-        await route.fulfill({
-          status: 204,
-          headers: corsHeaders(),
-        });
-        return;
-      }
-
-      const body = readRequestBody(request.postData());
-
-      state.requests.push({
-        method,
-        path,
-        search: url.search,
-        body,
+    if (method === 'OPTIONS') {
+      await route.fulfill({
+        status: 204,
+        headers: corsHeaders(),
       });
+      return;
+    }
 
-      const failure =
-        options.failures?.[
-          `${method} ${path}`
-        ];
+    const body = readRequestBody(request.postData());
 
-      if (failure) {
-        await fulfillJson(
-          route,
-          failure.status,
-          {
-            statusCode: failure.status,
-            message: failure.message,
-            error: 'Mock API error',
-          },
-        );
-        return;
-      }
+    state.requests.push({
+      method,
+      path,
+      search: url.search,
+      body,
+    });
 
-      if (
-        method === 'POST' &&
-        path === '/auth/refresh'
-      ) {
-        if (!state.authenticated) {
-          await fulfillJson(route, 401, {
-            statusCode: 401,
-            message: 'Unauthorized',
-          });
-          return;
-        }
+    const failure = options.failures?.[`${method} ${path}`];
 
-        await fulfillJson(
-          route,
-          200,
-          authResponse(),
-        );
-        return;
-      }
+    if (failure) {
+      await fulfillJson(route, failure.status, {
+        statusCode: failure.status,
+        message: failure.message,
+        error: 'Mock API error',
+      });
+      return;
+    }
 
-      if (
-        method === 'POST' &&
-        (
-          path === '/auth/login' ||
-          path === '/auth/register'
-        )
-      ) {
-        state.authenticated = true;
-        await fulfillJson(
-          route,
-          path === '/auth/register'
-            ? 201
-            : 200,
-          authResponse(),
-        );
-        return;
-      }
-
-      if (
-        method === 'POST' &&
-        (
-          path === '/auth/logout' ||
-          path === '/auth/logout-all'
-        )
-      ) {
-        state.authenticated = false;
-        await route.fulfill({
-          status: 204,
-          headers: corsHeaders(),
+    if (method === 'POST' && path === '/auth/refresh') {
+      if (!state.authenticated) {
+        await fulfillJson(route, 401, {
+          statusCode: 401,
+          message: 'Unauthorized',
         });
         return;
       }
 
-      if (
-        method === 'GET' &&
-        path === '/auth/me'
-      ) {
-        await fulfillJson(route, 200, {
-          user,
-          workspaces: state.workspaces.map(
-            (workspace) => ({
-              ...workspace,
-              role:
-                workspace.members[0]?.role ??
-                'VIEWER',
-            }),
-          ),
-        });
-        return;
-      }
+      await fulfillJson(route, 200, authResponse());
+      return;
+    }
 
-      const workspaceCollection =
-        path.match(/^\/workspaces$/);
+    if (method === 'POST' && (path === '/auth/login' || path === '/auth/register')) {
+      state.authenticated = true;
+      await fulfillJson(route, path === '/auth/register' ? 201 : 200, authResponse());
+      return;
+    }
 
-      if (
-        workspaceCollection &&
-        method === 'POST'
-      ) {
-        const payload = asRecord(body);
-        const name = readString(
-          payload,
-          'name',
-          'New Workspace',
-        );
-        const slug = readString(
-          payload,
-          'slug',
-          slugify(name),
-        );
-        const workspace = makeWorkspace({
-          id:
-            '99999999-9999-4999-8999-999999999999',
-          name,
-          slug,
-          members: [
-            {
-              role: 'OWNER',
-            },
-          ],
-          _count: {
-            members: 1,
-            saasApplications: 0,
-          },
-        });
+    if (method === 'POST' && (path === '/auth/logout' || path === '/auth/logout-all')) {
+      state.authenticated = false;
+      await route.fulfill({
+        status: 204,
+        headers: corsHeaders(),
+      });
+      return;
+    }
 
-        state.workspaces.push(workspace);
-
-        await fulfillJson(route, 201, {
+    if (method === 'GET' && path === '/auth/me') {
+      await fulfillJson(route, 200, {
+        user,
+        workspaces: state.workspaces.map((workspace) => ({
           ...workspace,
-          members: [
-            {
-              id:
-                '99999999-9999-4999-8999-000000000001',
-              userId: user.id,
-              role: 'OWNER',
-              joinedAt: NOW,
-            },
-          ],
+          role: workspace.members[0]?.role ?? 'VIEWER',
+        })),
+      });
+      return;
+    }
+
+    const workspaceCollection = path.match(/^\/workspaces$/);
+
+    if (workspaceCollection && method === 'POST') {
+      const payload = asRecord(body);
+      const name = readString(payload, 'name', 'New Workspace');
+      const slug = readString(payload, 'slug', slugify(name));
+      const workspace = makeWorkspace({
+        id: '99999999-9999-4999-8999-999999999999',
+        name,
+        slug,
+        members: [
+          {
+            role: 'OWNER',
+          },
+        ],
+        _count: {
+          members: 1,
+          saasApplications: 0,
+        },
+      });
+
+      state.workspaces.push(workspace);
+
+      await fulfillJson(route, 201, {
+        ...workspace,
+        members: [
+          {
+            id: '99999999-9999-4999-8999-000000000001',
+            userId: user.id,
+            role: 'OWNER',
+            joinedAt: NOW,
+          },
+        ],
+      });
+      return;
+    }
+
+    const workspaceMatch = path.match(/^\/workspaces\/([^/]+)$/);
+
+    if (workspaceMatch) {
+      const workspaceId = workspaceMatch[1];
+      const workspace = state.workspaces.find((item) => item.id === workspaceId);
+
+      if (!workspace) {
+        await fulfillJson(route, 404, {
+          statusCode: 404,
+          message: 'Workspace not found',
         });
         return;
       }
 
-      const workspaceMatch =
-        path.match(
-          /^\/workspaces\/([^/]+)$/,
-        );
-
-      if (workspaceMatch) {
-        const workspaceId = workspaceMatch[1];
-        const workspace =
-          state.workspaces.find(
-            (item) =>
-              item.id === workspaceId,
-          );
-
-        if (!workspace) {
-          await fulfillJson(route, 404, {
-            statusCode: 404,
-            message: 'Workspace not found',
-          });
-          return;
-        }
-
-        if (method === 'GET') {
-          await fulfillJson(
-            route,
-            200,
-            workspace,
-          );
-          return;
-        }
-
-        if (method === 'PATCH') {
-          const payload = asRecord(body);
-          const nextName = readOptionalString(
-            payload,
-            'name',
-          );
-          const nextSlug = readOptionalString(
-            payload,
-            'slug',
-          );
-
-          if (nextName) {
-            workspace.name = nextName;
-          }
-
-          if (nextSlug) {
-            workspace.slug = nextSlug;
-          }
-
-          workspace.updatedAt = NOW;
-
-          await fulfillJson(
-            route,
-            200,
-            workspace,
-          );
-          return;
-        }
-      }
-
-      const applicationsCollection =
-        path.match(
-          /^\/workspaces\/([^/]+)\/applications$/,
-        );
-
-      if (applicationsCollection) {
-        const workspaceId =
-          applicationsCollection[1];
-
-        if (method === 'GET') {
-          const search =
-            url.searchParams.get('search')
-              ?.toLowerCase() ?? '';
-          const status =
-            url.searchParams.get('status');
-          const priority =
-            url.searchParams.get('priority');
-          const category =
-            url.searchParams.get('category');
-          const archived =
-            url.searchParams.get('archived') ===
-            'true';
-
-          const filtered =
-            state.applications.filter(
-              (application) =>
-                application.workspaceId ===
-                  workspaceId &&
-                (
-                  !search ||
-                  application.name
-                    .toLowerCase()
-                    .includes(search)
-                ) &&
-                (
-                  !status ||
-                  application.status ===
-                    status
-                ) &&
-                (
-                  !priority ||
-                  application.priority ===
-                    priority
-                ) &&
-                (
-                  !category ||
-                  application.category ===
-                    category
-                ) &&
-                Boolean(
-                  application.archivedAt,
-                ) === archived,
-            );
-
-          await fulfillJson(route, 200, {
-            data: filtered,
-            meta: pagination(filtered.length),
-          });
-          return;
-        }
-
-        if (method === 'POST') {
-          const payload = asRecord(body);
-          const name = readString(
-            payload,
-            'name',
-            'New Application',
-          );
-          const application = makeApplication({
-            id:
-              '77777777-7777-4777-8777-777777777777',
-            workspaceId,
-            name,
-            slug: readString(
-              payload,
-              'slug',
-              slugify(name),
-            ),
-            shortDescription:
-              readNullableString(
-                payload,
-                'shortDescription',
-              ),
-            longDescription:
-              readNullableString(
-                payload,
-                'longDescription',
-              ),
-            category: readEnum(
-              payload,
-              'category',
-              'SAAS',
-            ),
-            status: readEnum(
-              payload,
-              'status',
-              'IDEA',
-            ),
-            priority: readEnum(
-              payload,
-              'priority',
-              'MEDIUM',
-            ),
-            startedAt: readNullableString(
-              payload,
-              'startedAt',
-            ),
-            targetLaunchAt:
-              readNullableString(
-                payload,
-                'targetLaunchAt',
-              ),
-            launchedAt: readNullableString(
-              payload,
-              'launchedAt',
-            ),
-            technologies: [],
-            links: [],
-            _count: {
-              technologies: 0,
-              links: 0,
-              activities: 0,
-            },
-          });
-
-          state.applications.push(application);
-          await fulfillJson(
-            route,
-            201,
-            application,
-          );
-          return;
-        }
-      }
-
-      const applicationMatch =
-        path.match(
-          /^\/workspaces\/([^/]+)\/applications\/([^/]+)$/,
-        );
-
-      if (
-        applicationMatch &&
-        method === 'GET'
-      ) {
-        const application =
-          state.applications.find(
-            (item) =>
-              item.workspaceId ===
-                applicationMatch[1] &&
-              item.id === applicationMatch[2],
-          );
-
-        if (!application) {
-          await fulfillJson(route, 404, {
-            statusCode: 404,
-            message: 'Application not found',
-          });
-          return;
-        }
-
-        await fulfillJson(
-          route,
-          200,
-          application,
-        );
+      if (method === 'GET') {
+        await fulfillJson(route, 200, workspace);
         return;
       }
 
-      const websiteCollection =
-        path.match(
-          /^\/workspaces\/([^/]+)\/websites$/,
-        );
+      if (method === 'PATCH') {
+        const payload = asRecord(body);
+        const nextName = readOptionalString(payload, 'name');
+        const nextSlug = readOptionalString(payload, 'slug');
 
-      if (websiteCollection) {
-        const workspaceId =
-          websiteCollection[1];
-
-        if (method === 'GET') {
-          const search =
-            url.searchParams.get('search')
-              ?.toLowerCase() ?? '';
-          const archived =
-            url.searchParams.get('archived') ===
-            'true';
-          const enabledValue =
-            url.searchParams.get('enabled');
-          const connectedValue =
-            url.searchParams.get('connected');
-
-          const filtered =
-            state.websites.filter(
-              (website) =>
-                website.workspaceId ===
-                  workspaceId &&
-                (
-                  !search ||
-                  website.name
-                    .toLowerCase()
-                    .includes(search) ||
-                  website.domain
-                    .toLowerCase()
-                    .includes(search)
-                ) &&
-                Boolean(website.archivedAt) ===
-                  archived &&
-                (
-                  enabledValue === null ||
-                  website.enabled ===
-                    (enabledValue === 'true')
-                ) &&
-                (
-                  connectedValue === null ||
-                  Boolean(
-                    website.applicationId,
-                  ) ===
-                    (connectedValue === 'true')
-                ),
-            );
-
-          await fulfillJson(route, 200, {
-            data: filtered,
-            meta: pagination(filtered.length),
-          });
-          return;
+        if (nextName) {
+          workspace.name = nextName;
         }
 
-        if (method === 'POST') {
-          const payload = asRecord(body);
-          const applicationId =
-            readNullableString(
-              payload,
-              'applicationId',
-            );
-          const application =
-            state.applications.find(
-              (item) =>
-                item.id === applicationId,
-            );
-          const website = makeWebsite({
-            id:
-              '88888888-8888-4888-8888-888888888888',
-            workspaceId,
-            name: readString(
-              payload,
-              'name',
-              'New Website',
-            ),
-            domain: readString(
-              payload,
-              'domain',
-              'example.com',
-            ),
-            timeZone: readString(
-              payload,
-              'timeZone',
-              'UTC',
-            ),
-            enabled: readBoolean(
-              payload,
-              'enabled',
-              true,
-            ),
-            allowedOrigins:
-              readStringArray(
-                payload,
-                'allowedOrigins',
-              ),
-            applicationId,
-            application: application
-              ? {
-                  id: application.id,
-                  name: application.name,
-                  slug: application.slug,
-                  archivedAt:
-                    application.archivedAt,
-                }
-              : null,
-          });
-
-          state.websites.push(website);
-          await fulfillJson(route, 201, {
-            website,
-            trackingKey: state.trackingKey,
-          });
-          return;
-        }
-      }
-
-      const websiteMatch =
-        path.match(
-          /^\/workspaces\/([^/]+)\/websites\/([^/]+)$/,
-        );
-
-      if (
-        websiteMatch &&
-        method === 'GET'
-      ) {
-        const website = state.websites.find(
-          (item) =>
-            item.workspaceId ===
-              websiteMatch[1] &&
-            item.id === websiteMatch[2],
-        );
-
-        if (!website) {
-          await fulfillJson(route, 404, {
-            statusCode: 404,
-            message: 'Website not found',
-          });
-          return;
+        if (nextSlug) {
+          workspace.slug = nextSlug;
         }
 
-        await fulfillJson(
-          route,
-          200,
-          website,
-        );
+        workspace.updatedAt = NOW;
+
+        await fulfillJson(route, 200, workspace);
         return;
       }
+    }
 
-      const trackingStatusMatch =
-        path.match(
-          /^\/workspaces\/([^/]+)\/websites\/([^/]+)\/tracking\/status$/,
-        );
+    const applicationsCollection = path.match(/^\/workspaces\/([^/]+)\/applications$/);
 
-      if (
-        trackingStatusMatch &&
-        method === 'GET'
-      ) {
-        const website = state.websites.find(
-          (item) =>
-            item.id ===
-            trackingStatusMatch[2],
+    if (applicationsCollection) {
+      const workspaceId = applicationsCollection[1];
+
+      if (method === 'GET') {
+        const search = url.searchParams.get('search')?.toLowerCase() ?? '';
+        const status = url.searchParams.get('status');
+        const priority = url.searchParams.get('priority');
+        const category = url.searchParams.get('category');
+        const archived = url.searchParams.get('archived') === 'true';
+
+        const filtered = state.applications.filter(
+          (application) =>
+            application.workspaceId === workspaceId &&
+            (!search || application.name.toLowerCase().includes(search)) &&
+            (!status || application.status === status) &&
+            (!priority || application.priority === priority) &&
+            (!category || application.category === category) &&
+            Boolean(application.archivedAt) === archived,
         );
 
         await fulfillJson(route, 200, {
-          website: {
-            id: website?.id ?? WEBSITE_ID,
-            name:
-              website?.name ?? 'Website',
-            domain:
-              website?.domain ?? 'example.com',
-            enabled:
-              website?.enabled ?? true,
-            lastEventAt:
-              website?.lastEventAt ?? NOW,
-          },
-          connected: true,
-          totalEvents: 14,
-          counts: {
-            PAGE_VIEW: 7,
-            HEARTBEAT: 5,
-            CUSTOM: 2,
-          },
+          data: filtered,
+          meta: pagination(filtered.length),
         });
         return;
       }
 
-      const applicationActivityMatch =
-        path.match(
-          /^\/workspaces\/([^/]+)\/applications\/([^/]+)\/activities$/,
-        );
-
-      if (
-        applicationActivityMatch &&
-        method === 'GET'
-      ) {
-        await fulfillJson(route, 200, {
-          data: [],
-          meta: pagination(0),
+      if (method === 'POST') {
+        const payload = asRecord(body);
+        const name = readString(payload, 'name', 'New Application');
+        const application = makeApplication({
+          id: '77777777-7777-4777-8777-777777777777',
+          workspaceId,
+          name,
+          slug: readString(payload, 'slug', slugify(name)),
+          shortDescription: readNullableString(payload, 'shortDescription'),
+          longDescription: readNullableString(payload, 'longDescription'),
+          category: readEnum(payload, 'category', 'SAAS'),
+          status: readEnum(payload, 'status', 'IDEA'),
+          priority: readEnum(payload, 'priority', 'MEDIUM'),
+          startedAt: readNullableString(payload, 'startedAt'),
+          targetLaunchAt: readNullableString(payload, 'targetLaunchAt'),
+          launchedAt: readNullableString(payload, 'launchedAt'),
+          technologies: [],
+          links: [],
+          _count: {
+            technologies: 0,
+            links: 0,
+            activities: 0,
+          },
         });
+
+        state.applications.push(application);
+        await fulfillJson(route, 201, application);
         return;
       }
+    }
 
-      const activityMatch = path.match(
-        /^\/workspaces\/([^/]+)\/activities$/,
+    const applicationMatch = path.match(/^\/workspaces\/([^/]+)\/applications\/([^/]+)$/);
+
+    if (applicationMatch && method === 'GET') {
+      const application = state.applications.find(
+        (item) => item.workspaceId === applicationMatch[1] && item.id === applicationMatch[2],
       );
 
-      if (
-        activityMatch &&
-        method === 'GET'
-      ) {
-        await fulfillJson(route, 200, {
-          data: [],
-          meta: pagination(0),
+      if (!application) {
+        await fulfillJson(route, 404, {
+          statusCode: 404,
+          message: 'Application not found',
         });
         return;
       }
 
-      await fulfillJson(route, 404, {
-        statusCode: 404,
-        message: `No mock for ${method} ${path}`,
+      await fulfillJson(route, 200, application);
+      return;
+    }
+
+    const websiteCollection = path.match(/^\/workspaces\/([^/]+)\/websites$/);
+
+    if (websiteCollection) {
+      const workspaceId = websiteCollection[1];
+
+      if (method === 'GET') {
+        const search = url.searchParams.get('search')?.toLowerCase() ?? '';
+        const archived = url.searchParams.get('archived') === 'true';
+        const enabledValue = url.searchParams.get('enabled');
+        const connectedValue = url.searchParams.get('connected');
+
+        const filtered = state.websites.filter(
+          (website) =>
+            website.workspaceId === workspaceId &&
+            (!search ||
+              website.name.toLowerCase().includes(search) ||
+              website.domain.toLowerCase().includes(search)) &&
+            Boolean(website.archivedAt) === archived &&
+            (enabledValue === null || website.enabled === (enabledValue === 'true')) &&
+            (connectedValue === null ||
+              Boolean(website.applicationId) === (connectedValue === 'true')),
+        );
+
+        await fulfillJson(route, 200, {
+          data: filtered,
+          meta: pagination(filtered.length),
+        });
+        return;
+      }
+
+      if (method === 'POST') {
+        const payload = asRecord(body);
+        const applicationId = readNullableString(payload, 'applicationId');
+        const application = state.applications.find((item) => item.id === applicationId);
+        const website = makeWebsite({
+          id: '88888888-8888-4888-8888-888888888888',
+          workspaceId,
+          name: readString(payload, 'name', 'New Website'),
+          domain: readString(payload, 'domain', 'example.com'),
+          timeZone: readString(payload, 'timeZone', 'UTC'),
+          enabled: readBoolean(payload, 'enabled', true),
+          allowedOrigins: readStringArray(payload, 'allowedOrigins'),
+          applicationId,
+          application: application
+            ? {
+                id: application.id,
+                name: application.name,
+                slug: application.slug,
+                archivedAt: application.archivedAt,
+              }
+            : null,
+        });
+
+        state.websites.push(website);
+        await fulfillJson(route, 201, {
+          website,
+          trackingKey: state.trackingKey,
+        });
+        return;
+      }
+    }
+
+    const websiteMatch = path.match(/^\/workspaces\/([^/]+)\/websites\/([^/]+)$/);
+
+    if (websiteMatch && method === 'GET') {
+      const website = state.websites.find(
+        (item) => item.workspaceId === websiteMatch[1] && item.id === websiteMatch[2],
+      );
+
+      if (!website) {
+        await fulfillJson(route, 404, {
+          statusCode: 404,
+          message: 'Website not found',
+        });
+        return;
+      }
+
+      await fulfillJson(route, 200, website);
+      return;
+    }
+
+    const trackingStatusMatch = path.match(
+      /^\/workspaces\/([^/]+)\/websites\/([^/]+)\/tracking\/status$/,
+    );
+
+    if (trackingStatusMatch && method === 'GET') {
+      const website = state.websites.find((item) => item.id === trackingStatusMatch[2]);
+
+      await fulfillJson(route, 200, {
+        website: {
+          id: website?.id ?? WEBSITE_ID,
+          name: website?.name ?? 'Website',
+          domain: website?.domain ?? 'example.com',
+          enabled: website?.enabled ?? true,
+          lastEventAt: website?.lastEventAt ?? NOW,
+        },
+        connected: true,
+        totalEvents: 14,
+        counts: {
+          PAGE_VIEW: 7,
+          HEARTBEAT: 5,
+          CUSTOM: 2,
+        },
       });
-    },
-  );
+      return;
+    }
+
+    const applicationActivityMatch = path.match(
+      /^\/workspaces\/([^/]+)\/applications\/([^/]+)\/activities$/,
+    );
+
+    if (applicationActivityMatch && method === 'GET') {
+      await fulfillJson(route, 200, {
+        data: [],
+        meta: pagination(0),
+      });
+      return;
+    }
+
+    const activityMatch = path.match(/^\/workspaces\/([^/]+)\/activities$/);
+
+    if (activityMatch && method === 'GET') {
+      await fulfillJson(route, 200, {
+        data: [],
+        meta: pagination(0),
+      });
+      return;
+    }
+
+    await fulfillJson(route, 404, {
+      statusCode: 404,
+      message: `No mock for ${method} ${path}`,
+    });
+  });
 
   return state;
 }
 
 function corsHeaders(): Record<string, string> {
   return {
-    'Access-Control-Allow-Origin':
-      'http://localhost:3000',
-    'Access-Control-Allow-Credentials':
-      'true',
-    'Access-Control-Allow-Headers':
-      'Authorization, Content-Type',
-    'Access-Control-Allow-Methods':
-      'GET, POST, PATCH, DELETE, OPTIONS',
+    'Access-Control-Allow-Origin': 'http://localhost:3000',
+    'Access-Control-Allow-Credentials': 'true',
+    'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+    'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
   };
 }
 
-async function fulfillJson(
-  route: Route,
-  status: number,
-  body: unknown,
-): Promise<void> {
+async function fulfillJson(route: Route, status: number, body: unknown): Promise<void> {
   await route.fulfill({
     status,
     contentType: 'application/json',
@@ -990,9 +648,7 @@ async function fulfillJson(
   });
 }
 
-function readRequestBody(
-  raw: string | null,
-): unknown {
+function readRequestBody(raw: string | null): unknown {
   if (!raw) {
     return undefined;
   }
@@ -1004,88 +660,46 @@ function readRequestBody(
   }
 }
 
-function asRecord(
-  value: unknown,
-): Record<string, unknown> {
-  if (
-    typeof value === 'object' &&
-    value !== null &&
-    !Array.isArray(value)
-  ) {
+function asRecord(value: unknown): Record<string, unknown> {
+  if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
     return value as Record<string, unknown>;
   }
 
   return {};
 }
 
-function readString(
-  record: Record<string, unknown>,
-  key: string,
-  fallback: string,
-): string {
+function readString(record: Record<string, unknown>, key: string, fallback: string): string {
   const value = record[key];
-  return typeof value === 'string' &&
-    value.length > 0
-    ? value
-    : fallback;
+  return typeof value === 'string' && value.length > 0 ? value : fallback;
 }
 
-function readOptionalString(
-  record: Record<string, unknown>,
-  key: string,
-): string | undefined {
+function readOptionalString(record: Record<string, unknown>, key: string): string | undefined {
   const value = record[key];
-  return typeof value === 'string' &&
-    value.length > 0
-    ? value
-    : undefined;
+  return typeof value === 'string' && value.length > 0 ? value : undefined;
 }
 
-function readNullableString(
-  record: Record<string, unknown>,
-  key: string,
-): string | null {
+function readNullableString(record: Record<string, unknown>, key: string): string | null {
   const value = record[key];
-  return typeof value === 'string'
-    ? value
-    : null;
+  return typeof value === 'string' ? value : null;
 }
 
-function readBoolean(
-  record: Record<string, unknown>,
-  key: string,
-  fallback: boolean,
-): boolean {
+function readBoolean(record: Record<string, unknown>, key: string, fallback: boolean): boolean {
   const value = record[key];
-  return typeof value === 'boolean'
-    ? value
-    : fallback;
+  return typeof value === 'boolean' ? value : fallback;
 }
 
-function readStringArray(
-  record: Record<string, unknown>,
-  key: string,
-): string[] {
+function readStringArray(record: Record<string, unknown>, key: string): string[] {
   const value = record[key];
   if (!Array.isArray(value)) {
     return [];
   }
 
-  return value.filter(
-    (item): item is string =>
-      typeof item === 'string',
-  );
+  return value.filter((item): item is string => typeof item === 'string');
 }
 
-function readEnum<T extends string>(
-  record: Record<string, unknown>,
-  key: string,
-  fallback: T,
-): T {
+function readEnum<T extends string>(record: Record<string, unknown>, key: string, fallback: T): T {
   const value = record[key];
-  return typeof value === 'string'
-    ? (value as T)
-    : fallback;
+  return typeof value === 'string' ? (value as T) : fallback;
 }
 
 function slugify(value: string): string {

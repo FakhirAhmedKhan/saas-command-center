@@ -6,10 +6,7 @@ import type {
   TechnologyType,
 } from './application-types';
 
-export const STATUS_LABELS: Record<
-  ApplicationStatus,
-  string
-> = {
+export const STATUS_LABELS: Record<ApplicationStatus, string> = {
   IDEA: 'Idea',
   PLANNING: 'Planning',
   IN_DEVELOPMENT: 'In development',
@@ -21,14 +18,7 @@ export const STATUS_LABELS: Record<
 
 export const STATUS_BADGE_VARIANTS: Record<
   ApplicationStatus,
-  | 'default'
-  | 'blue'
-  | 'green'
-  | 'yellow'
-  | 'orange'
-  | 'red'
-  | 'purple'
-  | 'slate'
+  'default' | 'blue' | 'green' | 'yellow' | 'orange' | 'red' | 'purple' | 'slate'
 > = {
   IDEA: 'slate',
   PLANNING: 'purple',
@@ -39,10 +29,7 @@ export const STATUS_BADGE_VARIANTS: Record<
   PAUSED: 'red',
 };
 
-export const PRIORITY_LABELS: Record<
-  ApplicationPriority,
-  string
-> = {
+export const PRIORITY_LABELS: Record<ApplicationPriority, string> = {
   LOW: 'Low',
   MEDIUM: 'Medium',
   HIGH: 'High',
@@ -59,10 +46,7 @@ export const PRIORITY_BADGE_VARIANTS: Record<
   CRITICAL: 'red',
 };
 
-export const CATEGORY_LABELS: Record<
-  ApplicationCategory,
-  string
-> = {
+export const CATEGORY_LABELS: Record<ApplicationCategory, string> = {
   SAAS: 'SaaS',
   AI: 'Artificial intelligence',
   MOBILE: 'Mobile',
@@ -72,10 +56,7 @@ export const CATEGORY_LABELS: Record<
   OTHER: 'Other',
 };
 
-export const TECHNOLOGY_TYPE_LABELS: Record<
-  TechnologyType,
-  string
-> = {
+export const TECHNOLOGY_TYPE_LABELS: Record<TechnologyType, string> = {
   FRONTEND: 'Frontend',
   BACKEND: 'Backend',
   DATABASE: 'Database',
@@ -85,10 +66,7 @@ export const TECHNOLOGY_TYPE_LABELS: Record<
   OTHER: 'Other',
 };
 
-export const LINK_TYPE_LABELS: Record<
-  ApplicationLinkType,
-  string
-> = {
+export const LINK_TYPE_LABELS: Record<ApplicationLinkType, string> = {
   PRODUCTION: 'Production',
   STAGING: 'Staging',
   REPOSITORY: 'Repository',

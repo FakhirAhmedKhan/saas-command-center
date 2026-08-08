@@ -1,6 +1,37 @@
+# Dependencies
 node_modules
+**/node_modules
 .pnpm-store
-.next
+**/.pnpm-store
+
+# Build output
 dist
+**/dist
+.next
+**/.next
 coverage
+**/coverage
+.turbo
+**/.turbo
+
+# Generated files
+apps/api/src/generated
+**/generated/prisma
+
+# Package manager
 pnpm-lock.yaml
+
+# Logs
+logs
+**/logs
+*.log
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Misc
+.git
+.idea
+.vscode

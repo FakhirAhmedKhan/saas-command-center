@@ -1,9 +1,5 @@
-import {
-  readFileSync,
-} from 'node:fs';
-import {
-  resolve,
-} from 'node:path';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 export interface SeedUser {
   id: string;
@@ -38,24 +34,13 @@ export interface FullStackState {
 }
 
 export function fullStackStateDirectory(): string {
-  return resolve(
-    process.cwd(),
-    'e2e/full-stack/.state',
-  );
+  return resolve(process.cwd(), 'e2e/full-stack/.state');
 }
 
 export function fullStackStatePath(): string {
-  return resolve(
-    fullStackStateDirectory(),
-    'seed.json',
-  );
+  return resolve(fullStackStateDirectory(), 'seed.json');
 }
 
 export function readFullStackState(): FullStackState {
-  return JSON.parse(
-    readFileSync(
-      fullStackStatePath(),
-      'utf8',
-    ),
-  ) as FullStackState;
+  return JSON.parse(readFileSync(fullStackStatePath(), 'utf8')) as FullStackState;
 }

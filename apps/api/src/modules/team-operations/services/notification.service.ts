@@ -1,19 +1,8 @@
- 
- 
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
-import {
-  NotificationPriority,
-  NotificationType,
-  Prisma,
-} from '../../../generated/prisma/client';
+import { NotificationPriority, NotificationType, Prisma } from '../../../generated/prisma/client';
 
-import {
-  PrismaService,
-} from '../../../database/prisma.service';
+import { PrismaService } from '../../../database/prisma.service';
 
 export interface CreateNotificationInput {
   workspaceId: string;
@@ -54,9 +43,7 @@ export interface ListNotificationsInput {
 
 @Injectable()
 export class NotificationService {
-  constructor(
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * Create a notification.
@@ -64,26 +51,17 @@ export class NotificationService {
    * When a dedupe key is supplied, the same notification
    * will not be created twice for the same user.
    */
-  async create(
-    input: CreateNotificationInput,
-  ) {
-    if (
-      input.dedupeKey
-    ) {
-      const existing =
-        await this.prisma.notification.findFirst({
-          where: {
-            userId:
-              input.userId,
+  async create(input: CreateNotificationInput) {
+    if (input.dedupeKey) {
+      const existing = await this.prisma.notification.findFirst({
+        where: {
+          userId: input.userId,
 
-            dedupeKey:
-              input.dedupeKey,
-          },
-        });
+          dedupeKey: input.dedupeKey,
+        },
+      });
 
-      if (
-        existing
-      ) {
+      if (existing) {
         return existing;
       }
     }
@@ -91,78 +69,49 @@ export class NotificationService {
     try {
       return await this.prisma.notification.create({
         data: {
-          workspaceId:
-            input.workspaceId,
+          workspaceId: input.workspaceId,
 
-          userId:
-            input.userId,
+          userId: input.userId,
 
-          applicationId:
-            input.applicationId ??
-            null,
+          applicationId: input.applicationId ?? null,
 
-          type:
-            input.type,
+          type: input.type,
 
-          priority:
-            input.priority ??
-            NotificationPriority.INFO,
+          priority: input.priority ?? NotificationPriority.INFO,
 
-          title:
-            input.title,
+          title: input.title,
 
-          message:
-            input.message,
+          message: input.message,
 
-          resourceType:
-            input.resourceType ??
-            null,
+          resourceType: input.resourceType ?? null,
 
-          resourceId:
-            input.resourceId ??
-            null,
+          resourceId: input.resourceId ?? null,
 
-          actionUrl:
-            input.actionUrl ??
-            null,
+          actionUrl: input.actionUrl ?? null,
 
-          payload:
-            input.payload,
+          payload: input.payload,
 
-          dedupeKey:
-            input.dedupeKey ??
-            null,
+          dedupeKey: input.dedupeKey ?? null,
 
-          expiresAt:
-            input.expiresAt ??
-            null,
+          expiresAt: input.expiresAt ?? null,
         },
       });
-    } catch (
-      error
-    ) {
+    } catch (error) {
       /*
        * Protect against concurrent duplicate notification
        * creation when two processes perform the same
        * dedupe check at nearly the same time.
        */
-      if (
-        input.dedupeKey
-      ) {
-        const existing =
-          await this.prisma.notification.findFirst({
-            where: {
-              userId:
-                input.userId,
+      if (input.dedupeKey) {
+        const existing = await this.prisma.notification.findFirst({
+          where: {
+            userId: input.userId,
 
-              dedupeKey:
-                input.dedupeKey,
-            },
-          });
+            dedupeKey: input.dedupeKey,
+          },
+        });
 
-        if (
-          existing
-        ) {
+        if (existing) {
           return existing;
         }
       }
@@ -174,17 +123,11 @@ export class NotificationService {
   /**
    * Alias used by Phase 17 domain services.
    */
-  async createForUser(
-    input: CreateNotificationInput,
-  ) {
+  async createForUser(input: CreateNotificationInput) {
     return this.create(input);
   }
-  async createNotification(
-    input: CreateNotificationInput,
-  ) {
-    return this.create(
-      input,
-    );
+  async createNotification(input: CreateNotificationInput) {
+    return this.create(input);
   }
 
   /**
@@ -192,106 +135,63 @@ export class NotificationService {
    *
    * notificationService.notify(...)
    */
-  async notify(
-    input: CreateNotificationInput,
-  ) {
-    return this.create(
-      input,
-    );
+  async notify(input: CreateNotificationInput) {
+    return this.create(input);
   }
 
   /**
    * List notifications belonging to one authenticated user.
    */
-  async list(
-    input: ListNotificationsInput,
-  ) {
-    const limit =
-      Math.min(
-        Math.max(
-          input.limit ??
-            30,
-          1,
-        ),
-        100,
-      );
+  async list(input: ListNotificationsInput) {
+    const limit = Math.min(Math.max(input.limit ?? 30, 1), 100);
 
-    const now =
-      new Date();
+    const now = new Date();
 
-    const items =
-      await this.prisma.notification.findMany({
-        where: {
-          userId:
-            input.userId,
+    const items = await this.prisma.notification.findMany({
+      where: {
+        userId: input.userId,
 
-          workspaceId:
-            input.workspaceId,
+        workspaceId: input.workspaceId,
 
-          readAt:
-            input.unreadOnly
-              ? null
-              : undefined,
+        readAt: input.unreadOnly ? null : undefined,
 
-          OR: [
-            {
-              expiresAt:
-                null,
+        OR: [
+          {
+            expiresAt: null,
+          },
+          {
+            expiresAt: {
+              gt: now,
             },
-            {
-              expiresAt: {
-                gt:
-                  now,
-              },
+          },
+        ],
+      },
+
+      orderBy: {
+        createdAt: 'desc',
+      },
+
+      take: limit + 1,
+
+      ...(input.cursor
+        ? {
+            cursor: {
+              id: input.cursor,
             },
-          ],
-        },
 
-        orderBy: {
-          createdAt:
-            'desc',
-        },
+            skip: 1,
+          }
+        : {}),
+    });
 
-        take:
-          limit + 1,
+    const hasMore = items.length > limit;
 
-        ...(input.cursor
-          ? {
-              cursor: {
-                id:
-                  input.cursor,
-              },
-
-              skip:
-                1,
-            }
-          : {}),
-      });
-
-    const hasMore =
-      items.length >
-      limit;
-
-    const results =
-      hasMore
-        ? items.slice(
-            0,
-            limit,
-          )
-        : items;
+    const results = hasMore ? items.slice(0, limit) : items;
 
     return {
-      items:
-        results,
+      items: results,
 
-      nextCursor:
-        hasMore
-          ? results[
-              results.length -
-                1
-            ]?.id ??
-            null
-          : null,
+      nextCursor: hasMore ? (results[results.length - 1]?.id ?? null) : null,
     };
   }
 
@@ -299,48 +199,36 @@ export class NotificationService {
    * Compatibility alias for controllers/services that use
    * listForUser().
    */
-  async listForUser(
-    input: ListNotificationsInput,
-  ) {
-    return this.list(
-      input,
-    );
+  async listForUser(input: ListNotificationsInput) {
+    return this.list(input);
   }
 
   /**
    * Return unread notifications count for one user.
    */
-  async getUnreadCount(
-    userId: string,
-    workspaceId?: string,
-  ) {
-    const now =
-      new Date();
+  async getUnreadCount(userId: string, workspaceId?: string) {
+    const now = new Date();
 
-    const count =
-      await this.prisma.notification.count({
-        where: {
-          userId,
+    const count = await this.prisma.notification.count({
+      where: {
+        userId,
 
-          workspaceId,
+        workspaceId,
 
-          readAt:
-            null,
+        readAt: null,
 
-          OR: [
-            {
-              expiresAt:
-                null,
+        OR: [
+          {
+            expiresAt: null,
+          },
+          {
+            expiresAt: {
+              gt: now,
             },
-            {
-              expiresAt: {
-                gt:
-                  now,
-              },
-            },
-          ],
-        },
-      });
+          },
+        ],
+      },
+    });
 
     return {
       count,
@@ -350,14 +238,8 @@ export class NotificationService {
   /**
    * Compatibility alias.
    */
-  async unreadCount(
-    userId: string,
-    workspaceId?: string,
-  ) {
-    return this.getUnreadCount(
-      userId,
-      workspaceId,
-    );
+  async unreadCount(userId: string, workspaceId?: string) {
+    return this.getUnreadCount(userId, workspaceId);
   }
 
   /**
@@ -366,43 +248,30 @@ export class NotificationService {
    * userId is part of the filter so a user cannot mutate
    * another user's notification.
    */
-  async markRead(
-    userId: string,
-    notificationId: string,
-  ) {
-    const notification =
-      await this.prisma.notification.findFirst({
-        where: {
-          id:
-            notificationId,
+  async markRead(userId: string, notificationId: string) {
+    const notification = await this.prisma.notification.findFirst({
+      where: {
+        id: notificationId,
 
-          userId,
-        },
-      });
+        userId,
+      },
+    });
 
-    if (
-      !notification
-    ) {
-      throw new NotFoundException(
-        'Notification not found.',
-      );
+    if (!notification) {
+      throw new NotFoundException('Notification not found.');
     }
 
-    if (
-      notification.readAt
-    ) {
+    if (notification.readAt) {
       return notification;
     }
 
     return this.prisma.notification.update({
       where: {
-        id:
-          notification.id,
+        id: notification.id,
       },
 
       data: {
-        readAt:
-          new Date(),
+        readAt: new Date(),
       },
     });
   }
@@ -410,14 +279,8 @@ export class NotificationService {
   /**
    * Compatibility alias.
    */
-  async markAsRead(
-    userId: string,
-    notificationId: string,
-  ) {
-    return this.markRead(
-      userId,
-      notificationId,
-    );
+  async markAsRead(userId: string, notificationId: string) {
+    return this.markRead(userId, notificationId);
   }
 
   /**
@@ -426,44 +289,31 @@ export class NotificationService {
    *
    * workspaceId can optionally scope the operation.
    */
-  async markAllRead(
-    userId: string,
-    workspaceId?: string,
-  ) {
-    const result =
-      await this.prisma.notification.updateMany({
-        where: {
-          userId,
+  async markAllRead(userId: string, workspaceId?: string) {
+    const result = await this.prisma.notification.updateMany({
+      where: {
+        userId,
 
-          workspaceId,
+        workspaceId,
 
-          readAt:
-            null,
-        },
+        readAt: null,
+      },
 
-        data: {
-          readAt:
-            new Date(),
-        },
-      });
+      data: {
+        readAt: new Date(),
+      },
+    });
 
     return {
-      updated:
-        result.count,
+      updated: result.count,
     };
   }
 
   /**
    * Compatibility alias.
    */
-  async markAllAsRead(
-    userId: string,
-    workspaceId?: string,
-  ) {
-    return this.markAllRead(
-      userId,
-      workspaceId,
-    );
+  async markAllAsRead(userId: string, workspaceId?: string) {
+    return this.markAllRead(userId, workspaceId);
   }
 
   /**
@@ -473,19 +323,16 @@ export class NotificationService {
    * scheduler.
    */
   async cleanupExpired() {
-    const result =
-      await this.prisma.notification.deleteMany({
-        where: {
-          expiresAt: {
-            lte:
-              new Date(),
-          },
+    const result = await this.prisma.notification.deleteMany({
+      where: {
+        expiresAt: {
+          lte: new Date(),
         },
-      });
+      },
+    });
 
     return {
-      deleted:
-        result.count,
+      deleted: result.count,
     };
   }
 }

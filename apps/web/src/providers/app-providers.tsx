@@ -8,12 +8,6 @@ interface AppProvidersProps {
   children: ReactNode;
 }
 
-export function AppProviders({
-  children,
-}: AppProvidersProps) {
-  return (
-    <AuthProvider>
-      {children}
-    </AuthProvider>
-  );
+export function AppProviders({ children }: AppProvidersProps) {
+  return <AuthProvider>{children}</AuthProvider>;
 }

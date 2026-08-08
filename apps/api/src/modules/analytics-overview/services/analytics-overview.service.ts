@@ -1,399 +1,260 @@
-import {
-    Injectable,
-    NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
-import {
-    Prisma,
-} from 'src/generated/prisma/client';
+import { Prisma } from 'src/generated/prisma/client';
 
-import {
-    AnalyticsAggregateDimension,
-} from 'src/generated/prisma/enums';
+import { AnalyticsAggregateDimension } from 'src/generated/prisma/enums';
 
-import {
-    PrismaService,
-} from 'src/database/prisma.service';
+import { PrismaService } from 'src/database/prisma.service';
 
-import {
-    AnalyticsOverviewQueryDto,
-} from '../dto/analytics-overview-query.dto';
+import { AnalyticsOverviewQueryDto } from '../dto/analytics-overview-query.dto';
 
 import type {
-    AnalyticsBreakdownItemDto,
-    AnalyticsOverviewResponseDto,
-    AnalyticsTrendPointDto,
+  AnalyticsBreakdownItemDto,
+  AnalyticsOverviewResponseDto,
+  AnalyticsTrendPointDto,
 } from '../dto/analytics-overview-response.dto';
 
-import {
-    resolveAnalyticsDateRange,
-} from '../utils/analytics-date-range';
+import { resolveAnalyticsDateRange } from '../utils/analytics-date-range';
 
 import {
-    createMetricComparison,
-    roundMetric,
-    toSafeNumber,
+  createMetricComparison,
+  roundMetric,
+  toSafeNumber,
 } from '../utils/analytics-overview-metrics';
 
 interface MetricsDatabaseRow {
-    visitors:
-    | bigint
-    | number
-    | string;
+  visitors: bigint | number | string;
 
-    sessions:
-    | bigint
-    | number
-    | string;
+  sessions: bigint | number | string;
 
-    page_views:
-    | bigint
-    | number
-    | string;
+  page_views: bigint | number | string;
 
-    bounced_sessions:
-    | bigint
-    | number
-    | string;
+  bounced_sessions: bigint | number | string;
 
-    measured_sessions:
-    | bigint
-    | number
-    | string;
+  measured_sessions: bigint | number | string;
 
-    total_duration_ms:
-    | bigint
-    | number
-    | string;
+  total_duration_ms: bigint | number | string;
 }
 
 interface PeriodMetrics {
-    visitors: number;
-    sessions: number;
-    pageViews: number;
-    bounceRate: number;
-    averageDurationSeconds:
-    number;
+  visitors: number;
+  sessions: number;
+  pageViews: number;
+  bounceRate: number;
+  averageDurationSeconds: number;
 }
 
 interface OverviewAggregateRow {
-    bucketStart: Date;
-    visitors: number;
-    sessions: number;
-    pageViews: number;
+  bucketStart: Date;
+  visitors: number;
+  sessions: number;
+  pageViews: number;
 }
 
 interface BreakdownAggregateRow {
-    dimensionValue: string;
-    dimensionLabel: string;
-    sessions: number;
-    pageViews: number;
+  dimensionValue: string;
+  dimensionLabel: string;
+  sessions: number;
+  pageViews: number;
 }
 
 @Injectable()
 export class AnalyticsOverviewService {
-    private readonly breakdownLimit =
-        8;
+  private readonly breakdownLimit = 8;
 
-    constructor(
-        private readonly prisma:
-            PrismaService,
-    ) { }
+  constructor(private readonly prisma: PrismaService) {}
 
-    async getOverview(
-        workspaceId: string,
-        websiteId: string,
-        query:
-            AnalyticsOverviewQueryDto,
-    ): Promise<AnalyticsOverviewResponseDto> {
-        const website =
-            await this.requireWebsite(
-                workspaceId,
-                websiteId,
-            );
+  async getOverview(
+    workspaceId: string,
+    websiteId: string,
+    query: AnalyticsOverviewQueryDto,
+  ): Promise<AnalyticsOverviewResponseDto> {
+    const website = await this.requireWebsite(workspaceId, websiteId);
 
-        const range =
-            resolveAnalyticsDateRange(
-                query,
-                website.timeZone,
-            );
+    const range = resolveAnalyticsDateRange(query, website.timeZone);
 
-        const [
-            currentMetrics,
-            previousMetrics,
-            trendRows,
-            pageRows,
-            sourceRows,
-            countryRows,
-            deviceRows,
-            browserRows,
-            operatingSystemRows,
-        ] = await Promise.all([
-            this.loadPeriodMetrics(
-                website.id,
-                range.current.start,
-                range.current.end,
-            ),
+    const [
+      currentMetrics,
+      previousMetrics,
+      trendRows,
+      pageRows,
+      sourceRows,
+      countryRows,
+      deviceRows,
+      browserRows,
+      operatingSystemRows,
+    ] = await Promise.all([
+      this.loadPeriodMetrics(website.id, range.current.start, range.current.end),
 
-            this.loadPeriodMetrics(
-                website.id,
-                range.previous.start,
-                range.previous.end,
-            ),
+      this.loadPeriodMetrics(website.id, range.previous.start, range.previous.end),
 
-            this.loadOverviewTrend(
-                website.id,
-                range.current.start,
-                range.current.end,
-                range.granularity,
-            ),
+      this.loadOverviewTrend(website.id, range.current.start, range.current.end, range.granularity),
 
-            this.loadBreakdownRows(
-                website.id,
-                range.current.start,
-                range.current.end,
-                range.granularity,
-                AnalyticsAggregateDimension
-                    .PAGE,
-            ),
+      this.loadBreakdownRows(
+        website.id,
+        range.current.start,
+        range.current.end,
+        range.granularity,
+        AnalyticsAggregateDimension.PAGE,
+      ),
 
-            this.loadBreakdownRows(
-                website.id,
-                range.current.start,
-                range.current.end,
-                range.granularity,
-                AnalyticsAggregateDimension
-                    .SOURCE,
-            ),
+      this.loadBreakdownRows(
+        website.id,
+        range.current.start,
+        range.current.end,
+        range.granularity,
+        AnalyticsAggregateDimension.SOURCE,
+      ),
 
-            this.loadBreakdownRows(
-                website.id,
-                range.current.start,
-                range.current.end,
-                range.granularity,
-                AnalyticsAggregateDimension
-                    .COUNTRY,
-            ),
+      this.loadBreakdownRows(
+        website.id,
+        range.current.start,
+        range.current.end,
+        range.granularity,
+        AnalyticsAggregateDimension.COUNTRY,
+      ),
 
-            this.loadBreakdownRows(
-                website.id,
-                range.current.start,
-                range.current.end,
-                range.granularity,
-                AnalyticsAggregateDimension
-                    .DEVICE,
-            ),
+      this.loadBreakdownRows(
+        website.id,
+        range.current.start,
+        range.current.end,
+        range.granularity,
+        AnalyticsAggregateDimension.DEVICE,
+      ),
 
-            this.loadBreakdownRows(
-                website.id,
-                range.current.start,
-                range.current.end,
-                range.granularity,
-                AnalyticsAggregateDimension
-                    .BROWSER,
-            ),
+      this.loadBreakdownRows(
+        website.id,
+        range.current.start,
+        range.current.end,
+        range.granularity,
+        AnalyticsAggregateDimension.BROWSER,
+      ),
 
-            this.loadBreakdownRows(
-                website.id,
-                range.current.start,
-                range.current.end,
-                range.granularity,
-                AnalyticsAggregateDimension
-                    .OPERATING_SYSTEM,
-            ),
-        ]);
+      this.loadBreakdownRows(
+        website.id,
+        range.current.start,
+        range.current.end,
+        range.granularity,
+        AnalyticsAggregateDimension.OPERATING_SYSTEM,
+      ),
+    ]);
 
-        return {
-            website: {
-                id:
-                    website.id,
+    return {
+      website: {
+        id: website.id,
 
-                name:
-                    website.name,
+        name: website.name,
 
-                domain:
-                    website.domain,
+        domain: website.domain,
 
-                timeZone:
-                    website.timeZone,
+        timeZone: website.timeZone,
 
-                lastEventAt:
-                    website.lastEventAt
-                        ?.toISOString() ??
-                    null,
-            },
+        lastEventAt: website.lastEventAt?.toISOString() ?? null,
+      },
 
-            range: {
-                preset:
-                    range.preset,
+      range: {
+        preset: range.preset,
 
-                from:
-                    range.current.from,
+        from: range.current.from,
 
-                to:
-                    range.current.to,
+        to: range.current.to,
 
-                previousFrom:
-                    range.previous
-                        .from,
+        previousFrom: range.previous.from,
 
-                previousTo:
-                    range.previous.to,
+        previousTo: range.previous.to,
 
-                granularity:
-                    range.granularity,
+        granularity: range.granularity,
 
-                days:
-                    range.days,
-            },
+        days: range.days,
+      },
 
-            metrics: {
-                visitors:
-                    createMetricComparison(
-                        currentMetrics
-                            .visitors,
+      metrics: {
+        visitors: createMetricComparison(
+          currentMetrics.visitors,
 
-                        previousMetrics
-                            .visitors,
-                    ),
+          previousMetrics.visitors,
+        ),
 
-                sessions:
-                    createMetricComparison(
-                        currentMetrics
-                            .sessions,
+        sessions: createMetricComparison(
+          currentMetrics.sessions,
 
-                        previousMetrics
-                            .sessions,
-                    ),
+          previousMetrics.sessions,
+        ),
 
-                pageViews:
-                    createMetricComparison(
-                        currentMetrics
-                            .pageViews,
+        pageViews: createMetricComparison(
+          currentMetrics.pageViews,
 
-                        previousMetrics
-                            .pageViews,
-                    ),
+          previousMetrics.pageViews,
+        ),
 
-                bounceRate:
-                    createMetricComparison(
-                        currentMetrics
-                            .bounceRate,
+        bounceRate: createMetricComparison(
+          currentMetrics.bounceRate,
 
-                        previousMetrics
-                            .bounceRate,
-                    ),
+          previousMetrics.bounceRate,
+        ),
 
-                averageDurationSeconds:
-                    createMetricComparison(
-                        currentMetrics
-                            .averageDurationSeconds,
+        averageDurationSeconds: createMetricComparison(
+          currentMetrics.averageDurationSeconds,
 
-                        previousMetrics
-                            .averageDurationSeconds,
-                    ),
-            },
+          previousMetrics.averageDurationSeconds,
+        ),
+      },
 
-            trend:
-                this.mapTrendRows(
-                    trendRows,
-                ),
+      trend: this.mapTrendRows(trendRows),
 
-            topPages:
-                this.buildBreakdown(
-                    pageRows,
-                    'pageViews',
-                ),
+      topPages: this.buildBreakdown(pageRows, 'pageViews'),
 
-            topSources:
-                this.buildBreakdown(
-                    sourceRows,
-                    'sessions',
-                ),
+      topSources: this.buildBreakdown(sourceRows, 'sessions'),
 
-            topCountries:
-                this.buildBreakdown(
-                    countryRows,
-                    'sessions',
-                ),
+      topCountries: this.buildBreakdown(countryRows, 'sessions'),
 
-            topDevices:
-                this.buildBreakdown(
-                    deviceRows,
-                    'sessions',
-                ),
+      topDevices: this.buildBreakdown(deviceRows, 'sessions'),
 
-            topBrowsers:
-                this.buildBreakdown(
-                    browserRows,
-                    'sessions',
-                ),
+      topBrowsers: this.buildBreakdown(browserRows, 'sessions'),
 
-            topOperatingSystems:
-                this.buildBreakdown(
-                    operatingSystemRows,
-                    'sessions',
-                ),
+      topOperatingSystems: this.buildBreakdown(operatingSystemRows, 'sessions'),
 
-            empty:
-                currentMetrics
-                    .sessions === 0 &&
-                currentMetrics
-                    .pageViews === 0,
-        };
+      empty: currentMetrics.sessions === 0 && currentMetrics.pageViews === 0,
+    };
+  }
+
+  private async requireWebsite(workspaceId: string, websiteId: string) {
+    const website = await this.prisma.website.findFirst({
+      where: {
+        id: websiteId,
+
+        workspaceId,
+
+        archivedAt: null,
+      },
+
+      select: {
+        id: true,
+
+        name: true,
+
+        domain: true,
+
+        timeZone: true,
+
+        lastEventAt: true,
+      },
+    });
+
+    if (!website) {
+      throw new NotFoundException('Website not found');
     }
 
-    private async requireWebsite(
-        workspaceId: string,
-        websiteId: string,
-    ) {
-        const website =
-            await this.prisma
-                .website.findFirst({
-                    where: {
-                        id:
-                            websiteId,
+    return website;
+  }
 
-                        workspaceId,
-
-                        archivedAt:
-                            null,
-                    },
-
-                    select: {
-                        id: true,
-
-                        name: true,
-
-                        domain: true,
-
-                        timeZone: true,
-
-                        lastEventAt:
-                            true,
-                    },
-                });
-
-        if (!website) {
-            throw new NotFoundException(
-                'Website not found',
-            );
-        }
-
-        return website;
-    }
-
-    private async loadPeriodMetrics(
-        websiteId: string,
-        start: Date,
-        end: Date,
-    ): Promise<PeriodMetrics> {
-        const rows =
-            await this.prisma
-                .$queryRaw<
-                    MetricsDatabaseRow[]
-                >(
-                    Prisma.sql`
+  private async loadPeriodMetrics(
+    websiteId: string,
+    start: Date,
+    end: Date,
+  ): Promise<PeriodMetrics> {
+    const rows = await this.prisma.$queryRaw<MetricsDatabaseRow[]>(
+      Prisma.sql`
                         SELECT
                             (
                                 SELECT
@@ -487,321 +348,187 @@ export class AnalyticsOverviewService {
                                         ${end}
                             ) AS total_duration_ms
                     `,
-                );
+    );
 
-        const row =
-            rows[0];
+    const row = rows[0];
 
-        const visitors =
-            toSafeNumber(
-                row?.visitors,
-            );
+    const visitors = toSafeNumber(row?.visitors);
 
-        const sessions =
-            toSafeNumber(
-                row?.sessions,
-            );
+    const sessions = toSafeNumber(row?.sessions);
 
-        const pageViews =
-            toSafeNumber(
-                row?.page_views,
-            );
+    const pageViews = toSafeNumber(row?.page_views);
 
-        const bouncedSessions =
-            toSafeNumber(
-                row?.bounced_sessions,
-            );
+    const bouncedSessions = toSafeNumber(row?.bounced_sessions);
 
-        const measuredSessions =
-            toSafeNumber(
-                row?.measured_sessions,
-            );
+    const measuredSessions = toSafeNumber(row?.measured_sessions);
 
-        const totalDurationMs =
-            toSafeNumber(
-                row?.total_duration_ms,
-            );
+    const totalDurationMs = toSafeNumber(row?.total_duration_ms);
 
-        const bounceRate =
-            measuredSessions === 0
-                ? 0
-                : roundMetric(
-                    (
-                        bouncedSessions /
-                        measuredSessions
-                    ) * 100,
-                    1,
-                );
+    const bounceRate =
+      measuredSessions === 0 ? 0 : roundMetric((bouncedSessions / measuredSessions) * 100, 1);
 
-        const averageDurationSeconds =
-            measuredSessions === 0
-                ? 0
-                : roundMetric(
-                    totalDurationMs /
-                    measuredSessions /
-                    1000,
-                    1,
-                );
+    const averageDurationSeconds =
+      measuredSessions === 0 ? 0 : roundMetric(totalDurationMs / measuredSessions / 1000, 1);
 
-        return {
-            visitors,
-            sessions,
-            pageViews,
-            bounceRate,
-            averageDurationSeconds,
-        };
+    return {
+      visitors,
+      sessions,
+      pageViews,
+      bounceRate,
+      averageDurationSeconds,
+    };
+  }
+
+  private async loadOverviewTrend(
+    websiteId: string,
+    start: Date,
+    end: Date,
+    granularity: 'hour' | 'day',
+  ): Promise<OverviewAggregateRow[]> {
+    const where = {
+      websiteId,
+
+      dimension: AnalyticsAggregateDimension.OVERVIEW,
+
+      bucketStart: {
+        gte: start,
+        lt: end,
+      },
+    };
+
+    const select = {
+      bucketStart: true,
+
+      visitors: true,
+
+      sessions: true,
+
+      pageViews: true,
+    } as const;
+
+    if (granularity === 'hour') {
+      return this.prisma.analyticsHourlyAggregate.findMany({
+        where,
+        select,
+
+        orderBy: {
+          bucketStart: 'asc',
+        },
+      });
     }
 
-    private async loadOverviewTrend(
-        websiteId: string,
-        start: Date,
-        end: Date,
-        granularity:
-            | 'hour'
-            | 'day',
-    ): Promise<
-        OverviewAggregateRow[]
-    > {
-        const where = {
-            websiteId,
+    return this.prisma.analyticsDailyAggregate.findMany({
+      where,
+      select,
 
-            dimension:
-                AnalyticsAggregateDimension
-                    .OVERVIEW,
+      orderBy: {
+        bucketStart: 'asc',
+      },
+    });
+  }
 
-            bucketStart: {
-                gte: start,
-                lt: end,
-            },
-        };
+  private async loadBreakdownRows(
+    websiteId: string,
+    start: Date,
+    end: Date,
+    granularity: 'hour' | 'day',
+    dimension: AnalyticsAggregateDimension,
+  ): Promise<BreakdownAggregateRow[]> {
+    const where = {
+      websiteId,
 
-        const select = {
-            bucketStart:
-                true,
+      dimension,
 
-            visitors:
-                true,
+      bucketStart: {
+        gte: start,
+        lt: end,
+      },
+    };
 
-            sessions:
-                true,
+    const select = {
+      dimensionValue: true,
 
-            pageViews:
-                true,
-        } as const;
+      dimensionLabel: true,
 
-        if (
-            granularity ===
-            'hour'
-        ) {
-            return this.prisma
-                .analyticsHourlyAggregate
-                .findMany({
-                    where,
-                    select,
+      sessions: true,
 
-                    orderBy: {
-                        bucketStart:
-                            'asc',
-                    },
-                });
-        }
+      pageViews: true,
+    } as const;
 
-        return this.prisma
-            .analyticsDailyAggregate
-            .findMany({
-                where,
-                select,
-
-                orderBy: {
-                    bucketStart:
-                        'asc',
-                },
-            });
+    if (granularity === 'hour') {
+      return this.prisma.analyticsHourlyAggregate.findMany({
+        where,
+        select,
+      });
     }
 
-    private async loadBreakdownRows(
-        websiteId: string,
-        start: Date,
-        end: Date,
-        granularity:
-            | 'hour'
-            | 'day',
-        dimension:
-            AnalyticsAggregateDimension,
-    ): Promise<
-        BreakdownAggregateRow[]
-    > {
-        const where = {
-            websiteId,
+    return this.prisma.analyticsDailyAggregate.findMany({
+      where,
+      select,
+    });
+  }
 
-            dimension,
+  private mapTrendRows(rows: OverviewAggregateRow[]): AnalyticsTrendPointDto[] {
+    return rows.map((row) => ({
+      bucketStart: row.bucketStart.toISOString(),
 
-            bucketStart: {
-                gte: start,
-                lt: end,
-            },
-        };
+      visitors: row.visitors,
 
-        const select = {
-            dimensionValue:
-                true,
+      sessions: row.sessions,
 
-            dimensionLabel:
-                true,
+      pageViews: row.pageViews,
+    }));
+  }
 
-            sessions:
-                true,
+  private buildBreakdown(
+    rows: BreakdownAggregateRow[],
 
-            pageViews:
-                true,
-        } as const;
+    metric: 'sessions' | 'pageViews',
+  ): AnalyticsBreakdownItemDto[] {
+    const grouped = new Map<
+      string,
+      {
+        label: string;
+        value: number;
+      }
+    >();
 
-        if (
-            granularity ===
-            'hour'
-        ) {
-            return this.prisma
-                .analyticsHourlyAggregate
-                .findMany({
-                    where,
-                    select,
-                });
-        }
+    for (const row of rows) {
+      const key = row.dimensionValue.trim() || 'unknown';
 
-        return this.prisma
-            .analyticsDailyAggregate
-            .findMany({
-                where,
-                select,
-            });
+      const label = row.dimensionLabel.trim() || 'Unknown';
+
+      const value = row[metric];
+
+      const existing = grouped.get(key);
+
+      if (existing) {
+        existing.value += value;
+      } else {
+        grouped.set(key, {
+          label,
+          value,
+        });
+      }
     }
 
-    private mapTrendRows(
-        rows:
-            OverviewAggregateRow[],
-    ): AnalyticsTrendPointDto[] {
-        return rows.map(
-            (row) => ({
-                bucketStart:
-                    row.bucketStart
-                        .toISOString(),
+    const total = Array.from(grouped.values()).reduce(
+      (sum, item) => sum + item.value,
 
-                visitors:
-                    row.visitors,
+      0,
+    );
 
-                sessions:
-                    row.sessions,
+    return Array.from(grouped.entries())
+      .map(([key, item]) => ({
+        key,
 
-                pageViews:
-                    row.pageViews,
-            }),
-        );
-    }
+        label: item.label,
 
-    private buildBreakdown(
-        rows:
-            BreakdownAggregateRow[],
+        value: item.value,
 
-        metric:
-            | 'sessions'
-            | 'pageViews',
-    ): AnalyticsBreakdownItemDto[] {
-        const grouped =
-            new Map<
-                string,
-                {
-                    label: string;
-                    value: number;
-                }
-            >();
-
-        for (const row of rows) {
-            const key =
-                row.dimensionValue
-                    .trim() ||
-                'unknown';
-
-            const label =
-                row.dimensionLabel
-                    .trim() ||
-                'Unknown';
-
-            const value =
-                row[metric];
-
-            const existing =
-                grouped.get(key);
-
-            if (existing) {
-                existing.value +=
-                    value;
-            } else {
-                grouped.set(
-                    key,
-                    {
-                        label,
-                        value,
-                    },
-                );
-            }
-        }
-
-        const total =
-            Array.from(
-                grouped.values(),
-            ).reduce(
-                (
-                    sum,
-                    item,
-                ) =>
-                    sum +
-                    item.value,
-
-                0,
-            );
-
-        return Array.from(
-            grouped.entries(),
-        )
-            .map(
-                (
-                    [
-                        key,
-                        item,
-                    ],
-                ) => ({
-                    key,
-
-                    label:
-                        item.label,
-
-                    value:
-                        item.value,
-
-                    percentage:
-                        total === 0
-                            ? 0
-                            : roundMetric(
-                                (
-                                    item.value /
-                                    total
-                                ) *
-                                100,
-                                1,
-                            ),
-                }),
-            )
-            .sort(
-                (
-                    first,
-                    second,
-                ) =>
-                    second.value -
-                    first.value,
-            )
-            .slice(
-                0,
-                this.breakdownLimit,
-            );
-    }
+        percentage: total === 0 ? 0 : roundMetric((item.value / total) * 100, 1),
+      }))
+      .sort((first, second) => second.value - first.value)
+      .slice(0, this.breakdownLimit);
+  }
 }

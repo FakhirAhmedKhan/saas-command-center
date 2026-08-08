@@ -1,18 +1,7 @@
-import {
-  expect,
-  test,
-  type BrowserContext,
-  type Page,
-} from '@playwright/test';
+import { expect, test, type BrowserContext, type Page } from '@playwright/test';
 
-import {
-  loginThroughUi,
-  uniqueValue,
-} from './fixtures/helpers';
-import {
-  readFullStackState,
-  type FullStackState,
-} from './fixtures/state';
+import { loginThroughUi, uniqueValue } from './fixtures/helpers';
+import { readFullStackState, type FullStackState } from './fixtures/state';
 
 let state: FullStackState;
 
@@ -26,27 +15,15 @@ test.describe('Batch 11 real workspace flows', () => {
   let createdWorkspaceId = '';
   let slug = '';
 
-  test.beforeAll(async ({
-    browser,
-  }) => {
-    state =
-      readFullStackState();
+  test.beforeAll(async ({ browser }) => {
+    state = readFullStackState();
 
-    slug =
-      uniqueValue(
-        'batch11-workspace',
-        state.runId,
-      );
+    slug = uniqueValue('batch11-workspace', state.runId);
 
-    context =
-      await browser.newContext();
-    page =
-      await context.newPage();
+    context = await browser.newContext();
+    page = await context.newPage();
 
-    await loginThroughUi(
-      page,
-      state.owner,
-    );
+    await loginThroughUi(page, state.owner);
   });
 
   test.afterAll(async () => {
@@ -58,9 +35,7 @@ test.describe('Batch 11 real workspace flows', () => {
 
     await expect(
       page.getByRole('heading', {
-        name: new RegExp(
-          'Batch 11 Owner Workspace',
-        ),
+        name: new RegExp('Batch 11 Owner Workspace'),
       }),
     ).toBeVisible();
 
@@ -74,13 +49,9 @@ test.describe('Batch 11 real workspace flows', () => {
   test('creates another workspace through the real UI and API', async () => {
     await page.goto('/workspaces/new');
 
-    await page
-      .getByLabel('Workspace name')
-      .fill('Batch 11 Product Workspace');
+    await page.getByLabel('Workspace name').fill('Batch 11 Product Workspace');
 
-    await page
-      .getByLabel('Workspace slug')
-      .fill(slug);
+    await page.getByLabel('Workspace slug').fill(slug);
 
     await page
       .getByRole('button', {
@@ -88,17 +59,11 @@ test.describe('Batch 11 real workspace flows', () => {
       })
       .click();
 
-    await expect(page).toHaveURL(
-      /\/workspaces\/[0-9a-f-]+\/applications$/,
-    );
+    await expect(page).toHaveURL(/\/workspaces\/[0-9a-f-]+\/applications$/);
 
-    const match =
-      page.url().match(
-        /\/workspaces\/([^/]+)\/applications$/,
-      );
+    const match = page.url().match(/\/workspaces\/([^/]+)\/applications$/);
 
-    createdWorkspaceId =
-      match?.[1] ?? '';
+    createdWorkspaceId = match?.[1] ?? '';
 
     expect(createdWorkspaceId).not.toBe('');
   });
@@ -106,13 +71,9 @@ test.describe('Batch 11 real workspace flows', () => {
   test('shows a real conflict for a duplicate workspace slug', async () => {
     await page.goto('/workspaces/new');
 
-    await page
-      .getByLabel('Workspace name')
-      .fill('Duplicate Batch 11 Workspace');
+    await page.getByLabel('Workspace name').fill('Duplicate Batch 11 Workspace');
 
-    await page
-      .getByLabel('Workspace slug')
-      .fill(slug);
+    await page.getByLabel('Workspace slug').fill(slug);
 
     await page
       .getByRole('button', {
@@ -120,16 +81,10 @@ test.describe('Batch 11 real workspace flows', () => {
       })
       .click();
 
-    await expect(
-      page.locator(
-        '[role="alert"]:not(#__next-route-announcer__)',
-      ),
-    ).toContainText(
+    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toContainText(
       /slug|already|use/i,
     );
 
-    await expect(page).toHaveURL(
-      /\/workspaces\/new$/,
-    );
+    await expect(page).toHaveURL(/\/workspaces\/new$/);
   });
 });

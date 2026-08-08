@@ -1,4 +1,3 @@
-
 import { apiRequest } from '../auth/auth.types';
 import type {
   SaveWebhookInput,
@@ -7,30 +6,20 @@ import type {
   WebhookListResponse,
 } from './integrations.types';
 
-function createBasePath(
-  workspaceId:
-    string,
-): string {
+function createBasePath(workspaceId: string): string {
   return `/workspaces/${workspaceId}/integrations/webhooks`;
 }
 
 export function getWebhookEndpoints(
-  workspaceId:
-    string,
+  workspaceId: string,
 
-  signal?:
-    AbortSignal,
+  signal?: AbortSignal,
 ): Promise<WebhookListResponse> {
-  return apiRequest<
-    WebhookListResponse
-  >(
-    createBasePath(
-      workspaceId,
-    ),
+  return apiRequest<WebhookListResponse>(
+    createBasePath(workspaceId),
 
     {
-      method:
-        'GET',
+      method: 'GET',
 
       signal,
     },
@@ -38,159 +27,115 @@ export function getWebhookEndpoints(
 }
 
 export function createWebhookEndpoint(
-  workspaceId:
-    string,
+  workspaceId: string,
 
-  input:
-    SaveWebhookInput,
+  input: SaveWebhookInput,
 ): Promise<{
-  endpoint:
-    WebhookEndpoint;
+  endpoint: WebhookEndpoint;
 
-  secret:
-    string;
+  secret: string;
 }> {
   return apiRequest(
-    createBasePath(
-      workspaceId,
-    ),
+    createBasePath(workspaceId),
 
     {
-      method:
-        'POST',
+      method: 'POST',
 
-      body:
-        input,
+      body: input,
     },
   );
 }
 
 export function updateWebhookEndpoint(
-  workspaceId:
-    string,
+  workspaceId: string,
 
-  endpointId:
-    string,
+  endpointId: string,
 
-  input:
-    Partial<SaveWebhookInput>,
+  input: Partial<SaveWebhookInput>,
 ): Promise<WebhookEndpoint> {
   return apiRequest(
-    `${createBasePath(
-      workspaceId,
-    )}/${endpointId}`,
+    `${createBasePath(workspaceId)}/${endpointId}`,
 
     {
-      method:
-        'PATCH',
+      method: 'PATCH',
 
-      body:
-        input,
+      body: input,
     },
   );
 }
 
 export function disableWebhookEndpoint(
-  workspaceId:
-    string,
+  workspaceId: string,
 
-  endpointId:
-    string,
+  endpointId: string,
 ): Promise<WebhookEndpoint> {
   return apiRequest(
-    `${createBasePath(
-      workspaceId,
-    )}/${endpointId}/disable`,
+    `${createBasePath(workspaceId)}/${endpointId}/disable`,
 
     {
-      method:
-        'POST',
+      method: 'POST',
     },
   );
 }
 
 export function rotateWebhookSecret(
-  workspaceId:
-    string,
+  workspaceId: string,
 
-  endpointId:
-    string,
+  endpointId: string,
 ): Promise<{
-  secret:
-    string;
+  secret: string;
 }> {
   return apiRequest(
-    `${createBasePath(
-      workspaceId,
-    )}/${endpointId}/rotate-secret`,
+    `${createBasePath(workspaceId)}/${endpointId}/rotate-secret`,
 
     {
-      method:
-        'POST',
+      method: 'POST',
     },
   );
 }
 
 export function sendWebhookTest(
-  workspaceId:
-    string,
+  workspaceId: string,
 
-  endpointId:
-    string,
+  endpointId: string,
 ): Promise<{
-  deliveryId:
-    string;
+  deliveryId: string;
 
-  status:
-    string;
+  status: string;
 }> {
   return apiRequest(
-    `${createBasePath(
-      workspaceId,
-    )}/${endpointId}/test`,
+    `${createBasePath(workspaceId)}/${endpointId}/test`,
 
     {
-      method:
-        'POST',
+      method: 'POST',
     },
   );
 }
 
 export function getWebhookDeliveries(
-  workspaceId:
-    string,
+  workspaceId: string,
 
-  endpointId:
-    string,
+  endpointId: string,
 
-  signal?:
-    AbortSignal,
+  signal?: AbortSignal,
 ): Promise<{
-  items:
-    WebhookDelivery[];
+  items: WebhookDelivery[];
 
   pagination: {
-    page:
-      number;
+    page: number;
 
-    limit:
-      number;
+    limit: number;
 
-    total:
-      number;
+    total: number;
 
-    totalPages:
-      number;
+    totalPages: number;
   };
 }> {
   return apiRequest(
-    `${createBasePath(
-      workspaceId,
-    )}/${endpointId}/deliveries?limit=50`,
+    `${createBasePath(workspaceId)}/${endpointId}/deliveries?limit=50`,
 
     {
-      method:
-        'GET',
+      method: 'GET',
 
       signal,
     },

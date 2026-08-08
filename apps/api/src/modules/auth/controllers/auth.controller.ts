@@ -1,92 +1,38 @@
-﻿import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Req,
-  Res,
-  UnauthorizedException,
-} from '@nestjs/common';
+﻿import { Body, Controller, Get, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
 
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import type {
-  Request,
-  Response,
-} from 'express';
+import type { Request, Response } from 'express';
 
-import {
-  CurrentUser,
-} from '../decorators/current-user.decorator';
+import { CurrentUser } from '../decorators/current-user.decorator';
 
-import {
-  Public,
-} from '../decorators/public.decorator';
+import { Public } from '../decorators/public.decorator';
 
-import {
-  LoginDto,
-} from '../dto/login.dto';
+import { LoginDto } from '../dto/login.dto';
 
-import {
-  RegisterDto,
-} from '../dto/register.dto';
+import { RegisterDto } from '../dto/register.dto';
 
+import { AuthCookieService } from '../services/auth-cookie.service';
 
-
-
-
-import {
-  AuthCookieService,
-} from '../services/auth-cookie.service';
-
-import {
-  AuthService,
-} from '../services/auth.service';
+import { AuthService } from '../services/auth.service';
 import { AuthenticatedUser } from '../interfaces/authenticated-user.interface';
 
+type AuthSessionResult = Awaited<ReturnType<AuthService['login']>>;
 
-type AuthSessionResult =
-  Awaited<
-    ReturnType<AuthService['login']>
-  >;
+type PublicAuthSession = Omit<AuthSessionResult, 'refreshToken'>;
 
-type PublicAuthSession =
-  Omit<
-    AuthSessionResult,
-    'refreshToken'
-  >;
+type AuthRequestMetadata = Parameters<AuthService['login']>[1];
 
-type AuthRequestMetadata =
-  Parameters<
-    AuthService['login']
-  >[1];
-
-function getAuthRequestMetadata(
-  request: Request,
-): AuthRequestMetadata {
+function getAuthRequestMetadata(request: Request): AuthRequestMetadata {
   return {
-    userAgent:
-      request
-        .get('user-agent')
-        ?.slice(0, 512),
+    userAgent: request.get('user-agent')?.slice(0, 512),
 
-    ipAddress:
-      request.ip ??
-      request.socket.remoteAddress,
+    ipAddress: request.ip ?? request.socket.remoteAddress,
   };
 }
 
-function toPublicAuthSession(
-  result: AuthSessionResult,
-): PublicAuthSession {
-  const {
-    refreshToken,
-    ...publicSession
-  } = result;
+function toPublicAuthSession(result: AuthSessionResult): PublicAuthSession {
+  const { refreshToken, ...publicSession } = result;
 
   void refreshToken;
 
@@ -96,18 +42,15 @@ function toPublicAuthSession(
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly authService:
-      AuthService,
+    private readonly authService: AuthService,
 
-    private readonly authCookieService:
-      AuthCookieService,
+    private readonly authCookieService: AuthCookieService,
   ) {}
 
   @Public()
   @Post('register')
   @ApiOperation({
-    summary:
-      'Register and create a user session',
+    summary: 'Register and create a user session',
   })
   async register(
     @Body()
@@ -121,31 +64,17 @@ export class AuthController {
     })
     response: Response,
   ): Promise<PublicAuthSession> {
-    const result =
-      await this.authService
-      .register(
-        dto,
-        getAuthRequestMetadata(
-          request,
-        ),
-      );
+    const result = await this.authService.register(dto, getAuthRequestMetadata(request));
 
-    this.authCookieService
-      .setRefreshToken(
-        response,
-        result.refreshToken,
-      );
+    this.authCookieService.setRefreshToken(response, result.refreshToken);
 
-    return toPublicAuthSession(
-      result,
-    );
+    return toPublicAuthSession(result);
   }
 
   @Public()
   @Post('login')
   @ApiOperation({
-    summary:
-      'Authenticate and create a user session',
+    summary: 'Authenticate and create a user session',
   })
   async login(
     @Body()
@@ -159,31 +88,17 @@ export class AuthController {
     })
     response: Response,
   ): Promise<PublicAuthSession> {
-    const result =
-      await this.authService
-      .login(
-        dto,
-        getAuthRequestMetadata(
-          request,
-        ),
-      );
+    const result = await this.authService.login(dto, getAuthRequestMetadata(request));
 
-    this.authCookieService
-      .setRefreshToken(
-        response,
-        result.refreshToken,
-      );
+    this.authCookieService.setRefreshToken(response, result.refreshToken);
 
-    return toPublicAuthSession(
-      result,
-    );
+    return toPublicAuthSession(result);
   }
 
   @Public()
   @Post('refresh')
   @ApiOperation({
-    summary:
-      'Rotate the current refresh session',
+    summary: 'Rotate the current refresh session',
   })
   async refresh(
     @Req()
@@ -194,43 +109,23 @@ export class AuthController {
     })
     response: Response,
   ): Promise<PublicAuthSession> {
-    const refreshToken =
-      this.authCookieService
-        .getRefreshToken(
-          request,
-        );
+    const refreshToken = this.authCookieService.getRefreshToken(request);
 
     if (!refreshToken) {
-      throw new UnauthorizedException(
-        'Refresh token is missing.',
-      );
+      throw new UnauthorizedException('Refresh token is missing.');
     }
 
-    const result =
-      await this.authService
-      .refresh(
-        refreshToken,
-        getAuthRequestMetadata(
-          request,
-        ),
-      );
+    const result = await this.authService.refresh(refreshToken, getAuthRequestMetadata(request));
 
-    this.authCookieService
-      .setRefreshToken(
-        response,
-        result.refreshToken,
-      );
+    this.authCookieService.setRefreshToken(response, result.refreshToken);
 
-    return toPublicAuthSession(
-      result,
-    );
+    return toPublicAuthSession(result);
   }
 
   @Public()
   @Post('logout')
   @ApiOperation({
-    summary:
-      'Revoke the current user session',
+    summary: 'Revoke the current user session',
   })
   async logout(
     @Req()
@@ -243,24 +138,14 @@ export class AuthController {
   ): Promise<{
     success: true;
   }> {
-    const refreshToken =
-      this.authCookieService
-        .getRefreshToken(
-          request,
-        );
+    const refreshToken = this.authCookieService.getRefreshToken(request);
 
     try {
       if (refreshToken) {
-        await this.authService
-          .logout(
-            refreshToken,
-          );
+        await this.authService.logout(refreshToken);
       }
     } finally {
-      this.authCookieService
-        .clearRefreshToken(
-          response,
-        );
+      this.authCookieService.clearRefreshToken(response);
     }
 
     return {
@@ -271,13 +156,11 @@ export class AuthController {
   @ApiBearerAuth()
   @Post('logout-all')
   @ApiOperation({
-    summary:
-      'Revoke every user session',
+    summary: 'Revoke every user session',
   })
   async logoutAll(
     @CurrentUser()
-    user:
-      AuthenticatedUser,
+    user: AuthenticatedUser,
 
     @Res({
       passthrough: true,
@@ -286,15 +169,9 @@ export class AuthController {
   ): Promise<{
     success: true;
   }> {
-    await this.authService
-      .logoutAll(
-        user.id,
-      );
+    await this.authService.logoutAll(user.id);
 
-    this.authCookieService
-      .clearRefreshToken(
-        response,
-      );
+    this.authCookieService.clearRefreshToken(response);
 
     return {
       success: true,
@@ -304,17 +181,12 @@ export class AuthController {
   @ApiBearerAuth()
   @Get('me')
   @ApiOperation({
-    summary:
-      'Return the active user',
+    summary: 'Return the active user',
   })
   getCurrentUser(
     @CurrentUser()
-    user:
-      AuthenticatedUser,
+    user: AuthenticatedUser,
   ): Promise<unknown> {
-    return this.authService
-      .getCurrentUser(
-        user.id,
-      );
+    return this.authService.getCurrentUser(user.id);
   }
 }

@@ -1,178 +1,103 @@
-
-
 import { apiDownload, apiRequest } from '../lib/api/http-client';
 import type {
-    AnalyticsDimension,
-    AnalyticsReportRequest,
-    AnalyticsReportResponse,
+  AnalyticsDimension,
+  AnalyticsReportRequest,
+  AnalyticsReportResponse,
 } from './analytics-reports.types';
 
-function getReportDimension(
-    request:
-        AnalyticsReportRequest,
-): AnalyticsDimension | null {
-    switch (
-    request.tab
-    ) {
-        case 'sources':
-            return 'sources';
+function getReportDimension(request: AnalyticsReportRequest): AnalyticsDimension | null {
+  switch (request.tab) {
+    case 'sources':
+      return 'sources';
 
-        case 'geography':
-            return 'countries';
+    case 'geography':
+      return 'countries';
 
-        case 'technology':
-            return request.dimension;
+    case 'technology':
+      return request.dimension;
 
-        default:
-            return null;
-    }
+    default:
+      return null;
+  }
 }
 
-function createSearchParams(
-    request:
-        AnalyticsReportRequest,
-): URLSearchParams {
-    const params =
-        new URLSearchParams({
-            preset:
-                request.preset,
+function createSearchParams(request: AnalyticsReportRequest): URLSearchParams {
+  const params = new URLSearchParams({
+    preset: request.preset,
 
-            page:
-                String(
-                    request.page,
-                ),
+    page: String(request.page),
 
-            limit:
-                String(
-                    request.limit,
-                ),
+    limit: String(request.limit),
 
-            sortBy:
-                request.sortBy,
+    sortBy: request.sortBy,
 
-            sortDirection:
-                request.sortDirection,
-        });
+    sortDirection: request.sortDirection,
+  });
 
-    if (
-        request.search.trim()
-    ) {
-        params.set(
-            'search',
-            request.search.trim(),
-        );
-    }
+  if (request.search.trim()) {
+    params.set('search', request.search.trim());
+  }
 
-    return params;
+  return params;
 }
 
-function createBasePath(
-    request:
-        AnalyticsReportRequest,
-): string {
-    return [
-        '/workspaces',
-        request.workspaceId,
-        'websites',
-        request.websiteId,
-        'analytics',
-        'reports',
-    ].join('/');
+function createBasePath(request: AnalyticsReportRequest): string {
+  return [
+    '/workspaces',
+    request.workspaceId,
+    'websites',
+    request.websiteId,
+    'analytics',
+    'reports',
+  ].join('/');
 }
 
-function createReportPath(
-    request:
-        AnalyticsReportRequest,
-    exportMode:
-        boolean,
-): string {
-    const basePath =
-        createBasePath(
-            request,
-        );
+function createReportPath(request: AnalyticsReportRequest, exportMode: boolean): string {
+  const basePath = createBasePath(request);
 
-    const prefix =
-        exportMode
-            ? `${basePath}/exports`
-            : basePath;
+  const prefix = exportMode ? `${basePath}/exports` : basePath;
 
-    if (
-        request.tab ===
-        'pages'
-    ) {
-        return `${prefix}/pages`;
-    }
+  if (request.tab === 'pages') {
+    return `${prefix}/pages`;
+  }
 
-    if (
-        request.tab ===
-        'events'
-    ) {
-        return `${prefix}/events`;
-    }
+  if (request.tab === 'events') {
+    return `${prefix}/events`;
+  }
 
-    const dimension =
-        getReportDimension(
-            request,
-        );
+  const dimension = getReportDimension(request);
 
-    if (!dimension) {
-        throw new Error(
-            'Unsupported analytics report dimension.',
-        );
-    }
+  if (!dimension) {
+    throw new Error('Unsupported analytics report dimension.');
+  }
 
-    return `${prefix}/dimensions/${dimension}`;
+  return `${prefix}/dimensions/${dimension}`;
 }
 
 export async function getAnalyticsReport(
-    request:
-        AnalyticsReportRequest,
+  request: AnalyticsReportRequest,
 ): Promise<AnalyticsReportResponse> {
-    const params =
-        createSearchParams(
-            request,
-        );
+  const params = createSearchParams(request);
 
-    const path =
-        createReportPath(
-            request,
-            false,
-        );
+  const path = createReportPath(request, false);
 
-    return apiRequest<
-        AnalyticsReportResponse
-    >(
-        `${path}?${params.toString()}`,
-        {
-            method: 'GET',
+  return apiRequest<AnalyticsReportResponse>(`${path}?${params.toString()}`, {
+    method: 'GET',
 
-            signal:
-                request.signal,
-        },
-    );
+    signal: request.signal,
+  });
 }
 
-export async function downloadAnalyticsReport(
-    request:
-        AnalyticsReportRequest,
-): Promise<void> {
-    const params =
-        createSearchParams({
-            ...request,
+export async function downloadAnalyticsReport(request: AnalyticsReportRequest): Promise<void> {
+  const params = createSearchParams({
+    ...request,
 
-            page: 1,
+    page: 1,
 
-            limit: 100,
-        });
+    limit: 100,
+  });
 
-    const path =
-        createReportPath(
-            request,
-            true,
-        );
+  const path = createReportPath(request, true);
 
-    await apiDownload(
-        `${path}?${params.toString()}`,
-        `analytics-${request.tab}.csv`,
-    );
+  await apiDownload(`${path}?${params.toString()}`, `analytics-${request.tab}.csv`);
 }

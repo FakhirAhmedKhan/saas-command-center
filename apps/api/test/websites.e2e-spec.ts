@@ -1,25 +1,12 @@
- 
- 
+import type { INestApplication } from '@nestjs/common';
 
-import type {
-  INestApplication,
-} from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
 
-import {
-  PrismaService,
-} from 'src/database/prisma.service';
+import { withBearer } from './helpers/auth';
 
-import {
-  withBearer,
-} from './helpers/auth';
+import { createTestApp } from './helpers/create-test-app';
 
-import {
-  createTestApp,
-} from './helpers/create-test-app';
-
-import {
-  resetDatabase,
-} from './helpers/database';
+import { resetDatabase } from './helpers/database';
 
 import {
   expectAccessDenied,
@@ -28,683 +15,312 @@ import {
 } from './helpers/workspace';
 import { recordString } from './helpers/application';
 import { findRecordById } from './helpers/development';
-import { createWebsite, getWebsite, readWebsiteRecord, websiteRoutes, updateWebsite, listWebsites, readWebsiteItems } from './helpers/website';
+import {
+  createWebsite,
+  getWebsite,
+  readWebsiteRecord,
+  websiteRoutes,
+  updateWebsite,
+  listWebsites,
+  readWebsiteItems,
+} from './helpers/website';
 
+describe('Websites E2E', () => {
+  let app: INestApplication;
 
+  let prisma: PrismaService;
 
-describe(
-  'Websites E2E',
-  () => {
-    let app:
-      INestApplication;
+  beforeEach(async () => {
+    app = await createTestApp();
 
-    let prisma:
-      PrismaService;
+    prisma = app.get(PrismaService);
 
-    beforeEach(
-      async () => {
-        app =
-          await createTestApp();
+    await resetDatabase(prisma);
+  });
 
-        prisma =
-          app.get(
-            PrismaService,
-          );
+  afterEach(async () => {
+    await app.close();
+  });
 
-        await resetDatabase(
-          prisma,
-        );
-      },
-    );
+  it('creates a website and normalizes its domain', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
 
-    afterEach(
-      async () => {
-        await app.close();
-      },
-    );
+    const website = await createWebsite(owner, {
+      name: 'Command Center Website',
 
-    it(
-      'creates a website and normalizes its domain',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+      domain: 'https://Command-Center.Example.com',
 
-        const website =
-          await createWebsite(
-            owner,
-            {
-              name:
-                'Command Center Website',
+      timeZone: 'Asia/Dubai',
 
-              domain:
-                'https://Command-Center.Example.com',
+      allowedOrigins: ['https://command-center.example.com', 'http://localhost:3000'],
+    });
 
-              timeZone:
-                'Asia/Dubai',
+    expect(website.id).toEqual(expect.any(String));
 
-              allowedOrigins: [
-                'https://command-center.example.com',
-                'http://localhost:3000',
-              ],
-            },
-          );
+    expect(recordString(website.record, 'name')).toBe('Command Center Website');
 
-        expect(
-          website.id,
-        ).toEqual(
-          expect.any(String),
-        );
+    expect(recordString(website.record, 'domain')).toBe('command-center.example.com');
 
-        expect(
-          recordString(
-            website.record,
-            'name',
-          ),
-        ).toBe(
-          'Command Center Website',
-        );
+    const detailsResponse = await getWebsite(owner, website.id);
 
-        expect(
-          recordString(
-            website.record,
-            'domain',
-          ),
-        ).toBe(
-          'command-center.example.com',
-        );
+    expect(detailsResponse.status).toBe(200);
 
-        const detailsResponse =
-          await getWebsite(
-            owner,
-            website.id,
-          );
+    const details = readWebsiteRecord(detailsResponse);
 
-        expect(
-          detailsResponse.status,
-        ).toBe(200);
+    expect(recordString(details, 'id')).toBe(website.id);
+  });
 
-        const details =
-          readWebsiteRecord(
-            detailsResponse,
-          );
+  it('creates a website using only required fields and applies defaults', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
 
-        expect(
-          recordString(
-            details,
-            'id',
-          ),
-        ).toBe(
-          website.id,
-        );
-      },
-    );
+    const response = await owner.agent
+      .post(websiteRoutes.root(owner.workspaceId))
+      .set(withBearer(owner.accessToken))
+      .send({
+        name: 'Minimal Website',
 
-    it(
-      'creates a website using only required fields and applies defaults',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+        domain: 'minimal.example.test',
+      });
 
-        const response =
-          await owner.agent
-            .post(
-              websiteRoutes.root(
-                owner.workspaceId,
-              ),
-            )
-            .set(
-              withBearer(
-                owner.accessToken,
-              ),
-            )
-            .send({
-              name:
-                'Minimal Website',
+    expect([200, 201]).toContain(response.status);
 
-              domain:
-                'minimal.example.test',
-            });
+    const website = readWebsiteRecord(response);
 
-        expect([
-          200,
-          201,
-        ]).toContain(
-          response.status,
-        );
+    expect(recordString(website, 'name')).toBe('Minimal Website');
 
-        const website =
-          readWebsiteRecord(
-            response,
-          );
+    expect(recordString(website, 'timeZone', 'timezone')).toBe('UTC');
+  });
 
-        expect(
-          recordString(
-            website,
-            'name',
-          ),
-        ).toBe(
-          'Minimal Website',
-        );
+  it('rejects invalid domains and invalid DTO fields', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
 
-        expect(
-          recordString(
-            website,
-            'timeZone',
-            'timezone',
-          ),
-        ).toBe(
-          'UTC',
-        );
-      },
-    );
+    const invalidDomains = [
+      '',
+      '*.example.com',
+      'https://user:pass@example.com',
+      'example.com/path',
+      'example.com?query=true',
+      'example.com#fragment',
+    ];
 
-    it(
-      'rejects invalid domains and invalid DTO fields',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+    for (const domain of invalidDomains) {
+      const response = await owner.agent
+        .post(websiteRoutes.root(owner.workspaceId))
+        .set(withBearer(owner.accessToken))
+        .send({
+          name: 'Invalid Domain Website',
 
-        const invalidDomains = [
-          '',
-          '*.example.com',
-          'https://user:pass@example.com',
-          'example.com/path',
-          'example.com?query=true',
-          'example.com#fragment',
-        ];
+          domain,
+        });
 
-        for (
-          const domain
-          of invalidDomains
-        ) {
-          const response =
-            await owner.agent
-              .post(
-                websiteRoutes.root(
-                  owner.workspaceId,
-                ),
-              )
-              .set(
-                withBearer(
-                  owner.accessToken,
-                ),
-              )
-              .send({
-                name:
-                  'Invalid Domain Website',
+      expect(response.status).toBe(400);
+    }
 
-                domain,
-              });
+    const invalidOrigins = await owner.agent
+      .post(websiteRoutes.root(owner.workspaceId))
+      .set(withBearer(owner.accessToken))
+      .send({
+        name: 'Invalid Origins',
 
-          expect(
-            response.status,
-          ).toBe(400);
-        }
+        domain: 'invalid-origins.example.test',
 
-        const invalidOrigins =
-          await owner.agent
-            .post(
-              websiteRoutes.root(
-                owner.workspaceId,
-              ),
-            )
-            .set(
-              withBearer(
-                owner.accessToken,
-              ),
-            )
-            .send({
-              name:
-                'Invalid Origins',
-
-              domain:
-                'invalid-origins.example.test',
-
-              allowedOrigins:
-                Array.from(
-                  {
-                    length: 21,
-                  },
-                  (
-                    _,
-                    index,
-                  ) =>
-                    `https://${index}.example.test`,
-                ),
-            });
-
-        expect(
-          invalidOrigins.status,
-        ).toBe(400);
-
-        const invalidApplication =
-          await owner.agent
-            .post(
-              websiteRoutes.root(
-                owner.workspaceId,
-              ),
-            )
-            .set(
-              withBearer(
-                owner.accessToken,
-              ),
-            )
-            .send({
-              name:
-                'Invalid App Website',
-
-              domain:
-                'invalid-app.example.test',
-
-              applicationId:
-                'not-a-uuid',
-            });
-
-        expect(
-          invalidApplication.status,
-        ).toBe(400);
-
-        const unknownField =
-          await owner.agent
-            .post(
-              websiteRoutes.root(
-                owner.workspaceId,
-              ),
-            )
-            .set(
-              withBearer(
-                owner.accessToken,
-              ),
-            )
-            .send({
-              name:
-                'Unknown Field Website',
-
-              domain:
-                'unknown-field.example.test',
-
-              trackingKey:
-                'injected-key',
-            });
-
-        expect(
-          unknownField.status,
-        ).toBe(400);
-      },
-    );
-
-    it(
-      'rejects duplicate domains within a workspace but allows them across workspaces',
-      async () => {
-        const alphaOwner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
-
-        const betaOwner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
-
-        const domain =
-          'shared-domain.example.test';
-
-        await createWebsite(
-          alphaOwner,
+        allowedOrigins: Array.from(
           {
-            domain,
+            length: 21,
           },
-        );
+          (_, index) => `https://${index}.example.test`,
+        ),
+      });
 
-        const duplicateResponse =
-          await alphaOwner.agent
-            .post(
-              websiteRoutes.root(
-                alphaOwner.workspaceId,
-              ),
-            )
-            .set(
-              withBearer(
-                alphaOwner.accessToken,
-              ),
-            )
-            .send({
-              name:
-                'Duplicate Website',
+    expect(invalidOrigins.status).toBe(400);
 
-              domain:
-                `https://${domain}`,
-            });
+    const invalidApplication = await owner.agent
+      .post(websiteRoutes.root(owner.workspaceId))
+      .set(withBearer(owner.accessToken))
+      .send({
+        name: 'Invalid App Website',
 
-        expectBusinessRuleRejected(
-          duplicateResponse,
-        );
+        domain: 'invalid-app.example.test',
 
-        const betaWebsite =
-          await createWebsite(
-            betaOwner,
-            {
-              domain,
-            },
-          );
+        applicationId: 'not-a-uuid',
+      });
 
-        expect(
-          betaWebsite.id,
-        ).toEqual(
-          expect.any(String),
-        );
+    expect(invalidApplication.status).toBe(400);
+
+    const unknownField = await owner.agent
+      .post(websiteRoutes.root(owner.workspaceId))
+      .set(withBearer(owner.accessToken))
+      .send({
+        name: 'Unknown Field Website',
+
+        domain: 'unknown-field.example.test',
+
+        trackingKey: 'injected-key',
+      });
+
+    expect(unknownField.status).toBe(400);
+  });
+
+  it('rejects duplicate domains within a workspace but allows them across workspaces', async () => {
+    const alphaOwner = await registerWorkspaceTestUser(app, prisma);
+
+    const betaOwner = await registerWorkspaceTestUser(app, prisma);
+
+    const domain = 'shared-domain.example.test';
+
+    await createWebsite(alphaOwner, {
+      domain,
+    });
+
+    const duplicateResponse = await alphaOwner.agent
+      .post(websiteRoutes.root(alphaOwner.workspaceId))
+      .set(withBearer(alphaOwner.accessToken))
+      .send({
+        name: 'Duplicate Website',
+
+        domain: `https://${domain}`,
+      });
+
+    expectBusinessRuleRejected(duplicateResponse);
+
+    const betaWebsite = await createWebsite(betaOwner, {
+      domain,
+    });
+
+    expect(betaWebsite.id).toEqual(expect.any(String));
+  });
+
+  it('updates website configuration', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
+
+    const website = await createWebsite(owner);
+
+    const response = await updateWebsite(owner, website.id, {
+      name: 'Updated Website',
+
+      domain: 'updated.example.test',
+
+      timeZone: 'UTC',
+
+      allowedOrigins: ['https://updated.example.test'],
+    });
+
+    expect(response.status).toBe(200);
+
+    const updated = readWebsiteRecord(response);
+
+    expect(recordString(updated, 'name')).toBe('Updated Website');
+
+    expect(recordString(updated, 'domain')).toBe('updated.example.test');
+
+    const databaseWebsite = await prisma.website.findUnique({
+      where: {
+        id: website.id,
       },
+    });
+
+    expect(databaseWebsite?.domain).toBe('updated.example.test');
+  });
+
+  it('supports search, enabled filtering, and pagination', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
+
+    const alpha = await createWebsite(owner, {
+      name: 'Alpha Analytics',
+
+      domain: 'alpha-analytics.example.test',
+
+      enabled: true,
+    });
+
+    const beta = await createWebsite(owner, {
+      name: 'Beta Storefront',
+
+      domain: 'beta-storefront.example.test',
+
+      enabled: false,
+    });
+
+    const searchResponse = await listWebsites(owner, {
+      search: 'Alpha',
+    });
+
+    expect(searchResponse.status).toBe(200);
+
+    const searched = readWebsiteItems(searchResponse);
+
+    expect(findRecordById(searched, alpha.id)).toBeDefined();
+
+    expect(findRecordById(searched, beta.id)).toBeUndefined();
+
+    const disabledResponse = await listWebsites(owner, {
+      enabled: false,
+    });
+
+    expect(findRecordById(readWebsiteItems(disabledResponse), beta.id)).toBeDefined();
+
+    const firstPage = readWebsiteItems(
+      await listWebsites(owner, {
+        page: 1,
+        limit: 1,
+      }),
     );
 
-    it(
-      'updates website configuration',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
-
-        const website =
-          await createWebsite(
-            owner,
-          );
-
-        const response =
-          await updateWebsite(
-            owner,
-            website.id,
-            {
-              name:
-                'Updated Website',
-
-              domain:
-                'updated.example.test',
-
-              timeZone:
-                'UTC',
-
-              allowedOrigins: [
-                'https://updated.example.test',
-              ],
-            },
-          );
-
-        expect(
-          response.status,
-        ).toBe(200);
-
-        const updated =
-          readWebsiteRecord(
-            response,
-          );
-
-        expect(
-          recordString(
-            updated,
-            'name',
-          ),
-        ).toBe(
-          'Updated Website',
-        );
-
-        expect(
-          recordString(
-            updated,
-            'domain',
-          ),
-        ).toBe(
-          'updated.example.test',
-        );
-
-        const databaseWebsite =
-          await prisma.website
-            .findUnique({
-              where: {
-                id:
-                  website.id,
-              },
-            });
-
-        expect(
-          databaseWebsite?.domain,
-        ).toBe(
-          'updated.example.test',
-        );
-      },
+    const secondPage = readWebsiteItems(
+      await listWebsites(owner, {
+        page: 2,
+        limit: 1,
+      }),
     );
 
-    it(
-      'supports search, enabled filtering, and pagination',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+    expect(firstPage).toHaveLength(1);
 
-        const alpha =
-          await createWebsite(
-            owner,
-            {
-              name:
-                'Alpha Analytics',
+    expect(secondPage).toHaveLength(1);
 
-              domain:
-                'alpha-analytics.example.test',
-
-              enabled: true,
-            },
-          );
-
-        const beta =
-          await createWebsite(
-            owner,
-            {
-              name:
-                'Beta Storefront',
-
-              domain:
-                'beta-storefront.example.test',
-
-              enabled: false,
-            },
-          );
-
-        const searchResponse =
-          await listWebsites(
-            owner,
-            {
-              search: 'Alpha',
-            },
-          );
-
-        expect(
-          searchResponse.status,
-        ).toBe(200);
-
-        const searched =
-          readWebsiteItems(
-            searchResponse,
-          );
-
-        expect(
-          findRecordById(
-            searched,
-            alpha.id,
-          ),
-        ).toBeDefined();
-
-        expect(
-          findRecordById(
-            searched,
-            beta.id,
-          ),
-        ).toBeUndefined();
-
-        const disabledResponse =
-          await listWebsites(
-            owner,
-            {
-              enabled: false,
-            },
-          );
-
-        expect(
-          findRecordById(
-            readWebsiteItems(
-              disabledResponse,
-            ),
-            beta.id,
-          ),
-        ).toBeDefined();
-
-        const firstPage =
-          readWebsiteItems(
-            await listWebsites(
-              owner,
-              {
-                page: 1,
-                limit: 1,
-              },
-            ),
-          );
-
-        const secondPage =
-          readWebsiteItems(
-            await listWebsites(
-              owner,
-              {
-                page: 2,
-                limit: 1,
-              },
-            ),
-          );
-
-        expect(
-          firstPage,
-        ).toHaveLength(1);
-
-        expect(
-          secondPage,
-        ).toHaveLength(1);
-
-        expect(
-          recordString(
-            firstPage[0] ?? {},
-            'id',
-          ),
-        ).not.toBe(
-          recordString(
-            secondPage[0] ?? {},
-            'id',
-          ),
-        );
-
-        expect(
-          (
-            await listWebsites(
-              owner,
-              {
-                page: 0,
-              },
-            )
-          ).status,
-        ).toBe(400);
-
-        expect(
-          (
-            await listWebsites(
-              owner,
-              {
-                limit: 101,
-              },
-            )
-          ).status,
-        ).toBe(400);
-      },
+    expect(recordString(firstPage[0] ?? {}, 'id')).not.toBe(
+      recordString(secondPage[0] ?? {}, 'id'),
     );
 
-    it(
-      'prevents cross-workspace website access',
-      async () => {
-        const alphaOwner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+    expect(
+      (
+        await listWebsites(owner, {
+          page: 0,
+        })
+      ).status,
+    ).toBe(400);
 
-        const betaOwner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+    expect(
+      (
+        await listWebsites(owner, {
+          limit: 101,
+        })
+      ).status,
+    ).toBe(400);
+  });
 
-        const website =
-          await createWebsite(
-            alphaOwner,
-          );
+  it('prevents cross-workspace website access', async () => {
+    const alphaOwner = await registerWorkspaceTestUser(app, prisma);
 
-        const response =
-          await betaOwner.agent
-            .get(
-              websiteRoutes.details(
-                alphaOwner.workspaceId,
-                website.id,
-              ),
-            )
-            .set(
-              withBearer(
-                betaOwner.accessToken,
-              ),
-            );
+    const betaOwner = await registerWorkspaceTestUser(app, prisma);
 
-        expectAccessDenied(
-          response,
-        );
-      },
-    );
+    const website = await createWebsite(alphaOwner);
 
-    it(
-      'rejects malformed and unknown website IDs',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+    const response = await betaOwner.agent
+      .get(websiteRoutes.details(alphaOwner.workspaceId, website.id))
+      .set(withBearer(betaOwner.accessToken));
 
-        const malformed =
-          await getWebsite(
-            owner,
-            'not-a-uuid',
-          );
+    expectAccessDenied(response);
+  });
 
-        expect(
-          malformed.status,
-        ).toBe(400);
+  it('rejects malformed and unknown website IDs', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
 
-        const unknown =
-          await getWebsite(
-            owner,
-            '11111111-1111-4111-8111-111111111111',
-          );
+    const malformed = await getWebsite(owner, 'not-a-uuid');
 
-        expect(
-          unknown.status,
-        ).toBe(404);
-      },
-    );
-  },
-);
+    expect(malformed.status).toBe(400);
+
+    const unknown = await getWebsite(owner, '11111111-1111-4111-8111-111111111111');
+
+    expect(unknown.status).toBe(404);
+  });
+});

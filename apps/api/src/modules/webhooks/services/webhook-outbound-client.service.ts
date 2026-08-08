@@ -1,413 +1,208 @@
-import {
-  BadRequestException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
-import {
-  lookup,
-} from 'node:dns/promises';
+import { lookup } from 'node:dns/promises';
 
-import {
-  isIP,
-} from 'node:net';
+import { isIP } from 'node:net';
 
 import ipaddr from 'ipaddr.js';
 
-import {
-  Agent,
-  request,
-} from 'undici';
+import { Agent, request } from 'undici';
 
 interface ResolvedAddress {
-  address:
-    string;
+  address: string;
 
-  family:
-    4 | 6;
+  family: 4 | 6;
 }
 
 export interface WebhookHttpResult {
-  success:
-    boolean;
+  success: boolean;
 
-  retriable:
-    boolean;
+  retriable: boolean;
 
-  statusCode:
-    number | null;
+  statusCode: number | null;
 
-  durationMs:
-    number;
+  durationMs: number;
 
-  errorCode:
-    string | null;
+  errorCode: string | null;
 
-  errorMessage:
-    string | null;
+  errorMessage: string | null;
 }
 
-const BLOCKED_HOSTS =
-  new Set([
-    'localhost',
-    'localhost.localdomain',
-    'metadata',
-    'metadata.google.internal',
-    'host.docker.internal',
-  ]);
+const BLOCKED_HOSTS = new Set([
+  'localhost',
+  'localhost.localdomain',
+  'metadata',
+  'metadata.google.internal',
+  'host.docker.internal',
+]);
 
-const BLOCKED_SUFFIXES = [
-  '.localhost',
-  '.local',
-  '.internal',
-  '.lan',
-  '.home',
-];
+const BLOCKED_SUFFIXES = ['.localhost', '.local', '.internal', '.lan', '.home'];
 
-function isBlockedHostname(
-  hostname:
-    string,
-): boolean {
-  const normalized =
-    hostname
-      .trim()
-      .toLowerCase()
-      .replace(
-        /\.$/,
-        '',
-      );
+function isBlockedHostname(hostname: string): boolean {
+  const normalized = hostname.trim().toLowerCase().replace(/\.$/, '');
 
-  if (
-    BLOCKED_HOSTS.has(
-      normalized,
-    )
-  ) {
+  if (BLOCKED_HOSTS.has(normalized)) {
     return true;
   }
 
-  return BLOCKED_SUFFIXES
-    .some(
-      (suffix) =>
-        normalized.endsWith(
-          suffix,
-        ),
-    );
+  return BLOCKED_SUFFIXES.some((suffix) => normalized.endsWith(suffix));
 }
 
-function isPublicAddress(
-  address:
-    string,
-): boolean {
+function isPublicAddress(address: string): boolean {
   try {
-    return (
-      ipaddr
-        .process(
-          address,
-        )
-        .range() ===
-      'unicast'
-    );
+    return ipaddr.process(address).range() === 'unicast';
   } catch {
     return false;
   }
 }
 
-function isRetriableStatus(
-  status:
-    number,
-): boolean {
-  return (
-    status === 408 ||
-    status === 425 ||
-    status === 429 ||
-    status >= 500
-  );
+function isRetriableStatus(status: number): boolean {
+  return status === 408 || status === 425 || status === 429 || status >= 500;
 }
 
 @Injectable()
 export class WebhookOutboundClientService {
-  async validateUrl(
-    rawUrl:
-      string,
-  ): Promise<void> {
-    const url =
-      this.parseUrl(
-        rawUrl,
-      );
+  async validateUrl(rawUrl: string): Promise<void> {
+    const url = this.parseUrl(rawUrl);
 
-    await this.resolvePublicAddresses(
-      url.hostname,
-    );
+    await this.resolvePublicAddresses(url.hostname);
   }
 
   async sendJson(
-    rawUrl:
-      string,
+    rawUrl: string,
 
-    rawBody:
-      string,
+    rawBody: string,
 
-    headers:
-      Record<
-        string,
-        string
-      >,
+    headers: Record<string, string>,
 
-    timeoutMs:
-      number,
+    timeoutMs: number,
   ): Promise<WebhookHttpResult> {
-    const startedAt =
-      performance.now();
+    const startedAt = performance.now();
 
-    let dispatcher:
-      Agent | undefined;
+    let dispatcher: Agent | undefined;
 
     try {
-      const url =
-        this.parseUrl(
-          rawUrl,
-        );
+      const url = this.parseUrl(rawUrl);
 
-      const addresses =
-        await this
-          .resolvePublicAddresses(
-            url.hostname,
-          );
+      const addresses = await this.resolvePublicAddresses(url.hostname);
 
-      const selectedAddress =
-        addresses.find(
-          (address) =>
-            address.family ===
-            4,
-        ) ??
-        addresses[0];
+      const selectedAddress = addresses.find((address) => address.family === 4) ?? addresses[0];
 
       if (!selectedAddress) {
-        throw new BadRequestException(
-          'Webhook hostname resolved to no safe address.',
-        );
+        throw new BadRequestException('Webhook hostname resolved to no safe address.');
       }
 
-      dispatcher =
-        new Agent({
-          connect: {
-            lookup(
-              _hostname,
-              _options,
-              callback,
-            ) {
-              callback(
-                null,
-                selectedAddress.address,
-                selectedAddress.family,
-              );
-            },
+      dispatcher = new Agent({
+        connect: {
+          lookup(_hostname, _options, callback) {
+            callback(null, selectedAddress.address, selectedAddress.family);
           },
-        });
+        },
+      });
 
-      const response =
-        await request(
-          url,
-          {
-            method:
-              'POST',
+      const response = await request(url, {
+        method: 'POST',
 
-            dispatcher,
-            headersTimeout:
-              timeoutMs,
+        dispatcher,
+        headersTimeout: timeoutMs,
 
-            bodyTimeout:
-              timeoutMs,
+        bodyTimeout: timeoutMs,
 
-            signal:
-              AbortSignal.timeout(
-                timeoutMs,
-              ),
+        signal: AbortSignal.timeout(timeoutMs),
 
-            headers: {
-              accept:
-                'application/json,text/plain,*/*',
+        headers: {
+          accept: 'application/json,text/plain,*/*',
 
-              'content-type':
-                'application/json',
+          'content-type': 'application/json',
 
-              'user-agent':
-                'SaaS-Command-Center-Webhook/1.0',
+          'user-agent': 'SaaS-Command-Center-Webhook/1.0',
 
-              ...headers,
-            },
+          ...headers,
+        },
 
-            body:
-              rawBody,
-          },
-        );
+        body: rawBody,
+      });
 
-      await response.body
-        .dump();
+      await response.body.dump();
 
-      const durationMs =
-        Math.max(
-          0,
-          Math.round(
-            performance.now() -
-              startedAt,
-          ),
-        );
+      const durationMs = Math.max(0, Math.round(performance.now() - startedAt));
 
-      const success =
-        response.statusCode >=
-          200 &&
-        response.statusCode <
-          300;
+      const success = response.statusCode >= 200 && response.statusCode < 300;
 
       return {
         success,
 
-        retriable:
-          !success &&
-          isRetriableStatus(
-            response.statusCode,
-          ),
+        retriable: !success && isRetriableStatus(response.statusCode),
 
-        statusCode:
-          response.statusCode,
+        statusCode: response.statusCode,
 
         durationMs,
 
-        errorCode:
-          success
-            ? null
-            : 'HTTP_STATUS',
+        errorCode: success ? null : 'HTTP_STATUS',
 
-        errorMessage:
-          success
-            ? null
-            : `Webhook returned HTTP ${response.statusCode}.`,
+        errorMessage: success ? null : `Webhook returned HTTP ${response.statusCode}.`,
       };
-    } catch (
-      error
-    ) {
-      const durationMs =
-        Math.max(
-          0,
-          Math.round(
-            performance.now() -
-              startedAt,
-          ),
-        );
+    } catch (error) {
+      const durationMs = Math.max(0, Math.round(performance.now() - startedAt));
 
-      const unsafeDestination =
-        error instanceof
-        BadRequestException;
+      const unsafeDestination = error instanceof BadRequestException;
 
       const message =
-        error instanceof
-        Error
-          ? error.message
-              .slice(
-                0,
-                500,
-              )
-          : 'Unknown webhook delivery failure.';
+        error instanceof Error ? error.message.slice(0, 500) : 'Unknown webhook delivery failure.';
 
       return {
-        success:
-          false,
+        success: false,
 
-        retriable:
-          !unsafeDestination,
+        retriable: !unsafeDestination,
 
-        statusCode:
-          null,
+        statusCode: null,
 
         durationMs,
 
-        errorCode:
-          unsafeDestination
-            ? 'UNSAFE_DESTINATION'
-            : error instanceof
-                Error
-              ? error.name
-              : 'UNKNOWN_ERROR',
+        errorCode: unsafeDestination
+          ? 'UNSAFE_DESTINATION'
+          : error instanceof Error
+            ? error.name
+            : 'UNKNOWN_ERROR',
 
-        errorMessage:
-          message,
+        errorMessage: message,
       };
     } finally {
       if (dispatcher) {
-        await dispatcher
-          .close();
+        await dispatcher.close();
       }
     }
   }
 
-  private parseUrl(
-    rawUrl:
-      string,
-  ): URL {
-    let url:
-      URL;
+  private parseUrl(rawUrl: string): URL {
+    let url: URL;
 
     try {
-      url =
-        new URL(
-          rawUrl,
-        );
+      url = new URL(rawUrl);
     } catch {
-      throw new BadRequestException(
-        'Webhook URL is invalid.',
-      );
+      throw new BadRequestException('Webhook URL is invalid.');
     }
 
-    if (
-      url.protocol !==
-        'http:' &&
-      url.protocol !==
-        'https:'
-    ) {
-      throw new BadRequestException(
-        'Webhook URL must use HTTP or HTTPS.',
-      );
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+      throw new BadRequestException('Webhook URL must use HTTP or HTTPS.');
     }
 
-    if (
-      url.username ||
-      url.password
-    ) {
-      throw new BadRequestException(
-        'Webhook URL cannot contain embedded credentials.',
-      );
+    if (url.username || url.password) {
+      throw new BadRequestException('Webhook URL cannot contain embedded credentials.');
     }
 
-    if (
-      isBlockedHostname(
-        url.hostname,
-      )
-    ) {
-      throw new BadRequestException(
-        'Private and internal webhook destinations are blocked.',
-      );
+    if (isBlockedHostname(url.hostname)) {
+      throw new BadRequestException('Private and internal webhook destinations are blocked.');
     }
 
     return url;
   }
 
-  private async resolvePublicAddresses(
-    hostname:
-      string,
-  ): Promise<
-    ResolvedAddress[]
-  > {
-    const addressFamily =
-      isIP(
-        hostname,
-      );
+  private async resolvePublicAddresses(hostname: string): Promise<ResolvedAddress[]> {
+    const addressFamily = isIP(hostname);
 
     if (addressFamily) {
-      if (
-        !isPublicAddress(
-          hostname,
-        )
-      ) {
+      if (!isPublicAddress(hostname)) {
         throw new BadRequestException(
           'Private, loopback, link-local, multicast and reserved IP addresses are blocked.',
         );
@@ -415,66 +210,36 @@ export class WebhookOutboundClientService {
 
       return [
         {
-          address:
-            hostname,
+          address: hostname,
 
-          family:
-            addressFamily as
-              | 4
-              | 6,
+          family: addressFamily as 4 | 6,
         },
       ];
     }
 
-    let addresses:
-      ResolvedAddress[];
+    let addresses: ResolvedAddress[];
 
     try {
-      addresses =
-        (
-          await lookup(
-            hostname,
-            {
-              all:
-                true,
+      addresses = (
+        await lookup(hostname, {
+          all: true,
 
-              verbatim:
-                true,
-            },
-          )
-        ).map(
-          (address) => ({
-            address:
-              address.address,
+          verbatim: true,
+        })
+      ).map((address) => ({
+        address: address.address,
 
-            family:
-              address.family as
-                | 4
-                | 6,
-          }),
-        );
+        family: address.family as 4 | 6,
+      }));
     } catch {
-      throw new BadRequestException(
-        'Webhook hostname could not be resolved.',
-      );
+      throw new BadRequestException('Webhook hostname could not be resolved.');
     }
 
-    if (
-      addresses.length ===
-      0
-    ) {
-      throw new BadRequestException(
-        'Webhook hostname resolved to no address.',
-      );
+    if (addresses.length === 0) {
+      throw new BadRequestException('Webhook hostname resolved to no address.');
     }
 
-    const unsafe =
-      addresses.find(
-        (address) =>
-          !isPublicAddress(
-            address.address,
-          ),
-      );
+    const unsafe = addresses.find((address) => !isPublicAddress(address.address));
 
     if (unsafe) {
       throw new BadRequestException(

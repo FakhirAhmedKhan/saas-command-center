@@ -1,40 +1,20 @@
 import { cn } from '@/features/lib/api/cn';
-import {
-  forwardRef,
-  type ButtonHTMLAttributes,
-} from 'react';
+import { forwardRef, type ButtonHTMLAttributes } from 'react';
 
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
 
+type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
 
-type ButtonVariant =
-  | 'primary'
-  | 'secondary'
-  | 'outline'
-  | 'ghost'
-  | 'danger';
-
-type ButtonSize =
-  | 'sm'
-  | 'md'
-  | 'lg'
-  | 'icon';
-
-export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   loading?: boolean;
 }
 
-const variantClasses: Record<
-  ButtonVariant,
-  string
-> = {
-  primary:
-    'bg-brand-600 text-white shadow-sm hover:bg-brand-700 focus-visible:ring-brand-500',
+const variantClasses: Record<ButtonVariant, string> = {
+  primary: 'bg-brand-600 text-white shadow-sm hover:bg-brand-700 focus-visible:ring-brand-500',
 
-  secondary:
-    'bg-slate-900 text-white shadow-sm hover:bg-slate-800 focus-visible:ring-slate-500',
+  secondary: 'bg-slate-900 text-white shadow-sm hover:bg-slate-800 focus-visible:ring-slate-500',
 
   outline:
     'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-brand-500',
@@ -42,24 +22,17 @@ const variantClasses: Record<
   ghost:
     'bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-slate-400',
 
-  danger:
-    'bg-red-600 text-white shadow-sm hover:bg-red-700 focus-visible:ring-red-500',
+  danger: 'bg-red-600 text-white shadow-sm hover:bg-red-700 focus-visible:ring-red-500',
 };
 
-const sizeClasses: Record<
-  ButtonSize,
-  string
-> = {
+const sizeClasses: Record<ButtonSize, string> = {
   sm: 'h-9 rounded-lg px-3 text-sm',
   md: 'h-11 rounded-xl px-4 text-sm',
   lg: 'h-12 rounded-xl px-5 text-base',
   icon: 'size-10 rounded-xl',
 };
 
-export const Button = forwardRef<
-  HTMLButtonElement,
-  ButtonProps
->(function Button(
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {
     className,
     variant = 'primary',

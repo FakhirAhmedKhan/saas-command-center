@@ -1,10 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import {
-  createTrackerHarness,
-  readBeaconPayload,
-} from '../test-support/tracker-harness.mjs';
+import { createTrackerHarness, readBeaconPayload } from '../test-support/tracker-harness.mjs';
 
 test('records heartbeat duration while the document is visible', async () => {
   const harness = await createTrackerHarness({
@@ -15,9 +12,7 @@ test('records heartbeat duration while the document is visible', async () => {
   harness.advanceTime(15000);
   await harness.runIntervalsByDelay(15000);
 
-  const heartbeat = harness
-    .queuedEvents()
-    .find((event) => event.type === 'HEARTBEAT');
+  const heartbeat = harness.queuedEvents().find((event) => event.type === 'HEARTBEAT');
 
   assert.equal(heartbeat.durationMs, 15000);
 });
@@ -31,9 +26,7 @@ test('caps heartbeat duration at five minutes', async () => {
   harness.advanceTime(900000);
   await harness.runIntervalsByDelay(15000);
 
-  const heartbeat = harness
-    .queuedEvents()
-    .find((event) => event.type === 'HEARTBEAT');
+  const heartbeat = harness.queuedEvents().find((event) => event.type === 'HEARTBEAT');
 
   assert.equal(heartbeat.durationMs, 300000);
 });
@@ -83,9 +76,7 @@ test('resets heartbeat timing when the document becomes visible again', async ()
   harness.advanceTime(15000);
   await harness.runIntervalsByDelay(15000);
 
-  const heartbeat = harness
-    .queuedEvents()
-    .find((event) => event.type === 'HEARTBEAT');
+  const heartbeat = harness.queuedEvents().find((event) => event.type === 'HEARTBEAT');
 
   assert.equal(heartbeat.durationMs, 15000);
 });

@@ -1,18 +1,10 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
-import {
-  ThrottlerGuard,
-  ThrottlerModule,
-} from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
-
-import {
-  DatabaseModule,
-} from './database/database.module';
-import {
-  HealthModule,
-} from './health/health.module';
+import { DatabaseModule } from './database/database.module';
+import { HealthModule } from './modules/health/health.module';
 import { AuthSessionsModule } from './modules/auth/module/auth-sessions.module';
 import { AuthModule } from './modules/auth/module/auth.module';
 import { UsersModule } from './modules/users/users.module';
@@ -81,4 +73,4 @@ import { WebhooksModule } from './modules/webhooks/webhooks.module';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}

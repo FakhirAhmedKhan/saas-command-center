@@ -9,208 +9,142 @@ export type WebhookEventType =
   | 'WORKSPACE_ACTIVITY_CREATED';
 
 export type WebhookDeliveryStatus =
-  | 'PENDING'
-  | 'PROCESSING'
-  | 'RETRY_SCHEDULED'
-  | 'SUCCEEDED'
-  | 'DEAD_LETTERED'
-  | 'CANCELLED';
+  'PENDING' | 'PROCESSING' | 'RETRY_SCHEDULED' | 'SUCCEEDED' | 'DEAD_LETTERED' | 'CANCELLED';
 
 export interface WebhookEventCatalogItem {
-  type:
-    WebhookEventType;
+  type: WebhookEventType;
 
-  label:
-    string;
+  label: string;
 
-  description:
-    string;
+  description: string;
 }
 
 export interface WebhookEndpoint {
-  id:
-    string;
+  id: string;
 
-  workspaceId:
-    string;
+  workspaceId: string;
 
-  name:
-    string;
+  name: string;
 
-  url:
-    string;
+  url: string;
 
-  eventTypes:
-    WebhookEventType[];
+  eventTypes: WebhookEventType[];
 
-  payloadVersion:
-    string;
+  payloadVersion: string;
 
-  timeoutMs:
-    number;
+  timeoutMs: number;
 
-  maxAttempts:
-    number;
+  maxAttempts: number;
 
-  enabled:
-    boolean;
+  enabled: boolean;
 
-  secretConfigured:
-    boolean;
+  secretConfigured: boolean;
 
-  lastDeliveryAt:
-    string | null;
+  lastDeliveryAt: string | null;
 
-  lastSuccessAt:
-    string | null;
+  lastSuccessAt: string | null;
 
-  lastFailureAt:
-    string | null;
+  lastFailureAt: string | null;
 
-  createdAt:
-    string;
+  createdAt: string;
 
-  updatedAt:
-    string;
+  updatedAt: string;
 
-  deliveryCount:
-    number;
+  deliveryCount: number;
 
   latestDelivery: {
-    id:
-      string;
+    id: string;
 
-    status:
-      WebhookDeliveryStatus;
+    status: WebhookDeliveryStatus;
 
-    responseStatus:
-      number | null;
+    responseStatus: number | null;
 
-    responseDurationMs:
-      number | null;
+    responseDurationMs: number | null;
 
-    createdAt:
-      string;
+    createdAt: string;
 
-    deliveredAt:
-      string | null;
+    deliveredAt: string | null;
   } | null;
 }
 
 export interface WebhookListResponse {
-  canManage:
-    boolean;
+  canManage: boolean;
 
-  eventCatalog:
-    WebhookEventCatalogItem[];
+  eventCatalog: WebhookEventCatalogItem[];
 
-  items:
-    WebhookEndpoint[];
+  items: WebhookEndpoint[];
 }
 
 export interface WebhookDeliveryAttempt {
-  id:
-    string;
+  id: string;
 
-  attemptNumber:
-    number;
+  attemptNumber: number;
 
-  outcome:
-    'SUCCEEDED' | 'FAILED';
+  outcome: 'SUCCEEDED' | 'FAILED';
 
-  responseStatus:
-    number | null;
+  responseStatus: number | null;
 
-  durationMs:
-    number;
+  durationMs: number;
 
-  errorCode:
-    string | null;
+  errorCode: string | null;
 
-  errorMessage:
-    string | null;
+  errorMessage: string | null;
 
-  startedAt:
-    string;
+  startedAt: string;
 
-  finishedAt:
-    string;
+  finishedAt: string;
 }
 
 export interface WebhookDelivery {
-  id:
-    string;
+  id: string;
 
-  status:
-    WebhookDeliveryStatus;
+  status: WebhookDeliveryStatus;
 
-  attemptCount:
-    number;
+  attemptCount: number;
 
-  maxAttempts:
-    number;
+  maxAttempts: number;
 
-  nextAttemptAt:
-    string;
+  nextAttemptAt: string;
 
-  responseStatus:
-    number | null;
+  responseStatus: number | null;
 
-  responseDurationMs:
-    number | null;
+  responseDurationMs: number | null;
 
-  failureCode:
-    string | null;
+  failureCode: string | null;
 
-  failureReason:
-    string | null;
+  failureReason: string | null;
 
-  deliveredAt:
-    string | null;
+  deliveredAt: string | null;
 
-  createdAt:
-    string;
+  createdAt: string;
 
   event: {
-    id:
-      string;
+    id: string;
 
-    type:
-      string;
+    type: string;
 
-    payloadVersion:
-      string;
+    payloadVersion: string;
 
-    resourceType:
-      string | null;
+    resourceType: string | null;
 
-    resourceId:
-      string | null;
+    resourceId: string | null;
 
-    occurredAt:
-      string;
+    occurredAt: string;
   };
 
-  attempts:
-    WebhookDeliveryAttempt[];
+  attempts: WebhookDeliveryAttempt[];
 }
 
 export interface SaveWebhookInput {
-  name:
-    string;
+  name: string;
 
-  url:
-    string;
+  url: string;
 
-  eventTypes:
-    WebhookEventType[];
+  eventTypes: WebhookEventType[];
 
-  timeoutMs:
-    number;
+  timeoutMs: number;
 
-  maxAttempts:
-    number;
+  maxAttempts: number;
 
-  enabled:
-    boolean;
+  enabled: boolean;
 }

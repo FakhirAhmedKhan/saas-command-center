@@ -1,37 +1,21 @@
 'use client';
 
-import {
-    useParams,
-} from 'next/navigation';
+import { useParams } from 'next/navigation';
 
-import {
-    AnalyticsProcessingPanel,
-} from '@/features/analytics-processing/analytics-processing-panel';
+import { AnalyticsProcessingPanel } from '@/features/analytics-processing/analytics-processing-panel';
 
 interface RouteParameters extends Record<string, string> {
-    workspaceId:
-    string;
+  workspaceId: string;
 
-    websiteId:
-    string;
+  websiteId: string;
 }
 
 export default function AnalyticsProcessingPage() {
-    const params =
-        useParams<
-            RouteParameters
-        >();
+  const params = useParams<RouteParameters>();
 
-    return (
-        <div className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">
-            <AnalyticsProcessingPanel
-                workspaceId={
-                    params.workspaceId
-                }
-                websiteId={
-                    params.websiteId
-                }
-            />
-        </div>
-    );
+  return (
+    <div className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">
+      <AnalyticsProcessingPanel workspaceId={params.workspaceId} websiteId={params.websiteId} />
+    </div>
+  );
 }

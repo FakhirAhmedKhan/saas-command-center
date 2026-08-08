@@ -1,25 +1,15 @@
 ﻿'use client';
 
-import type {
-  PropsWithChildren,
-} from 'react';
+import type { PropsWithChildren } from 'react';
 
-import {
-  AuthProvider,
-} from '@/features/auth/auth-provider';
+import { AuthProvider } from '@/features/auth/auth-provider';
 
-import {
-  SessionProvider,
-} from '@/features/auth/session-provider';
+import { SessionProvider } from '@/features/auth/session-provider';
 
-export function Providers({
-  children,
-}: PropsWithChildren) {
+export function Providers({ children }: PropsWithChildren) {
   return (
     <AuthProvider>
-      <SessionProvider>
-        {children}
-      </SessionProvider>
+      <SessionProvider>{children}</SessionProvider>
     </AuthProvider>
   );
 }

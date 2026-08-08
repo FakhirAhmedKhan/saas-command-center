@@ -1,6 +1,4 @@
-export function formatApplicationDate(
-  value: string | null | undefined,
-): string {
+export function formatApplicationDate(value: string | null | undefined): string {
   if (!value) {
     return 'Not set';
   }
@@ -18,9 +16,7 @@ export function formatApplicationDate(
   }).format(date);
 }
 
-export function toDateInputValue(
-  value: string | null | undefined,
-): string {
+export function toDateInputValue(value: string | null | undefined): string {
   if (!value) {
     return '';
   }
@@ -34,21 +30,15 @@ export function toDateInputValue(
   return date.toISOString().slice(0, 10);
 }
 
-export function toApiDateValue(
-  value: string,
-): string | null {
+export function toApiDateValue(value: string): string | null {
   if (!value) {
     return null;
   }
 
-  return new Date(
-    `${value}T00:00:00.000Z`,
-  ).toISOString();
+  return new Date(`${value}T00:00:00.000Z`).toISOString();
 }
 
-export function getApplicationInitials(
-  name: string,
-): string {
+export function getApplicationInitials(name: string): string {
   return name
     .split(/\s+/)
     .filter(Boolean)
@@ -58,10 +48,7 @@ export function getApplicationInitials(
     .toUpperCase();
 }
 
-export function getErrorMessage(
-  error: unknown,
-  fallback = 'Something went wrong',
-): string {
+export function getErrorMessage(error: unknown, fallback = 'Something went wrong'): string {
   if (error instanceof Error) {
     return error.message;
   }

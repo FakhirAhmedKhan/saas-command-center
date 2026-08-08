@@ -30,7 +30,7 @@ export interface UpdateUserProfileInput {
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(input: CreateUserInput): Promise<PublicUser> {
     return this.prisma.user.create({
@@ -86,9 +86,7 @@ export class UsersService {
    * Internal authentication method.
    * This returns passwordHash and must never be exposed from a controller.
    */
-  async findAuthenticationRecordByEmail(
-    email: string,
-  ): Promise<User | null> {
+  async findAuthenticationRecordByEmail(email: string): Promise<User | null> {
     return this.prisma.user.findFirst({
       where: {
         email: this.normalizeEmail(email),
@@ -98,10 +96,7 @@ export class UsersService {
     });
   }
 
-  async updateProfile(
-    id: string,
-    input: UpdateUserProfileInput,
-  ): Promise<PublicUser> {
+  async updateProfile(id: string, input: UpdateUserProfileInput): Promise<PublicUser> {
     await this.findByIdOrThrow(id);
 
     return this.prisma.user.update({
@@ -111,10 +106,8 @@ export class UsersService {
       data: {
         ...(input.displayName !== undefined
           ? {
-            displayName: this.normalizeDisplayName(
-              input.displayName,
-            ),
-          }
+              displayName: this.normalizeDisplayName(input.displayName),
+            }
           : {}),
       },
       select: publicUserSelect,
@@ -163,9 +156,7 @@ export class UsersService {
     return email.trim().toLowerCase();
   }
 
-  private normalizeDisplayName(
-    displayName?: string | null,
-  ): string | null {
+  private normalizeDisplayName(displayName?: string | null): string | null {
     if (displayName === undefined || displayName === null) {
       return null;
     }

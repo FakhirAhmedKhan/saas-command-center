@@ -1,101 +1,57 @@
 'use client';
 
-import {
-    useEffect,
-    useState,
-} from 'react';
+import { useEffect, useState } from 'react';
 
+import { HealthStatusBadge } from './health-status-badge';
 
-
-import {
-    HealthStatusBadge,
-} from './health-status-badge';
-
-import type {
-    HealthCheckStatus,
-} from './monitoring.types';
+import type { HealthCheckStatus } from './monitoring.types';
 import { apiRequest } from '../auth/auth.types';
 
 interface ApplicationHealthSummary {
-    status:
-    HealthCheckStatus;
+  status: HealthCheckStatus;
 
-    checks:
-    number;
+  checks: number;
 
-    averageResponseTimeMs:
-    number | null;
+  averageResponseTimeMs: number | null;
 
-    lastCheckedAt:
-    string | null;
+  lastCheckedAt: string | null;
 }
 
 export function ApplicationHealthBadge({
-    workspaceId,
-    applicationId,
+  workspaceId,
+  applicationId,
 }: {
-    workspaceId:
-    string;
+  workspaceId: string;
 
-    applicationId:
-    string;
+  applicationId: string;
 }) {
-    const [
-        summary,
-        setSummary,
-    ] =
-        useState<
-            ApplicationHealthSummary | null
-        >(null);
+  const [summary, setSummary] = useState<ApplicationHealthSummary | null>(null);
 
-    useEffect(
-        () => {
-            const controller =
-                new AbortController();
+  useEffect(() => {
+    const controller = new AbortController();
 
-            void apiRequest<
-                ApplicationHealthSummary
-            >(
-                `/workspaces/${workspaceId}/monitoring/applications/${applicationId}/summary`,
+    void apiRequest<ApplicationHealthSummary>(
+      `/workspaces/${workspaceId}/monitoring/applications/${applicationId}/summary`,
 
-                {
-                    method:
-                        'GET',
+      {
+        method: 'GET',
 
-                    signal:
-                        controller.signal,
-                },
-            )
-                .then(
-                    setSummary,
-                )
-                .catch(
-                    () => {
-                        setSummary(
-                            null,
-                        );
-                    },
-                );
+        signal: controller.signal,
+      },
+    )
+      .then(setSummary)
+      .catch(() => {
+        setSummary(null);
+      });
 
-            return () => {
-                controller.abort();
-            };
-        },
-        [
-            workspaceId,
-            applicationId,
-        ],
-    );
+    return () => {
+      controller.abort();
+    };
+  }, [workspaceId, applicationId]);
 
-    if (!summary) {
-        return null;
-    }
+  if (!summary) {
+    return null;
+  }
 
-    return (
-        <HealthStatusBadge
-            status={
-                summary.status
-            }
-        />
-    );
+  return <HealthStatusBadge status={summary.status} />;
 }

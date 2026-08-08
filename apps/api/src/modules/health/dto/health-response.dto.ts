@@ -1,6 +1,4 @@
-import {
-  ApiProperty,
-} from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class PublicHealthResponseDto {
   @ApiProperty({
@@ -9,8 +7,7 @@ export class PublicHealthResponseDto {
   status!: 'ok';
 
   @ApiProperty({
-    example:
-      '2026-08-07T01:18:43.237Z',
+    example: '2026-08-07T01:18:43.237Z',
   })
   timestamp!: string;
 }
@@ -19,9 +16,7 @@ export class DatabaseReadinessDto {
   @ApiProperty({
     example: 'up',
   })
-  status!:
-    | 'up'
-    | 'down';
+  status!: 'up' | 'down';
 
   @ApiProperty({
     example: 73,
@@ -36,8 +31,7 @@ export class ReadinessResponseDto {
   status!: 'ready';
 
   @ApiProperty({
-    example:
-      'command-center-api',
+    example: 'command-center-api',
   })
   service!: string;
 
@@ -52,15 +46,12 @@ export class ReadinessResponseDto {
   environment!: string;
 
   @ApiProperty({
-    example:
-      '2026-08-07T01:18:43.237Z',
+    example: '2026-08-07T01:18:43.237Z',
   })
   timestamp!: string;
 
   @ApiProperty({
-    type:
-      DatabaseReadinessDto,
+    type: DatabaseReadinessDto,
   })
-  database!:
-    DatabaseReadinessDto;
+  database!: DatabaseReadinessDto;
 }

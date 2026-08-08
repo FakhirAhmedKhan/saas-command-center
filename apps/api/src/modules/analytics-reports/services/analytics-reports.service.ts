@@ -1,683 +1,404 @@
-import {
-    BadRequestException,
-    Injectable,
-    NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+
+import { Prisma } from 'src/generated/prisma/client';
+
+import { AnalyticsAggregateDimension } from 'src/generated/prisma/enums';
+
+import { PrismaService } from 'src/database/prisma.service';
+
+import { resolveAnalyticsDateRange } from '../../analytics-overview/utils/analytics-date-range';
 
 import {
-    Prisma,
-} from 'src/generated/prisma/client';
-
-import {
-    AnalyticsAggregateDimension,
-} from 'src/generated/prisma/enums';
-
-import {
-    PrismaService,
-} from 'src/database/prisma.service';
-
-import {
-    resolveAnalyticsDateRange,
-} from '../../analytics-overview/utils/analytics-date-range';
-
-import {
-    roundMetric,
-    toSafeNumber,
+  roundMetric,
+  toSafeNumber,
 } from '../../analytics-overview/utils/analytics-overview-metrics';
 
 import {
-    ANALYTICS_EXPORT_MAX_DAYS,
-    ANALYTICS_EXPORT_MAX_ROWS,
+  ANALYTICS_EXPORT_MAX_DAYS,
+  ANALYTICS_EXPORT_MAX_ROWS,
 } from '../analytics-reports.constants';
 
 import {
-    AnalyticsReportDimension,
-    AnalyticsSortDirection,
-    DimensionReportQueryDto,
-    DimensionReportSortField,
-    EventReportQueryDto,
-    EventReportSortField,
-    PageReportQueryDto,
-    PageReportSortField,
+  AnalyticsReportDimension,
+  AnalyticsSortDirection,
+  DimensionReportQueryDto,
+  DimensionReportSortField,
+  EventReportQueryDto,
+  EventReportSortField,
+  PageReportQueryDto,
+  PageReportSortField,
 } from '../dto/analytics-report-query.dto';
 
 import type {
-    AnalyticsPaginationDto,
-    AnalyticsReportRangeDto,
-    DimensionReportItemDto,
-    DimensionReportResponseDto,
-    EventReportItemDto,
-    EventReportResponseDto,
-    PageReportItemDto,
-    PageReportResponseDto,
+  AnalyticsPaginationDto,
+  AnalyticsReportRangeDto,
+  DimensionReportItemDto,
+  DimensionReportResponseDto,
+  EventReportItemDto,
+  EventReportResponseDto,
+  PageReportItemDto,
+  PageReportResponseDto,
 } from '../dto/analytics-report-response.dto';
 
-import {
-    createCsv,
-    createCsvFilename,
-} from '../utils/analytics-csv';
+import { createCsv, createCsvFilename } from '../utils/analytics-csv';
 
 interface WebsiteReportContext {
-    websiteId: string;
+  websiteId: string;
 
-    websiteName: string;
+  websiteName: string;
 
-    timeZone: string;
+  timeZone: string;
 
-    range: ReturnType<
-        typeof resolveAnalyticsDateRange
-    >;
+  range: ReturnType<typeof resolveAnalyticsDateRange>;
 }
 
 interface PageDatabaseRow {
-    path: string;
+  path: string;
 
-    title: string | null;
+  title: string | null;
 
-    views:
-    | bigint
-    | number
-    | string;
+  views: bigint | number | string;
 
-    visitors:
-    | bigint
-    | number
-    | string;
+  visitors: bigint | number | string;
 
-    sessions:
-    | bigint
-    | number
-    | string;
+  sessions: bigint | number | string;
 
-    entrances:
-    | bigint
-    | number
-    | string;
+  entrances: bigint | number | string;
 
-    exits:
-    | bigint
-    | number
-    | string;
+  exits: bigint | number | string;
 
-    bounced_sessions:
-    | bigint
-    | number
-    | string;
+  bounced_sessions: bigint | number | string;
 
-    total_duration_ms:
-    | bigint
-    | number
-    | string;
+  total_duration_ms: bigint | number | string;
 
-    total_count:
-    | bigint
-    | number
-    | string;
+  total_count: bigint | number | string;
 }
 
 interface EventDatabaseRow {
-    name: string;
+  name: string;
 
-    events:
-    | bigint
-    | number
-    | string;
+  events: bigint | number | string;
 
-    visitors:
-    | bigint
-    | number
-    | string;
+  visitors: bigint | number | string;
 
-    sessions:
-    | bigint
-    | number
-    | string;
+  sessions: bigint | number | string;
 
-    total_count:
-    | bigint
-    | number
-    | string;
+  total_count: bigint | number | string;
 }
 
 interface EventSummaryDatabaseRow {
-    total_events:
-    | bigint
-    | number
-    | string;
+  total_events: bigint | number | string;
 
-    unique_visitors:
-    | bigint
-    | number
-    | string;
+  unique_visitors: bigint | number | string;
 
-    unique_sessions:
-    | bigint
-    | number
-    | string;
+  unique_sessions: bigint | number | string;
 }
 
 interface AggregateDimensionRow {
-    dimensionValue: string;
+  dimensionValue: string;
 
-    dimensionLabel: string;
+  dimensionLabel: string;
 
-    visitors: number;
+  visitors: number;
 
-    sessions: number;
+  sessions: number;
 
-    pageViews: number;
+  pageViews: number;
 }
 
 export interface CsvExportResult {
-    filename: string;
+  filename: string;
 
-    content: string;
+  content: string;
 }
 
 @Injectable()
 export class AnalyticsReportsService {
-    constructor(
-        private readonly prisma:
-            PrismaService,
-    ) { }
-
-    async getPagesReport(
-        workspaceId: string,
-        websiteId: string,
-        query:
-            PageReportQueryDto,
-    ): Promise<PageReportResponseDto> {
-        const context =
-            await this.resolveContext(
-                workspaceId,
-                websiteId,
-                query,
-            );
-
-        return this.loadPagesReport(
-            context,
-            query,
-            query.page,
-            query.limit,
-        );
-    }
-
-    async getEventsReport(
-        workspaceId: string,
-        websiteId: string,
-        query:
-            EventReportQueryDto,
-    ): Promise<EventReportResponseDto> {
-        const context =
-            await this.resolveContext(
-                workspaceId,
-                websiteId,
-                query,
-            );
-
-        return this.loadEventsReport(
-            context,
-            query,
-            query.page,
-            query.limit,
-        );
-    }
-
-    async getDimensionReport(
-        workspaceId: string,
-        websiteId: string,
-        dimension:
-            AnalyticsReportDimension,
-        query:
-            DimensionReportQueryDto,
-    ): Promise<DimensionReportResponseDto> {
-        const context =
-            await this.resolveContext(
-                workspaceId,
-                websiteId,
-                query,
-            );
-
-        return this.loadDimensionReport(
-            context,
-            dimension,
-            query,
-            query.page,
-            query.limit,
-        );
-    }
-
-    async exportPages(
-        workspaceId: string,
-        websiteId: string,
-        query:
-            PageReportQueryDto,
-    ): Promise<CsvExportResult> {
-        const context =
-            await this.resolveContext(
-                workspaceId,
-                websiteId,
-                query,
-            );
-
-        this.assertExportRange(
-            context,
-        );
-
-        const report =
-            await this.loadPagesReport(
-                context,
-                query,
-                1,
-                ANALYTICS_EXPORT_MAX_ROWS,
-            );
-
-        return {
-            filename:
-                createCsvFilename(
-                    'pages',
-                    context.range
-                        .current.from,
-                    context.range
-                        .current.to,
-                ),
-
-            content:
-                createCsv(
-                    [
-                        {
-                            header:
-                                'Path',
-
-                            value:
-                                (
-                                    row,
-                                ) =>
-                                    row.path,
-                        },
-
-                        {
-                            header:
-                                'Title',
-
-                            value:
-                                (
-                                    row,
-                                ) =>
-                                    row.title,
-                        },
-
-                        {
-                            header:
-                                'Views',
-
-                            value:
-                                (
-                                    row,
-                                ) =>
-                                    row.views,
-                        },
-
-                        {
-                            header:
-                                'Visitors',
-
-                            value:
-                                (
-                                    row,
-                                ) =>
-                                    row.visitors,
-                        },
-
-                        {
-                            header:
-                                'Sessions',
-
-                            value:
-                                (
-                                    row,
-                                ) =>
-                                    row.sessions,
-                        },
-
-                        {
-                            header:
-                                'Entrances',
-
-                            value:
-                                (
-                                    row,
-                                ) =>
-                                    row.entrances,
-                        },
-
-                        {
-                            header:
-                                'Exits',
-
-                            value:
-                                (
-                                    row,
-                                ) =>
-                                    row.exits,
-                        },
-
-                        {
-                            header:
-                                'Bounce Rate',
-
-                            value:
-                                (
-                                    row,
-                                ) =>
-                                    row.bounceRate,
-                        },
-
-                        {
-                            header:
-                                'Average Duration Seconds',
-
-                            value:
-                                (
-                                    row,
-                                ) =>
-                                    row.averageDurationSeconds,
-                        },
-                    ],
-
-                    report.items,
-                ),
-        };
-    }
-
-    async exportEvents(
-        workspaceId: string,
-        websiteId: string,
-        query:
-            EventReportQueryDto,
-    ): Promise<CsvExportResult> {
-        const context =
-            await this.resolveContext(
-                workspaceId,
-                websiteId,
-                query,
-            );
-
-        this.assertExportRange(
-            context,
-        );
-
-        const report =
-            await this.loadEventsReport(
-                context,
-                query,
-                1,
-                ANALYTICS_EXPORT_MAX_ROWS,
-            );
-
-        return {
-            filename:
-                createCsvFilename(
-                    'events',
-                    context.range
-                        .current.from,
-                    context.range
-                        .current.to,
-                ),
-
-            content:
-                createCsv(
-                    [
-                        {
-                            header:
-                                'Event',
-
-                            value:
-                                (
-                                    row,
-                                ) =>
-                                    row.name,
-                        },
-
-                        {
-                            header:
-                                'Total Events',
-
-                            value:
-                                (
-                                    row,
-                                ) =>
-                                    row.events,
-                        },
-
-                        {
-                            header:
-                                'Unique Visitors',
-
-                            value:
-                                (
-                                    row,
-                                ) =>
-                                    row.visitors,
-                        },
-
-                        {
-                            header:
-                                'Sessions',
-
-                            value:
-                                (
-                                    row,
-                                ) =>
-                                    row.sessions,
-                        },
-                    ],
-
-                    report.items,
-                ),
-        };
-    }
-
-    async exportDimension(
-        workspaceId: string,
-        websiteId: string,
-        dimension:
-            AnalyticsReportDimension,
-        query:
-            DimensionReportQueryDto,
-    ): Promise<CsvExportResult> {
-        const context =
-            await this.resolveContext(
-                workspaceId,
-                websiteId,
-                query,
-            );
-
-        this.assertExportRange(
-            context,
-        );
-
-        const report =
-            await this.loadDimensionReport(
-                context,
-                dimension,
-                query,
-                1,
-                ANALYTICS_EXPORT_MAX_ROWS,
-            );
-
-        return {
-            filename:
-                createCsvFilename(
-                    dimension,
-                    context.range
-                        .current.from,
-                    context.range
-                        .current.to,
-                ),
-
-            content:
-                createCsv(
-                    [
-                        {
-                            header:
-                                'Value',
-
-                            value:
-                                (
-                                    row,
-                                ) =>
-                                    row.label,
-                        },
-
-                        {
-                            header:
-                                'Visitors',
-
-                            value:
-                                (
-                                    row,
-                                ) =>
-                                    row.visitors,
-                        },
-
-                        {
-                            header:
-                                'Sessions',
-
-                            value:
-                                (
-                                    row,
-                                ) =>
-                                    row.sessions,
-                        },
-
-                        {
-                            header:
-                                'Page Views',
-
-                            value:
-                                (
-                                    row,
-                                ) =>
-                                    row.pageViews,
-                        },
-
-                        {
-                            header:
-                                'Percentage',
-
-                            value:
-                                (
-                                    row,
-                                ) =>
-                                    row.percentage,
-                        },
-                    ],
-
-                    report.items,
-                ),
-        };
-    }
-
-    private async resolveContext(
-        workspaceId: string,
-        websiteId: string,
-        query: {
-            preset?: never;
-            from?: string;
-            to?: string;
-        } | PageReportQueryDto |
-            EventReportQueryDto |
-            DimensionReportQueryDto,
-    ): Promise<WebsiteReportContext> {
-        const website =
-            await this.prisma
-                .website.findFirst({
-                    where: {
-                        id:
-                            websiteId,
-
-                        workspaceId,
-
-                        archivedAt:
-                            null,
-                    },
-
-                    select: {
-                        id: true,
-
-                        name: true,
-
-                        timeZone: true,
-                    },
-                });
-
-        if (!website) {
-            throw new NotFoundException(
-                'Website not found',
-            );
+  constructor(private readonly prisma: PrismaService) {}
+
+  async getPagesReport(
+    workspaceId: string,
+    websiteId: string,
+    query: PageReportQueryDto,
+  ): Promise<PageReportResponseDto> {
+    const context = await this.resolveContext(workspaceId, websiteId, query);
+
+    return this.loadPagesReport(context, query, query.page, query.limit);
+  }
+
+  async getEventsReport(
+    workspaceId: string,
+    websiteId: string,
+    query: EventReportQueryDto,
+  ): Promise<EventReportResponseDto> {
+    const context = await this.resolveContext(workspaceId, websiteId, query);
+
+    return this.loadEventsReport(context, query, query.page, query.limit);
+  }
+
+  async getDimensionReport(
+    workspaceId: string,
+    websiteId: string,
+    dimension: AnalyticsReportDimension,
+    query: DimensionReportQueryDto,
+  ): Promise<DimensionReportResponseDto> {
+    const context = await this.resolveContext(workspaceId, websiteId, query);
+
+    return this.loadDimensionReport(context, dimension, query, query.page, query.limit);
+  }
+
+  async exportPages(
+    workspaceId: string,
+    websiteId: string,
+    query: PageReportQueryDto,
+  ): Promise<CsvExportResult> {
+    const context = await this.resolveContext(workspaceId, websiteId, query);
+
+    this.assertExportRange(context);
+
+    const report = await this.loadPagesReport(context, query, 1, ANALYTICS_EXPORT_MAX_ROWS);
+
+    return {
+      filename: createCsvFilename('pages', context.range.current.from, context.range.current.to),
+
+      content: createCsv(
+        [
+          {
+            header: 'Path',
+
+            value: (row) => row.path,
+          },
+
+          {
+            header: 'Title',
+
+            value: (row) => row.title,
+          },
+
+          {
+            header: 'Views',
+
+            value: (row) => row.views,
+          },
+
+          {
+            header: 'Visitors',
+
+            value: (row) => row.visitors,
+          },
+
+          {
+            header: 'Sessions',
+
+            value: (row) => row.sessions,
+          },
+
+          {
+            header: 'Entrances',
+
+            value: (row) => row.entrances,
+          },
+
+          {
+            header: 'Exits',
+
+            value: (row) => row.exits,
+          },
+
+          {
+            header: 'Bounce Rate',
+
+            value: (row) => row.bounceRate,
+          },
+
+          {
+            header: 'Average Duration Seconds',
+
+            value: (row) => row.averageDurationSeconds,
+          },
+        ],
+
+        report.items,
+      ),
+    };
+  }
+
+  async exportEvents(
+    workspaceId: string,
+    websiteId: string,
+    query: EventReportQueryDto,
+  ): Promise<CsvExportResult> {
+    const context = await this.resolveContext(workspaceId, websiteId, query);
+
+    this.assertExportRange(context);
+
+    const report = await this.loadEventsReport(context, query, 1, ANALYTICS_EXPORT_MAX_ROWS);
+
+    return {
+      filename: createCsvFilename('events', context.range.current.from, context.range.current.to),
+
+      content: createCsv(
+        [
+          {
+            header: 'Event',
+
+            value: (row) => row.name,
+          },
+
+          {
+            header: 'Total Events',
+
+            value: (row) => row.events,
+          },
+
+          {
+            header: 'Unique Visitors',
+
+            value: (row) => row.visitors,
+          },
+
+          {
+            header: 'Sessions',
+
+            value: (row) => row.sessions,
+          },
+        ],
+
+        report.items,
+      ),
+    };
+  }
+
+  async exportDimension(
+    workspaceId: string,
+    websiteId: string,
+    dimension: AnalyticsReportDimension,
+    query: DimensionReportQueryDto,
+  ): Promise<CsvExportResult> {
+    const context = await this.resolveContext(workspaceId, websiteId, query);
+
+    this.assertExportRange(context);
+
+    const report = await this.loadDimensionReport(
+      context,
+      dimension,
+      query,
+      1,
+      ANALYTICS_EXPORT_MAX_ROWS,
+    );
+
+    return {
+      filename: createCsvFilename(dimension, context.range.current.from, context.range.current.to),
+
+      content: createCsv(
+        [
+          {
+            header: 'Value',
+
+            value: (row) => row.label,
+          },
+
+          {
+            header: 'Visitors',
+
+            value: (row) => row.visitors,
+          },
+
+          {
+            header: 'Sessions',
+
+            value: (row) => row.sessions,
+          },
+
+          {
+            header: 'Page Views',
+
+            value: (row) => row.pageViews,
+          },
+
+          {
+            header: 'Percentage',
+
+            value: (row) => row.percentage,
+          },
+        ],
+
+        report.items,
+      ),
+    };
+  }
+
+  private async resolveContext(
+    workspaceId: string,
+    websiteId: string,
+    query:
+      | {
+          preset?: never;
+          from?: string;
+          to?: string;
         }
+      | PageReportQueryDto
+      | EventReportQueryDto
+      | DimensionReportQueryDto,
+  ): Promise<WebsiteReportContext> {
+    const website = await this.prisma.website.findFirst({
+      where: {
+        id: websiteId,
 
-        return {
-            websiteId:
-                website.id,
+        workspaceId,
 
-            websiteName:
-                website.name,
+        archivedAt: null,
+      },
 
-            timeZone:
-                website.timeZone,
+      select: {
+        id: true,
 
-            range:
-                resolveAnalyticsDateRange(
-                    query as Parameters<
-                        typeof resolveAnalyticsDateRange
-                    >[0],
-                    website.timeZone,
-                ),
-        };
+        name: true,
+
+        timeZone: true,
+      },
+    });
+
+    if (!website) {
+      throw new NotFoundException('Website not found');
     }
 
-    private async loadPagesReport(
-        context:
-            WebsiteReportContext,
+    return {
+      websiteId: website.id,
 
-        query:
-            PageReportQueryDto,
+      websiteName: website.name,
 
-        page: number,
+      timeZone: website.timeZone,
 
-        limit: number,
-    ): Promise<PageReportResponseDto> {
-        const offset =
-            (page - 1) *
-            limit;
+      range: resolveAnalyticsDateRange(
+        query as Parameters<typeof resolveAnalyticsDateRange>[0],
+        website.timeZone,
+      ),
+    };
+  }
 
-        const search =
-            query.search?.trim() ??
-            '';
+  private async loadPagesReport(
+    context: WebsiteReportContext,
 
-        const searchPattern =
-            `%${search}%`;
+    query: PageReportQueryDto,
 
-        const sortColumn =
-            this.getPageSortColumn(
-                query.sortBy,
-            );
+    page: number,
 
-        const sortDirection =
-            query.sortDirection ===
-                AnalyticsSortDirection.ASC
-                ? Prisma.sql`ASC`
-                : Prisma.sql`DESC`;
+    limit: number,
+  ): Promise<PageReportResponseDto> {
+    const offset = (page - 1) * limit;
 
-        const rows =
-            await this.prisma
-                .$queryRaw<
-                    PageDatabaseRow[]
-                >(
-                    Prisma.sql`
+    const search = query.search?.trim() ?? '';
+
+    const searchPattern = `%${search}%`;
+
+    const sortColumn = this.getPageSortColumn(query.sortBy);
+
+    const sortDirection =
+      query.sortDirection === AnalyticsSortDirection.ASC ? Prisma.sql`ASC` : Prisma.sql`DESC`;
+
+    const rows = await this.prisma.$queryRaw<PageDatabaseRow[]>(
+      Prisma.sql`
                         WITH page_report AS (
                             SELECT
                                 pv.path AS path,
@@ -817,81 +538,44 @@ export class AnalyticsReportsService {
                         OFFSET
                             ${offset}
                     `,
-                );
+    );
 
-        const total =
-            toSafeNumber(
-                rows[0]
-                    ?.total_count,
-            );
+    const total = toSafeNumber(rows[0]?.total_count);
 
-        const items =
-            rows.map(
-                (row) =>
-                    this.mapPageRow(
-                        row,
-                    ),
-            );
+    const items = rows.map((row) => this.mapPageRow(row));
 
-        return {
-            items,
+    return {
+      items,
 
-            pagination:
-                this.createPagination(
-                    page,
-                    limit,
-                    total,
-                ),
+      pagination: this.createPagination(page, limit, total),
 
-            range:
-                this.createRangeDto(
-                    context,
-                ),
-        };
-    }
+      range: this.createRangeDto(context),
+    };
+  }
 
-    private async loadEventsReport(
-        context:
-            WebsiteReportContext,
+  private async loadEventsReport(
+    context: WebsiteReportContext,
 
-        query:
-            EventReportQueryDto,
+    query: EventReportQueryDto,
 
-        page: number,
+    page: number,
 
-        limit: number,
-    ): Promise<EventReportResponseDto> {
-        const offset =
-            (page - 1) *
-            limit;
+    limit: number,
+  ): Promise<EventReportResponseDto> {
+    const offset = (page - 1) * limit;
 
-        const search =
-            query.search?.trim() ??
-            '';
+    const search = query.search?.trim() ?? '';
 
-        const searchPattern =
-            `%${search}%`;
+    const searchPattern = `%${search}%`;
 
-        const sortColumn =
-            this.getEventSortColumn(
-                query.sortBy,
-            );
+    const sortColumn = this.getEventSortColumn(query.sortBy);
 
-        const sortDirection =
-            query.sortDirection ===
-                AnalyticsSortDirection.ASC
-                ? Prisma.sql`ASC`
-                : Prisma.sql`DESC`;
+    const sortDirection =
+      query.sortDirection === AnalyticsSortDirection.ASC ? Prisma.sql`ASC` : Prisma.sql`DESC`;
 
-        const [
-            rows,
-            summaryRows,
-        ] = await Promise.all([
-            this.prisma
-                .$queryRaw<
-                    EventDatabaseRow[]
-                >(
-                    Prisma.sql`
+    const [rows, summaryRows] = await Promise.all([
+      this.prisma.$queryRaw<EventDatabaseRow[]>(
+        Prisma.sql`
                         WITH event_report AS (
                             SELECT
                                 analytics_event
@@ -979,13 +663,10 @@ export class AnalyticsReportsService {
                         OFFSET
                             ${offset}
                     `,
-                ),
+      ),
 
-            this.prisma
-                .$queryRaw<
-                    EventSummaryDatabaseRow[]
-                >(
-                    Prisma.sql`
+      this.prisma.$queryRaw<EventSummaryDatabaseRow[]>(
+        Prisma.sql`
                         SELECT
                             COUNT(*)::bigint
                                 AS total_events,
@@ -1025,410 +706,231 @@ export class AnalyticsReportsService {
                             event_name
                                 <> ''
                     `,
-                ),
-        ]);
+      ),
+    ]);
 
-        const total =
-            toSafeNumber(
-                rows[0]
-                    ?.total_count,
-            );
+    const total = toSafeNumber(rows[0]?.total_count);
 
-        const summary =
-            summaryRows[0];
+    const summary = summaryRows[0];
 
-        return {
-            items:
-                rows.map(
-                    (
-                        row,
-                    ): EventReportItemDto => ({
-                        name:
-                            row.name,
+    return {
+      items: rows.map((row): EventReportItemDto => ({
+        name: row.name,
 
-                        events:
-                            toSafeNumber(
-                                row.events,
-                            ),
+        events: toSafeNumber(row.events),
 
-                        visitors:
-                            toSafeNumber(
-                                row.visitors,
-                            ),
+        visitors: toSafeNumber(row.visitors),
 
-                        sessions:
-                            toSafeNumber(
-                                row.sessions,
-                            ),
-                    }),
-                ),
+        sessions: toSafeNumber(row.sessions),
+      })),
 
-            summary: {
-                totalEvents:
-                    toSafeNumber(
-                        summary
-                            ?.total_events,
-                    ),
+      summary: {
+        totalEvents: toSafeNumber(summary?.total_events),
 
-                uniqueVisitors:
-                    toSafeNumber(
-                        summary
-                            ?.unique_visitors,
-                    ),
+        uniqueVisitors: toSafeNumber(summary?.unique_visitors),
 
-                uniqueSessions:
-                    toSafeNumber(
-                        summary
-                            ?.unique_sessions,
-                    ),
-            },
+        uniqueSessions: toSafeNumber(summary?.unique_sessions),
+      },
 
-            pagination:
-                this.createPagination(
-                    page,
-                    limit,
-                    total,
-                ),
+      pagination: this.createPagination(page, limit, total),
 
-            range:
-                this.createRangeDto(
-                    context,
-                ),
-        };
+      range: this.createRangeDto(context),
+    };
+  }
+
+  private async loadDimensionReport(
+    context: WebsiteReportContext,
+
+    dimension: AnalyticsReportDimension,
+
+    query: DimensionReportQueryDto,
+
+    page: number,
+
+    limit: number,
+  ): Promise<DimensionReportResponseDto> {
+    const aggregateDimension = this.mapDimension(dimension);
+
+    const where = {
+      websiteId: context.websiteId,
+
+      dimension: aggregateDimension,
+
+      bucketStart: {
+        gte: context.range.current.start,
+
+        lt: context.range.current.end,
+      },
+    };
+
+    const select = {
+      dimensionValue: true,
+
+      dimensionLabel: true,
+
+      visitors: true,
+
+      sessions: true,
+
+      pageViews: true,
+    } as const;
+
+    const rows: AggregateDimensionRow[] =
+      context.range.granularity === 'hour'
+        ? await this.prisma.analyticsHourlyAggregate.findMany({
+            where,
+            select,
+          })
+        : await this.prisma.analyticsDailyAggregate.findMany({
+            where,
+            select,
+          });
+
+    const grouped = new Map<
+      string,
+      {
+        label: string;
+        visitors: number;
+        sessions: number;
+        pageViews: number;
+      }
+    >();
+
+    for (const row of rows) {
+      const key = row.dimensionValue.trim() || 'unknown';
+
+      const label = row.dimensionLabel.trim() || 'Unknown';
+
+      const current = grouped.get(key);
+
+      if (current) {
+        current.visitors += row.visitors;
+
+        current.sessions += row.sessions;
+
+        current.pageViews += row.pageViews;
+      } else {
+        grouped.set(key, {
+          label,
+
+          visitors: row.visitors,
+
+          sessions: row.sessions,
+
+          pageViews: row.pageViews,
+        });
+      }
     }
 
-    private async loadDimensionReport(
-        context:
-            WebsiteReportContext,
+    const search = query.search?.trim().toLowerCase() ?? '';
 
-        dimension:
-            AnalyticsReportDimension,
+    const filtered = Array.from(grouped.entries())
+      .map(([key, value]) => ({
+        key,
 
-        query:
-            DimensionReportQueryDto,
+        ...value,
+      }))
+      .filter(
+        (item) =>
+          search === '' ||
+          item.key.toLowerCase().includes(search) ||
+          item.label.toLowerCase().includes(search),
+      );
 
-        page: number,
+    const totalSessions = filtered.reduce(
+      (total, item) => total + item.sessions,
 
-        limit: number,
-    ): Promise<DimensionReportResponseDto> {
-        const aggregateDimension =
-            this.mapDimension(
-                dimension,
-            );
+      0,
+    );
 
-        const where = {
-            websiteId:
-                context.websiteId,
+    const items = filtered.map((item): DimensionReportItemDto => ({
+      ...item,
 
-            dimension:
-                aggregateDimension,
+      percentage:
+        totalSessions === 0
+          ? 0
+          : roundMetric(
+              (item.sessions / totalSessions) * 100,
 
-            bucketStart: {
-                gte:
-                    context.range
-                        .current.start,
+              1,
+            ),
+    }));
 
-                lt:
-                    context.range
-                        .current.end,
-            },
-        };
+    this.sortDimensionItems(items, query.sortBy, query.sortDirection);
 
-        const select = {
-            dimensionValue:
-                true,
+    const total = items.length;
 
-            dimensionLabel:
-                true,
+    const offset = (page - 1) * limit;
 
-            visitors: true,
+    return {
+      items: items.slice(offset, offset + limit),
 
-            sessions: true,
+      pagination: this.createPagination(page, limit, total),
 
-            pageViews: true,
-        } as const;
+      range: this.createRangeDto(context),
+    };
+  }
 
-        const rows:
-            AggregateDimensionRow[] =
-            context.range
-                .granularity ===
-                'hour'
-                ? await this.prisma
-                    .analyticsHourlyAggregate
-                    .findMany({
-                        where,
-                        select,
-                    })
-                : await this.prisma
-                    .analyticsDailyAggregate
-                    .findMany({
-                        where,
-                        select,
-                    });
+  private mapPageRow(row: PageDatabaseRow): PageReportItemDto {
+    const views = toSafeNumber(row.views);
 
-        const grouped =
-            new Map<
-                string,
-                {
-                    label: string;
-                    visitors: number;
-                    sessions: number;
-                    pageViews: number;
-                }
-            >();
+    const entrances = toSafeNumber(row.entrances);
 
-        for (
-            const row of rows
-        ) {
-            const key =
-                row.dimensionValue
-                    .trim() ||
-                'unknown';
+    const bouncedSessions = toSafeNumber(row.bounced_sessions);
 
-            const label =
-                row.dimensionLabel
-                    .trim() ||
-                'Unknown';
+    const totalDurationMs = toSafeNumber(row.total_duration_ms);
 
-            const current =
-                grouped.get(key);
+    return {
+      path: row.path,
 
-            if (current) {
-                current.visitors +=
-                    row.visitors;
+      title: row.title ?? row.path,
 
-                current.sessions +=
-                    row.sessions;
+      views,
 
-                current.pageViews +=
-                    row.pageViews;
-            } else {
-                grouped.set(
-                    key,
-                    {
-                        label,
+      visitors: toSafeNumber(row.visitors),
 
-                        visitors:
-                            row.visitors,
+      sessions: toSafeNumber(row.sessions),
 
-                        sessions:
-                            row.sessions,
+      entrances,
 
-                        pageViews:
-                            row.pageViews,
-                    },
-                );
-            }
-        }
+      exits: toSafeNumber(row.exits),
 
-        const search =
-            query.search
-                ?.trim()
-                .toLowerCase() ??
-            '';
+      bounceRate:
+        entrances === 0
+          ? 0
+          : roundMetric(
+              (bouncedSessions / entrances) * 100,
 
-        const filtered =
-            Array.from(
-                grouped.entries(),
-            )
-                .map(
-                    (
-                        [
-                            key,
-                            value,
-                        ],
-                    ) => ({
-                        key,
+              1,
+            ),
 
-                        ...value,
-                    }),
-                )
-                .filter(
-                    (item) =>
-                        search ===
-                        '' ||
-                        item.key
-                            .toLowerCase()
-                            .includes(
-                                search,
-                            ) ||
-                        item.label
-                            .toLowerCase()
-                            .includes(
-                                search,
-                            ),
-                );
+      averageDurationSeconds:
+        views === 0
+          ? 0
+          : roundMetric(
+              totalDurationMs / views / 1000,
 
-        const totalSessions =
-            filtered.reduce(
-                (
-                    total,
-                    item,
-                ) =>
-                    total +
-                    item.sessions,
+              1,
+            ),
+    };
+  }
 
-                0,
-            );
+  private getPageSortColumn(field: PageReportSortField): Prisma.Sql {
+    switch (field) {
+      case PageReportSortField.VISITORS:
+        return Prisma.sql`visitors`;
 
-        const items =
-            filtered.map(
-                (
-                    item,
-                ): DimensionReportItemDto => ({
-                    ...item,
+      case PageReportSortField.SESSIONS:
+        return Prisma.sql`sessions`;
 
-                    percentage:
-                        totalSessions ===
-                            0
-                            ? 0
-                            : roundMetric(
-                                (
-                                    item.sessions /
-                                    totalSessions
-                                ) *
-                                100,
+      case PageReportSortField.ENTRANCES:
+        return Prisma.sql`entrances`;
 
-                                1,
-                            ),
-                }),
-            );
+      case PageReportSortField.EXITS:
+        return Prisma.sql`exits`;
 
-        this.sortDimensionItems(
-            items,
-            query.sortBy,
-            query.sortDirection,
-        );
-
-        const total =
-            items.length;
-
-        const offset =
-            (page - 1) *
-            limit;
-
-        return {
-            items:
-                items.slice(
-                    offset,
-                    offset +
-                    limit,
-                ),
-
-            pagination:
-                this.createPagination(
-                    page,
-                    limit,
-                    total,
-                ),
-
-            range:
-                this.createRangeDto(
-                    context,
-                ),
-        };
-    }
-
-    private mapPageRow(
-        row:
-            PageDatabaseRow,
-    ): PageReportItemDto {
-        const views =
-            toSafeNumber(
-                row.views,
-            );
-
-        const entrances =
-            toSafeNumber(
-                row.entrances,
-            );
-
-        const bouncedSessions =
-            toSafeNumber(
-                row.bounced_sessions,
-            );
-
-        const totalDurationMs =
-            toSafeNumber(
-                row.total_duration_ms,
-            );
-
-        return {
-            path:
-                row.path,
-
-            title:
-                row.title ??
-                row.path,
-
-            views,
-
-            visitors:
-                toSafeNumber(
-                    row.visitors,
-                ),
-
-            sessions:
-                toSafeNumber(
-                    row.sessions,
-                ),
-
-            entrances,
-
-            exits:
-                toSafeNumber(
-                    row.exits,
-                ),
-
-            bounceRate:
-                entrances === 0
-                    ? 0
-                    : roundMetric(
-                        (
-                            bouncedSessions /
-                            entrances
-                        ) * 100,
-
-                        1,
-                    ),
-
-            averageDurationSeconds:
-                views === 0
-                    ? 0
-                    : roundMetric(
-                        totalDurationMs /
-                        views /
-                        1000,
-
-                        1,
-                    ),
-        };
-    }
-
-    private getPageSortColumn(
-        field:
-            PageReportSortField,
-    ): Prisma.Sql {
-        switch (field) {
-            case PageReportSortField
-                .VISITORS:
-                return Prisma.sql`visitors`;
-
-            case PageReportSortField
-                .SESSIONS:
-                return Prisma.sql`sessions`;
-
-            case PageReportSortField
-                .ENTRANCES:
-                return Prisma.sql`entrances`;
-
-            case PageReportSortField
-                .EXITS:
-                return Prisma.sql`exits`;
-
-            case PageReportSortField
-                .BOUNCE_RATE:
-                return Prisma.sql`
+      case PageReportSortField.BOUNCE_RATE:
+        return Prisma.sql`
                     CASE
                         WHEN entrances = 0
                             THEN 0
@@ -1438,9 +940,8 @@ export class AnalyticsReportsService {
                     END
                 `;
 
-            case PageReportSortField
-                .AVERAGE_DURATION:
-                return Prisma.sql`
+      case PageReportSortField.AVERAGE_DURATION:
+        return Prisma.sql`
                     CASE
                         WHEN views = 0
                             THEN 0
@@ -1450,213 +951,120 @@ export class AnalyticsReportsService {
                     END
                 `;
 
-            case PageReportSortField
-                .PATH:
-                return Prisma.sql`path`;
+      case PageReportSortField.PATH:
+        return Prisma.sql`path`;
 
-            case PageReportSortField
-                .VIEWS:
-            default:
-                return Prisma.sql`views`;
-        }
+      case PageReportSortField.VIEWS:
+      default:
+        return Prisma.sql`views`;
     }
+  }
 
-    private getEventSortColumn(
-        field:
-            EventReportSortField,
-    ): Prisma.Sql {
-        switch (field) {
-            case EventReportSortField
-                .VISITORS:
-                return Prisma.sql`visitors`;
+  private getEventSortColumn(field: EventReportSortField): Prisma.Sql {
+    switch (field) {
+      case EventReportSortField.VISITORS:
+        return Prisma.sql`visitors`;
 
-            case EventReportSortField
-                .SESSIONS:
-                return Prisma.sql`sessions`;
+      case EventReportSortField.SESSIONS:
+        return Prisma.sql`sessions`;
 
-            case EventReportSortField
-                .NAME:
-                return Prisma.sql`name`;
+      case EventReportSortField.NAME:
+        return Prisma.sql`name`;
 
-            case EventReportSortField
-                .EVENTS:
-            default:
-                return Prisma.sql`events`;
-        }
+      case EventReportSortField.EVENTS:
+      default:
+        return Prisma.sql`events`;
     }
+  }
 
-    private mapDimension(
-        dimension:
-            AnalyticsReportDimension,
-    ): AnalyticsAggregateDimension {
-        switch (dimension) {
-            case AnalyticsReportDimension
-                .SOURCES:
-                return AnalyticsAggregateDimension
-                    .SOURCE;
+  private mapDimension(dimension: AnalyticsReportDimension): AnalyticsAggregateDimension {
+    switch (dimension) {
+      case AnalyticsReportDimension.SOURCES:
+        return AnalyticsAggregateDimension.SOURCE;
 
-            case AnalyticsReportDimension
-                .COUNTRIES:
-                return AnalyticsAggregateDimension
-                    .COUNTRY;
+      case AnalyticsReportDimension.COUNTRIES:
+        return AnalyticsAggregateDimension.COUNTRY;
 
-            case AnalyticsReportDimension
-                .DEVICES:
-                return AnalyticsAggregateDimension
-                    .DEVICE;
+      case AnalyticsReportDimension.DEVICES:
+        return AnalyticsAggregateDimension.DEVICE;
 
-            case AnalyticsReportDimension
-                .BROWSERS:
-                return AnalyticsAggregateDimension
-                    .BROWSER;
+      case AnalyticsReportDimension.BROWSERS:
+        return AnalyticsAggregateDimension.BROWSER;
 
-            case AnalyticsReportDimension
-                .OPERATING_SYSTEMS:
-                return AnalyticsAggregateDimension
-                    .OPERATING_SYSTEM;
-        }
+      case AnalyticsReportDimension.OPERATING_SYSTEMS:
+        return AnalyticsAggregateDimension.OPERATING_SYSTEM;
     }
+  }
 
-    private sortDimensionItems(
-        items:
-            DimensionReportItemDto[],
+  private sortDimensionItems(
+    items: DimensionReportItemDto[],
 
-        field:
-            DimensionReportSortField,
+    field: DimensionReportSortField,
 
-        direction:
-            AnalyticsSortDirection,
-    ): void {
-        const multiplier =
-            direction ===
-                AnalyticsSortDirection.ASC
-                ? 1
-                : -1;
+    direction: AnalyticsSortDirection,
+  ): void {
+    const multiplier = direction === AnalyticsSortDirection.ASC ? 1 : -1;
 
-        items.sort(
-            (
-                first,
-                second,
-            ) => {
-                if (
-                    field ===
-                    DimensionReportSortField
-                        .LABEL
-                ) {
-                    return (
-                        first.label.localeCompare(
-                            second.label,
-                        ) *
-                        multiplier
-                    );
-                }
+    items.sort((first, second) => {
+      if (field === DimensionReportSortField.LABEL) {
+        return first.label.localeCompare(second.label) * multiplier;
+      }
 
-                const firstValue =
-                    field ===
-                        DimensionReportSortField
-                            .VISITORS
-                        ? first.visitors
-                        : field ===
-                            DimensionReportSortField
-                                .PAGE_VIEWS
-                            ? first.pageViews
-                            : first.sessions;
+      const firstValue =
+        field === DimensionReportSortField.VISITORS
+          ? first.visitors
+          : field === DimensionReportSortField.PAGE_VIEWS
+            ? first.pageViews
+            : first.sessions;
 
-                const secondValue =
-                    field ===
-                        DimensionReportSortField
-                            .VISITORS
-                        ? second.visitors
-                        : field ===
-                            DimensionReportSortField
-                                .PAGE_VIEWS
-                            ? second.pageViews
-                            : second.sessions;
+      const secondValue =
+        field === DimensionReportSortField.VISITORS
+          ? second.visitors
+          : field === DimensionReportSortField.PAGE_VIEWS
+            ? second.pageViews
+            : second.sessions;
 
-                if (
-                    firstValue ===
-                    secondValue
-                ) {
-                    return first.label.localeCompare(
-                        second.label,
-                    );
-                }
+      if (firstValue === secondValue) {
+        return first.label.localeCompare(second.label);
+      }
 
-                return (
-                    (
-                        firstValue -
-                        secondValue
-                    ) *
-                    multiplier
-                );
-            },
-        );
+      return (firstValue - secondValue) * multiplier;
+    });
+  }
+
+  private createPagination(page: number, limit: number, total: number): AnalyticsPaginationDto {
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+
+    return {
+      page,
+
+      limit,
+
+      total,
+
+      totalPages,
+
+      hasPreviousPage: page > 1,
+
+      hasNextPage: page < totalPages,
+    };
+  }
+
+  private createRangeDto(context: WebsiteReportContext): AnalyticsReportRangeDto {
+    return {
+      from: context.range.current.from,
+
+      to: context.range.current.to,
+
+      timeZone: context.timeZone,
+
+      days: context.range.days,
+    };
+  }
+
+  private assertExportRange(context: WebsiteReportContext): void {
+    if (context.range.days > ANALYTICS_EXPORT_MAX_DAYS) {
+      throw new BadRequestException(`CSV exports cannot exceed ${ANALYTICS_EXPORT_MAX_DAYS} days`);
     }
-
-    private createPagination(
-        page: number,
-        limit: number,
-        total: number,
-    ): AnalyticsPaginationDto {
-        const totalPages =
-            Math.max(
-                1,
-                Math.ceil(
-                    total /
-                    limit,
-                ),
-            );
-
-        return {
-            page,
-
-            limit,
-
-            total,
-
-            totalPages,
-
-            hasPreviousPage:
-                page > 1,
-
-            hasNextPage:
-                page <
-                totalPages,
-        };
-    }
-
-    private createRangeDto(
-        context:
-            WebsiteReportContext,
-    ): AnalyticsReportRangeDto {
-        return {
-            from:
-                context.range
-                    .current.from,
-
-            to:
-                context.range
-                    .current.to,
-
-            timeZone:
-                context.timeZone,
-
-            days:
-                context.range.days,
-        };
-    }
-
-    private assertExportRange(
-        context:
-            WebsiteReportContext,
-    ): void {
-        if (
-            context.range.days >
-            ANALYTICS_EXPORT_MAX_DAYS
-        ) {
-            throw new BadRequestException(
-                `CSV exports cannot exceed ${ANALYTICS_EXPORT_MAX_DAYS} days`,
-            );
-        }
-    }
+  }
 }

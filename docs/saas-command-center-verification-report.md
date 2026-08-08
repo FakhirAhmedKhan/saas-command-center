@@ -6,12 +6,12 @@ I reviewed the updated codebase, the Phase 1–10 implementation scope, and the 
 
 ### Verified automated test status
 
-| Area | Result |
-|---|---:|
-| Backend E2E | 206 passed |
-| Tracker SDK | 56 passed |
-| Frontend Playwright | 40 passed |
-| **Total** | **302 passed** |
+| Area                |         Result |
+| ------------------- | -------------: |
+| Backend E2E         |     206 passed |
+| Tracker SDK         |      56 passed |
+| Frontend Playwright |      40 passed |
+| **Total**           | **302 passed** |
 
 The completed E2E work successfully identified and fixed several real defects, including:
 
@@ -31,22 +31,22 @@ The covered Phase 1–10 functionality is stable. Batch 11 real full-stack testi
 
 ## Completed vs. Pending Changes
 
-| Area | Status | Notes |
-|---|---|---|
-| Authentication and workspace authorization | Completed | API and frontend flows covered |
-| Applications | Completed | CRUD, filtering, roles, links, technologies |
-| Development tracking | Completed | Tasks, milestones, blockers, progress and activity |
-| Website management | Completed | Lifecycle, environments, roles and tracking setup |
-| Analytics ingestion | Completed | Origin, tracking key, validation, limits and deduplication |
-| Analytics normalization | Completed | Visitors, sessions and page views |
-| Aggregates and retention | Completed | Time zones, reprocessing, retention and late events |
-| Tracker SDK | Completed | Privacy, queue, retries, sessions, SPA and lifecycle |
-| Frontend Playwright flows | Completed | 40 Chromium tests with mocked API |
-| Real frontend → API → PostgreSQL E2E | **Pending** | Batch 11 paused |
-| Cross-browser testing | **Pending** | Firefox and WebKit not completed |
-| Performance and load testing | **Pending** | Planned for later testing |
-| Security hardening review | **Pending** | Deeper adversarial testing still needed |
-| CI/CD automation | **Pending** | Full pipeline not yet confirmed |
+| Area                                       | Status      | Notes                                                      |
+| ------------------------------------------ | ----------- | ---------------------------------------------------------- |
+| Authentication and workspace authorization | Completed   | API and frontend flows covered                             |
+| Applications                               | Completed   | CRUD, filtering, roles, links, technologies                |
+| Development tracking                       | Completed   | Tasks, milestones, blockers, progress and activity         |
+| Website management                         | Completed   | Lifecycle, environments, roles and tracking setup          |
+| Analytics ingestion                        | Completed   | Origin, tracking key, validation, limits and deduplication |
+| Analytics normalization                    | Completed   | Visitors, sessions and page views                          |
+| Aggregates and retention                   | Completed   | Time zones, reprocessing, retention and late events        |
+| Tracker SDK                                | Completed   | Privacy, queue, retries, sessions, SPA and lifecycle       |
+| Frontend Playwright flows                  | Completed   | 40 Chromium tests with mocked API                          |
+| Real frontend → API → PostgreSQL E2E       | **Pending** | Batch 11 paused                                            |
+| Cross-browser testing                      | **Pending** | Firefox and WebKit not completed                           |
+| Performance and load testing               | **Pending** | Planned for later testing                                  |
+| Security hardening review                  | **Pending** | Deeper adversarial testing still needed                    |
+| CI/CD automation                           | **Pending** | Full pipeline not yet confirmed                            |
 
 ---
 
@@ -253,16 +253,16 @@ Batch-specific helper files should be merged into stable domain helpers with cle
 
 ### Remaining Risks
 
-| Priority | Risk | Recommended Action |
-|---|---|---|
-| High | Production/test startup mismatch | Shared bootstrap |
-| High | Incomplete real full-stack validation | Resume Batch 11 |
-| High | Non-atomic analytics reprocessing | Staging or rollback strategy |
-| Medium | In-memory rate limiting | Redis |
-| Medium | No distributed processing lock | Queue or advisory lock |
-| Medium | Forwarded-IP trust issues | Use trusted proxy configuration |
-| Medium | Large services | Split by responsibility |
-| Low | Tracker fallback randomness | Monitor collision risk |
+| Priority | Risk                                  | Recommended Action              |
+| -------- | ------------------------------------- | ------------------------------- |
+| High     | Production/test startup mismatch      | Shared bootstrap                |
+| High     | Incomplete real full-stack validation | Resume Batch 11                 |
+| High     | Non-atomic analytics reprocessing     | Staging or rollback strategy    |
+| Medium   | In-memory rate limiting               | Redis                           |
+| Medium   | No distributed processing lock        | Queue or advisory lock          |
+| Medium   | Forwarded-IP trust issues             | Use trusted proxy configuration |
+| Medium   | Large services                        | Split by responsibility         |
+| Low      | Tracker fallback randomness           | Monitor collision risk          |
 
 ---
 

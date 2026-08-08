@@ -1,123 +1,81 @@
-import {
-  WebhookEventType,
-} from '../../generated/prisma/client';
+import { WebhookEventType } from '../../generated/prisma/client';
 
-export const WEBHOOK_PAYLOAD_VERSION =
-  '2026-08-01';
+export const WEBHOOK_PAYLOAD_VERSION = '2026-08-01';
 
-export const WEBHOOK_SIGNATURE_VERSION =
-  'v1';
+export const WEBHOOK_SIGNATURE_VERSION = 'v1';
 
-export const WEBHOOK_RETRY_BASE_DELAY_MS =
-  5_000;
+export const WEBHOOK_RETRY_BASE_DELAY_MS = 5_000;
 
-export const WEBHOOK_RETRY_MAX_DELAY_MS =
-  5 * 60 * 1_000;
+export const WEBHOOK_RETRY_MAX_DELAY_MS = 5 * 60 * 1_000;
 
-export const WEBHOOK_EVENT_CATALOG:
-  ReadonlyArray<{
-    type:
-      WebhookEventType;
+export const WEBHOOK_EVENT_CATALOG: ReadonlyArray<{
+  type: WebhookEventType;
 
-    label:
-      string;
+  label: string;
 
-    description:
-      string;
-  }> = [
-    {
-      type:
-        WebhookEventType
-          .APPLICATION_CREATED,
+  description: string;
+}> = [
+  {
+    type: WebhookEventType.APPLICATION_CREATED,
 
-      label:
-        'Application created',
+    label: 'Application created',
 
-      description:
-        'A new SaaS application is registered.',
-    },
+    description: 'A new SaaS application is registered.',
+  },
 
-    {
-      type:
-        WebhookEventType
-          .APPLICATION_UPDATED,
+  {
+    type: WebhookEventType.APPLICATION_UPDATED,
 
-      label:
-        'Application updated',
+    label: 'Application updated',
 
-      description:
-        'An application record is updated.',
-    },
+    description: 'An application record is updated.',
+  },
 
-    {
-      type:
-        WebhookEventType
-          .DEPLOYMENT_STATUS_CHANGED,
+  {
+    type: WebhookEventType.DEPLOYMENT_STATUS_CHANGED,
 
-      label:
-        'Deployment status changed',
+    label: 'Deployment status changed',
 
-      description:
-        'A deployment changes status.',
-    },
+    description: 'A deployment changes status.',
+  },
 
-    {
-      type:
-        WebhookEventType
-          .DEPLOYMENT_FAILED,
+  {
+    type: WebhookEventType.DEPLOYMENT_FAILED,
 
-      label:
-        'Deployment failed',
+    label: 'Deployment failed',
 
-      description:
-        'A deployment enters the Failed state.',
-    },
+    description: 'A deployment enters the Failed state.',
+  },
 
-    {
-      type:
-        WebhookEventType
-          .HEALTH_INCIDENT_OPENED,
+  {
+    type: WebhookEventType.HEALTH_INCIDENT_OPENED,
 
-      label:
-        'Health incident opened',
+    label: 'Health incident opened',
 
-      description:
-        'Monitoring opens a new incident.',
-    },
+    description: 'Monitoring opens a new incident.',
+  },
 
-    {
-      type:
-        WebhookEventType
-          .HEALTH_INCIDENT_RESOLVED,
+  {
+    type: WebhookEventType.HEALTH_INCIDENT_RESOLVED,
 
-      label:
-        'Health incident resolved',
+    label: 'Health incident resolved',
 
-      description:
-        'A health incident recovers.',
-    },
+    description: 'A health incident recovers.',
+  },
 
-    {
-      type:
-        WebhookEventType
-          .ANALYTICS_PROCESSING_FAILED,
+  {
+    type: WebhookEventType.ANALYTICS_PROCESSING_FAILED,
 
-      label:
-        'Analytics processing failed',
+    label: 'Analytics processing failed',
 
-      description:
-        'An analytics processing run is dead-lettered.',
-    },
+    description: 'An analytics processing run is dead-lettered.',
+  },
 
-    {
-      type:
-        WebhookEventType
-          .WORKSPACE_ACTIVITY_CREATED,
+  {
+    type: WebhookEventType.WORKSPACE_ACTIVITY_CREATED,
 
-      label:
-        'Workspace activity created',
+    label: 'Workspace activity created',
 
-      description:
-        'A selected workspace activity record is created.',
-    },
-  ];
+    description: 'A selected workspace activity record is created.',
+  },
+];

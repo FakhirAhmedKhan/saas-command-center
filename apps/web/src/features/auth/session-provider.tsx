@@ -1,18 +1,9 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
-import {
-  createContext,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 
-import type {
-  PropsWithChildren,
-} from 'react';
-
+import type { PropsWithChildren } from 'react';
 
 import {
   login as loginRequest,
@@ -29,223 +20,107 @@ import {
 } from './auth.types';
 import { setAccessToken } from '../lib/api/api-client';
 
-export type SessionStatus =
-  | 'loading'
-  | 'authenticated'
-  | 'unauthenticated';
+export type SessionStatus = 'loading' | 'authenticated' | 'unauthenticated';
 
 export interface SessionContextValue {
-  status:
-    SessionStatus;
+  status: SessionStatus;
 
-  user:
-    AuthUser | null;
+  user: AuthUser | null;
 
-  login(
-    input: LoginInput,
-  ): Promise<void>;
+  login(input: LoginInput): Promise<void>;
 
-  register(
-    input: RegisterInput,
-  ): Promise<void>;
+  register(input: RegisterInput): Promise<void>;
 
-  logout():
-    Promise<void>;
+  logout(): Promise<void>;
 
-  refresh():
-    Promise<void>;
+  refresh(): Promise<void>;
 }
 
-export const SessionContext =
-  createContext<
-    | SessionContextValue
-    | undefined
-  >(undefined);
+export const SessionContext = createContext<SessionContextValue | undefined>(undefined);
 
-export function SessionProvider({
-  children,
-}: PropsWithChildren) {
-  const [
-    status,
-    setStatus,
-  ] = useState<
-    SessionStatus
-  >('loading');
+export function SessionProvider({ children }: PropsWithChildren) {
+  const [status, setStatus] = useState<SessionStatus>('loading');
 
-  const [
-    user,
-    setUser,
-  ] = useState<
-    AuthUser | null
-  >(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
 
-  const clearSession =
-    useCallback(
-      () => {
-        setAccessToken(
-          null,
-        );
+  const clearSession = useCallback(() => {
+    setAccessToken(null);
 
-        setUser(
-          null,
-        );
+    setUser(null);
 
-        setStatus(
-          'unauthenticated',
-        );
-      },
-      [],
-    );
+    setStatus('unauthenticated');
+  }, []);
 
-  const applySession =
-    useCallback(
-      (
-        nextUser:
-          AuthUser,
+  const applySession = useCallback(
+    (
+      nextUser: AuthUser,
 
-        token:
-          string,
-      ) => {
-        setAccessToken(
-          token,
-        );
+      token: string,
+    ) => {
+      setAccessToken(token);
 
-        setUser(
-          nextUser,
-        );
+      setUser(nextUser);
 
-        setStatus(
-          'authenticated',
-        );
-      },
-      [],
-    );
-
-  const refresh =
-    useCallback(
-      async () => {
-        const session =
-          await restoreSession();
-
-        applySession(
-          session.user,
-          session.accessToken,
-        );
-      },
-      [
-        applySession,
-      ],
-    );
-
-  useEffect(
-    () => {
-      setUnauthorizedHandler(
-        clearSession,
-      );
-
-      void refresh().catch(
-        () => {
-          clearSession();
-        },
-      );
-
-      return () => {
-        setUnauthorizedHandler(
-          null,
-        );
-      };
+      setStatus('authenticated');
     },
-    [
-      clearSession,
+    [],
+  );
+
+  const refresh = useCallback(async () => {
+    const session = await restoreSession();
+
+    applySession(session.user, session.accessToken);
+  }, [applySession]);
+
+  useEffect(() => {
+    setUnauthorizedHandler(clearSession);
+
+    void refresh().catch(() => {
+      clearSession();
+    });
+
+    return () => {
+      setUnauthorizedHandler(null);
+    };
+  }, [clearSession, refresh]);
+
+  const login = useCallback(
+    async (input: LoginInput) => {
+      const session = await loginRequest(input);
+
+      applySession(session.user, session.accessToken);
+    },
+    [applySession],
+  );
+
+  const register = useCallback(
+    async (input: RegisterInput) => {
+      const session = await registerRequest(input);
+
+      applySession(session.user, session.accessToken);
+    },
+    [applySession],
+  );
+
+  const logout = useCallback(async () => {
+    try {
+      await logoutRequest();
+    } finally {
+      clearSession();
+    }
+  }, [clearSession]);
+
+  const contextValue = useMemo<SessionContextValue>(
+    () => ({
+      status,
+      user,
+      login,
+      register,
+      logout,
       refresh,
-    ],
+    }),
+    [status, user, login, register, logout, refresh],
   );
 
-  const login =
-    useCallback(
-      async (
-        input:
-          LoginInput,
-      ) => {
-        const session =
-          await loginRequest(
-            input,
-          );
-
-        applySession(
-          session.user,
-          session.accessToken,
-        );
-      },
-      [
-        applySession,
-      ],
-    );
-
-  const register =
-    useCallback(
-      async (
-        input:
-          RegisterInput,
-      ) => {
-        const session =
-          await registerRequest(
-            input,
-          );
-
-        applySession(
-          session.user,
-          session.accessToken,
-        );
-      },
-      [
-        applySession,
-      ],
-    );
-
-  const logout =
-    useCallback(
-      async () => {
-        try {
-          await logoutRequest();
-        } finally {
-          clearSession();
-        }
-      },
-      [
-        clearSession,
-      ],
-    );
-
-  const contextValue =
-    useMemo<
-      SessionContextValue
-    >(
-      () => ({
-        status,
-        user,
-        login,
-        register,
-        logout,
-        refresh,
-      }),
-      [
-        status,
-        user,
-        login,
-        register,
-        logout,
-        refresh,
-      ],
-    );
-
-  return (
-    <SessionContext.Provider
-      value={
-        contextValue
-      }
-    >
-      {children}
-    </SessionContext.Provider>
-  );
+  return <SessionContext.Provider value={contextValue}>{children}</SessionContext.Provider>;
 }

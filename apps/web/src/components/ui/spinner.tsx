@@ -1,12 +1,10 @@
-import { cn } from "@/features/lib/api/cn";
+import { cn } from '@/features/lib/api/cn';
 
 interface SpinnerProps {
   className?: string;
 }
 
-export function Spinner({
-  className,
-}: SpinnerProps) {
+export function Spinner({ className }: SpinnerProps) {
   return (
     <span
       role="status"

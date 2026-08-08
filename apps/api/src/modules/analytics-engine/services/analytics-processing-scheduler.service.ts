@@ -1,9 +1,4 @@
-import {
-    Injectable,
-    Logger,
-    OnModuleDestroy,
-    OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 
 import { PrismaService } from 'src/database/prisma.service';
 
@@ -14,134 +9,108 @@ const DEFAULT_MAX_EVENTS = 5_000;
 const DEFAULT_MAX_WEBSITES = 20;
 
 @Injectable()
-export class AnalyticsProcessingSchedulerService
-    implements OnModuleInit, OnModuleDestroy {
-    private readonly logger = new Logger(
-        AnalyticsProcessingSchedulerService.name,
+export class AnalyticsProcessingSchedulerService implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(AnalyticsProcessingSchedulerService.name);
+
+  private timer: NodeJS.Timeout | null = null;
+  private running = false;
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly processingService: AnalyticsProcessingService,
+  ) {}
+
+  onModuleInit(): void {
+    const enabled = process.env.ANALYTICS_PROCESSING_SCHEDULER_ENABLED === 'true';
+
+    if (!enabled) {
+      this.logger.log('Analytics processing scheduler is disabled');
+
+      return;
+    }
+
+    const intervalMs = this.readPositiveInteger(
+      process.env.ANALYTICS_PROCESSING_INTERVAL_MS,
+      DEFAULT_INTERVAL_MS,
     );
 
-    private timer: NodeJS.Timeout | null = null;
-    private running = false;
+    this.timer = setInterval(() => {
+      void this.runOnce();
+    }, intervalMs);
 
-    constructor(
-        private readonly prisma: PrismaService,
-        private readonly processingService: AnalyticsProcessingService,
-    ) { }
+    this.timer.unref();
 
-    onModuleInit(): void {
-        const enabled =
-            process.env.ANALYTICS_PROCESSING_SCHEDULER_ENABLED ===
-            'true';
+    this.logger.log(`Analytics processing scheduler started with interval ${intervalMs}ms`);
+  }
 
-        if (!enabled) {
-            this.logger.log(
-                'Analytics processing scheduler is disabled',
-            );
+  onModuleDestroy(): void {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
+  }
 
-            return;
-        }
+  async runOnce(): Promise<void> {
+    if (this.running) {
+      this.logger.warn('Analytics processing run is already active');
 
-        const intervalMs = this.readPositiveInteger(
-            process.env.ANALYTICS_PROCESSING_INTERVAL_MS,
-            DEFAULT_INTERVAL_MS,
-        );
-
-        this.timer = setInterval(() => {
-            void this.runOnce();
-        }, intervalMs);
-
-        this.timer.unref();
-
-        this.logger.log(
-            `Analytics processing scheduler started with interval ${intervalMs}ms`,
-        );
+      return;
     }
 
-    onModuleDestroy(): void {
-        if (this.timer) {
-            clearInterval(this.timer);
-            this.timer = null;
-        }
-    }
+    this.running = true;
 
-    async runOnce(): Promise<void> {
-        if (this.running) {
-            this.logger.warn(
-                'Analytics processing run is already active',
-            );
+    try {
+      const maxEvents = this.readPositiveInteger(
+        process.env.ANALYTICS_PROCESSING_MAX_EVENTS,
+        DEFAULT_MAX_EVENTS,
+      );
 
-            return;
-        }
+      const maxWebsites = this.readPositiveInteger(
+        process.env.ANALYTICS_PROCESSING_MAX_WEBSITES,
+        DEFAULT_MAX_WEBSITES,
+      );
 
-        this.running = true;
+      const websites = await this.prisma.website.findMany({
+        where: {
+          enabled: true,
+          archivedAt: null,
+        },
 
+        select: {
+          id: true,
+          name: true,
+        },
+
+        orderBy: {
+          lastEventAt: 'asc',
+        },
+
+        take: maxWebsites,
+      });
+
+      for (const website of websites) {
         try {
-            const maxEvents = this.readPositiveInteger(
-                process.env.ANALYTICS_PROCESSING_MAX_EVENTS,
-                DEFAULT_MAX_EVENTS,
+          const result = await this.processingService.processWebsiteById(website.id, maxEvents);
+
+          if (result.rawEventsProcessed > 0) {
+            this.logger.log(
+              `Processed ${result.rawEventsProcessed} analytics events for ${website.name}`,
             );
+          }
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : 'Unknown scheduler error';
 
-            const maxWebsites = this.readPositiveInteger(
-                process.env.ANALYTICS_PROCESSING_MAX_WEBSITES,
-                DEFAULT_MAX_WEBSITES,
-            );
-
-            const websites =
-                await this.prisma.website.findMany({
-                    where: {
-                        enabled: true,
-                        archivedAt: null,
-                    },
-
-                    select: {
-                        id: true,
-                        name: true,
-                    },
-
-                    orderBy: {
-                        lastEventAt: 'asc',
-                    },
-
-                    take: maxWebsites,
-                });
-
-            for (const website of websites) {
-                try {
-                    const result =
-                        await this.processingService.processWebsiteById(
-                            website.id,
-                            maxEvents,
-                        );
-
-                    if (result.rawEventsProcessed > 0) {
-                        this.logger.log(
-                            `Processed ${result.rawEventsProcessed} analytics events for ${website.name}`,
-                        );
-                    }
-                } catch (error: unknown) {
-                    const message =
-                        error instanceof Error
-                            ? error.message
-                            : 'Unknown scheduler error';
-
-                    this.logger.error(
-                        `Analytics processing failed for website ${website.id}: ${message}`,
-                    );
-                }
-            }
-        } finally {
-            this.running = false;
+          this.logger.error(`Analytics processing failed for website ${website.id}: ${message}`);
         }
+      }
+    } finally {
+      this.running = false;
     }
+  }
 
-    private readPositiveInteger(
-        value: string | undefined,
-        fallback: number,
-    ): number {
-        const parsed = Number(value);
+  private readPositiveInteger(value: string | undefined, fallback: number): number {
+    const parsed = Number(value);
 
-        return Number.isInteger(parsed) && parsed > 0
-            ? parsed
-            : fallback;
-    }
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+  }
 }

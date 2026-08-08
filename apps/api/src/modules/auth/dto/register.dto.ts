@@ -48,8 +48,7 @@ export class RegisterDto {
   @IsString()
   @Length(2, 120)
   @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
-    message:
-      'workspaceSlug can contain lowercase letters, numbers and hyphens only',
+    message: 'workspaceSlug can contain lowercase letters, numbers and hyphens only',
   })
   workspaceSlug?: string;
 }

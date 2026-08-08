@@ -1,25 +1,10 @@
+import type { Response } from 'supertest';
 
+import { applicationRoutes, asRecord, readApiItems, recordString } from './application';
 
+import { withBearer } from './auth';
 
-
-import type {
-  Response,
-} from 'supertest';
-
-import {
-  applicationRoutes,
-  asRecord,
-  readApiItems,
-  recordString,
-} from './application';
-
-import {
-  withBearer,
-} from './auth';
-
-import type {
-  WorkspaceTestUser,
-} from './workspace';
+import type { WorkspaceTestUser } from './workspace';
 
 export interface WebsitePayload {
   name: string;
@@ -38,128 +23,62 @@ export interface CreatedWebsite {
 }
 
 export const websiteRoutes = {
-  root(
-    workspaceId: string,
-  ): string {
+  root(workspaceId: string): string {
     return `/api/v1/workspaces/${workspaceId}/websites`;
   },
 
-  details(
-    workspaceId: string,
-    websiteId: string,
-  ): string {
-    return `${this.root(
-      workspaceId,
-    )}/${websiteId}`;
+  details(workspaceId: string, websiteId: string): string {
+    return `${this.root(workspaceId)}/${websiteId}`;
   },
 
-  enable(
-    workspaceId: string,
-    websiteId: string,
-  ): string {
-    return `${this.details(
-      workspaceId,
-      websiteId,
-    )}/enable`;
+  enable(workspaceId: string, websiteId: string): string {
+    return `${this.details(workspaceId, websiteId)}/enable`;
   },
 
-  disable(
-    workspaceId: string,
-    websiteId: string,
-  ): string {
-    return `${this.details(
-      workspaceId,
-      websiteId,
-    )}/disable`;
+  disable(workspaceId: string, websiteId: string): string {
+    return `${this.details(workspaceId, websiteId)}/disable`;
   },
 
-  archive(
-    workspaceId: string,
-    websiteId: string,
-  ): string {
-    return `${this.details(
-      workspaceId,
-      websiteId,
-    )}/archive`;
+  archive(workspaceId: string, websiteId: string): string {
+    return `${this.details(workspaceId, websiteId)}/archive`;
   },
 
-  restore(
-    workspaceId: string,
-    websiteId: string,
-  ): string {
-    return `${this.details(
-      workspaceId,
-      websiteId,
-    )}/restore`;
+  restore(workspaceId: string, websiteId: string): string {
+    return `${this.details(workspaceId, websiteId)}/restore`;
   },
 
-  rotateKey(
-    workspaceId: string,
-    websiteId: string,
-  ): string {
-    return `${this.details(
-      workspaceId,
-      websiteId,
-    )}/rotate-key`;
+  rotateKey(workspaceId: string, websiteId: string): string {
+    return `${this.details(workspaceId, websiteId)}/rotate-key`;
   },
 
-  connect(
-    workspaceId: string,
-    websiteId: string,
-  ): string {
-    return `${this.details(
-      workspaceId,
-      websiteId,
-    )}/connect`;
+  connect(workspaceId: string, websiteId: string): string {
+    return `${this.details(workspaceId, websiteId)}/connect`;
   },
 
-  disconnect(
-    workspaceId: string,
-    websiteId: string,
-  ): string {
-    return `${this.details(
-      workspaceId,
-      websiteId,
-    )}/disconnect`;
+  disconnect(workspaceId: string, websiteId: string): string {
+    return `${this.details(workspaceId, websiteId)}/disconnect`;
   },
 
-  workspaceActivities(
-    workspaceId: string,
-  ): string {
-    return applicationRoutes
-      .workspaceActivities(
-        workspaceId,
-      );
+  workspaceActivities(workspaceId: string): string {
+    return applicationRoutes.workspaceActivities(workspaceId);
   },
 } as const;
 
 function uniqueSuffix(): string {
-  return `${Date.now()}-${Math.random()
-    .toString(36)
-    .slice(2, 9)}`;
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
-export function buildWebsitePayload(
-  overrides:
-    Partial<WebsitePayload> = {},
-): WebsitePayload {
-  const suffix =
-    uniqueSuffix();
+export function buildWebsitePayload(overrides: Partial<WebsitePayload> = {}): WebsitePayload {
+  const suffix = uniqueSuffix();
 
   return {
-    name:
-      `Batch 5 Website ${suffix}`,
+    name: `Batch 5 Website ${suffix}`,
 
-    domain:
-      `batch-5-${suffix}.example.test`,
+    domain: `batch-5-${suffix}.example.test`,
 
-    timeZone:
-      'Asia/Dubai',
+    timeZone: 'Asia/Dubai',
 
-    allowedOrigins: [
-      `https://batch-5-${suffix}.example.test`,
-      'http://localhost:3000',
-    ],
+    allowedOrigins: [`https://batch-5-${suffix}.example.test`, 'http://localhost:3000'],
 
     enabled: true,
 
@@ -167,46 +86,19 @@ export function buildWebsitePayload(
   };
 }
 
-export function expectWebsiteSuccess(
-  response: Response,
-): void {
-  expect([
-    200,
-    201,
-    202,
-  ]).toContain(
-    response.status,
-  );
+export function expectWebsiteSuccess(response: Response): void {
+  expect([200, 201, 202]).toContain(response.status);
 }
 
-export function readWebsiteRecord(
-  response: Response,
-): Record<string, unknown> {
-  const body =
-    asRecord(
-      response.body,
-    );
+export function readWebsiteRecord(response: Response): Record<string, unknown> {
+  const body = asRecord(response.body);
 
-  const data =
-    asRecord(
-      body?.data,
-    );
+  const data = asRecord(body?.data);
 
-  const candidates: unknown[] = [
-    body?.website,
-    data?.website,
-    data,
-    body,
-  ];
+  const candidates: unknown[] = [body?.website, data?.website, data, body];
 
-  for (
-    const candidate
-    of candidates
-  ) {
-    const record =
-      asRecord(
-        candidate,
-      );
+  for (const candidate of candidates) {
+    const record = asRecord(candidate);
 
     if (record) {
       return record;
@@ -216,57 +108,30 @@ export function readWebsiteRecord(
   throw new Error(
     [
       'Expected a website object in the response.',
-      `Received: ${JSON.stringify(
-        response.body,
-      )}`,
+      `Received: ${JSON.stringify(response.body)}`,
     ].join(' '),
   );
 }
 
-export function readWebsiteItems(
-  response: Response,
-): Record<string, unknown>[] {
-  return readApiItems(
-    response,
-    [
-      'websites',
-    ],
-  );
+export function readWebsiteItems(response: Response): Record<string, unknown>[] {
+  return readApiItems(response, ['websites']);
 }
 
 export function findRecordById(
-  records:
-    Record<string, unknown>[],
+  records: Record<string, unknown>[],
   id: string,
 ): Record<string, unknown> | undefined {
-  return records.find(
-    (record) =>
-      recordString(
-        record,
-        'id',
-        'websiteId',
-      ) === id,
-  );
+  return records.find((record) => recordString(record, 'id', 'websiteId') === id);
 }
 
-export function findStringDeep(
-  value: unknown,
-  keys: string[],
-): string | undefined {
-  if (
-    typeof value !== 'object' ||
-    value === null
-  ) {
+export function findStringDeep(value: unknown, keys: string[]): string | undefined {
+  if (typeof value !== 'object' || value === null) {
     return undefined;
   }
 
   if (Array.isArray(value)) {
     for (const item of value) {
-      const found =
-        findStringDeep(
-          item,
-          keys,
-        );
+      const found = findStringDeep(item, keys);
 
       if (found) {
         return found;
@@ -276,33 +141,18 @@ export function findStringDeep(
     return undefined;
   }
 
-  const record =
-    value as Record<
-      string,
-      unknown
-    >;
+  const record = value as Record<string, unknown>;
 
   for (const key of keys) {
-    const candidate =
-      record[key];
+    const candidate = record[key];
 
-    if (
-      typeof candidate ===
-      'string'
-    ) {
+    if (typeof candidate === 'string') {
       return candidate;
     }
   }
 
-  for (
-    const candidate
-    of Object.values(record)
-  ) {
-    const found =
-      findStringDeep(
-        candidate,
-        keys,
-      );
+  for (const candidate of Object.values(record)) {
+    const found = findStringDeep(candidate, keys);
 
     if (found) {
       return found;
@@ -312,28 +162,16 @@ export function findStringDeep(
   return undefined;
 }
 
-export function findBooleanDeep(
-  value: unknown,
-  keys: string[],
-): boolean | undefined {
-  if (
-    typeof value !== 'object' ||
-    value === null
-  ) {
+export function findBooleanDeep(value: unknown, keys: string[]): boolean | undefined {
+  if (typeof value !== 'object' || value === null) {
     return undefined;
   }
 
   if (Array.isArray(value)) {
     for (const item of value) {
-      const found =
-        findBooleanDeep(
-          item,
-          keys,
-        );
+      const found = findBooleanDeep(item, keys);
 
-      if (
-        found !== undefined
-      ) {
+      if (found !== undefined) {
         return found;
       }
     }
@@ -341,37 +179,20 @@ export function findBooleanDeep(
     return undefined;
   }
 
-  const record =
-    value as Record<
-      string,
-      unknown
-    >;
+  const record = value as Record<string, unknown>;
 
   for (const key of keys) {
-    const candidate =
-      record[key];
+    const candidate = record[key];
 
-    if (
-      typeof candidate ===
-      'boolean'
-    ) {
+    if (typeof candidate === 'boolean') {
       return candidate;
     }
   }
 
-  for (
-    const candidate
-    of Object.values(record)
-  ) {
-    const found =
-      findBooleanDeep(
-        candidate,
-        keys,
-      );
+  for (const candidate of Object.values(record)) {
+    const found = findBooleanDeep(candidate, keys);
 
-    if (
-      found !== undefined
-    ) {
+    if (found !== undefined) {
       return found;
     }
   }
@@ -379,27 +200,19 @@ export function findBooleanDeep(
   return undefined;
 }
 
-export function readTrackingKey(
-  response: Response,
-): string {
-  const trackingKey =
-    findStringDeep(
-      response.body,
-      [
-        'trackingKey',
-        'rawTrackingKey',
-        'writeKey',
-        'key',
-      ],
-    );
+export function readTrackingKey(response: Response): string {
+  const trackingKey = findStringDeep(response.body, [
+    'trackingKey',
+    'rawTrackingKey',
+    'writeKey',
+    'key',
+  ]);
 
   if (!trackingKey) {
     throw new Error(
       [
         'Tracking key was not found in the response.',
-        `Received: ${JSON.stringify(
-          response.body,
-        )}`,
+        `Received: ${JSON.stringify(response.body)}`,
       ].join(' '),
     );
   }
@@ -409,51 +222,26 @@ export function readTrackingKey(
 
 export async function createWebsite(
   actor: WorkspaceTestUser,
-  overrides:
-    Partial<WebsitePayload> = {},
+  overrides: Partial<WebsitePayload> = {},
 ): Promise<CreatedWebsite> {
-  const payload =
-    buildWebsitePayload(
-      overrides,
-    );
+  const payload = buildWebsitePayload(overrides);
 
-  const response =
-    await actor.agent
-      .post(
-        websiteRoutes.root(
-          actor.workspaceId,
-        ),
-      )
-      .set(
-        withBearer(
-          actor.accessToken,
-        ),
-      )
-      .send(payload);
+  const response = await actor.agent
+    .post(websiteRoutes.root(actor.workspaceId))
+    .set(withBearer(actor.accessToken))
+    .send(payload);
 
-  expectWebsiteSuccess(
-    response,
-  );
+  expectWebsiteSuccess(response);
 
-  const record =
-    readWebsiteRecord(
-      response,
-    );
+  const record = readWebsiteRecord(response);
 
-  const id =
-    recordString(
-      record,
-      'id',
-      'websiteId',
-    );
+  const id = recordString(record, 'id', 'websiteId');
 
   if (!id) {
     throw new Error(
       [
         'Website response does not contain an ID.',
-        `Received: ${JSON.stringify(
-          response.body,
-        )}`,
+        `Received: ${JSON.stringify(response.body)}`,
       ].join(' '),
     );
   }
@@ -468,62 +256,28 @@ export async function createWebsite(
 
 export async function listWebsites(
   actor: WorkspaceTestUser,
-  query:
-    Record<
-      string,
-      string | number | boolean
-    > = {},
+  query: Record<string, string | number | boolean> = {},
 ): Promise<Response> {
   return actor.agent
-    .get(
-      websiteRoutes.root(
-        actor.workspaceId,
-      ),
-    )
-    .set(
-      withBearer(
-        actor.accessToken,
-      ),
-    )
+    .get(websiteRoutes.root(actor.workspaceId))
+    .set(withBearer(actor.accessToken))
     .query(query);
 }
 
-export async function getWebsite(
-  actor: WorkspaceTestUser,
-  websiteId: string,
-): Promise<Response> {
+export async function getWebsite(actor: WorkspaceTestUser, websiteId: string): Promise<Response> {
   return actor.agent
-    .get(
-      websiteRoutes.details(
-        actor.workspaceId,
-        websiteId,
-      ),
-    )
-    .set(
-      withBearer(
-        actor.accessToken,
-      ),
-    );
+    .get(websiteRoutes.details(actor.workspaceId, websiteId))
+    .set(withBearer(actor.accessToken));
 }
 
 export async function updateWebsite(
   actor: WorkspaceTestUser,
   websiteId: string,
-  payload:
-    Partial<WebsitePayload>,
+  payload: Partial<WebsitePayload>,
 ): Promise<Response> {
   return actor.agent
-    .patch(
-      websiteRoutes.details(
-        actor.workspaceId,
-        websiteId,
-      ),
-    )
-    .set(
-      withBearer(
-        actor.accessToken,
-      ),
-    )
+    .patch(websiteRoutes.details(actor.workspaceId, websiteId))
+    .set(withBearer(actor.accessToken))
     .send(payload);
 }
 
@@ -532,17 +286,8 @@ export async function enableWebsite(
   websiteId: string,
 ): Promise<Response> {
   return actor.agent
-    .post(
-      websiteRoutes.enable(
-        actor.workspaceId,
-        websiteId,
-      ),
-    )
-    .set(
-      withBearer(
-        actor.accessToken,
-      ),
-    );
+    .post(websiteRoutes.enable(actor.workspaceId, websiteId))
+    .set(withBearer(actor.accessToken));
 }
 
 export async function disableWebsite(
@@ -550,17 +295,8 @@ export async function disableWebsite(
   websiteId: string,
 ): Promise<Response> {
   return actor.agent
-    .post(
-      websiteRoutes.disable(
-        actor.workspaceId,
-        websiteId,
-      ),
-    )
-    .set(
-      withBearer(
-        actor.accessToken,
-      ),
-    );
+    .post(websiteRoutes.disable(actor.workspaceId, websiteId))
+    .set(withBearer(actor.accessToken));
 }
 
 export async function archiveWebsite(
@@ -568,17 +304,8 @@ export async function archiveWebsite(
   websiteId: string,
 ): Promise<Response> {
   return actor.agent
-    .post(
-      websiteRoutes.archive(
-        actor.workspaceId,
-        websiteId,
-      ),
-    )
-    .set(
-      withBearer(
-        actor.accessToken,
-      ),
-    );
+    .post(websiteRoutes.archive(actor.workspaceId, websiteId))
+    .set(withBearer(actor.accessToken));
 }
 
 export async function restoreWebsite(
@@ -586,17 +313,8 @@ export async function restoreWebsite(
   websiteId: string,
 ): Promise<Response> {
   return actor.agent
-    .post(
-      websiteRoutes.restore(
-        actor.workspaceId,
-        websiteId,
-      ),
-    )
-    .set(
-      withBearer(
-        actor.accessToken,
-      ),
-    );
+    .post(websiteRoutes.restore(actor.workspaceId, websiteId))
+    .set(withBearer(actor.accessToken));
 }
 
 export async function rotateWebsiteKey(
@@ -604,17 +322,8 @@ export async function rotateWebsiteKey(
   websiteId: string,
 ): Promise<Response> {
   return actor.agent
-    .post(
-      websiteRoutes.rotateKey(
-        actor.workspaceId,
-        websiteId,
-      ),
-    )
-    .set(
-      withBearer(
-        actor.accessToken,
-      ),
-    );
+    .post(websiteRoutes.rotateKey(actor.workspaceId, websiteId))
+    .set(withBearer(actor.accessToken));
 }
 
 export async function connectWebsite(
@@ -623,17 +332,8 @@ export async function connectWebsite(
   applicationId: string,
 ): Promise<Response> {
   return actor.agent
-    .post(
-      websiteRoutes.connect(
-        actor.workspaceId,
-        websiteId,
-      ),
-    )
-    .set(
-      withBearer(
-        actor.accessToken,
-      ),
-    )
+    .post(websiteRoutes.connect(actor.workspaceId, websiteId))
+    .set(withBearer(actor.accessToken))
     .send({
       applicationId,
     });
@@ -644,33 +344,15 @@ export async function disconnectWebsite(
   websiteId: string,
 ): Promise<Response> {
   return actor.agent
-    .post(
-      websiteRoutes.disconnect(
-        actor.workspaceId,
-        websiteId,
-      ),
-    )
-    .set(
-      withBearer(
-        actor.accessToken,
-      ),
-    );
+    .post(websiteRoutes.disconnect(actor.workspaceId, websiteId))
+    .set(withBearer(actor.accessToken));
 }
 
-export function nestedRecords(
-  value: unknown,
-): Record<string, unknown>[] {
+export function nestedRecords(value: unknown): Record<string, unknown>[] {
   if (Array.isArray(value)) {
     return value
       .map(asRecord)
-      .filter(
-        (
-          item,
-        ): item is Record<
-          string,
-          unknown
-        > => item !== undefined,
-      );
+      .filter((item): item is Record<string, unknown> => item !== undefined);
   }
 
   return [];

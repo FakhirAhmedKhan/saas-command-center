@@ -1,10 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import {
-  usePathname,
-  useRouter,
-} from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 import { useAuth } from '@/features/auth/auth-provider';
@@ -13,22 +10,13 @@ interface DashboardShellProps {
   children: ReactNode;
 }
 
-export function DashboardShell({
-  children,
-}: DashboardShellProps) {
+export function DashboardShell({ children }: DashboardShellProps) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const {
-    user,
-    workspaces,
-    logout,
-  } = useAuth();
+  const { user, workspaces, logout } = useAuth();
 
-  const selectedWorkspaceId =
-    pathname.match(
-      /\/workspaces\/([^/]+)/,
-    )?.[1] ?? '';
+  const selectedWorkspaceId = pathname.match(/\/workspaces\/([^/]+)/)?.[1] ?? '';
 
   async function handleLogout() {
     await logout();
@@ -38,13 +26,8 @@ export function DashboardShell({
   return (
     <div className="dashboard-layout">
       <aside className="sidebar">
-        <Link
-          className="sidebar-brand"
-          href="/dashboard"
-        >
-          <span className="brand-mark small">
-            SC
-          </span>
+        <Link className="sidebar-brand" href="/dashboard">
+          <span className="brand-mark small">SC</span>
 
           <span>
             SaaS Command
@@ -54,28 +37,17 @@ export function DashboardShell({
 
         <nav className="sidebar-nav">
           <Link
-            className={
-              pathname === '/dashboard'
-                ? 'nav-item active'
-                : 'nav-item'
-            }
+            className={pathname === '/dashboard' ? 'nav-item active' : 'nav-item'}
             href="/dashboard"
           >
             <span>Overview</span>
           </Link>
 
-          <p className="nav-section-label">
-            Workspaces
-          </p>
+          <p className="nav-section-label">Workspaces</p>
 
           {workspaces.map((workspace) => (
             <Link
-              className={
-                selectedWorkspaceId ===
-                workspace.id
-                  ? 'nav-item active'
-                  : 'nav-item'
-              }
+              className={selectedWorkspaceId === workspace.id ? 'nav-item active' : 'nav-item'}
               href={`/workspaces/${workspace.id}`}
               key={workspace.id}
             >
@@ -88,20 +60,11 @@ export function DashboardShell({
         <div className="sidebar-footer">
           <div className="user-summary">
             <div className="avatar">
-              {(
-                user?.displayName ||
-                user?.email ||
-                'U'
-              )
-                .charAt(0)
-                .toUpperCase()}
+              {(user?.displayName || user?.email || 'U').charAt(0).toUpperCase()}
             </div>
 
             <div>
-              <strong>
-                {user?.displayName ||
-                  'Account owner'}
-              </strong>
+              <strong>{user?.displayName || 'Account owner'}</strong>
 
               <span>{user?.email}</span>
             </div>
@@ -109,9 +72,7 @@ export function DashboardShell({
 
           <button
             className="button button-ghost button-full"
-            onClick={() =>
-              void handleLogout()
-            }
+            onClick={() => void handleLogout()}
             type="button"
           >
             Sign out
@@ -122,13 +83,9 @@ export function DashboardShell({
       <div className="dashboard-main">
         <header className="topbar">
           <div>
-            <p className="eyebrow">
-              Project visibility
-            </p>
+            <p className="eyebrow">Project visibility</p>
 
-            <strong>
-              SaaS Command Center
-            </strong>
+            <strong>SaaS Command Center</strong>
           </div>
 
           {workspaces.length > 0 && (
@@ -137,37 +94,25 @@ export function DashboardShell({
               className="workspace-select"
               value={selectedWorkspaceId}
               onChange={(event) => {
-                const workspaceId =
-                  event.target.value;
+                const workspaceId = event.target.value;
 
                 if (workspaceId) {
-                  router.push(
-                    `/workspaces/${workspaceId}`,
-                  );
+                  router.push(`/workspaces/${workspaceId}`);
                 }
               }}
             >
-              <option value="">
-                Select workspace
-              </option>
+              <option value="">Select workspace</option>
 
-              {workspaces.map(
-                (workspace) => (
-                  <option
-                    key={workspace.id}
-                    value={workspace.id}
-                  >
-                    {workspace.name}
-                  </option>
-                ),
-              )}
+              {workspaces.map((workspace) => (
+                <option key={workspace.id} value={workspace.id}>
+                  {workspace.name}
+                </option>
+              ))}
             </select>
           )}
         </header>
 
-        <main className="page-content">
-          {children}
-        </main>
+        <main className="page-content">{children}</main>
       </div>
     </div>
   );

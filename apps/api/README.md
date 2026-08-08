@@ -35,7 +35,7 @@ Merge the relevant values from `prisma.config.example.ts` into your existing
 The important setting is:
 
 ```ts
-schema: "prisma"
+schema: 'prisma';
 ```
 
 Do not use `schema: "prisma/schema.prisma"` because Prisma would ignore the

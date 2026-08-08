@@ -1,16 +1,9 @@
-import {
-  expect,
-  test,
-} from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
-import {
-  installMockApi,
-} from './fixtures/mock-api';
+import { installMockApi } from './fixtures/mock-api';
 
 test.describe('Batch 10 authentication flows', () => {
-  test('redirects the public root to login when the session is missing', async ({
-    page,
-  }) => {
+  test('redirects the public root to login when the session is missing', async ({ page }) => {
     await installMockApi(page, {
       authenticated: false,
     });
@@ -25,9 +18,7 @@ test.describe('Batch 10 authentication flows', () => {
     ).toBeVisible();
   });
 
-  test('redirects protected dashboard access to login', async ({
-    page,
-  }) => {
+  test('redirects protected dashboard access to login', async ({ page }) => {
     await installMockApi(page, {
       authenticated: false,
     });
@@ -37,20 +28,14 @@ test.describe('Batch 10 authentication flows', () => {
     await expect(page).toHaveURL(/\/login$/);
   });
 
-  test('logs in and opens the dashboard', async ({
-    page,
-  }) => {
+  test('logs in and opens the dashboard', async ({ page }) => {
     const state = await installMockApi(page, {
       authenticated: false,
     });
 
     await page.goto('/login');
-    await page
-      .getByLabel('Email address')
-      .fill('owner@example.com');
-    await page
-      .getByLabel('Password')
-      .fill('StrongPassword123!');
+    await page.getByLabel('Email address').fill('owner@example.com');
+    await page.getByLabel('Password').fill('StrongPassword123!');
     await page
       .getByRole('button', {
         name: 'Sign in',
@@ -64,12 +49,9 @@ test.describe('Batch 10 authentication flows', () => {
       }),
     ).toBeVisible();
 
-    const loginRequest =
-      state.requests.find(
-        (request) =>
-          request.method === 'POST' &&
-          request.path === '/auth/login',
-      );
+    const loginRequest = state.requests.find(
+      (request) => request.method === 'POST' && request.path === '/auth/login',
+    );
 
     expect(loginRequest?.body).toEqual({
       email: 'owner@example.com',
@@ -77,9 +59,7 @@ test.describe('Batch 10 authentication flows', () => {
     });
   });
 
-  test('shows the backend login error without navigating', async ({
-    page,
-  }) => {
+  test('shows the backend login error without navigating', async ({ page }) => {
     await installMockApi(page, {
       authenticated: false,
       failures: {
@@ -91,12 +71,8 @@ test.describe('Batch 10 authentication flows', () => {
     });
 
     await page.goto('/login');
-    await page
-      .getByLabel('Email address')
-      .fill('wrong@example.com');
-    await page
-      .getByLabel('Password')
-      .fill('WrongPassword123!');
+    await page.getByLabel('Email address').fill('wrong@example.com');
+    await page.getByLabel('Password').fill('WrongPassword123!');
     await page
       .getByRole('button', {
         name: 'Sign in',
@@ -104,31 +80,19 @@ test.describe('Batch 10 authentication flows', () => {
       .click();
 
     await expect(page).toHaveURL(/\/login$/);
-    await expect(
-      page.getByText('Invalid email or password'),
-    ).toBeVisible();
+    await expect(page.getByText('Invalid email or password')).toBeVisible();
   });
 
-  test('registers a new account with the expected request payload', async ({
-    page,
-  }) => {
+  test('registers a new account with the expected request payload', async ({ page }) => {
     const state = await installMockApi(page, {
       authenticated: false,
     });
 
     await page.goto('/register');
-    await page
-      .getByLabel('Your name')
-      .fill('  New Owner  ');
-    await page
-      .getByLabel('Email address')
-      .fill('new-owner@example.com');
-    await page
-      .getByLabel('Password')
-      .fill('StrongPassword123!');
-    await page
-      .getByLabel('Workspace name')
-      .fill('New SaaS Team');
+    await page.getByLabel('Your name').fill('  New Owner  ');
+    await page.getByLabel('Email address').fill('new-owner@example.com');
+    await page.getByLabel('Password').fill('StrongPassword123!');
+    await page.getByLabel('Workspace name').fill('New SaaS Team');
     await page
       .getByRole('button', {
         name: 'Create account',
@@ -137,12 +101,9 @@ test.describe('Batch 10 authentication flows', () => {
 
     await expect(page).toHaveURL(/\/dashboard$/);
 
-    const registerRequest =
-      state.requests.find(
-        (request) =>
-          request.method === 'POST' &&
-          request.path === '/auth/register',
-      );
+    const registerRequest = state.requests.find(
+      (request) => request.method === 'POST' && request.path === '/auth/register',
+    );
 
     expect(registerRequest?.body).toEqual({
       displayName: 'New Owner',
@@ -152,23 +113,15 @@ test.describe('Batch 10 authentication flows', () => {
     });
   });
 
-  test('uses browser validation for short registration passwords', async ({
-    page,
-  }) => {
+  test('uses browser validation for short registration passwords', async ({ page }) => {
     const state = await installMockApi(page, {
       authenticated: false,
     });
 
     await page.goto('/register');
-    await page
-      .getByLabel('Email address')
-      .fill('new-owner@example.com');
-    await page
-      .getByLabel('Password')
-      .fill('too-short');
-    await page
-      .getByLabel('Workspace name')
-      .fill('New Team');
+    await page.getByLabel('Email address').fill('new-owner@example.com');
+    await page.getByLabel('Password').fill('too-short');
+    await page.getByLabel('Workspace name').fill('New Team');
     await page
       .getByRole('button', {
         name: 'Create account',
@@ -176,27 +129,15 @@ test.describe('Batch 10 authentication flows', () => {
       .click();
 
     await expect(page).toHaveURL(/\/register$/);
-    const passwordValid =
-      await page
-        .getByLabel('Password')
-        .evaluate(
-          (input) =>
-            (input as HTMLInputElement)
-              .validity.valid,
-        );
+    const passwordValid = await page
+      .getByLabel('Password')
+      .evaluate((input) => (input as HTMLInputElement).validity.valid);
 
     expect(passwordValid).toBe(false);
-    expect(
-      state.requests.some(
-        (request) =>
-          request.path === '/auth/register',
-      ),
-    ).toBe(false);
+    expect(state.requests.some((request) => request.path === '/auth/register')).toBe(false);
   });
 
-  test('redirects an authenticated user away from login', async ({
-    page,
-  }) => {
+  test('redirects an authenticated user away from login', async ({ page }) => {
     await installMockApi(page);
 
     await page.goto('/login');
@@ -204,9 +145,7 @@ test.describe('Batch 10 authentication flows', () => {
     await expect(page).toHaveURL(/\/dashboard$/);
   });
 
-  test('logs out and returns to login', async ({
-    page,
-  }) => {
+  test('logs out and returns to login', async ({ page }) => {
     const state = await installMockApi(page);
 
     await page.goto('/dashboard');
@@ -219,9 +158,7 @@ test.describe('Batch 10 authentication flows', () => {
     await expect(page).toHaveURL(/\/login$/);
     expect(
       state.requests.some(
-        (request) =>
-          request.method === 'POST' &&
-          request.path === '/auth/logout',
+        (request) => request.method === 'POST' && request.path === '/auth/logout',
       ),
     ).toBe(true);
   });

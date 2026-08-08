@@ -1,16 +1,6 @@
-import {
-  AnalyticsProcessingAccessService,
-} from '../services/analytics-processing-access.service';
- 
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { AnalyticsProcessingAccessService } from '../services/analytics-processing-access.service';
+
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, UseGuards } from '@nestjs/common';
 
 import {
   ApiBearerAuth,
@@ -20,204 +10,112 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import {
-  AnalyticsProcessingTrigger,
-} from '../../../generated/prisma/client';
+import { AnalyticsProcessingTrigger } from '../../../generated/prisma/client';
 
-import {
-  CurrentUser,
-} from '../../auth/decorators/current-user.decorator';
+import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 
-import {
-  JwtAuthGuard,
-} from '../../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
-import {
-  WorkspaceAccessGuard,
-} from '../../workspace/guards/workspace-access.guard';
-
-
+import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
 
 import {
   AnalyticsProcessingStatusDto,
   ProcessingRunDto,
 } from '../dto/analytics-processing-response.dto';
 
-import {
-  ReprocessAnalyticsDto,
-} from '../dto/reprocess-analytics.dto';
+import { ReprocessAnalyticsDto } from '../dto/reprocess-analytics.dto';
 
-import {
-  AnalyticsProcessingQueueService,
-} from '../services/analytics-processing-queue.service';
+import { AnalyticsProcessingQueueService } from '../services/analytics-processing-queue.service';
 
-import {
-  AnalyticsProcessingStatusService,
-} from '../services/analytics-processing-status.service';
+import { AnalyticsProcessingStatusService } from '../services/analytics-processing-status.service';
 import { AuthenticatedUser } from 'src/modules/auth/interfaces/authenticated-user.interface';
 
-@ApiTags(
-  'Analytics Processing',
-)
-@ApiBearerAuth(
-  'access-token',
-)
-@Controller(
-  'workspaces/:workspaceId/websites/:websiteId/analytics/processing',
-)
-@UseGuards(
-  JwtAuthGuard,
-  WorkspaceAccessGuard,
-)
+@ApiTags('Analytics Processing')
+@ApiBearerAuth('access-token')
+@Controller('workspaces/:workspaceId/websites/:websiteId/analytics/processing')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard)
 export class AnalyticsProcessingController {
   constructor(
-    private readonly status:
-      AnalyticsProcessingStatusService,
+    private readonly status: AnalyticsProcessingStatusService,
 
-    private readonly queue:
-      AnalyticsProcessingQueueService,
+    private readonly queue: AnalyticsProcessingQueueService,
 
-    private readonly access:
-      AnalyticsProcessingAccessService,
+    private readonly access: AnalyticsProcessingAccessService,
   ) {}
 
   @Get('status')
   @ApiOperation({
-    summary:
-      'Get analytics processing status',
+    summary: 'Get analytics processing status',
   })
   @ApiOkResponse({
-    type:
-      AnalyticsProcessingStatusDto,
+    type: AnalyticsProcessingStatusDto,
   })
   getStatus(
-    @Param(
-      'workspaceId',
-      ParseUUIDPipe,
-    )
-    workspaceId:
-      string,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
 
-    @Param(
-      'websiteId',
-      ParseUUIDPipe,
-    )
-    websiteId:
-      string,
+    @Param('websiteId', ParseUUIDPipe)
+    websiteId: string,
 
     @CurrentUser()
-    user:
-      AuthenticatedUser,
-  ): Promise<
-    AnalyticsProcessingStatusDto
-  > {
-    return this.status
-      .getStatus(
-        workspaceId,
-        websiteId,
-        user.id,
-      );
+    user: AuthenticatedUser,
+  ): Promise<AnalyticsProcessingStatusDto> {
+    return this.status.getStatus(workspaceId, websiteId, user.id);
   }
 
   @Post('reprocess')
   @ApiOperation({
-    summary:
-      'Queue manual analytics reprocessing',
+    summary: 'Queue manual analytics reprocessing',
   })
   @ApiCreatedResponse({
-    type:
-      ProcessingRunDto,
+    type: ProcessingRunDto,
   })
   async reprocess(
-    @Param(
-      'workspaceId',
-      ParseUUIDPipe,
-    )
-    workspaceId:
-      string,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
 
-    @Param(
-      'websiteId',
-      ParseUUIDPipe,
-    )
-    websiteId:
-      string,
+    @Param('websiteId', ParseUUIDPipe)
+    websiteId: string,
 
     @CurrentUser()
-    user:
-      AuthenticatedUser,
+    user: AuthenticatedUser,
 
     @Body()
-    body:
-      ReprocessAnalyticsDto,
+    body: ReprocessAnalyticsDto,
   ) {
-    await this.access
-      .assertCanReprocess(
-        workspaceId,
-        user.id,
-      );
+    await this.access.assertCanReprocess(workspaceId, user.id);
 
-    return this.queue
-      .queue({
-        workspaceId,
+    return this.queue.queue({
+      workspaceId,
 
-        websiteId,
+      websiteId,
 
-        initiatedByUserId:
-          user.id,
+      initiatedByUserId: user.id,
 
-        from:
-          new Date(
-            body.from,
-          ),
+      from: new Date(body.from),
 
-        to:
-          new Date(
-            body.to,
-          ),
+      to: new Date(body.to),
 
-        trigger:
-          AnalyticsProcessingTrigger
-            .MANUAL,
-      });
+      trigger: AnalyticsProcessingTrigger.MANUAL,
+    });
   }
 
-  @Post(
-    'runs/:runId/retry',
-  )
+  @Post('runs/:runId/retry')
   @ApiOperation({
-    summary:
-      'Retry a dead-lettered processing run',
+    summary: 'Retry a dead-lettered processing run',
   })
   async retry(
-    @Param(
-      'workspaceId',
-      ParseUUIDPipe,
-    )
-    workspaceId:
-      string,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
 
-    @Param(
-      'runId',
-      ParseUUIDPipe,
-    )
-    runId:
-      string,
+    @Param('runId', ParseUUIDPipe)
+    runId: string,
 
     @CurrentUser()
-    user:
-      AuthenticatedUser,
+    user: AuthenticatedUser,
   ) {
-    await this.access
-      .assertCanReprocess(
-        workspaceId,
-        user.id,
-      );
+    await this.access.assertCanReprocess(workspaceId, user.id);
 
-    return this.queue
-      .retryDeadLetter(
-        runId,
-        user.id,
-      );
+    return this.queue.retryDeadLetter(runId, user.id);
   }
 }

@@ -9,17 +9,10 @@ import { WorkspaceCreationService } from '../service/workspace-creation.service'
 import { WorkspaceMembersService } from '../service/workspace-members.service';
 import { WorkspacesService } from '../service/workspaces.service';
 
-
 @Module({
-  imports: [
-    UsersModule,
-  ],
+  imports: [UsersModule],
 
-  controllers: [
-    WorkspacesController,
-    WorkspaceMembersController,
-    WorkspaceCreationController,
-  ],
+  controllers: [WorkspacesController, WorkspaceMembersController, WorkspaceCreationController],
 
   providers: [
     WorkspacesService,
@@ -37,4 +30,4 @@ import { WorkspacesService } from '../service/workspaces.service';
     WorkspaceRolesGuard,
   ],
 })
-export class WorkspaceModule { }
+export class WorkspaceModule {}

@@ -1,27 +1,17 @@
 ﻿'use client';
 
-import {
-  Suspense,
-  type ComponentProps,
-} from 'react';
+import { Suspense, type ComponentProps } from 'react';
 
-import {
-  ProtectedRoute as ProtectedRouteContent,
-} from './protected-route-content';
+import { ProtectedRoute as ProtectedRouteContent } from './protected-route-content';
 
-type ProtectedRouteProps =
-  ComponentProps<typeof ProtectedRouteContent>;
+type ProtectedRouteProps = ComponentProps<typeof ProtectedRouteContent>;
 
-export function ProtectedRoute(
-  props: ProtectedRouteProps,
-) {
+export function ProtectedRoute(props: ProtectedRouteProps) {
   return (
     <Suspense
       fallback={
         <div className="flex min-h-screen items-center justify-center">
-          <p className="text-sm text-slate-500">
-            Loading...
-          </p>
+          <p className="text-sm text-slate-500">Loading...</p>
         </div>
       }
     >

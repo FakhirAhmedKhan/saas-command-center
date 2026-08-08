@@ -1,37 +1,21 @@
-import {
-    Module,
-} from '@nestjs/common';
+import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-members.module';
+import { Module } from '@nestjs/common';
 
-import {
-    ActivityModule,
-} from '../activity/activity.module';
+import { ActivityModule } from '../activity/activity.module';
 
+import { WebsitesController } from './controllers/websites.controller';
 
-import {
-    WebsitesController,
-} from './controllers/websites.controller';
-
-import {
-    WebsitesService,
-} from './services/websites.service';
+import { WebsitesService } from './services/websites.service';
 import { WorkspaceModule } from '../workspace/modules/workspaces.module';
 
 @Module({
-    imports: [
-        WorkspaceModule,
-        ActivityModule,
-    ],
+  imports: [
+        WorkspaceMembersModule,WorkspaceModule, ActivityModule],
 
-    controllers: [
-        WebsitesController,
-    ],
+  controllers: [WebsitesController],
 
-    providers: [
-        WebsitesService,
-    ],
+  providers: [WebsitesService],
 
-    exports: [
-        WebsitesService,
-    ],
+  exports: [WebsitesService],
 })
-export class WebsitesModule { }
+export class WebsitesModule {}

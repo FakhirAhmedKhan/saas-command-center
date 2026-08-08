@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: command_center_full_e2e
       POSTGRES_DB: command_center_full_e2e
     ports:
-      - "5435:5432"
+      - '5435:5432'
     healthcheck:
       test:
         - CMD-SHELL

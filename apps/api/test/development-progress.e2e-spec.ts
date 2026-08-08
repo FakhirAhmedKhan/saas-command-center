@@ -1,20 +1,10 @@
- 
+import type { INestApplication } from '@nestjs/common';
 
-import type {
-  INestApplication,
-} from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
 
-import {
-  PrismaService,
-} from 'src/database/prisma.service';
+import { createApplication } from './helpers/application';
 
-import {
-  createApplication,
-} from './helpers/application';
-
-import {
-  createTestApp,
-} from './helpers/create-test-app';
+import { createTestApp } from './helpers/create-test-app';
 
 import {
   completeMilestone,
@@ -34,584 +24,207 @@ import {
   skipTask,
 } from './helpers/development';
 
-import {
-  resetDatabase,
-} from './helpers/database';
+import { resetDatabase } from './helpers/database';
 
-import {
-  registerWorkspaceTestUser,
-} from './helpers/workspace';
+import { registerWorkspaceTestUser } from './helpers/workspace';
 
-describe(
-  'Development Progress E2E',
-  () => {
-    let app:
-      INestApplication;
+describe('Development Progress E2E', () => {
+  let app: INestApplication;
 
-    let prisma:
-      PrismaService;
+  let prisma: PrismaService;
 
-    beforeEach(
-      async () => {
-        app =
-          await createTestApp();
+  beforeEach(async () => {
+    app = await createTestApp();
 
-        prisma =
-          app.get(
-            PrismaService,
-          );
+    prisma = app.get(PrismaService);
 
-        await resetDatabase(
-          prisma,
-        );
-      },
-    );
+    await resetDatabase(prisma);
+  });
 
-    afterEach(
-      async () => {
-        await app.close();
-      },
-    );
+  afterEach(async () => {
+    await app.close();
+  });
 
-    async function readProgress(
-      owner:
-        Awaited<
-          ReturnType<
-            typeof registerWorkspaceTestUser
-          >
-        >,
-      applicationId: string,
-    ): Promise<number> {
-      const response =
-        await getDevelopmentSummary(
-          owner,
-          applicationId,
-        );
+  async function readProgress(
+    owner: Awaited<ReturnType<typeof registerWorkspaceTestUser>>,
+    applicationId: string,
+  ): Promise<number> {
+    const response = await getDevelopmentSummary(owner, applicationId);
 
-      expect(
-        response.status,
-      ).toBe(200);
+    expect(response.status).toBe(200);
 
-      const progress =
-        findNumberDeep(
-          response.body,
-          [
-            'percentage',
-            'progressPercent',
-            'progress',
-          ],
-        );
+    const progress = findNumberDeep(response.body, ['percentage', 'progressPercent', 'progress']);
 
-      if (
-        progress === undefined
-      ) {
-        throw new Error(
-          `Progress was not found in ${JSON.stringify(
-            response.body,
-          )}`,
-        );
-      }
-
-      return progress;
+    if (progress === undefined) {
+      throw new Error(`Progress was not found in ${JSON.stringify(response.body)}`);
     }
 
-    it(
-      'starts at zero progress',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+    return progress;
+  }
 
-        const application =
-          await createApplication(
-            owner,
-          );
+  it('starts at zero progress', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
 
-        expect(
-          await readProgress(
-            owner,
-            application.id,
-          ),
-        ).toBe(0);
-      },
-    );
+    const application = await createApplication(owner);
 
-    it(
-      'calculates weighted task and milestone progress',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+    expect(await readProgress(owner, application.id)).toBe(0);
+  });
 
-        const application =
-          await createApplication(
-            owner,
-          );
+  it('calculates weighted task and milestone progress', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
 
-        const heavyMilestone =
-          await createMilestone(
-            owner,
-            application.id,
-            {
-              title:
-                'Heavy Milestone',
-              weight: 2,
-            },
-          );
+    const application = await createApplication(owner);
 
-        const lightMilestone =
-          await createMilestone(
-            owner,
-            application.id,
-            {
-              title:
-                'Light Milestone',
-              weight: 1,
-            },
-          );
+    const heavyMilestone = await createMilestone(owner, application.id, {
+      title: 'Heavy Milestone',
+      weight: 2,
+    });
 
-        const heavyTask =
-          await createTask(
-            owner,
-            application.id,
-            heavyMilestone.id,
-            {
-              weight: 1,
-            },
-          );
+    const lightMilestone = await createMilestone(owner, application.id, {
+      title: 'Light Milestone',
+      weight: 1,
+    });
 
-        await createTask(
-          owner,
-          application.id,
-          lightMilestone.id,
-          {
-            weight: 1,
-          },
-        );
+    const heavyTask = await createTask(owner, application.id, heavyMilestone.id, {
+      weight: 1,
+    });
 
-        expectDevelopmentSuccess(
-          await completeTask(
-            owner,
-            application.id,
-            heavyTask.id,
-          ),
-        );
+    await createTask(owner, application.id, lightMilestone.id, {
+      weight: 1,
+    });
 
-        expect(
-          await readProgress(
-            owner,
-            application.id,
-          ),
-        ).toBe(67);
-      },
-    );
+    expectDevelopmentSuccess(await completeTask(owner, application.id, heavyTask.id));
 
-    it(
-      'calculates milestone progress from weighted tasks',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+    expect(await readProgress(owner, application.id)).toBe(67);
+  });
 
-        const application =
-          await createApplication(
-            owner,
-          );
+  it('calculates milestone progress from weighted tasks', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
 
-        const milestone =
-          await createMilestone(
-            owner,
-            application.id,
-            {
-              weight: 1,
-            },
-          );
+    const application = await createApplication(owner);
 
-        const heavyTask =
-          await createTask(
-            owner,
-            application.id,
-            milestone.id,
-            {
-              title:
-                'Heavy Task',
-              weight: 3,
-            },
-          );
+    const milestone = await createMilestone(owner, application.id, {
+      weight: 1,
+    });
 
-        await createTask(
-          owner,
-          application.id,
-          milestone.id,
-          {
-            title:
-                'Light Task',
-            weight: 1,
-          },
-        );
+    const heavyTask = await createTask(owner, application.id, milestone.id, {
+      title: 'Heavy Task',
+      weight: 3,
+    });
 
-        expectDevelopmentSuccess(
-          await completeTask(
-            owner,
-            application.id,
-            heavyTask.id,
-          ),
-        );
+    await createTask(owner, application.id, milestone.id, {
+      title: 'Light Task',
+      weight: 1,
+    });
 
-        expect(
-          await readProgress(
-            owner,
-            application.id,
-          ),
-        ).toBe(75);
-      },
-    );
+    expectDevelopmentSuccess(await completeTask(owner, application.id, heavyTask.id));
 
-    it(
-      'excludes skipped tasks from applicable task weight',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+    expect(await readProgress(owner, application.id)).toBe(75);
+  });
 
-        const application =
-          await createApplication(
-            owner,
-          );
+  it('excludes skipped tasks from applicable task weight', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
 
-        const milestone =
-          await createMilestone(
-            owner,
-            application.id,
-          );
+    const application = await createApplication(owner);
 
-        const completed =
-          await createTask(
-            owner,
-            application.id,
-            milestone.id,
-            {
-              weight: 1,
-            },
-          );
+    const milestone = await createMilestone(owner, application.id);
 
-        const skipped =
-          await createTask(
-            owner,
-            application.id,
-            milestone.id,
-            {
-              weight: 3,
-            },
-          );
+    const completed = await createTask(owner, application.id, milestone.id, {
+      weight: 1,
+    });
 
-        expectDevelopmentSuccess(
-          await completeTask(
-            owner,
-            application.id,
-            completed.id,
-          ),
-        );
+    const skipped = await createTask(owner, application.id, milestone.id, {
+      weight: 3,
+    });
 
-        expectDevelopmentSuccess(
-          await skipTask(
-            owner,
-            application.id,
-            skipped.id,
-          ),
-        );
+    expectDevelopmentSuccess(await completeTask(owner, application.id, completed.id));
 
-        expect(
-          await readProgress(
-            owner,
-            application.id,
-          ),
-        ).toBe(100);
-      },
-    );
+    expectDevelopmentSuccess(await skipTask(owner, application.id, skipped.id));
 
-    it(
-      'excludes skipped milestones from application progress',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+    expect(await readProgress(owner, application.id)).toBe(100);
+  });
 
-        const application =
-          await createApplication(
-            owner,
-          );
+  it('excludes skipped milestones from application progress', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
 
-        const completedMilestone =
-          await createMilestone(
-            owner,
-            application.id,
-            {
-              weight: 1,
-            },
-          );
+    const application = await createApplication(owner);
 
-        const skippedMilestone =
-          await createMilestone(
-            owner,
-            application.id,
-            {
-              weight: 9,
-            },
-          );
+    const completedMilestone = await createMilestone(owner, application.id, {
+      weight: 1,
+    });
 
-        expectDevelopmentSuccess(
-          await completeMilestone(
-            owner,
-            application.id,
-            completedMilestone.id,
-          ),
-        );
+    const skippedMilestone = await createMilestone(owner, application.id, {
+      weight: 9,
+    });
 
-        expectDevelopmentSuccess(
-          await skipMilestone(
-            owner,
-            application.id,
-            skippedMilestone.id,
-          ),
-        );
+    expectDevelopmentSuccess(await completeMilestone(owner, application.id, completedMilestone.id));
 
-        expect(
-          await readProgress(
-            owner,
-            application.id,
-          ),
-        ).toBe(100);
-      },
-    );
+    expectDevelopmentSuccess(await skipMilestone(owner, application.id, skippedMilestone.id));
 
-    it(
-      'recalculates progress after task reopen',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+    expect(await readProgress(owner, application.id)).toBe(100);
+  });
 
-        const application =
-          await createApplication(
-            owner,
-          );
+  it('recalculates progress after task reopen', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
 
-        const milestone =
-          await createMilestone(
-            owner,
-            application.id,
-          );
+    const application = await createApplication(owner);
 
-        const task =
-          await createTask(
-            owner,
-            application.id,
-            milestone.id,
-          );
+    const milestone = await createMilestone(owner, application.id);
 
-        expectDevelopmentSuccess(
-          await completeTask(
-            owner,
-            application.id,
-            task.id,
-          ),
-        );
+    const task = await createTask(owner, application.id, milestone.id);
 
-        expect(
-          await readProgress(
-            owner,
-            application.id,
-          ),
-        ).toBe(100);
+    expectDevelopmentSuccess(await completeTask(owner, application.id, task.id));
 
-        expectDevelopmentSuccess(
-          await reopenTask(
-            owner,
-            application.id,
-            task.id,
-          ),
-        );
+    expect(await readProgress(owner, application.id)).toBe(100);
 
-        expect(
-          await readProgress(
-            owner,
-            application.id,
-          ),
-        ).toBe(0);
-      },
-    );
+    expectDevelopmentSuccess(await reopenTask(owner, application.id, task.id));
 
-    it(
-      'supports manual milestone complete and reopen when it has no tasks',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+    expect(await readProgress(owner, application.id)).toBe(0);
+  });
 
-        const application =
-          await createApplication(
-            owner,
-          );
+  it('supports manual milestone complete and reopen when it has no tasks', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
 
-        const milestone =
-          await createMilestone(
-            owner,
-            application.id,
-          );
+    const application = await createApplication(owner);
 
-        expectDevelopmentSuccess(
-          await completeMilestone(
-            owner,
-            application.id,
-            milestone.id,
-          ),
-        );
+    const milestone = await createMilestone(owner, application.id);
 
-        expect(
-          await readProgress(
-            owner,
-            application.id,
-          ),
-        ).toBe(100);
+    expectDevelopmentSuccess(await completeMilestone(owner, application.id, milestone.id));
 
-        expectDevelopmentSuccess(
-          await reopenMilestone(
-            owner,
-            application.id,
-            milestone.id,
-          ),
-        );
+    expect(await readProgress(owner, application.id)).toBe(100);
 
-        expect(
-          await readProgress(
-            owner,
-            application.id,
-          ),
-        ).toBe(0);
-      },
-    );
+    expectDevelopmentSuccess(await reopenMilestone(owner, application.id, milestone.id));
 
-    it(
-      'derives milestone status from task progress',
-      async () => {
-        const owner =
-          await registerWorkspaceTestUser(
-            app,
-            prisma,
-          );
+    expect(await readProgress(owner, application.id)).toBe(0);
+  });
 
-        const application =
-          await createApplication(
-            owner,
-          );
+  it('derives milestone status from task progress', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
 
-        const milestone =
-          await createMilestone(
-            owner,
-            application.id,
-          );
+    const application = await createApplication(owner);
 
-        const firstTask =
-          await createTask(
-            owner,
-            application.id,
-            milestone.id,
-          );
+    const milestone = await createMilestone(owner, application.id);
 
-        const secondTask =
-          await createTask(
-            owner,
-            application.id,
-            milestone.id,
-          );
+    const firstTask = await createTask(owner, application.id, milestone.id);
 
-        expectDevelopmentSuccess(
-          await completeTask(
-            owner,
-            application.id,
-            firstTask.id,
-          ),
-        );
+    const secondTask = await createTask(owner, application.id, milestone.id);
 
-        let milestones =
-          readDevelopmentItems(
-            await listMilestones(
-              owner,
-              application.id,
-            ),
-            [
-              'milestones',
-            ],
-          );
+    expectDevelopmentSuccess(await completeTask(owner, application.id, firstTask.id));
 
-        let stored =
-          findRecordById(
-            milestones,
-            milestone.id,
-          );
+    let milestones = readDevelopmentItems(await listMilestones(owner, application.id), [
+      'milestones',
+    ]);
 
-        expect(
-          findStringDeep(
-            stored,
-            [
-              'status',
-            ],
-          ),
-        ).toBe(
-          'IN_PROGRESS',
-        );
+    let stored = findRecordById(milestones, milestone.id);
 
-        expectDevelopmentSuccess(
-          await completeTask(
-            owner,
-            application.id,
-            secondTask.id,
-          ),
-        );
+    expect(findStringDeep(stored, ['status'])).toBe('IN_PROGRESS');
 
-        milestones =
-          readDevelopmentItems(
-            await listMilestones(
-              owner,
-              application.id,
-            ),
-            [
-              'milestones',
-            ],
-          );
+    expectDevelopmentSuccess(await completeTask(owner, application.id, secondTask.id));
 
-        stored =
-          findRecordById(
-            milestones,
-            milestone.id,
-          );
+    milestones = readDevelopmentItems(await listMilestones(owner, application.id), ['milestones']);
 
-        expect(
-          findStringDeep(
-            stored,
-            [
-              'status',
-            ],
-          ),
-        ).toBe(
-          'COMPLETED',
-        );
-      },
-    );
-  },
-);
+    stored = findRecordById(milestones, milestone.id);
+
+    expect(findStringDeep(stored, ['status'])).toBe('COMPLETED');
+  });
+});

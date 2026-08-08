@@ -1,127 +1,101 @@
-export type AnalyticsPreset =
-    | 'today'
-    | '7d'
-    | '30d'
-    | '90d';
+export type AnalyticsPreset = 'today' | '7d' | '30d' | '90d';
 
 export interface AnalyticsMetric {
-    value: number;
+  value: number;
 
-    previousValue: number;
+  previousValue: number;
 
-    changePercent:
-    | number
-    | null;
+  changePercent: number | null;
 }
 
 export interface AnalyticsBreakdownItem {
-    key: string;
+  key: string;
 
-    label: string;
+  label: string;
 
-    value: number;
+  value: number;
 
-    percentage: number;
+  percentage: number;
 }
 
 export interface AnalyticsTrendPoint {
-    bucketStart: string;
+  bucketStart: string;
 
-    visitors: number;
+  visitors: number;
 
-    sessions: number;
+  sessions: number;
 
-    pageViews: number;
+  pageViews: number;
 }
 
 export interface AnalyticsOverviewResponse {
-    website: {
-        id: string;
+  website: {
+    id: string;
 
-        name: string;
+    name: string;
 
-        domain: string;
+    domain: string;
 
-        timeZone: string;
+    timeZone: string;
 
-        lastEventAt:
-        | string
-        | null;
-    };
+    lastEventAt: string | null;
+  };
 
-    range: {
-        preset: string;
+  range: {
+    preset: string;
 
-        from: string;
+    from: string;
 
-        to: string;
+    to: string;
 
-        previousFrom:
-        string;
+    previousFrom: string;
 
-        previousTo:
-        string;
+    previousTo: string;
 
-        granularity:
-        | 'hour'
-        | 'day';
+    granularity: 'hour' | 'day';
 
-        days: number;
-    };
+    days: number;
+  };
 
-    metrics: {
-        visitors:
-        AnalyticsMetric;
+  metrics: {
+    visitors: AnalyticsMetric;
 
-        sessions:
-        AnalyticsMetric;
+    sessions: AnalyticsMetric;
 
-        pageViews:
-        AnalyticsMetric;
+    pageViews: AnalyticsMetric;
 
-        bounceRate:
-        AnalyticsMetric;
+    bounceRate: AnalyticsMetric;
 
-        averageDurationSeconds:
-        AnalyticsMetric;
-    };
+    averageDurationSeconds: AnalyticsMetric;
+  };
 
-    trend:
-    AnalyticsTrendPoint[];
+  trend: AnalyticsTrendPoint[];
 
-    topPages:
-    AnalyticsBreakdownItem[];
+  topPages: AnalyticsBreakdownItem[];
 
-    topSources:
-    AnalyticsBreakdownItem[];
+  topSources: AnalyticsBreakdownItem[];
 
-    topCountries:
-    AnalyticsBreakdownItem[];
+  topCountries: AnalyticsBreakdownItem[];
 
-    topDevices:
-    AnalyticsBreakdownItem[];
+  topDevices: AnalyticsBreakdownItem[];
 
-    topBrowsers:
-    AnalyticsBreakdownItem[];
+  topBrowsers: AnalyticsBreakdownItem[];
 
-    topOperatingSystems:
-    AnalyticsBreakdownItem[];
+  topOperatingSystems: AnalyticsBreakdownItem[];
 
-    empty: boolean;
+  empty: boolean;
 }
 
 export interface GetAnalyticsOverviewInput {
-    workspaceId: string;
+  workspaceId: string;
 
-    websiteId: string;
+  websiteId: string;
 
-    preset?:
-    AnalyticsPreset;
+  preset?: AnalyticsPreset;
 
-    from?: string;
+  from?: string;
 
-    to?: string;
+  to?: string;
 
-    signal?:
-    AbortSignal;
+  signal?: AbortSignal;
 }

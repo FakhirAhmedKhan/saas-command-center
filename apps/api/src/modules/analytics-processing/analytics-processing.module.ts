@@ -1,81 +1,50 @@
+import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-members.module';
+import { Module } from '@nestjs/common';
 
-import {
-    Module,
-} from '@nestjs/common';
+import { DatabaseModule } from '../../database/database.module';
 
-import {
-    DatabaseModule,
-} from '../../database/database.module';
+import { SharedRateLimitModule } from '../../common/rate-limit/shared-rate-limit.module';
 
-import {
-    SharedRateLimitModule,
-} from '../../common/rate-limit/shared-rate-limit.module';
+import { PostgresAdvisoryLockService } from '../../infrastructure/database/postgres-advisory-lock.service';
 
-import {
-    PostgresAdvisoryLockService,
-} from '../../infrastructure/database/postgres-advisory-lock.service';
+import { AnalyticsEngineModule } from '../analytics-engine/analytics-engine.module';
 
-import {
-    AnalyticsEngineModule,
-} from '../analytics-engine/analytics-engine.module';
+import { AnalyticsProcessingController } from './controllers/analytics-processing.controller';
 
-import {
-    AnalyticsProcessingController,
-} from './controllers/analytics-processing.controller';
+import { AnalyticsProcessingAccessService } from './services/analytics-processing-access.service';
 
+import { AnalyticsProcessingQueueService } from './services/analytics-processing-queue.service';
 
+import { AnalyticsProcessingSchedulerService } from './services/analytics-processing-scheduler.service';
 
-import {
-    AnalyticsProcessingQueueService,
-} from './services/analytics-processing-queue.service';
+import { AnalyticsProcessingStatusService } from './services/analytics-processing-status.service';
 
-import {
-    AnalyticsProcessingSchedulerService,
-} from './services/analytics-processing-scheduler.service';
+import { AnalyticsProcessingWorkerService } from './services/analytics-processing-worker.service';
 
-import {
-    AnalyticsProcessingStatusService,
-} from './services/analytics-processing-status.service';
-
-import {
-    AnalyticsProcessingWorkerService,
-} from './services/analytics-processing-worker.service';
-
-import {
-    AnalyticsRangeProcessorService,
-} from './services/analytics-range-processor.service';
+import { AnalyticsRangeProcessorService } from './services/analytics-range-processor.service';
 
 @Module({
-    imports: [
-        DatabaseModule,
-        AnalyticsEngineModule,
-        SharedRateLimitModule,
-    ],
+  imports: [
+        WorkspaceMembersModule,DatabaseModule, AnalyticsEngineModule, SharedRateLimitModule],
 
-    controllers: [
-        AnalyticsProcessingController,
-    ],
+  controllers: [AnalyticsProcessingController],
 
-    providers: [
-        PostgresAdvisoryLockService,
+  providers: [
+    PostgresAdvisoryLockService,
 
-        AnalyticsProcessingStatusService,
+    AnalyticsProcessingAccessService,
 
-        AnalyticsProcessingQueueService,
+    AnalyticsProcessingStatusService,
 
-        AnalyticsProcessingSchedulerService,
+    AnalyticsProcessingQueueService,
 
-        AnalyticsProcessingStatusService,
+    AnalyticsProcessingSchedulerService,
 
-        AnalyticsProcessingWorkerService,
+    AnalyticsProcessingWorkerService,
 
-        AnalyticsRangeProcessorService,
-    ],
+    AnalyticsRangeProcessorService,
+  ],
 
-    exports: [
-        AnalyticsProcessingQueueService,
-
-        AnalyticsProcessingStatusService,
-    ],
+  exports: [AnalyticsProcessingQueueService, AnalyticsProcessingStatusService],
 })
-export class AnalyticsProcessingModule { }
+export class AnalyticsProcessingModule {}

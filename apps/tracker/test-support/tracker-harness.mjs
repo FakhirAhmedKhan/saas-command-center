@@ -77,8 +77,7 @@ function makeEventTarget() {
     },
 
     dispatchEvent(event) {
-      const normalized =
-        typeof event === 'string' ? { type: event } : event;
+      const normalized = typeof event === 'string' ? { type: event } : event;
 
       for (const listener of listeners.get(normalized.type) ?? []) {
         listener.call(this, normalized);
@@ -269,8 +268,7 @@ export async function createTrackerHarness(options = {}) {
 
   const testIntl = {
     DateTimeFormat(...args) {
-      const formatter =
-        new Intl.DateTimeFormat(...args);
+      const formatter = new Intl.DateTimeFormat(...args);
 
       return {
         resolvedOptions() {

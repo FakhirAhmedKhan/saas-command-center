@@ -1,14 +1,7 @@
-﻿import {
-  mkdirSync,
-  writeFileSync,
-} from 'node:fs';
-import {
-  resolve,
-} from 'node:path';
+﻿import { mkdirSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
-import {
-  request,
-} from '@playwright/test';
+import { request } from '@playwright/test';
 
 import {
   fullStackStateDirectory,
@@ -42,81 +35,53 @@ interface WebsiteResponse {
   trackingKey: string;
 }
 
-async function globalSetup(
-): Promise<void> {
-  const apiUrl =
-    process.env.FULLSTACK_API_URL ??
-    'http://127.0.0.1:4100/api/v1';
+async function globalSetup(): Promise<void> {
+  const apiUrl = process.env.FULLSTACK_API_URL ?? 'http://127.0.0.1:4100/api/v1';
 
-  const webUrl =
-    process.env.FULLSTACK_WEB_URL ??
-    'http://127.0.0.1:3100';
+  const webUrl = process.env.FULLSTACK_WEB_URL ?? 'http://127.0.0.1:3100';
 
-  const runId =
-    `${Date.now()}-${Math.random()
-      .toString(36)
-      .slice(2, 8)}`;
+  const runId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-  const stateDirectory =
-    fullStackStateDirectory();
+  const stateDirectory = fullStackStateDirectory();
 
-  mkdirSync(
-    stateDirectory,
-    {
-      recursive: true,
-    },
-  );
+  mkdirSync(stateDirectory, {
+    recursive: true,
+  });
 
-  const healthContext =
-    await request.newContext({
-      baseURL: apiUrl,
-    });
+  const healthContext = await request.newContext({
+    baseURL: apiUrl,
+  });
 
-  const healthResponse =
-    await healthContext.get(`${apiUrl}/health`);
+  const healthResponse = await healthContext.get(`${apiUrl}/health`);
 
   if (!healthResponse.ok()) {
-    throw new Error(
-      `Full-stack API health check failed: ${healthResponse.status()}`,
-    );
+    throw new Error(`Full-stack API health check failed: ${healthResponse.status()}`);
   }
 
   await healthContext.dispose();
 
-  async function register(
-    roleName: string,
-  ): Promise<SeedUser> {
-    const email =
-      `batch11-${roleName}-${runId}@example.test`;
+  async function register(roleName: string): Promise<SeedUser> {
+    const email = `batch11-${roleName}-${runId}@example.test`;
 
-    const password =
-      'StrongBatch11Password123!';
+    const password = 'StrongBatch11Password123!';
 
-    const displayName =
-      `Batch 11 ${roleName}`;
+    const displayName = `Batch 11 ${roleName}`;
 
-    const context =
-      await request.newContext({
-        baseURL: apiUrl,
-        extraHTTPHeaders: {
-          'Content-Type':
-            'application/json',
-        },
-      });
+    const context = await request.newContext({
+      baseURL: apiUrl,
+      extraHTTPHeaders: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-    const response =
-      await context.post(
-        `${apiUrl}/auth/register`,
-        {
-          data: {
-            email,
-            password,
-            displayName,
-            workspaceName:
-              `Batch 11 ${roleName} Workspace ${runId}`,
-          },
-        },
-      );
+    const response = await context.post(`${apiUrl}/auth/register`, {
+      data: {
+        email,
+        password,
+        displayName,
+        workspaceName: `Batch 11 ${roleName} Workspace ${runId}`,
+      },
+    });
 
     if (response.status() !== 201) {
       throw new Error(
@@ -124,14 +89,9 @@ async function globalSetup(
       );
     }
 
-    const body =
-      await response.json() as AuthResponse;
+    const body = (await response.json()) as AuthResponse;
 
-    const storageStatePath =
-      resolve(
-        stateDirectory,
-        `${roleName.toLowerCase()}.json`,
-      );
+    const storageStatePath = resolve(stateDirectory, `${roleName.toLowerCase()}.json`);
 
     await context.storageState({
       path: storageStatePath,
@@ -139,13 +99,10 @@ async function globalSetup(
 
     await context.dispose();
 
-    const workspaceId =
-      body.workspaces[0]?.id;
+    const workspaceId = body.workspaces[0]?.id;
 
     if (!workspaceId) {
-      throw new Error(
-        `${roleName} registration did not create a workspace`,
-      );
+      throw new Error(`${roleName} registration did not create a workspace`);
     }
 
     return {
@@ -154,34 +111,26 @@ async function globalSetup(
       password,
       displayName,
       workspaceId,
-      accessToken:
-        body.accessToken,
+      accessToken: body.accessToken,
       storageStatePath,
     };
   }
 
-  const owner =
-    await register('Owner');
+  const owner = await register('Owner');
 
-  const admin =
-    await register('Admin');
+  const admin = await register('Admin');
 
-  const developer =
-    await register('Developer');
+  const developer = await register('Developer');
 
-  const viewer =
-    await register('Viewer');
+  const viewer = await register('Viewer');
 
-  const ownerApi =
-    await request.newContext({
-      baseURL: apiUrl,
-      extraHTTPHeaders: {
-        Authorization:
-          `Bearer ${owner.accessToken}`,
-        'Content-Type':
-          'application/json',
-      },
-    });
+  const ownerApi = await request.newContext({
+    baseURL: apiUrl,
+    extraHTTPHeaders: {
+      Authorization: `Bearer ${owner.accessToken}`,
+      'Content-Type': 'application/json',
+    },
+  });
 
   for (const member of [
     {
@@ -197,16 +146,12 @@ async function globalSetup(
       role: 'VIEWER',
     },
   ]) {
-    const response =
-      await ownerApi.post(
-        `${apiUrl}/workspaces/${owner.workspaceId}/members`,
-        {
-          data: {
-            email: member.user.email,
-            role: member.role,
-          },
-        },
-      );
+    const response = await ownerApi.post(`${apiUrl}/workspaces/${owner.workspaceId}/members`, {
+      data: {
+        email: member.user.email,
+        role: member.role,
+      },
+    });
 
     if (response.status() !== 201) {
       throw new Error(
@@ -215,22 +160,19 @@ async function globalSetup(
     }
   }
 
-  const applicationResponse =
-    await ownerApi.post(
-      `${apiUrl}/workspaces/${owner.workspaceId}/applications`,
-      {
-        data: {
-          name: 'Batch 11 Baseline App',
-          slug:
-            `batch11-baseline-app-${runId}`,
-          shortDescription:
-            'Real full-stack baseline application',
-          category: 'SAAS',
-          status: 'IN_DEVELOPMENT',
-          priority: 'HIGH',
-        },
+  const applicationResponse = await ownerApi.post(
+    `${apiUrl}/workspaces/${owner.workspaceId}/applications`,
+    {
+      data: {
+        name: 'Batch 11 Baseline App',
+        slug: `batch11-baseline-app-${runId}`,
+        shortDescription: 'Real full-stack baseline application',
+        category: 'SAAS',
+        status: 'IN_DEVELOPMENT',
+        priority: 'HIGH',
       },
-    );
+    },
+  );
 
   if (applicationResponse.status() !== 201) {
     throw new Error(
@@ -238,30 +180,23 @@ async function globalSetup(
     );
   }
 
-  const baselineApplication =
-    await applicationResponse.json() as ApplicationResponse;
+  const baselineApplication = (await applicationResponse.json()) as ApplicationResponse;
 
-  const trackingOrigin =
-    `https://batch11-${runId}.example.test`;
+  const trackingOrigin = `https://batch11-${runId}.example.test`;
 
-  const websiteResponse =
-    await ownerApi.post(
-      `${apiUrl}/workspaces/${owner.workspaceId}/websites`,
-      {
-        data: {
-          name: 'Batch 11 Baseline Website',
-          domain:
-            `batch11-${runId}.example.test`,
-          timeZone: 'Asia/Dubai',
-          enabled: true,
-          allowedOrigins: [
-            trackingOrigin,
-          ],
-          applicationId:
-            baselineApplication.id,
-        },
+  const websiteResponse = await ownerApi.post(
+    `${apiUrl}/workspaces/${owner.workspaceId}/websites`,
+    {
+      data: {
+        name: 'Batch 11 Baseline Website',
+        domain: `batch11-${runId}.example.test`,
+        timeZone: 'Asia/Dubai',
+        enabled: true,
+        allowedOrigins: [trackingOrigin],
+        applicationId: baselineApplication.id,
       },
-    );
+    },
+  );
 
   if (websiteResponse.status() !== 201) {
     throw new Error(
@@ -269,8 +204,7 @@ async function globalSetup(
     );
   }
 
-  const baselineWebsiteResponse =
-    await websiteResponse.json() as WebsiteResponse;
+  const baselineWebsiteResponse = (await websiteResponse.json()) as WebsiteResponse;
 
   await ownerApi.dispose();
 
@@ -289,29 +223,14 @@ async function globalSetup(
       slug: baselineApplication.slug,
     },
     baselineWebsite: {
-      id:
-        baselineWebsiteResponse.website.id,
-      name:
-        baselineWebsiteResponse.website.name,
-      domain:
-        baselineWebsiteResponse.website.domain,
-      trackingKey:
-        baselineWebsiteResponse.trackingKey,
+      id: baselineWebsiteResponse.website.id,
+      name: baselineWebsiteResponse.website.name,
+      domain: baselineWebsiteResponse.website.domain,
+      trackingKey: baselineWebsiteResponse.trackingKey,
     },
   };
 
-  writeFileSync(
-    fullStackStatePath(),
-    JSON.stringify(
-      state,
-      null,
-      2,
-    ),
-    'utf8',
-  );
+  writeFileSync(fullStackStatePath(), JSON.stringify(state, null, 2), 'utf8');
 }
 
 export default globalSetup;
-
-
-

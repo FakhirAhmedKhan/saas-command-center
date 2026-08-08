@@ -1,119 +1,33 @@
-import {
-  BadRequestException,
-} from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 
-import {
-  DeploymentStatus,
-} from '../../../generated/prisma/client';
+import { DeploymentStatus } from '../../../generated/prisma/client';
 
-import {
-  DeploymentTransitionService,
-} from './deployment-transition.service';
+import { DeploymentTransitionService } from './deployment-transition.service';
 
-describe(
-  DeploymentTransitionService.name,
-  () => {
-    const service =
-      new DeploymentTransitionService();
+describe(DeploymentTransitionService.name, () => {
+  const service = new DeploymentTransitionService();
 
-    it.each([
-      [
-        DeploymentStatus
-          .DRAFT,
+  it.each([
+    [DeploymentStatus.DRAFT, DeploymentStatus.SCHEDULED],
 
-        DeploymentStatus
-          .SCHEDULED,
-      ],
+    [DeploymentStatus.SCHEDULED, DeploymentStatus.IN_PROGRESS],
 
-      [
-        DeploymentStatus
-          .SCHEDULED,
+    [DeploymentStatus.IN_PROGRESS, DeploymentStatus.SUCCESSFUL],
 
-        DeploymentStatus
-          .IN_PROGRESS,
-      ],
+    [DeploymentStatus.IN_PROGRESS, DeploymentStatus.FAILED],
 
-      [
-        DeploymentStatus
-          .IN_PROGRESS,
+    [DeploymentStatus.SUCCESSFUL, DeploymentStatus.ROLLED_BACK],
+  ])('allows %s -> %s', (current, target) => {
+    expect(() => service.assertTransition(current, target)).not.toThrow();
+  });
 
-        DeploymentStatus
-          .SUCCESSFUL,
-      ],
+  it.each([
+    [DeploymentStatus.DRAFT, DeploymentStatus.SUCCESSFUL],
 
-      [
-        DeploymentStatus
-          .IN_PROGRESS,
+    [DeploymentStatus.SUCCESSFUL, DeploymentStatus.IN_PROGRESS],
 
-        DeploymentStatus
-          .FAILED,
-      ],
-
-      [
-        DeploymentStatus
-          .SUCCESSFUL,
-
-        DeploymentStatus
-          .ROLLED_BACK,
-      ],
-    ])(
-      'allows %s -> %s',
-      (
-        current,
-        target,
-      ) => {
-        expect(
-          () =>
-            service
-              .assertTransition(
-                current,
-                target,
-              ),
-        ).not.toThrow();
-      },
-    );
-
-    it.each([
-      [
-        DeploymentStatus
-          .DRAFT,
-
-        DeploymentStatus
-          .SUCCESSFUL,
-      ],
-
-      [
-        DeploymentStatus
-          .SUCCESSFUL,
-
-        DeploymentStatus
-          .IN_PROGRESS,
-      ],
-
-      [
-        DeploymentStatus
-          .ROLLED_BACK,
-
-        DeploymentStatus
-          .DRAFT,
-      ],
-    ])(
-      'rejects %s -> %s',
-      (
-        current,
-        target,
-      ) => {
-        expect(
-          () =>
-            service
-              .assertTransition(
-                current,
-                target,
-              ),
-        ).toThrow(
-          BadRequestException,
-        );
-      },
-    );
-  },
-);
+    [DeploymentStatus.ROLLED_BACK, DeploymentStatus.DRAFT],
+  ])('rejects %s -> %s', (current, target) => {
+    expect(() => service.assertTransition(current, target)).toThrow(BadRequestException);
+  });
+});

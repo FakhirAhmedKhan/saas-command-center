@@ -1,214 +1,149 @@
-export type HealthTargetType =
-    | 'APPLICATION'
-    | 'WEBSITE';
+export type HealthTargetType = 'APPLICATION' | 'WEBSITE';
 
-export type HealthCheckStatus =
-    | 'UNKNOWN'
-    | 'HEALTHY'
-    | 'DEGRADED'
-    | 'DOWN'
-    | 'DISABLED';
+export type HealthCheckStatus = 'UNKNOWN' | 'HEALTHY' | 'DEGRADED' | 'DOWN' | 'DISABLED';
 
-export type HealthIncidentStatus =
-    | 'OPEN'
-    | 'RESOLVED';
+export type HealthIncidentStatus = 'OPEN' | 'RESOLVED';
 
 export interface MonitoringSummary {
-    canManage:
-    boolean;
+  canManage: boolean;
 
-    total:
-    number;
+  total: number;
 
-    healthy:
-    number;
+  healthy: number;
 
-    degraded:
-    number;
+  degraded: number;
 
-    down:
-    number;
+  down: number;
 
-    unknown:
-    number;
+  unknown: number;
 
-    disabled:
-    number;
+  disabled: number;
 
-    activeIncidents:
-    number;
+  activeIncidents: number;
 }
 
 export interface HealthCheck {
-    id: string;
+  id: string;
 
-    targetType:
-    HealthTargetType;
+  targetType: HealthTargetType;
 
-    targetId:
-    string;
+  targetId: string;
 
-    targetName:
-    string;
+  targetName: string;
 
-    applicationId:
-    string | null;
+  applicationId: string | null;
 
-    websiteId:
-    string | null;
+  websiteId: string | null;
 
-    name: string;
+  name: string;
 
-    url: string;
+  url: string;
 
-    intervalSeconds:
-    number;
+  intervalSeconds: number;
 
-    timeoutMs:
-    number;
+  timeoutMs: number;
 
-    expectedStatusMin:
-    number;
+  expectedStatusMin: number;
 
-    expectedStatusMax:
-    number;
+  expectedStatusMax: number;
 
-    degradedAfterMs:
-    number;
+  degradedAfterMs: number;
 
-    failureThreshold:
-    number;
+  failureThreshold: number;
 
-    enabled:
-    boolean;
+  enabled: boolean;
 
-    latestStatus:
-    HealthCheckStatus;
+  latestStatus: HealthCheckStatus;
 
-    lastStatusCode:
-    number | null;
+  lastStatusCode: number | null;
 
-    lastResponseTimeMs:
-    number | null;
+  lastResponseTimeMs: number | null;
 
-    lastFailureReason:
-    string | null;
+  lastFailureReason: string | null;
 
-    consecutiveFailures:
-    number;
+  consecutiveFailures: number;
 
-    lastCheckedAt:
-    string | null;
+  lastCheckedAt: string | null;
 
-    lastSuccessfulAt:
-    string | null;
+  lastSuccessfulAt: string | null;
 
-    nextRunAt:
-    string;
+  nextRunAt: string;
 
-    createdAt:
-    string;
+  createdAt: string;
 
-    updatedAt:
-    string;
+  updatedAt: string;
 }
 
 export interface HealthCheckHistory {
-    id: string;
+  id: string;
 
-    status:
-    HealthCheckStatus;
+  status: HealthCheckStatus;
 
-    statusCode:
-    number | null;
+  statusCode: number | null;
 
-    responseTimeMs:
-    number | null;
+  responseTimeMs: number | null;
 
-    failureReason:
-    string | null;
+  failureReason: string | null;
 
-    checkedAt:
-    string;
+  checkedAt: string;
 }
 
 export interface HealthIncident {
-    id: string;
+  id: string;
 
-    healthCheckId:
-    string;
+  healthCheckId: string;
 
-    healthCheckName:
-    string;
+  healthCheckName: string;
 
-    targetName:
-    string;
+  targetName: string;
 
-    status:
-    HealthIncidentStatus;
+  status: HealthIncidentStatus;
 
-    summary: string;
+  summary: string;
 
-    failureCount:
-    number;
+  failureCount: number;
 
-    firstFailureAt:
-    string;
+  firstFailureAt: string;
 
-    lastFailureAt:
-    string;
+  lastFailureAt: string;
 
-    startedAt:
-    string;
+  startedAt: string;
 
-    resolvedAt:
-    string | null;
+  resolvedAt: string | null;
 }
 
 export interface MonitoringTarget {
-    id: string;
+  id: string;
 
-    type:
-    HealthTargetType;
+  type: HealthTargetType;
 
-    name: string;
+  name: string;
 
-    subtitle:
-    string | null;
+  subtitle: string | null;
 }
 
 export interface SaveHealthCheckInput {
-    targetType:
-    HealthTargetType;
+  targetType: HealthTargetType;
 
-    applicationId?:
-    string;
+  applicationId?: string;
 
-    websiteId?:
-    string;
+  websiteId?: string;
 
-    name: string;
+  name: string;
 
-    url: string;
+  url: string;
 
-    intervalSeconds:
-    number;
+  intervalSeconds: number;
 
-    timeoutMs:
-    number;
+  timeoutMs: number;
 
-    expectedStatusMin:
-    number;
+  expectedStatusMin: number;
 
-    expectedStatusMax:
-    number;
+  expectedStatusMax: number;
 
-    degradedAfterMs:
-    number;
+  degradedAfterMs: number;
 
-    failureThreshold:
-    number;
+  failureThreshold: number;
 
-    enabled:
-    boolean;
+  enabled: boolean;
 }

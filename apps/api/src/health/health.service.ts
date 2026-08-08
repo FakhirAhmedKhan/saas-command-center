@@ -17,9 +17,7 @@ export class HealthService {
       status: database.status === 'up' ? 'ok' : 'error',
       service: 'command-center-api',
       version: process.env.npm_package_version ?? '0.1.0',
-      environment:
-        this.configService.get<string>('NODE_ENV') ??
-        'development',
+      environment: this.configService.get<string>('NODE_ENV') ?? 'development',
       timestamp: new Date().toISOString(),
       database,
     };

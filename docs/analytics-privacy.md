@@ -78,3 +78,4 @@ Then grant consent through:
 
 ```js
 window.CommandCenterAnalytics?.consent('grant');
+```

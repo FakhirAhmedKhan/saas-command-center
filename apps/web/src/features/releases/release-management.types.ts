@@ -1,211 +1,151 @@
 export type ReleaseStatus =
-    | 'DRAFT'
-    | 'SCHEDULED'
-    | 'IN_PROGRESS'
-    | 'SUCCESSFUL'
-    | 'FAILED'
-    | 'ROLLED_BACK';
+  'DRAFT' | 'SCHEDULED' | 'IN_PROGRESS' | 'SUCCESSFUL' | 'FAILED' | 'ROLLED_BACK';
 
-export type DeploymentStatus =
-    ReleaseStatus;
+export type DeploymentStatus = ReleaseStatus;
 
 export interface UserSummary {
-    id: string;
-    name:
-    string | null;
-    email: string;
+  id: string;
+  name: string | null;
+  email: string;
 }
 
 export interface Release {
-    id: string;
-    version: string;
-    name:
-    string | null;
-    notes:
-    string | null;
-    commitRef:
-    string | null;
-    repositoryUrl:
-    string | null;
-    status:
-    ReleaseStatus;
-    scheduledAt:
-    string | null;
-    releasedAt:
-    string | null;
-    createdAt:
-    string;
-    updatedAt:
-    string;
+  id: string;
+  version: string;
+  name: string | null;
+  notes: string | null;
+  commitRef: string | null;
+  repositoryUrl: string | null;
+  status: ReleaseStatus;
+  scheduledAt: string | null;
+  releasedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
 
-    createdBy:
-    UserSummary;
+  createdBy: UserSummary;
 
-    _count?: {
-        deployments:
-        number;
-    };
+  _count?: {
+    deployments: number;
+  };
 }
 
 export interface DeploymentActivity {
-    id: string;
-    action: string;
-    fromStatus:
-    DeploymentStatus | null;
-    toStatus:
-    DeploymentStatus | null;
-    message:
-    string | null;
-    metadata:
-    Record<
-        string,
-        unknown
-    > | null;
-    createdAt:
-    string;
-    actor:
-    UserSummary;
+  id: string;
+  action: string;
+  fromStatus: DeploymentStatus | null;
+  toStatus: DeploymentStatus | null;
+  message: string | null;
+  metadata: Record<string, unknown> | null;
+  createdAt: string;
+  actor: UserSummary;
 }
 
 export interface Deployment {
+  id: string;
+  releaseId: string;
+  environmentId: string;
+  attempt: number;
+
+  status: DeploymentStatus;
+
+  commitRef: string | null;
+
+  repositoryUrl: string | null;
+
+  ciJobUrl: string | null;
+
+  liveUrl: string | null;
+
+  deploymentNotes: string | null;
+
+  failureReason: string | null;
+
+  scheduledAt: string | null;
+
+  startedAt: string | null;
+
+  finishedAt: string | null;
+
+  durationMs: number | null;
+
+  statusChangedAt: string;
+
+  createdAt: string;
+
+  release: Release;
+
+  environment: {
     id: string;
-    releaseId: string;
-    environmentId:
-    string;
-    attempt: number;
+    name: string;
+  };
 
-    status:
-    DeploymentStatus;
+  deployedBy: UserSummary | null;
 
-    commitRef:
-    string | null;
+  healthIncident: {
+    id: string;
+    status: string;
+    summary: string;
+    startedAt: string;
+    resolvedAt: string | null;
+  } | null;
 
-    repositoryUrl:
-    string | null;
-
-    ciJobUrl:
-    string | null;
-
-    liveUrl:
-    string | null;
-
-    deploymentNotes:
-    string | null;
-
-    failureReason:
-    string | null;
-
-    scheduledAt:
-    string | null;
-
-    startedAt:
-    string | null;
-
-    finishedAt:
-    string | null;
-
-    durationMs:
-    number | null;
-
-    statusChangedAt:
-    string;
-
-    createdAt:
-    string;
-
-    release:
-    Release;
-
+  rollbackTo: {
+    id: string;
+    release: Release;
     environment: {
-        id: string;
-        name: string;
+      id: string;
+      name: string;
     };
+  } | null;
 
-    deployedBy:
-    UserSummary | null;
+  activities: DeploymentActivity[];
 
-    healthIncident: {
-        id: string;
-        status: string;
-        summary: string;
-        startedAt: string;
-        resolvedAt:
-        string | null;
-    } | null;
-
-    rollbackTo: {
-        id: string;
-        release:
-        Release;
-        environment: {
-            id: string;
-            name: string;
-        };
-    } | null;
-
-    activities:
-    DeploymentActivity[];
-
-    allowedTransitions:
-    DeploymentStatus[];
+  allowedTransitions: DeploymentStatus[];
 }
 
 export interface CurrentEnvironmentVersion {
-    environmentId:
-    string;
+  environmentId: string;
 
-    environmentName:
-    string;
+  environmentName: string;
 
-    deploymentId:
-    string | null;
+  deploymentId: string | null;
 
-    releaseId:
-    string | null;
+  releaseId: string | null;
 
-    version:
-    string | null;
+  version: string | null;
 
-    status:
-    DeploymentStatus | null;
+  status: DeploymentStatus | null;
 
-    deployedAt:
-    string | null;
+  deployedAt: string | null;
 
-    liveUrl:
-    string | null;
+  liveUrl: string | null;
 }
 
 export interface DeploymentOptions {
-    canManage:
-    boolean;
+  canManage: boolean;
 
-    environments: Array<{
-        id: string;
-        name: string;
-    }>;
+  environments: Array<{
+    id: string;
+    name: string;
+  }>;
 
-    openIncidents: Array<{
-        id: string;
-        name: string;
-        summary: string;
-        startedAt:
-        string;
-    }>;
+  openIncidents: Array<{
+    id: string;
+    name: string;
+    summary: string;
+    startedAt: string;
+  }>;
 }
 
 export interface PaginatedResponse<T> {
-    items: T[];
+  items: T[];
 
-    pagination: {
-        page: number;
-        limit: number;
-        total: number;
-        totalPages:
-        number;
-        hasPreviousPage:
-        boolean;
-        hasNextPage:
-        boolean;
-    };
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasPreviousPage: boolean;
+    hasNextPage: boolean;
+  };
 }

@@ -1,81 +1,46 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 
-import {
-  PrismaService,
-} from '../../../database/prisma.service';
+import { PrismaService } from '../../../database/prisma.service';
 
-const WEBHOOK_MANAGEMENT_ROLES =
-  new Set([
-    'OWNER',
-    'ADMIN',
-    'DEVELOPER',
-  ]);
+const WEBHOOK_MANAGEMENT_ROLES = new Set(['OWNER', 'ADMIN', 'DEVELOPER']);
 
 @Injectable()
 export class WebhookAccessService {
-  constructor(
-    private readonly prisma:
-      PrismaService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async canManage(
-    workspaceId:
-      string,
+    workspaceId: string,
 
-    userId:
-      string,
+    userId: string,
   ): Promise<boolean> {
-    const membership =
-      await this.prisma
-        .workspaceMember
-        .findFirst({
-          where: {
-            workspaceId,
+    const membership = await this.prisma.workspaceMember.findFirst({
+      where: {
+        workspaceId,
 
-            userId,
-          },
+        userId,
+      },
 
-          select: {
-            role:
-              true,
-          },
-        });
+      select: {
+        role: true,
+      },
+    });
 
     if (!membership) {
-      throw new NotFoundException(
-        'Workspace membership not found.',
-      );
+      throw new NotFoundException('Workspace membership not found.');
     }
 
-    return WEBHOOK_MANAGEMENT_ROLES
-      .has(
-        String(
-          membership.role,
-        ),
-      );
+    return WEBHOOK_MANAGEMENT_ROLES.has(String(membership.role));
   }
 
   async assertCanManage(
-    workspaceId:
-      string,
+    workspaceId: string,
 
-    userId:
-      string,
+    userId: string,
   ): Promise<void> {
-    const allowed =
-      await this.canManage(
-        workspaceId,
-        userId,
-      );
+    const allowed = await this.canManage(workspaceId, userId);
 
     if (!allowed) {
-      throw new ForbiddenException(
-        'Your workspace role cannot manage integrations.',
-      );
+      throw new ForbiddenException('Your workspace role cannot manage integrations.');
     }
   }
 }

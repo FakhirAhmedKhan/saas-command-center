@@ -1,10 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import {
-  createTrackerHarness,
-  readBeaconPayload,
-} from '../test-support/tracker-harness.mjs';
+import { createTrackerHarness, readBeaconPayload } from '../test-support/tracker-harness.mjs';
 
 test('uses the configured endpoint and browser-safe request options', async () => {
   const endpoint = 'https://collector.example.com/custom-collect';
@@ -15,10 +12,7 @@ test('uses the configured endpoint and browser-safe request options', async () =
   assert.equal(request.init.method, 'POST');
   assert.equal(request.init.mode, 'no-cors');
   assert.equal(request.init.keepalive, true);
-  assert.equal(
-    request.init.headers['Content-Type'],
-    'text/plain;charset=UTF-8',
-  );
+  assert.equal(request.init.headers['Content-Type'], 'text/plain;charset=UTF-8');
 });
 
 test('preserves queued events after a network failure', async () => {
@@ -95,7 +89,10 @@ test('caps the persisted queue at 100 events and drops the oldest entries', asyn
 
   const queue = harness.queuedEvents();
   assert.equal(queue.length, 100);
-  assert.equal(queue.some((event) => event.eventName === 'event_0'), false);
+  assert.equal(
+    queue.some((event) => event.eventName === 'event_0'),
+    false,
+  );
   assert.equal(queue.at(-1).eventName, 'event_109');
 });
 
@@ -107,7 +104,10 @@ test('uses sendBeacon and clears the queue during pagehide', async () => {
 
   assert.equal(harness.beacons.length, 1);
   const payload = await readBeaconPayload(harness.beacons[0]);
-  assert.equal(payload.events.some((event) => event.eventName === 'page_closing'), true);
+  assert.equal(
+    payload.events.some((event) => event.eventName === 'page_closing'),
+    true,
+  );
   assert.equal(harness.queuedEvents().length, 0);
 });
 

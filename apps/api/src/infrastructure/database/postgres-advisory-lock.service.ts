@@ -1,89 +1,56 @@
-import {
-    Injectable,
-    Logger,
-    OnModuleDestroy,
-} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Injectable, Logger, OnModuleDestroy, Inject } from '@nestjs/common';
 
-import type {
-    PoolClient,
-} from 'pg';
+import type { PoolClient } from 'pg';
 
-import {
-    Pool,
-} from 'pg';
+import { Pool } from 'pg';
 
-import type {
-    TypedConfigService,
-} from '../../config/runtime-config';
+import type { TypedConfigService } from '../../config/runtime-config';
 
 export interface DistributedLockResult<T> {
-    acquired: boolean;
+  acquired: boolean;
 
-    value?: T;
+  value?: T;
 }
 
 interface AdvisoryLockRow {
-    acquired: boolean;
+  acquired: boolean;
 }
 
 @Injectable()
-export class PostgresAdvisoryLockService
-    implements OnModuleDestroy {
-    private readonly logger =
-        new Logger(
-            PostgresAdvisoryLockService.name,
-        );
+export class PostgresAdvisoryLockService implements OnModuleDestroy {
+  private readonly logger = new Logger(PostgresAdvisoryLockService.name);
 
-    private readonly pool:
-        Pool;
+  private readonly pool: Pool;
 
-    constructor(
-        config:
-            TypedConfigService,
-    ) {
-        this.pool =
-            new Pool({
-                connectionString:
-                    config.get(
-                        'DATABASE_URL',
-                        {
-                            infer: true,
-                        },
-                    ),
+  constructor(
+    @Inject(ConfigService)
+    config: TypedConfigService,
+  ) {
+    this.pool = new Pool({
+      connectionString: config.get('DATABASE_URL', {
+        infer: true,
+      }),
 
-                max: 5,
+      max: 5,
 
-                idleTimeoutMillis:
-                    30_000,
+      idleTimeoutMillis: 30_000,
 
-                connectionTimeoutMillis:
-                    10_000,
-            });
-    }
+      connectionTimeoutMillis: 10_000,
+    });
+  }
 
-    async withLock<T>(
-        lockKey: string,
-        callback:
-            (
-                client:
-                    PoolClient,
-            ) => Promise<T>,
-    ): Promise<
-        DistributedLockResult<T>
-    > {
-        const client =
-            await this.pool
-                .connect();
+  async withLock<T>(
+    lockKey: string,
+    callback: (client: PoolClient) => Promise<T>,
+  ): Promise<DistributedLockResult<T>> {
+    const client = await this.pool.connect();
 
-        let acquired =
-            false;
+    let acquired = false;
 
-        try {
-            const result =
-                await client.query<
-                    AdvisoryLockRow
-                >(
-                    `
+    try {
+      const result = await client.query<AdvisoryLockRow>(
+        `
             SELECT
               pg_try_advisory_lock(
                 hashtextextended(
@@ -92,36 +59,28 @@ export class PostgresAdvisoryLockService
                 )
               ) AS acquired
           `,
-                    [
-                        lockKey,
-                    ],
-                );
+        [lockKey],
+      );
 
-            acquired =
-                result.rows[0]
-                    ?.acquired ===
-                true;
+      acquired = result.rows[0]?.acquired === true;
 
-            if (!acquired) {
-                return {
-                    acquired: false,
-                };
-            }
+      if (!acquired) {
+        return {
+          acquired: false,
+        };
+      }
 
-            const value =
-                await callback(
-                    client,
-                );
+      const value = await callback(client);
 
-            return {
-                acquired: true,
-                value,
-            };
-        } finally {
-            if (acquired) {
-                try {
-                    await client.query(
-                        `
+      return {
+        acquired: true,
+        value,
+      };
+    } finally {
+      if (acquired) {
+        try {
+          await client.query(
+            `
               SELECT
                 pg_advisory_unlock(
                   hashtextextended(
@@ -130,30 +89,22 @@ export class PostgresAdvisoryLockService
                   )
                 )
             `,
-                        [
-                            lockKey,
-                        ],
-                    );
-                } catch (
-                error
-                ) {
-                    this.logger.error(
-                        'Unable to release advisory lock.',
+            [lockKey],
+          );
+        } catch (error) {
+          this.logger.error(
+            'Unable to release advisory lock.',
 
-                        error instanceof
-                            Error
-                            ? error.stack
-                            : undefined,
-                    );
-                }
-            }
-
-            client.release();
+            error instanceof Error ? error.stack : undefined,
+          );
         }
-    }
+      }
 
-    async onModuleDestroy():
-        Promise<void> {
-        await this.pool.end();
+      client.release();
     }
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await this.pool.end();
+  }
 }

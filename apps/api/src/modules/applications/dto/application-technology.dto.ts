@@ -1,16 +1,5 @@
- 
-import {
-  ApiProperty,
-  ApiPropertyOptional,
-  PartialType,
-} from '@nestjs/swagger';
-import {
-  IsEnum,
-  IsOptional,
-  IsString,
-  Length,
-  MaxLength,
-} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { IsEnum, IsOptional, IsString, Length, MaxLength } from 'class-validator';
 
 import { TechnologyType } from 'src/generated/prisma/enums';
 
@@ -37,6 +26,4 @@ export class CreateApplicationTechnologyDto {
   version?: string | null;
 }
 
-export class UpdateApplicationTechnologyDto extends PartialType(
-  CreateApplicationTechnologyDto,
-) {}
+export class UpdateApplicationTechnologyDto extends PartialType(CreateApplicationTechnologyDto) {}

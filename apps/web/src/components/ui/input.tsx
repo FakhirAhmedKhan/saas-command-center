@@ -1,44 +1,23 @@
 import { cn } from '@/features/lib/api/cn';
-import {
-  forwardRef,
-  type InputHTMLAttributes,
-  type ReactNode,
-} from 'react';
+import { forwardRef, type InputHTMLAttributes, type ReactNode } from 'react';
 
-
-export interface InputProps
-  extends InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   hint?: string;
   leadingIcon?: ReactNode;
 }
 
-export const Input = forwardRef<
-  HTMLInputElement,
-  InputProps
->(function Input(
-  {
-    className,
-    label,
-    error,
-    hint,
-    leadingIcon,
-    id,
-    ...props
-  },
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+  { className, label, error, hint, leadingIcon, id, ...props },
   ref,
 ) {
-  const inputId =
-    id ?? props.name ?? undefined;
+  const inputId = id ?? props.name ?? undefined;
 
   return (
     <div className="space-y-1.5">
       {label ? (
-        <label
-          htmlFor={inputId}
-          className="block text-sm font-medium text-slate-700"
-        >
+        <label htmlFor={inputId} className="block text-sm font-medium text-slate-700">
           {label}
         </label>
       ) : null}
@@ -70,13 +49,9 @@ export const Input = forwardRef<
       </div>
 
       {error ? (
-        <p className="text-sm text-red-600">
-          {error}
-        </p>
+        <p className="text-sm text-red-600">{error}</p>
       ) : hint ? (
-        <p className="text-sm text-slate-500">
-          {hint}
-        </p>
+        <p className="text-sm text-slate-500">{hint}</p>
       ) : null}
     </div>
   );

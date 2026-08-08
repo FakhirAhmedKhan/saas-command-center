@@ -1,21 +1,17 @@
-import {
-    Injectable,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import {
-    RedisService,
-} from '../../infrastructure/redis/redis.service';
+import { RedisService } from '../../infrastructure/redis/redis.service';
 
 export interface RateLimitResult {
-    allowed: boolean;
+  allowed: boolean;
 
-    limit: number;
+  limit: number;
 
-    remaining: number;
+  remaining: number;
 
-    retryAfterSeconds: number;
+  retryAfterSeconds: number;
 
-    resetAfterSeconds: number;
+  resetAfterSeconds: number;
 }
 
 const FIXED_WINDOW_SCRIPT = `
@@ -45,91 +41,40 @@ return {
 
 @Injectable()
 export class SharedRateLimitService {
-    constructor(
-        private readonly redis:
-            RedisService,
-    ) { }
+  constructor(private readonly redis: RedisService) {}
 
-    async consume(
-        scope: string,
-        identity: string,
-        limit: number,
-        windowSeconds: number,
-    ): Promise<RateLimitResult> {
-        const windowMs =
-            windowSeconds *
-            1_000;
+  async consume(
+    scope: string,
+    identity: string,
+    limit: number,
+    windowSeconds: number,
+  ): Promise<RateLimitResult> {
+    const windowMs = windowSeconds * 1_000;
 
-        const key =
-            [
-                'rate-limit',
-                scope,
-                identity,
-            ].join(':');
+    const key = ['rate-limit', scope, identity].join(':');
 
-        const result =
-            await this.redis
-                .getClient()
-                .eval(
-                    FIXED_WINDOW_SCRIPT,
-                    1,
-                    key,
-                    String(
-                        windowMs,
-                    ),
-                );
+    const result = await this.redis.getClient().eval(FIXED_WINDOW_SCRIPT, 1, key, String(windowMs));
 
-        if (
-            !Array.isArray(
-                result,
-            )
-        ) {
-            throw new Error(
-                'Invalid Redis rate-limit result.',
-            );
-        }
-
-        const count =
-            Number(
-                result[0],
-            );
-
-        const ttlMs =
-            Math.max(
-                Number(
-                    result[1],
-                ),
-                0,
-            );
-
-        const resetAfterSeconds =
-            Math.max(
-                1,
-                Math.ceil(
-                    ttlMs /
-                    1_000,
-                ),
-            );
-
-        return {
-            allowed:
-                count <= limit,
-
-            limit,
-
-            remaining:
-                Math.max(
-                    limit -
-                    count,
-                    0,
-                ),
-
-            retryAfterSeconds:
-                count > limit
-                    ? resetAfterSeconds
-                    : 0,
-
-            resetAfterSeconds,
-        };
+    if (!Array.isArray(result)) {
+      throw new Error('Invalid Redis rate-limit result.');
     }
+
+    const count = Number(result[0]);
+
+    const ttlMs = Math.max(Number(result[1]), 0);
+
+    const resetAfterSeconds = Math.max(1, Math.ceil(ttlMs / 1_000));
+
+    return {
+      allowed: count <= limit,
+
+      limit,
+
+      remaining: Math.max(limit - count, 0),
+
+      retryAfterSeconds: count > limit ? resetAfterSeconds : 0,
+
+      resetAfterSeconds,
+    };
+  }
 }

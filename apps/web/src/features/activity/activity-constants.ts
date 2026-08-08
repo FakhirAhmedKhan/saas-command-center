@@ -5,19 +5,9 @@ import type {
 } from './activity-types';
 
 export type ActivityBadgeVariant =
-  | 'default'
-  | 'blue'
-  | 'green'
-  | 'yellow'
-  | 'orange'
-  | 'red'
-  | 'purple'
-  | 'slate';
+  'default' | 'blue' | 'green' | 'yellow' | 'orange' | 'red' | 'purple' | 'slate';
 
-export const ACTIVITY_TYPE_LABELS: Record<
-  ApplicationActivityType,
-  string
-> = {
+export const ACTIVITY_TYPE_LABELS: Record<ApplicationActivityType, string> = {
   // Application
   APPLICATION_CREATED: 'Application created',
   APPLICATION_UPDATED: 'Application updated',
@@ -65,8 +55,7 @@ export const ACTIVITY_TYPE_LABELS: Record<
   BLOCKER_DELETED: 'Blocker deleted',
 
   // Development template
-  DEVELOPMENT_TEMPLATE_APPLIED:
-    'Development template applied',
+  DEVELOPMENT_TEMPLATE_APPLIED: 'Development template applied',
 
   // Website
   WEBSITE_CREATED: 'Website created',
@@ -75,16 +64,12 @@ export const ACTIVITY_TYPE_LABELS: Record<
   WEBSITE_DISABLED: 'Website disabled',
   WEBSITE_ARCHIVED: 'Website archived',
   WEBSITE_RESTORED: 'Website restored',
-  WEBSITE_TRACKING_KEY_ROTATED:
-    'Tracking key rotated',
+  WEBSITE_TRACKING_KEY_ROTATED: 'Tracking key rotated',
   WEBSITE_CONNECTED: 'Website connected',
   WEBSITE_DISCONNECTED: 'Website disconnected',
 };
 
-export const ACTIVITY_BADGE_VARIANTS: Record<
-  ApplicationActivityType,
-  ActivityBadgeVariant
-> = {
+export const ACTIVITY_BADGE_VARIANTS: Record<ApplicationActivityType, ActivityBadgeVariant> = {
   // Application
   APPLICATION_CREATED: 'green',
   APPLICATION_UPDATED: 'blue',
@@ -146,18 +131,12 @@ export const ACTIVITY_BADGE_VARIANTS: Record<
   WEBSITE_DISCONNECTED: 'orange',
 };
 
-export const ACTOR_TYPE_LABELS: Record<
-  ActivityActorType,
-  string
-> = {
+export const ACTOR_TYPE_LABELS: Record<ActivityActorType, string> = {
   USER: 'User',
   SYSTEM: 'System',
 };
 
-export const ENTITY_TYPE_LABELS: Record<
-  ActivityEntityType,
-  string
-> = {
+export const ENTITY_TYPE_LABELS: Record<ActivityEntityType, string> = {
   APPLICATION: 'Application',
   TECHNOLOGY: 'Technology',
   LINK: 'Link',

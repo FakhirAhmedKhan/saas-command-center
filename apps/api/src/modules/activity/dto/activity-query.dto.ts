@@ -1,7 +1,4 @@
-import {
-  Transform,
-  Type,
-} from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 import {
   IsDateString,
@@ -15,9 +12,7 @@ import {
   Min,
 } from 'class-validator';
 
-import {
-  ApiPropertyOptional,
-} from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 import {
   ActivityActorType,
@@ -25,13 +20,8 @@ import {
   ApplicationActivityType,
 } from 'src/generated/prisma/enums';
 
-function trimString(
-  value: unknown,
-): unknown {
-  return typeof value ===
-    'string'
-    ? value.trim()
-    : value;
+function trimString(value: unknown): unknown {
+  return typeof value === 'string' ? value.trim() : value;
 }
 
 export class ActivityQueryDto {
@@ -39,33 +29,22 @@ export class ActivityQueryDto {
   @IsOptional()
   @IsString()
   @MaxLength(120)
-  @Transform(
-    ({ value }: { value: unknown }) =>
-      trimString(value),
-  )
+  @Transform(({ value }: { value: unknown }) => trimString(value))
   search?: string;
 
   @ApiPropertyOptional({
-    enum:
-      ApplicationActivityType,
+    enum: ApplicationActivityType,
   })
   @IsOptional()
-  @IsEnum(
-    ApplicationActivityType,
-  )
-  activityType?:
-    ApplicationActivityType;
+  @IsEnum(ApplicationActivityType)
+  activityType?: ApplicationActivityType;
 
   @ApiPropertyOptional({
-    enum:
-      ActivityActorType,
+    enum: ActivityActorType,
   })
   @IsOptional()
-  @IsEnum(
-    ActivityActorType,
-  )
-  actorType?:
-    ActivityActorType;
+  @IsEnum(ActivityActorType)
+  actorType?: ActivityActorType;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -73,15 +52,11 @@ export class ActivityQueryDto {
   actorUserId?: string;
 
   @ApiPropertyOptional({
-    enum:
-      ActivityEntityType,
+    enum: ActivityEntityType,
   })
   @IsOptional()
-  @IsEnum(
-    ActivityEntityType,
-  )
-  entityType?:
-    ActivityEntityType;
+  @IsEnum(ActivityEntityType)
+  entityType?: ActivityEntityType;
 
   @ApiPropertyOptional()
   @IsOptional()

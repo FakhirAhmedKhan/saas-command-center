@@ -1,10 +1,6 @@
-import {
-  Injectable,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import {
-  createHash,
-} from 'node:crypto';
+import { createHash } from 'node:crypto';
 
 import {
   AnalyticsAggregateDimension,
@@ -12,17 +8,11 @@ import {
   RawAnalyticsEventType,
 } from 'src/generated/prisma/enums';
 
-import {
-  PrismaService,
-} from 'src/database/prisma.service';
+import { PrismaService } from 'src/database/prisma.service';
 
-import {
-  AnalyticsAggregatePeriod,
-} from '../dto/analytics-engine.dto';
+import { AnalyticsAggregatePeriod } from '../dto/analytics-engine.dto';
 
-import {
-  getAnalyticsBucket,
-} from '../utils/analytics-time';
+import { getAnalyticsBucket } from '../utils/analytics-time';
 import { DefaultArgs } from '@prisma/client/runtime/client';
 import { PrismaClient } from 'src/generated/prisma/internal/class';
 import { GlobalOmitConfig } from 'src/generated/prisma/internal/prismaNamespace';
@@ -34,329 +24,206 @@ export interface AnalyticsAggregationWebsite {
 }
 
 interface MutableAggregate {
-  dimension:
-  AnalyticsAggregateDimension;
+  dimension: AnalyticsAggregateDimension;
 
   value: string;
   label: string;
 
-  visitors:
-  Set<string>;
+  visitors: Set<string>;
 
-  sessions:
-  Set<string>;
+  sessions: Set<string>;
 
   pageViews: number;
   events: number;
   customEvents: number;
   bounces: number;
 
-  totalDurationMs:
-  bigint;
+  totalDurationMs: bigint;
 }
 
 @Injectable()
 export class AnalyticsAggregationService {
-  rebuildRange(transaction: Omit<PrismaClient<never, GlobalOmitConfig | undefined, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$use" | "$extends">, input: ProcessAnalyticsRangeInput) {
+  rebuildRange(
+    transaction: Omit<
+      PrismaClient<never, GlobalOmitConfig | undefined, DefaultArgs>,
+      '$connect' | '$disconnect' | '$on' | '$use' | '$extends'
+    >,
+    input: ProcessAnalyticsRangeInput,
+  ) {
     throw new Error('Method not implemented.');
   }
-  constructor(
-    private readonly prisma:
-      PrismaService,
-  ) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async rebuildBucket(
     website: AnalyticsAggregationWebsite,
     period: AnalyticsAggregatePeriod,
     bucketStart: Date,
   ): Promise<void> {
-    const bucket =
-      getAnalyticsBucket(
-        bucketStart,
-        website.timeZone,
-        period,
-      );
+    const bucket = getAnalyticsBucket(bucketStart, website.timeZone, period);
 
-    const [
-      events,
-      pageViews,
-      sessions,
-    ] =
-      await this.prisma
-        .$transaction([
-          this.prisma
-            .analyticsEvent
-            .findMany({
-              where: {
-                websiteId:
-                  website.id,
+    const [events, pageViews, sessions] = await this.prisma.$transaction([
+      this.prisma.analyticsEvent.findMany({
+        where: {
+          websiteId: website.id,
 
-                occurredAt: {
-                  gte:
-                    bucket.start,
+          occurredAt: {
+            gte: bucket.start,
 
-                  lt:
-                    bucket.end,
-                },
-              },
+            lt: bucket.end,
+          },
+        },
 
-              select: {
-                visitorId:
-                  true,
+        select: {
+          visitorId: true,
 
-                sessionId:
-                  true,
+          sessionId: true,
 
-                type:
-                  true,
+          type: true,
 
-                eventName:
-                  true,
-              },
-            }),
+          eventName: true,
+        },
+      }),
 
-          this.prisma
-            .analyticsPageView
-            .findMany({
-              where: {
-                websiteId:
-                  website.id,
+      this.prisma.analyticsPageView.findMany({
+        where: {
+          websiteId: website.id,
 
-                occurredAt: {
-                  gte:
-                    bucket.start,
+          occurredAt: {
+            gte: bucket.start,
 
-                  lt:
-                    bucket.end,
-                },
-              },
+            lt: bucket.end,
+          },
+        },
 
-              select: {
-                visitorId:
-                  true,
+        select: {
+          visitorId: true,
 
-                sessionId:
-                  true,
+          sessionId: true,
 
-                normalizedPath:
-                  true,
+          normalizedPath: true,
 
-                title:
-                  true,
-              },
-            }),
+          title: true,
+        },
+      }),
 
-          this.prisma
-            .analyticsSession
-            .findMany({
-              where: {
-                websiteId:
-                  website.id,
+      this.prisma.analyticsSession.findMany({
+        where: {
+          websiteId: website.id,
 
-                startedAt: {
-                  gte:
-                    bucket.start,
+          startedAt: {
+            gte: bucket.start,
 
-                  lt:
-                    bucket.end,
-                },
-              },
+            lt: bucket.end,
+          },
+        },
 
-              select: {
-                id:
-                  true,
+        select: {
+          id: true,
 
-                visitorId:
-                  true,
+          visitorId: true,
 
-                sourceName:
-                  true,
+          sourceName: true,
 
-                countryCode:
-                  true,
+          countryCode: true,
 
-                deviceType:
-                  true,
+          deviceType: true,
 
-                browserName:
-                  true,
+          browserName: true,
 
-                operatingSystem:
-                  true,
+          operatingSystem: true,
 
-                pageViewCount:
-                  true,
+          pageViewCount: true,
 
-                eventCount:
-                  true,
+          eventCount: true,
 
-                customEventCount:
-                  true,
+          customEventCount: true,
 
-                bounced:
-                  true,
+          bounced: true,
 
-                durationMs:
-                  true,
-              },
-            }),
-        ]);
+          durationMs: true,
+        },
+      }),
+    ]);
 
-    const aggregates =
-      new Map<
-        string,
-        MutableAggregate
-      >();
+    const aggregates = new Map<string, MutableAggregate>();
 
-    const overview =
-      this.getAggregate(
-        aggregates,
-        AnalyticsAggregateDimension
-          .OVERVIEW,
-        'overview',
-        'Overview',
-      );
+    const overview = this.getAggregate(
+      aggregates,
+      AnalyticsAggregateDimension.OVERVIEW,
+      'overview',
+      'Overview',
+    );
 
-    for (
-      const event
-      of events
-    ) {
-      overview
-        .visitors
-        .add(
-          event.visitorId,
+    for (const event of events) {
+      overview.visitors.add(event.visitorId);
+
+      overview.events += 1;
+
+      if (event.type === RawAnalyticsEventType.CUSTOM) {
+        overview.customEvents += 1;
+
+        const eventName = event.eventName ?? 'Unknown';
+
+        const custom = this.getAggregate(
+          aggregates,
+
+          AnalyticsAggregateDimension.CUSTOM_EVENT,
+
+          eventName,
+          eventName,
         );
 
-      overview.events +=
-        1;
+        custom.visitors.add(event.visitorId);
 
-      if (
-        event.type ===
-        RawAnalyticsEventType
-          .CUSTOM
-      ) {
-        overview
-          .customEvents +=
-          1;
+        custom.sessions.add(event.sessionId);
 
-        const eventName =
-          event.eventName ??
-          'Unknown';
+        custom.events += 1;
 
-        const custom =
-          this.getAggregate(
-            aggregates,
-
-            AnalyticsAggregateDimension
-              .CUSTOM_EVENT,
-
-            eventName,
-            eventName,
-          );
-
-        custom
-          .visitors
-          .add(
-            event.visitorId,
-          );
-
-        custom
-          .sessions
-          .add(
-            event.sessionId,
-          );
-
-        custom.events +=
-          1;
-
-        custom
-          .customEvents +=
-          1;
+        custom.customEvents += 1;
       }
     }
 
-    for (
-      const pageView
-      of pageViews
-    ) {
-      overview
-        .visitors
-        .add(
-          pageView
-            .visitorId,
-        );
+    for (const pageView of pageViews) {
+      overview.visitors.add(pageView.visitorId);
 
-      overview.pageViews +=
-        1;
+      overview.pageViews += 1;
 
-      const page =
-        this.getAggregate(
-          aggregates,
+      const page = this.getAggregate(
+        aggregates,
 
-          AnalyticsAggregateDimension
-            .PAGE,
+        AnalyticsAggregateDimension.PAGE,
 
-          pageView
-            .normalizedPath,
+        pageView.normalizedPath,
 
-          pageView.title ??
-          pageView
-            .normalizedPath,
-        );
-
-      page.visitors.add(
-        pageView.visitorId,
+        pageView.title ?? pageView.normalizedPath,
       );
 
-      page.sessions.add(
-        pageView.sessionId,
-      );
+      page.visitors.add(pageView.visitorId);
 
-      page.pageViews +=
-        1;
+      page.sessions.add(pageView.sessionId);
 
-      page.events +=
-        1;
+      page.pageViews += 1;
+
+      page.events += 1;
     }
 
-    for (
-      const session
-      of sessions
-    ) {
-      overview
-        .visitors
-        .add(
-          session.visitorId,
-        );
+    for (const session of sessions) {
+      overview.visitors.add(session.visitorId);
 
-      overview
-        .sessions
-        .add(
-          session.id,
-        );
+      overview.sessions.add(session.id);
 
-      overview.bounces +=
-        session.bounced
-          ? 1
-          : 0;
+      overview.bounces += session.bounced ? 1 : 0;
 
-      overview
-        .totalDurationMs +=
-        BigInt(
-          session.durationMs,
-        );
+      overview.totalDurationMs += BigInt(session.durationMs);
 
       this.addSessionDimension(
         aggregates,
 
-        AnalyticsAggregateDimension
-          .SOURCE,
+        AnalyticsAggregateDimension.SOURCE,
 
-        session.sourceName ||
-        'Unknown',
+        session.sourceName || 'Unknown',
 
-        session.sourceName ||
-        'Unknown',
+        session.sourceName || 'Unknown',
 
         session,
       );
@@ -364,14 +231,11 @@ export class AnalyticsAggregationService {
       this.addSessionDimension(
         aggregates,
 
-        AnalyticsAggregateDimension
-          .COUNTRY,
+        AnalyticsAggregateDimension.COUNTRY,
 
-        session.countryCode ??
-        'Unknown',
+        session.countryCode ?? 'Unknown',
 
-        session.countryCode ??
-        'Unknown',
+        session.countryCode ?? 'Unknown',
 
         session,
       );
@@ -379,16 +243,11 @@ export class AnalyticsAggregationService {
       this.addSessionDimension(
         aggregates,
 
-        AnalyticsAggregateDimension
-          .DEVICE,
+        AnalyticsAggregateDimension.DEVICE,
 
-        session.deviceType ??
-        AnalyticsDeviceType
-          .OTHER,
+        session.deviceType ?? AnalyticsDeviceType.OTHER,
 
-        session.deviceType ??
-        AnalyticsDeviceType
-          .OTHER,
+        session.deviceType ?? AnalyticsDeviceType.OTHER,
 
         session,
       );
@@ -396,14 +255,11 @@ export class AnalyticsAggregationService {
       this.addSessionDimension(
         aggregates,
 
-        AnalyticsAggregateDimension
-          .BROWSER,
+        AnalyticsAggregateDimension.BROWSER,
 
-        session.browserName ||
-        'Unknown',
+        session.browserName || 'Unknown',
 
-        session.browserName ||
-        'Unknown',
+        session.browserName || 'Unknown',
 
         session,
       );
@@ -411,152 +267,87 @@ export class AnalyticsAggregationService {
       this.addSessionDimension(
         aggregates,
 
-        AnalyticsAggregateDimension
-          .OPERATING_SYSTEM,
+        AnalyticsAggregateDimension.OPERATING_SYSTEM,
 
-        session.operatingSystem ||
-        'Unknown',
+        session.operatingSystem || 'Unknown',
 
-        session.operatingSystem ||
-        'Unknown',
+        session.operatingSystem || 'Unknown',
 
         session,
       );
     }
 
-    const generatedAt =
-      new Date();
+    const generatedAt = new Date();
 
-    const data =
-      [...aggregates.values()]
-        .map(
-          (item) => ({
-            websiteId:
-              website.id,
+    const data = [...aggregates.values()].map((item) => ({
+      websiteId: website.id,
 
-            bucketStart:
-              bucket.start,
+      bucketStart: bucket.start,
 
-            bucketEnd:
-              bucket.end,
+      bucketEnd: bucket.end,
 
-            timeZone:
-              website.timeZone,
+      timeZone: website.timeZone,
 
-            dimension:
-              item.dimension,
+      dimension: item.dimension,
 
-            dimensionKey:
-              this.createDimensionKey(
-                item.dimension,
-                item.value,
-              ),
+      dimensionKey: this.createDimensionKey(item.dimension, item.value),
 
-            dimensionValue:
-              item.value.slice(
-                0,
-                2048,
-              ),
+      dimensionValue: item.value.slice(0, 2048),
 
-            dimensionLabel:
-              item.label.slice(
-                0,
-                256,
-              ),
+      dimensionLabel: item.label.slice(0, 256),
 
-            visitors:
-              item.visitors.size,
+      visitors: item.visitors.size,
 
-            sessions:
-              item.sessions.size,
+      sessions: item.sessions.size,
 
-            pageViews:
-              item.pageViews,
+      pageViews: item.pageViews,
 
-            events:
-              item.events,
+      events: item.events,
 
-            customEvents:
-              item.customEvents,
+      customEvents: item.customEvents,
 
-            bounces:
-              item.bounces,
+      bounces: item.bounces,
 
-            totalDurationMs:
-              item
-                .totalDurationMs,
+      totalDurationMs: item.totalDurationMs,
 
-            generatedAt,
-          }),
-        );
+      generatedAt,
+    }));
 
-    if (
-      period ===
-      AnalyticsAggregatePeriod
-        .HOURLY
-    ) {
-      await this.prisma
-        .$transaction(
-          async (
-            transaction,
-          ) => {
-            await transaction
-              .analyticsHourlyAggregate
-              .deleteMany({
-                where: {
-                  websiteId:
-                    website.id,
+    if (period === AnalyticsAggregatePeriod.HOURLY) {
+      await this.prisma.$transaction(async (transaction) => {
+        await transaction.analyticsHourlyAggregate.deleteMany({
+          where: {
+            websiteId: website.id,
 
-                  bucketStart:
-                    bucket.start,
-                },
-              });
-
-            if (
-              data.length >
-              0
-            ) {
-              await transaction
-                .analyticsHourlyAggregate
-                .createMany({
-                  data,
-                });
-            }
+            bucketStart: bucket.start,
           },
-        );
+        });
+
+        if (data.length > 0) {
+          await transaction.analyticsHourlyAggregate.createMany({
+            data,
+          });
+        }
+      });
 
       return;
     }
 
-    await this.prisma
-      .$transaction(
-        async (
-          transaction,
-        ) => {
-          await transaction
-            .analyticsDailyAggregate
-            .deleteMany({
-              where: {
-                websiteId:
-                  website.id,
+    await this.prisma.$transaction(async (transaction) => {
+      await transaction.analyticsDailyAggregate.deleteMany({
+        where: {
+          websiteId: website.id,
 
-                bucketStart:
-                  bucket.start,
-              },
-            });
-
-          if (
-            data.length >
-            0
-          ) {
-            await transaction
-              .analyticsDailyAggregate
-              .createMany({
-                data,
-              });
-          }
+          bucketStart: bucket.start,
         },
-      );
+      });
+
+      if (data.length > 0) {
+        await transaction.analyticsDailyAggregate.createMany({
+          data,
+        });
+      }
+    });
   }
 
   async rebuild(
@@ -564,11 +355,7 @@ export class AnalyticsAggregationService {
     period: AnalyticsAggregatePeriod,
     bucketStart: Date,
   ): Promise<void> {
-    await this.rebuildBucket(
-      website,
-      period,
-      bucketStart,
-    );
+    await this.rebuildBucket(website, period, bucketStart);
   }
 
   async rebuildBuckets(
@@ -576,85 +363,57 @@ export class AnalyticsAggregationService {
     period: AnalyticsAggregatePeriod,
     bucketStarts: readonly Date[],
   ): Promise<void> {
-    for (
-      const bucketStart
-      of bucketStarts
-    ) {
-      await this.rebuildBucket(
-        website,
-        period,
-        bucketStart,
-      );
+    for (const bucketStart of bucketStarts) {
+      await this.rebuildBucket(website, period, bucketStart);
     }
   }
 
   private getAggregate(
-    collection: Map<
-      string,
-      MutableAggregate
-    >,
+    collection: Map<string, MutableAggregate>,
 
-    dimension:
-      AnalyticsAggregateDimension,
+    dimension: AnalyticsAggregateDimension,
 
     value: string,
 
     label: string,
   ): MutableAggregate {
-    const key =
-      `${dimension}:${value}`;
+    const key = `${dimension}:${value}`;
 
-    const existing =
-      collection.get(key);
+    const existing = collection.get(key);
 
     if (existing) {
       return existing;
     }
 
-    const created:
-      MutableAggregate = {
+    const created: MutableAggregate = {
       dimension,
       value,
       label,
 
-      visitors:
-        new Set<string>(),
+      visitors: new Set<string>(),
 
-      sessions:
-        new Set<string>(),
+      sessions: new Set<string>(),
 
-      pageViews:
-        0,
+      pageViews: 0,
 
-      events:
-        0,
+      events: 0,
 
-      customEvents:
-        0,
+      customEvents: 0,
 
-      bounces:
-        0,
+      bounces: 0,
 
-      totalDurationMs:
-        0n,
+      totalDurationMs: 0n,
     };
 
-    collection.set(
-      key,
-      created,
-    );
+    collection.set(key, created);
 
     return created;
   }
 
   private addSessionDimension(
-    collection: Map<
-      string,
-      MutableAggregate
-    >,
+    collection: Map<string, MutableAggregate>,
 
-    dimension:
-      AnalyticsAggregateDimension,
+    dimension: AnalyticsAggregateDimension,
 
     value: string,
 
@@ -670,71 +429,32 @@ export class AnalyticsAggregationService {
       durationMs: number;
     },
   ): void {
-    const aggregate =
-      this.getAggregate(
-        collection,
-        dimension,
-        value,
-        label,
-      );
+    const aggregate = this.getAggregate(collection, dimension, value, label);
 
-    aggregate
-      .visitors
-      .add(
-        session.visitorId,
-      );
+    aggregate.visitors.add(session.visitorId);
 
-    aggregate
-      .sessions
-      .add(
-        session.id,
-      );
+    aggregate.sessions.add(session.id);
 
-    aggregate.pageViews +=
-      session.pageViewCount;
+    aggregate.pageViews += session.pageViewCount;
 
-    aggregate.events +=
-      session.eventCount;
+    aggregate.events += session.eventCount;
 
-    aggregate
-      .customEvents +=
-      session
-        .customEventCount;
+    aggregate.customEvents += session.customEventCount;
 
-    aggregate.bounces +=
-      session.bounced
-        ? 1
-        : 0;
+    aggregate.bounces += session.bounced ? 1 : 0;
 
-    aggregate
-      .totalDurationMs +=
-      BigInt(
-        session.durationMs,
-      );
+    aggregate.totalDurationMs += BigInt(session.durationMs);
   }
 
   private createDimensionKey(
-    dimension:
-      AnalyticsAggregateDimension,
+    dimension: AnalyticsAggregateDimension,
 
     value: string,
   ): string {
-    if (
-      dimension ===
-      AnalyticsAggregateDimension
-        .OVERVIEW
-    ) {
+    if (dimension === AnalyticsAggregateDimension.OVERVIEW) {
       return 'overview';
     }
 
-    return createHash(
-      'sha256',
-    )
-      .update(
-        `${dimension}:${value}`,
-      )
-      .digest(
-        'hex',
-      );
+    return createHash('sha256').update(`${dimension}:${value}`).digest('hex');
   }
 }

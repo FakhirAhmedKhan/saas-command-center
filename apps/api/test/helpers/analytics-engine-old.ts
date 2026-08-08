@@ -1,92 +1,46 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-import type {
-  INestApplication,
-} from '@nestjs/common';
+import type { INestApplication } from '@nestjs/common';
 
-import request, {
-  type Response,
-} from 'supertest';
+import request, { type Response } from 'supertest';
 
-import {
-  asRecord,
-} from './application';
+import { asRecord } from './application';
 
-import {
-  withBearer,
-} from './auth';
+import { withBearer } from './auth';
 
-import type {
-  WorkspaceTestUser,
-} from './workspace';
+import type { WorkspaceTestUser } from './workspace';
 
 export const analyticsEngineRoutes = {
-  root(
-    workspaceId: string,
-    websiteId: string,
-  ): string {
+  root(workspaceId: string, websiteId: string): string {
     return `/api/v1/workspaces/${workspaceId}/websites/${websiteId}/analytics-engine`;
   },
 
-  status(
-    workspaceId: string,
-    websiteId: string,
-  ): string {
-    return `${this.root(
-      workspaceId,
-      websiteId,
-    )}/status`;
+  status(workspaceId: string, websiteId: string): string {
+    return `${this.root(workspaceId, websiteId)}/status`;
   },
 
-  process(
-    workspaceId: string,
-    websiteId: string,
-  ): string {
-    return `${this.root(
-      workspaceId,
-      websiteId,
-    )}/process`;
+  process(workspaceId: string, websiteId: string): string {
+    return `${this.root(workspaceId, websiteId)}/process`;
   },
 
-  aggregates(
-    workspaceId: string,
-    websiteId: string,
-  ): string {
-    return `${this.root(
-      workspaceId,
-      websiteId,
-    )}/aggregates`;
+  aggregates(workspaceId: string, websiteId: string): string {
+    return `${this.root(workspaceId, websiteId)}/aggregates`;
   },
 
-  reprocess(
-    workspaceId: string,
-    websiteId: string,
-  ): string {
-    return `${this.root(
-      workspaceId,
-      websiteId,
-    )}/reprocess`;
+  reprocess(workspaceId: string, websiteId: string): string {
+    return `${this.root(workspaceId, websiteId)}/reprocess`;
   },
 
-  retention(
-    workspaceId: string,
-    websiteId: string,
-  ): string {
-    return `${this.root(
-      workspaceId,
-      websiteId,
-    )}/retention`;
+  retention(workspaceId: string, websiteId: string): string {
+    return `${this.root(workspaceId, websiteId)}/retention`;
   },
 } as const;
 
 export interface AnalyticsEngineStatusBody {
   website: Record<string, unknown>;
   counts: Record<string, number>;
-  processingState:
-    Record<string, unknown> | null;
-  latestRun:
-    Record<string, unknown> | null;
-  recentSessions:
-    Record<string, unknown>[];
+  processingState: Record<string, unknown> | null;
+  latestRun: Record<string, unknown> | null;
+  recentSessions: Record<string, unknown>[];
 }
 
 export async function getAnalyticsEngineStatus(
@@ -95,17 +49,8 @@ export async function getAnalyticsEngineStatus(
   websiteId: string,
 ): Promise<Response> {
   return actor.agent
-    .get(
-      analyticsEngineRoutes.status(
-        workspaceId,
-        websiteId,
-      ),
-    )
-    .set(
-      withBearer(
-        actor.accessToken,
-      ),
-    );
+    .get(analyticsEngineRoutes.status(workspaceId, websiteId))
+    .set(withBearer(actor.accessToken));
 }
 
 export async function getAnonymousAnalyticsEngineStatus(
@@ -113,14 +58,7 @@ export async function getAnonymousAnalyticsEngineStatus(
   workspaceId: string,
   websiteId: string,
 ): Promise<Response> {
-  return request(
-    app.getHttpServer(),
-  ).get(
-    analyticsEngineRoutes.status(
-      workspaceId,
-      websiteId,
-    ),
-  );
+  return request(app.getHttpServer()).get(analyticsEngineRoutes.status(workspaceId, websiteId));
 }
 
 export async function processAnalytics(
@@ -130,123 +68,56 @@ export async function processAnalytics(
   body: Record<string, unknown> = {},
 ): Promise<Response> {
   return actor.agent
-    .post(
-      analyticsEngineRoutes.process(
-        workspaceId,
-        websiteId,
-      ),
-    )
-    .set(
-      withBearer(
-        actor.accessToken,
-      ),
-    )
+    .post(analyticsEngineRoutes.process(workspaceId, websiteId))
+    .set(withBearer(actor.accessToken))
     .send(body);
 }
 
-export function readAnalyticsEngineStatus(
-  response: Response,
-): AnalyticsEngineStatusBody {
-  const body =
-    asRecord(
-      response.body,
-    );
+export function readAnalyticsEngineStatus(response: Response): AnalyticsEngineStatusBody {
+  const body = asRecord(response.body);
 
-  const website =
-    asRecord(
-      body?.website,
-    );
+  const website = asRecord(body?.website);
 
-  const countsRecord =
-    asRecord(
-      body?.counts,
-    );
+  const countsRecord = asRecord(body?.counts);
 
-  if (
-    !body ||
-    !website ||
-    !countsRecord
-  ) {
+  if (!body || !website || !countsRecord) {
     throw new Error(
       [
         'Unexpected analytics-engine status response.',
-        `Received: ${JSON.stringify(
-          response.body,
-        )}`,
+        `Received: ${JSON.stringify(response.body)}`,
       ].join(' '),
     );
   }
 
-  const counts:
-    Record<string, number> = {};
+  const counts: Record<string, number> = {};
 
-  for (
-    const [
-      key,
-      value,
-    ] of Object.entries(
-      countsRecord,
-    )
-  ) {
-    if (
-      typeof value ===
-      'number'
-    ) {
-      counts[key] =
-        value;
+  for (const [key, value] of Object.entries(countsRecord)) {
+    if (typeof value === 'number') {
+      counts[key] = value;
     }
   }
 
-  const recentSessions =
-    Array.isArray(
-      body.recentSessions,
-    )
-      ? body.recentSessions
+  const recentSessions = Array.isArray(body.recentSessions)
+    ? body.recentSessions
         .map(asRecord)
-        .filter(
-          (
-            value,
-          ): value is Record<
-            string,
-            unknown
-          > =>
-            value !== undefined,
-        )
-      : [];
+        .filter((value): value is Record<string, unknown> => value !== undefined)
+    : [];
 
   return {
     website,
     counts,
-    processingState:
-      asRecord(
-        body.processingState,
-      ) ?? null,
-    latestRun:
-      asRecord(
-        body.latestRun,
-      ) ?? null,
+    processingState: asRecord(body.processingState) ?? null,
+    latestRun: asRecord(body.latestRun) ?? null,
     recentSessions,
   };
 }
 
-export function expectAnalyticsSuccess(
-  response: Response,
-): void {
-  if (
-    ![
-      200,
-      201,
-      202,
-    ].includes(
-      response.status,
-    )
-  ) {
+export function expectAnalyticsSuccess(response: Response): void {
+  if (![200, 201, 202].includes(response.status)) {
     throw new Error(
       [
         `Expected analytics success but received ${response.status}.`,
-        `Response: ${JSON.stringify(
-          response.body,
-        )}`,
+        `Response: ${JSON.stringify(response.body)}`,
       ].join(' '),
     );
   }

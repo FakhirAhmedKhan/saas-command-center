@@ -25,8 +25,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const request = context.getRequest<Request>();
     const response = context.getResponse<Response>();
 
-    const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
-    const exceptionResponse = exception instanceof HttpException ? exception.getResponse() : undefined;
+    const status =
+      exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
+    const exceptionResponse =
+      exception instanceof HttpException ? exception.getResponse() : undefined;
     const normalized = this.normalizeError(exceptionResponse);
     const requestId = response.getHeader('x-request-id')?.toString() ?? 'unknown';
 
@@ -43,7 +45,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       message:
         status >= 500
           ? 'An unexpected server error occurred'
-          : normalized.message ?? 'Request failed',
+          : (normalized.message ?? 'Request failed'),
       path: request.originalUrl,
       requestId,
       timestamp: new Date().toISOString(),

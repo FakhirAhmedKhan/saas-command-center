@@ -1,39 +1,28 @@
 const path = require('node:path');
 
 module.exports = {
-  moduleFileExtensions: [
-    'js',
-    'json',
-    'ts',
-  ],
+  moduleFileExtensions: ['js', 'json', 'ts'],
 
   rootDir: '..',
 
   testEnvironment: 'node',
 
-  testRegex:
-    'test/.*\\.e2e-spec\\.ts$',
+  testRegex: 'test/.*\\.e2e-spec\\.ts$',
 
   transform: {
     '^.+\\.(t|j)s$': [
       require.resolve('ts-jest'),
       {
-        tsconfig: path.join(
-          __dirname,
-          'tsconfig.json',
-        ),
+        tsconfig: path.join(__dirname, 'tsconfig.json'),
       },
     ],
   },
 
   moduleNameMapper: {
-    '^src/(.*)$':
-      '<rootDir>/src/$1',
+    '^src/(.*)$': '<rootDir>/src/$1',
   },
 
-  setupFiles: [
-    '<rootDir>/test/setup-env.ts',
-  ],
+  setupFiles: ['<rootDir>/test/setup-env.ts'],
 
   collectCoverageFrom: [
     'src/**/*.ts',
@@ -52,8 +41,7 @@ module.exports = {
     '\\.test\\.ts$',
   ],
 
-  coverageDirectory:
-    '<rootDir>/coverage/e2e',
+  coverageDirectory: '<rootDir>/coverage/e2e',
 
   testTimeout: 30000,
 

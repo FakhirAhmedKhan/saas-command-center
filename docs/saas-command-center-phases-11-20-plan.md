@@ -646,18 +646,18 @@ A production-ready SaaS Command Center with automated delivery, verified full-st
 
 Estimated duration: **18–22 weeks** for a small team working sequentially, with some backend and frontend work performed in parallel.
 
-| Phase | Focus | Estimated Duration |
-|---|---|---:|
-| 11 | Full-stack foundation and production parity | 1–2 weeks |
-| 12 | Analytics overview dashboard | 2 weeks |
-| 13 | Detailed analytics and exports | 2 weeks |
-| 14 | Analytics reliability and scalability | 2–3 weeks |
-| 15 | Health monitoring and incidents | 2–3 weeks |
-| 16 | Releases and deployments | 2 weeks |
-| 17 | Invitations, notifications, and activity | 2 weeks |
-| 18 | Webhooks and integrations | 2–3 weeks |
-| 19 | Security, performance, accessibility, observability | 2–3 weeks |
-| 20 | CI/CD, real full-stack testing, and production launch | 1–2 weeks |
+| Phase | Focus                                                 | Estimated Duration |
+| ----- | ----------------------------------------------------- | -----------------: |
+| 11    | Full-stack foundation and production parity           |          1–2 weeks |
+| 12    | Analytics overview dashboard                          |            2 weeks |
+| 13    | Detailed analytics and exports                        |            2 weeks |
+| 14    | Analytics reliability and scalability                 |          2–3 weeks |
+| 15    | Health monitoring and incidents                       |          2–3 weeks |
+| 16    | Releases and deployments                              |            2 weeks |
+| 17    | Invitations, notifications, and activity              |            2 weeks |
+| 18    | Webhooks and integrations                             |          2–3 weeks |
+| 19    | Security, performance, accessibility, observability   |          2–3 weeks |
+| 20    | CI/CD, real full-stack testing, and production launch |          1–2 weeks |
 
 ## Milestones
 

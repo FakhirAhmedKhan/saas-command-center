@@ -32,10 +32,7 @@ import {
   ENTITY_TYPE_LABELS,
 } from '../activity-constants';
 
-import type {
-  ApplicationActivity,
-  ApplicationActivityType,
-} from '../activity-types';
+import type { ApplicationActivity, ApplicationActivityType } from '../activity-types';
 
 import {
   formatActivityDate,
@@ -121,33 +118,24 @@ export function ActivityItem({
   activity,
   showApplication = false,
 }: ActivityItemProps) {
-const metadataSummary = getMetadataSummary(activity);
+  const metadataSummary = getMetadataSummary(activity);
 
-  const activityLabel =
-    ACTIVITY_TYPE_LABELS[activity.activityType];
+  const activityLabel = ACTIVITY_TYPE_LABELS[activity.activityType];
 
-  const entityLabel =
-    ENTITY_TYPE_LABELS[activity.entityType];
+  const entityLabel = ENTITY_TYPE_LABELS[activity.entityType];
 
-  const badgeVariant =
-    ACTIVITY_BADGE_VARIANTS[activity.activityType];
+  const badgeVariant = ACTIVITY_BADGE_VARIANTS[activity.activityType];
 
-  const formattedDate = formatActivityDate(
-    activity.createdAt,
-  );
+  const formattedDate = formatActivityDate(activity.createdAt);
 
-  const relativeDate = formatRelativeActivityDate(
-    activity.createdAt,
-  );
+  const relativeDate = formatRelativeActivityDate(activity.createdAt);
 
   const actorName = getActivityActorName(activity);
 
   const applicationUrl = activity.applicationId
-    ? `/workspaces/${encodeURIComponent(
-      workspaceId,
-    )}/applications/${encodeURIComponent(
-      activity.applicationId,
-    )}`
+    ? `/workspaces/${encodeURIComponent(workspaceId)}/applications/${encodeURIComponent(
+        activity.applicationId,
+      )}`
     : null;
 
   return (
@@ -158,33 +146,22 @@ const metadataSummary = getMetadataSummary(activity);
       />
 
       <div className="relative z-10 flex size-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm">
-        {createElement(
-          ACTIVITY_ICONS[
-            activity.activityType
-          ],
-          {
-            'aria-hidden': true,
-            className: 'size-[18px]',
-            strokeWidth: 1.8,
-          },
-        )}
+        {createElement(ACTIVITY_ICONS[activity.activityType], {
+          'aria-hidden': true,
+          className: 'size-[18px]',
+          strokeWidth: 1.8,
+        })}
       </div>
 
       <div className="min-w-0 flex-1 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h3 className="break-words font-semibold text-slate-950">
-                {activity.title}
-              </h3>
+              <h3 className="break-words font-semibold text-slate-950">{activity.title}</h3>
 
-              <Badge variant={badgeVariant}>
-                {activityLabel}
-              </Badge>
+              <Badge variant={badgeVariant}>{activityLabel}</Badge>
 
-              <Badge variant="slate">
-                {entityLabel}
-              </Badge>
+              <Badge variant="slate">{entityLabel}</Badge>
             </div>
 
             {activity.description ? (
@@ -207,22 +184,14 @@ const metadataSummary = getMetadataSummary(activity);
                   href={applicationUrl}
                   className="mt-3 inline-flex max-w-full items-center gap-1.5 text-sm font-semibold text-brand-700 transition-colors hover:text-brand-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
                 >
-                  <span className="truncate">
-                    {activity.applicationName}
-                  </span>
+                  <span className="truncate">{activity.applicationName}</span>
 
-                  <ExternalLink
-                    aria-hidden="true"
-                    className="size-3.5 shrink-0"
-                  />
+                  <ExternalLink aria-hidden="true" className="size-3.5 shrink-0" />
                 </Link>
               ) : (
                 <p className="mt-3 text-sm font-medium text-slate-500">
                   {activity.applicationName}
-                  <span className="font-normal">
-                    {' '}
-                    — deleted
-                  </span>
+                  <span className="font-normal"> — deleted</span>
                 </p>
               )
             ) : null}
@@ -237,9 +206,7 @@ const metadataSummary = getMetadataSummary(activity);
               {relativeDate}
             </time>
 
-            <p className="mt-1 text-xs text-slate-400">
-              by {actorName}
-            </p>
+            <p className="mt-1 text-xs text-slate-400">by {actorName}</p>
           </div>
         </div>
       </div>

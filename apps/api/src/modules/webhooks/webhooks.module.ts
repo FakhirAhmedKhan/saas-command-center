@@ -1,64 +1,35 @@
-import {
-  Module,
-} from '@nestjs/common';
+import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-members.module';
+import { Module } from '@nestjs/common';
 
-import {
-  DatabaseModule,
-} from '../../database/database.module';
+import { DatabaseModule } from '../../database/database.module';
 
-import {
-  SharedRateLimitModule,
-} from '../../common/rate-limit/shared-rate-limit.module';
+import { SharedRateLimitModule } from '../../common/rate-limit/shared-rate-limit.module';
 
-import {
-  PostgresAdvisoryLockService,
-} from '../../infrastructure/database/postgres-advisory-lock.service';
+import { PostgresAdvisoryLockService } from '../../infrastructure/database/postgres-advisory-lock.service';
 
-import {
-  WebhooksController,
-} from './controllers/webhooks.controller';
+import { WebhooksController } from './controllers/webhooks.controller';
 
-import {
-  WebhookAccessService,
-} from './services/webhook-access.service';
+import { WebhookAccessService } from './services/webhook-access.service';
 
-import {
-  WebhookCleanupService,
-} from './services/webhook-cleanup.service';
+import { WebhookCleanupService } from './services/webhook-cleanup.service';
 
-import {
-  WebhookDeliveryWorkerService,
-} from './services/webhook-delivery-worker.service';
+import { WebhookDeliveryWorkerService } from './services/webhook-delivery-worker.service';
 
-import {
-  WebhookEventPublisherService,
-} from './services/webhook-event-publisher.service';
+import { WebhookEventPublisherService } from './services/webhook-event-publisher.service';
 
-import {
-  WebhookManagementService,
-} from './services/webhook-management.service';
+import { WebhookManagementService } from './services/webhook-management.service';
 
-import {
-  WebhookOutboundClientService,
-} from './services/webhook-outbound-client.service';
+import { WebhookOutboundClientService } from './services/webhook-outbound-client.service';
 
-import {
-  WebhookSecretCryptoService,
-} from './services/webhook-secret-crypto.service';
+import { WebhookSecretCryptoService } from './services/webhook-secret-crypto.service';
 
-import {
-  WebhookSignatureService,
-} from './services/webhook-signature.service';
+import { WebhookSignatureService } from './services/webhook-signature.service';
 
 @Module({
   imports: [
-    DatabaseModule,
-    SharedRateLimitModule,
-  ],
+        WorkspaceMembersModule,DatabaseModule, SharedRateLimitModule],
 
-  controllers: [
-    WebhooksController,
-  ],
+  controllers: [WebhooksController],
 
   providers: [
     PostgresAdvisoryLockService,
@@ -73,8 +44,6 @@ import {
     WebhookCleanupService,
   ],
 
-  exports: [
-    WebhookEventPublisherService,
-  ],
+  exports: [WebhookEventPublisherService],
 })
 export class WebhooksModule {}

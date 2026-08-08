@@ -1,7 +1,4 @@
-import {
-  expect,
-  test,
-} from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import {
   APPLICATION_ID,
@@ -21,14 +18,10 @@ function viewerWorkspace() {
 }
 
 test.describe('Batch 10 frontend role authorization', () => {
-  test('allows an owner to open application creation', async ({
-    page,
-  }) => {
+  test('allows an owner to open application creation', async ({ page }) => {
     await installMockApi(page);
 
-    await page.goto(
-      `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`,
-    );
+    await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}/applications`);
 
     await expect(
       page.getByRole('link', {
@@ -37,16 +30,12 @@ test.describe('Batch 10 frontend role authorization', () => {
     ).toBeVisible();
   });
 
-  test('does not expose application creation to a viewer', async ({
-    page,
-  }) => {
+  test('does not expose application creation to a viewer', async ({ page }) => {
     await installMockApi(page, {
       workspaces: [viewerWorkspace()],
     });
 
-    await page.goto(
-      `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`,
-    );
+    await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}/applications`);
 
     await expect(
       page.getByRole('link', {
@@ -55,16 +44,12 @@ test.describe('Batch 10 frontend role authorization', () => {
     ).toHaveCount(0);
   });
 
-  test('does not expose website creation to a viewer', async ({
-    page,
-  }) => {
+  test('does not expose website creation to a viewer', async ({ page }) => {
     await installMockApi(page, {
       workspaces: [viewerWorkspace()],
     });
 
-    await page.goto(
-      `/workspaces/${PRIMARY_WORKSPACE_ID}/websites`,
-    );
+    await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}/websites`);
 
     await expect(
       page.getByRole('link', {
@@ -73,16 +58,12 @@ test.describe('Batch 10 frontend role authorization', () => {
     ).toHaveCount(0);
   });
 
-  test('keeps lifecycle controls read-only for a viewer', async ({
-    page,
-  }) => {
+  test('keeps lifecycle controls read-only for a viewer', async ({ page }) => {
     await installMockApi(page, {
       workspaces: [viewerWorkspace()],
     });
 
-    await page.goto(
-      `/workspaces/${PRIMARY_WORKSPACE_ID}/applications/${APPLICATION_ID}/settings`,
-    );
+    await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}/applications/${APPLICATION_ID}/settings`);
 
     await expect(
       page.getByText(
@@ -90,9 +71,7 @@ test.describe('Batch 10 frontend role authorization', () => {
       ),
     ).toBeVisible();
     await expect(
-      page.getByText(
-        'Only the workspace owner can permanently delete an application.',
-      ),
+      page.getByText('Only the workspace owner can permanently delete an application.'),
     ).toBeVisible();
     await expect(
       page.getByRole('button', {
