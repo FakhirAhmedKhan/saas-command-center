@@ -26,6 +26,7 @@ import { DevelopmentModule } from './modules/development/development.module';
 import { AnalyticsIngestionModule } from './modules/analytics-ingestion/analytics-ingestion.module';
 import { AnalyticsEngineModule } from './modules/analytics-engine/analytics-engine.module';
 import { validateEnvironment } from './config/env.validation';
+import { AnalyticsOverviewModule } from './modules/analytics-overview/analytics-overview.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { validateEnvironment } from './config/env.validation';
     DevelopmentModule,
     AnalyticsIngestionModule,
     AnalyticsEngineModule,
+    AnalyticsOverviewModule
   ],
   providers: [
     {
