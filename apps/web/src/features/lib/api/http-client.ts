@@ -2,7 +2,125 @@
 
 import { publicEnv } from 'config/public-env';
 import { ApiError } from './api-error';
+function getDownloadFilename(
+    response: Response,
+    fallback:
+        string,
+): string {
+    const disposition =
+        response.headers.get(
+            'content-disposition',
+        );
 
+    const match =
+        disposition?.match(
+            /filename="?([^"]+)"?/i,
+        );
+
+    return (
+        match?.[1] ??
+        fallback
+    );
+}
+
+async function executeDownloadRequest(
+    path: string,
+): Promise<Response> {
+    const headers =
+        new Headers({
+            Accept:
+                'text/csv',
+        });
+
+    if (accessToken) {
+        headers.set(
+            'Authorization',
+            `Bearer ${accessToken}`,
+        );
+    }
+
+    return fetch(
+        buildUrl(path),
+        {
+            method: 'GET',
+
+            credentials:
+                'include',
+
+            headers,
+        },
+    );
+}
+
+export async function apiDownload(
+    path: string,
+    fallbackFilename:
+        string,
+): Promise<void> {
+    let response =
+        await executeDownloadRequest(
+            path,
+        );
+
+    if (
+        response.status ===
+        401
+    ) {
+        await refreshAccessToken();
+
+        response =
+            await executeDownloadRequest(
+                path,
+            );
+    }
+
+    if (!response.ok) {
+        throw await ApiError
+            .fromResponse(
+                response,
+            );
+    }
+
+    const blob =
+        await response.blob();
+
+    const filename =
+        getDownloadFilename(
+            response,
+            fallbackFilename,
+        );
+
+    const objectUrl =
+        URL.createObjectURL(
+            blob,
+        );
+
+    const link =
+        document.createElement(
+            'a',
+        );
+
+    link.href =
+        objectUrl;
+
+    link.download =
+        filename;
+
+    link.style.display =
+        'none';
+
+    document.body.appendChild(
+        link,
+    );
+
+    link.click();
+
+    link.remove();
+
+    URL.revokeObjectURL(
+        objectUrl,
+    );
+}
 interface RequestOptions
     extends Omit<
         RequestInit,
