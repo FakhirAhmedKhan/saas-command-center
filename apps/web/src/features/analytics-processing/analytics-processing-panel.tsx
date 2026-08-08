@@ -83,7 +83,7 @@ function formatDateTime(
         string | null,
 ): string {
     if (!value) {
-        return '—';
+        return 'â€”';
     }
 
     return new Intl
@@ -193,7 +193,7 @@ function RunRow({
 
             <td className="max-w-xs px-4 py-4 text-sm text-red-700">
                 {run.errorMessage ??
-                    '—'}
+                    'â€”'}
             </td>
 
             <td className="px-4 py-4 text-right">
@@ -213,7 +213,7 @@ function RunRow({
                         className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium disabled:opacity-50"
                     >
                         {retrying
-                            ? 'Retrying…'
+                            ? 'Retryingâ€¦'
                             : 'Retry'}
                     </button>
                 ) : null}
@@ -435,8 +435,12 @@ export function AnalyticsProcessingPanel({
                 requestId={
                     error instanceof
                         ApiError
-                        ? error
-                            .requestId
+                        ? (
+                              "requestId" in error &&
+                              typeof error.requestId === "string"
+                                ? error.requestId
+                                : undefined
+                            )
                         : undefined
                 }
                 onRetry={
@@ -635,7 +639,7 @@ export function AnalyticsProcessingPanel({
                             className="self-end rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             {submitting
-                                ? 'Queueing…'
+                                ? 'Queueingâ€¦'
                                 : 'Reprocess'}
                         </button>
                     </div>

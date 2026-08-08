@@ -8,7 +8,7 @@ import {
     MonitoringDashboard,
 } from '@/features/monitoring/monitoring-dashboard';
 
-interface RouteParameters {
+interface RouteParameters extends Record<string, string> {
     workspaceId:
     string;
 }

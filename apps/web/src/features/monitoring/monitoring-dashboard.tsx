@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
 import {
@@ -7,14 +8,6 @@ import {
     useState,
 } from 'react';
 
-import {
-    ApiError,
-    getErrorMessage,
-} from '@/lib/api/api-error';
-
-import {
-    EmptyState,
-} from '@/components/states/empty-state';
 
 import {
     PageError,
@@ -45,6 +38,9 @@ import type {
     MonitoringTarget,
     SaveHealthCheckInput,
 } from './monitoring.types';
+import { EmptyState } from '@/components/ui/empty-state';
+import { ApiError } from 'next/dist/server/api-utils';
+import { getErrorMessage } from '../applications/application-utils';
 
 interface MonitoringDashboardProps {
     workspaceId:
@@ -456,7 +452,7 @@ function MonitoringForm({
                                 >
                                     {target.name}
                                     {target.subtitle
-                                        ? ` — ${target.subtitle}`
+                                        ? ` â€” ${target.subtitle}`
                                         : ''}
                                 </option>
                             ),
@@ -800,7 +796,7 @@ function MonitoringForm({
                 className="mt-5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
             >
                 {submitting
-                    ? 'Saving…'
+                    ? 'Savingâ€¦'
                     : editing
                         ? 'Save changes'
                         : 'Create health check'}
@@ -1203,8 +1199,12 @@ export function MonitoringDashboard({
                 requestId={
                     error instanceof
                         ApiError
-                        ? error
-                            .requestId
+                        ? (
+                              "requestId" in error &&
+                              typeof error.requestId === "string"
+                                ? error.requestId
+                                : undefined
+                            )
                         : undefined
                 }
                 onRetry={() => {
@@ -1437,15 +1437,13 @@ export function MonitoringDashboard({
             {data.checks.length ===
                 0 ? (
                 <EmptyState
-                    title="Monitoring is not configured"
-                    description="Add a health check to begin tracking application or website availability."
-                />
+                        title="Monitoring is not configured"
+                        description="Add a health check to begin tracking application or website availability." icon={undefined}                />
             ) : filteredChecks.length ===
                 0 ? (
                 <EmptyState
-                    title="No matching health checks"
-                    description="No health checks match the selected filters."
-                />
+                            title="No matching health checks"
+                            description="No health checks match the selected filters." icon={undefined}                />
             ) : (
                 <section className="grid gap-4 lg:grid-cols-2">
                     {filteredChecks.map(
@@ -1462,7 +1460,7 @@ export function MonitoringDashboard({
                                             {
                                                 check.targetType
                                             }
-                                            {' · '}
+                                            {' Â· '}
                                             {
                                                 check.targetName
                                             }
@@ -1503,7 +1501,7 @@ export function MonitoringDashboard({
                                             {check.lastResponseTimeMs !==
                                                 null
                                                 ? `${check.lastResponseTimeMs}ms`
-                                                : '—'}
+                                                : 'â€”'}
                                         </dd>
                                     </div>
 
@@ -1514,7 +1512,7 @@ export function MonitoringDashboard({
 
                                         <dd className="mt-1 font-semibold text-slate-900">
                                             {check.lastStatusCode ??
-                                                '—'}
+                                                'â€”'}
                                         </dd>
                                     </div>
 
@@ -1806,19 +1804,19 @@ export function MonitoringDashboard({
 
                                                 <td className="px-3 py-3 text-right">
                                                     {item.statusCode ??
-                                                        '—'}
+                                                        'â€”'}
                                                 </td>
 
                                                 <td className="px-3 py-3 text-right">
                                                     {item.responseTimeMs !==
                                                         null
                                                         ? `${item.responseTimeMs}ms`
-                                                        : '—'}
+                                                        : 'â€”'}
                                                 </td>
 
                                                 <td className="max-w-sm px-3 py-3 text-slate-600">
                                                     {item.failureReason ??
-                                                        '—'}
+                                                        'â€”'}
                                                 </td>
                                             </tr>
                                         ),

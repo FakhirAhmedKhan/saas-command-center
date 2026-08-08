@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
 import {
@@ -8,10 +9,6 @@ import {
 import Link from 'next/link';
 
 import {
-    getErrorMessage,
-} from '@/lib/api/api-error';
-
-import {
     getNotifications,
     markAllNotificationsRead,
     markNotificationRead,
@@ -20,6 +17,7 @@ import {
 import type {
     UserNotification,
 } from '@/features/team-operations/team-operations.types';
+import { getErrorMessage } from '@/features/applications/application-utils';
 
 function formatDateTime(
     value: string,
@@ -101,11 +99,10 @@ export default function NotificationsPage() {
 
     useEffect(
         () => {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             void load();
         },
-        [
-            unreadOnly,
-        ],
+        [load, unreadOnly],
     );
 
     async function openNotification(

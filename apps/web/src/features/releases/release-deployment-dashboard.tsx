@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
 import {
@@ -6,15 +7,6 @@ import {
   useMemo,
   useState,
 } from 'react';
-
-import {
-  ApiError,
-  getErrorMessage,
-} from '@/lib/api/api-error';
-
-import {
-  EmptyState,
-} from '@/components/states/empty-state';
 
 import {
   PageError,
@@ -41,6 +33,9 @@ import type {
   DeploymentStatus,
   Release,
 } from './release-management.types';
+import { EmptyState } from '@/components/ui/empty-state';
+import { ApiError } from 'next/dist/server/api-utils';
+import { getErrorMessage } from '../applications/application-utils';
 
 interface DashboardProps {
   workspaceId:
@@ -79,7 +74,7 @@ function formatDateTime(
     string | null,
 ): string {
   if (!value) {
-    return '—';
+    return 'â€”';
   }
 
   return new Intl
@@ -108,7 +103,7 @@ function formatDuration(
     durationMs ===
     null
   ) {
-    return '—';
+    return 'â€”';
   }
 
   const totalSeconds =
@@ -415,7 +410,7 @@ function ReleaseForm({
         className="mt-5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
       >
         {submitting
-          ? 'Creating…'
+          ? 'Creatingâ€¦'
           : 'Create release'}
       </button>
     </form>
@@ -583,7 +578,7 @@ function DeploymentForm({
                     release.version
                   }
                   {release.name
-                    ? ` — ${release.name}`
+                    ? ` â€” ${release.name}`
                     : ''}
                 </option>
               ),
@@ -726,7 +721,7 @@ function DeploymentForm({
                     {
                       incident.name
                     }
-                    {' — '}
+                    {' â€” '}
                     {
                       incident.summary
                     }
@@ -770,7 +765,7 @@ function DeploymentForm({
         className="mt-5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
       >
         {submitting
-          ? 'Creating…'
+          ? 'Creatingâ€¦'
           : 'Create deployment'}
       </button>
     </form>
@@ -1238,8 +1233,12 @@ export function ReleaseDeploymentDashboard({
         requestId={
           error instanceof
           ApiError
-            ? error
-                .requestId
+            ? (
+                              "requestId" in error &&
+                              typeof error.requestId === "string"
+                                ? error.requestId
+                                : undefined
+                            )
             : undefined
         }
         onRetry={() => {
@@ -1362,9 +1361,8 @@ export function ReleaseDeploymentDashboard({
           .length === 0 ? (
           <div className="mt-3">
             <EmptyState
-              title="No environments"
-              description="Create an application environment before recording deployments."
-            />
+                title="No environments"
+                description="Create an application environment before recording deployments." icon={undefined}            />
           </div>
         ) : (
           <div className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -1525,9 +1523,8 @@ export function ReleaseDeploymentDashboard({
       {data.deployments
         .length === 0 ? (
         <EmptyState
-          title="No deployments"
-          description="Create a release and record its first deployment."
-        />
+            title="No deployments"
+            description="Create a release and record its first deployment." icon={undefined}        />
       ) : (
         <section className="space-y-4">
           <h2 className="text-lg font-semibold text-slate-950">
@@ -1628,7 +1625,7 @@ export function ReleaseDeploymentDashboard({
 
                     <dd className="mt-1 font-medium text-slate-900">
                       {deployment.commitRef ??
-                        '—'}
+                        'â€”'}
                     </dd>
                   </div>
 
@@ -1816,7 +1813,7 @@ export function ReleaseDeploymentDashboard({
                                   activity
                                     .actor
                                     .email}
-                                {' · '}
+                                {' Â· '}
                                 {formatDateTime(
                                   activity
                                     .createdAt,

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
 import {
@@ -9,15 +10,6 @@ import {
 import type {
   FormEvent,
 } from 'react';
-
-import {
-  ApiError,
-  getErrorMessage,
-} from '@/lib/api/api-error';
-
-import {
-  EmptyState,
-} from '@/components/states/empty-state';
 
 import {
   PageError,
@@ -41,52 +33,55 @@ import type {
   WebhookEventType,
   WebhookListResponse,
 } from './integrations.types';
+import { ApiError } from 'next/dist/server/api-utils';
+import { getErrorMessage } from '../applications/application-utils';
+import { EmptyState } from '@/components/ui/empty-state';
 
 interface WebhookIntegrationsDashboardProps {
   workspaceId:
-    string;
+  string;
 }
 
 interface WebhookFormState {
   name:
-    string;
+  string;
 
   url:
-    string;
+  string;
 
   eventTypes:
-    WebhookEventType[];
+  WebhookEventType[];
 
   timeoutMs:
-    number;
+  number;
 
   maxAttempts:
-    number;
+  number;
 
   enabled:
-    boolean;
+  boolean;
 }
 
 const INITIAL_FORM:
   WebhookFormState = {
-    name:
-      '',
+  name:
+    '',
 
-    url:
-      '',
+  url:
+    '',
 
-    eventTypes:
-      [],
+  eventTypes:
+    [],
 
-    timeoutMs:
-      10_000,
+  timeoutMs:
+    10_000,
 
-    maxAttempts:
-      5,
+  maxAttempts:
+    5,
 
-    enabled:
-      true,
-  };
+  enabled:
+    true,
+};
 
 function formatDateTime(
   value:
@@ -119,7 +114,7 @@ function deliveryStatusClasses(
     string,
 ): string {
   switch (
-    status
+  status
   ) {
     case 'SUCCEEDED':
       return 'bg-emerald-50 text-emerald-700 border-emerald-200';
@@ -147,22 +142,22 @@ function WebhookForm({
   onSave,
 }: {
   catalog:
-    WebhookEventCatalogItem[];
+  WebhookEventCatalogItem[];
 
   editing:
-    WebhookEndpoint | null;
+  WebhookEndpoint | null;
 
   submitting:
-    boolean;
+  boolean;
 
   onCancel:
-    () => void;
+  () => void;
 
   onSave:
-    (
-      input:
-        SaveWebhookInput,
-    ) => Promise<void>;
+  (
+    input:
+      SaveWebhookInput,
+  ) => Promise<void>;
 }) {
   const [
     form,
@@ -221,15 +216,15 @@ function WebhookForm({
               eventType,
             )
             ? current.eventTypes
-                .filter(
-                  (value) =>
-                    value !==
-                    eventType,
-                )
+              .filter(
+                (value) =>
+                  value !==
+                  eventType,
+              )
             : [
-                ...current.eventTypes,
-                eventType,
-              ],
+              ...current.eventTypes,
+              eventType,
+            ],
       }),
     );
   }
@@ -519,12 +514,12 @@ function WebhookForm({
           submitting ||
           form.eventTypes
             .length ===
-            0
+          0
         }
         className="mt-5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
       >
         {submitting
-          ? 'Saving…'
+          ? 'Savingâ€¦'
           : editing
             ? 'Save changes'
             : 'Create webhook'}
@@ -649,7 +644,7 @@ export function WebhookIntegrationsDashboard({
             null,
           );
         } catch (
-          caughtError
+        caughtError
         ) {
           setError(
             caughtError,
@@ -701,7 +696,7 @@ export function WebhookIntegrationsDashboard({
         response.items,
       );
     } catch (
-      caughtError
+    caughtError
     ) {
       setActionError(
         getErrorMessage(
@@ -756,7 +751,7 @@ export function WebhookIntegrationsDashboard({
 
       await load();
     } catch (
-      caughtError
+    caughtError
     ) {
       setActionError(
         getErrorMessage(
@@ -793,7 +788,7 @@ export function WebhookIntegrationsDashboard({
         1_000,
       );
     } catch (
-      caughtError
+    caughtError
     ) {
       setActionError(
         getErrorMessage(
@@ -837,7 +832,7 @@ export function WebhookIntegrationsDashboard({
 
       await load();
     } catch (
-      caughtError
+    caughtError
     ) {
       setActionError(
         getErrorMessage(
@@ -871,7 +866,7 @@ export function WebhookIntegrationsDashboard({
         response.secret,
       );
     } catch (
-      caughtError
+    caughtError
     ) {
       setActionError(
         getErrorMessage(
@@ -906,9 +901,13 @@ export function WebhookIntegrationsDashboard({
         )}
         requestId={
           error instanceof
-          ApiError
-            ? error
-                .requestId
+            ApiError
+            ? (
+                              "requestId" in error &&
+                              typeof error.requestId === "string"
+                                ? error.requestId
+                                : undefined
+                            )
             : undefined
         }
         onRetry={() => {
@@ -1061,7 +1060,7 @@ export function WebhookIntegrationsDashboard({
         </p>
 
         <pre className="mt-4 overflow-x-auto rounded-xl bg-slate-950 p-4 text-xs text-slate-100">
-{`const signed = timestamp + "." + rawBody;
+          {`const signed = timestamp + "." + rawBody;
 const digest = createHmac("sha256", secret)
   .update(signed)
   .digest("hex");
@@ -1071,11 +1070,10 @@ const expected = "v1=" + digest;`}
       </section>
 
       {data.items.length ===
-      0 ? (
+        0 ? (
         <EmptyState
           title="No integrations configured"
-          description="Create a webhook to deliver selected Command Center events to another system."
-        />
+          description="Create a webhook to deliver selected Command Center events to another system." icon={undefined} />
       ) : (
         <section className="grid gap-4 lg:grid-cols-2">
           {data.items.map(
@@ -1392,19 +1390,19 @@ const expected = "v1=" + digest;`}
 
                         <td className="px-4 py-4 text-right">
                           {delivery.responseStatus ??
-                            '—'}
+                            'â€”'}
                         </td>
 
                         <td className="px-4 py-4 text-right">
                           {delivery.responseDurationMs !==
-                          null
+                            null
                             ? `${delivery.responseDurationMs}ms`
-                            : '—'}
+                            : 'â€”'}
                         </td>
 
                         <td className="max-w-sm px-4 py-4 text-red-700">
                           {delivery.failureReason ??
-                            '—'}
+                            'â€”'}
                         </td>
 
                         <td className="px-4 py-4">

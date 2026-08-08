@@ -1,6 +1,5 @@
-import {
-    apiRequest,
-} from '@/lib/api/http-client';
+import { apiRequest } from "../auth/auth.types";
+
 
 export interface WorkspaceActivity {
     id: string;

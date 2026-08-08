@@ -1,7 +1,4 @@
-import {
-    apiRequest,
-} from '@/lib/api/http-client';
-
+import { apiRequest } from '../auth/auth.types';
 import type {
     HealthCheck,
     HealthCheckHistory,

@@ -5,9 +5,7 @@ import {
     useState,
 } from 'react';
 
-import {
-    apiRequest,
-} from '@/lib/api/http-client';
+
 
 import {
     HealthStatusBadge,
@@ -16,6 +14,7 @@ import {
 import type {
     HealthCheckStatus,
 } from './monitoring.types';
+import { apiRequest } from '../auth/auth.types';
 
 interface ApplicationHealthSummary {
     status:

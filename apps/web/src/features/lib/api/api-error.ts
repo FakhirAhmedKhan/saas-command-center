@@ -1,4 +1,5 @@
-﻿export class ApiError extends Error {
+/* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
+export class ApiError extends Error {
   constructor(
     message: string,
     public readonly status: number,
@@ -39,4 +40,8 @@ export function getErrorMessage(
   }
 
   return 'Something went wrong. Please try again.';
+}
+
+export interface ApiError {
+  readonly requestId?: string;
 }

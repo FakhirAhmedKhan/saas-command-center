@@ -250,9 +250,7 @@ test.describe(
                 ).toBeVisible();
 
                 await expect(
-                    page.getByDisplayValue(
-                        /invitations\/test-token/,
-                    ),
+                    page.locator('input[value*="invitations/test-token"]'),
                 ).toBeVisible();
             },
         );

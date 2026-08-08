@@ -8,7 +8,7 @@ import {
     AnalyticsProcessingPanel,
 } from '@/features/analytics-processing/analytics-processing-panel';
 
-interface RouteParameters {
+interface RouteParameters extends Record<string, string> {
     workspaceId:
     string;
 

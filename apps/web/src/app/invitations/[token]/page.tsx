@@ -12,9 +12,6 @@ import {
     useRouter,
 } from 'next/navigation';
 
-import {
-    getErrorMessage,
-} from '@/lib/api/api-error';
 
 import {
     useSession,
@@ -29,6 +26,7 @@ import {
 import type {
     InvitationPreview,
 } from '@/features/team-operations/team-operations.types';
+import { getErrorMessage } from '@/features/applications/application-utils';
 
 export default function InvitationPage() {
     const params =

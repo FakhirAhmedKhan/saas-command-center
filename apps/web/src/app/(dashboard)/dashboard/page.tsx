@@ -112,7 +112,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {workspaces.map((workspace) => {
+              {workspaces.map((workspace: { id: string; name: string; slug: string; members?: { role: string }[] }) => {
                 const role =
                   workspace.members?.[0]
                     ?.role ?? 'VIEWER';
@@ -182,12 +182,12 @@ export default function DashboardPage() {
                       </Link>
 
                       <Link
-                        href={`/workspaces/${workspace.id}/websites/${website.id}/analytics/processing`}
+                        href={`/workspaces/${workspace.id}/websites`}
                       >
                         Processing
                       </Link>
                       <Link
-                        href={`/workspaces/${workspaceId}/settings/integrations`}
+                        href={`/workspaces/${workspace.id}/settings/integrations`}
                       >
                         Integrations
                       </Link>

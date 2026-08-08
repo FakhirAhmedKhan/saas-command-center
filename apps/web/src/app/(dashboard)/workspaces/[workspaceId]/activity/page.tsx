@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  SetStateAction,
   useEffect,
   useState,
 } from 'react';
@@ -11,7 +12,7 @@ import {
 
 import {
   getErrorMessage,
-} from '@/lib/api/api-error';
+} from '@/features/applications/application-utils';
 
 import {
   getWorkspaceActivities,
@@ -135,7 +136,7 @@ export default function WorkspaceActivityPage() {
             )
               .then(
                 (
-                  response,
+                  response: { items: SetStateAction<WorkspaceActivity[]>; },
                 ) => {
                   setActivities(
                     response.items,
@@ -148,7 +149,7 @@ export default function WorkspaceActivityPage() {
               )
               .catch(
                 (
-                  caughtError,
+                  caughtError: unknown,
                 ) => {
                   if (
                     !controller

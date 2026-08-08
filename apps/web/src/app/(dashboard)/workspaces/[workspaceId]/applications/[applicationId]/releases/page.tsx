@@ -8,7 +8,7 @@ import {
     ReleaseDeploymentDashboard,
 } from '@/features/releases/release-deployment-dashboard';
 
-interface RouteParameters {
+interface RouteParameters extends Record<string, string> {
     workspaceId:
     string;
 

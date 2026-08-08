@@ -6,9 +6,7 @@ import {
   useState,
 } from 'react';
 
-import {
-  getErrorMessage,
-} from '@/lib/api/api-error';
+
 
 import {
   createWorkspaceInvitation,
@@ -21,6 +19,7 @@ import type {
   WorkspaceInvitation,
   WorkspaceRole,
 } from './team-operations.types';
+import { getErrorMessage } from '../applications/application-utils';
 
 interface WorkspaceInvitationsPanelProps {
   workspaceId:
@@ -143,6 +142,7 @@ export function WorkspaceInvitationsPanel({
 
   useEffect(
     () => {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       void load();
     },
     [

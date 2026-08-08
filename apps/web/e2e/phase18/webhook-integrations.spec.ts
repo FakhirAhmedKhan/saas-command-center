@@ -228,9 +228,7 @@ test.describe(
                 ).toBeVisible();
 
                 await expect(
-                    page.getByDisplayValue(
-                        'one-time-webhook-secret',
-                    ),
+                    page.locator('input[value="one-time-webhook-secret"]'),
                 ).toBeVisible();
             },
         );
