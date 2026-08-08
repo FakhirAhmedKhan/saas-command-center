@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+ 
 import {
     Injectable,
     NotFoundException,
 } from '@nestjs/common';
 
 import {
-    AnalyticsProcessingRunStatus,
+    AnalyticsProcessingStatus,
 } from '../../../generated/prisma/client';
 
 import {
@@ -107,10 +107,10 @@ export class AnalyticsProcessingStatusService {
 
                         status: {
                             in: [
-                                AnalyticsProcessingRunStatus
+                                AnalyticsProcessingStatus
                                     .QUEUED,
 
-                                AnalyticsProcessingRunStatus
+                                AnalyticsProcessingStatus
                                     .RUNNING,
                             ],
                         },
@@ -142,7 +142,7 @@ export class AnalyticsProcessingStatusService {
                         websiteId,
 
                         status:
-                            AnalyticsProcessingRunStatus
+                            AnalyticsProcessingStatus
                                 .SUCCEEDED,
                     },
 
@@ -233,7 +233,7 @@ export class AnalyticsProcessingStatusService {
             maxRetries:
             number;
 
-            processedEvents:
+            rawEventsProcessed:
             number;
 
             failedEvents:
@@ -280,8 +280,7 @@ export class AnalyticsProcessingStatusService {
             maxRetries:
                 run.maxRetries,
 
-            processedEvents:
-                run.processedEvents,
+            processedEvents: run.rawEventsProcessed,
 
             failedEvents:
                 run.failedEvents,

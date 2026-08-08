@@ -4,10 +4,6 @@ import {
 } from '@nestjs/common';
 
 import {
-    ConfigService,
-} from '@nestjs/config';
-
-import {
     Cron,
     CronExpression,
 } from '@nestjs/schedule';
@@ -167,7 +163,16 @@ export class AnalyticsProcessingSchedulerService {
                     take: 20,
                 });
 
-        return groups
+        return (groups as Array<{
+            workspaceId: string;
+            websiteId: string;
+            _min: {
+                occurredAt: Date | null;
+            };
+            _max: {
+                occurredAt: Date | null;
+            };
+        }>)
             .filter(
                 (
                     group,

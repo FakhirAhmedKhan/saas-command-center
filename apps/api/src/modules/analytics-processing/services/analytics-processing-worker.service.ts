@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
+ 
+ 
 import {
     Injectable,
     Logger,
@@ -9,7 +10,7 @@ import {
 } from '@nestjs/schedule';
 
 import {
-    AnalyticsProcessingRunStatus,
+    AnalyticsProcessingStatus,
 } from '../../../generated/prisma/client';
 
 import {
@@ -89,7 +90,7 @@ export class AnalyticsProcessingWorkerService {
                 .findFirst({
                     where: {
                         status:
-                            AnalyticsProcessingRunStatus
+                            AnalyticsProcessingStatus
                                 .QUEUED,
 
                         nextAttemptAt: {
@@ -138,7 +139,7 @@ export class AnalyticsProcessingWorkerService {
                             run.id,
 
                         status:
-                            AnalyticsProcessingRunStatus
+                            AnalyticsProcessingStatus
                                 .QUEUED,
                     },
 
@@ -165,13 +166,13 @@ export class AnalyticsProcessingWorkerService {
                             runId,
 
                         status:
-                            AnalyticsProcessingRunStatus
+                            AnalyticsProcessingStatus
                                 .QUEUED,
                     },
 
                     data: {
                         status:
-                            AnalyticsProcessingRunStatus
+                            AnalyticsProcessingStatus
                                 .RUNNING,
 
                         startedAt:
@@ -253,7 +254,7 @@ export class AnalyticsProcessingWorkerService {
 
                     data: {
                         status:
-                            AnalyticsProcessingRunStatus
+                            AnalyticsProcessingStatus
                                 .SUCCEEDED,
 
                         activeKey:
@@ -263,7 +264,7 @@ export class AnalyticsProcessingWorkerService {
                             result
                                 .pendingEventsAtStart,
 
-                        processedEvents:
+                        rawEventsProcessed:
                             result
                                 .processedEvents,
 
@@ -290,7 +291,7 @@ export class AnalyticsProcessingWorkerService {
                     websiteId:
                         run.websiteId,
 
-                    processedEvents:
+                    rawEventsProcessed:
                         result
                             .processedEvents,
 
@@ -375,7 +376,7 @@ export class AnalyticsProcessingWorkerService {
 
                     data: {
                         status:
-                            AnalyticsProcessingRunStatus
+                            AnalyticsProcessingStatus
                                 .QUEUED,
 
                         retryCount:
@@ -434,7 +435,7 @@ export class AnalyticsProcessingWorkerService {
 
                             data: {
                                 status:
-                                    AnalyticsProcessingRunStatus
+                                    AnalyticsProcessingStatus
                                         .DEAD_LETTERED,
 
                                 activeKey:

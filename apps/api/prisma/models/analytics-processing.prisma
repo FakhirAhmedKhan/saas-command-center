@@ -15,22 +15,84 @@ model AnalyticsProcessingState {
 }
 
 model AnalyticsProcessingRun {
-  id                 String                    @id @default(uuid()) @db.Uuid
-  websiteId          String                    @map("website_id") @db.Uuid
-  initiatedByUserId  String?                   @map("initiated_by_user_id") @db.Uuid
-  status             AnalyticsProcessingStatus @default(RUNNING)
-  rawEventsProcessed Int                       @default(0) @map("raw_events_processed")
-  sessionsRebuilt    Int                       @default(0) @map("sessions_rebuilt")
-  hourlyBuckets      Int                       @default(0) @map("hourly_buckets")
-  dailyBuckets       Int                       @default(0) @map("daily_buckets")
-  startedAt          DateTime                  @default(now()) @map("started_at")
-  completedAt        DateTime?                 @map("completed_at")
-  failedAt           DateTime?                 @map("failed_at")
-  errorMessage       String?                   @map("error_message") @db.Text
+  id                String  @id @default(uuid()) @db.Uuid
+  workspaceId       String  @map("workspace_id") @db.Uuid
+  websiteId         String  @map("website_id") @db.Uuid
+  initiatedByUserId String? @map("initiated_by_user_id") @db.Uuid
 
-  website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  trigger AnalyticsProcessingTrigger @default(MANUAL)
+  status  AnalyticsProcessingStatus  @default(RUNNING)
 
+  rangeStart DateTime @map("range_start") @db.Timestamptz(6)
+  rangeEnd   DateTime @map("range_end") @db.Timestamptz(6)
+
+  activeKey String? @unique @map("active_key")
+  lockKey   String  @map("lock_key")
+
+  retryCount    Int      @default(0) @map("retry_count")
+  maxRetries    Int      @default(3) @map("max_retries")
+  nextAttemptAt DateTime @default(now()) @map("next_attempt_at") @db.Timestamptz(6)
+
+  pendingEventsAtStart Int @default(0) @map("pending_events_at_start")
+
+  // Existing Phase 1â€“10 processing metrics are preserved for compatibility.
+  rawEventsProcessed Int @default(0) @map("raw_events_processed")
+  sessionsRebuilt    Int @default(0) @map("sessions_rebuilt")
+  hourlyBuckets      Int @default(0) @map("hourly_buckets")
+  dailyBuckets       Int @default(0) @map("daily_buckets")
+
+  failedEvents Int @default(0) @map("failed_events")
+
+  errorCode    String? @map("error_code")
+  errorMessage String? @map("error_message") @db.Text
+
+  startedAt   DateTime  @default(now()) @map("started_at") @db.Timestamptz(6)
+  heartbeatAt DateTime? @map("heartbeat_at") @db.Timestamptz(6)
+  completedAt DateTime? @map("completed_at") @db.Timestamptz(6)
+  failedAt    DateTime? @map("failed_at") @db.Timestamptz(6)
+  finishedAt  DateTime? @map("finished_at") @db.Timestamptz(6)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  website     Website   @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  initiatedBy User?     @relation("AnalyticsProcessingRunInitiatedBy", fields: [initiatedByUserId], references: [id], onDelete: SetNull)
+
+  deadLetter AnalyticsProcessingDeadLetter?
+
+  @@index([workspaceId, websiteId, createdAt(sort: Desc)])
+  @@index([status, nextAttemptAt])
+  @@index([websiteId, status])
   @@index([websiteId, startedAt])
-  @@index([status, startedAt])
   @@map("analytics_processing_runs")
+}
+
+model AnalyticsProcessingDeadLetter {
+  id          String  @id @default(uuid()) @db.Uuid
+  runId       String  @unique @map("run_id") @db.Uuid
+  workspaceId String? @map("workspace_id") @db.Uuid
+  websiteId   String  @map("website_id") @db.Uuid
+
+  rangeStart DateTime @map("range_start") @db.Timestamptz(6)
+  rangeEnd   DateTime @map("range_end") @db.Timestamptz(6)
+
+  retryCount   Int     @map("retry_count")
+  errorCode    String? @map("error_code")
+  errorMessage String  @map("error_message") @db.Text
+
+  resolvedAt   DateTime? @map("resolved_at") @db.Timestamptz(6)
+  resolvedById String?   @map("resolved_by_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  run        AnalyticsProcessingRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  workspace  Workspace?             @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  website    Website                @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  resolvedBy User?                  @relation("AnalyticsProcessingDeadLetterResolvedBy", fields: [resolvedById], references: [id], onDelete: SetNull)
+
+  @@index([websiteId, resolvedAt, createdAt(sort: Desc)])
+  @@index([workspaceId, createdAt(sort: Desc)])
+  @@map("analytics_processing_dead_letters")
 }

@@ -1,3 +1,4 @@
+
 import {
     Module,
 } from '@nestjs/common';
@@ -58,7 +59,7 @@ import {
     providers: [
         PostgresAdvisoryLockService,
 
-        AnalyticsProcessingAccessService,
+        AnalyticsProcessingStatusService,
 
         AnalyticsProcessingQueueService,
 

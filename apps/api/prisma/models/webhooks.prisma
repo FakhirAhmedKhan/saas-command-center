@@ -1,0 +1,131 @@
+model WebhookEndpoint {
+  id          String @id @default(uuid()) @db.Uuid
+  workspaceId String @map("workspace_id") @db.Uuid
+
+  name String
+  url  String @db.Text
+
+  eventTypes WebhookEventType[] @map("event_types")
+
+  payloadVersion String @default("2026-08-01") @map("payload_version")
+
+  secretCiphertext String @map("secret_ciphertext") @db.Text
+  secretIv         String @map("secret_iv")
+  secretAuthTag    String @map("secret_auth_tag")
+  secretKeyVersion Int    @default(1) @map("secret_key_version")
+
+  timeoutMs   Int @default(10000) @map("timeout_ms")
+  maxAttempts Int @default(5) @map("max_attempts")
+
+  enabled Boolean @default(true)
+
+  lastDeliveryAt DateTime? @map("last_delivery_at") @db.Timestamptz(6)
+  lastSuccessAt  DateTime? @map("last_success_at") @db.Timestamptz(6)
+  lastFailureAt  DateTime? @map("last_failure_at") @db.Timestamptz(6)
+
+  createdById String @map("created_by_id") @db.Uuid
+  updatedById String @map("updated_by_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  createdBy User @relation("WebhookEndpointCreatedBy", fields: [createdById], references: [id])
+  updatedBy User @relation("WebhookEndpointUpdatedBy", fields: [updatedById], references: [id])
+
+  deliveries WebhookDelivery[]
+
+  @@unique([workspaceId, name])
+  @@index([workspaceId, enabled])
+  @@map("webhook_endpoints")
+}
+
+model WebhookEvent {
+  id          String @id @default(uuid()) @db.Uuid
+  workspaceId String @map("workspace_id") @db.Uuid
+
+  type           WebhookEventType
+  payloadVersion String           @default("2026-08-01") @map("payload_version")
+
+  resourceType String? @map("resource_type")
+  resourceId   String? @map("resource_id") @db.Uuid
+
+  payload Json
+
+  occurredAt DateTime @map("occurred_at") @db.Timestamptz(6)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  deliveries WebhookDelivery[]
+
+  @@index([workspaceId, type, occurredAt(sort: Desc)])
+  @@index([resourceType, resourceId])
+  @@map("webhook_events")
+}
+
+model WebhookDelivery {
+  id          String @id @default(uuid()) @db.Uuid
+  workspaceId String @map("workspace_id") @db.Uuid
+
+  endpointId String @map("endpoint_id") @db.Uuid
+  eventId    String @map("event_id") @db.Uuid
+
+  status WebhookDeliveryStatus @default(PENDING)
+
+  attemptCount Int @default(0) @map("attempt_count")
+  maxAttempts  Int @default(5) @map("max_attempts")
+
+  nextAttemptAt DateTime @default(now()) @map("next_attempt_at") @db.Timestamptz(6)
+
+  responseStatus     Int? @map("response_status")
+  responseDurationMs Int? @map("response_duration_ms")
+
+  failureCode   String? @map("failure_code")
+  failureReason String? @map("failure_reason") @db.Text
+
+  startedAt   DateTime? @map("started_at") @db.Timestamptz(6)
+  finishedAt  DateTime? @map("finished_at") @db.Timestamptz(6)
+  deliveredAt DateTime? @map("delivered_at") @db.Timestamptz(6)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  workspace Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  endpoint  WebhookEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  event     WebhookEvent    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  attempts WebhookDeliveryAttempt[]
+
+  @@unique([endpointId, eventId])
+  @@index([status, nextAttemptAt])
+  @@index([workspaceId, createdAt(sort: Desc)])
+  @@index([endpointId, createdAt(sort: Desc)])
+  @@map("webhook_deliveries")
+}
+
+model WebhookDeliveryAttempt {
+  id         String @id @default(uuid()) @db.Uuid
+  deliveryId String @map("delivery_id") @db.Uuid
+
+  attemptNumber Int @map("attempt_number")
+
+  outcome WebhookAttemptOutcome
+
+  responseStatus Int? @map("response_status")
+  durationMs     Int  @map("duration_ms")
+
+  errorCode    String? @map("error_code")
+  errorMessage String? @map("error_message") @db.Text
+
+  startedAt  DateTime @map("started_at") @db.Timestamptz(6)
+  finishedAt DateTime @map("finished_at") @db.Timestamptz(6)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  delivery WebhookDelivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+
+  @@unique([deliveryId, attemptNumber])
+  @@index([deliveryId, createdAt(sort: Desc)])
+  @@map("webhook_delivery_attempts")
+}

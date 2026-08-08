@@ -1,10 +1,7 @@
+ 
 import {
     Injectable,
 } from '@nestjs/common';
-
-import {
-    ConfigService,
-} from '@nestjs/config';
 
 import {
     PrismaService,
@@ -13,6 +10,11 @@ import {
 import type {
     TypedConfigService,
 } from '../../../config/runtime-config';
+import { AnalyticsAggregationService } from 'src/modules/analytics-engine/services/analytics-aggregation.service';
+import { PageViewRebuilderService } from 'src/modules/analytics-engine/services/page-view-rebuilder.service';
+import { RawEventProcessingService } from 'src/modules/analytics-engine/services/raw-event-processing.service';
+import { SessionRebuilderService } from 'src/modules/analytics-engine/services/session-rebuilder.service';
+import { VisitorRebuilderService } from 'src/modules/analytics-engine/services/visitor-rebuilder.service';
 
 
 
@@ -27,14 +29,9 @@ export interface ProcessAnalyticsRangeInput {
 }
 
 export interface ProcessAnalyticsRangeResult {
-    pendingEventsAtStart:
-    number;
-
-    processedEvents:
-    number;
-
-    failedEvents:
-    number;
+    pendingEventsAtStart: number;
+    processedEvents: number;
+    failedEvents: number;
 }
 
 @Injectable()

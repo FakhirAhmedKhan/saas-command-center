@@ -1,0 +1,29 @@
+enum WorkspaceInvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  REVOKED
+  EXPIRED
+}
+
+enum InvitationDeliveryStatus {
+  NOT_REQUESTED
+  SENT
+  FAILED
+}
+
+enum NotificationType {
+  WORKSPACE_INVITATION
+  WORKSPACE_INVITATION_ACCEPTED
+  ASSIGNMENT
+  DEPLOYMENT_FAILED
+  HEALTH_INCIDENT_OPENED
+  ANALYTICS_PROCESSING_FAILED
+  SYSTEM
+}
+
+enum NotificationPriority {
+  INFO
+  WARNING
+  CRITICAL
+}

@@ -1,0 +1,27 @@
+model ApplicationEnvironment {
+  id            String @id @default(uuid()) @db.Uuid
+  workspaceId   String @map("workspace_id") @db.Uuid
+  applicationId String @map("application_id") @db.Uuid
+
+  name String @db.VarChar(80)
+  slug String @db.VarChar(80)
+
+  description String? @db.VarChar(280)
+  url         String? @db.VarChar(2048)
+
+  isProduction Boolean   @default(false) @map("is_production")
+  archivedAt   DateTime? @map("archived_at") @db.Timestamptz(6)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  workspace   Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  application SaasApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  deployments Deployment[]
+
+  @@unique([applicationId, slug])
+  @@index([workspaceId, applicationId])
+  @@index([applicationId, archivedAt])
+  @@map("application_environments")
+}

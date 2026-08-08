@@ -18,6 +18,29 @@ model User {
   createdApplicationBlockers  ApplicationBlocker[]  @relation("ApplicationBlockerCreator")
   resolvedApplicationBlockers ApplicationBlocker[]  @relation("ApplicationBlockerResolver")
 
+  initiatedAnalyticsProcessingRuns   AnalyticsProcessingRun[]        @relation("AnalyticsProcessingRunInitiatedBy")
+  resolvedAnalyticsProcessingLetters AnalyticsProcessingDeadLetter[] @relation("AnalyticsProcessingDeadLetterResolvedBy")
+
+  createdHealthChecks HealthCheck[] @relation("HealthCheckCreatedBy")
+  updatedHealthChecks HealthCheck[] @relation("HealthCheckUpdatedBy")
+
+  createdReleases Release[] @relation("ReleaseCreatedBy")
+  updatedReleases Release[] @relation("ReleaseUpdatedBy")
+
+  createdDeployments  Deployment[] @relation("DeploymentCreatedBy")
+  updatedDeployments  Deployment[] @relation("DeploymentUpdatedBy")
+  executedDeployments Deployment[] @relation("DeploymentDeployedBy")
+
+  deploymentActivities DeploymentActivity[]
+
+  sentWorkspaceInvitations     WorkspaceInvitation[] @relation("WorkspaceInvitationInvitedBy")
+  acceptedWorkspaceInvitations WorkspaceInvitation[] @relation("WorkspaceInvitationAcceptedBy")
+
+  notifications Notification[]
+
+  createdWebhookEndpoints WebhookEndpoint[] @relation("WebhookEndpointCreatedBy")
+  updatedWebhookEndpoints WebhookEndpoint[] @relation("WebhookEndpointUpdatedBy")
+
   @@index([deletedAt])
   @@index([isActive])
   @@map("users")

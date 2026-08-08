@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+ 
+ 
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import {
@@ -15,9 +15,6 @@ import {
     Prisma,
 } from '../../../generated/prisma/client';
 
-import {
-    ConfigService,
-} from '@nestjs/config';
 
 import {
     PrismaService,
@@ -734,7 +731,7 @@ export class MonitoringService {
     ) {
         const application =
             await this.prisma
-                .application
+                .saasApplication
                 .findFirst({
                     where: {
                         id:
@@ -873,7 +870,7 @@ export class MonitoringService {
             websites,
         ] = await Promise.all([
             this.prisma
-                .application
+                .saasApplication
                 .findMany({
                     where: {
                         workspaceId,
@@ -941,7 +938,7 @@ export class MonitoringService {
 
             ...websites.map(
                 (
-                    website,
+                    website: { id: any; name: any; domain: any; },
                 ): MonitoringTargetDto => ({
                     id:
                         website.id,
@@ -1105,7 +1102,7 @@ export class MonitoringService {
         ) {
             const application =
                 await this.prisma
-                    .application
+                    .saasApplication
                     .findFirst({
                         where: {
                             id:

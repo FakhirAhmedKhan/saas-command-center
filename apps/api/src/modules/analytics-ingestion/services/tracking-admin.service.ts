@@ -128,7 +128,7 @@ export class TrackingAdminService {
         for (
             const item of grouped
         ) {
-            counts[item.type] =
+            counts[item.type as RawAnalyticsEventType] =
                 typeof item._count === 'object' &&
                 item._count !== null
                     ? item._count.id ?? 0

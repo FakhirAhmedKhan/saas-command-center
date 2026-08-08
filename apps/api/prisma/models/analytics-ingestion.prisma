@@ -7,6 +7,7 @@ model RawAnalyticsEvent {
   sessionId      String                @map("session_id") @db.VarChar(80)
   occurredAt     DateTime              @map("occurred_at")
   receivedAt     DateTime              @default(now()) @map("received_at")
+  processedAt    DateTime?             @map("processed_at") @db.Timestamptz(6)
   pageUrl        String                @map("page_url") @db.VarChar(2048)
   pagePath       String                @map("page_path") @db.VarChar(2048)
   pageTitle      String?               @map("page_title") @db.VarChar(512)

@@ -333,13 +333,49 @@ const dateFrom = new Date(dto.dateFrom);
         const incrementProcessedTotal =
             options.incrementProcessedTotal ?? true;
 
-        const run = await this.prisma.analyticsProcessingRun.create({
-            data: {
-                websiteId: website.id,
-                initiatedByUserId,
-                status: AnalyticsProcessingStatus.RUNNING,
-            },
-        });
+        const runRangeStart =
+            options.range?.dateFrom ??
+            new Date(0);
+
+        const runRangeEnd =
+            options.range?.dateTo ??
+            new Date();
+
+        const runLockKey =
+            [
+                'analytics-engine',
+                website.workspaceId,
+                website.id,
+                Date.now().toString(),
+            ].join(':');
+
+        const run =
+            await this.prisma
+                .analyticsProcessingRun
+                .create({
+                    data: {
+                        workspaceId:
+                            website.workspaceId,
+
+                        websiteId:
+                            website.id,
+
+                        initiatedByUserId,
+
+                        status:
+                            AnalyticsProcessingStatus
+                                .RUNNING,
+
+                        rangeStart:
+                            runRangeStart,
+
+                        rangeEnd:
+                            runRangeEnd,
+
+                        lockKey:
+                            runLockKey,
+                    },
+                });
 
         await this.prisma.analyticsProcessingState.upsert({
             where: { websiteId: website.id },

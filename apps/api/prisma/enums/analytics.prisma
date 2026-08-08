@@ -27,9 +27,19 @@ enum AnalyticsAggregateDimension {
 }
 
 enum AnalyticsProcessingStatus {
+  QUEUED
   RUNNING
   COMPLETED
+  SUCCEEDED
   FAILED
+  DEAD_LETTERED
+  CANCELLED
+}
+
+enum AnalyticsProcessingTrigger {
+  SCHEDULED
+  MANUAL
+  RETRY
 }
 
 enum RawAnalyticsEventType {

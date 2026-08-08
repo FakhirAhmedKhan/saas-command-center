@@ -14,7 +14,7 @@ import {
 } from 'node:crypto';
 
 import {
-    AnalyticsProcessingRunStatus,
+    AnalyticsProcessingStatus,
     AnalyticsProcessingTrigger,
     Prisma,
 } from '../../../generated/prisma/client';
@@ -35,7 +35,7 @@ export interface QueueProcessingInput {
 
     websiteId: string;
 
-    requestedById?:
+    initiatedByUserId?:
     string;
 
     from: Date;
@@ -122,14 +122,14 @@ export class AnalyticsProcessingQueueService {
                         websiteId:
                             input.websiteId,
 
-                        requestedById:
-                            input.requestedById,
+                        initiatedByUserId:
+                            input.initiatedByUserId,
 
                         trigger:
                             input.trigger,
 
                         status:
-                            AnalyticsProcessingRunStatus
+                            AnalyticsProcessingStatus
                                 .QUEUED,
 
                         rangeStart:
@@ -194,7 +194,7 @@ export class AnalyticsProcessingQueueService {
         if (
             !run ||
             run.status !==
-            AnalyticsProcessingRunStatus
+            AnalyticsProcessingStatus
                 .DEAD_LETTERED
         ) {
             throw new NotFoundException(
@@ -234,7 +234,7 @@ export class AnalyticsProcessingQueueService {
                                 websiteId:
                                     run.websiteId,
 
-                                requestedById:
+                                initiatedByUserId:
                                     userId,
 
                                 trigger:
@@ -242,7 +242,7 @@ export class AnalyticsProcessingQueueService {
                                         .RETRY,
 
                                 status:
-                                    AnalyticsProcessingRunStatus
+                                    AnalyticsProcessingStatus
                                         .QUEUED,
 
                                 rangeStart:

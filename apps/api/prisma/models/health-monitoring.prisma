@@ -1,0 +1,107 @@
+model HealthCheck {
+  id          String @id @default(uuid()) @db.Uuid
+  workspaceId String @map("workspace_id") @db.Uuid
+
+  targetType    HealthTargetType @map("target_type")
+  applicationId String?          @map("application_id") @db.Uuid
+  websiteId     String?          @map("website_id") @db.Uuid
+
+  name String
+  url  String @db.Text
+
+  intervalSeconds Int @default(300) @map("interval_seconds")
+  timeoutMs       Int @default(10000) @map("timeout_ms")
+
+  expectedStatusMin Int @default(200) @map("expected_status_min")
+  expectedStatusMax Int @default(399) @map("expected_status_max")
+
+  degradedAfterMs  Int @default(1500) @map("degraded_after_ms")
+  failureThreshold Int @default(3) @map("failure_threshold")
+
+  enabled Boolean @default(true)
+
+  latestStatus HealthCheckStatus @default(UNKNOWN) @map("latest_status")
+
+  lastStatusCode     Int?    @map("last_status_code")
+  lastResponseTimeMs Int?    @map("last_response_time_ms")
+  lastFailureReason  String? @map("last_failure_reason") @db.Text
+
+  consecutiveFailures Int @default(0) @map("consecutive_failures")
+
+  lastCheckedAt    DateTime? @map("last_checked_at") @db.Timestamptz(6)
+  lastSuccessfulAt DateTime? @map("last_successful_at") @db.Timestamptz(6)
+  nextRunAt        DateTime  @default(now()) @map("next_run_at") @db.Timestamptz(6)
+
+  createdById String @map("created_by_id") @db.Uuid
+  updatedById String @map("updated_by_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  workspace   Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  application SaasApplication? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  website     Website?         @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  createdBy User @relation("HealthCheckCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  updatedBy User @relation("HealthCheckUpdatedBy", fields: [updatedById], references: [id], onDelete: Restrict)
+
+  history   HealthCheckHistory[]
+  incidents HealthIncident[]
+
+  @@index([workspaceId, latestStatus])
+  @@index([workspaceId, enabled])
+  @@index([enabled, nextRunAt])
+  @@index([applicationId])
+  @@index([websiteId])
+  @@map("health_checks")
+}
+
+model HealthCheckHistory {
+  id            String @id @default(uuid()) @db.Uuid
+  healthCheckId String @map("health_check_id") @db.Uuid
+
+  status HealthCheckStatus
+
+  statusCode     Int?    @map("status_code")
+  responseTimeMs Int?    @map("response_time_ms")
+  failureReason  String? @map("failure_reason") @db.Text
+
+  checkedAt DateTime @default(now()) @map("checked_at") @db.Timestamptz(6)
+
+  healthCheck HealthCheck @relation(fields: [healthCheckId], references: [id], onDelete: Cascade)
+
+  @@index([healthCheckId, checkedAt(sort: Desc)])
+  @@index([checkedAt])
+  @@map("health_check_history")
+}
+
+model HealthIncident {
+  id            String @id @default(uuid()) @db.Uuid
+  healthCheckId String @map("health_check_id") @db.Uuid
+  workspaceId   String @map("workspace_id") @db.Uuid
+
+  status HealthIncidentStatus @default(OPEN)
+
+  activeKey String? @unique @map("active_key")
+
+  summary      String
+  failureCount Int    @default(1) @map("failure_count")
+
+  firstFailureAt DateTime @map("first_failure_at") @db.Timestamptz(6)
+  lastFailureAt  DateTime @map("last_failure_at") @db.Timestamptz(6)
+
+  startedAt  DateTime  @default(now()) @map("started_at") @db.Timestamptz(6)
+  resolvedAt DateTime? @map("resolved_at") @db.Timestamptz(6)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  healthCheck HealthCheck @relation(fields: [healthCheckId], references: [id], onDelete: Cascade)
+  workspace   Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  deployments Deployment[]
+
+  @@index([workspaceId, status, startedAt(sort: Desc)])
+  @@index([healthCheckId, status])
+  @@map("health_incidents")
+}

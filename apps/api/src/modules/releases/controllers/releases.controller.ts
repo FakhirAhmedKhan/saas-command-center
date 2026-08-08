@@ -20,9 +20,6 @@ import {
   CurrentUser,
 } from '../../auth/decorators/current-user.decorator';
 
-import type {
-  AuthenticatedUser,
-} from '../../auth/interfaces/auth-session.interface';
 
 import {
   JwtAuthGuard,
@@ -41,6 +38,7 @@ import {
 import {
   ReleaseDeploymentService,
 } from '../services/release-deployment.service';
+import { AuthenticatedUser } from 'src/modules/auth/interfaces/authenticated-user.interface';
 
 @ApiTags(
   'Releases',

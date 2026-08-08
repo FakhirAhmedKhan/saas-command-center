@@ -85,10 +85,10 @@ export class ActivityQueryService {
           where,
 
           include: {
-            actorUser: {
+            actor: {
               select: {
                 id: true,
-                name: true,
+                displayName: true,
                 email: true,
               },
             },
@@ -234,8 +234,8 @@ export class ActivityQueryService {
             },
 
             {
-              actorUser: {
-                name: {
+              actor: {
+                displayName: {
                   contains:
                     query.search,
 
@@ -246,7 +246,7 @@ export class ActivityQueryService {
             },
 
             {
-              actorUser: {
+              actor: {
                 email: {
                   contains:
                     query.search,

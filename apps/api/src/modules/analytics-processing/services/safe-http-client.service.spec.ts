@@ -1,10 +1,9 @@
 import {
     BadRequestException,
 } from '@nestjs/common';
+import { SafeHttpClientService } from 'src/modules/monitoring/services/safe-http-client.service';
 
-import {
-    SafeHttpClientService,
-} from './safe-http-client.service';
+
 
 describe(
     SafeHttpClientService.name,

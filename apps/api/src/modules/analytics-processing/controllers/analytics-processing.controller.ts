@@ -1,4 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
+import {
+  AnalyticsProcessingAccessService,
+} from '../services/analytics-processing-access.service';
+ 
 import {
   Body,
   Controller,
@@ -160,7 +163,7 @@ export class AnalyticsProcessingController {
 
         websiteId,
 
-        requestedById:
+        initiatedByUserId:
           user.id,
 
         from:

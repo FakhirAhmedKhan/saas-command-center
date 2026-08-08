@@ -631,7 +631,9 @@ export class AnalyticsReportsService {
 
             range:
                 resolveAnalyticsDateRange(
-                    query,
+                    query as Parameters<
+                        typeof resolveAnalyticsDateRange
+                    >[0],
                     website.timeZone,
                 ),
         };

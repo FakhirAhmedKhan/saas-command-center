@@ -12,7 +12,24 @@ model Workspace {
   saasApplications      SaasApplication[]
   applicationActivities ApplicationActivity[]
   websites              Website[]
-  healthChecks          HealthCheck[]
+
+  analyticsProcessingRuns        AnalyticsProcessingRun[]
+  analyticsProcessingDeadLetters AnalyticsProcessingDeadLetter[]
+
+  healthChecks    HealthCheck[]
+  healthIncidents HealthIncident[]
+
+  applicationEnvironments ApplicationEnvironment[]
+  releases                Release[]
+  deployments             Deployment[]
+  deploymentActivities    DeploymentActivity[]
+
+  invitations   WorkspaceInvitation[]
+  notifications Notification[]
+
+  webhookEndpoints  WebhookEndpoint[]
+  webhookEvents     WebhookEvent[]
+  webhookDeliveries WebhookDelivery[]
 
   @@index([ownerId])
   @@index([deletedAt])

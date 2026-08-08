@@ -1,3 +1,7 @@
+ 
+ 
+ 
+ 
 import {
   BadRequestException,
   ConflictException,
@@ -248,7 +252,7 @@ export class ReleaseDeploymentService {
             createdBy: {
               select: {
                 id: true,
-                name: true,
+                displayName: true,
                 email: true,
               },
             },
@@ -481,7 +485,7 @@ export class ReleaseDeploymentService {
             createdBy: {
               select: {
                 id: true,
-                name: true,
+                displayName: true,
                 email: true,
               },
             },
@@ -1407,7 +1411,7 @@ export class ReleaseDeploymentService {
   ) {
     const application =
       await this.prisma
-        .application
+        .saasApplication
         .findFirst({
           where: {
             id:
@@ -1504,7 +1508,7 @@ export class ReleaseDeploymentService {
             createdBy: {
               select: {
                 id: true,
-                name: true,
+                displayName: true,
                 email: true,
               },
             },
@@ -1621,7 +1625,7 @@ export class ReleaseDeploymentService {
       deployedBy: {
         select: {
           id: true,
-          name: true,
+          displayName: true,
           email: true,
         },
       },
@@ -1654,7 +1658,7 @@ export class ReleaseDeploymentService {
           actor: {
             select: {
               id: true,
-              name: true,
+              displayName: true,
               email: true,
             },
           },

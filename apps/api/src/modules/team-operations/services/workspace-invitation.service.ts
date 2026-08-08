@@ -1,3 +1,6 @@
+ 
+ 
+ 
 import {
   BadRequestException,
   ConflictException,
@@ -92,7 +95,7 @@ export class WorkspaceInvitationService {
 
           select: {
             id: true,
-            name: true,
+            displayName: true,
             email: true,
           },
         }),
@@ -230,7 +233,7 @@ export class WorkspaceInvitationService {
           workspace.name,
 
         inviterName:
-          inviter.name ??
+          inviter.displayName ??
           inviter.email,
 
         role:
@@ -261,7 +264,7 @@ export class WorkspaceInvitationService {
             `Invitation to ${workspace.name}`,
 
           message:
-            `${inviter.name ?? inviter.email} invited you as ${invitation.role}.`,
+            `${inviter.displayName ?? inviter.email} invited you as ${invitation.role}.`,
 
           resourceType:
             'WORKSPACE_INVITATION',
@@ -420,7 +423,7 @@ export class WorkspaceInvitationService {
 
         inviterName:
           updated.invitedBy
-            .name ??
+            .displayName ??
           updated.invitedBy
             .email,
 
@@ -539,7 +542,7 @@ export class WorkspaceInvitationService {
       invitedBy: {
         name:
           invitation.invitedBy
-            .name,
+            .displayName,
 
         email:
           invitation.invitedBy
@@ -577,7 +580,7 @@ export class WorkspaceInvitationService {
           select: {
             id: true,
             email: true,
-            name: true,
+            displayName: true,
           },
         });
 
@@ -706,7 +709,7 @@ export class WorkspaceInvitationService {
           'Workspace invitation accepted',
 
         message:
-          `${user.name ?? user.email} joined ${invitation.workspace.name}.`,
+          `${user.displayName ?? user.email} joined ${invitation.workspace.name}.`,
 
         resourceType:
           'WORKSPACE_INVITATION',
@@ -1099,7 +1102,7 @@ export class WorkspaceInvitationService {
       invitedBy: {
         select: {
           id: true,
-          name: true,
+          displayName: true,
           email: true,
         },
       },
@@ -1107,7 +1110,7 @@ export class WorkspaceInvitationService {
       acceptedBy: {
         select: {
           id: true,
-          name: true,
+          displayName: true,
           email: true,
         },
       },

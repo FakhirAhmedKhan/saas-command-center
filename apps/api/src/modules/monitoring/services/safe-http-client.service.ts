@@ -208,10 +208,6 @@ export class SafeHttpClientService {
                         method: 'GET',
 
                         dispatcher,
-
-                        maxRedirections:
-                            0,
-
                         headersTimeout:
                             input.timeoutMs,
 

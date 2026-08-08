@@ -22,10 +22,6 @@ import {
     CurrentUser,
 } from '../../auth/decorators/current-user.decorator';
 
-import type {
-    AuthenticatedUser,
-} from '../../auth/interfaces/auth-session.interface';
-
 import {
     JwtAuthGuard,
 } from '../../auth/guards/jwt-auth.guard';
@@ -52,6 +48,7 @@ import {
 import {
     MonitoringService,
 } from '../services/monitoring.service';
+import { AuthenticatedUser } from 'src/modules/auth/interfaces/authenticated-user.interface';
 
 @ApiTags('Monitoring')
 @ApiBearerAuth(

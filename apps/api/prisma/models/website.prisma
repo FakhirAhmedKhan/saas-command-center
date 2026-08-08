@@ -15,18 +15,19 @@ model Website {
   createdAt            DateTime  @default(now()) @map("created_at")
   updatedAt            DateTime  @updatedAt @map("updated_at")
 
-  workspace                Workspace                  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  application              SaasApplication?           @relation(fields: [applicationId], references: [id], onDelete: SetNull)
-  rawEvents                RawAnalyticsEvent[]
-  analyticsVisitors        AnalyticsVisitor[]
-  analyticsSessions        AnalyticsSession[]
-  analyticsEvents          AnalyticsEvent[]
-  analyticsPageViews       AnalyticsPageView[]
-  hourlyAggregates         AnalyticsHourlyAggregate[]
-  dailyAggregates          AnalyticsDailyAggregate[]
-  analyticsProcessingRuns  AnalyticsProcessingRun[]
-  analyticsProcessingState AnalyticsProcessingState?
-  healthChecks             HealthCheck[]
+  workspace                      Workspace                       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  application                    SaasApplication?                @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  rawEvents                      RawAnalyticsEvent[]
+  analyticsVisitors              AnalyticsVisitor[]
+  analyticsSessions              AnalyticsSession[]
+  analyticsEvents                AnalyticsEvent[]
+  analyticsPageViews             AnalyticsPageView[]
+  hourlyAggregates               AnalyticsHourlyAggregate[]
+  dailyAggregates                AnalyticsDailyAggregate[]
+  analyticsProcessingRuns        AnalyticsProcessingRun[]
+  analyticsProcessingDeadLetters AnalyticsProcessingDeadLetter[]
+  analyticsProcessingState       AnalyticsProcessingState?
+  healthChecks                   HealthCheck[]
 
   @@unique([workspaceId, domain])
   @@index([workspaceId, archivedAt])

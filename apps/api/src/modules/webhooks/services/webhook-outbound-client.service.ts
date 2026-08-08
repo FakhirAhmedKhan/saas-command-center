@@ -212,10 +212,6 @@ export class WebhookOutboundClientService {
               'POST',
 
             dispatcher,
-
-            maxRedirections:
-              0,
-
             headersTimeout:
               timeoutMs,
 

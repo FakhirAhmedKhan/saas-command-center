@@ -35,14 +35,26 @@ export class WebhookSecretCryptoService {
     config:
       TypedConfigService,
   ) {
+    const encryptionKey =
+      config.get(
+        'WEBHOOK_ENCRYPTION_KEY',
+        {
+          infer: true,
+        },
+      );
+
+    if (
+      typeof encryptionKey !==
+      'string'
+    ) {
+      throw new Error(
+        'WEBHOOK_ENCRYPTION_KEY must be a base64 string.',
+      );
+    }
+
     this.key =
       Buffer.from(
-        config.get(
-          'WEBHOOK_ENCRYPTION_KEY',
-          {
-            infer: true,
-          },
-        ),
+        encryptionKey,
         'base64',
       );
 

@@ -25,10 +25,9 @@ import {
 import {
   NotificationListQueryDto,
 } from '../dto/notification.dto';
+import { NotificationService } from '../services/notification.service';
 
-import {
-  NotificationService,
-} from '../services/notification.service';
+
 
 interface AuthenticatedRequest
   extends Request {
@@ -66,10 +65,12 @@ export class NotificationsController {
       NotificationListQueryDto,
   ) {
     return this.notifications
-      .list(
-        request.user.id,
-        query,
-      );
+      .list({
+        userId:
+          request.user.id,
+
+        ...query,
+      });
   }
 
   @Get('unread-count')

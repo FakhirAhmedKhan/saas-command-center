@@ -81,80 +81,6 @@ export interface EnvironmentVariables {
   WEBHOOK_RETENTION_DAYS: number;
   WEBHOOK_CLEANUP_ENABLED: boolean;
 }
-const webhookEncryptionKey =
-  getRequiredString(
-    config,
-    'WEBHOOK_ENCRYPTION_KEY',
-  );
-
-let decodedWebhookKey: Buffer;
-
-try {
-  decodedWebhookKey =
-    Buffer.from(
-      webhookEncryptionKey,
-      'base64',
-    );
-} catch {
-  throw new Error(
-    'WEBHOOK_ENCRYPTION_KEY must be valid base64.',
-  );
-}
-
-if (
-  decodedWebhookKey.length !==
-  32
-) {
-  throw new Error(
-    'WEBHOOK_ENCRYPTION_KEY must decode to exactly 32 bytes.',
-  );
-}
-
-const webhookDefaultTimeoutMs =
-  getPositiveInteger(
-    config,
-    'WEBHOOK_DEFAULT_TIMEOUT_MS',
-    10_000,
-  );
-
-const webhookMaxTimeoutMs =
-  getPositiveInteger(
-    config,
-    'WEBHOOK_MAX_TIMEOUT_MS',
-    30_000,
-  );
-
-if (
-  webhookDefaultTimeoutMs >
-  webhookMaxTimeoutMs
-) {
-  throw new Error(
-    'WEBHOOK_DEFAULT_TIMEOUT_MS cannot exceed WEBHOOK_MAX_TIMEOUT_MS.',
-  );
-}
-
-const webhookDefaultMaxAttempts =
-  getPositiveInteger(
-    config,
-    'WEBHOOK_DEFAULT_MAX_ATTEMPTS',
-    5,
-  );
-
-const webhookMaxAttempts =
-  getPositiveInteger(
-    config,
-    'WEBHOOK_MAX_ATTEMPTS',
-    8,
-  );
-
-if (
-  webhookDefaultMaxAttempts >
-  webhookMaxAttempts
-) {
-  throw new Error(
-    'WEBHOOK_DEFAULT_MAX_ATTEMPTS cannot exceed WEBHOOK_MAX_ATTEMPTS.',
-  );
-}
 function getOptionalString(
   config: Record<string, unknown>,
   key: string,
@@ -263,17 +189,6 @@ function parseNodeEnvironment(
     'NODE_ENV must be development, test, or production.',
   );
 }
-const invitationTokenPepper =
-  getRequiredString(
-    config,
-    'INVITATION_TOKEN_PEPPER',
-  );
-
-validateSecret(
-  'INVITATION_TOKEN_PEPPER',
-  invitationTokenPepper,
-  nodeEnvironment,
-);
 function parseCookieSameSite(
   value: string | undefined,
 ): CookieSameSite {
@@ -407,6 +322,92 @@ export function validateEnvironment(
       config,
       'FRONTEND_URL',
     );
+  const invitationTokenPepper =
+    getRequiredString(
+      config,
+      'INVITATION_TOKEN_PEPPER',
+    );
+
+  validateSecret(
+    'INVITATION_TOKEN_PEPPER',
+    invitationTokenPepper,
+    nodeEnvironment,
+  );
+
+  const webhookEncryptionKey =
+    getRequiredString(
+      config,
+      'WEBHOOK_ENCRYPTION_KEY',
+    );
+
+  let decodedWebhookKey: Buffer;
+
+  try {
+    decodedWebhookKey =
+      Buffer.from(
+        webhookEncryptionKey,
+        'base64',
+      );
+  } catch {
+    throw new Error(
+      'WEBHOOK_ENCRYPTION_KEY must be valid base64.',
+    );
+  }
+
+  if (
+    decodedWebhookKey.length !==
+    32
+  ) {
+    throw new Error(
+      'WEBHOOK_ENCRYPTION_KEY must decode to exactly 32 bytes.',
+    );
+  }
+
+  const webhookDefaultTimeoutMs =
+    getPositiveInteger(
+      config,
+      'WEBHOOK_DEFAULT_TIMEOUT_MS',
+      10_000,
+    );
+
+  const webhookMaxTimeoutMs =
+    getPositiveInteger(
+      config,
+      'WEBHOOK_MAX_TIMEOUT_MS',
+      30_000,
+    );
+
+  if (
+    webhookDefaultTimeoutMs >
+    webhookMaxTimeoutMs
+  ) {
+    throw new Error(
+      'WEBHOOK_DEFAULT_TIMEOUT_MS cannot exceed WEBHOOK_MAX_TIMEOUT_MS.',
+    );
+  }
+
+  const webhookDefaultMaxAttempts =
+    getPositiveInteger(
+      config,
+      'WEBHOOK_DEFAULT_MAX_ATTEMPTS',
+      5,
+    );
+
+  const webhookMaxAttempts =
+    getPositiveInteger(
+      config,
+      'WEBHOOK_MAX_ATTEMPTS',
+      8,
+    );
+
+  if (
+    webhookDefaultMaxAttempts >
+    webhookMaxAttempts
+  ) {
+    throw new Error(
+      'WEBHOOK_DEFAULT_MAX_ATTEMPTS cannot exceed WEBHOOK_MAX_ATTEMPTS.',
+    );
+  }
   const minimumInterval =
     getPositiveInteger(
       config,
