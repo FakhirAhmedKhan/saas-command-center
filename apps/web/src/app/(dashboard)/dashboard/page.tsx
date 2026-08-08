@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 
 import { useAuth } from '@/features/auth/auth-provider';
+import { NotificationBell } from '@/features/team-operations/notification-bell';
 // import { Activity } from 'react';
 
 export default function DashboardPage() {
@@ -28,7 +29,7 @@ export default function DashboardPage() {
             <p className="text-sm font-semibold text-brand-600">
               Portfolio overview
             </p>
-
+            <NotificationBell />
             <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
               Welcome back
               {user?.displayName
@@ -180,6 +181,21 @@ export default function DashboardPage() {
                         <ArrowRight className="size-4" />
                       </Link>
 
+                      <Link
+                        href={`/workspaces/${workspace.id}/websites/${website.id}/analytics/processing`}
+                      >
+                        Processing
+                      </Link>
+                      <Link
+                        href={`/workspaces/${workspaceId}/settings/integrations`}
+                      >
+                        Integrations
+                      </Link>
+                      <Link
+                        href={`/workspaces/${workspace.id}/monitoring`}
+                      >
+                        Monitoring
+                      </Link>
                       <Link
                         href={`/workspaces/${workspace.id}`}
                         className="inline-flex h-11 items-center justify-between rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"

@@ -1,208 +1,275 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+} from '@nestjs/common';
 
-import { PrismaService } from 'src/database/prisma.service';
+import {
+  Prisma,
+} from 'src/generated/prisma/client';
 
-import { Prisma } from 'src/generated/prisma/client';
+import {
+  PrismaService,
+} from '../../../database/prisma.service';
 
-import type { ActivityQueryDto } from '../dto/activity-query.dto';
-
-const activityInclude = {
-  actor: {
-    select: {
-      id: true,
-      email: true,
-      displayName: true,
-    },
-  },
-
-  application: {
-    select: {
-      id: true,
-      name: true,
-      slug: true,
-      archivedAt: true,
-    },
-  },
-} satisfies Prisma.ApplicationActivityInclude;
+import {
+  ActivityQueryDto,
+} from '../dto/activity-query.dto';
 
 @Injectable()
 export class ActivityQueryService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma:
+      PrismaService,
+  ) { }
 
-  async listWorkspaceActivities(workspaceId: string, query: ActivityQueryDto) {
-    return this.list(workspaceId, null, query);
+  async listWorkspaceActivities(
+    workspaceId: string,
+
+    query:
+      ActivityQueryDto,
+  ) {
+    const where =
+      this.buildWhere(
+        workspaceId,
+        undefined,
+        query,
+      );
+
+    return this.list(
+      where,
+      query,
+    );
   }
 
   async listApplicationActivities(
     workspaceId: string,
+
     applicationId: string,
-    query: ActivityQueryDto,
+
+    query:
+      ActivityQueryDto,
   ) {
-    const application = await this.prisma.saasApplication.findFirst({
-      where: {
-        id: applicationId,
+    const where =
+      this.buildWhere(
         workspaceId,
-      },
+        applicationId,
+        query,
+      );
 
-      select: {
-        id: true,
-      },
-    });
-
-    if (!application) {
-      throw new NotFoundException('SaaS application not found');
-    }
-
-    return this.list(workspaceId, applicationId, query);
+    return this.list(
+      where,
+      query,
+    );
   }
 
-  private async list(workspaceId: string, applicationId: string | null, query: ActivityQueryDto) {
-    const page = query.page;
-    const limit = query.limit;
-    const skip = (page - 1) * limit;
+  private async list(
+    where:
+      Prisma.ApplicationActivityWhereInput,
 
-    const search = query.search?.trim();
+    query:
+      ActivityQueryDto,
+  ) {
+    const [
+      total,
+      items,
+    ] = await Promise.all([
+      this.prisma
+        .applicationActivity
+        .count({
+          where,
+        }),
 
-    const dateFilter: Prisma.DateTimeFilter | undefined =
-      query.dateFrom || query.dateTo
-        ? {
-            ...(query.dateFrom
-              ? {
-                  gte: new Date(query.dateFrom),
-                }
-              : {}),
+      this.prisma
+        .applicationActivity
+        .findMany({
+          where,
 
-            ...(query.dateTo
-              ? {
-                  lte: new Date(query.dateTo),
-                }
-              : {}),
-          }
-        : undefined;
-
-    const where: Prisma.ApplicationActivityWhereInput = {
-      workspaceId,
-
-      ...(applicationId
-        ? {
-            applicationId,
-          }
-        : {}),
-
-      ...(query.activityType
-        ? {
-            activityType: query.activityType,
-          }
-        : {}),
-
-      ...(query.actorType
-        ? {
-            actorType: query.actorType,
-          }
-        : {}),
-
-      ...(query.entityType
-        ? {
-            entityType: query.entityType,
-          }
-        : {}),
-
-      ...(query.actorUserId
-        ? {
-            actorUserId: query.actorUserId,
-          }
-        : {}),
-
-      ...(dateFilter
-        ? {
-            createdAt: dateFilter,
-          }
-        : {}),
-
-      ...(search
-        ? {
-            OR: [
-              {
-                title: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
+          include: {
+            actorUser: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
               },
+            },
 
-              {
-                description: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
+            application: {
+              select: {
+                id: true,
+                name: true,
               },
-
-              {
-                applicationName: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-
-              {
-                actor: {
-                  is: {
-                    OR: [
-                      {
-                        displayName: {
-                          contains: search,
-                          mode: 'insensitive',
-                        },
-                      },
-
-                      {
-                        email: {
-                          contains: search,
-                          mode: 'insensitive',
-                        },
-                      },
-                    ],
-                  },
-                },
-              },
-            ],
-          }
-        : {}),
-    };
-
-    const [activities, total] = await this.prisma.$transaction([
-      this.prisma.applicationActivity.findMany({
-        where,
-        include: activityInclude,
-        orderBy: [
-          {
-            createdAt: 'desc',
+            },
           },
-          {
-            id: 'desc',
-          },
-        ],
-        skip,
-        take: limit,
-      }),
 
-      this.prisma.applicationActivity.count({
-        where,
-      }),
+          orderBy: [
+            {
+              createdAt:
+                'desc',
+            },
+
+            {
+              id:
+                'desc',
+            },
+          ],
+
+          skip:
+            (
+              query.page -
+              1
+            ) *
+            query.limit,
+
+          take:
+            query.limit,
+        }),
     ]);
 
-    const totalPages = Math.ceil(total / limit);
+    return {
+      items:
+        items.map(
+          (item) => ({
+            ...item,
+
+            createdAt:
+              item.createdAt
+                .toISOString(),
+          }),
+        ),
+
+      pagination: {
+        page:
+          query.page,
+
+        limit:
+          query.limit,
+
+        total,
+
+        totalPages:
+          Math.max(
+            1,
+            Math.ceil(
+              total /
+              query.limit,
+            ),
+          ),
+      },
+    };
+  }
+
+  private buildWhere(
+    workspaceId: string,
+
+    applicationId:
+      string | undefined,
+
+    query:
+      ActivityQueryDto,
+  ):
+    Prisma.ApplicationActivityWhereInput {
+    const from =
+      query.from
+        ? new Date(
+          query.from,
+        )
+        : undefined;
+
+    const to =
+      query.to
+        ? new Date(
+          query.to,
+        )
+        : undefined;
+
+    if (
+      from &&
+      to &&
+      to < from
+    ) {
+      throw new BadRequestException(
+        'to must be on or after from.',
+      );
+    }
 
     return {
-      data: activities,
+      workspaceId,
 
-      meta: {
-        page,
-        limit,
-        total,
-        totalPages,
-        hasNextPage: page < totalPages,
-        hasPreviousPage: page > 1,
-      },
+      applicationId,
+
+      activityType:
+        query.activityType,
+
+      actorType:
+        query.actorType,
+
+      actorUserId:
+        query.actorUserId,
+
+      entityType:
+        query.entityType,
+
+      entityId:
+        query.entityId,
+
+      createdAt:
+        from || to
+          ? {
+            gte: from,
+            lte: to,
+          }
+          : undefined,
+
+      OR:
+        query.search
+          ? [
+            {
+              description: {
+                contains:
+                  query.search,
+
+                mode:
+                  'insensitive',
+              },
+            },
+
+            {
+              actorUser: {
+                name: {
+                  contains:
+                    query.search,
+
+                  mode:
+                    'insensitive',
+                },
+              },
+            },
+
+            {
+              actorUser: {
+                email: {
+                  contains:
+                    query.search,
+
+                  mode:
+                    'insensitive',
+                },
+              },
+            },
+
+            {
+              application: {
+                name: {
+                  contains:
+                    query.search,
+
+                  mode:
+                    'insensitive',
+                },
+              },
+            },
+          ]
+          : undefined,
     };
   }
 }

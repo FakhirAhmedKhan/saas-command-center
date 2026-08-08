@@ -1,4 +1,7 @@
-import { Transform, Type } from 'class-transformer';
+import {
+  Transform,
+  Type,
+} from 'class-transformer';
 
 import {
   IsDateString,
@@ -12,7 +15,9 @@ import {
   Min,
 } from 'class-validator';
 
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  ApiPropertyOptional,
+} from '@nestjs/swagger';
 
 import {
   ActivityActorType,
@@ -20,36 +25,47 @@ import {
   ApplicationActivityType,
 } from 'src/generated/prisma/enums';
 
+function trimString(
+  value: unknown,
+): unknown {
+  return typeof value ===
+    'string'
+    ? value.trim()
+    : value;
+}
+
 export class ActivityQueryDto {
-  @ApiPropertyOptional({
-    example: 'status',
-  })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   @MaxLength(120)
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(
+    ({ value }: { value: unknown }) =>
+      trimString(value),
+  )
   search?: string;
 
   @ApiPropertyOptional({
-    enum: ApplicationActivityType,
+    enum:
+      ApplicationActivityType,
   })
   @IsOptional()
-  @IsEnum(ApplicationActivityType)
-  activityType?: ApplicationActivityType;
+  @IsEnum(
+    ApplicationActivityType,
+  )
+  activityType?:
+    ApplicationActivityType;
 
   @ApiPropertyOptional({
-    enum: ActivityActorType,
+    enum:
+      ActivityActorType,
   })
   @IsOptional()
-  @IsEnum(ActivityActorType)
-  actorType?: ActivityActorType;
-
-  @ApiPropertyOptional({
-    enum: ActivityEntityType,
-  })
-  @IsOptional()
-  @IsEnum(ActivityEntityType)
-  entityType?: ActivityEntityType;
+  @IsEnum(
+    ActivityActorType,
+  )
+  actorType?:
+    ActivityActorType;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -57,36 +73,47 @@ export class ActivityQueryDto {
   actorUserId?: string;
 
   @ApiPropertyOptional({
-    example: '2026-08-01T00:00:00.000Z',
+    enum:
+      ActivityEntityType,
   })
   @IsOptional()
-  @IsDateString()
-  dateFrom?: string;
+  @IsEnum(
+    ActivityEntityType,
+  )
+  entityType?:
+    ActivityEntityType;
 
-  @ApiPropertyOptional({
-    example: '2026-08-31T23:59:59.999Z',
-  })
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  entityId?: string;
+
+  @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
-  dateTo?: string;
+  from?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  to?: string;
 
   @ApiPropertyOptional({
     default: 1,
-    minimum: 1,
   })
+  @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
   page = 1;
 
   @ApiPropertyOptional({
-    default: 20,
-    minimum: 1,
-    maximum: 100,
+    default: 25,
   })
+  @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(100)
-  limit = 20;
+  limit = 25;
 }

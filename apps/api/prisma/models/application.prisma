@@ -21,6 +21,7 @@ model SaasApplication {
   links        ApplicationLink[]
   activities   ApplicationActivity[]
   websites     Website[]
+  healthChecks HealthCheck[]
 
   progressPercent     Int                      @default(0) @map("progress_percent")
   progressUpdatedAt   DateTime?                @map("progress_updated_at")

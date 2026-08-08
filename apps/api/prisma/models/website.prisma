@@ -26,6 +26,7 @@ model Website {
   dailyAggregates          AnalyticsDailyAggregate[]
   analyticsProcessingRuns  AnalyticsProcessingRun[]
   analyticsProcessingState AnalyticsProcessingState?
+  healthChecks             HealthCheck[]
 
   @@unique([workspaceId, domain])
   @@index([workspaceId, archivedAt])

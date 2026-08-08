@@ -12,6 +12,7 @@ model Workspace {
   saasApplications      SaasApplication[]
   applicationActivities ApplicationActivity[]
   websites              Website[]
+  healthChecks          HealthCheck[]
 
   @@index([ownerId])
   @@index([deletedAt])

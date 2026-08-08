@@ -28,6 +28,11 @@ import { AnalyticsEngineModule } from './modules/analytics-engine/analytics-engi
 import { validateEnvironment } from './config/env.validation';
 import { AnalyticsOverviewModule } from './modules/analytics-overview/analytics-overview.module';
 import { AnalyticsReportsModule } from './modules/analytics-reports/analytics-reports.module';
+import { AnalyticsProcessingModule } from './modules/analytics-processing/analytics-processing.module';
+import { RedisModule } from './infrastructure/redis/redis.module';
+import { MonitoringModule } from './modules/monitoring/monitoring.module';
+import { TeamOperationsModule } from './modules/team-operations/team-operations.module';
+import { WebhooksModule } from './modules/webhooks/webhooks.module';
 
 @Module({
   imports: [
@@ -44,7 +49,7 @@ import { AnalyticsReportsModule } from './modules/analytics-reports/analytics-re
         limit: 100,
       },
     ]),
-  
+
     ApplicationsModule,
     DatabaseModule,
     UsersModule,
@@ -61,6 +66,13 @@ import { AnalyticsReportsModule } from './modules/analytics-reports/analytics-re
     AnalyticsEngineModule,
     AnalyticsOverviewModule,
     AnalyticsReportsModule,
+
+    RedisModule,
+    MonitoringModule,
+    TeamOperationsModule,
+    WebhooksModule,
+
+    AnalyticsProcessingModule,
   ],
   providers: [
     {

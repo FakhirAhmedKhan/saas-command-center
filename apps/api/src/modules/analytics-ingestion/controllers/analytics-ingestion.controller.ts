@@ -20,42 +20,70 @@ import {
     AnalyticsIngestionService,
 } from '../services/analytics-ingestion.service';
 
+import {
+    ConfigService,
+} from '@nestjs/config';
+
+import {
+    SharedRateLimit,
+} from '../../../common/rate-limit/shared-rate-limit.decorator';
+
+import {
+    SharedRateLimitGuard,
+} from '../../../common/rate-limit/shared-rate-limit.guard';
+
 @ApiExcludeController()
-@Public()
-@Controller('collect')
-export class AnalyticsIngestionController {
-    constructor(
-        private readonly ingestionService:
-            AnalyticsIngestionService,
-    ) { }
+@UseGuards(
+    SharedRateLimitGuard,
+)
+@SharedRateLimit({
+    scope:
+        'analytics-ingestion',
 
-    @Post()
-    @HttpCode(202)
-    collect(
-        @Body()
-        body: unknown,
+    limit: 120,
 
-        @Headers('origin')
-        origin: string | undefined,
+    windowSeconds: 60,
+})
+@Post('events')
 
-        @Headers('user-agent')
-        userAgent: string | undefined,
+ingestEvents() {
+    // Existing ingestion method.
+    @Public()
+    @Controller('collect')
+    export class AnalyticsIngestionController {
+        constructor(
+            private readonly ingestionService:
+                AnalyticsIngestionService,
+        ) { }
 
-        @Req()
-        request: Request,
-    ) {
-        return this.ingestionService.collect(
-            body,
-            {
-                origin,
+        @Post()
+        @HttpCode(202)
+        collect(
+            @Body()
+            body: unknown,
 
-                userAgent,
+            @Headers('origin')
+            origin: string | undefined,
 
-                ipAddress:
-                    request.ip ??
-                    request.socket
-                        .remoteAddress,
-            },
-        );
+            @Headers('user-agent')
+            userAgent: string | undefined,
+
+            @Req()
+            request: Request,
+        ) {
+            return this.ingestionService.collect(
+                body,
+                {
+                    origin,
+
+                    userAgent,
+
+                    ipAddress:
+                        request.ip ??
+                        request.socket
+                            .remoteAddress,
+                },
+            );
+        }
     }
 }
