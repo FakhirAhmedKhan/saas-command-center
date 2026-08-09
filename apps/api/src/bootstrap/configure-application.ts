@@ -10,7 +10,7 @@ import cookieParser from 'cookie-parser';
 
 import type { Express } from 'express';
 
-import { json, urlencoded } from 'express';
+import { json, raw, urlencoded } from 'express';
 
 import helmet from 'helmet';
 

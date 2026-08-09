@@ -33,8 +33,9 @@ model SaasApplication {
   developmentTemplate DevelopmentTemplateType? @map("development_template")
   templateAppliedAt   DateTime?                @map("template_applied_at")
 
-  milestones ApplicationMilestone[]
-  blockers   ApplicationBlocker[]
+  milestones            ApplicationMilestone[]
+  blockers              ApplicationBlocker[]
+  repositoryConnections RepositoryConnection[]
 
   @@unique([workspaceId, slug])
   @@index([workspaceId, archivedAt])

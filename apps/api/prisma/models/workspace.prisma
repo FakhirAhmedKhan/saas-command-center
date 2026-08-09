@@ -31,6 +31,10 @@ model Workspace {
   webhookEvents     WebhookEvent[]
   webhookDeliveries WebhookDelivery[]
 
+  repositoryConnectIntents RepositoryConnectIntent[]
+  repositoryInstallations  RepositoryInstallation[]
+  repositoryConnections    RepositoryConnection[]
+
   @@index([ownerId])
   @@index([deletedAt])
   @@map("workspaces")

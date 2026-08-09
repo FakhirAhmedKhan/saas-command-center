@@ -25,6 +25,7 @@ import { RedisModule } from './infrastructure/redis/redis.module';
 import { MonitoringModule } from './modules/monitoring/monitoring.module';
 import { TeamOperationsModule } from './modules/team-operations/team-operations.module';
 import { WebhooksModule } from './modules/webhooks/webhooks.module';
+import { RepositoriesModule } from './modules/repositories/repositories.module';
 
 @Module({
   imports: [
@@ -41,7 +42,7 @@ import { WebhooksModule } from './modules/webhooks/webhooks.module';
         limit: 100,
       },
     ]),
-
+    RepositoriesModule,
     ApplicationsModule,
     DatabaseModule,
     UsersModule,
@@ -73,4 +74,4 @@ import { WebhooksModule } from './modules/webhooks/webhooks.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }
