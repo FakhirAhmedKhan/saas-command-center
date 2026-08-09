@@ -8,8 +8,7 @@ export type WebhookEventType =
   | 'ANALYTICS_PROCESSING_FAILED'
   | 'WORKSPACE_ACTIVITY_CREATED';
 
-export type WebhookDeliveryStatus =
-  'PENDING' | 'PROCESSING' | 'RETRY_SCHEDULED' | 'SUCCEEDED' | 'DEAD_LETTERED' | 'CANCELLED';
+export type WebhookDeliveryStatus = 'PENDING' | 'PROCESSING' | 'RETRY_SCHEDULED' | 'SUCCEEDED' | 'DEAD_LETTERED' | 'CANCELLED';
 
 export interface WebhookEventCatalogItem {
   type: WebhookEventType;

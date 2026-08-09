@@ -1,11 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import {
-  APPLICATION_ID,
-  installMockApi,
-  PRIMARY_WORKSPACE_ID,
-  WEBSITE_ID,
-} from './fixtures/mock-api';
+import { APPLICATION_ID, installMockApi, PRIMARY_WORKSPACE_ID, WEBSITE_ID } from './fixtures/mock-api';
 
 test.describe('Batch 10 website and tracker setup flows', () => {
   test('lists websites with connection and tracking information', async ({ page }) => {
@@ -67,12 +62,7 @@ test.describe('Batch 10 website and tracker setup flows', () => {
       })
       .click();
 
-    const request = state.requests
-      .filter(
-        (item) =>
-          item.method === 'GET' && item.path === `/workspaces/${PRIMARY_WORKSPACE_ID}/websites`,
-      )
-      .at(-1);
+    const request = state.requests.filter((item) => item.method === 'GET' && item.path === `/workspaces/${PRIMARY_WORKSPACE_ID}/websites`).at(-1);
 
     expect(request?.search).toContain('search=command-center');
     expect(request?.search).toContain('enabled=true');
@@ -81,16 +71,12 @@ test.describe('Batch 10 website and tracker setup flows', () => {
   test('creates a connected website and preserves its one-time tracking key', async ({ page }) => {
     const state = await installMockApi(page);
 
-    await page.goto(
-      `/workspaces/${PRIMARY_WORKSPACE_ID}/websites/new?applicationId=${APPLICATION_ID}`,
-    );
+    await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}/websites/new?applicationId=${APPLICATION_ID}`);
 
     await page.getByLabel('Website name').fill('  MadadAI Web  ');
     await page.getByLabel('Domain').fill('madadai.example.com');
     await page.getByLabel('Reporting time zone').fill('Asia/Dubai');
-    await page
-      .getByLabel('Allowed origins')
-      .fill('https://madadai.example.com\nhttps://madadai.example.com\nhttp://localhost:3000');
+    await page.getByLabel('Allowed origins').fill('https://madadai.example.com\nhttps://madadai.example.com\nhttp://localhost:3000');
     await page
       .getByRole('button', {
         name: 'Create website',
@@ -105,10 +91,7 @@ test.describe('Batch 10 website and tracker setup flows', () => {
     ).toBeVisible();
     await expect(page.getByText(state.trackingKey).first()).toBeVisible();
 
-    const request = state.requests.find(
-      (item) =>
-        item.method === 'POST' && item.path === `/workspaces/${PRIMARY_WORKSPACE_ID}/websites`,
-    );
+    const request = state.requests.find((item) => item.method === 'POST' && item.path === `/workspaces/${PRIMARY_WORKSPACE_ID}/websites`);
 
     expect(request?.body).toEqual({
       name: 'MadadAI Web',
@@ -171,9 +154,7 @@ test.describe('Batch 10 website and tracker setup flows', () => {
 
     await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}/websites/${WEBSITE_ID}/installation`);
 
-    await expect(
-      page.getByText('The complete key is shown only after website creation or key rotation.'),
-    ).toBeVisible();
+    await expect(page.getByText('The complete key is shown only after website creation or key rotation.')).toBeVisible();
     await expect(
       page.getByRole('link', {
         name: 'Website Settings',
@@ -200,9 +181,7 @@ test.describe('Batch 10 website and tracker setup flows', () => {
       })
       .click();
 
-    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toContainText(
-      'Website domain already exists',
-    );
+    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toContainText('Website domain already exists');
     await expect(page).toHaveURL(new RegExp(`/workspaces/${PRIMARY_WORKSPACE_ID}/websites/new$`));
   });
 });

@@ -22,10 +22,7 @@ export default function WorkspaceMembersSettingsPage() {
         <h1 className="text-2xl font-bold text-slate-950">Members and invitations</h1>
       </header>
 
-      <WorkspaceInvitationsPanel
-        workspaceId={params.workspaceId}
-        canManageMembers={canManageMembers}
-      />
+      <WorkspaceInvitationsPanel workspaceId={params.workspaceId} canManageMembers={canManageMembers} />
     </div>
   );
 }

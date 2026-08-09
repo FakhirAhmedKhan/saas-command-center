@@ -6,13 +6,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { PageError } from '@/components/states/page-error';
 
-import type {
-  AnalyticsBreakdownItem,
-  AnalyticsMetric,
-  AnalyticsOverviewResponse,
-  AnalyticsPreset,
-  AnalyticsTrendPoint,
-} from './analytics-overview.types';
+import type { AnalyticsBreakdownItem, AnalyticsMetric, AnalyticsOverviewResponse, AnalyticsPreset, AnalyticsTrendPoint } from './analytics-overview.types';
 
 import { useAnalyticsOverview } from './use-analytics-overview';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -131,9 +125,7 @@ function MetricCard({ title, metric, formattedValue, description }: MetricCardPr
           <p className="mt-2 text-3xl font-bold tracking-tight text-slate-950">{formattedValue}</p>
         </div>
 
-        <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${change.className}`}>
-          {change.label}
-        </span>
+        <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${change.className}`}>{change.label}</span>
       </div>
 
       <p className="mt-3 text-xs text-slate-500">{description}</p>
@@ -190,12 +182,7 @@ function BreakdownPanel({ title, items, emptyLabel }: BreakdownPanelProps) {
   );
 }
 
-function buildChartPoints(
-  values: number[],
-  width: number,
-  height: number,
-  padding: number,
-): string {
+function buildChartPoints(values: number[], width: number, height: number, padding: number): string {
   if (values.length === 0) {
     return '';
   }
@@ -204,10 +191,7 @@ function buildChartPoints(
 
   return values
     .map((value, index) => {
-      const x =
-        values.length === 1
-          ? width / 2
-          : padding + (index / (values.length - 1)) * (width - padding * 2);
+      const x = values.length === 1 ? width / 2 : padding + (index / (values.length - 1)) * (width - padding * 2);
 
       const y = height - padding - (value / maximum) * (height - padding * 2);
 
@@ -274,10 +258,7 @@ function TrafficChart({
 
   const maximumValue = Math.max(...points.map((point) => point.pageViews), 0);
 
-  const labelIndexes =
-    points.length <= 3
-      ? points.map((_point, index) => index)
-      : [0, Math.floor((points.length - 1) / 2), points.length - 1];
+  const labelIndexes = points.length <= 3 ? points.map((_point, index) => index) : [0, Math.floor((points.length - 1) / 2), points.length - 1];
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2">
@@ -296,19 +277,11 @@ function TrafficChart({
       </div>
 
       {points.length === 0 ? (
-        <div className="flex h-64 items-center justify-center text-sm text-slate-500">
-          No traffic was recorded in this range.
-        </div>
+        <div className="flex h-64 items-center justify-center text-sm text-slate-500">No traffic was recorded in this range.</div>
       ) : (
         <>
           <div className="mt-6 overflow-hidden">
-            <svg
-              viewBox={`0 0 ${width} ${height}`}
-              className="h-64 w-full"
-              role="img"
-              aria-label="Page views trend chart"
-              preserveAspectRatio="none"
-            >
+            <svg viewBox={`0 0 ${width} ${height}`} className="h-64 w-full" role="img" aria-label="Page views trend chart" preserveAspectRatio="none">
               {[0.25, 0.5, 0.75].map((ratio) => (
                 <line
                   key={ratio}
@@ -342,11 +315,7 @@ function TrafficChart({
                 return null;
               }
 
-              return (
-                <span key={point.bucketStart}>
-                  {formatTrendLabel(point.bucketStart, timeZone, granularity)}
-                </span>
-              );
+              return <span key={point.bucketStart}>{formatTrendLabel(point.bucketStart, timeZone, granularity)}</span>;
             })}
           </div>
         </>
@@ -414,58 +383,27 @@ function AnalyticsContent({ data }: { data: AnalyticsOverviewResponse }) {
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <TrafficChart
-          points={data.trend}
-          timeZone={data.website.timeZone}
-          granularity={data.range.granularity}
-        />
+        <TrafficChart points={data.trend} timeZone={data.website.timeZone} granularity={data.range.granularity} />
       </div>
 
       <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        <BreakdownPanel
-          title="Top pages"
-          items={data.topPages}
-          emptyLabel="No page data available."
-        />
+        <BreakdownPanel title="Top pages" items={data.topPages} emptyLabel="No page data available." />
 
-        <BreakdownPanel
-          title="Top sources"
-          items={data.topSources}
-          emptyLabel="No source data available."
-        />
+        <BreakdownPanel title="Top sources" items={data.topSources} emptyLabel="No source data available." />
 
-        <BreakdownPanel
-          title="Countries"
-          items={data.topCountries}
-          emptyLabel="No country data available."
-        />
+        <BreakdownPanel title="Countries" items={data.topCountries} emptyLabel="No country data available." />
 
-        <BreakdownPanel
-          title="Devices"
-          items={data.topDevices}
-          emptyLabel="No device data available."
-        />
+        <BreakdownPanel title="Devices" items={data.topDevices} emptyLabel="No device data available." />
 
-        <BreakdownPanel
-          title="Browsers"
-          items={data.topBrowsers}
-          emptyLabel="No browser data available."
-        />
+        <BreakdownPanel title="Browsers" items={data.topBrowsers} emptyLabel="No browser data available." />
 
-        <BreakdownPanel
-          title="Operating systems"
-          items={data.topOperatingSystems}
-          emptyLabel="No operating-system data available."
-        />
+        <BreakdownPanel title="Operating systems" items={data.topOperatingSystems} emptyLabel="No operating-system data available." />
       </div>
     </>
   );
 }
 
-export function AnalyticsOverviewDashboard({
-  workspaceId,
-  websiteId,
-}: AnalyticsOverviewDashboardProps) {
+export function AnalyticsOverviewDashboard({ workspaceId, websiteId }: AnalyticsOverviewDashboardProps) {
   const router = useRouter();
 
   const pathname = usePathname();
@@ -474,8 +412,7 @@ export function AnalyticsOverviewDashboard({
 
   const rawPreset = searchParams.get('range');
 
-  const preset: AnalyticsPreset =
-    rawPreset === 'today' || rawPreset === '30d' || rawPreset === '90d' ? rawPreset : '7d';
+  const preset: AnalyticsPreset = rawPreset === 'today' || rawPreset === '30d' || rawPreset === '90d' ? rawPreset : '7d';
 
   const { data, loading, error, reload } = useAnalyticsOverview({
     workspaceId,
@@ -520,9 +457,7 @@ export function AnalyticsOverviewDashboard({
         <div>
           <p className="text-sm font-medium text-slate-500">Analytics</p>
 
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-950">
-            {data.website.name}
-          </h1>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-950">{data.website.name}</h1>
 
           <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-500">
             <span>{data.website.domain}</span>

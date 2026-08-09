@@ -6,11 +6,7 @@ import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
 
 import { AnalyticsAggregatePeriod } from '../dto/analytics-engine.dto';
 
-import {
-  normalizeAnalyticsPage,
-  normalizeSource,
-  parseUserAgent,
-} from '../utils/analytics-normalization';
+import { normalizeAnalyticsPage, normalizeSource, parseUserAgent } from '../utils/analytics-normalization';
 
 import { getAnalyticsBucket } from '../utils/analytics-time';
 
@@ -243,9 +239,7 @@ export class RawEventProcessingService {
       });
 
       if (analyticsEvent.sessionId !== session.id || analyticsEvent.visitorId !== eventVisitorId) {
-        throw new BadRequestException(
-          'An analytics event identifier cannot belong to multiple sessions or visitors',
-        );
+        throw new BadRequestException('An analytics event identifier cannot belong to multiple sessions or visitors');
       }
 
       if (raw.type === RawAnalyticsEventType.PAGE_VIEW) {
@@ -427,19 +421,10 @@ export class RawEventProcessingService {
     return result;
   }
 
-  private addAffectedBuckets(
-    hourlyBuckets: Set<string>,
-    dailyBuckets: Set<string>,
-    occurredAt: Date,
-    timeZone: string,
-  ): void {
-    hourlyBuckets.add(
-      getAnalyticsBucket(occurredAt, timeZone, AnalyticsAggregatePeriod.HOURLY).start.toISOString(),
-    );
+  private addAffectedBuckets(hourlyBuckets: Set<string>, dailyBuckets: Set<string>, occurredAt: Date, timeZone: string): void {
+    hourlyBuckets.add(getAnalyticsBucket(occurredAt, timeZone, AnalyticsAggregatePeriod.HOURLY).start.toISOString());
 
-    dailyBuckets.add(
-      getAnalyticsBucket(occurredAt, timeZone, AnalyticsAggregatePeriod.DAILY).start.toISOString(),
-    );
+    dailyBuckets.add(getAnalyticsBucket(occurredAt, timeZone, AnalyticsAggregatePeriod.DAILY).start.toISOString());
   }
 
   private readCountryCode(raw: RawAnalyticsEventRecord): string | null {

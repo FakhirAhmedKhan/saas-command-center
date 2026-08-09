@@ -22,11 +22,9 @@ import type { Website } from '@/features/websites/website-types';
 
 import { getWebsiteError, websiteKeyStorageName } from '@/features/websites/website-utils';
 
-const TRACKER_SCRIPT_URL =
-  process.env.NEXT_PUBLIC_TRACKER_SCRIPT_URL ?? 'http://localhost:3002/tracker.js';
+const TRACKER_SCRIPT_URL = process.env.NEXT_PUBLIC_TRACKER_SCRIPT_URL ?? 'http://localhost:3002/tracker.js';
 
-const INGESTION_URL =
-  process.env.NEXT_PUBLIC_INGESTION_URL ?? 'http://localhost:4000/api/v1/collect';
+const INGESTION_URL = process.env.NEXT_PUBLIC_INGESTION_URL ?? 'http://localhost:4000/api/v1/collect';
 
 export default function WebsiteInstallationPage() {
   const params = useParams<{
@@ -122,21 +120,14 @@ export default function WebsiteInstallationPage() {
   }
 
   if (!website) {
-    return (
-      <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
-        {error}
-      </div>
-    );
+    return <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">{error}</div>;
   }
 
   const baseHref = `/workspaces/${workspaceId}/websites/${websiteId}`;
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-      <Link
-        href={baseHref}
-        className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900"
-      >
+      <Link href={baseHref} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900">
         <ArrowLeft className="size-4" />
         Back to website
       </Link>
@@ -148,9 +139,7 @@ export default function WebsiteInstallationPage() {
           </div>
 
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-950">
-              Tracker installation
-            </h1>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-950">Tracker installation</h1>
 
             <p className="mt-2 text-sm leading-6 text-slate-500">
               Install the lightweight tracker on <strong>{website.domain}</strong>.
@@ -179,9 +168,7 @@ export default function WebsiteInstallationPage() {
 
           <CardContent>
             <div className="flex flex-col gap-3 sm:flex-row">
-              <code className="min-w-0 flex-1 break-all rounded-xl bg-slate-950 p-4 text-sm text-slate-100">
-                {trackingKey}
-              </code>
+              <code className="min-w-0 flex-1 break-all rounded-xl bg-slate-950 p-4 text-sm text-slate-100">{trackingKey}</code>
 
               <Button variant="outline" onClick={() => void copy('key', trackingKey)}>
                 {copied === 'key' ? <Check className="size-4" /> : <Clipboard className="size-4" />}
@@ -217,9 +204,7 @@ export default function WebsiteInstallationPage() {
         <CardHeader>
           <h2 className="font-semibold text-slate-950">Custom events</h2>
 
-          <p className="mt-1 text-sm text-slate-500">
-            Form values are never captured automatically. Send only safe, non-sensitive properties.
-          </p>
+          <p className="mt-1 text-sm text-slate-500">Form values are never captured automatically. Send only safe, non-sensitive properties.</p>
         </CardHeader>
 
         <CardContent>
@@ -227,11 +212,7 @@ export default function WebsiteInstallationPage() {
             <code>{customEventSnippet}</code>
           </pre>
 
-          <Button
-            className="mt-4"
-            variant="outline"
-            onClick={() => void copy('custom', customEventSnippet)}
-          >
+          <Button className="mt-4" variant="outline" onClick={() => void copy('custom', customEventSnippet)}>
             {copied === 'custom' ? <Check className="size-4" /> : <Clipboard className="size-4" />}
 
             {copied === 'custom' ? 'Copied' : 'Copy example'}

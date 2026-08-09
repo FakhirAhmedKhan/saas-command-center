@@ -116,9 +116,7 @@ test.describe('Phase 13 analytics reports', () => {
   });
 
   test('supports deep links to technology reports', async ({ page }) => {
-    await page.goto(
-      `/workspaces/${workspaceId}/websites/${websiteId}/analytics/reports?tab=technology&dimension=browsers&range=7d`,
-    );
+    await page.goto(`/workspaces/${workspaceId}/websites/${websiteId}/analytics/reports?tab=technology&dimension=browsers&range=7d`);
 
     await expect(page.getByLabel('Technology')).toHaveValue('browsers');
   });
@@ -158,9 +156,7 @@ test.describe('Phase 13 analytics reports', () => {
       });
     });
 
-    const navigation = page.goto(
-      `/workspaces/${workspaceId}/websites/${websiteId}/analytics/reports?tab=pages`,
-    );
+    const navigation = page.goto(`/workspaces/${workspaceId}/websites/${websiteId}/analytics/reports?tab=pages`);
 
     await expect(page.locator('.animate-pulse').first()).toBeVisible();
 
@@ -202,9 +198,7 @@ test.describe('Phase 13 analytics reports', () => {
 
     await expect(page.getByText('No report data')).toBeVisible();
 
-    await expect(
-      page.getByText('No matching analytics data was found for the selected filters and date range.'),
-    ).toBeVisible();
+    await expect(page.getByText('No matching analytics data was found for the selected filters and date range.')).toBeVisible();
   });
 
   test('shows an error state with a retry action when the report request fails', async ({ page }) => {

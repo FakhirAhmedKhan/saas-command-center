@@ -102,12 +102,7 @@ function serializeBody(body: unknown): BodyInit | undefined {
     return undefined;
   }
 
-  if (
-    body instanceof FormData ||
-    body instanceof Blob ||
-    body instanceof URLSearchParams ||
-    typeof body === 'string'
-  ) {
+  if (body instanceof FormData || body instanceof Blob || body instanceof URLSearchParams || typeof body === 'string') {
     return body;
   }
 

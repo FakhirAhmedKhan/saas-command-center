@@ -3,13 +3,7 @@ import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import request, { type Response } from 'supertest';
 
 import { PrismaService } from '../src/database/prisma.service';
-import {
-  AnalyticsAggregateDimension,
-  AnalyticsDeviceType,
-  AnalyticsSourceType,
-  RawAnalyticsEventType,
-  WorkspaceRole,
-} from '../src/generated/prisma/enums';
+import { AnalyticsAggregateDimension, AnalyticsDeviceType, AnalyticsSourceType, RawAnalyticsEventType, WorkspaceRole } from '../src/generated/prisma/enums';
 import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
 import { createTestApp } from './helpers/create-test-app';
 import { resetDatabase } from './helpers/database';
@@ -530,9 +524,7 @@ async function seedNormalizedAnalytics(prisma: PrismaService, websiteId: string)
 
       const occurredAt = new Date(BUCKET_START.getTime() + (180 + pageIndex) * 60_000);
 
-      const pageUrl = page.path.startsWith('/')
-        ? `https://phase13.example.test${page.path}`
-        : 'https://phase13.example.test/formula';
+      const pageUrl = page.path.startsWith('/') ? `https://phase13.example.test${page.path}` : 'https://phase13.example.test/formula';
 
       const analyticsEvent = await prisma.analyticsEvent.create({
         data: {
@@ -659,10 +651,7 @@ describe('Phase 13 Analytics Reports E2E', () => {
     return `${reportsBase(workspaceId, currentWebsiteId)}/events`;
   }
 
-  function dimensionUrl(
-    dimension: 'sources' | 'countries' | 'devices' | 'browsers' | 'operating-systems',
-    currentWebsiteId = websiteId,
-  ): string {
+  function dimensionUrl(dimension: 'sources' | 'countries' | 'devices' | 'browsers' | 'operating-systems', currentWebsiteId = websiteId): string {
     return `${reportsBase(workspaceId, currentWebsiteId)}/dimensions/${dimension}`;
   }
 
@@ -674,17 +663,11 @@ describe('Phase 13 Analytics Reports E2E', () => {
     return `${reportsBase()}/exports/events`;
   }
 
-  function exportDimensionUrl(
-    dimension: 'sources' | 'countries' | 'devices' | 'browsers' | 'operating-systems',
-  ): string {
+  function exportDimensionUrl(dimension: 'sources' | 'countries' | 'devices' | 'browsers' | 'operating-systems'): string {
     return `${reportsBase()}/exports/dimensions/${dimension}`;
   }
 
-  async function get(
-    url: string,
-    token: string,
-    query: Record<string, string | number> = {},
-  ): Promise<Response> {
+  async function get(url: string, token: string, query: Record<string, string | number> = {}): Promise<Response> {
     return request(app.getHttpServer()).get(url).set(withBearer(token)).query(query);
   }
 
@@ -718,10 +701,7 @@ describe('Phase 13 Analytics Reports E2E', () => {
       select: { workspaceId: true },
     });
 
-    workspaceId = requireValue(
-      ownerMembership?.workspaceId,
-      'Phase 13 owner workspace was not found',
-    );
+    workspaceId = requireValue(ownerMembership?.workspaceId, 'Phase 13 owner workspace was not found');
 
     const viewer = createTestUser({
       name: 'Phase 13 Viewer',
@@ -820,9 +800,7 @@ describe('Phase 13 Analytics Reports E2E', () => {
   // ---------------------------------------------------------------------------------------
 
   it('rejects anonymous report access', async () => {
-    const response = await request(app.getHttpServer())
-      .get(pagesUrl())
-      .query({ from: FROM, to: TO });
+    const response = await request(app.getHttpServer()).get(pagesUrl()).query({ from: FROM, to: TO });
 
     expect(response.status).toBe(401);
   });
@@ -862,9 +840,7 @@ describe('Phase 13 Analytics Reports E2E', () => {
 
     const paths = rows.map((row) => row.path);
 
-    expect(paths).toEqual(
-      expect.arrayContaining(['/pricing', '/docs', '/blog', DANGEROUS_CSV_PATH]),
-    );
+    expect(paths).toEqual(expect.arrayContaining(['/pricing', '/docs', '/blog', DANGEROUS_CSV_PATH]));
 
     const totalViews = rows.reduce((sum, row) => sum + Number(row.views), 0);
 
@@ -958,9 +934,7 @@ describe('Phase 13 Analytics Reports E2E', () => {
     const combinedPaths = [...firstRows, ...secondRows].map((row) => row.path);
 
     expect(new Set(combinedPaths).size).toBe(4);
-    expect(new Set(combinedPaths)).toEqual(
-      new Set(['/pricing', '/docs', '/blog', DANGEROUS_CSV_PATH]),
-    );
+    expect(new Set(combinedPaths)).toEqual(new Set(['/pricing', '/docs', '/blog', DANGEROUS_CSV_PATH]));
 
     expect(body(firstResponse).pagination).toMatchObject({
       page: 1,
@@ -1098,11 +1072,7 @@ describe('Phase 13 Analytics Reports E2E', () => {
   // ---------------------------------------------------------------------------------------
 
   it('rejects an unsupported dimension path parameter', async () => {
-    const response = await get(
-      `${reportsBase()}/dimensions/not-a-real-dimension`,
-      ownerAccessToken,
-      { from: FROM, to: TO },
-    );
+    const response = await get(`${reportsBase()}/dimensions/not-a-real-dimension`, ownerAccessToken, { from: FROM, to: TO });
 
     expect(response.status).toBe(400);
   });
@@ -1166,11 +1136,7 @@ describe('Phase 13 Analytics Reports E2E', () => {
   });
 
   it('rejects a malformed website ID', async () => {
-    const response = await get(
-      `${API_PREFIX}/workspaces/${workspaceId}/websites/not-a-uuid/analytics/reports/pages`,
-      ownerAccessToken,
-      { from: FROM, to: TO },
-    );
+    const response = await get(`${API_PREFIX}/workspaces/${workspaceId}/websites/not-a-uuid/analytics/reports/pages`, ownerAccessToken, { from: FROM, to: TO });
 
     expect(response.status).toBe(400);
   });
@@ -1222,23 +1188,11 @@ describe('Phase 13 Analytics Reports E2E', () => {
 
     expect(response.status).toBe(200);
     expect(String(response.headers['content-type'])).toMatch(/^text\/csv/i);
-    expect(String(response.headers['content-disposition'])).toMatch(
-      /^attachment; filename="pages_2026-08-01_2026-08-04\.csv"$/,
-    );
+    expect(String(response.headers['content-disposition'])).toMatch(/^attachment; filename="pages_2026-08-01_2026-08-04\.csv"$/);
 
     const rows = parseCsv(readResponseText(response));
 
-    expect(rows[0]).toEqual([
-      'Path',
-      'Title',
-      'Views',
-      'Visitors',
-      'Sessions',
-      'Entrances',
-      'Exits',
-      'Bounce Rate',
-      'Average Duration Seconds',
-    ]);
+    expect(rows[0]).toEqual(['Path', 'Title', 'Views', 'Visitors', 'Sessions', 'Entrances', 'Exits', 'Bounce Rate', 'Average Duration Seconds']);
 
     // header + 4 data rows
     expect(rows).toHaveLength(5);
@@ -1260,9 +1214,7 @@ describe('Phase 13 Analytics Reports E2E', () => {
     expect(csvRows).toHaveLength(apiRows.length);
 
     for (const apiRow of apiRows) {
-      const matchingCsvRow = csvRows.find((row) =>
-        apiRow.path === DANGEROUS_CSV_PATH ? row[0] === `'${DANGEROUS_CSV_PATH}` : row[0] === apiRow.path,
-      );
+      const matchingCsvRow = csvRows.find((row) => (apiRow.path === DANGEROUS_CSV_PATH ? row[0] === `'${DANGEROUS_CSV_PATH}` : row[0] === apiRow.path));
 
       expect(matchingCsvRow).toBeDefined();
       expect(matchingCsvRow?.[2]).toBe(String(apiRow.views));
@@ -1288,9 +1240,7 @@ describe('Phase 13 Analytics Reports E2E', () => {
     });
 
     expect(response.status).toBe(200);
-    expect(String(response.headers['content-disposition'])).toMatch(
-      /^attachment; filename="sources_2026-08-01_2026-08-04\.csv"$/,
-    );
+    expect(String(response.headers['content-disposition'])).toMatch(/^attachment; filename="sources_2026-08-01_2026-08-04\.csv"$/);
 
     const rows = parseCsv(readResponseText(response));
 
@@ -1331,9 +1281,7 @@ describe('Phase 13 Analytics Reports E2E', () => {
   });
 
   it('rejects unauthenticated CSV export requests', async () => {
-    const response = await request(app.getHttpServer())
-      .get(exportPagesUrl())
-      .query({ from: FROM, to: TO });
+    const response = await request(app.getHttpServer()).get(exportPagesUrl()).query({ from: FROM, to: TO });
 
     expect(response.status).toBe(401);
   });

@@ -18,9 +18,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
 
             <h1>Know what needs your attention.</h1>
 
-            <p className="auth-brand-copy">
-              Keep projects, teams and workspace activity organized in one clear command center.
-            </p>
+            <p className="auth-brand-copy">Keep projects, teams and workspace activity organized in one clear command center.</p>
           </div>
         </section>
 

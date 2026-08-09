@@ -38,9 +38,7 @@ describe('Analytics processing reliability', () => {
 
   it('allows an admin to queue reprocessing', async () => {
     await request(app.getHttpServer())
-      .post(
-        `/api/v1/workspaces/${workspaceId}/websites/${websiteId}/analytics/processing/reprocess`,
-      )
+      .post(`/api/v1/workspaces/${workspaceId}/websites/${websiteId}/analytics/processing/reprocess`)
       .set('Authorization', `Bearer ${adminAccessToken}`)
       .send({
         from: '2026-08-01T00:00:00.000Z',
@@ -52,9 +50,7 @@ describe('Analytics processing reliability', () => {
 
   it('blocks viewer reprocessing', async () => {
     await request(app.getHttpServer())
-      .post(
-        `/api/v1/workspaces/${workspaceId}/websites/${websiteId}/analytics/processing/reprocess`,
-      )
+      .post(`/api/v1/workspaces/${workspaceId}/websites/${websiteId}/analytics/processing/reprocess`)
       .set('Authorization', `Bearer ${viewerAccessToken}`)
       .send({
         from: '2026-08-01T00:00:00.000Z',
@@ -66,9 +62,7 @@ describe('Analytics processing reliability', () => {
 
   it('rejects excessive ranges', async () => {
     await request(app.getHttpServer())
-      .post(
-        `/api/v1/workspaces/${workspaceId}/websites/${websiteId}/analytics/processing/reprocess`,
-      )
+      .post(`/api/v1/workspaces/${workspaceId}/websites/${websiteId}/analytics/processing/reprocess`)
       .set('Authorization', `Bearer ${adminAccessToken}`)
       .send({
         from: '2026-01-01T00:00:00.000Z',

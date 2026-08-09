@@ -10,11 +10,7 @@ import { createTestApp } from './helpers/create-test-app';
 
 import { resetDatabase } from './helpers/database';
 
-import {
-  expectAccessDenied,
-  registerWorkspaceTestUser,
-  type WorkspaceTestUser,
-} from './helpers/workspace';
+import { expectAccessDenied, registerWorkspaceTestUser, type WorkspaceTestUser } from './helpers/workspace';
 
 import {
   archiveWebsite,
@@ -48,12 +44,9 @@ describe('Website Activity E2E', () => {
   });
 
   async function listActivity(actor: WorkspaceTestUser) {
-    return actor.agent
-      .get(websiteRoutes.workspaceActivities(actor.workspaceId))
-      .set(withBearer(actor.accessToken))
-      .query({
-        limit: 100,
-      });
+    return actor.agent.get(websiteRoutes.workspaceActivities(actor.workspaceId)).set(withBearer(actor.accessToken)).query({
+      limit: 100,
+    });
   }
 
   async function activityCount(actor: WorkspaceTestUser): Promise<number> {
@@ -127,13 +120,10 @@ describe('Website Activity E2E', () => {
 
     const beforeCount = await activityCount(owner);
 
-    const response = await owner.agent
-      .post(websiteRoutes.root(owner.workspaceId))
-      .set(withBearer(owner.accessToken))
-      .send({
-        name: '',
-        domain: 'example.com/path',
-      });
+    const response = await owner.agent.post(websiteRoutes.root(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
+      name: '',
+      domain: 'example.com/path',
+    });
 
     expect(response.status).toBe(400);
 
@@ -161,9 +151,7 @@ describe('Website Activity E2E', () => {
 
     expect(serialized).not.toContain('beta-activity.example.test');
 
-    const foreignResponse = await betaOwner.agent
-      .get(websiteRoutes.workspaceActivities(alphaOwner.workspaceId))
-      .set(withBearer(betaOwner.accessToken));
+    const foreignResponse = await betaOwner.agent.get(websiteRoutes.workspaceActivities(alphaOwner.workspaceId)).set(withBearer(betaOwner.accessToken));
 
     expectAccessDenied(foreignResponse);
   });

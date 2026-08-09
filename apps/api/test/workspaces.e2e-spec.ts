@@ -11,12 +11,7 @@ import { createTestApp } from './helpers/create-test-app';
 
 import { resetDatabase } from './helpers/database';
 
-import {
-  expectSuccessfulStatus,
-  readAccessToken,
-  readResourceId,
-  readResponseArray,
-} from './helpers/response';
+import { expectSuccessfulStatus, readAccessToken, readResourceId, readResponseArray } from './helpers/response';
 import { PrismaService } from '../src/database/prisma.service';
 
 interface WorkspaceResponse {
@@ -55,10 +50,7 @@ describe('Workspaces E2E', () => {
 
     const workspaceName = 'Second E2E Workspace';
 
-    const response = await agent
-      .post(TEST_ROUTES.workspaces.root)
-      .set(withBearer(accessToken))
-      .send(buildWorkspacePayload(workspaceName));
+    const response = await agent.post(TEST_ROUTES.workspaces.root).set(withBearer(accessToken)).send(buildWorkspacePayload(workspaceName));
 
     expectSuccessfulStatus(response);
 
@@ -78,10 +70,7 @@ describe('Workspaces E2E', () => {
 
     const accessToken = readAccessToken(registerResponse);
 
-    const createResponse = await agent
-      .post(TEST_ROUTES.workspaces.root)
-      .set(withBearer(accessToken))
-      .send(buildWorkspacePayload('Additional Workspace'));
+    const createResponse = await agent.post(TEST_ROUTES.workspaces.root).set(withBearer(accessToken)).send(buildWorkspacePayload('Additional Workspace'));
 
     expectSuccessfulStatus(createResponse);
 
@@ -97,9 +86,7 @@ describe('Workspaces E2E', () => {
   });
 
   it('rejects anonymous workspace creation', async () => {
-    const response = await request(app.getHttpServer())
-      .post(TEST_ROUTES.workspaces.root)
-      .send(buildWorkspacePayload('Anonymous Workspace'));
+    const response = await request(app.getHttpServer()).post(TEST_ROUTES.workspaces.root).send(buildWorkspacePayload('Anonymous Workspace'));
 
     expect(response.status).toBe(401);
   });
@@ -113,13 +100,10 @@ describe('Workspaces E2E', () => {
 
     const accessToken = readAccessToken(registerResponse);
 
-    const response = await agent
-      .post(TEST_ROUTES.workspaces.root)
-      .set(withBearer(accessToken))
-      .send({
-        name: ' ',
-        unexpectedField: true,
-      });
+    const response = await agent.post(TEST_ROUTES.workspaces.root).set(withBearer(accessToken)).send({
+      name: ' ',
+      unexpectedField: true,
+    });
 
     expect(response.status).toBe(400);
   });
@@ -150,9 +134,7 @@ describe('Workspaces E2E', () => {
 
     const secondToken = readAccessToken(secondRegisterResponse);
 
-    const foreignAccessResponse = await secondAgent
-      .get(TEST_ROUTES.workspaces.applications(foreignWorkspaceId))
-      .set(withBearer(secondToken));
+    const foreignAccessResponse = await secondAgent.get(TEST_ROUTES.workspaces.applications(foreignWorkspaceId)).set(withBearer(secondToken));
 
     /*
      * Either 403 or a security-hidden 404

@@ -182,9 +182,7 @@ test.describe('Phase 14 analytics processing', () => {
       });
     });
 
-    const navigation = page.goto(
-      `/workspaces/${workspaceId}/websites/${websiteId}/analytics/processing`,
-    );
+    const navigation = page.goto(`/workspaces/${workspaceId}/websites/${websiteId}/analytics/processing`);
 
     await expect(page.getByLabel('Loading processing status')).toBeVisible();
 

@@ -28,13 +28,7 @@ export interface WebhookHttpResult {
   errorMessage: string | null;
 }
 
-const BLOCKED_HOSTS = new Set([
-  'localhost',
-  'localhost.localdomain',
-  'metadata',
-  'metadata.google.internal',
-  'host.docker.internal',
-]);
+const BLOCKED_HOSTS = new Set(['localhost', 'localhost.localdomain', 'metadata', 'metadata.google.internal', 'host.docker.internal']);
 
 const BLOCKED_SUFFIXES = ['.localhost', '.local', '.internal', '.lan', '.home'];
 
@@ -147,8 +141,7 @@ export class WebhookOutboundClientService {
 
       const unsafeDestination = error instanceof BadRequestException;
 
-      const message =
-        error instanceof Error ? error.message.slice(0, 500) : 'Unknown webhook delivery failure.';
+      const message = error instanceof Error ? error.message.slice(0, 500) : 'Unknown webhook delivery failure.';
 
       return {
         success: false,
@@ -159,11 +152,7 @@ export class WebhookOutboundClientService {
 
         durationMs,
 
-        errorCode: unsafeDestination
-          ? 'UNSAFE_DESTINATION'
-          : error instanceof Error
-            ? error.name
-            : 'UNKNOWN_ERROR',
+        errorCode: unsafeDestination ? 'UNSAFE_DESTINATION' : error instanceof Error ? error.name : 'UNKNOWN_ERROR',
 
         errorMessage: message,
       };
@@ -203,9 +192,7 @@ export class WebhookOutboundClientService {
 
     if (addressFamily) {
       if (!isPublicAddress(hostname)) {
-        throw new BadRequestException(
-          'Private, loopback, link-local, multicast and reserved IP addresses are blocked.',
-        );
+        throw new BadRequestException('Private, loopback, link-local, multicast and reserved IP addresses are blocked.');
       }
 
       return [
@@ -242,9 +229,7 @@ export class WebhookOutboundClientService {
     const unsafe = addresses.find((address) => !isPublicAddress(address.address));
 
     if (unsafe) {
-      throw new BadRequestException(
-        `Webhook destination resolved to a blocked address: ${unsafe.address}`,
-      );
+      throw new BadRequestException(`Webhook destination resolved to a blocked address: ${unsafe.address}`);
     }
 
     return addresses;

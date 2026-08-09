@@ -45,10 +45,7 @@ describe('Development Progress E2E', () => {
     await app.close();
   });
 
-  async function readProgress(
-    owner: Awaited<ReturnType<typeof registerWorkspaceTestUser>>,
-    applicationId: string,
-  ): Promise<number> {
+  async function readProgress(owner: Awaited<ReturnType<typeof registerWorkspaceTestUser>>, applicationId: string): Promise<number> {
     const response = await getDevelopmentSummary(owner, applicationId);
 
     expect(response.status).toBe(200);
@@ -211,9 +208,7 @@ describe('Development Progress E2E', () => {
 
     expectDevelopmentSuccess(await completeTask(owner, application.id, firstTask.id));
 
-    let milestones = readDevelopmentItems(await listMilestones(owner, application.id), [
-      'milestones',
-    ]);
+    let milestones = readDevelopmentItems(await listMilestones(owner, application.id), ['milestones']);
 
     let stored = findRecordById(milestones, milestone.id);
 

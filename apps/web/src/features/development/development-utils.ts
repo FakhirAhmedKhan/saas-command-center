@@ -38,10 +38,7 @@ export function toApiDate(value: string): string | null {
   return new Date(`${value}T00:00:00.000Z`).toISOString();
 }
 
-export function getDevelopmentError(
-  error: unknown,
-  fallback = 'Unable to complete this action',
-): string {
+export function getDevelopmentError(error: unknown, fallback = 'Unable to complete this action'): string {
   if (error instanceof Error) {
     return error.message;
   }

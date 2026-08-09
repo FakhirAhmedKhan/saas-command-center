@@ -94,10 +94,7 @@ describe('Analytics Time Zones E2E', () => {
   });
 
   it('creates a 23-hour daily bucket across DST spring-forward', async () => {
-    const { website } = await processOneEvent(
-      'America/New_York',
-      new Date('2026-03-08T12:00:00.000Z'),
-    );
+    const { website } = await processOneEvent('America/New_York', new Date('2026-03-08T12:00:00.000Z'));
 
     const aggregate = await prisma.analyticsDailyAggregate.findFirstOrThrow({
       where: {
@@ -110,16 +107,11 @@ describe('Analytics Time Zones E2E', () => {
 
     expect(aggregate.bucketEnd.toISOString()).toBe('2026-03-09T04:00:00.000Z');
 
-    expect(aggregate.bucketEnd.getTime() - aggregate.bucketStart.getTime()).toBe(
-      23 * 60 * 60 * 1000,
-    );
+    expect(aggregate.bucketEnd.getTime() - aggregate.bucketStart.getTime()).toBe(23 * 60 * 60 * 1000);
   });
 
   it('creates a 25-hour daily bucket across DST fall-back', async () => {
-    const { website } = await processOneEvent(
-      'America/New_York',
-      new Date('2026-11-01T12:00:00.000Z'),
-    );
+    const { website } = await processOneEvent('America/New_York', new Date('2026-11-01T12:00:00.000Z'));
 
     const aggregate = await prisma.analyticsDailyAggregate.findFirstOrThrow({
       where: {
@@ -132,9 +124,7 @@ describe('Analytics Time Zones E2E', () => {
 
     expect(aggregate.bucketEnd.toISOString()).toBe('2026-11-02T05:00:00.000Z');
 
-    expect(aggregate.bucketEnd.getTime() - aggregate.bucketStart.getTime()).toBe(
-      25 * 60 * 60 * 1000,
-    );
+    expect(aggregate.bucketEnd.getTime() - aggregate.bucketStart.getTime()).toBe(25 * 60 * 60 * 1000);
   });
 
   it('splits events across Asia/Dubai local midnight', async () => {
@@ -177,9 +167,6 @@ describe('Analytics Time Zones E2E', () => {
 
     expect(overview).toHaveLength(2);
 
-    expect(overview.map((item) => item.bucketStart.toISOString())).toEqual([
-      '2026-08-05T20:00:00.000Z',
-      '2026-08-06T20:00:00.000Z',
-    ]);
+    expect(overview.map((item) => item.bucketStart.toISOString())).toEqual(['2026-08-05T20:00:00.000Z', '2026-08-06T20:00:00.000Z']);
   });
 });

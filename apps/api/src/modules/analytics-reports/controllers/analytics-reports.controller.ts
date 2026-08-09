@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Param,
-  ParseEnumPipe,
-  ParseUUIDPipe,
-  Query,
-  Res,
-  StreamableFile,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Param, ParseEnumPipe, ParseUUIDPipe, Query, Res, StreamableFile, UseGuards } from '@nestjs/common';
 
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiProduces, ApiTags } from '@nestjs/swagger';
 
@@ -18,18 +8,9 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
 import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
 
-import {
-  AnalyticsReportDimension,
-  DimensionReportQueryDto,
-  EventReportQueryDto,
-  PageReportQueryDto,
-} from '../dto/analytics-report-query.dto';
+import { AnalyticsReportDimension, DimensionReportQueryDto, EventReportQueryDto, PageReportQueryDto } from '../dto/analytics-report-query.dto';
 
-import {
-  DimensionReportResponseDto,
-  EventReportResponseDto,
-  PageReportResponseDto,
-} from '../dto/analytics-report-response.dto';
+import { DimensionReportResponseDto, EventReportResponseDto, PageReportResponseDto } from '../dto/analytics-report-response.dto';
 
 import { AnalyticsReportsService } from '../services/analytics-reports.service';
 
@@ -100,12 +81,7 @@ export class AnalyticsReportsController {
     @Query()
     query: DimensionReportQueryDto,
   ): Promise<DimensionReportResponseDto> {
-    return this.analyticsReportsService.getDimensionReport(
-      workspaceId,
-      websiteId,
-      dimension,
-      query,
-    );
+    return this.analyticsReportsService.getDimensionReport(workspaceId, websiteId, dimension, query);
   }
 
   @Get('exports/pages')
@@ -128,11 +104,7 @@ export class AnalyticsReportsController {
     })
     response: Response,
   ): Promise<StreamableFile> {
-    const exportResult = await this.analyticsReportsService.exportPages(
-      workspaceId,
-      websiteId,
-      query,
-    );
+    const exportResult = await this.analyticsReportsService.exportPages(workspaceId, websiteId, query);
 
     return this.createCsvResponse(response, exportResult.filename, exportResult.content);
   }
@@ -157,11 +129,7 @@ export class AnalyticsReportsController {
     })
     response: Response,
   ): Promise<StreamableFile> {
-    const exportResult = await this.analyticsReportsService.exportEvents(
-      workspaceId,
-      websiteId,
-      query,
-    );
+    const exportResult = await this.analyticsReportsService.exportEvents(workspaceId, websiteId, query);
 
     return this.createCsvResponse(response, exportResult.filename, exportResult.content);
   }
@@ -189,12 +157,7 @@ export class AnalyticsReportsController {
     })
     response: Response,
   ): Promise<StreamableFile> {
-    const exportResult = await this.analyticsReportsService.exportDimension(
-      workspaceId,
-      websiteId,
-      dimension,
-      query,
-    );
+    const exportResult = await this.analyticsReportsService.exportDimension(workspaceId, websiteId, dimension, query);
 
     return this.createCsvResponse(response, exportResult.filename, exportResult.content);
   }

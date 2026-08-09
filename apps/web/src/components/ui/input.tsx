@@ -8,10 +8,7 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   leadingIcon?: ReactNode;
 }
 
-export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
-  { className, label, error, hint, leadingIcon, id, ...props },
-  ref,
-) {
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ className, label, error, hint, leadingIcon, id, ...props }, ref) {
   const inputId = id ?? props.name ?? undefined;
 
   return (
@@ -23,11 +20,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       ) : null}
 
       <div className="relative">
-        {leadingIcon ? (
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-            {leadingIcon}
-          </div>
-        ) : null}
+        {leadingIcon ? <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">{leadingIcon}</div> : null}
 
         <input
           ref={ref}
@@ -38,9 +31,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
             'focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10',
             'disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500',
             leadingIcon && 'pl-10',
-            error
-              ? 'border-red-400 focus:border-red-500 focus:ring-red-500/10'
-              : 'border-slate-300',
+            error ? 'border-red-400 focus:border-red-500 focus:ring-red-500/10' : 'border-slate-300',
             className,
           )}
           aria-invalid={Boolean(error)}
@@ -48,11 +39,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         />
       </div>
 
-      {error ? (
-        <p className="text-sm text-red-600">{error}</p>
-      ) : hint ? (
-        <p className="text-sm text-slate-500">{hint}</p>
-      ) : null}
+      {error ? <p className="text-sm text-red-600">{error}</p> : hint ? <p className="text-sm text-slate-500">{hint}</p> : null}
     </div>
   );
 });

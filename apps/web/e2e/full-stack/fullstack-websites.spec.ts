@@ -101,8 +101,6 @@ test.describe('Batch 11 real website flows', () => {
       })
       .click();
 
-    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toContainText(
-      /domain|already|use/i,
-    );
+    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toContainText(/domain|already|use/i);
   });
 });

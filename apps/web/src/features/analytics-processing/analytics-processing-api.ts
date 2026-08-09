@@ -1,9 +1,5 @@
 import { apiRequest } from '../auth/auth.types';
-import type {
-  AnalyticsProcessingStatus,
-  ProcessingRun,
-  ReprocessAnalyticsInput,
-} from './analytics-processing.types';
+import type { AnalyticsProcessingStatus, ProcessingRun, ReprocessAnalyticsInput } from './analytics-processing.types';
 
 function createBasePath(
   workspaceId: string,
@@ -48,10 +44,7 @@ export function retryAnalyticsProcessingRun(
 
   runId: string,
 ): Promise<ProcessingRun> {
-  return apiRequest<ProcessingRun>(
-    `${createBasePath(workspaceId, websiteId)}/runs/${runId}/retry`,
-    {
-      method: 'POST',
-    },
-  );
+  return apiRequest<ProcessingRun>(`${createBasePath(workspaceId, websiteId)}/runs/${runId}/retry`, {
+    method: 'POST',
+  });
 }

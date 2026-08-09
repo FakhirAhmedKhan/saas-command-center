@@ -71,18 +71,12 @@ export function DevelopmentTimeline({ milestones }: DevelopmentTimelineProps) {
 
                 <div className="text-right">
                   {'TODO' in TASK_STATUS_LABELS && item.type === 'Task' ? (
-                    <Badge
-                      variant={
-                        TASK_STATUS_VARIANTS[item.status as keyof typeof TASK_STATUS_VARIANTS]
-                      }
-                    >
+                    <Badge variant={TASK_STATUS_VARIANTS[item.status as keyof typeof TASK_STATUS_VARIANTS]}>
                       {TASK_STATUS_LABELS[item.status as keyof typeof TASK_STATUS_LABELS]}
                     </Badge>
                   ) : null}
 
-                  <p className="mt-2 text-sm font-medium text-slate-700">
-                    {formatDevelopmentDate(item.date)}
-                  </p>
+                  <p className="mt-2 text-sm font-medium text-slate-700">{formatDevelopmentDate(item.date)}</p>
                 </div>
               </article>
             ))}

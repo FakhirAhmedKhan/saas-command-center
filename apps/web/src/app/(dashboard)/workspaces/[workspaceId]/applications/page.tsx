@@ -16,16 +16,9 @@ import { getApplications } from '@/features/applications/application-api';
 
 import { ApplicationCard } from '@/features/applications/components/application-card';
 
-import {
-  ApplicationFilters,
-  type ApplicationFilterValue,
-} from '@/features/applications/components/application-filters';
+import { ApplicationFilters, type ApplicationFilterValue } from '@/features/applications/components/application-filters';
 
-import type {
-  ApplicationListQuery,
-  ApplicationPagination,
-  SaasApplication,
-} from '@/features/applications/application-types';
+import type { ApplicationListQuery, ApplicationPagination, SaasApplication } from '@/features/applications/application-types';
 
 import { getErrorMessage } from '@/features/applications/application-utils';
 
@@ -171,12 +164,7 @@ export default function ApplicationsPage() {
         </div>
       </header>
 
-      <ApplicationFilters
-        value={filterDraft}
-        onChange={setFilterDraft}
-        onApply={applyFilters}
-        onReset={resetFilters}
-      />
+      <ApplicationFilters value={filterDraft} onChange={setFilterDraft} onApply={applyFilters} onReset={resetFilters} />
 
       {loading ? (
         <div className="flex min-h-80 items-center justify-center">
@@ -192,9 +180,7 @@ export default function ApplicationsPage() {
               <Boxes className="size-6" />
             </div>
 
-            <h2 className="mt-5 text-lg font-semibold text-slate-900">
-              Unable to load applications
-            </h2>
+            <h2 className="mt-5 text-lg font-semibold text-slate-900">Unable to load applications</h2>
 
             <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">{error}</p>
 
@@ -207,11 +193,7 @@ export default function ApplicationsPage() {
         <EmptyState
           icon={<Boxes className="size-6" />}
           title={query.archived ? 'No archived applications' : 'No applications yet'}
-          description={
-            query.archived
-              ? 'Archived applications will appear here.'
-              : 'Create your first SaaS application and start tracking its progress.'
-          }
+          description={query.archived ? 'Archived applications will appear here.' : 'Create your first SaaS application and start tracking its progress.'}
           action={
             !query.archived ? (
               <Link
@@ -228,18 +210,14 @@ export default function ApplicationsPage() {
         <>
           <div className="flex items-center justify-between">
             <p className="text-sm text-slate-500">
-              Showing <strong className="text-slate-800">{applications.length}</strong> of{' '}
-              <strong className="text-slate-800">{pagination.total}</strong> applications
+              Showing <strong className="text-slate-800">{applications.length}</strong> of <strong className="text-slate-800">{pagination.total}</strong>{' '}
+              applications
             </p>
           </div>
 
           <div className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
             {applications.map((application) => (
-              <ApplicationCard
-                key={application.id}
-                workspaceId={workspaceId}
-                application={application}
-              />
+              <ApplicationCard key={application.id} workspaceId={workspaceId} application={application} />
             ))}
           </div>
 
@@ -250,20 +228,12 @@ export default function ApplicationsPage() {
               </p>
 
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  disabled={!pagination.hasPreviousPage}
-                  onClick={() => changePage(pagination.page - 1)}
-                >
+                <Button variant="outline" disabled={!pagination.hasPreviousPage} onClick={() => changePage(pagination.page - 1)}>
                   <ChevronLeft className="size-4" />
                   Previous
                 </Button>
 
-                <Button
-                  variant="outline"
-                  disabled={!pagination.hasNextPage}
-                  onClick={() => changePage(pagination.page + 1)}
-                >
+                <Button variant="outline" disabled={!pagination.hasNextPage} onClick={() => changePage(pagination.page + 1)}>
                   Next
                   <ChevronRight className="size-4" />
                 </Button>

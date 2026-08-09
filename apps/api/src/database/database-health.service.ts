@@ -23,10 +23,7 @@ export class DatabaseHealthService {
         responseTimeMs: this.calculateDuration(startedAt),
       };
     } catch (error: unknown) {
-      this.logger.error(
-        'Database health check failed',
-        error instanceof Error ? error.stack : undefined,
-      );
+      this.logger.error('Database health check failed', error instanceof Error ? error.stack : undefined);
 
       return {
         status: 'down',

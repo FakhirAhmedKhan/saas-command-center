@@ -6,13 +6,7 @@ import { PrismaService } from 'src/database/prisma.service';
 
 import { AnalyticsProcessingService } from 'src/modules/analytics-engine/services/analytics-processing.service';
 
-import {
-  buildTrackerEvent,
-  collectEvents,
-  createTrackedWebsite,
-  expectCollectionAccepted,
-  uniqueTrackerId,
-} from './helpers/analytics-ingestion';
+import { buildTrackerEvent, collectEvents, createTrackedWebsite, expectCollectionAccepted, uniqueTrackerId } from './helpers/analytics-ingestion';
 
 import { createTestApp } from './helpers/create-test-app';
 
@@ -62,12 +56,7 @@ describe('Analytics Visitors E2E', () => {
       2,
     );
 
-    await processingService.processForWorkspace(
-      owner.workspaceId,
-      trackedWebsite.id,
-      owner.userId,
-      100,
-    );
+    await processingService.processForWorkspace(owner.workspaceId, trackedWebsite.id, owner.userId, 100);
 
     const visitors = await prisma.analyticsVisitor.findMany({
       where: {
@@ -120,9 +109,7 @@ describe('Analytics Visitors E2E', () => {
 
     expect(visitors).toHaveLength(2);
 
-    expect(new Set(visitors.map((visitor) => visitor.websiteId))).toEqual(
-      new Set([websiteA.id, websiteB.id]),
-    );
+    expect(new Set(visitors.map((visitor) => visitor.websiteId))).toEqual(new Set([websiteA.id, websiteB.id]));
   });
 
   it('rebuilds firstSeenAt and lastSeenAt from out-of-order events', async () => {
@@ -157,12 +144,7 @@ describe('Analytics Visitors E2E', () => {
       2,
     );
 
-    await processingService.processForWorkspace(
-      owner.workspaceId,
-      trackedWebsite.id,
-      owner.userId,
-      100,
-    );
+    await processingService.processForWorkspace(owner.workspaceId, trackedWebsite.id, owner.userId, 100);
 
     const visitor = await prisma.analyticsVisitor.findFirstOrThrow({
       where: {
@@ -201,19 +183,9 @@ describe('Analytics Visitors E2E', () => {
       2,
     );
 
-    await processingService.processForWorkspace(
-      owner.workspaceId,
-      trackedWebsite.id,
-      owner.userId,
-      100,
-    );
+    await processingService.processForWorkspace(owner.workspaceId, trackedWebsite.id, owner.userId, 100);
 
-    await processingService.processForWorkspace(
-      owner.workspaceId,
-      trackedWebsite.id,
-      owner.userId,
-      100,
-    );
+    await processingService.processForWorkspace(owner.workspaceId, trackedWebsite.id, owner.userId, 100);
 
     const visitor = await prisma.analyticsVisitor.findFirstOrThrow({
       where: {

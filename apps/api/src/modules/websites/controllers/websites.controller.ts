@@ -1,15 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  Query,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -25,12 +14,7 @@ import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.gu
 
 import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
 
-import {
-  ConnectWebsiteDto,
-  CreateWebsiteDto,
-  UpdateWebsiteDto,
-  WebsiteListQueryDto,
-} from '../dto/website.dto';
+import { ConnectWebsiteDto, CreateWebsiteDto, UpdateWebsiteDto, WebsiteListQueryDto } from '../dto/website.dto';
 
 import { WebsitesService } from '../services/websites.service';
 

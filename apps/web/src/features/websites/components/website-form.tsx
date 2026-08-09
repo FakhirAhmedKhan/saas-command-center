@@ -51,27 +51,16 @@ const COMMON_TIME_ZONES = [
   'Australia/Sydney',
 ];
 
-export function WebsiteForm({
-  website,
-  applications,
-  initialApplicationId = '',
-  cancelHref,
-  submitLabel,
-  onSubmit,
-}: WebsiteFormProps) {
+export function WebsiteForm({ website, applications, initialApplicationId = '', cancelHref, submitLabel, onSubmit }: WebsiteFormProps) {
   const [name, setName] = useState(website?.name ?? '');
 
   const [domain, setDomain] = useState(website?.domain ?? '');
 
   const [timeZone, setTimeZone] = useState(website?.timeZone ?? 'UTC');
 
-  const [applicationId, setApplicationId] = useState(
-    website?.applicationId ?? initialApplicationId,
-  );
+  const [applicationId, setApplicationId] = useState(website?.applicationId ?? initialApplicationId);
 
-  const [originsText, setOriginsText] = useState(
-    website ? originsToText(website.allowedOrigins) : '',
-  );
+  const [originsText, setOriginsText] = useState(website ? originsToText(website.allowedOrigins) : '');
 
   const [enabled, setEnabled] = useState(website?.enabled ?? true);
 
@@ -125,20 +114,14 @@ export function WebsiteForm({
             <div>
               <h2 className="text-lg font-semibold text-slate-950">Website configuration</h2>
 
-              <p className="mt-1 text-sm leading-6 text-slate-500">
-                Configure the website identity, time zone and origins permitted to send analytics
-                events.
-              </p>
+              <p className="mt-1 text-sm leading-6 text-slate-500">Configure the website identity, time zone and origins permitted to send analytics events.</p>
             </div>
           </div>
         </CardHeader>
 
         <CardContent className="space-y-6">
           {error ? (
-            <div
-              role="alert"
-              className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-            >
+            <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {error}
             </div>
           ) : null}
@@ -215,20 +198,13 @@ export function WebsiteForm({
           />
 
           <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <input
-              type="checkbox"
-              checked={enabled}
-              disabled={submitting}
-              className="mt-1 size-4"
-              onChange={(event) => setEnabled(event.target.checked)}
-            />
+            <input type="checkbox" checked={enabled} disabled={submitting} className="mt-1 size-4" onChange={(event) => setEnabled(event.target.checked)} />
 
             <span>
               <span className="block text-sm font-semibold text-slate-900">Enable tracking</span>
 
               <span className="mt-1 block text-sm leading-6 text-slate-500">
-                Enabled websites will accept tracking events after the Phase 9 ingestion API is
-                installed.
+                Enabled websites will accept tracking events after the Phase 9 ingestion API is installed.
               </span>
             </span>
           </label>

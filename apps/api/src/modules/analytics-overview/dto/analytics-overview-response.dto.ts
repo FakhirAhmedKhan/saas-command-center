@@ -65,8 +65,7 @@ export class AnalyticsMetricDto {
 
   @ApiProperty({
     nullable: true,
-    description:
-      'Null means the previous period was zero and no meaningful percentage can be calculated.',
+    description: 'Null means the previous period was zero and no meaningful percentage can be calculated.',
   })
   changePercent!: number | null;
 }

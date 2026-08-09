@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from 'src/database/prisma.service';
 
@@ -92,10 +87,7 @@ export class DevelopmentService {
       label: template.label,
       description: template.description,
       milestoneCount: template.milestones.length,
-      taskCount: template.milestones.reduce(
-        (total, milestone) => total + milestone.tasks.length,
-        0,
-      ),
+      taskCount: template.milestones.reduce((total, milestone) => total + milestone.tasks.length, 0),
     }));
   }
 
@@ -117,12 +109,7 @@ export class DevelopmentService {
     });
   }
 
-  async applyTemplate(
-    workspaceId: string,
-    applicationId: string,
-    dto: ApplyDevelopmentTemplateDto,
-    actorUserId: string,
-  ) {
+  async applyTemplate(workspaceId: string, applicationId: string, dto: ApplyDevelopmentTemplateDto, actorUserId: string) {
     const template = DEVELOPMENT_TEMPLATES[dto.template];
 
     if (!template) {
@@ -141,9 +128,7 @@ export class DevelopmentService {
       });
 
       if (existingMilestones > 0 && !dto.replaceExisting) {
-        throw new ConflictException(
-          'This application already has milestones. Set replaceExisting to true to replace them.',
-        );
+        throw new ConflictException('This application already has milestones. Set replaceExisting to true to replace them.');
       }
 
       if (existingMilestones > 0 && dto.replaceExisting) {
@@ -160,11 +145,7 @@ export class DevelopmentService {
         });
       }
 
-      for (
-        let milestoneIndex = 0;
-        milestoneIndex < template.milestones.length;
-        milestoneIndex += 1
-      ) {
+      for (let milestoneIndex = 0; milestoneIndex < template.milestones.length; milestoneIndex += 1) {
         const definition = template.milestones[milestoneIndex];
 
         const milestone = await transaction.applicationMilestone.create({
@@ -201,11 +182,7 @@ export class DevelopmentService {
         },
       });
 
-      await this.progressCalculator.recalculateWithTransaction(
-        transaction,
-        workspaceId,
-        applicationId,
-      );
+      await this.progressCalculator.recalculateWithTransaction(transaction, workspaceId, applicationId);
 
       await this.writeActivity(transaction, application, actorUserId, {
         activityType: ApplicationActivityType.DEVELOPMENT_TEMPLATE_APPLIED,
@@ -224,12 +201,7 @@ export class DevelopmentService {
     });
   }
 
-  async createMilestone(
-    workspaceId: string,
-    applicationId: string,
-    dto: CreateMilestoneDto,
-    actorUserId: string,
-  ) {
+  async createMilestone(workspaceId: string, applicationId: string, dto: CreateMilestoneDto, actorUserId: string) {
     return this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -256,11 +228,7 @@ export class DevelopmentService {
         include: milestoneInclude,
       });
 
-      await this.progressCalculator.recalculateWithTransaction(
-        transaction,
-        workspaceId,
-        applicationId,
-      );
+      await this.progressCalculator.recalculateWithTransaction(transaction, workspaceId, applicationId);
 
       await this.writeActivity(transaction, application, actorUserId, {
         activityType: ApplicationActivityType.MILESTONE_CREATED,
@@ -283,13 +251,7 @@ export class DevelopmentService {
     });
   }
 
-  async updateMilestone(
-    workspaceId: string,
-    applicationId: string,
-    milestoneId: string,
-    dto: UpdateMilestoneDto,
-    actorUserId: string,
-  ) {
+  async updateMilestone(workspaceId: string, applicationId: string, milestoneId: string, dto: UpdateMilestoneDto, actorUserId: string) {
     return this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -301,8 +263,7 @@ export class DevelopmentService {
         throw new ConflictException('Reopen the milestone before editing it');
       }
 
-      const startsAt =
-        dto.startsAt !== undefined ? this.toNullableDate(dto.startsAt) : milestone.startsAt;
+      const startsAt = dto.startsAt !== undefined ? this.toNullableDate(dto.startsAt) : milestone.startsAt;
 
       const dueAt = dto.dueAt !== undefined ? this.toNullableDate(dto.dueAt) : milestone.dueAt;
 
@@ -342,11 +303,7 @@ export class DevelopmentService {
         include: milestoneInclude,
       });
 
-      await this.progressCalculator.recalculateWithTransaction(
-        transaction,
-        workspaceId,
-        applicationId,
-      );
+      await this.progressCalculator.recalculateWithTransaction(transaction, workspaceId, applicationId);
 
       await this.writeActivity(transaction, application, actorUserId, {
         activityType: ApplicationActivityType.MILESTONE_UPDATED,
@@ -374,12 +331,7 @@ export class DevelopmentService {
     });
   }
 
-  async completeMilestone(
-    workspaceId: string,
-    applicationId: string,
-    milestoneId: string,
-    actorUserId: string,
-  ) {
+  async completeMilestone(workspaceId: string, applicationId: string, milestoneId: string, actorUserId: string) {
     return this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -437,11 +389,7 @@ export class DevelopmentService {
         },
       });
 
-      await this.progressCalculator.recalculateWithTransaction(
-        transaction,
-        workspaceId,
-        applicationId,
-      );
+      await this.progressCalculator.recalculateWithTransaction(transaction, workspaceId, applicationId);
 
       await this.writeActivity(transaction, application, actorUserId, {
         activityType: ApplicationActivityType.MILESTONE_COMPLETED,
@@ -460,12 +408,7 @@ export class DevelopmentService {
     });
   }
 
-  async reopenMilestone(
-    workspaceId: string,
-    applicationId: string,
-    milestoneId: string,
-    actorUserId: string,
-  ) {
+  async reopenMilestone(workspaceId: string, applicationId: string, milestoneId: string, actorUserId: string) {
     return this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -496,11 +439,7 @@ export class DevelopmentService {
         },
       });
 
-      await this.progressCalculator.recalculateWithTransaction(
-        transaction,
-        workspaceId,
-        applicationId,
-      );
+      await this.progressCalculator.recalculateWithTransaction(transaction, workspaceId, applicationId);
 
       await this.writeActivity(transaction, application, actorUserId, {
         activityType: ApplicationActivityType.MILESTONE_REOPENED,
@@ -519,13 +458,7 @@ export class DevelopmentService {
     });
   }
 
-  async skipMilestone(
-    workspaceId: string,
-    applicationId: string,
-    milestoneId: string,
-    dto: SkipWorkItemDto,
-    actorUserId: string,
-  ) {
+  async skipMilestone(workspaceId: string, applicationId: string, milestoneId: string, dto: SkipWorkItemDto, actorUserId: string) {
     return this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -546,11 +479,7 @@ export class DevelopmentService {
         },
       });
 
-      await this.progressCalculator.recalculateWithTransaction(
-        transaction,
-        workspaceId,
-        applicationId,
-      );
+      await this.progressCalculator.recalculateWithTransaction(transaction, workspaceId, applicationId);
 
       await this.writeActivity(transaction, application, actorUserId, {
         activityType: ApplicationActivityType.MILESTONE_SKIPPED,
@@ -572,12 +501,7 @@ export class DevelopmentService {
     });
   }
 
-  async deleteMilestone(
-    workspaceId: string,
-    applicationId: string,
-    milestoneId: string,
-    actorUserId: string,
-  ): Promise<void> {
+  async deleteMilestone(workspaceId: string, applicationId: string, milestoneId: string, actorUserId: string): Promise<void> {
     await this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -608,11 +532,7 @@ export class DevelopmentService {
 
       await this.normalizeMilestonePositions(transaction, applicationId);
 
-      await this.progressCalculator.recalculateWithTransaction(
-        transaction,
-        workspaceId,
-        applicationId,
-      );
+      await this.progressCalculator.recalculateWithTransaction(transaction, workspaceId, applicationId);
 
       await this.writeActivity(transaction, application, actorUserId, {
         activityType: ApplicationActivityType.MILESTONE_DELETED,
@@ -624,12 +544,7 @@ export class DevelopmentService {
     });
   }
 
-  async reorderMilestones(
-    workspaceId: string,
-    applicationId: string,
-    dto: ReorderItemsDto,
-    actorUserId: string,
-  ) {
+  async reorderMilestones(workspaceId: string, applicationId: string, dto: ReorderItemsDto, actorUserId: string) {
     return this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -684,13 +599,7 @@ export class DevelopmentService {
     });
   }
 
-  async createTask(
-    workspaceId: string,
-    applicationId: string,
-    milestoneId: string,
-    dto: CreateTaskDto,
-    actorUserId: string,
-  ) {
+  async createTask(workspaceId: string, applicationId: string, milestoneId: string, dto: CreateTaskDto, actorUserId: string) {
     return this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -731,11 +640,7 @@ export class DevelopmentService {
         },
       });
 
-      await this.progressCalculator.recalculateWithTransaction(
-        transaction,
-        workspaceId,
-        applicationId,
-      );
+      await this.progressCalculator.recalculateWithTransaction(transaction, workspaceId, applicationId);
 
       await this.writeActivity(transaction, application, actorUserId, {
         activityType: ApplicationActivityType.TASK_CREATED,
@@ -754,13 +659,7 @@ export class DevelopmentService {
     });
   }
 
-  async updateTask(
-    workspaceId: string,
-    applicationId: string,
-    taskId: string,
-    dto: UpdateTaskDto,
-    actorUserId: string,
-  ) {
+  async updateTask(workspaceId: string, applicationId: string, taskId: string, dto: UpdateTaskDto, actorUserId: string) {
     return this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -824,11 +723,7 @@ export class DevelopmentService {
         },
       });
 
-      await this.progressCalculator.recalculateWithTransaction(
-        transaction,
-        workspaceId,
-        applicationId,
-      );
+      await this.progressCalculator.recalculateWithTransaction(transaction, workspaceId, applicationId);
 
       await this.writeActivity(transaction, application, actorUserId, {
         activityType: ApplicationActivityType.TASK_UPDATED,
@@ -858,13 +753,7 @@ export class DevelopmentService {
     });
   }
 
-  async setTaskStatus(
-    workspaceId: string,
-    applicationId: string,
-    taskId: string,
-    dto: ChangeTaskStatusDto,
-    actorUserId: string,
-  ) {
+  async setTaskStatus(workspaceId: string, applicationId: string, taskId: string, dto: ChangeTaskStatusDto, actorUserId: string) {
     return this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -886,11 +775,7 @@ export class DevelopmentService {
         },
       });
 
-      await this.progressCalculator.recalculateWithTransaction(
-        transaction,
-        workspaceId,
-        applicationId,
-      );
+      await this.progressCalculator.recalculateWithTransaction(transaction, workspaceId, applicationId);
 
       await this.writeActivity(transaction, application, actorUserId, {
         activityType: ApplicationActivityType.TASK_STATUS_CHANGED,
@@ -908,12 +793,7 @@ export class DevelopmentService {
     });
   }
 
-  async completeTask(
-    workspaceId: string,
-    applicationId: string,
-    taskId: string,
-    actorUserId: string,
-  ) {
+  async completeTask(workspaceId: string, applicationId: string, taskId: string, actorUserId: string) {
     return this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -944,11 +824,7 @@ export class DevelopmentService {
         },
       });
 
-      await this.progressCalculator.recalculateWithTransaction(
-        transaction,
-        workspaceId,
-        applicationId,
-      );
+      await this.progressCalculator.recalculateWithTransaction(transaction, workspaceId, applicationId);
 
       await this.writeActivity(transaction, application, actorUserId, {
         activityType: ApplicationActivityType.TASK_COMPLETED,
@@ -962,12 +838,7 @@ export class DevelopmentService {
     });
   }
 
-  async reopenTask(
-    workspaceId: string,
-    applicationId: string,
-    taskId: string,
-    actorUserId: string,
-  ) {
+  async reopenTask(workspaceId: string, applicationId: string, taskId: string, actorUserId: string) {
     return this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -987,11 +858,7 @@ export class DevelopmentService {
         },
       });
 
-      await this.progressCalculator.recalculateWithTransaction(
-        transaction,
-        workspaceId,
-        applicationId,
-      );
+      await this.progressCalculator.recalculateWithTransaction(transaction, workspaceId, applicationId);
 
       await this.writeActivity(transaction, application, actorUserId, {
         activityType: ApplicationActivityType.TASK_REOPENED,
@@ -1005,13 +872,7 @@ export class DevelopmentService {
     });
   }
 
-  async skipTask(
-    workspaceId: string,
-    applicationId: string,
-    taskId: string,
-    dto: SkipWorkItemDto,
-    actorUserId: string,
-  ) {
+  async skipTask(workspaceId: string, applicationId: string, taskId: string, dto: SkipWorkItemDto, actorUserId: string) {
     return this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -1031,11 +892,7 @@ export class DevelopmentService {
         },
       });
 
-      await this.progressCalculator.recalculateWithTransaction(
-        transaction,
-        workspaceId,
-        applicationId,
-      );
+      await this.progressCalculator.recalculateWithTransaction(transaction, workspaceId, applicationId);
 
       await this.writeActivity(transaction, application, actorUserId, {
         activityType: ApplicationActivityType.TASK_SKIPPED,
@@ -1052,13 +909,7 @@ export class DevelopmentService {
     });
   }
 
-  async moveTask(
-    workspaceId: string,
-    applicationId: string,
-    taskId: string,
-    dto: MoveTaskDto,
-    actorUserId: string,
-  ) {
+  async moveTask(workspaceId: string, applicationId: string, taskId: string, dto: MoveTaskDto, actorUserId: string) {
     return this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -1066,18 +917,13 @@ export class DevelopmentService {
 
       const task = await this.requireTask(transaction, applicationId, taskId);
 
-      const targetMilestone = await this.requireMilestone(
-        transaction,
-        applicationId,
-        dto.targetMilestoneId,
-      );
+      const targetMilestone = await this.requireMilestone(transaction, applicationId, dto.targetMilestoneId);
 
       if (targetMilestone.status === MilestoneStatus.SKIPPED) {
         throw new ConflictException('Tasks cannot be moved into a skipped milestone');
       }
 
-      const targetPosition =
-        dto.position ?? (await this.nextTaskPosition(transaction, dto.targetMilestoneId));
+      const targetPosition = dto.position ?? (await this.nextTaskPosition(transaction, dto.targetMilestoneId));
 
       const updated = await transaction.applicationTask.update({
         where: {
@@ -1093,11 +939,7 @@ export class DevelopmentService {
 
       await this.normalizeTaskPositions(transaction, dto.targetMilestoneId);
 
-      await this.progressCalculator.recalculateWithTransaction(
-        transaction,
-        workspaceId,
-        applicationId,
-      );
+      await this.progressCalculator.recalculateWithTransaction(transaction, workspaceId, applicationId);
 
       await this.writeActivity(transaction, application, actorUserId, {
         activityType: ApplicationActivityType.TASK_MOVED,
@@ -1115,13 +957,7 @@ export class DevelopmentService {
     });
   }
 
-  async reorderTasks(
-    workspaceId: string,
-    applicationId: string,
-    milestoneId: string,
-    dto: ReorderItemsDto,
-    actorUserId: string,
-  ) {
+  async reorderTasks(workspaceId: string, applicationId: string, milestoneId: string, dto: ReorderItemsDto, actorUserId: string) {
     return this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -1174,12 +1010,7 @@ export class DevelopmentService {
     });
   }
 
-  async deleteTask(
-    workspaceId: string,
-    applicationId: string,
-    taskId: string,
-    actorUserId: string,
-  ): Promise<void> {
+  async deleteTask(workspaceId: string, applicationId: string, taskId: string, actorUserId: string): Promise<void> {
     await this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -1201,11 +1032,7 @@ export class DevelopmentService {
 
       await this.normalizeTaskPositions(transaction, task.milestoneId);
 
-      await this.progressCalculator.recalculateWithTransaction(
-        transaction,
-        workspaceId,
-        applicationId,
-      );
+      await this.progressCalculator.recalculateWithTransaction(transaction, workspaceId, applicationId);
 
       await this.writeActivity(transaction, application, actorUserId, {
         activityType: ApplicationActivityType.TASK_DELETED,
@@ -1324,12 +1151,7 @@ export class DevelopmentService {
     };
   }
 
-  async createBlocker(
-    workspaceId: string,
-    applicationId: string,
-    dto: CreateBlockerDto,
-    actorUserId: string,
-  ) {
+  async createBlocker(workspaceId: string, applicationId: string, dto: CreateBlockerDto, actorUserId: string) {
     return this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -1345,17 +1167,12 @@ export class DevelopmentService {
         const task = await this.requireTask(transaction, applicationId, dto.taskId);
 
         if (milestoneId && milestoneId !== task.milestoneId) {
-          throw new BadRequestException(
-            'The selected task does not belong to the selected milestone',
-          );
+          throw new BadRequestException('The selected task does not belong to the selected milestone');
         }
 
         milestoneId = task.milestoneId;
 
-        if (
-          task.status !== ApplicationTaskStatus.COMPLETED &&
-          task.status !== ApplicationTaskStatus.SKIPPED
-        ) {
+        if (task.status !== ApplicationTaskStatus.COMPLETED && task.status !== ApplicationTaskStatus.SKIPPED) {
           await transaction.applicationTask.update({
             where: {
               id: task.id,
@@ -1384,11 +1201,7 @@ export class DevelopmentService {
         },
       });
 
-      await this.progressCalculator.recalculateWithTransaction(
-        transaction,
-        workspaceId,
-        applicationId,
-      );
+      await this.progressCalculator.recalculateWithTransaction(transaction, workspaceId, applicationId);
 
       await this.writeActivity(transaction, application, actorUserId, {
         activityType: ApplicationActivityType.BLOCKER_CREATED,
@@ -1407,13 +1220,7 @@ export class DevelopmentService {
     });
   }
 
-  async updateBlocker(
-    workspaceId: string,
-    applicationId: string,
-    blockerId: string,
-    dto: UpdateBlockerDto,
-    actorUserId: string,
-  ) {
+  async updateBlocker(workspaceId: string, applicationId: string, blockerId: string, dto: UpdateBlockerDto, actorUserId: string) {
     return this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -1460,13 +1267,7 @@ export class DevelopmentService {
     });
   }
 
-  async resolveBlocker(
-    workspaceId: string,
-    applicationId: string,
-    blockerId: string,
-    dto: ResolveBlockerDto,
-    actorUserId: string,
-  ) {
+  async resolveBlocker(workspaceId: string, applicationId: string, blockerId: string, dto: ResolveBlockerDto, actorUserId: string) {
     return this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -1490,11 +1291,7 @@ export class DevelopmentService {
         await this.releaseTaskWhenUnblocked(transaction, blocker.taskId);
       }
 
-      await this.progressCalculator.recalculateWithTransaction(
-        transaction,
-        workspaceId,
-        applicationId,
-      );
+      await this.progressCalculator.recalculateWithTransaction(transaction, workspaceId, applicationId);
 
       await this.writeActivity(transaction, application, actorUserId, {
         activityType: ApplicationActivityType.BLOCKER_RESOLVED,
@@ -1511,12 +1308,7 @@ export class DevelopmentService {
     });
   }
 
-  async reopenBlocker(
-    workspaceId: string,
-    applicationId: string,
-    blockerId: string,
-    actorUserId: string,
-  ) {
+  async reopenBlocker(workspaceId: string, applicationId: string, blockerId: string, actorUserId: string) {
     return this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -1543,11 +1335,7 @@ export class DevelopmentService {
           },
         });
 
-        if (
-          task &&
-          task.status !== ApplicationTaskStatus.COMPLETED &&
-          task.status !== ApplicationTaskStatus.SKIPPED
-        ) {
+        if (task && task.status !== ApplicationTaskStatus.COMPLETED && task.status !== ApplicationTaskStatus.SKIPPED) {
           await transaction.applicationTask.update({
             where: {
               id: task.id,
@@ -1559,11 +1347,7 @@ export class DevelopmentService {
         }
       }
 
-      await this.progressCalculator.recalculateWithTransaction(
-        transaction,
-        workspaceId,
-        applicationId,
-      );
+      await this.progressCalculator.recalculateWithTransaction(transaction, workspaceId, applicationId);
 
       await this.writeActivity(transaction, application, actorUserId, {
         activityType: ApplicationActivityType.BLOCKER_REOPENED,
@@ -1577,12 +1361,7 @@ export class DevelopmentService {
     });
   }
 
-  async deleteBlocker(
-    workspaceId: string,
-    applicationId: string,
-    blockerId: string,
-    actorUserId: string,
-  ): Promise<void> {
+  async deleteBlocker(workspaceId: string, applicationId: string, blockerId: string, actorUserId: string): Promise<void> {
     await this.prisma.$transaction(async (transaction) => {
       const application = await this.requireApplication(transaction, workspaceId, applicationId);
 
@@ -1600,11 +1379,7 @@ export class DevelopmentService {
         await this.releaseTaskWhenUnblocked(transaction, blocker.taskId);
       }
 
-      await this.progressCalculator.recalculateWithTransaction(
-        transaction,
-        workspaceId,
-        applicationId,
-      );
+      await this.progressCalculator.recalculateWithTransaction(transaction, workspaceId, applicationId);
 
       await this.writeActivity(transaction, application, actorUserId, {
         activityType: ApplicationActivityType.BLOCKER_DELETED,
@@ -1616,11 +1391,7 @@ export class DevelopmentService {
     });
   }
 
-  private async getSummaryWithClient(
-    client: PrismaService | Prisma.TransactionClient,
-    workspaceId: string,
-    applicationId: string,
-  ) {
+  private async getSummaryWithClient(client: PrismaService | Prisma.TransactionClient, workspaceId: string, applicationId: string) {
     const application = await this.requireApplication(client, workspaceId, applicationId);
 
     const milestones = await client.applicationMilestone.findMany({
@@ -1673,11 +1444,7 @@ export class DevelopmentService {
     );
 
     const overdueTasks = allTasks.filter(
-      (task) =>
-        task.dueAt &&
-        task.dueAt < now &&
-        task.status !== ApplicationTaskStatus.COMPLETED &&
-        task.status !== ApplicationTaskStatus.SKIPPED,
+      (task) => task.dueAt && task.dueAt < now && task.status !== ApplicationTaskStatus.COMPLETED && task.status !== ApplicationTaskStatus.SKIPPED,
     );
 
     const upcomingTasks = allTasks.filter(
@@ -1706,10 +1473,8 @@ export class DevelopmentService {
       counts: {
         milestones: milestones.length,
         tasks: allTasks.length,
-        completedTasks: allTasks.filter((task) => task.status === ApplicationTaskStatus.COMPLETED)
-          .length,
-        skippedTasks: allTasks.filter((task) => task.status === ApplicationTaskStatus.SKIPPED)
-          .length,
+        completedTasks: allTasks.filter((task) => task.status === ApplicationTaskStatus.COMPLETED).length,
+        skippedTasks: allTasks.filter((task) => task.status === ApplicationTaskStatus.SKIPPED).length,
         openBlockers: blockers.filter((blocker) => blocker.status === BlockerStatus.OPEN).length,
         overdueTasks: overdueTasks.length,
         upcomingTasks: upcomingTasks.length,
@@ -1721,11 +1486,7 @@ export class DevelopmentService {
     };
   }
 
-  private async requireApplication(
-    client: PrismaService | Prisma.TransactionClient,
-    workspaceId: string,
-    applicationId: string,
-  ) {
+  private async requireApplication(client: PrismaService | Prisma.TransactionClient, workspaceId: string, applicationId: string) {
     const application = await client.saasApplication.findFirst({
       where: {
         id: applicationId,
@@ -1746,11 +1507,7 @@ export class DevelopmentService {
     }
   }
 
-  private async requireMilestone(
-    client: PrismaService | Prisma.TransactionClient,
-    applicationId: string,
-    milestoneId: string,
-  ) {
+  private async requireMilestone(client: PrismaService | Prisma.TransactionClient, applicationId: string, milestoneId: string) {
     const milestone = await client.applicationMilestone.findFirst({
       where: {
         id: milestoneId,
@@ -1765,11 +1522,7 @@ export class DevelopmentService {
     return milestone;
   }
 
-  private async requireTask(
-    client: PrismaService | Prisma.TransactionClient,
-    applicationId: string,
-    taskId: string,
-  ) {
+  private async requireTask(client: PrismaService | Prisma.TransactionClient, applicationId: string, taskId: string) {
     const task = await client.applicationTask.findFirst({
       where: {
         id: taskId,
@@ -1786,11 +1539,7 @@ export class DevelopmentService {
     return task;
   }
 
-  private async requireBlocker(
-    client: PrismaService | Prisma.TransactionClient,
-    applicationId: string,
-    blockerId: string,
-  ) {
+  private async requireBlocker(client: PrismaService | Prisma.TransactionClient, applicationId: string, blockerId: string) {
     const blocker = await client.applicationBlocker.findFirst({
       where: {
         id: blockerId,
@@ -1805,11 +1554,7 @@ export class DevelopmentService {
     return blocker;
   }
 
-  private async requireWorkspaceMember(
-    transaction: Prisma.TransactionClient,
-    workspaceId: string,
-    userId: string,
-  ): Promise<void> {
+  private async requireWorkspaceMember(transaction: Prisma.TransactionClient, workspaceId: string, userId: string): Promise<void> {
     const member = await transaction.workspaceMember.findUnique({
       where: {
         workspaceId_userId: {
@@ -1827,10 +1572,7 @@ export class DevelopmentService {
     }
   }
 
-  private async nextMilestonePosition(
-    transaction: Prisma.TransactionClient,
-    applicationId: string,
-  ): Promise<number> {
+  private async nextMilestonePosition(transaction: Prisma.TransactionClient, applicationId: string): Promise<number> {
     const result = await transaction.applicationMilestone.aggregate({
       where: {
         applicationId,
@@ -1843,10 +1585,7 @@ export class DevelopmentService {
     return (result._max.position ?? -1) + 1;
   }
 
-  private async nextTaskPosition(
-    transaction: Prisma.TransactionClient,
-    milestoneId: string,
-  ): Promise<number> {
+  private async nextTaskPosition(transaction: Prisma.TransactionClient, milestoneId: string): Promise<number> {
     const result = await transaction.applicationTask.aggregate({
       where: {
         milestoneId,
@@ -1859,10 +1598,7 @@ export class DevelopmentService {
     return (result._max.position ?? -1) + 1;
   }
 
-  private async normalizeMilestonePositions(
-    transaction: Prisma.TransactionClient,
-    applicationId: string,
-  ): Promise<void> {
+  private async normalizeMilestonePositions(transaction: Prisma.TransactionClient, applicationId: string): Promise<void> {
     const milestones = await transaction.applicationMilestone.findMany({
       where: {
         applicationId,
@@ -1887,10 +1623,7 @@ export class DevelopmentService {
     }
   }
 
-  private async normalizeTaskPositions(
-    transaction: Prisma.TransactionClient,
-    milestoneId: string,
-  ): Promise<void> {
+  private async normalizeTaskPositions(transaction: Prisma.TransactionClient, milestoneId: string): Promise<void> {
     const tasks = await transaction.applicationTask.findMany({
       where: {
         milestoneId,
@@ -1915,10 +1648,7 @@ export class DevelopmentService {
     }
   }
 
-  private async releaseTaskWhenUnblocked(
-    transaction: Prisma.TransactionClient,
-    taskId: string,
-  ): Promise<void> {
+  private async releaseTaskWhenUnblocked(transaction: Prisma.TransactionClient, taskId: string): Promise<void> {
     const openBlockers = await transaction.applicationBlocker.count({
       where: {
         taskId,
@@ -1944,11 +1674,7 @@ export class DevelopmentService {
     }
   }
 
-  private validateOrderedIds(
-    existingIds: string[],
-    orderedIds: string[],
-    resourceName: string,
-  ): void {
+  private validateOrderedIds(existingIds: string[], orderedIds: string[], resourceName: string): void {
     if (existingIds.length !== orderedIds.length) {
       throw new BadRequestException(`All ${resourceName} must be included when reordering`);
     }

@@ -127,9 +127,7 @@ describe('Analytics Ingestion Security E2E', () => {
 
     expectWebsiteSuccess(await disableWebsite(owner, disabledWebsite.id));
 
-    const disabledResponse = await collectEvents(app, disabledWebsite, [
-      buildTrackerEvent(disabledWebsite.origin),
-    ]);
+    const disabledResponse = await collectEvents(app, disabledWebsite, [buildTrackerEvent(disabledWebsite.origin)]);
 
     expect(disabledResponse.status).toBe(403);
 
@@ -137,9 +135,7 @@ describe('Analytics Ingestion Security E2E', () => {
 
     expectWebsiteSuccess(await archiveWebsite(owner, archivedWebsite.id));
 
-    const archivedResponse = await collectEvents(app, archivedWebsite, [
-      buildTrackerEvent(archivedWebsite.origin),
-    ]);
+    const archivedResponse = await collectEvents(app, archivedWebsite, [buildTrackerEvent(archivedWebsite.origin)]);
 
     expect(archivedResponse.status).toBe(403);
   });
@@ -231,10 +227,7 @@ describe('Analytics Ingestion Security E2E', () => {
 
     const trackedWebsite = await createTrackedWebsite(owner);
 
-    const emptyObject = await request(app.getHttpServer())
-      .post(analyticsIngestionRoutes.collect())
-      .set('Origin', trackedWebsite.origin)
-      .send({});
+    const emptyObject = await request(app.getHttpServer()).post(analyticsIngestionRoutes.collect()).set('Origin', trackedWebsite.origin).send({});
 
     expect(emptyObject.status).toBe(400);
 
@@ -254,9 +247,7 @@ describe('Analytics Ingestion Security E2E', () => {
 
     expect((await collectEvents(app, trackedWebsite, tooManyEvents)).status).toBe(400);
 
-    const oversizedBody = buildCollectPayload(trackedWebsite, [
-      buildTrackerEvent(trackedWebsite.origin),
-    ]) as unknown as Record<string, unknown>;
+    const oversizedBody = buildCollectPayload(trackedWebsite, [buildTrackerEvent(trackedWebsite.origin)]) as unknown as Record<string, unknown>;
 
     oversizedBody.padding = 'x'.repeat(70_000);
 

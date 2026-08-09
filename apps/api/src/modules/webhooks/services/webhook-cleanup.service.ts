@@ -43,13 +43,7 @@ export class WebhookCleanupService {
         },
 
         status: {
-          in: [
-            WebhookDeliveryStatus.SUCCEEDED,
-
-            WebhookDeliveryStatus.DEAD_LETTERED,
-
-            WebhookDeliveryStatus.CANCELLED,
-          ],
+          in: [WebhookDeliveryStatus.SUCCEEDED, WebhookDeliveryStatus.DEAD_LETTERED, WebhookDeliveryStatus.CANCELLED],
         },
       },
     });

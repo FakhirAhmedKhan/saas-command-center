@@ -15,11 +15,5 @@ const STATUS_STYLES: Record<DeploymentStatus, string> = {
 };
 
 export function DeploymentStatusBadge({ status }: { status: DeploymentStatus }) {
-  return (
-    <span
-      className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${STATUS_STYLES[status]}`}
-    >
-      {status.replace(/_/g, ' ')}
-    </span>
-  );
+  return <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${STATUS_STYLES[status]}`}>{status.replace(/_/g, ' ')}</span>;
 }

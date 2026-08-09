@@ -1,12 +1,5 @@
 import { apiRequest } from '../auth/auth.types';
-import type {
-  HealthCheck,
-  HealthCheckHistory,
-  HealthIncident,
-  MonitoringSummary,
-  MonitoringTarget,
-  SaveHealthCheckInput,
-} from './monitoring.types';
+import type { HealthCheck, HealthCheckHistory, HealthIncident, MonitoringSummary, MonitoringTarget, SaveHealthCheckInput } from './monitoring.types';
 
 function createBasePath(workspaceId: string): string {
   return `/workspaces/${workspaceId}/monitoring`;

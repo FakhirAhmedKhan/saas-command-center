@@ -159,18 +159,12 @@ export default function WorkspaceActivityPage() {
         </label>
       </section>
 
-      {error ? (
-        <div className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-          {error}
-        </div>
-      ) : null}
+      {error ? <div className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error}</div> : null}
 
       {loading ? (
         <div className="mt-5 h-72 animate-pulse rounded-2xl bg-slate-200" />
       ) : activities.length === 0 ? (
-        <div className="mt-5 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
-          No activity matched these filters.
-        </div>
+        <div className="mt-5 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">No activity matched these filters.</div>
       ) : (
         <section className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           {activities.map((activity) => (
@@ -182,9 +176,7 @@ export default function WorkspaceActivityPage() {
                   <p className="mt-1 text-sm text-slate-700">{activity.description}</p>
 
                   <p className="mt-2 text-xs text-slate-500">
-                    {activity.actorUser?.name ??
-                      activity.actorUser?.email ??
-                      humanize(activity.actorType)}
+                    {activity.actorUser?.name ?? activity.actorUser?.email ?? humanize(activity.actorType)}
                     {activity.application ? ` · ${activity.application.name}` : ''}
                   </p>
                 </div>

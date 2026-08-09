@@ -1,5 +1,4 @@
-export type ProcessingRunStatus =
-  'QUEUED' | 'RUNNING' | 'SUCCEEDED' | 'DEAD_LETTERED' | 'CANCELLED';
+export type ProcessingRunStatus = 'QUEUED' | 'RUNNING' | 'SUCCEEDED' | 'DEAD_LETTERED' | 'CANCELLED';
 
 export interface ProcessingRun {
   id: string;

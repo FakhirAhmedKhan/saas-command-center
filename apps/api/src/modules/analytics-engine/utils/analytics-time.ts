@@ -7,11 +7,7 @@ export interface AnalyticsBucket {
   end: Date;
 }
 
-export function getAnalyticsBucket(
-  value: Date,
-  timeZone: string,
-  period: AnalyticsAggregatePeriod,
-): AnalyticsBucket {
+export function getAnalyticsBucket(value: Date, timeZone: string, period: AnalyticsAggregatePeriod): AnalyticsBucket {
   const local = DateTime.fromJSDate(value, {
     zone: 'utc',
   }).setZone(timeZone);
@@ -20,8 +16,7 @@ export function getAnalyticsBucket(
     throw new Error(`Invalid analytics time zone: ${timeZone}`);
   }
 
-  const start =
-    period === AnalyticsAggregatePeriod.HOURLY ? local.startOf('hour') : local.startOf('day');
+  const start = period === AnalyticsAggregatePeriod.HOURLY ? local.startOf('hour') : local.startOf('day');
 
   const end =
     period === AnalyticsAggregatePeriod.HOURLY

@@ -1,31 +1,10 @@
 import { Transform, Type } from 'class-transformer';
 
-import {
-  ArrayMaxSize,
-  ArrayUnique,
-  IsArray,
-  IsBoolean,
-  IsInt,
-  IsOptional,
-  IsString,
-  IsUUID,
-  Length,
-  Max,
-  MaxLength,
-  Min,
-} from 'class-validator';
+import { ArrayMaxSize, ArrayUnique, IsArray, IsBoolean, IsInt, IsOptional, IsString, IsUUID, Length, Max, MaxLength, Min } from 'class-validator';
 
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 
-function transformBoolean({
-  value,
-  obj,
-  key,
-}: {
-  value: unknown;
-  obj?: Record<string, unknown>;
-  key?: string;
-}): unknown {
+function transformBoolean({ value, obj, key }: { value: unknown; obj?: Record<string, unknown>; key?: string }): unknown {
   const rawValue = obj && key ? obj[key] : value;
 
   if (rawValue === true || rawValue === 'true') {

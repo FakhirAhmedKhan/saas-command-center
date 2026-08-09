@@ -96,10 +96,7 @@ export class WorkspaceMembersService {
     });
   }
 
-  async findMembership(
-    workspaceId: string,
-    userId: string,
-  ): Promise<WorkspaceMemberDetails | null> {
+  async findMembership(workspaceId: string, userId: string): Promise<WorkspaceMemberDetails | null> {
     return this.prisma.workspaceMember.findFirst({
       where: {
         workspaceId,
@@ -131,11 +128,7 @@ export class WorkspaceMembersService {
     });
   }
 
-  async updateRole(
-    workspaceId: string,
-    userId: string,
-    role: WorkspaceRole,
-  ): Promise<WorkspaceMemberDetails> {
+  async updateRole(workspaceId: string, userId: string, role: WorkspaceRole): Promise<WorkspaceMemberDetails> {
     return this.prisma.$transaction(async (transaction) => {
       const workspace = await transaction.workspace.findFirst({
         where: {
@@ -165,9 +158,7 @@ export class WorkspaceMembersService {
       }
 
       if (workspace.ownerId === userId && role !== WorkspaceRole.OWNER) {
-        throw new ConflictException(
-          'The workspace owner cannot be demoted. Transfer ownership first.',
-        );
+        throw new ConflictException('The workspace owner cannot be demoted. Transfer ownership first.');
       }
 
       if (workspace.ownerId !== userId && role === WorkspaceRole.OWNER) {
@@ -206,9 +197,7 @@ export class WorkspaceMembersService {
       }
 
       if (workspace.ownerId === userId) {
-        throw new ConflictException(
-          'The workspace owner cannot be removed. Transfer ownership first.',
-        );
+        throw new ConflictException('The workspace owner cannot be removed. Transfer ownership first.');
       }
 
       const membership = await transaction.workspaceMember.findUnique({

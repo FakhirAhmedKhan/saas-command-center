@@ -5,13 +5,7 @@ import { ArrowRight, CalendarDays, ExternalLink, Layers3 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 
-import {
-  CATEGORY_LABELS,
-  PRIORITY_BADGE_VARIANTS,
-  PRIORITY_LABELS,
-  STATUS_BADGE_VARIANTS,
-  STATUS_LABELS,
-} from '../application-constants';
+import { CATEGORY_LABELS, PRIORITY_BADGE_VARIANTS, PRIORITY_LABELS, STATUS_BADGE_VARIANTS, STATUS_LABELS } from '../application-constants';
 
 import type { SaasApplication } from '../application-types';
 
@@ -38,13 +32,9 @@ export function ApplicationCard({ workspaceId, application }: ApplicationCardPro
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div className="min-w-0">
-                <h2 className="truncate text-lg font-semibold text-slate-950">
-                  {application.name}
-                </h2>
+                <h2 className="truncate text-lg font-semibold text-slate-950">{application.name}</h2>
 
-                <p className="mt-1 text-xs font-medium uppercase tracking-wide text-slate-400">
-                  {CATEGORY_LABELS[application.category]}
-                </p>
+                <p className="mt-1 text-xs font-medium uppercase tracking-wide text-slate-400">{CATEGORY_LABELS[application.category]}</p>
               </div>
 
               {application.archivedAt ? <Badge variant="slate">Archived</Badge> : null}
@@ -54,18 +44,12 @@ export function ApplicationCard({ workspaceId, application }: ApplicationCardPro
       </CardHeader>
 
       <CardContent className="flex-1 space-y-5">
-        <p className="line-clamp-3 min-h-16 text-sm leading-6 text-slate-600">
-          {application.shortDescription ?? 'No description has been added yet.'}
-        </p>
+        <p className="line-clamp-3 min-h-16 text-sm leading-6 text-slate-600">{application.shortDescription ?? 'No description has been added yet.'}</p>
 
         <div className="flex flex-wrap gap-2">
-          <Badge variant={STATUS_BADGE_VARIANTS[application.status]}>
-            {STATUS_LABELS[application.status]}
-          </Badge>
+          <Badge variant={STATUS_BADGE_VARIANTS[application.status]}>{STATUS_LABELS[application.status]}</Badge>
 
-          <Badge variant={PRIORITY_BADGE_VARIANTS[application.priority]}>
-            {PRIORITY_LABELS[application.priority]} priority
-          </Badge>
+          <Badge variant={PRIORITY_BADGE_VARIANTS[application.priority]}>{PRIORITY_LABELS[application.priority]} priority</Badge>
         </div>
 
         <div>
@@ -77,18 +61,13 @@ export function ApplicationCard({ workspaceId, application }: ApplicationCardPro
           {technologies.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {technologies.map((technology) => (
-                <span
-                  key={technology.id}
-                  className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700"
-                >
+                <span key={technology.id} className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
                   {technology.name}
                 </span>
               ))}
 
               {extraTechnologyCount > 0 ? (
-                <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-500">
-                  +{extraTechnologyCount}
-                </span>
+                <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-500">+{extraTechnologyCount}</span>
               ) : null}
             </div>
           ) : (
@@ -103,9 +82,7 @@ export function ApplicationCard({ workspaceId, application }: ApplicationCardPro
               Target launch
             </div>
 
-            <p className="mt-1 font-medium text-slate-700">
-              {formatApplicationDate(application.targetLaunchAt)}
-            </p>
+            <p className="mt-1 font-medium text-slate-700">{formatApplicationDate(application.targetLaunchAt)}</p>
           </div>
 
           <div className="rounded-xl bg-slate-50 p-3">

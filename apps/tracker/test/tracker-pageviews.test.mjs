@@ -30,10 +30,7 @@ test('removes sensitive query parameters, URL credentials, and fragments', async
     href: 'https://alice:secret@app.example.com/page?campaign=spring&token=abc&email=user%40example.com&z=9#a',
   });
 
-  assert.equal(
-    harness.payloads()[0].events[0].url,
-    'https://app.example.com/page?campaign=spring&z=9',
-  );
+  assert.equal(harness.payloads()[0].events[0].url, 'https://app.example.com/page?campaign=spring&z=9');
 });
 
 test('sorts non-sensitive query parameters for stable page identity', async () => {
@@ -55,10 +52,7 @@ test('sanitizes the referrer URL', async () => {
     referrer: 'https://search.example.com/results?q=tracker&token=secret#top',
   });
 
-  assert.equal(
-    harness.payloads()[0].events[0].referrer,
-    'https://search.example.com/results?q=tracker',
-  );
+  assert.equal(harness.payloads()[0].events[0].referrer, 'https://search.example.com/results?q=tracker');
 });
 
 test('deduplicates repeated manual page-view calls for the same URL', async () => {

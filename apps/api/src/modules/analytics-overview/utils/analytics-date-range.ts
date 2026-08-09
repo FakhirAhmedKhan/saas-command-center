@@ -1,9 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 
-import {
-  AnalyticsDatePreset,
-  AnalyticsOverviewQueryDto,
-} from '../dto/analytics-overview-query.dto';
+import { AnalyticsDatePreset, AnalyticsOverviewQueryDto } from '../dto/analytics-overview-query.dto';
 
 const MILLISECONDS_PER_DAY = 86_400_000;
 
@@ -90,13 +87,7 @@ function getDateParts(date: Date, timeZone: string): DateParts {
 }
 
 function formatDateKey(year: number, month: number, day: number): string {
-  return [
-    String(year).padStart(4, '0'),
-
-    String(month).padStart(2, '0'),
-
-    String(day).padStart(2, '0'),
-  ].join('-');
+  return [String(year).padStart(4, '0'), String(month).padStart(2, '0'), String(day).padStart(2, '0')].join('-');
 }
 
 export function getDateKeyInTimeZone(date: Date, timeZone: string): string {
@@ -124,11 +115,7 @@ function parseDateKey(dateKey: string): {
 
   const date = new Date(Date.UTC(year, month - 1, day));
 
-  if (
-    date.getUTCFullYear() !== year ||
-    date.getUTCMonth() !== month - 1 ||
-    date.getUTCDate() !== day
-  ) {
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) {
     throw new BadRequestException(`Invalid calendar date ${dateKey}`);
   }
 
@@ -150,14 +137,7 @@ export function addDateKeyDays(dateKey: string, amount: number): string {
 function getTimeZoneOffsetMilliseconds(instant: Date, timeZone: string): number {
   const parts = getDateParts(instant, timeZone);
 
-  const representedAsUtc = Date.UTC(
-    parts.year,
-    parts.month - 1,
-    parts.day,
-    parts.hour,
-    parts.minute,
-    parts.second,
-  );
+  const representedAsUtc = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
 
   return representedAsUtc - instant.getTime();
 }

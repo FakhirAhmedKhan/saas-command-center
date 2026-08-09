@@ -10,17 +10,9 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 
-import {
-  addApplicationLink,
-  removeApplicationLink,
-  updateApplicationLink,
-} from '../application-api';
+import { addApplicationLink, removeApplicationLink, updateApplicationLink } from '../application-api';
 
-import {
-  APPLICATION_LINK_TYPES,
-  type ApplicationLink,
-  type ApplicationLinkType,
-} from '../application-types';
+import { APPLICATION_LINK_TYPES, type ApplicationLink, type ApplicationLinkType } from '../application-types';
 
 import { LINK_TYPE_LABELS } from '../application-constants';
 import { getErrorMessage } from '../application-utils';
@@ -33,13 +25,7 @@ interface LinkManagerProps {
   onChanged: () => void;
 }
 
-export function LinkManager({
-  workspaceId,
-  applicationId,
-  links,
-  disabled = false,
-  onChanged,
-}: LinkManagerProps) {
+export function LinkManager({ workspaceId, applicationId, links, disabled = false, onChanged }: LinkManagerProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const [label, setLabel] = useState('');
@@ -129,9 +115,7 @@ export function LinkManager({
       <CardHeader>
         <h2 className="text-lg font-semibold text-slate-950">Important links</h2>
 
-        <p className="mt-1 text-sm text-slate-500">
-          Store production, repository, staging, documentation and design links.
-        </p>
+        <p className="mt-1 text-sm text-slate-500">Store production, repository, staging, documentation and design links.</p>
       </CardHeader>
 
       <CardContent className="space-y-6">
@@ -140,10 +124,7 @@ export function LinkManager({
             Restore this application before modifying its links.
           </div>
         ) : (
-          <form
-            onSubmit={handleSubmit}
-            className="grid gap-4 rounded-2xl bg-slate-50 p-4 xl:grid-cols-[200px_180px_minmax(240px,1fr)_auto]"
-          >
+          <form onSubmit={handleSubmit} className="grid gap-4 rounded-2xl bg-slate-50 p-4 xl:grid-cols-[200px_180px_minmax(240px,1fr)_auto]">
             <Input
               aria-label="Link label"
               placeholder="Production website"
@@ -152,12 +133,7 @@ export function LinkManager({
               onChange={(event) => setLabel(event.target.value)}
             />
 
-            <Select
-              aria-label="Link type"
-              value={type}
-              disabled={saving}
-              onChange={(event) => setType(event.target.value as ApplicationLinkType)}
-            >
+            <Select aria-label="Link type" value={type} disabled={saving} onChange={(event) => setType(event.target.value as ApplicationLinkType)}>
               {APPLICATION_LINK_TYPES.map((linkType) => (
                 <option key={linkType} value={linkType}>
                   {LINK_TYPE_LABELS[linkType]}
@@ -190,23 +166,14 @@ export function LinkManager({
           </form>
         )}
 
-        {error ? (
-          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
-          </div>
-        ) : null}
+        {error ? <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
 
         {links.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">
-            No application links have been added.
-          </p>
+          <p className="rounded-xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">No application links have been added.</p>
         ) : (
           <div className="divide-y divide-slate-100">
             {links.map((link) => (
-              <div
-                key={link.id}
-                className="flex flex-col gap-3 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-center"
-              >
+              <div key={link.id} className="flex flex-col gap-3 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-center">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-semibold text-slate-900">{link.label}</p>
@@ -228,23 +195,11 @@ export function LinkManager({
 
                 {!disabled ? (
                   <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      disabled={busyId === link.id}
-                      onClick={() => beginEdit(link)}
-                    >
+                    <Button type="button" variant="ghost" size="icon" disabled={busyId === link.id} onClick={() => beginEdit(link)}>
                       <Pencil className="size-4" />
                     </Button>
 
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      disabled={busyId === link.id}
-                      onClick={() => void handleRemove(link)}
-                    >
+                    <Button type="button" variant="ghost" size="icon" disabled={busyId === link.id} onClick={() => void handleRemove(link)}>
                       <Trash2 className="size-4 text-red-600" />
                     </Button>
                   </div>

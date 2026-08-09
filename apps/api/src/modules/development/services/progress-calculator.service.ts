@@ -50,13 +50,9 @@ export class ProgressCalculatorService {
 
     const totalMilestoneWeight = included.reduce((total, milestone) => total + milestone.weight, 0);
 
-    const weightedProgressPoints = included.reduce(
-      (total, milestone) => total + milestone.weight * milestone.progressPercent,
-      0,
-    );
+    const weightedProgressPoints = included.reduce((total, milestone) => total + milestone.weight * milestone.progressPercent, 0);
 
-    const percentage =
-      totalMilestoneWeight === 0 ? 0 : Math.round(weightedProgressPoints / totalMilestoneWeight);
+    const percentage = totalMilestoneWeight === 0 ? 0 : Math.round(weightedProgressPoints / totalMilestoneWeight);
 
     return {
       percentage,
@@ -69,11 +65,7 @@ export class ProgressCalculatorService {
     };
   }
 
-  async recalculateWithTransaction(
-    transaction: Prisma.TransactionClient,
-    workspaceId: string,
-    applicationId: string,
-  ): Promise<ApplicationProgressExplanation> {
+  async recalculateWithTransaction(transaction: Prisma.TransactionClient, workspaceId: string, applicationId: string): Promise<ApplicationProgressExplanation> {
     const application = await transaction.saasApplication.findFirst({
       where: {
         id: applicationId,
@@ -164,9 +156,7 @@ export class ProgressCalculatorService {
       };
     }
 
-    const applicableTasks = milestone.tasks.filter(
-      (task) => task.status !== ApplicationTaskStatus.SKIPPED,
-    );
+    const applicableTasks = milestone.tasks.filter((task) => task.status !== ApplicationTaskStatus.SKIPPED);
 
     const applicableTaskWeight = applicableTasks.reduce((total, task) => total + task.weight, 0);
 
@@ -184,10 +174,7 @@ export class ProgressCalculatorService {
 
     let derivedStatus: MilestoneStatus = MilestoneStatus.PLANNED;
 
-    if (
-      progressPercent === 100 &&
-      (applicableTasks.length > 0 || milestone.status === MilestoneStatus.COMPLETED)
-    ) {
+    if (progressPercent === 100 && (applicableTasks.length > 0 || milestone.status === MilestoneStatus.COMPLETED)) {
       derivedStatus = MilestoneStatus.COMPLETED;
     } else if (applicableTasks.some((task) => task.status !== ApplicationTaskStatus.TODO)) {
       derivedStatus = MilestoneStatus.IN_PROGRESS;

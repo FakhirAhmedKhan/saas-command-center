@@ -110,10 +110,7 @@ describe('Raw Events E2E', () => {
       eventName: 'signup_completed',
     });
 
-    expectCollectionAccepted(
-      await collectEvents(app, trackedWebsite, [pageView, checkout, signup]),
-      3,
-    );
+    expectCollectionAccepted(await collectEvents(app, trackedWebsite, [pageView, checkout, signup]), 3);
 
     const customList = readRawEventList(
       await listRawEvents(owner, trackedWebsite.id, {
@@ -161,10 +158,7 @@ describe('Raw Events E2E', () => {
       sessionId: sessionB,
     });
 
-    expectCollectionAccepted(
-      await collectEvents(app, trackedWebsite, [firstEvent, secondEvent]),
-      2,
-    );
+    expectCollectionAccepted(await collectEvents(app, trackedWebsite, [firstEvent, secondEvent]), 2);
 
     const visitorList = readRawEventList(
       await listRawEvents(owner, trackedWebsite.id, {

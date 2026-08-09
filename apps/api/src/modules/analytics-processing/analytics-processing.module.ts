@@ -24,8 +24,7 @@ import { AnalyticsProcessingWorkerService } from './services/analytics-processin
 import { AnalyticsRangeProcessorService } from './services/analytics-range-processor.service';
 
 @Module({
-  imports: [
-        WorkspaceMembersModule,DatabaseModule, AnalyticsEngineModule, SharedRateLimitModule],
+  imports: [WorkspaceMembersModule, DatabaseModule, AnalyticsEngineModule, SharedRateLimitModule],
 
   controllers: [AnalyticsProcessingController],
 

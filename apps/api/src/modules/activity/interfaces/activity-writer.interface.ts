@@ -1,8 +1,4 @@
-import type {
-  ActivityActorType,
-  ActivityEntityType,
-  ApplicationActivityType,
-} from 'src/generated/prisma/enums';
+import type { ActivityActorType, ActivityEntityType, ApplicationActivityType } from 'src/generated/prisma/enums';
 
 export interface ActivityWriteInput {
   workspaceId: string;

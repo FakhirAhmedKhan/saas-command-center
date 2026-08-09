@@ -6,11 +6,7 @@ function validateSession(session: AuthSession): AuthSession {
     throw new Error('Authentication response is missing accessToken.');
   }
 
-  if (
-    !session.user ||
-    typeof session.user.id !== 'string' ||
-    typeof session.user.email !== 'string'
-  ) {
+  if (!session.user || typeof session.user.id !== 'string' || typeof session.user.email !== 'string') {
     throw new Error('Authentication response is missing a valid user.');
   }
 

@@ -47,30 +47,19 @@ test.describe('Batch 11 real authorization and isolation', () => {
   });
 
   test('rejects a viewer application write at the real API boundary', async ({ request }) => {
-    const response = await authorizedApiRequest(
-      request,
-      state,
-      state.viewer.accessToken,
-      `/workspaces/${state.owner.workspaceId}/applications`,
-      {
-        method: 'POST',
-        data: {
-          name: 'Viewer Must Not Create',
-          slug: uniqueValue('viewer-forbidden', state.runId),
-        },
+    const response = await authorizedApiRequest(request, state, state.viewer.accessToken, `/workspaces/${state.owner.workspaceId}/applications`, {
+      method: 'POST',
+      data: {
+        name: 'Viewer Must Not Create',
+        slug: uniqueValue('viewer-forbidden', state.runId),
       },
-    );
+    });
 
     expect(response.status()).toBe(403);
   });
 
   test('prevents cross-workspace reads for a non-member owner', async ({ request }) => {
-    const response = await authorizedApiRequest(
-      request,
-      state,
-      state.owner.accessToken,
-      `/workspaces/${state.admin.workspaceId}/applications`,
-    );
+    const response = await authorizedApiRequest(request, state, state.owner.accessToken, `/workspaces/${state.admin.workspaceId}/applications`);
 
     expect(response.status()).toBe(403);
   });

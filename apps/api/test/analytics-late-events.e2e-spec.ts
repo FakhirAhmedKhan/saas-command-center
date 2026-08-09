@@ -306,8 +306,6 @@ describe('Analytics Late Events E2E', () => {
       },
     });
 
-    expect(unrelatedAfter.generatedAt.toISOString()).toBe(
-      unrelatedBefore.generatedAt.toISOString(),
-    );
+    expect(unrelatedAfter.generatedAt.toISOString()).toBe(unrelatedBefore.generatedAt.toISOString());
   });
 });

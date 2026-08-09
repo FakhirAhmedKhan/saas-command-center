@@ -49,9 +49,7 @@ test.describe('Batch 10 authentication flows', () => {
       }),
     ).toBeVisible();
 
-    const loginRequest = state.requests.find(
-      (request) => request.method === 'POST' && request.path === '/auth/login',
-    );
+    const loginRequest = state.requests.find((request) => request.method === 'POST' && request.path === '/auth/login');
 
     expect(loginRequest?.body).toEqual({
       email: 'owner@example.com',
@@ -101,9 +99,7 @@ test.describe('Batch 10 authentication flows', () => {
 
     await expect(page).toHaveURL(/\/dashboard$/);
 
-    const registerRequest = state.requests.find(
-      (request) => request.method === 'POST' && request.path === '/auth/register',
-    );
+    const registerRequest = state.requests.find((request) => request.method === 'POST' && request.path === '/auth/register');
 
     expect(registerRequest?.body).toEqual({
       displayName: 'New Owner',
@@ -129,9 +125,7 @@ test.describe('Batch 10 authentication flows', () => {
       .click();
 
     await expect(page).toHaveURL(/\/register$/);
-    const passwordValid = await page
-      .getByLabel('Password')
-      .evaluate((input) => (input as HTMLInputElement).validity.valid);
+    const passwordValid = await page.getByLabel('Password').evaluate((input) => (input as HTMLInputElement).validity.valid);
 
     expect(passwordValid).toBe(false);
     expect(state.requests.some((request) => request.path === '/auth/register')).toBe(false);
@@ -156,10 +150,6 @@ test.describe('Batch 10 authentication flows', () => {
       .click();
 
     await expect(page).toHaveURL(/\/login$/);
-    expect(
-      state.requests.some(
-        (request) => request.method === 'POST' && request.path === '/auth/logout',
-      ),
-    ).toBe(true);
+    expect(state.requests.some((request) => request.method === 'POST' && request.path === '/auth/logout')).toBe(true);
   });
 });

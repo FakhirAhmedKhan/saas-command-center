@@ -19,19 +19,9 @@ function buildActivityQuery(query: ActivityListQuery = {}): string {
 }
 
 export function getWorkspaceActivities(workspaceId: string, query?: ActivityListQuery) {
-  return apiRequest<ActivityListResponse>(
-    `/workspaces/${workspaceId}/activities${buildActivityQuery(query)}`,
-  );
+  return apiRequest<ActivityListResponse>(`/workspaces/${workspaceId}/activities${buildActivityQuery(query)}`);
 }
 
-export function getApplicationActivities(
-  workspaceId: string,
-  applicationId: string,
-  query?: ActivityListQuery,
-) {
-  return apiRequest<ActivityListResponse>(
-    `/workspaces/${workspaceId}/applications/${applicationId}/activities${buildActivityQuery(
-      query,
-    )}`,
-  );
+export function getApplicationActivities(workspaceId: string, applicationId: string, query?: ActivityListQuery) {
+  return apiRequest<ActivityListResponse>(`/workspaces/${workspaceId}/applications/${applicationId}/activities${buildActivityQuery(query)}`);
 }

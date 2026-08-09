@@ -1,12 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  HttpException,
-  HttpStatus,
-  Logger,
-} from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import type { ApiErrorResponse } from '@command-center/shared-types';
 
@@ -25,27 +18,19 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const request = context.getRequest<Request>();
     const response = context.getResponse<Response>();
 
-    const status =
-      exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
-    const exceptionResponse =
-      exception instanceof HttpException ? exception.getResponse() : undefined;
+    const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
+    const exceptionResponse = exception instanceof HttpException ? exception.getResponse() : undefined;
     const normalized = this.normalizeError(exceptionResponse);
     const requestId = response.getHeader('x-request-id')?.toString() ?? 'unknown';
 
     if (status >= 500) {
-      this.logger.error(
-        `${request.method} ${request.originalUrl} failed [requestId=${requestId}]`,
-        exception instanceof Error ? exception.stack : undefined,
-      );
+      this.logger.error(`${request.method} ${request.originalUrl} failed [requestId=${requestId}]`, exception instanceof Error ? exception.stack : undefined);
     }
 
     const body: ApiErrorResponse = {
       statusCode: status,
       code: normalized.code ?? this.defaultCode(status),
-      message:
-        status >= 500
-          ? 'An unexpected server error occurred'
-          : (normalized.message ?? 'Request failed'),
+      message: status >= 500 ? 'An unexpected server error occurred' : (normalized.message ?? 'Request failed'),
       path: request.originalUrl,
       requestId,
       timestamp: new Date().toISOString(),

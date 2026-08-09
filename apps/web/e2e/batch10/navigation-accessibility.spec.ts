@@ -44,9 +44,7 @@ test.describe('Batch 10 navigation, responsiveness, and accessibility', () => {
 
     await page.goto('/dashboard');
 
-    const hasHorizontalOverflow = await page.evaluate(
-      () => document.documentElement.scrollWidth > window.innerWidth,
-    );
+    const hasHorizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
 
     expect(hasHorizontalOverflow).toBe(false);
     await expect(page.getByLabel('Select workspace')).toBeVisible();
@@ -91,11 +89,7 @@ test.describe('Batch 10 navigation, responsiveness, and accessibility', () => {
     ).toBeVisible();
 
     const latestRequest = state.requests
-      .filter(
-        (request) =>
-          request.method === 'GET' &&
-          request.path === `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`,
-      )
+      .filter((request) => request.method === 'GET' && request.path === `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`)
       .at(-1);
 
     expect(latestRequest?.search).toContain('search=PriceScout');

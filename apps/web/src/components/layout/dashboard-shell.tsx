@@ -36,21 +36,14 @@ export function DashboardShell({ children }: DashboardShellProps) {
         </Link>
 
         <nav className="sidebar-nav">
-          <Link
-            className={pathname === '/dashboard' ? 'nav-item active' : 'nav-item'}
-            href="/dashboard"
-          >
+          <Link className={pathname === '/dashboard' ? 'nav-item active' : 'nav-item'} href="/dashboard">
             <span>Overview</span>
           </Link>
 
           <p className="nav-section-label">Workspaces</p>
 
           {workspaces.map((workspace) => (
-            <Link
-              className={selectedWorkspaceId === workspace.id ? 'nav-item active' : 'nav-item'}
-              href={`/workspaces/${workspace.id}`}
-              key={workspace.id}
-            >
+            <Link className={selectedWorkspaceId === workspace.id ? 'nav-item active' : 'nav-item'} href={`/workspaces/${workspace.id}`} key={workspace.id}>
               <span className="workspace-dot" />
               <span>{workspace.name}</span>
             </Link>
@@ -59,9 +52,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
 
         <div className="sidebar-footer">
           <div className="user-summary">
-            <div className="avatar">
-              {(user?.displayName || user?.email || 'U').charAt(0).toUpperCase()}
-            </div>
+            <div className="avatar">{(user?.displayName || user?.email || 'U').charAt(0).toUpperCase()}</div>
 
             <div>
               <strong>{user?.displayName || 'Account owner'}</strong>
@@ -70,11 +61,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
             </div>
           </div>
 
-          <button
-            className="button button-ghost button-full"
-            onClick={() => void handleLogout()}
-            type="button"
-          >
+          <button className="button button-ghost button-full" onClick={() => void handleLogout()} type="button">
             Sign out
           </button>
         </div>

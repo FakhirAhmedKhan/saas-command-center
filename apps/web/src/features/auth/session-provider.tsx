@@ -5,19 +5,9 @@ import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
 
 import type { PropsWithChildren } from 'react';
 
-import {
-  login as loginRequest,
-  logout as logoutRequest,
-  register as registerRequest,
-  restoreSession,
-} from './auth-api';
+import { login as loginRequest, logout as logoutRequest, register as registerRequest, restoreSession } from './auth-api';
 
-import {
-  AuthUser,
-  setUnauthorizedHandler,
-  type LoginInput,
-  type RegisterInput,
-} from './auth.types';
+import { AuthUser, setUnauthorizedHandler, type LoginInput, type RegisterInput } from './auth.types';
 import { setAccessToken } from '../lib/api/api-client';
 
 export type SessionStatus = 'loading' | 'authenticated' | 'unauthenticated';

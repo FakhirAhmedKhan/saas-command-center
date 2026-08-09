@@ -1,20 +1,10 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { createHash } from 'node:crypto';
 
 import { Prisma } from 'src/generated/prisma/client';
 
-import {
-  AnalyticsAggregateDimension,
-  AnalyticsDeviceType,
-  AnalyticsProcessingStatus,
-  RawAnalyticsEventType,
-} from 'src/generated/prisma/enums';
+import { AnalyticsAggregateDimension, AnalyticsDeviceType, AnalyticsProcessingStatus, RawAnalyticsEventType } from 'src/generated/prisma/enums';
 
 import { PrismaService } from 'src/database/prisma.service';
 
@@ -22,11 +12,7 @@ import { AnalyticsAggregatePeriod, ReprocessAnalyticsDto } from '../dto/analytic
 
 import { calculateSessionMetrics } from '../utils/analytics-metrics';
 
-import {
-  normalizeAnalyticsPage,
-  normalizeSource,
-  parseUserAgent,
-} from '../utils/analytics-normalization';
+import { normalizeAnalyticsPage, normalizeSource, parseUserAgent } from '../utils/analytics-normalization';
 
 import { getAnalyticsBucket } from '../utils/analytics-time';
 
@@ -104,21 +90,13 @@ const MAX_ERROR_MESSAGE_LENGTH = 10_000;
 export class AnalyticsProcessingService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async processForWorkspace(
-    workspaceId: string,
-    websiteId: string,
-    initiatedByUserId: string | null,
-    maxEvents = DEFAULT_MAX_EVENTS,
-  ): Promise<ProcessingRun> {
+  async processForWorkspace(workspaceId: string, websiteId: string, initiatedByUserId: string | null, maxEvents = DEFAULT_MAX_EVENTS): Promise<ProcessingRun> {
     const website = await this.requireWebsite(workspaceId, websiteId);
 
     return this.processWebsite(website, initiatedByUserId, maxEvents);
   }
 
-  async processWebsiteById(
-    websiteId: string,
-    maxEvents = DEFAULT_MAX_EVENTS,
-  ): Promise<ProcessingRun> {
+  async processWebsiteById(websiteId: string, maxEvents = DEFAULT_MAX_EVENTS): Promise<ProcessingRun> {
     const website = await this.prisma.website.findUnique({
       where: { id: websiteId },
       select: {
@@ -138,12 +116,7 @@ export class AnalyticsProcessingService {
     return this.processWebsite(website, null, maxEvents);
   }
 
-  async reprocessRange(
-    workspaceId: string,
-    websiteId: string,
-    dto: ReprocessAnalyticsDto,
-    initiatedByUserId: string,
-  ): Promise<ProcessingRun> {
+  async reprocessRange(workspaceId: string, websiteId: string, dto: ReprocessAnalyticsDto, initiatedByUserId: string): Promise<ProcessingRun> {
     const website = await this.requireWebsite(workspaceId, websiteId);
 
     if (!website.enabled || website.archivedAt !== null) {
@@ -167,9 +140,7 @@ export class AnalyticsProcessingService {
     });
 
     if (rawEventCount > maxEvents) {
-      throw new BadRequestException(
-        `The selected range contains ${rawEventCount} raw events, but maxEvents is ${maxEvents}`,
-      );
+      throw new BadRequestException(`The selected range contains ${rawEventCount} raw events, but maxEvents is ${maxEvents}`);
     }
 
     /*
@@ -198,20 +169,11 @@ export class AnalyticsProcessingService {
   async runRetention(workspaceId: string, websiteId: string): Promise<RetentionResult> {
     await this.requireWebsite(workspaceId, websiteId);
 
-    const rawRetentionDays = this.readPositiveInteger(
-      process.env.ANALYTICS_RAW_RETENTION_DAYS,
-      DEFAULT_RAW_RETENTION_DAYS,
-    );
+    const rawRetentionDays = this.readPositiveInteger(process.env.ANALYTICS_RAW_RETENTION_DAYS, DEFAULT_RAW_RETENTION_DAYS);
 
-    const normalizedRetentionDays = this.readPositiveInteger(
-      process.env.ANALYTICS_NORMALIZED_RETENTION_DAYS,
-      DEFAULT_NORMALIZED_RETENTION_DAYS,
-    );
+    const normalizedRetentionDays = this.readPositiveInteger(process.env.ANALYTICS_NORMALIZED_RETENTION_DAYS, DEFAULT_NORMALIZED_RETENTION_DAYS);
 
-    const aggregateRetentionDays = this.readPositiveInteger(
-      process.env.ANALYTICS_AGGREGATE_RETENTION_DAYS,
-      DEFAULT_AGGREGATE_RETENTION_DAYS,
-    );
+    const aggregateRetentionDays = this.readPositiveInteger(process.env.ANALYTICS_AGGREGATE_RETENTION_DAYS, DEFAULT_AGGREGATE_RETENTION_DAYS);
 
     const now = Date.now();
     const rawCutoff = new Date(now - rawRetentionDays * DAY_MS);
@@ -285,12 +247,7 @@ export class AnalyticsProcessingService {
 
     const runRangeEnd = options.range?.dateTo ?? new Date();
 
-    const runLockKey = [
-      'analytics-engine',
-      website.workspaceId,
-      website.id,
-      Date.now().toString(),
-    ].join(':');
+    const runLockKey = ['analytics-engine', website.workspaceId, website.id, Date.now().toString()].join(':');
 
     const run = await this.prisma.analyticsProcessingRun.create({
       data: {
@@ -357,9 +314,7 @@ export class AnalyticsProcessingService {
           break;
         }
 
-        const result = await this.prisma.$transaction((transaction) =>
-          this.processBatch(transaction, website, rawEvents),
-        );
+        const result = await this.prisma.$transaction((transaction) => this.processBatch(transaction, website, rawEvents));
 
         totalProcessed += result.processed;
 
@@ -420,9 +375,7 @@ export class AnalyticsProcessingService {
           status: AnalyticsProcessingStatus.COMPLETED,
           lastCompletedAt: completedAt,
           lastError: null,
-          ...(updateProcessingCursor && lastReceivedAt
-            ? { lastProcessedReceivedAt: lastReceivedAt }
-            : {}),
+          ...(updateProcessingCursor && lastReceivedAt ? { lastProcessedReceivedAt: lastReceivedAt } : {}),
           ...(incrementProcessedTotal && totalProcessed > 0
             ? {
                 totalRawEventsProcessed: {
@@ -473,11 +426,7 @@ export class AnalyticsProcessingService {
     }
   }
 
-  private async processBatch(
-    transaction: Prisma.TransactionClient,
-    website: ProcessingWebsite,
-    rawEvents: RawEvent[],
-  ): Promise<BatchResult> {
+  private async processBatch(transaction: Prisma.TransactionClient, website: ProcessingWebsite, rawEvents: RawEvent[]): Promise<BatchResult> {
     const affectedSessions = new Set<string>();
     const affectedVisitors = new Set<string>();
     const hourlyBuckets = new Set<string>();
@@ -612,9 +561,7 @@ export class AnalyticsProcessingService {
       });
 
       if (analyticsEvent.sessionId !== session.id || analyticsEvent.visitorId !== eventVisitorId) {
-        throw new BadRequestException(
-          'An analytics event identifier cannot belong to multiple sessions or visitors',
-        );
+        throw new BadRequestException('An analytics event identifier cannot belong to multiple sessions or visitors');
       }
 
       if (raw.type === RawAnalyticsEventType.PAGE_VIEW) {
@@ -672,19 +619,9 @@ export class AnalyticsProcessingService {
     for (const sessionId of affectedSessions) {
       const rebuilt = await this.rebuildSession(transaction, sessionId);
 
-      this.addAffectedBuckets(
-        hourlyBuckets,
-        dailyBuckets,
-        rebuilt.previousStartedAt,
-        website.timeZone,
-      );
+      this.addAffectedBuckets(hourlyBuckets, dailyBuckets, rebuilt.previousStartedAt, website.timeZone);
 
-      this.addAffectedBuckets(
-        hourlyBuckets,
-        dailyBuckets,
-        rebuilt.session.startedAt,
-        website.timeZone,
-      );
+      this.addAffectedBuckets(hourlyBuckets, dailyBuckets, rebuilt.session.startedAt, website.timeZone);
     }
 
     for (const visitorId of affectedVisitors) {
@@ -700,10 +637,7 @@ export class AnalyticsProcessingService {
     };
   }
 
-  private async rebuildSession(
-    transaction: Prisma.TransactionClient,
-    sessionId: string,
-  ): Promise<RebuiltSessionResult> {
+  private async rebuildSession(transaction: Prisma.TransactionClient, sessionId: string): Promise<RebuiltSessionResult> {
     const existingSession = await transaction.analyticsSession.findUniqueOrThrow({
       where: { id: sessionId },
     });
@@ -799,10 +733,7 @@ export class AnalyticsProcessingService {
     };
   }
 
-  private async rebuildVisitor(
-    transaction: Prisma.TransactionClient,
-    visitorId: string,
-  ): Promise<void> {
+  private async rebuildVisitor(transaction: Prisma.TransactionClient, visitorId: string): Promise<void> {
     const [eventStats, sessionCount, pageViewCount, eventCount] = await Promise.all([
       transaction.analyticsEvent.aggregate({
         where: { visitorId },
@@ -839,11 +770,7 @@ export class AnalyticsProcessingService {
     });
   }
 
-  private async rebuildBucket(
-    website: ProcessingWebsite,
-    period: AnalyticsAggregatePeriod,
-    bucketStart: Date,
-  ): Promise<void> {
+  private async rebuildBucket(website: ProcessingWebsite, period: AnalyticsAggregatePeriod, bucketStart: Date): Promise<void> {
     const bucket = getAnalyticsBucket(bucketStart, website.timeZone, period);
 
     const [events, pageViews, sessions] = await this.prisma.$transaction([
@@ -904,12 +831,7 @@ export class AnalyticsProcessingService {
 
     const aggregates = new Map<string, MutableAggregate>();
 
-    const overview = this.getAggregate(
-      aggregates,
-      AnalyticsAggregateDimension.OVERVIEW,
-      'overview',
-      'Overview',
-    );
+    const overview = this.getAggregate(aggregates, AnalyticsAggregateDimension.OVERVIEW, 'overview', 'Overview');
 
     for (const event of events) {
       overview.visitors.add(event.visitorId);
@@ -919,12 +841,7 @@ export class AnalyticsProcessingService {
         overview.customEvents += 1;
 
         const eventName = event.eventName ?? 'Unknown';
-        const custom = this.getAggregate(
-          aggregates,
-          AnalyticsAggregateDimension.CUSTOM_EVENT,
-          eventName,
-          eventName,
-        );
+        const custom = this.getAggregate(aggregates, AnalyticsAggregateDimension.CUSTOM_EVENT, eventName, eventName);
 
         custom.visitors.add(event.visitorId);
         custom.sessions.add(event.sessionId);
@@ -937,12 +854,7 @@ export class AnalyticsProcessingService {
       overview.visitors.add(pageView.visitorId);
       overview.pageViews += 1;
 
-      const page = this.getAggregate(
-        aggregates,
-        AnalyticsAggregateDimension.PAGE,
-        pageView.normalizedPath,
-        pageView.title ?? pageView.normalizedPath,
-      );
+      const page = this.getAggregate(aggregates, AnalyticsAggregateDimension.PAGE, pageView.normalizedPath, pageView.title ?? pageView.normalizedPath);
 
       page.visitors.add(pageView.visitorId);
       page.sessions.add(pageView.sessionId);
@@ -956,21 +868,9 @@ export class AnalyticsProcessingService {
       overview.bounces += session.bounced ? 1 : 0;
       overview.totalDurationMs += BigInt(session.durationMs);
 
-      this.addSessionDimension(
-        aggregates,
-        AnalyticsAggregateDimension.SOURCE,
-        session.sourceName || 'Unknown',
-        session.sourceName || 'Unknown',
-        session,
-      );
+      this.addSessionDimension(aggregates, AnalyticsAggregateDimension.SOURCE, session.sourceName || 'Unknown', session.sourceName || 'Unknown', session);
 
-      this.addSessionDimension(
-        aggregates,
-        AnalyticsAggregateDimension.COUNTRY,
-        session.countryCode ?? 'Unknown',
-        session.countryCode ?? 'Unknown',
-        session,
-      );
+      this.addSessionDimension(aggregates, AnalyticsAggregateDimension.COUNTRY, session.countryCode ?? 'Unknown', session.countryCode ?? 'Unknown', session);
 
       this.addSessionDimension(
         aggregates,
@@ -980,13 +880,7 @@ export class AnalyticsProcessingService {
         session,
       );
 
-      this.addSessionDimension(
-        aggregates,
-        AnalyticsAggregateDimension.BROWSER,
-        session.browserName || 'Unknown',
-        session.browserName || 'Unknown',
-        session,
-      );
+      this.addSessionDimension(aggregates, AnalyticsAggregateDimension.BROWSER, session.browserName || 'Unknown', session.browserName || 'Unknown', session);
 
       this.addSessionDimension(
         aggregates,
@@ -1053,12 +947,7 @@ export class AnalyticsProcessingService {
     });
   }
 
-  private getAggregate(
-    collection: Map<string, MutableAggregate>,
-    dimension: AnalyticsAggregateDimension,
-    value: string,
-    label: string,
-  ): MutableAggregate {
+  private getAggregate(collection: Map<string, MutableAggregate>, dimension: AnalyticsAggregateDimension, value: string, label: string): MutableAggregate {
     const key = `${dimension}:${value}`;
     const existing = collection.get(key);
 
@@ -1117,19 +1006,10 @@ export class AnalyticsProcessingService {
     return createHash('sha256').update(`${dimension}:${value}`).digest('hex');
   }
 
-  private addAffectedBuckets(
-    hourlyBuckets: Set<string>,
-    dailyBuckets: Set<string>,
-    occurredAt: Date,
-    timeZone: string,
-  ): void {
-    hourlyBuckets.add(
-      getAnalyticsBucket(occurredAt, timeZone, AnalyticsAggregatePeriod.HOURLY).start.toISOString(),
-    );
+  private addAffectedBuckets(hourlyBuckets: Set<string>, dailyBuckets: Set<string>, occurredAt: Date, timeZone: string): void {
+    hourlyBuckets.add(getAnalyticsBucket(occurredAt, timeZone, AnalyticsAggregatePeriod.HOURLY).start.toISOString());
 
-    dailyBuckets.add(
-      getAnalyticsBucket(occurredAt, timeZone, AnalyticsAggregatePeriod.DAILY).start.toISOString(),
-    );
+    dailyBuckets.add(getAnalyticsBucket(occurredAt, timeZone, AnalyticsAggregatePeriod.DAILY).start.toISOString());
   }
 
   /**

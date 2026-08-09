@@ -6,13 +6,7 @@ import { PrismaService } from 'src/database/prisma.service';
 
 import { AnalyticsProcessingService } from 'src/modules/analytics-engine/services/analytics-processing.service';
 
-import {
-  buildTrackerEvent,
-  collectEvents,
-  createTrackedWebsite,
-  expectCollectionAccepted,
-  uniqueTrackerId,
-} from './helpers/analytics-ingestion';
+import { buildTrackerEvent, collectEvents, createTrackedWebsite, expectCollectionAccepted, uniqueTrackerId } from './helpers/analytics-ingestion';
 
 import { createTestApp } from './helpers/create-test-app';
 
@@ -55,12 +49,7 @@ describe('Analytics Page Views E2E', () => {
       1,
     );
 
-    await processingService.processForWorkspace(
-      owner.workspaceId,
-      trackedWebsite.id,
-      owner.userId,
-      100,
-    );
+    await processingService.processForWorkspace(owner.workspaceId, trackedWebsite.id, owner.userId, 100);
 
     const pageView = await prisma.analyticsPageView.findFirstOrThrow({
       where: {
@@ -89,12 +78,7 @@ describe('Analytics Page Views E2E', () => {
       1,
     );
 
-    await processingService.processForWorkspace(
-      owner.workspaceId,
-      trackedWebsite.id,
-      owner.userId,
-      100,
-    );
+    await processingService.processForWorkspace(owner.workspaceId, trackedWebsite.id, owner.userId, 100);
 
     const pageView = await prisma.analyticsPageView.findFirstOrThrow({
       where: {
@@ -153,12 +137,7 @@ describe('Analytics Page Views E2E', () => {
 
     expectCollectionAccepted(await collectEvents(app, trackedWebsite, events), events.length);
 
-    await processingService.processForWorkspace(
-      owner.workspaceId,
-      trackedWebsite.id,
-      owner.userId,
-      100,
-    );
+    await processingService.processForWorkspace(owner.workspaceId, trackedWebsite.id, owner.userId, 100);
 
     const pageViews = await prisma.analyticsPageView.findMany({
       where: {
@@ -208,12 +187,7 @@ describe('Analytics Page Views E2E', () => {
       3,
     );
 
-    await processingService.processForWorkspace(
-      owner.workspaceId,
-      trackedWebsite.id,
-      owner.userId,
-      100,
-    );
+    await processingService.processForWorkspace(owner.workspaceId, trackedWebsite.id, owner.userId, 100);
 
     expect(
       await prisma.analyticsEvent.count({
@@ -241,19 +215,9 @@ describe('Analytics Page Views E2E', () => {
 
     expectCollectionAccepted(await collectEvents(app, trackedWebsite, [event]), 1);
 
-    await processingService.processForWorkspace(
-      owner.workspaceId,
-      trackedWebsite.id,
-      owner.userId,
-      100,
-    );
+    await processingService.processForWorkspace(owner.workspaceId, trackedWebsite.id, owner.userId, 100);
 
-    await processingService.processForWorkspace(
-      owner.workspaceId,
-      trackedWebsite.id,
-      owner.userId,
-      100,
-    );
+    await processingService.processForWorkspace(owner.workspaceId, trackedWebsite.id, owner.userId, 100);
 
     expect(
       await prisma.analyticsEvent.count({

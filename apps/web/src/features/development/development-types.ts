@@ -12,13 +12,7 @@ export type WorkItemPriority = (typeof WORK_ITEM_PRIORITIES)[number];
 
 export type BlockerStatus = 'OPEN' | 'RESOLVED';
 
-export const DEVELOPMENT_TEMPLATE_TYPES = [
-  'STANDARD_SAAS',
-  'AI_SAAS',
-  'MOBILE',
-  'API',
-  'ECOMMERCE',
-] as const;
+export const DEVELOPMENT_TEMPLATE_TYPES = ['STANDARD_SAAS', 'AI_SAAS', 'MOBILE', 'API', 'ECOMMERCE'] as const;
 
 export type DevelopmentTemplateType = (typeof DEVELOPMENT_TEMPLATE_TYPES)[number];
 

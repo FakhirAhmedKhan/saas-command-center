@@ -9,8 +9,7 @@ import { ApplicationsService } from './services/applications.service';
 import { WorkspaceModule } from '../workspace/modules/workspaces.module';
 
 @Module({
-  imports: [
-        WorkspaceMembersModule,WorkspaceModule, ActivityModule],
+  imports: [WorkspaceMembersModule, WorkspaceModule, ActivityModule],
 
   controllers: [ApplicationsController],
 

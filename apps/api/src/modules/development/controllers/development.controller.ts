@@ -1,16 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  Query,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
 
@@ -125,12 +113,7 @@ export class DevelopmentController {
     @Body()
     dto: CreateMilestoneDto,
   ) {
-    return this.developmentService.createMilestone(
-      workspaceId,
-      applicationId,
-      dto,
-      request.user.id,
-    );
+    return this.developmentService.createMilestone(workspaceId, applicationId, dto, request.user.id);
   }
 
   @Patch('milestones/:milestoneId')
@@ -151,13 +134,7 @@ export class DevelopmentController {
     @Body()
     dto: UpdateMilestoneDto,
   ) {
-    return this.developmentService.updateMilestone(
-      workspaceId,
-      applicationId,
-      milestoneId,
-      dto,
-      request.user.id,
-    );
+    return this.developmentService.updateMilestone(workspaceId, applicationId, milestoneId, dto, request.user.id);
   }
 
   @Post('milestones/:milestoneId/complete')
@@ -172,12 +149,7 @@ export class DevelopmentController {
     @Param('milestoneId', ParseUUIDPipe)
     milestoneId: string,
   ) {
-    return this.developmentService.completeMilestone(
-      workspaceId,
-      applicationId,
-      milestoneId,
-      request.user.id,
-    );
+    return this.developmentService.completeMilestone(workspaceId, applicationId, milestoneId, request.user.id);
   }
 
   @Post('milestones/:milestoneId/reopen')
@@ -192,12 +164,7 @@ export class DevelopmentController {
     @Param('milestoneId', ParseUUIDPipe)
     milestoneId: string,
   ) {
-    return this.developmentService.reopenMilestone(
-      workspaceId,
-      applicationId,
-      milestoneId,
-      request.user.id,
-    );
+    return this.developmentService.reopenMilestone(workspaceId, applicationId, milestoneId, request.user.id);
   }
 
   @Post('milestones/:milestoneId/skip')
@@ -214,13 +181,7 @@ export class DevelopmentController {
     @Body()
     dto: SkipWorkItemDto,
   ) {
-    return this.developmentService.skipMilestone(
-      workspaceId,
-      applicationId,
-      milestoneId,
-      dto,
-      request.user.id,
-    );
+    return this.developmentService.skipMilestone(workspaceId, applicationId, milestoneId, dto, request.user.id);
   }
 
   @Delete('milestones/:milestoneId')
@@ -235,12 +196,7 @@ export class DevelopmentController {
     @Param('milestoneId', ParseUUIDPipe)
     milestoneId: string,
   ) {
-    await this.developmentService.deleteMilestone(
-      workspaceId,
-      applicationId,
-      milestoneId,
-      request.user.id,
-    );
+    await this.developmentService.deleteMilestone(workspaceId, applicationId, milestoneId, request.user.id);
 
     return {
       message: 'Milestone deleted',
@@ -259,12 +215,7 @@ export class DevelopmentController {
     @Body()
     dto: ReorderItemsDto,
   ) {
-    return this.developmentService.reorderMilestones(
-      workspaceId,
-      applicationId,
-      dto,
-      request.user.id,
-    );
+    return this.developmentService.reorderMilestones(workspaceId, applicationId, dto, request.user.id);
   }
 
   @Post('milestones/:milestoneId/tasks')
@@ -281,13 +232,7 @@ export class DevelopmentController {
     @Body()
     dto: CreateTaskDto,
   ) {
-    return this.developmentService.createTask(
-      workspaceId,
-      applicationId,
-      milestoneId,
-      dto,
-      request.user.id,
-    );
+    return this.developmentService.createTask(workspaceId, applicationId, milestoneId, dto, request.user.id);
   }
 
   @Patch('tasks/:taskId')
@@ -304,13 +249,7 @@ export class DevelopmentController {
     @Body()
     dto: UpdateTaskDto,
   ) {
-    return this.developmentService.updateTask(
-      workspaceId,
-      applicationId,
-      taskId,
-      dto,
-      request.user.id,
-    );
+    return this.developmentService.updateTask(workspaceId, applicationId, taskId, dto, request.user.id);
   }
 
   @Post('tasks/:taskId/status')
@@ -327,13 +266,7 @@ export class DevelopmentController {
     @Body()
     dto: ChangeTaskStatusDto,
   ) {
-    return this.developmentService.setTaskStatus(
-      workspaceId,
-      applicationId,
-      taskId,
-      dto,
-      request.user.id,
-    );
+    return this.developmentService.setTaskStatus(workspaceId, applicationId, taskId, dto, request.user.id);
   }
 
   @Post('tasks/:taskId/complete')
@@ -348,12 +281,7 @@ export class DevelopmentController {
     @Param('taskId', ParseUUIDPipe)
     taskId: string,
   ) {
-    return this.developmentService.completeTask(
-      workspaceId,
-      applicationId,
-      taskId,
-      request.user.id,
-    );
+    return this.developmentService.completeTask(workspaceId, applicationId, taskId, request.user.id);
   }
 
   @Post('tasks/:taskId/reopen')
@@ -385,13 +313,7 @@ export class DevelopmentController {
     @Body()
     dto: SkipWorkItemDto,
   ) {
-    return this.developmentService.skipTask(
-      workspaceId,
-      applicationId,
-      taskId,
-      dto,
-      request.user.id,
-    );
+    return this.developmentService.skipTask(workspaceId, applicationId, taskId, dto, request.user.id);
   }
 
   @Post('tasks/:taskId/move')
@@ -408,13 +330,7 @@ export class DevelopmentController {
     @Body()
     dto: MoveTaskDto,
   ) {
-    return this.developmentService.moveTask(
-      workspaceId,
-      applicationId,
-      taskId,
-      dto,
-      request.user.id,
-    );
+    return this.developmentService.moveTask(workspaceId, applicationId, taskId, dto, request.user.id);
   }
 
   @Post('milestones/:milestoneId/tasks/reorder')
@@ -431,13 +347,7 @@ export class DevelopmentController {
     @Body()
     dto: ReorderItemsDto,
   ) {
-    return this.developmentService.reorderTasks(
-      workspaceId,
-      applicationId,
-      milestoneId,
-      dto,
-      request.user.id,
-    );
+    return this.developmentService.reorderTasks(workspaceId, applicationId, milestoneId, dto, request.user.id);
   }
 
   @Delete('tasks/:taskId')
@@ -500,13 +410,7 @@ export class DevelopmentController {
     @Body()
     dto: UpdateBlockerDto,
   ) {
-    return this.developmentService.updateBlocker(
-      workspaceId,
-      applicationId,
-      blockerId,
-      dto,
-      request.user.id,
-    );
+    return this.developmentService.updateBlocker(workspaceId, applicationId, blockerId, dto, request.user.id);
   }
 
   @Post('blockers/:blockerId/resolve')
@@ -523,13 +427,7 @@ export class DevelopmentController {
     @Body()
     dto: ResolveBlockerDto,
   ) {
-    return this.developmentService.resolveBlocker(
-      workspaceId,
-      applicationId,
-      blockerId,
-      dto,
-      request.user.id,
-    );
+    return this.developmentService.resolveBlocker(workspaceId, applicationId, blockerId, dto, request.user.id);
   }
 
   @Post('blockers/:blockerId/reopen')
@@ -544,12 +442,7 @@ export class DevelopmentController {
     @Param('blockerId', ParseUUIDPipe)
     blockerId: string,
   ) {
-    return this.developmentService.reopenBlocker(
-      workspaceId,
-      applicationId,
-      blockerId,
-      request.user.id,
-    );
+    return this.developmentService.reopenBlocker(workspaceId, applicationId, blockerId, request.user.id);
   }
 
   @Delete('blockers/:blockerId')
@@ -564,12 +457,7 @@ export class DevelopmentController {
     @Param('blockerId', ParseUUIDPipe)
     blockerId: string,
   ) {
-    await this.developmentService.deleteBlocker(
-      workspaceId,
-      applicationId,
-      blockerId,
-      request.user.id,
-    );
+    await this.developmentService.deleteBlocker(workspaceId, applicationId, blockerId, request.user.id);
 
     return {
       message: 'Blocker deleted',

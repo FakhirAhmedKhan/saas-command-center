@@ -81,9 +81,7 @@ export function getMetadataSummary(activity: ApplicationActivity): string | null
   const changedFields = metadata.changedFields;
 
   if (Array.isArray(changedFields)) {
-    const fields = changedFields
-      .filter((field): field is string => typeof field === 'string')
-      .map(humanizeValue);
+    const fields = changedFields.filter((field): field is string => typeof field === 'string').map(humanizeValue);
 
     if (fields.length > 0) {
       return `Changed: ${fields.join(', ')}`;

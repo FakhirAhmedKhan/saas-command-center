@@ -105,11 +105,7 @@ describe('Analytics Ingestion E2E', () => {
     expect(stored).toHaveLength(3);
 
     expect(new Set(stored.map((event) => event.type))).toEqual(
-      new Set([
-        RawAnalyticsEventType.PAGE_VIEW,
-        RawAnalyticsEventType.HEARTBEAT,
-        RawAnalyticsEventType.CUSTOM,
-      ]),
+      new Set([RawAnalyticsEventType.PAGE_VIEW, RawAnalyticsEventType.HEARTBEAT, RawAnalyticsEventType.CUSTOM]),
     );
 
     expect(stored.every((event) => event.sdkVersion === '1.0.0-e2e')).toBe(true);

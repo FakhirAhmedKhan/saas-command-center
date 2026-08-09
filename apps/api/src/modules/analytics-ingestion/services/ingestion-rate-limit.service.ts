@@ -9,15 +9,9 @@ interface RateLimitBucket {
 export class IngestionRateLimitService {
   private readonly buckets = new Map<string, RateLimitBucket>();
 
-  private readonly windowMs = this.readPositiveInteger(
-    process.env.ANALYTICS_RATE_WINDOW_MS,
-    60_000,
-  );
+  private readonly windowMs = this.readPositiveInteger(process.env.ANALYTICS_RATE_WINDOW_MS, 60_000);
 
-  private readonly maxEvents = this.readPositiveInteger(
-    process.env.ANALYTICS_RATE_MAX_EVENTS,
-    1_000,
-  );
+  private readonly maxEvents = this.readPositiveInteger(process.env.ANALYTICS_RATE_MAX_EVENTS, 1_000);
 
   consume(key: string, eventCount: number): void {
     if (eventCount > this.maxEvents) {

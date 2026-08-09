@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 
 import { Prisma, WorkspaceRole } from '../../../generated/prisma/client';
 import { PrismaService } from '../../../database/prisma.service';
@@ -86,11 +81,7 @@ export class WorkspacesService {
       });
     });
   }
-  async transferOwnership(
-    workspaceId: string,
-    currentOwnerId: string,
-    newOwnerId: string,
-  ): Promise<WorkspaceSummary> {
+  async transferOwnership(workspaceId: string, currentOwnerId: string, newOwnerId: string): Promise<WorkspaceSummary> {
     if (currentOwnerId === newOwnerId) {
       throw new BadRequestException('The selected user already owns the workspace');
     }

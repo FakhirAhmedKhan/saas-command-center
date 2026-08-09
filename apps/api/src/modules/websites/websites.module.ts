@@ -9,8 +9,7 @@ import { WebsitesService } from './services/websites.service';
 import { WorkspaceModule } from '../workspace/modules/workspaces.module';
 
 @Module({
-  imports: [
-        WorkspaceMembersModule,WorkspaceModule, ActivityModule],
+  imports: [WorkspaceMembersModule, WorkspaceModule, ActivityModule],
 
   controllers: [WebsitesController],
 

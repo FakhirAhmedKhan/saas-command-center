@@ -21,30 +21,27 @@ describe('createCsv', () => {
     expect(result).toContain('"Hello, ""World"""');
   });
 
-  it.each(['=SUM(A1:A2)', '+1+1', '-1+1', '@IMPORT', '\tformula', '\rformula'])(
-    'protects dangerous spreadsheet values: %s',
-    (dangerousValue) => {
-      const result = createCsv(
-        [
-          {
-            header: 'Value',
+  it.each(['=SUM(A1:A2)', '+1+1', '-1+1', '@IMPORT', '\tformula', '\rformula'])('protects dangerous spreadsheet values: %s', (dangerousValue) => {
+    const result = createCsv(
+      [
+        {
+          header: 'Value',
 
-            value: (row: { value: string }) => row.value,
-          },
-        ],
+          value: (row: { value: string }) => row.value,
+        },
+      ],
 
-        [
-          {
-            value: dangerousValue,
-          },
-        ],
-      );
+      [
+        {
+          value: dangerousValue,
+        },
+      ],
+    );
 
-      expect(result).toContain(
-        `"'\${
+    expect(result).toContain(
+      `"'\${
                         dangerousValue
                     }"`.replace('\\$', '$'),
-      );
-    },
-  );
+    );
+  });
 });

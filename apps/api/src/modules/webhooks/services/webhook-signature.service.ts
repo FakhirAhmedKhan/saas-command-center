@@ -13,9 +13,7 @@ export class WebhookSignatureService {
 
     rawBody: string,
   ): string {
-    const digest = createHmac('sha256', secret)
-      .update(`${timestamp}.${rawBody}`, 'utf8')
-      .digest('hex');
+    const digest = createHmac('sha256', secret).update(`${timestamp}.${rawBody}`, 'utf8').digest('hex');
 
     return `${WEBHOOK_SIGNATURE_VERSION}=${digest}`;
   }

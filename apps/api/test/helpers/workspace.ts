@@ -101,11 +101,7 @@ export async function registerWorkspaceTestUser(
   };
 }
 
-export async function addWorkspaceMember(
-  actor: WorkspaceTestUser,
-  target: WorkspaceTestUser,
-  role?: WorkspaceRole,
-): Promise<Response> {
+export async function addWorkspaceMember(actor: WorkspaceTestUser, target: WorkspaceTestUser, role?: WorkspaceRole): Promise<Response> {
   const payload: {
     email: string;
     role?: WorkspaceRole;
@@ -117,39 +113,20 @@ export async function addWorkspaceMember(
     payload.role = role;
   }
 
-  return actor.agent
-    .post(workspaceRoutes.members(actor.workspaceId))
-    .set(withBearer(actor.accessToken))
-    .send(payload);
+  return actor.agent.post(workspaceRoutes.members(actor.workspaceId)).set(withBearer(actor.accessToken)).send(payload);
 }
 
-export async function updateWorkspaceMemberRole(
-  actor: WorkspaceTestUser,
-  targetUserId: string,
-  role: WorkspaceRole,
-): Promise<Response> {
-  return actor.agent
-    .patch(workspaceRoutes.member(actor.workspaceId, targetUserId))
-    .set(withBearer(actor.accessToken))
-    .send({
-      role,
-    });
+export async function updateWorkspaceMemberRole(actor: WorkspaceTestUser, targetUserId: string, role: WorkspaceRole): Promise<Response> {
+  return actor.agent.patch(workspaceRoutes.member(actor.workspaceId, targetUserId)).set(withBearer(actor.accessToken)).send({
+    role,
+  });
 }
 
-export async function removeWorkspaceMember(
-  actor: WorkspaceTestUser,
-  targetUserId: string,
-): Promise<Response> {
-  return actor.agent
-    .delete(workspaceRoutes.member(actor.workspaceId, targetUserId))
-    .set(withBearer(actor.accessToken));
+export async function removeWorkspaceMember(actor: WorkspaceTestUser, targetUserId: string): Promise<Response> {
+  return actor.agent.delete(workspaceRoutes.member(actor.workspaceId, targetUserId)).set(withBearer(actor.accessToken));
 }
 
-export async function getWorkspaceMembership(
-  prisma: PrismaService,
-  workspaceId: string,
-  userId: string,
-) {
+export async function getWorkspaceMembership(prisma: PrismaService, workspaceId: string, userId: string) {
   return prisma.workspaceMember.findFirst({
     where: {
       workspaceId,
@@ -169,24 +146,11 @@ export function readWorkspaceMembers(response: Response): NormalizedWorkspaceMem
   const rawMembers = readResponseArray<Record<string, unknown>>(response);
 
   return rawMembers.map((member): NormalizedWorkspaceMember => {
-    const nestedUser =
-      member.user && typeof member.user === 'object'
-        ? (member.user as Record<string, unknown>)
-        : undefined;
+    const nestedUser = member.user && typeof member.user === 'object' ? (member.user as Record<string, unknown>) : undefined;
 
-    const userId =
-      typeof member.userId === 'string'
-        ? member.userId
-        : typeof nestedUser?.id === 'string'
-          ? nestedUser.id
-          : undefined;
+    const userId = typeof member.userId === 'string' ? member.userId : typeof nestedUser?.id === 'string' ? nestedUser.id : undefined;
 
-    const email =
-      typeof member.email === 'string'
-        ? member.email
-        : typeof nestedUser?.email === 'string'
-          ? nestedUser.email
-          : undefined;
+    const email = typeof member.email === 'string' ? member.email : typeof nestedUser?.email === 'string' ? nestedUser.email : undefined;
 
     const role = typeof member.role === 'string' ? member.role : undefined;
 

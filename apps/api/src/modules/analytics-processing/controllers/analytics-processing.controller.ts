@@ -2,13 +2,7 @@ import { AnalyticsProcessingAccessService } from '../services/analytics-processi
 
 import { Body, Controller, Get, Param, ParseUUIDPipe, Post, UseGuards } from '@nestjs/common';
 
-import {
-  ApiBearerAuth,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { AnalyticsProcessingTrigger } from '../../../generated/prisma/client';
 
@@ -18,10 +12,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
 import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
 
-import {
-  AnalyticsProcessingStatusDto,
-  ProcessingRunDto,
-} from '../dto/analytics-processing-response.dto';
+import { AnalyticsProcessingStatusDto, ProcessingRunDto } from '../dto/analytics-processing-response.dto';
 
 import { ReprocessAnalyticsDto } from '../dto/reprocess-analytics.dto';
 

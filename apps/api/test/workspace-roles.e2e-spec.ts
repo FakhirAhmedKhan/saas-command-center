@@ -49,21 +49,15 @@ describe('Workspace Roles and Ownership E2E', () => {
 
     expect([200, 201]).toContain(addAdminResponse.status);
 
-    const ownerUpdateResponse = await owner.agent
-      .patch(workspaceRoutes.details(owner.workspaceId))
-      .set(withBearer(owner.accessToken))
-      .send({
-        name: 'Owner Updated Workspace',
-      });
+    const ownerUpdateResponse = await owner.agent.patch(workspaceRoutes.details(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
+      name: 'Owner Updated Workspace',
+    });
 
     expect(ownerUpdateResponse.status).toBe(200);
 
-    const adminUpdateResponse = await admin.agent
-      .patch(workspaceRoutes.details(owner.workspaceId))
-      .set(withBearer(admin.accessToken))
-      .send({
-        name: 'Admin Updated Workspace',
-      });
+    const adminUpdateResponse = await admin.agent.patch(workspaceRoutes.details(owner.workspaceId)).set(withBearer(admin.accessToken)).send({
+      name: 'Admin Updated Workspace',
+    });
 
     expect(adminUpdateResponse.status).toBe(200);
 
@@ -87,29 +81,19 @@ describe('Workspace Roles and Ownership E2E', () => {
 
     const viewer = await registerWorkspaceTestUser(app, prisma);
 
-    expect([200, 201]).toContain(
-      (await addWorkspaceMember(owner, developer, WorkspaceRole.DEVELOPER)).status,
-    );
+    expect([200, 201]).toContain((await addWorkspaceMember(owner, developer, WorkspaceRole.DEVELOPER)).status);
 
-    expect([200, 201]).toContain(
-      (await addWorkspaceMember(owner, viewer, WorkspaceRole.VIEWER)).status,
-    );
+    expect([200, 201]).toContain((await addWorkspaceMember(owner, viewer, WorkspaceRole.VIEWER)).status);
 
-    const developerResponse = await developer.agent
-      .patch(workspaceRoutes.details(owner.workspaceId))
-      .set(withBearer(developer.accessToken))
-      .send({
-        name: 'Developer Unauthorized Name',
-      });
+    const developerResponse = await developer.agent.patch(workspaceRoutes.details(owner.workspaceId)).set(withBearer(developer.accessToken)).send({
+      name: 'Developer Unauthorized Name',
+    });
 
     expect(developerResponse.status).toBe(403);
 
-    const viewerResponse = await viewer.agent
-      .patch(workspaceRoutes.details(owner.workspaceId))
-      .set(withBearer(viewer.accessToken))
-      .send({
-        name: 'Viewer Unauthorized Name',
-      });
+    const viewerResponse = await viewer.agent.patch(workspaceRoutes.details(owner.workspaceId)).set(withBearer(viewer.accessToken)).send({
+      name: 'Viewer Unauthorized Name',
+    });
 
     expect(viewerResponse.status).toBe(403);
   });
@@ -123,33 +107,23 @@ describe('Workspace Roles and Ownership E2E', () => {
 
     const target = await registerWorkspaceTestUser(app, prisma);
 
-    expect([200, 201]).toContain(
-      (await addWorkspaceMember(owner, developer, WorkspaceRole.DEVELOPER)).status,
-    );
+    expect([200, 201]).toContain((await addWorkspaceMember(owner, developer, WorkspaceRole.DEVELOPER)).status);
 
-    expect([200, 201]).toContain(
-      (await addWorkspaceMember(owner, viewer, WorkspaceRole.VIEWER)).status,
-    );
+    expect([200, 201]).toContain((await addWorkspaceMember(owner, viewer, WorkspaceRole.VIEWER)).status);
 
-    const developerResponse = await developer.agent
-      .post(workspaceRoutes.members(owner.workspaceId))
-      .set(withBearer(developer.accessToken))
-      .send({
-        email: target.input.email,
+    const developerResponse = await developer.agent.post(workspaceRoutes.members(owner.workspaceId)).set(withBearer(developer.accessToken)).send({
+      email: target.input.email,
 
-        role: WorkspaceRole.VIEWER,
-      });
+      role: WorkspaceRole.VIEWER,
+    });
 
     expect(developerResponse.status).toBe(403);
 
-    const viewerResponse = await viewer.agent
-      .post(workspaceRoutes.members(owner.workspaceId))
-      .set(withBearer(viewer.accessToken))
-      .send({
-        email: target.input.email,
+    const viewerResponse = await viewer.agent.post(workspaceRoutes.members(owner.workspaceId)).set(withBearer(viewer.accessToken)).send({
+      email: target.input.email,
 
-        role: WorkspaceRole.VIEWER,
-      });
+      role: WorkspaceRole.VIEWER,
+    });
 
     expect(viewerResponse.status).toBe(403);
 
@@ -165,18 +139,13 @@ describe('Workspace Roles and Ownership E2E', () => {
 
     const target = await registerWorkspaceTestUser(app, prisma);
 
-    expect([200, 201]).toContain(
-      (await addWorkspaceMember(owner, admin, WorkspaceRole.ADMIN)).status,
-    );
+    expect([200, 201]).toContain((await addWorkspaceMember(owner, admin, WorkspaceRole.ADMIN)).status);
 
-    const adminAddResponse = await admin.agent
-      .post(workspaceRoutes.members(owner.workspaceId))
-      .set(withBearer(admin.accessToken))
-      .send({
-        email: target.input.email,
+    const adminAddResponse = await admin.agent.post(workspaceRoutes.members(owner.workspaceId)).set(withBearer(admin.accessToken)).send({
+      email: target.input.email,
 
-        role: WorkspaceRole.DEVELOPER,
-      });
+      role: WorkspaceRole.DEVELOPER,
+    });
 
     expect([200, 201]).toContain(adminAddResponse.status);
 
@@ -184,20 +153,13 @@ describe('Workspace Roles and Ownership E2E', () => {
 
     expect(targetMembership?.role).toBe(WorkspaceRole.DEVELOPER);
 
-    const promoteToOwnerResponse = await admin.agent
-      .patch(workspaceRoutes.member(owner.workspaceId, target.userId))
-      .set(withBearer(admin.accessToken))
-      .send({
-        role: WorkspaceRole.OWNER,
-      });
+    const promoteToOwnerResponse = await admin.agent.patch(workspaceRoutes.member(owner.workspaceId, target.userId)).set(withBearer(admin.accessToken)).send({
+      role: WorkspaceRole.OWNER,
+    });
 
     expectBusinessRuleRejected(promoteToOwnerResponse);
 
-    const membershipAfterAttempt = await getWorkspaceMembership(
-      prisma,
-      owner.workspaceId,
-      target.userId,
-    );
+    const membershipAfterAttempt = await getWorkspaceMembership(prisma, owner.workspaceId, target.userId);
 
     expect(membershipAfterAttempt?.role).not.toBe(WorkspaceRole.OWNER);
   });
@@ -207,22 +169,15 @@ describe('Workspace Roles and Ownership E2E', () => {
 
     const admin = await registerWorkspaceTestUser(app, prisma);
 
-    expect([200, 201]).toContain(
-      (await addWorkspaceMember(owner, admin, WorkspaceRole.ADMIN)).status,
-    );
+    expect([200, 201]).toContain((await addWorkspaceMember(owner, admin, WorkspaceRole.ADMIN)).status);
 
-    const updateOwnerResponse = await admin.agent
-      .patch(workspaceRoutes.member(owner.workspaceId, owner.userId))
-      .set(withBearer(admin.accessToken))
-      .send({
-        role: WorkspaceRole.VIEWER,
-      });
+    const updateOwnerResponse = await admin.agent.patch(workspaceRoutes.member(owner.workspaceId, owner.userId)).set(withBearer(admin.accessToken)).send({
+      role: WorkspaceRole.VIEWER,
+    });
 
     expectBusinessRuleRejected(updateOwnerResponse);
 
-    const removeOwnerResponse = await admin.agent
-      .delete(workspaceRoutes.member(owner.workspaceId, owner.userId))
-      .set(withBearer(admin.accessToken));
+    const removeOwnerResponse = await admin.agent.delete(workspaceRoutes.member(owner.workspaceId, owner.userId)).set(withBearer(admin.accessToken));
 
     expectBusinessRuleRejected(removeOwnerResponse);
 
@@ -236,16 +191,11 @@ describe('Workspace Roles and Ownership E2E', () => {
 
     const successor = await registerWorkspaceTestUser(app, prisma);
 
-    expect([200, 201]).toContain(
-      (await addWorkspaceMember(owner, successor, WorkspaceRole.ADMIN)).status,
-    );
+    expect([200, 201]).toContain((await addWorkspaceMember(owner, successor, WorkspaceRole.ADMIN)).status);
 
-    const transferResponse = await owner.agent
-      .post(workspaceRoutes.transferOwnership(owner.workspaceId))
-      .set(withBearer(owner.accessToken))
-      .send({
-        newOwnerUserId: successor.userId,
-      });
+    const transferResponse = await owner.agent.post(workspaceRoutes.transferOwnership(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
+      newOwnerUserId: successor.userId,
+    });
 
     expect([200, 201]).toContain(transferResponse.status);
 
@@ -261,30 +211,19 @@ describe('Workspace Roles and Ownership E2E', () => {
 
     expect(workspace?.ownerId).toBe(successor.userId);
 
-    const successorMembership = await getWorkspaceMembership(
-      prisma,
-      owner.workspaceId,
-      successor.userId,
-    );
+    const successorMembership = await getWorkspaceMembership(prisma, owner.workspaceId, successor.userId);
 
     expect(successorMembership?.role).toBe(WorkspaceRole.OWNER);
 
-    const previousOwnerMembership = await getWorkspaceMembership(
-      prisma,
-      owner.workspaceId,
-      owner.userId,
-    );
+    const previousOwnerMembership = await getWorkspaceMembership(prisma, owner.workspaceId, owner.userId);
 
     expect(previousOwnerMembership).not.toBeNull();
 
     expect(previousOwnerMembership?.role).not.toBe(WorkspaceRole.OWNER);
 
-    const successorUpdateResponse = await successor.agent
-      .patch(workspaceRoutes.details(owner.workspaceId))
-      .set(withBearer(successor.accessToken))
-      .send({
-        name: 'Transferred Workspace',
-      });
+    const successorUpdateResponse = await successor.agent.patch(workspaceRoutes.details(owner.workspaceId)).set(withBearer(successor.accessToken)).send({
+      name: 'Transferred Workspace',
+    });
 
     expect(successorUpdateResponse.status).toBe(200);
   });
@@ -294,16 +233,11 @@ describe('Workspace Roles and Ownership E2E', () => {
 
     const admin = await registerWorkspaceTestUser(app, prisma);
 
-    expect([200, 201]).toContain(
-      (await addWorkspaceMember(owner, admin, WorkspaceRole.ADMIN)).status,
-    );
+    expect([200, 201]).toContain((await addWorkspaceMember(owner, admin, WorkspaceRole.ADMIN)).status);
 
-    const response = await admin.agent
-      .post(workspaceRoutes.transferOwnership(owner.workspaceId))
-      .set(withBearer(admin.accessToken))
-      .send({
-        newOwnerUserId: admin.userId,
-      });
+    const response = await admin.agent.post(workspaceRoutes.transferOwnership(owner.workspaceId)).set(withBearer(admin.accessToken)).send({
+      newOwnerUserId: admin.userId,
+    });
 
     expect(response.status).toBe(403);
 
@@ -325,12 +259,9 @@ describe('Workspace Roles and Ownership E2E', () => {
 
     const outsider = await registerWorkspaceTestUser(app, prisma);
 
-    const response = await owner.agent
-      .post(workspaceRoutes.transferOwnership(owner.workspaceId))
-      .set(withBearer(owner.accessToken))
-      .send({
-        newOwnerUserId: outsider.userId,
-      });
+    const response = await owner.agent.post(workspaceRoutes.transferOwnership(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
+      newOwnerUserId: outsider.userId,
+    });
 
     expectBusinessRuleRejected(response);
 
@@ -350,11 +281,7 @@ describe('Workspace Roles and Ownership E2E', () => {
   it('prevents the only OWNER from being demoted or removed', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
 
-    const demotionResponse = await updateWorkspaceMemberRole(
-      owner,
-      owner.userId,
-      WorkspaceRole.ADMIN,
-    );
+    const demotionResponse = await updateWorkspaceMemberRole(owner, owner.userId, WorkspaceRole.ADMIN);
 
     expectBusinessRuleRejected(demotionResponse);
 
@@ -388,9 +315,7 @@ describe('Workspace Roles and Ownership E2E', () => {
       workspaceName: 'Beta Role Workspace',
     });
 
-    const response = await betaOwner.agent
-      .get(workspaceRoutes.members(alphaOwner.workspaceId))
-      .set(withBearer(betaOwner.accessToken));
+    const response = await betaOwner.agent.get(workspaceRoutes.members(alphaOwner.workspaceId)).set(withBearer(betaOwner.accessToken));
 
     expectAccessDenied(response);
   });

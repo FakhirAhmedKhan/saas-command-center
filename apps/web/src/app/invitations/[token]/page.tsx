@@ -8,11 +8,7 @@ import { useParams, useRouter } from 'next/navigation';
 
 import { useSession } from '@/features/auth/use-session';
 
-import {
-  acceptInvitation,
-  declineInvitation,
-  getInvitationPreview,
-} from '@/features/team-operations/team-operations-api';
+import { acceptInvitation, declineInvitation, getInvitationPreview } from '@/features/team-operations/team-operations-api';
 
 import type { InvitationPreview } from '@/features/team-operations/team-operations.types';
 import { getErrorMessage } from '@/features/applications/application-utils';
@@ -119,19 +115,14 @@ export default function InvitationPage() {
         <h1 className="mt-2 text-2xl font-bold text-slate-950">Join {invitation.workspace.name}</h1>
 
         <p className="mt-3 text-sm text-slate-600">
-          {invitation.invitedBy.name ?? invitation.invitedBy.email} invited{' '}
-          <strong>{invitation.email}</strong> as <strong>{invitation.role}</strong>.
+          {invitation.invitedBy.name ?? invitation.invitedBy.email} invited <strong>{invitation.email}</strong> as <strong>{invitation.role}</strong>.
         </p>
 
         {unavailable ? (
-          <div className="mt-5 rounded-xl bg-amber-50 p-4 text-sm text-amber-800">
-            This invitation is {invitation.status.toLowerCase()}.
-          </div>
+          <div className="mt-5 rounded-xl bg-amber-50 p-4 text-sm text-amber-800">This invitation is {invitation.status.toLowerCase()}.</div>
         ) : status === 'unauthenticated' ? (
           <div className="mt-6">
-            <p className="text-sm text-slate-600">
-              Sign in using {invitation.email} before accepting.
-            </p>
+            <p className="text-sm text-slate-600">Sign in using {invitation.email} before accepting.</p>
 
             <Link
               href={`/login?next=${encodeURIComponent(`/invitations/${params.token}`)}`}
@@ -151,9 +142,7 @@ export default function InvitationPage() {
             <div className="mt-6 flex gap-3">
               <button
                 type="button"
-                disabled={
-                  submitting || user?.email.toLowerCase() !== invitation.email.toLowerCase()
-                }
+                disabled={submitting || user?.email.toLowerCase() !== invitation.email.toLowerCase()}
                 onClick={() => {
                   void accept();
                 }}
@@ -164,9 +153,7 @@ export default function InvitationPage() {
 
               <button
                 type="button"
-                disabled={
-                  submitting || user?.email.toLowerCase() !== invitation.email.toLowerCase()
-                }
+                disabled={submitting || user?.email.toLowerCase() !== invitation.email.toLowerCase()}
                 onClick={() => {
                   void decline();
                 }}

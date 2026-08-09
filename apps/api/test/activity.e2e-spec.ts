@@ -20,11 +20,7 @@ import { createTestApp } from './helpers/create-test-app';
 
 import { resetDatabase } from './helpers/database';
 
-import {
-  expectAccessDenied,
-  registerWorkspaceTestUser,
-  type WorkspaceTestUser,
-} from './helpers/workspace';
+import { expectAccessDenied, registerWorkspaceTestUser, type WorkspaceTestUser } from './helpers/workspace';
 
 describe('Application Activity E2E', () => {
   let app: INestApplication;
@@ -43,25 +39,12 @@ describe('Application Activity E2E', () => {
     await app.close();
   });
 
-  async function listApplicationActivity(
-    actor: WorkspaceTestUser,
-    applicationId: string,
-    query: Record<string, string | number> = {},
-  ) {
-    return actor.agent
-      .get(applicationRoutes.applicationActivities(actor.workspaceId, applicationId))
-      .set(withBearer(actor.accessToken))
-      .query(query);
+  async function listApplicationActivity(actor: WorkspaceTestUser, applicationId: string, query: Record<string, string | number> = {}) {
+    return actor.agent.get(applicationRoutes.applicationActivities(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken)).query(query);
   }
 
-  async function listWorkspaceActivity(
-    actor: WorkspaceTestUser,
-    query: Record<string, string | number> = {},
-  ) {
-    return actor.agent
-      .get(applicationRoutes.workspaceActivities(actor.workspaceId))
-      .set(withBearer(actor.accessToken))
-      .query(query);
+  async function listWorkspaceActivity(actor: WorkspaceTestUser, query: Record<string, string | number> = {}) {
+    return actor.agent.get(applicationRoutes.workspaceActivities(actor.workspaceId)).set(withBearer(actor.accessToken)).query(query);
   }
 
   it('writes application create and update activities', async () => {
@@ -246,9 +229,7 @@ describe('Application Activity E2E', () => {
 
     expect(serialized).not.toContain(betaApp.id);
 
-    const foreignResponse = await betaOwner.agent
-      .get(applicationRoutes.workspaceActivities(alphaOwner.workspaceId))
-      .set(withBearer(betaOwner.accessToken));
+    const foreignResponse = await betaOwner.agent.get(applicationRoutes.workspaceActivities(alphaOwner.workspaceId)).set(withBearer(betaOwner.accessToken));
 
     expectAccessDenied(foreignResponse);
 

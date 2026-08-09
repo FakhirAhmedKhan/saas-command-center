@@ -2,13 +2,7 @@ import type { INestApplication } from '@nestjs/common';
 
 import { PrismaService } from 'src/database/prisma.service';
 
-import {
-  buildEventBatch,
-  buildTrackerEvent,
-  collectEvents,
-  createTrackedWebsite,
-  expectCollectionAccepted,
-} from './helpers/analytics-ingestion';
+import { buildEventBatch, buildTrackerEvent, collectEvents, createTrackedWebsite, expectCollectionAccepted } from './helpers/analytics-ingestion';
 
 import { createTestApp } from './helpers/create-test-app';
 
@@ -62,19 +56,11 @@ describe('Analytics Ingestion Rate Limit E2E', () => {
 
     const trackedWebsite = await createTrackedWebsite(owner);
 
-    expectCollectionAccepted(
-      await collectEvents(app, trackedWebsite, buildEventBatch(trackedWebsite.origin, 3)),
-      3,
-    );
+    expectCollectionAccepted(await collectEvents(app, trackedWebsite, buildEventBatch(trackedWebsite.origin, 3)), 3);
 
-    expectCollectionAccepted(
-      await collectEvents(app, trackedWebsite, buildEventBatch(trackedWebsite.origin, 2)),
-      2,
-    );
+    expectCollectionAccepted(await collectEvents(app, trackedWebsite, buildEventBatch(trackedWebsite.origin, 2)), 2);
 
-    const rejected = await collectEvents(app, trackedWebsite, [
-      buildTrackerEvent(trackedWebsite.origin),
-    ]);
+    const rejected = await collectEvents(app, trackedWebsite, [buildTrackerEvent(trackedWebsite.origin)]);
 
     expect(rejected.status).toBe(400);
 
@@ -94,11 +80,7 @@ describe('Analytics Ingestion Rate Limit E2E', () => {
 
     const trackedWebsite = await createTrackedWebsite(owner);
 
-    const response = await collectEvents(
-      app,
-      trackedWebsite,
-      buildEventBatch(trackedWebsite.origin, 6),
-    );
+    const response = await collectEvents(app, trackedWebsite, buildEventBatch(trackedWebsite.origin, 6));
 
     /*
      * The current limiter starts a new bucket with the supplied count.
@@ -123,23 +105,13 @@ describe('Analytics Ingestion Rate Limit E2E', () => {
 
     const secondWebsite = await createTrackedWebsite(owner);
 
-    expectCollectionAccepted(
-      await collectEvents(app, firstWebsite, buildEventBatch(firstWebsite.origin, 5)),
-      5,
-    );
+    expectCollectionAccepted(await collectEvents(app, firstWebsite, buildEventBatch(firstWebsite.origin, 5)), 5);
 
-    expectCollectionAccepted(
-      await collectEvents(app, secondWebsite, buildEventBatch(secondWebsite.origin, 5)),
-      5,
-    );
+    expectCollectionAccepted(await collectEvents(app, secondWebsite, buildEventBatch(secondWebsite.origin, 5)), 5);
 
-    expect(
-      (await collectEvents(app, firstWebsite, [buildTrackerEvent(firstWebsite.origin)])).status,
-    ).toBe(400);
+    expect((await collectEvents(app, firstWebsite, [buildTrackerEvent(firstWebsite.origin)])).status).toBe(400);
 
-    expect(
-      (await collectEvents(app, secondWebsite, [buildTrackerEvent(secondWebsite.origin)])).status,
-    ).toBe(400);
+    expect((await collectEvents(app, secondWebsite, [buildTrackerEvent(secondWebsite.origin)])).status).toBe(400);
   });
 
   it('counts duplicate submissions toward the request rate', async () => {

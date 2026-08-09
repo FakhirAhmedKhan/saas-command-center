@@ -212,20 +212,12 @@ function MonitoringForm({
     <form onSubmit={submit} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="font-semibold text-slate-950">
-            {editing ? 'Edit health check' : 'Add health check'}
-          </h2>
+          <h2 className="font-semibold text-slate-950">{editing ? 'Edit health check' : 'Add health check'}</h2>
 
-          <p className="mt-1 text-sm text-slate-600">
-            Only public HTTP and HTTPS destinations are allowed.
-          </p>
+          <p className="mt-1 text-sm text-slate-600">Only public HTTP and HTTPS destinations are allowed.</p>
         </div>
 
-        <button
-          type="button"
-          onClick={onCancel}
-          className="text-sm font-medium text-slate-500 hover:text-slate-950"
-        >
+        <button type="button" onClick={onCancel} className="text-sm font-medium text-slate-500 hover:text-slate-950">
           Cancel
         </button>
       </div>
@@ -453,11 +445,7 @@ function MonitoringForm({
         Monitoring enabled
       </label>
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="mt-5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
-      >
+      <button type="submit" disabled={submitting} className="mt-5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">
         {submitting ? 'Savingâ€¦' : editing ? 'Save changes' : 'Create health check'}
       </button>
     </form>
@@ -539,9 +527,7 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
   const filteredChecks = useMemo(
     () =>
       (data?.checks ?? []).filter(
-        (check) =>
-          (statusFilter === 'ALL' || check.latestStatus === statusFilter) &&
-          (targetFilter === 'ALL' || check.targetType === targetFilter),
+        (check) => (statusFilter === 'ALL' || check.latestStatus === statusFilter) && (targetFilter === 'ALL' || check.targetType === targetFilter),
       ),
     [data, statusFilter, targetFilter],
   );
@@ -627,13 +613,7 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
       <PageError
         title="Monitoring unavailable"
         message={getErrorMessage(error)}
-        requestId={
-          error instanceof ApiError
-            ? 'requestId' in error && typeof error.requestId === 'string'
-              ? error.requestId
-              : undefined
-            : undefined
-        }
+        requestId={error instanceof ApiError ? ('requestId' in error && typeof error.requestId === 'string' ? error.requestId : undefined) : undefined}
         onRetry={() => {
           void load();
         }}
@@ -649,9 +629,7 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
 
           <h1 className="mt-1 text-2xl font-bold text-slate-950">Health monitoring</h1>
 
-          <p className="mt-2 text-sm text-slate-600">
-            Application and website availability, response times and incidents.
-          </p>
+          <p className="mt-2 text-sm text-slate-600">Application and website availability, response times and incidents.</p>
         </div>
 
         {data.summary.canManage ? (
@@ -686,10 +664,7 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
       </section>
 
       {actionError ? (
-        <div
-          role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"
-        >
+        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
           {actionError}
         </div>
       ) : null}
@@ -711,9 +686,7 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
       <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="grid gap-3 sm:grid-cols-2">
           <label>
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Status
-            </span>
+            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Status</span>
 
             <select
               value={statusFilter}
@@ -737,9 +710,7 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
           </label>
 
           <label>
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Target type
-            </span>
+            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Target type</span>
 
             <select
               value={targetFilter}
@@ -765,18 +736,11 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
           icon={undefined}
         />
       ) : filteredChecks.length === 0 ? (
-        <EmptyState
-          title="No matching health checks"
-          description="No health checks match the selected filters."
-          icon={undefined}
-        />
+        <EmptyState title="No matching health checks" description="No health checks match the selected filters." icon={undefined} />
       ) : (
         <section className="grid gap-4 lg:grid-cols-2">
           {filteredChecks.map((check) => (
-            <article
-              key={check.id}
-              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-            >
+            <article key={check.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
                   <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
@@ -785,9 +749,7 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
                     {check.targetName}
                   </p>
 
-                  <h2 className="mt-1 truncate text-lg font-semibold text-slate-950">
-                    {check.name}
-                  </h2>
+                  <h2 className="mt-1 truncate text-lg font-semibold text-slate-950">{check.name}</h2>
 
                   <p title={check.url} className="mt-1 truncate text-sm text-slate-500">
                     {check.url}
@@ -801,25 +763,19 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
                 <div>
                   <dt className="text-slate-500">Response</dt>
 
-                  <dd className="mt-1 font-semibold text-slate-900">
-                    {check.lastResponseTimeMs !== null ? `${check.lastResponseTimeMs}ms` : 'â€”'}
-                  </dd>
+                  <dd className="mt-1 font-semibold text-slate-900">{check.lastResponseTimeMs !== null ? `${check.lastResponseTimeMs}ms` : 'â€”'}</dd>
                 </div>
 
                 <div>
                   <dt className="text-slate-500">HTTP status</dt>
 
-                  <dd className="mt-1 font-semibold text-slate-900">
-                    {check.lastStatusCode ?? 'â€”'}
-                  </dd>
+                  <dd className="mt-1 font-semibold text-slate-900">{check.lastStatusCode ?? 'â€”'}</dd>
                 </div>
 
                 <div>
                   <dt className="text-slate-500">Last checked</dt>
 
-                  <dd className="mt-1 font-semibold text-slate-900">
-                    {formatDateTime(check.lastCheckedAt)}
-                  </dd>
+                  <dd className="mt-1 font-semibold text-slate-900">{formatDateTime(check.lastCheckedAt)}</dd>
                 </div>
 
                 <div>
@@ -831,11 +787,7 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
                 </div>
               </dl>
 
-              {check.lastFailureReason ? (
-                <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-800">
-                  {check.lastFailureReason}
-                </p>
-              ) : null}
+              {check.lastFailureReason ? <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-800">{check.lastFailureReason}</p> : null}
 
               <div className="mt-5 flex flex-wrap gap-2">
                 <button
@@ -926,9 +878,7 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
 
                   <span>Failures: {incident.failureCount}</span>
 
-                  {incident.resolvedAt ? (
-                    <span>Recovered: {formatDateTime(incident.resolvedAt)}</span>
-                  ) : null}
+                  {incident.resolvedAt ? <span>Recovered: {formatDateTime(incident.resolvedAt)}</span> : null}
                 </div>
               </article>
             ))}
@@ -990,13 +940,9 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
 
                       <td className="px-3 py-3 text-right">{item.statusCode ?? 'â€”'}</td>
 
-                      <td className="px-3 py-3 text-right">
-                        {item.responseTimeMs !== null ? `${item.responseTimeMs}ms` : 'â€”'}
-                      </td>
+                      <td className="px-3 py-3 text-right">{item.responseTimeMs !== null ? `${item.responseTimeMs}ms` : 'â€”'}</td>
 
-                      <td className="max-w-sm px-3 py-3 text-slate-600">
-                        {item.failureReason ?? 'â€”'}
-                      </td>
+                      <td className="max-w-sm px-3 py-3 text-slate-600">{item.failureReason ?? 'â€”'}</td>
                     </tr>
                   ))}
                 </tbody>

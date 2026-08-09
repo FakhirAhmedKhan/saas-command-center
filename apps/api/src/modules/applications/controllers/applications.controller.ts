@@ -1,18 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  Query,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import type { Request } from 'express';
@@ -27,18 +13,11 @@ import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.gu
 
 import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
 
-import {
-  ApplicationListQueryDto,
-  CreateApplicationDto,
-  UpdateApplicationDto,
-} from '../dto/application.dto';
+import { ApplicationListQueryDto, CreateApplicationDto, UpdateApplicationDto } from '../dto/application.dto';
 
 import { CreateApplicationLinkDto, UpdateApplicationLinkDto } from '../dto/application-link.dto';
 
-import {
-  CreateApplicationTechnologyDto,
-  UpdateApplicationTechnologyDto,
-} from '../dto/application-technology.dto';
+import { CreateApplicationTechnologyDto, UpdateApplicationTechnologyDto } from '../dto/application-technology.dto';
 
 import { ApplicationsService } from '../services/applications.service';
 
@@ -210,13 +189,7 @@ export class ApplicationsController {
     @Body()
     dto: UpdateApplicationTechnologyDto,
   ) {
-    return this.applicationsService.updateTechnology(
-      workspaceId,
-      applicationId,
-      technologyId,
-      dto,
-      request.user.id,
-    );
+    return this.applicationsService.updateTechnology(workspaceId, applicationId, technologyId, dto, request.user.id);
   }
 
   @Delete(':applicationId/technologies/:technologyId')
@@ -234,12 +207,7 @@ export class ApplicationsController {
     @Param('technologyId', ParseUUIDPipe)
     technologyId: string,
   ) {
-    await this.applicationsService.removeTechnology(
-      workspaceId,
-      applicationId,
-      technologyId,
-      request.user.id,
-    );
+    await this.applicationsService.removeTechnology(workspaceId, applicationId, technologyId, request.user.id);
 
     return {
       message: 'Technology removed',
@@ -282,13 +250,7 @@ export class ApplicationsController {
     @Body()
     dto: UpdateApplicationLinkDto,
   ) {
-    return this.applicationsService.updateLink(
-      workspaceId,
-      applicationId,
-      linkId,
-      dto,
-      request.user.id,
-    );
+    return this.applicationsService.updateLink(workspaceId, applicationId, linkId, dto, request.user.id);
   }
 
   @Delete(':applicationId/links/:linkId')

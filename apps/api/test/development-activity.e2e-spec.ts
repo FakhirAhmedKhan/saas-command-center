@@ -8,23 +8,11 @@ import { withBearer } from './helpers/auth';
 
 import { createTestApp } from './helpers/create-test-app';
 
-import {
-  completeTask,
-  createBlocker,
-  createMilestone,
-  createTask,
-  expectDevelopmentSuccess,
-  resolveBlocker,
-  updateMilestone,
-} from './helpers/development';
+import { completeTask, createBlocker, createMilestone, createTask, expectDevelopmentSuccess, resolveBlocker, updateMilestone } from './helpers/development';
 
 import { resetDatabase } from './helpers/database';
 
-import {
-  expectAccessDenied,
-  registerWorkspaceTestUser,
-  type WorkspaceTestUser,
-} from './helpers/workspace';
+import { expectAccessDenied, registerWorkspaceTestUser, type WorkspaceTestUser } from './helpers/workspace';
 
 describe('Development Activity E2E', () => {
   let app: INestApplication;
@@ -44,12 +32,9 @@ describe('Development Activity E2E', () => {
   });
 
   async function listActivity(actor: WorkspaceTestUser, applicationId: string) {
-    return actor.agent
-      .get(applicationRoutes.applicationActivities(actor.workspaceId, applicationId))
-      .set(withBearer(actor.accessToken))
-      .query({
-        limit: 100,
-      });
+    return actor.agent.get(applicationRoutes.applicationActivities(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken)).query({
+      limit: 100,
+    });
   }
 
   async function activityCount(actor: WorkspaceTestUser, applicationId: string): Promise<number> {
@@ -103,9 +88,7 @@ describe('Development Activity E2E', () => {
       ).status,
     ).toBe(200);
 
-    expectDevelopmentSuccess(
-      await resolveBlocker(owner, application.id, blocker.id, 'Resolved for activity test'),
-    );
+    expectDevelopmentSuccess(await resolveBlocker(owner, application.id, blocker.id, 'Resolved for activity test'));
 
     expectDevelopmentSuccess(await completeTask(owner, application.id, task.id));
 
@@ -122,9 +105,7 @@ describe('Development Activity E2E', () => {
     const beforeCount = await activityCount(owner, application.id);
 
     const response = await owner.agent
-      .post(
-        `/api/v1/workspaces/${owner.workspaceId}/applications/${application.id}/development/milestones`,
-      )
+      .post(`/api/v1/workspaces/${owner.workspaceId}/applications/${application.id}/development/milestones`)
       .set(withBearer(owner.accessToken))
       .send({
         title: '',

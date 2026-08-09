@@ -14,11 +14,7 @@ import { createBlocker, deleteBlocker, reopenBlocker, resolveBlocker } from '../
 
 import { PRIORITY_LABELS, PRIORITY_VARIANTS } from '../development-constants';
 
-import type {
-  ApplicationBlocker,
-  ApplicationMilestone,
-  WorkItemPriority,
-} from '../development-types';
+import type { ApplicationBlocker, ApplicationMilestone, WorkItemPriority } from '../development-types';
 
 import { getDevelopmentError } from '../development-utils';
 
@@ -30,13 +26,7 @@ interface BlockerPanelProps {
   onChanged: () => void;
 }
 
-export function BlockerPanel({
-  workspaceId,
-  applicationId,
-  milestones,
-  blockers,
-  onChanged,
-}: BlockerPanelProps) {
+export function BlockerPanel({ workspaceId, applicationId, milestones, blockers, onChanged }: BlockerPanelProps) {
   const [title, setTitle] = useState('');
   const [severity, setSeverity] = useState<WorkItemPriority>('HIGH');
   const [milestoneId, setMilestoneId] = useState('');
@@ -100,30 +90,16 @@ export function BlockerPanel({
           <div>
             <h2 className="text-lg font-semibold text-slate-950">Blockers</h2>
 
-            <p className="mt-1 text-sm text-slate-500">
-              Record problems preventing development from continuing.
-            </p>
+            <p className="mt-1 text-sm text-slate-500">Record problems preventing development from continuing.</p>
           </div>
         </div>
       </CardHeader>
 
       <CardContent className="space-y-6">
-        <form
-          onSubmit={handleSubmit}
-          className="grid gap-3 rounded-2xl bg-slate-50 p-4 xl:grid-cols-[minmax(220px,1fr)_140px_220px_220px_auto]"
-        >
-          <Input
-            placeholder="Blocker title"
-            value={title}
-            disabled={saving}
-            onChange={(event) => setTitle(event.target.value)}
-          />
+        <form onSubmit={handleSubmit} className="grid gap-3 rounded-2xl bg-slate-50 p-4 xl:grid-cols-[minmax(220px,1fr)_140px_220px_220px_auto]">
+          <Input placeholder="Blocker title" value={title} disabled={saving} onChange={(event) => setTitle(event.target.value)} />
 
-          <Select
-            value={severity}
-            disabled={saving}
-            onChange={(event) => setSeverity(event.target.value as WorkItemPriority)}
-          >
+          <Select value={severity} disabled={saving} onChange={(event) => setSeverity(event.target.value as WorkItemPriority)}>
             {(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'] as const).map((item) => (
               <option key={item} value={item}>
                 {PRIORITY_LABELS[item]}
@@ -148,11 +124,7 @@ export function BlockerPanel({
             ))}
           </Select>
 
-          <Select
-            value={taskId}
-            disabled={saving}
-            onChange={(event) => setTaskId(event.target.value)}
-          >
+          <Select value={taskId} disabled={saving} onChange={(event) => setTaskId(event.target.value)}>
             <option value="">No specific task</option>
 
             {availableTasks.map((task) => (
@@ -168,44 +140,27 @@ export function BlockerPanel({
           </Button>
         </form>
 
-        {error ? (
-          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
-          </div>
-        ) : null}
+        {error ? <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
 
         {blockers.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">
-            No blockers recorded.
-          </div>
+          <div className="rounded-xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">No blockers recorded.</div>
         ) : (
           <div className="divide-y divide-slate-100">
             {blockers.map((blocker) => (
-              <article
-                key={blocker.id}
-                className="flex flex-col gap-4 py-4 first:pt-0 last:pb-0 lg:flex-row lg:items-center"
-              >
+              <article key={blocker.id} className="flex flex-col gap-4 py-4 first:pt-0 last:pb-0 lg:flex-row lg:items-center">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-semibold text-slate-900">{blocker.title}</p>
 
-                    <Badge variant={blocker.status === 'OPEN' ? 'red' : 'green'}>
-                      {blocker.status === 'OPEN' ? 'Open' : 'Resolved'}
-                    </Badge>
+                    <Badge variant={blocker.status === 'OPEN' ? 'red' : 'green'}>{blocker.status === 'OPEN' ? 'Open' : 'Resolved'}</Badge>
 
-                    <Badge variant={PRIORITY_VARIANTS[blocker.severity]}>
-                      {PRIORITY_LABELS[blocker.severity]}
-                    </Badge>
+                    <Badge variant={PRIORITY_VARIANTS[blocker.severity]}>{PRIORITY_LABELS[blocker.severity]}</Badge>
                   </div>
 
-                  <p className="mt-1 text-sm text-slate-500">
-                    {blocker.task?.title ?? blocker.milestone?.title ?? 'Application-level blocker'}
-                  </p>
+                  <p className="mt-1 text-sm text-slate-500">{blocker.task?.title ?? blocker.milestone?.title ?? 'Application-level blocker'}</p>
 
                   {blocker.resolution ? (
-                    <p className="mt-2 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
-                      Resolution: {blocker.resolution}
-                    </p>
+                    <p className="mt-2 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800">Resolution: {blocker.resolution}</p>
                   ) : null}
                 </div>
 
@@ -217,9 +172,7 @@ export function BlockerPanel({
                         const resolution = window.prompt('How was this blocker resolved?');
 
                         if (resolution) {
-                          void run(() =>
-                            resolveBlocker(workspaceId, applicationId, blocker.id, resolution),
-                          );
+                          void run(() => resolveBlocker(workspaceId, applicationId, blocker.id, resolution));
                         }
                       }}
                     >
@@ -227,12 +180,7 @@ export function BlockerPanel({
                       Resolve
                     </Button>
                   ) : (
-                    <Button
-                      variant="outline"
-                      onClick={() =>
-                        void run(() => reopenBlocker(workspaceId, applicationId, blocker.id))
-                      }
-                    >
+                    <Button variant="outline" onClick={() => void run(() => reopenBlocker(workspaceId, applicationId, blocker.id))}>
                       <RotateCcw className="size-4" />
                       Reopen
                     </Button>

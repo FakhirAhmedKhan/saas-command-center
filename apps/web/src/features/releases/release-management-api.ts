@@ -1,12 +1,5 @@
 import { apiRequest } from '../auth/auth.types';
-import type {
-  CurrentEnvironmentVersion,
-  Deployment,
-  DeploymentOptions,
-  DeploymentStatus,
-  PaginatedResponse,
-  Release,
-} from './release-management.types';
+import type { CurrentEnvironmentVersion, Deployment, DeploymentOptions, DeploymentStatus, PaginatedResponse, Release } from './release-management.types';
 
 function createApplicationPath(
   workspaceId: string,

@@ -1,7 +1,4 @@
-export function getWebsiteError(
-  error: unknown,
-  fallback = 'Unable to complete website action',
-): string {
+export function getWebsiteError(error: unknown, fallback = 'Unable to complete website action'): string {
   if (error instanceof Error) {
     return error.message;
   }

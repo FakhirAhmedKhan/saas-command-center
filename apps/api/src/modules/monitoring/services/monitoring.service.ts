@@ -4,31 +4,15 @@ import { ConfigService } from '@nestjs/config';
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { BadRequestException, Injectable, NotFoundException, Inject } from '@nestjs/common';
 
-import {
-  HealthCheckStatus,
-  HealthIncidentStatus,
-  HealthTargetType,
-  Prisma,
-} from '../../../generated/prisma/client';
+import { HealthCheckStatus, HealthIncidentStatus, HealthTargetType, Prisma } from '../../../generated/prisma/client';
 
 import { PrismaService } from '../../../database/prisma.service';
 
 import type { TypedConfigService } from '../../../config/runtime-config';
 
-import type {
-  CreateHealthCheckDto,
-  HealthCheckListQueryDto,
-  IncidentListQueryDto,
-  UpdateHealthCheckDto,
-} from '../dto/health-check.dto';
+import type { CreateHealthCheckDto, HealthCheckListQueryDto, IncidentListQueryDto, UpdateHealthCheckDto } from '../dto/health-check.dto';
 
-import type {
-  HealthCheckDto,
-  HealthCheckHistoryDto,
-  HealthIncidentDto,
-  MonitoringSummaryDto,
-  MonitoringTargetDto,
-} from '../dto/monitoring-response.dto';
+import type { HealthCheckDto, HealthCheckHistoryDto, HealthIncidentDto, MonitoringSummaryDto, MonitoringTargetDto } from '../dto/monitoring-response.dto';
 
 import { MonitoringAccessService } from './monitoring-access.service';
 
@@ -77,12 +61,7 @@ export class MonitoringService {
 
     await this.safeHttp.validateUrl(input.url);
 
-    await this.assertTargetExists(
-      workspaceId,
-      input.targetType,
-      input.applicationId,
-      input.websiteId,
-    );
+    await this.assertTargetExists(workspaceId, input.targetType, input.applicationId, input.websiteId);
 
     const created = await this.prisma.healthCheck.create({
       data: {
@@ -90,8 +69,7 @@ export class MonitoringService {
 
         targetType: input.targetType,
 
-        applicationId:
-          input.targetType === HealthTargetType.APPLICATION ? input.applicationId : null,
+        applicationId: input.targetType === HealthTargetType.APPLICATION ? input.applicationId : null,
 
         websiteId: input.targetType === HealthTargetType.WEBSITE ? input.websiteId : null,
 
@@ -144,13 +122,9 @@ export class MonitoringService {
     const merged = {
       targetType: input.targetType ?? existing.targetType,
 
-      applicationId:
-        input.applicationId !== undefined
-          ? input.applicationId
-          : (existing.applicationId ?? undefined),
+      applicationId: input.applicationId !== undefined ? input.applicationId : (existing.applicationId ?? undefined),
 
-      websiteId:
-        input.websiteId !== undefined ? input.websiteId : (existing.websiteId ?? undefined),
+      websiteId: input.websiteId !== undefined ? input.websiteId : (existing.websiteId ?? undefined),
 
       name: input.name ?? existing.name,
 
@@ -177,17 +151,8 @@ export class MonitoringService {
       await this.safeHttp.validateUrl(merged.url);
     }
 
-    if (
-      input.targetType !== undefined ||
-      input.applicationId !== undefined ||
-      input.websiteId !== undefined
-    ) {
-      await this.assertTargetExists(
-        workspaceId,
-        merged.targetType,
-        merged.applicationId,
-        merged.websiteId,
-      );
+    if (input.targetType !== undefined || input.applicationId !== undefined || input.websiteId !== undefined) {
+      await this.assertTargetExists(workspaceId, merged.targetType, merged.applicationId, merged.websiteId);
     }
 
     const updated = await this.prisma.healthCheck.update({
@@ -198,8 +163,7 @@ export class MonitoringService {
       data: {
         targetType: merged.targetType,
 
-        applicationId:
-          merged.targetType === HealthTargetType.APPLICATION ? merged.applicationId : null,
+        applicationId: merged.targetType === HealthTargetType.APPLICATION ? merged.applicationId : null,
 
         websiteId: merged.targetType === HealthTargetType.WEBSITE ? merged.websiteId : null,
 
@@ -221,11 +185,7 @@ export class MonitoringService {
 
         enabled: merged.enabled,
 
-        latestStatus: merged.enabled
-          ? existing.enabled
-            ? existing.latestStatus
-            : HealthCheckStatus.UNKNOWN
-          : HealthCheckStatus.DISABLED,
+        latestStatus: merged.enabled ? (existing.enabled ? existing.latestStatus : HealthCheckStatus.UNKNOWN) : HealthCheckStatus.DISABLED,
 
         consecutiveFailures: merged.enabled ? existing.consecutiveFailures : 0,
 
@@ -473,21 +433,9 @@ export class MonitoringService {
       },
     });
 
-    const priority = [
-      HealthCheckStatus.DOWN,
+    const priority = [HealthCheckStatus.DOWN, HealthCheckStatus.DEGRADED, HealthCheckStatus.UNKNOWN, HealthCheckStatus.HEALTHY, HealthCheckStatus.DISABLED];
 
-      HealthCheckStatus.DEGRADED,
-
-      HealthCheckStatus.UNKNOWN,
-
-      HealthCheckStatus.HEALTHY,
-
-      HealthCheckStatus.DISABLED,
-    ];
-
-    const status =
-      priority.find((candidate) => checks.some((check) => check.latestStatus === candidate)) ??
-      HealthCheckStatus.UNKNOWN;
+    const status = priority.find((candidate) => checks.some((check) => check.latestStatus === candidate)) ?? HealthCheckStatus.UNKNOWN;
 
     return {
       applicationId: application.id,
@@ -498,11 +446,7 @@ export class MonitoringService {
 
       checks: checks.length,
 
-      averageResponseTimeMs: this.average(
-        checks
-          .map((check) => check.lastResponseTimeMs)
-          .filter((value): value is number => value !== null),
-      ),
+      averageResponseTimeMs: this.average(checks.map((check) => check.lastResponseTimeMs).filter((value): value is number => value !== null)),
 
       lastCheckedAt:
         checks
@@ -605,9 +549,7 @@ export class MonitoringService {
     }
 
     if (input.expectedStatusMax < input.expectedStatusMin) {
-      throw new BadRequestException(
-        'expectedStatusMax must be greater than or equal to expectedStatusMin.',
-      );
+      throw new BadRequestException('expectedStatusMax must be greater than or equal to expectedStatusMin.');
     }
 
     const minimumInterval = this.config.get('HEALTH_MIN_INTERVAL_SECONDS', {
@@ -619,9 +561,7 @@ export class MonitoringService {
     });
 
     if (input.intervalSeconds < minimumInterval || input.intervalSeconds > maximumInterval) {
-      throw new BadRequestException(
-        `Health-check interval must be between ${minimumInterval} and ${maximumInterval} seconds.`,
-      );
+      throw new BadRequestException(`Health-check interval must be between ${minimumInterval} and ${maximumInterval} seconds.`);
     }
 
     const minimumTimeout = this.config.get('HEALTH_MIN_TIMEOUT_MS', {
@@ -633,9 +573,7 @@ export class MonitoringService {
     });
 
     if (input.timeoutMs < minimumTimeout || input.timeoutMs > maximumTimeout) {
-      throw new BadRequestException(
-        `Health-check timeout must be between ${minimumTimeout} and ${maximumTimeout} milliseconds.`,
-      );
+      throw new BadRequestException(`Health-check timeout must be between ${minimumTimeout} and ${maximumTimeout} milliseconds.`);
     }
 
     if (input.degradedAfterMs > input.timeoutMs) {
@@ -752,8 +690,7 @@ export class MonitoringService {
   }
 
   private mapCheck(check: HealthCheckWithTarget): HealthCheckDto {
-    const targetId =
-      check.targetType === HealthTargetType.APPLICATION ? check.applicationId! : check.websiteId!;
+    const targetId = check.targetType === HealthTargetType.APPLICATION ? check.applicationId! : check.websiteId!;
 
     return {
       id: check.id,

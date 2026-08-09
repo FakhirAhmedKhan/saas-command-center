@@ -24,12 +24,7 @@ import { createTestApp } from './helpers/create-test-app';
 
 import { resetDatabase } from './helpers/database';
 
-import {
-  addWorkspaceMember,
-  expectAccessDenied,
-  registerWorkspaceTestUser,
-  type WorkspaceTestUser,
-} from './helpers/workspace';
+import { addWorkspaceMember, expectAccessDenied, registerWorkspaceTestUser, type WorkspaceTestUser } from './helpers/workspace';
 
 interface RoleMatrix {
   owner: WorkspaceTestUser;
@@ -64,17 +59,11 @@ describe('Application Roles E2E', () => {
 
     const rawViewer = await registerWorkspaceTestUser(app, prisma);
 
-    expect([200, 201]).toContain(
-      (await addWorkspaceMember(owner, rawAdmin, WorkspaceRole.ADMIN)).status,
-    );
+    expect([200, 201]).toContain((await addWorkspaceMember(owner, rawAdmin, WorkspaceRole.ADMIN)).status);
 
-    expect([200, 201]).toContain(
-      (await addWorkspaceMember(owner, rawDeveloper, WorkspaceRole.DEVELOPER)).status,
-    );
+    expect([200, 201]).toContain((await addWorkspaceMember(owner, rawDeveloper, WorkspaceRole.DEVELOPER)).status);
 
-    expect([200, 201]).toContain(
-      (await addWorkspaceMember(owner, rawViewer, WorkspaceRole.VIEWER)).status,
-    );
+    expect([200, 201]).toContain((await addWorkspaceMember(owner, rawViewer, WorkspaceRole.VIEWER)).status);
 
     return {
       owner,
@@ -189,15 +178,11 @@ describe('Application Roles E2E', () => {
 
     const outsider = await registerWorkspaceTestUser(app, prisma);
 
-    const outsiderResponse = await outsider.agent
-      .get(applicationRoutes.root(matrix.owner.workspaceId))
-      .set('Authorization', `Bearer ${outsider.accessToken}`);
+    const outsiderResponse = await outsider.agent.get(applicationRoutes.root(matrix.owner.workspaceId)).set('Authorization', `Bearer ${outsider.accessToken}`);
 
     expectAccessDenied(outsiderResponse);
 
-    const anonymousResponse = await request(app.getHttpServer()).get(
-      applicationRoutes.root(matrix.owner.workspaceId),
-    );
+    const anonymousResponse = await request(app.getHttpServer()).get(applicationRoutes.root(matrix.owner.workspaceId));
 
     expect(anonymousResponse.status).toBe(401);
   });

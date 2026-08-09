@@ -3,12 +3,7 @@ import { randomUUID } from 'node:crypto';
 import request, { type Response } from 'supertest';
 
 import { PrismaService } from '../src/database/prisma.service';
-import {
-  HealthCheckStatus,
-  HealthIncidentStatus,
-  HealthTargetType,
-  WorkspaceRole,
-} from '../src/generated/prisma/enums';
+import { HealthCheckStatus, HealthIncidentStatus, HealthTargetType, WorkspaceRole } from '../src/generated/prisma/enums';
 import { HealthCheckRunnerService } from '../src/modules/monitoring/services/health-check-runner.service';
 import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
 import { createTestApp } from './helpers/create-test-app';
@@ -182,10 +177,7 @@ describe('Phase 15 Monitoring E2E', () => {
     return `${API_PREFIX}/workspaces/${workspaceId}/monitoring/applications/${currentApplicationId}/summary`;
   }
 
-  async function createCheck(
-    token: string,
-    overrides: Partial<Record<string, unknown>> = {},
-  ): Promise<Response> {
+  async function createCheck(token: string, overrides: Partial<Record<string, unknown>> = {}): Promise<Response> {
     return request(app.getHttpServer())
       .post(checksUrl())
       .set(withBearer(token))
@@ -223,10 +215,7 @@ describe('Phase 15 Monitoring E2E', () => {
       select: { workspaceId: true },
     });
 
-    workspaceId = requireValue(
-      ownerMembership?.workspaceId,
-      'Phase 15 owner workspace was not found',
-    );
+    workspaceId = requireValue(ownerMembership?.workspaceId, 'Phase 15 owner workspace was not found');
 
     const developer = createTestUser({
       name: 'Phase 15 Developer',
@@ -382,9 +371,7 @@ describe('Phase 15 Monitoring E2E', () => {
   });
 
   it('lists checks scoped to the workspace', async () => {
-    const response = await request(app.getHttpServer())
-      .get(checksUrl())
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(checksUrl()).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
 
@@ -399,9 +386,7 @@ describe('Phase 15 Monitoring E2E', () => {
 
     const checkId = body(createResponse).id as string;
 
-    const response = await request(app.getHttpServer())
-      .get(checkUrl(checkId))
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(checkUrl(checkId)).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
     expect(body(response)).toMatchObject({ id: checkId, name: 'Phase 15 Detail Check' });
@@ -450,10 +435,7 @@ describe('Phase 15 Monitoring E2E', () => {
       },
     });
 
-    const response = await request(app.getHttpServer())
-      .patch(checkUrl(checkId))
-      .set(withBearer(ownerAccessToken))
-      .send({ enabled: false });
+    const response = await request(app.getHttpServer()).patch(checkUrl(checkId)).set(withBearer(ownerAccessToken)).send({ enabled: false });
 
     expect(response.status).toBe(200);
     expect(body(response)).toMatchObject({
@@ -469,9 +451,7 @@ describe('Phase 15 Monitoring E2E', () => {
   });
 
   it('returns 404 for a nonexistent check', async () => {
-    const response = await request(app.getHttpServer())
-      .get(checkUrl(randomUUID()))
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(checkUrl(randomUUID())).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(404);
   });
@@ -535,9 +515,7 @@ describe('Phase 15 Monitoring E2E', () => {
   });
 
   it('rejects a malformed check ID', async () => {
-    const response = await request(app.getHttpServer())
-      .get(`${checksUrl()}/not-a-uuid`)
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(`${checksUrl()}/not-a-uuid`).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(400);
   });
@@ -558,10 +536,7 @@ describe('Phase 15 Monitoring E2E', () => {
           (
             await prisma.workspaceMember.findFirst({
               where: {
-                userId: requireValue(
-                  (await prisma.user.findFirst({ where: { name: 'Phase 15 Outsider' } }))?.id,
-                  'Outsider user missing',
-                ),
+                userId: requireValue((await prisma.user.findFirst({ where: { name: 'Phase 15 Outsider' } }))?.id, 'Outsider user missing'),
                 role: WorkspaceRole.OWNER,
               },
               select: { workspaceId: true },
@@ -574,10 +549,7 @@ describe('Phase 15 Monitoring E2E', () => {
         category: 'WEB_APP',
         status: 'ACTIVE',
         priority: 'MEDIUM',
-        createdById: requireValue(
-          (await prisma.user.findFirst({ where: { name: 'Phase 15 Outsider' } }))?.id,
-          'Outsider user missing',
-        ),
+        createdById: requireValue((await prisma.user.findFirst({ where: { name: 'Phase 15 Outsider' } }))?.id, 'Outsider user missing'),
       },
       select: { id: true },
     });
@@ -665,24 +637,17 @@ describe('Phase 15 Monitoring E2E', () => {
 
     const checkId = body(createResponse).id as string;
 
-    const response = await request(app.getHttpServer())
-      .patch(checkUrl(checkId))
-      .set(withBearer(viewerAccessToken))
-      .send({ name: 'Should not apply' });
+    const response = await request(app.getHttpServer()).patch(checkUrl(checkId)).set(withBearer(viewerAccessToken)).send({ name: 'Should not apply' });
 
     expect(response.status).toBe(403);
   });
 
   it('allows a VIEWER to read checks, history, and incidents (read-only access)', async () => {
-    const listResponse = await request(app.getHttpServer())
-      .get(checksUrl())
-      .set(withBearer(viewerAccessToken));
+    const listResponse = await request(app.getHttpServer()).get(checksUrl()).set(withBearer(viewerAccessToken));
 
     expect(listResponse.status).toBe(200);
 
-    const incidentsResponse = await request(app.getHttpServer())
-      .get(incidentsUrl())
-      .set(withBearer(viewerAccessToken));
+    const incidentsResponse = await request(app.getHttpServer()).get(incidentsUrl()).set(withBearer(viewerAccessToken));
 
     expect(incidentsResponse.status).toBe(200);
   });
@@ -694,9 +659,7 @@ describe('Phase 15 Monitoring E2E', () => {
 
     const checkId = body(createResponse).id as string;
 
-    const response = await request(app.getHttpServer())
-      .post(runUrl(checkId))
-      .set(withBearer(viewerAccessToken));
+    const response = await request(app.getHttpServer()).post(runUrl(checkId)).set(withBearer(viewerAccessToken));
 
     expect(response.status).toBe(403);
   });
@@ -706,25 +669,19 @@ describe('Phase 15 Monitoring E2E', () => {
   // ---------------------------------------------------------------------------------------
 
   it('blocks an outsider from listing another workspace health checks', async () => {
-    const response = await request(app.getHttpServer())
-      .get(checksUrl())
-      .set(withBearer(outsiderAccessToken));
+    const response = await request(app.getHttpServer()).get(checksUrl()).set(withBearer(outsiderAccessToken));
 
     expect(response.status).toBe(403);
   });
 
   it('blocks an outsider from reading the monitoring summary', async () => {
-    const response = await request(app.getHttpServer())
-      .get(summaryUrl())
-      .set(withBearer(outsiderAccessToken));
+    const response = await request(app.getHttpServer()).get(summaryUrl()).set(withBearer(outsiderAccessToken));
 
     expect(response.status).toBe(403);
   });
 
   it('blocks an outsider from reading incidents', async () => {
-    const response = await request(app.getHttpServer())
-      .get(incidentsUrl())
-      .set(withBearer(outsiderAccessToken));
+    const response = await request(app.getHttpServer()).get(incidentsUrl()).set(withBearer(outsiderAccessToken));
 
     expect(response.status).toBe(403);
   });
@@ -760,9 +717,7 @@ describe('Phase 15 Monitoring E2E', () => {
     expect(persisted.lastCheckedAt).not.toBeNull();
     expect(persisted.lastSuccessfulAt).toBeNull();
 
-    const historyResponse = await request(app.getHttpServer())
-      .get(historyUrl(checkId))
-      .set(withBearer(ownerAccessToken));
+    const historyResponse = await request(app.getHttpServer()).get(historyUrl(checkId)).set(withBearer(ownerAccessToken));
 
     expect(historyResponse.status).toBe(200);
 
@@ -784,9 +739,7 @@ describe('Phase 15 Monitoring E2E', () => {
 
     await runner.run(workspaceId, checkId);
 
-    const response = await request(app.getHttpServer())
-      .get(historyUrl(checkId))
-      .set(withBearer(viewerAccessToken));
+    const response = await request(app.getHttpServer()).get(historyUrl(checkId)).set(withBearer(viewerAccessToken));
 
     expect(response.status).toBe(200);
   });
@@ -827,9 +780,7 @@ describe('Phase 15 Monitoring E2E', () => {
     expect(incidents).toHaveLength(1);
     expect(incidents[0]?.failureCount).toBe(3);
 
-    const incidentsResponse = await request(app.getHttpServer())
-      .get(incidentsUrl())
-      .set(withBearer(ownerAccessToken));
+    const incidentsResponse = await request(app.getHttpServer()).get(incidentsUrl()).set(withBearer(ownerAccessToken));
 
     expect(incidentsResponse.status).toBe(200);
 
@@ -900,14 +851,10 @@ describe('Phase 15 Monitoring E2E', () => {
     expect(resolved.status).toBe(HealthIncidentStatus.RESOLVED);
     expect(resolved.resolvedAt).not.toBeNull();
 
-    const incidentsResponse = await request(app.getHttpServer())
-      .get(`${incidentsUrl()}?status=${HealthIncidentStatus.OPEN}`)
-      .set(withBearer(ownerAccessToken));
+    const incidentsResponse = await request(app.getHttpServer()).get(`${incidentsUrl()}?status=${HealthIncidentStatus.OPEN}`).set(withBearer(ownerAccessToken));
 
     expect(incidentsResponse.status).toBe(200);
-    expect(arrayBody(incidentsResponse).map((incident) => incident.id)).not.toContain(
-      openIncident.id,
-    );
+    expect(arrayBody(incidentsResponse).map((incident) => incident.id)).not.toContain(openIncident.id);
   });
 
   it('filters incidents by status', async () => {
@@ -916,17 +863,11 @@ describe('Phase 15 Monitoring E2E', () => {
       .set(withBearer(ownerAccessToken));
 
     expect(resolvedOnlyResponse.status).toBe(200);
-    expect(
-      arrayBody(resolvedOnlyResponse).every(
-        (incident) => incident.status === HealthIncidentStatus.RESOLVED,
-      ),
-    ).toBe(true);
+    expect(arrayBody(resolvedOnlyResponse).every((incident) => incident.status === HealthIncidentStatus.RESOLVED)).toBe(true);
   });
 
   it('rejects an invalid incident status filter', async () => {
-    const response = await request(app.getHttpServer())
-      .get(`${incidentsUrl()}?status=NOT_A_REAL_STATUS`)
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(`${incidentsUrl()}?status=NOT_A_REAL_STATUS`).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(400);
   });
@@ -945,9 +886,7 @@ describe('Phase 15 Monitoring E2E', () => {
 
     const checkId = body(createResponse).id as string;
 
-    const detailResponse = await request(app.getHttpServer())
-      .get(checkUrl(checkId))
-      .set(withBearer(ownerAccessToken));
+    const detailResponse = await request(app.getHttpServer()).get(checkUrl(checkId)).set(withBearer(ownerAccessToken));
 
     const raw = JSON.stringify(detailResponse.body);
 
@@ -967,9 +906,7 @@ describe('Phase 15 Monitoring E2E', () => {
 
     await runner.run(workspaceId, checkId);
 
-    const historyResponse = await request(app.getHttpServer())
-      .get(historyUrl(checkId))
-      .set(withBearer(ownerAccessToken));
+    const historyResponse = await request(app.getHttpServer()).get(historyUrl(checkId)).set(withBearer(ownerAccessToken));
 
     const raw = JSON.stringify(historyResponse.body);
 
@@ -982,40 +919,28 @@ describe('Phase 15 Monitoring E2E', () => {
   // ---------------------------------------------------------------------------------------
 
   it('filters checks by targetType', async () => {
-    const response = await request(app.getHttpServer())
-      .get(`${checksUrl()}?targetType=${HealthTargetType.WEBSITE}`)
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(`${checksUrl()}?targetType=${HealthTargetType.WEBSITE}`).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
-    expect(arrayBody(response).every((check) => check.targetType === HealthTargetType.WEBSITE)).toBe(
-      true,
-    );
+    expect(arrayBody(response).every((check) => check.targetType === HealthTargetType.WEBSITE)).toBe(true);
   });
 
   it('filters checks by enabled=false', async () => {
-    const response = await request(app.getHttpServer())
-      .get(`${checksUrl()}?enabled=false`)
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(`${checksUrl()}?enabled=false`).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
     expect(arrayBody(response).every((check) => check.enabled === false)).toBe(true);
   });
 
   it('filters checks by applicationId', async () => {
-    const response = await request(app.getHttpServer())
-      .get(`${checksUrl()}?applicationId=${applicationId}`)
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(`${checksUrl()}?applicationId=${applicationId}`).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
-    expect(
-      arrayBody(response).every((check) => check.applicationId === applicationId),
-    ).toBe(true);
+    expect(arrayBody(response).every((check) => check.applicationId === applicationId)).toBe(true);
   });
 
   it('gets the workspace-wide summary with correct roll-up counts', async () => {
-    const response = await request(app.getHttpServer())
-      .get(summaryUrl())
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(summaryUrl()).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
 
@@ -1024,42 +949,30 @@ describe('Phase 15 Monitoring E2E', () => {
     expect(summary.canManage).toBe(true);
     expect(typeof summary.total).toBe('number');
     expect(summary.total).toBe(
-      (summary.healthy as number) +
-        (summary.degraded as number) +
-        (summary.down as number) +
-        (summary.unknown as number) +
-        (summary.disabled as number),
+      (summary.healthy as number) + (summary.degraded as number) + (summary.down as number) + (summary.unknown as number) + (summary.disabled as number),
     );
   });
 
   it('lists available monitoring targets (applications and websites)', async () => {
-    const response = await request(app.getHttpServer())
-      .get(targetsUrl())
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(targetsUrl()).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
 
     const targets = arrayBody(response);
 
-    expect(targets.some((target) => target.id === applicationId && target.type === 'APPLICATION')).toBe(
-      true,
-    );
+    expect(targets.some((target) => target.id === applicationId && target.type === 'APPLICATION')).toBe(true);
     expect(targets.some((target) => target.id === websiteId && target.type === 'WEBSITE')).toBe(true);
   });
 
   it('returns a rolled-up application summary', async () => {
-    const response = await request(app.getHttpServer())
-      .get(applicationSummaryUrl())
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(applicationSummaryUrl()).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
     expect(body(response)).toMatchObject({ applicationId, applicationName: 'Phase 15 Application' });
   });
 
   it('returns 404 for an application summary of a nonexistent application', async () => {
-    const response = await request(app.getHttpServer())
-      .get(applicationSummaryUrl(randomUUID()))
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(applicationSummaryUrl(randomUUID())).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(404);
   });

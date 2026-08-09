@@ -247,8 +247,7 @@ export class WebhookDeliveryWorkerService {
 
         errorCode: error instanceof Error ? error.name : 'SECRET_DECRYPTION_FAILED',
 
-        errorMessage:
-          error instanceof Error ? error.message.slice(0, 500) : 'Webhook delivery failed.',
+        errorMessage: error instanceof Error ? error.message.slice(0, 500) : 'Webhook delivery failed.',
       };
     }
 

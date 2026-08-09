@@ -1,11 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import {
-  APPLICATION_ID,
-  installMockApi,
-  makeApplication,
-  PRIMARY_WORKSPACE_ID,
-} from './fixtures/mock-api';
+import { APPLICATION_ID, installMockApi, makeApplication, PRIMARY_WORKSPACE_ID } from './fixtures/mock-api';
 
 test.describe('Batch 10 application flows', () => {
   test('lists active applications with status, priority, and technology', async ({ page }) => {
@@ -74,11 +69,7 @@ test.describe('Batch 10 application flows', () => {
     ).toBeVisible();
 
     const latestListRequest = state.requests
-      .filter(
-        (request) =>
-          request.method === 'GET' &&
-          request.path === `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`,
-      )
+      .filter((request) => request.method === 'GET' && request.path === `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`)
       .at(-1);
 
     expect(latestListRequest?.search).toContain('search=PriceScout');
@@ -110,11 +101,7 @@ test.describe('Batch 10 application flows', () => {
       }),
     ).toBeVisible();
 
-    const createRequest = state.requests.find(
-      (request) =>
-        request.method === 'POST' &&
-        request.path === `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`,
-    );
+    const createRequest = state.requests.find((request) => request.method === 'POST' && request.path === `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`);
 
     expect(createRequest?.body).toMatchObject({
       name: 'MadadAI Portal',
@@ -143,9 +130,7 @@ test.describe('Batch 10 application flows', () => {
       })
       .click();
 
-    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toContainText(
-      'Application name must contain at least two characters.',
-    );
+    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toContainText('Application name must contain at least two characters.');
   });
 
   test('shows an API error on application creation', async ({ page }) => {
@@ -167,9 +152,7 @@ test.describe('Batch 10 application flows', () => {
       })
       .click();
 
-    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toContainText(
-      'Application slug already exists',
-    );
+    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toContainText('Application slug already exists');
   });
 
   test('opens an application detail page', async ({ page }) => {

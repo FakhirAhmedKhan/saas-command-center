@@ -22,12 +22,7 @@ export class AnalyticsIngestionController {
 
   @Post()
   @HttpCode(202)
-  collect(
-    @Body() body: unknown,
-    @Headers('origin') origin: string | undefined,
-    @Headers('user-agent') userAgent: string | undefined,
-    @Req() request: Request,
-  ) {
+  collect(@Body() body: unknown, @Headers('origin') origin: string | undefined, @Headers('user-agent') userAgent: string | undefined, @Req() request: Request) {
     return this.ingestionService.collect(body, {
       origin,
       userAgent,

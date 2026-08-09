@@ -1,13 +1,6 @@
-import type {
-  ApplicationTaskStatus,
-  BlockerStatus,
-  DevelopmentTemplateType,
-  MilestoneStatus,
-  WorkItemPriority,
-} from './development-types';
+import type { ApplicationTaskStatus, BlockerStatus, DevelopmentTemplateType, MilestoneStatus, WorkItemPriority } from './development-types';
 
-export type BadgeVariant =
-  'default' | 'blue' | 'green' | 'yellow' | 'orange' | 'red' | 'purple' | 'slate';
+export type BadgeVariant = 'default' | 'blue' | 'green' | 'yellow' | 'orange' | 'red' | 'purple' | 'slate';
 
 export const MILESTONE_STATUS_LABELS: Record<MilestoneStatus, string> = {
   PLANNED: 'Planned',

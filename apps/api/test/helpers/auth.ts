@@ -3,12 +3,7 @@ import request, { type Response, type SuperAgentTest } from 'supertest';
 
 import type { INestApplication } from '@nestjs/common';
 
-import {
-  buildLoginPayload,
-  buildRegisterPayload,
-  TEST_ROUTES,
-  type TestUserInput,
-} from './contracts';
+import { buildLoginPayload, buildRegisterPayload, TEST_ROUTES, type TestUserInput } from './contracts';
 
 export interface RegisteredTestUser extends TestUserInput {
   registerResponse: Response;
@@ -36,10 +31,7 @@ export async function registerUser(agent: SuperAgentTest, user: TestUserInput): 
   return agent.post(TEST_ROUTES.auth.register).send(buildRegisterPayload(user));
 }
 
-export async function loginUser(
-  agent: SuperAgentTest,
-  user: Pick<TestUserInput, 'email' | 'password'>,
-): Promise<Response> {
+export async function loginUser(agent: SuperAgentTest, user: Pick<TestUserInput, 'email' | 'password'>): Promise<Response> {
   return agent.post(TEST_ROUTES.auth.login).send(buildLoginPayload(user));
 }
 

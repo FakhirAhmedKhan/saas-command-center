@@ -306,9 +306,7 @@ test.describe('Phase 16 releases and deployments', () => {
       });
     });
 
-    const navigation = page.goto(
-      `/workspaces/${workspaceId}/applications/${applicationId}/releases`,
-    );
+    const navigation = page.goto(`/workspaces/${workspaceId}/applications/${applicationId}/releases`);
 
     await expect(page.locator('.animate-pulse').first()).toBeVisible();
 
@@ -317,9 +315,7 @@ test.describe('Phase 16 releases and deployments', () => {
     await navigation;
   });
 
-  test('shows an error state with a retry action when release data fails to load', async ({
-    page,
-  }) => {
+  test('shows an error state with a retry action when release data fails to load', async ({ page }) => {
     await page.route('**/deployments/options', async (route) => {
       await route.fulfill({
         status: 500,
@@ -376,9 +372,7 @@ test.describe('Phase 16 releases and deployments', () => {
 
     await expect(page.getByText('No environments')).toBeVisible();
 
-    await expect(
-      page.getByText('Create an application environment before recording deployments.'),
-    ).toBeVisible();
+    await expect(page.getByText('Create an application environment before recording deployments.')).toBeVisible();
   });
 
   test('shows an empty state when no deployments exist', async ({ page }) => {
@@ -410,9 +404,7 @@ test.describe('Phase 16 releases and deployments', () => {
     await expect(page.getByText('Create a release and record its first deployment.')).toBeVisible();
   });
 
-  test('transitions a deployment forward after the confirmation dialog is accepted', async ({
-    page,
-  }) => {
+  test('transitions a deployment forward after the confirmation dialog is accepted', async ({ page }) => {
     let transitionCalled = false;
 
     await page.route('**/deployments/deployment-1/transition', async (route) => {
@@ -450,9 +442,7 @@ test.describe('Phase 16 releases and deployments', () => {
     expect(transitionCalled).toBe(true);
   });
 
-  test('does not transition a deployment when the confirmation dialog is dismissed', async ({
-    page,
-  }) => {
+  test('does not transition a deployment when the confirmation dialog is dismissed', async ({ page }) => {
     let transitionCalled = false;
 
     await page.route('**/deployments/deployment-1/transition', async (route) => {

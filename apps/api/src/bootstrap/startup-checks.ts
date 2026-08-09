@@ -10,11 +10,7 @@ import { PrismaService } from '../database/prisma.service';
 
 const DATABASE_TIMEOUT_MS = 10_000;
 
-async function withTimeout<T>(
-  promise: Promise<T>,
-  timeoutMs: number,
-  timeoutMessage: string,
-): Promise<T> {
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMessage: string): Promise<T> {
   let timer: NodeJS.Timeout | undefined;
 
   const timeoutPromise = new Promise<never>((_resolve, reject) => {

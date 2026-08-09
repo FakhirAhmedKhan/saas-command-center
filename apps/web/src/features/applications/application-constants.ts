@@ -1,10 +1,4 @@
-import type {
-  ApplicationCategory,
-  ApplicationLinkType,
-  ApplicationPriority,
-  ApplicationStatus,
-  TechnologyType,
-} from './application-types';
+import type { ApplicationCategory, ApplicationLinkType, ApplicationPriority, ApplicationStatus, TechnologyType } from './application-types';
 
 export const STATUS_LABELS: Record<ApplicationStatus, string> = {
   IDEA: 'Idea',
@@ -16,10 +10,7 @@ export const STATUS_LABELS: Record<ApplicationStatus, string> = {
   PAUSED: 'Paused',
 };
 
-export const STATUS_BADGE_VARIANTS: Record<
-  ApplicationStatus,
-  'default' | 'blue' | 'green' | 'yellow' | 'orange' | 'red' | 'purple' | 'slate'
-> = {
+export const STATUS_BADGE_VARIANTS: Record<ApplicationStatus, 'default' | 'blue' | 'green' | 'yellow' | 'orange' | 'red' | 'purple' | 'slate'> = {
   IDEA: 'slate',
   PLANNING: 'purple',
   IN_DEVELOPMENT: 'blue',
@@ -36,10 +27,7 @@ export const PRIORITY_LABELS: Record<ApplicationPriority, string> = {
   CRITICAL: 'Critical',
 };
 
-export const PRIORITY_BADGE_VARIANTS: Record<
-  ApplicationPriority,
-  'green' | 'blue' | 'orange' | 'red'
-> = {
+export const PRIORITY_BADGE_VARIANTS: Record<ApplicationPriority, 'green' | 'blue' | 'orange' | 'red'> = {
   LOW: 'green',
   MEDIUM: 'blue',
   HIGH: 'orange',

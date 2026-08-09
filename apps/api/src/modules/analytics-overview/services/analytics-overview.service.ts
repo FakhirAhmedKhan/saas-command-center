@@ -8,19 +8,11 @@ import { PrismaService } from 'src/database/prisma.service';
 
 import { AnalyticsOverviewQueryDto } from '../dto/analytics-overview-query.dto';
 
-import type {
-  AnalyticsBreakdownItemDto,
-  AnalyticsOverviewResponseDto,
-  AnalyticsTrendPointDto,
-} from '../dto/analytics-overview-response.dto';
+import type { AnalyticsBreakdownItemDto, AnalyticsOverviewResponseDto, AnalyticsTrendPointDto } from '../dto/analytics-overview-response.dto';
 
 import { resolveAnalyticsDateRange } from '../utils/analytics-date-range';
 
-import {
-  createMetricComparison,
-  roundMetric,
-  toSafeNumber,
-} from '../utils/analytics-overview-metrics';
+import { createMetricComparison, roundMetric, toSafeNumber } from '../utils/analytics-overview-metrics';
 
 interface MetricsDatabaseRow {
   visitors: bigint | number | string;
@@ -64,79 +56,29 @@ export class AnalyticsOverviewService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async getOverview(
-    workspaceId: string,
-    websiteId: string,
-    query: AnalyticsOverviewQueryDto,
-  ): Promise<AnalyticsOverviewResponseDto> {
+  async getOverview(workspaceId: string, websiteId: string, query: AnalyticsOverviewQueryDto): Promise<AnalyticsOverviewResponseDto> {
     const website = await this.requireWebsite(workspaceId, websiteId);
 
     const range = resolveAnalyticsDateRange(query, website.timeZone);
 
-    const [
-      currentMetrics,
-      previousMetrics,
-      trendRows,
-      pageRows,
-      sourceRows,
-      countryRows,
-      deviceRows,
-      browserRows,
-      operatingSystemRows,
-    ] = await Promise.all([
+    const [currentMetrics, previousMetrics, trendRows, pageRows, sourceRows, countryRows, deviceRows, browserRows, operatingSystemRows] = await Promise.all([
       this.loadPeriodMetrics(website.id, range.current.start, range.current.end),
 
       this.loadPeriodMetrics(website.id, range.previous.start, range.previous.end),
 
       this.loadOverviewTrend(website.id, range.current.start, range.current.end, range.granularity),
 
-      this.loadBreakdownRows(
-        website.id,
-        range.current.start,
-        range.current.end,
-        range.granularity,
-        AnalyticsAggregateDimension.PAGE,
-      ),
+      this.loadBreakdownRows(website.id, range.current.start, range.current.end, range.granularity, AnalyticsAggregateDimension.PAGE),
 
-      this.loadBreakdownRows(
-        website.id,
-        range.current.start,
-        range.current.end,
-        range.granularity,
-        AnalyticsAggregateDimension.SOURCE,
-      ),
+      this.loadBreakdownRows(website.id, range.current.start, range.current.end, range.granularity, AnalyticsAggregateDimension.SOURCE),
 
-      this.loadBreakdownRows(
-        website.id,
-        range.current.start,
-        range.current.end,
-        range.granularity,
-        AnalyticsAggregateDimension.COUNTRY,
-      ),
+      this.loadBreakdownRows(website.id, range.current.start, range.current.end, range.granularity, AnalyticsAggregateDimension.COUNTRY),
 
-      this.loadBreakdownRows(
-        website.id,
-        range.current.start,
-        range.current.end,
-        range.granularity,
-        AnalyticsAggregateDimension.DEVICE,
-      ),
+      this.loadBreakdownRows(website.id, range.current.start, range.current.end, range.granularity, AnalyticsAggregateDimension.DEVICE),
 
-      this.loadBreakdownRows(
-        website.id,
-        range.current.start,
-        range.current.end,
-        range.granularity,
-        AnalyticsAggregateDimension.BROWSER,
-      ),
+      this.loadBreakdownRows(website.id, range.current.start, range.current.end, range.granularity, AnalyticsAggregateDimension.BROWSER),
 
-      this.loadBreakdownRows(
-        website.id,
-        range.current.start,
-        range.current.end,
-        range.granularity,
-        AnalyticsAggregateDimension.OPERATING_SYSTEM,
-      ),
+      this.loadBreakdownRows(website.id, range.current.start, range.current.end, range.granularity, AnalyticsAggregateDimension.OPERATING_SYSTEM),
     ]);
 
     return {
@@ -248,11 +190,7 @@ export class AnalyticsOverviewService {
     return website;
   }
 
-  private async loadPeriodMetrics(
-    websiteId: string,
-    start: Date,
-    end: Date,
-  ): Promise<PeriodMetrics> {
+  private async loadPeriodMetrics(websiteId: string, start: Date, end: Date): Promise<PeriodMetrics> {
     const rows = await this.prisma.$queryRaw<MetricsDatabaseRow[]>(
       Prisma.sql`
                         SELECT
@@ -364,11 +302,9 @@ export class AnalyticsOverviewService {
 
     const totalDurationMs = toSafeNumber(row?.total_duration_ms);
 
-    const bounceRate =
-      measuredSessions === 0 ? 0 : roundMetric((bouncedSessions / measuredSessions) * 100, 1);
+    const bounceRate = measuredSessions === 0 ? 0 : roundMetric((bouncedSessions / measuredSessions) * 100, 1);
 
-    const averageDurationSeconds =
-      measuredSessions === 0 ? 0 : roundMetric(totalDurationMs / measuredSessions / 1000, 1);
+    const averageDurationSeconds = measuredSessions === 0 ? 0 : roundMetric(totalDurationMs / measuredSessions / 1000, 1);
 
     return {
       visitors,
@@ -379,12 +315,7 @@ export class AnalyticsOverviewService {
     };
   }
 
-  private async loadOverviewTrend(
-    websiteId: string,
-    start: Date,
-    end: Date,
-    granularity: 'hour' | 'day',
-  ): Promise<OverviewAggregateRow[]> {
+  private async loadOverviewTrend(websiteId: string, start: Date, end: Date, granularity: 'hour' | 'day'): Promise<OverviewAggregateRow[]> {
     const where = {
       websiteId,
 

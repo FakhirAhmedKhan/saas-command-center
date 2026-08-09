@@ -1,23 +1,8 @@
 'use client';
 
-import {
-  createContext,
-  type ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import type {
-  AuthResponse,
-  CurrentUserResponse,
-  LoginInput,
-  RegisterInput,
-  User,
-  Workspace,
-} from './auth.types';
+import type { AuthResponse, CurrentUserResponse, LoginInput, RegisterInput, User, Workspace } from './auth.types';
 import { setAccessToken, apiRequest } from '../lib/api/api-client';
 
 type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
@@ -189,17 +174,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       refreshCurrentUser,
       updateWorkspaceInState,
     }),
-    [
-      status,
-      user,
-      workspaces,
-      login,
-      register,
-      logout,
-      logoutAll,
-      refreshCurrentUser,
-      updateWorkspaceInState,
-    ],
+    [status, user, workspaces, login, register, logout, logoutAll, refreshCurrentUser, updateWorkspaceInState],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

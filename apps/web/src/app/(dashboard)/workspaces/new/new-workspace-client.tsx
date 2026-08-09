@@ -78,10 +78,7 @@ export default function NewWorkspacePage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <header>
-        <Link
-          href="/dashboard"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-slate-900"
-        >
+        <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-slate-900">
           <ArrowLeft className="size-4" />
           Back to dashboard
         </Link>
@@ -94,13 +91,10 @@ export default function NewWorkspacePage() {
           <div>
             <p className="text-sm font-semibold text-brand-600">Workspace management</p>
 
-            <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-950">
-              Create a new workspace
-            </h1>
+            <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-950">Create a new workspace</h1>
 
             <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">
-              Separate your personal products, client applications, and team projects into
-              independent workspaces.
+              Separate your personal products, client applications, and team projects into independent workspaces.
             </p>
           </div>
         </div>
@@ -110,18 +104,13 @@ export default function NewWorkspacePage() {
         <CardHeader>
           <h2 className="text-lg font-semibold text-slate-950">Workspace information</h2>
 
-          <p className="mt-1 text-sm leading-6 text-slate-500">
-            You will automatically become the owner of this workspace.
-          </p>
+          <p className="mt-1 text-sm leading-6 text-slate-500">You will automatically become the owner of this workspace.</p>
         </CardHeader>
 
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-6">
             {error ? (
-              <div
-                role="alert"
-                className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-              >
+              <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                 {error}
               </div>
             ) : null}
@@ -146,11 +135,7 @@ export default function NewWorkspacePage() {
               value={slug}
               maxLength={120}
               disabled={submitting}
-              hint={
-                slugPreview
-                  ? `Workspace URL identifier: ${slugPreview}`
-                  : 'Leave blank to generate it from the workspace name.'
-              }
+              hint={slugPreview ? `Workspace URL identifier: ${slugPreview}` : 'Leave blank to generate it from the workspace name.'}
               leadingIcon={<FolderKanban className="size-4" />}
               onChange={(event) => setSlug(event.target.value)}
             />
@@ -162,8 +147,7 @@ export default function NewWorkspacePage() {
                 <p className="font-semibold">Independent workspace</p>
 
                 <p className="mt-1">
-                  Applications, members, technologies, links, and future activity history will
-                  remain separated from your other workspaces.
+                  Applications, members, technologies, links, and future activity history will remain separated from your other workspaces.
                 </p>
               </div>
             </div>

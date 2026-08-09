@@ -53,9 +53,7 @@ export function WebsiteCard({ workspaceId, website }: WebsiteCardProps) {
             Application
           </div>
 
-          <p className="mt-2 text-sm font-semibold text-slate-800">
-            {website.application?.name ?? 'Not connected'}
-          </p>
+          <p className="mt-2 text-sm font-semibold text-slate-800">{website.application?.name ?? 'Not connected'}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
@@ -74,15 +72,11 @@ export function WebsiteCard({ workspaceId, website }: WebsiteCardProps) {
               Key prefix
             </div>
 
-            <p className="mt-1 truncate font-mono text-sm font-medium text-slate-700">
-              {website.trackingKeyPrefix}
-            </p>
+            <p className="mt-1 truncate font-mono text-sm font-medium text-slate-700">{website.trackingKeyPrefix}</p>
           </div>
         </div>
 
-        <p className="text-xs text-slate-400">
-          Last event: {formatWebsiteDate(website.lastEventAt)}
-        </p>
+        <p className="text-xs text-slate-400">Last event: {formatWebsiteDate(website.lastEventAt)}</p>
       </CardContent>
 
       <CardFooter>

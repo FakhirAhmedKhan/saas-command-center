@@ -6,18 +6,7 @@ import Link from 'next/link';
 
 import { useParams } from 'next/navigation';
 
-import {
-  ArrowLeft,
-  Clock3,
-  Code2,
-  DatabaseZap,
-  Globe2,
-  KeyRound,
-  Link2,
-  Pencil,
-  Radio,
-  Settings,
-} from 'lucide-react';
+import { ArrowLeft, Clock3, Code2, DatabaseZap, Globe2, KeyRound, Link2, Pencil, Radio, Settings } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 
@@ -99,10 +88,7 @@ export default function WebsiteDetailsPage() {
   return (
     <div className="space-y-6">
       <header>
-        <Link
-          href={`/workspaces/${workspaceId}/websites`}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900"
-        >
+        <Link href={`/workspaces/${workspaceId}/websites`} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900">
           <ArrowLeft className="size-4" />
           Back to websites
         </Link>
@@ -118,16 +104,10 @@ export default function WebsiteDetailsPage() {
                 <Badge variant="orange">Tracking disabled</Badge>
               )}
 
-              {website.application ? (
-                <Badge variant="blue">{website.application.name}</Badge>
-              ) : (
-                <Badge variant="slate">Not connected</Badge>
-              )}
+              {website.application ? <Badge variant="blue">{website.application.name}</Badge> : <Badge variant="slate">Not connected</Badge>}
             </div>
 
-            <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-950">
-              {website.name}
-            </h1>
+            <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-950">{website.name}</h1>
 
             <a
               href={`https://${website.domain}`}
@@ -193,10 +173,7 @@ export default function WebsiteDetailsPage() {
           <CardContent>
             <div className="space-y-3">
               {website.allowedOrigins.map((origin) => (
-                <div
-                  key={origin}
-                  className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3"
-                >
+                <div key={origin} className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3">
                   <Globe2 className="size-4 text-slate-400" />
 
                   <code className="break-all text-sm text-slate-700">{origin}</code>
@@ -212,29 +189,13 @@ export default function WebsiteDetailsPage() {
           </CardHeader>
 
           <CardContent className="space-y-4">
-            <DetailRow
-              icon={<Clock3 className="size-4" />}
-              label="Time zone"
-              value={website.timeZone}
-            />
+            <DetailRow icon={<Clock3 className="size-4" />} label="Time zone" value={website.timeZone} />
 
-            <DetailRow
-              icon={<KeyRound className="size-4" />}
-              label="Key prefix"
-              value={website.trackingKeyPrefix}
-              mono
-            />
+            <DetailRow icon={<KeyRound className="size-4" />} label="Key prefix" value={website.trackingKeyPrefix} mono />
 
-            <DetailRow
-              icon={<Link2 className="size-4" />}
-              label="Application"
-              value={website.application?.name ?? 'Not connected'}
-            />
+            <DetailRow icon={<Link2 className="size-4" />} label="Application" value={website.application?.name ?? 'Not connected'} />
 
-            <DetailRow
-              label="Key rotated"
-              value={formatWebsiteDate(website.trackingKeyRotatedAt)}
-            />
+            <DetailRow label="Key rotated" value={formatWebsiteDate(website.trackingKeyRotatedAt)} />
 
             <DetailRow label="Last event" value={formatWebsiteDate(website.lastEventAt)} />
 
@@ -246,17 +207,7 @@ export default function WebsiteDetailsPage() {
   );
 }
 
-function DetailRow({
-  icon,
-  label,
-  value,
-  mono = false,
-}: {
-  icon?: React.ReactNode;
-  label: string;
-  value: string;
-  mono?: boolean;
-}) {
+function DetailRow({ icon, label, value, mono = false }: { icon?: React.ReactNode; label: string; value: string; mono?: boolean }) {
   return (
     <div className="border-b border-slate-100 pb-3 last:border-0 last:pb-0">
       <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
@@ -264,11 +215,7 @@ function DetailRow({
         {label}
       </div>
 
-      <p
-        className={`mt-1 break-all text-sm font-semibold text-slate-800 ${mono ? 'font-mono' : ''}`}
-      >
-        {value}
-      </p>
+      <p className={`mt-1 break-all text-sm font-semibold text-slate-800 ${mono ? 'font-mono' : ''}`}>{value}</p>
     </div>
   );
 }

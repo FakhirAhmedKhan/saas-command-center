@@ -2,20 +2,7 @@ import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 
 import { Type } from 'class-transformer';
 
-import {
-  IsDateString,
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsString,
-  IsUrl,
-  IsUUID,
-  Matches,
-  Max,
-  MaxLength,
-  Min,
-  ValidateIf,
-} from 'class-validator';
+import { IsDateString, IsEnum, IsInt, IsOptional, IsString, IsUrl, IsUUID, Matches, Max, MaxLength, Min, ValidateIf } from 'class-validator';
 
 import { DeploymentStatus } from '../../../generated/prisma/client';
 

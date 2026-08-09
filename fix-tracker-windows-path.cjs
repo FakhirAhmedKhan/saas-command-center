@@ -48,14 +48,11 @@ if (nodeUrlImport.test(content)) {
  */
 let replacements = 0;
 
-content = content.replace(
-  /new\s+URL\(\s*(['"`][^'"`]+['"`])\s*,\s*import\.meta\.url\s*\)\.pathname/g,
-  (_match, relativePath) => {
-    replacements += 1;
+content = content.replace(/new\s+URL\(\s*(['"`][^'"`]+['"`])\s*,\s*import\.meta\.url\s*\)\.pathname/g, (_match, relativePath) => {
+  replacements += 1;
 
-    return `fileURLToPath(new URL(${relativePath}, import.meta.url))`;
-  },
-);
+  return `fileURLToPath(new URL(${relativePath}, import.meta.url))`;
+});
 
 /*
  * Fix:

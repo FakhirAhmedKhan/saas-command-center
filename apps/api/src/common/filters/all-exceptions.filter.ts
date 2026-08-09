@@ -1,11 +1,4 @@
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  HttpException,
-  HttpStatus,
-  Logger,
-} from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common';
 
 import type {
   //   Request,
@@ -51,8 +44,7 @@ function normalizeHttpException(exception: HttpException): NormalizedException {
 
   const rawMessage = responseRecord.message;
 
-  const message =
-    typeof rawMessage === 'string' || isStringArray(rawMessage) ? rawMessage : exception.message;
+  const message = typeof rawMessage === 'string' || isStringArray(rawMessage) ? rawMessage : exception.message;
 
   const rawError = responseRecord.error;
 
@@ -88,13 +80,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       const stack = exception instanceof Error ? exception.stack : String(exception);
 
       this.logger.error(
-        [
-          `${request.method} ${request.originalUrl}`,
-          request.requestId ? `requestId=${request.requestId}` : undefined,
-          stack,
-        ]
-          .filter(Boolean)
-          .join(' | '),
+        [`${request.method} ${request.originalUrl}`, request.requestId ? `requestId=${request.requestId}` : undefined, stack].filter(Boolean).join(' | '),
       );
     }
 

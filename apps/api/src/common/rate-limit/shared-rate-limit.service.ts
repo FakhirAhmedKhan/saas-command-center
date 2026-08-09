@@ -43,12 +43,7 @@ return {
 export class SharedRateLimitService {
   constructor(private readonly redis: RedisService) {}
 
-  async consume(
-    scope: string,
-    identity: string,
-    limit: number,
-    windowSeconds: number,
-  ): Promise<RateLimitResult> {
+  async consume(scope: string, identity: string, limit: number, windowSeconds: number): Promise<RateLimitResult> {
     const windowMs = windowSeconds * 1_000;
 
     const key = ['rate-limit', scope, identity].join(':');

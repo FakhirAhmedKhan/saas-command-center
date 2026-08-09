@@ -15,10 +15,7 @@ export default function ApplicationReleasesPage() {
 
   return (
     <div className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">
-      <ReleaseDeploymentDashboard
-        workspaceId={params.workspaceId}
-        applicationId={params.applicationId}
-      />
+      <ReleaseDeploymentDashboard workspaceId={params.workspaceId} applicationId={params.applicationId} />
     </div>
   );
 }

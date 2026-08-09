@@ -1,10 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  HttpException,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 import { Reflector } from '@nestjs/core';
 
@@ -41,10 +35,7 @@ export class SharedRateLimitGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const options = this.reflector.getAllAndOverride<SharedRateLimitOptions>(
-      SHARED_RATE_LIMIT_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const options = this.reflector.getAllAndOverride<SharedRateLimitOptions>(SHARED_RATE_LIMIT_KEY, [context.getHandler(), context.getClass()]);
 
     if (!options) {
       return true;
@@ -56,12 +47,7 @@ export class SharedRateLimitGuard implements CanActivate {
 
     const response = httpContext.getResponse<Response>();
 
-    const result = await this.rateLimit.consume(
-      options.scope,
-      getIdentity(request),
-      options.limit,
-      options.windowSeconds,
-    );
+    const result = await this.rateLimit.consume(options.scope, getIdentity(request), options.limit, options.windowSeconds);
 
     response.setHeader('X-RateLimit-Limit', String(result.limit));
 

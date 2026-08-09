@@ -50,9 +50,7 @@ describe('Workspace Members E2E', () => {
 
     expect([200, 201]).toContain(addResponse.status);
 
-    const listResponse = await owner.agent
-      .get(workspaceRoutes.members(owner.workspaceId))
-      .set(withBearer(owner.accessToken));
+    const listResponse = await owner.agent.get(workspaceRoutes.members(owner.workspaceId)).set(withBearer(owner.accessToken));
 
     expect(listResponse.status).toBe(200);
 
@@ -94,14 +92,11 @@ describe('Workspace Members E2E', () => {
   it('returns 404 when adding an unregistered email', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
 
-    const response = await owner.agent
-      .post(workspaceRoutes.members(owner.workspaceId))
-      .set(withBearer(owner.accessToken))
-      .send({
-        email: 'missing-user@example.test',
+    const response = await owner.agent.post(workspaceRoutes.members(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
+      email: 'missing-user@example.test',
 
-        role: WorkspaceRole.VIEWER,
-      });
+      role: WorkspaceRole.VIEWER,
+    });
 
     expect(response.status).toBe(404);
 
@@ -141,11 +136,7 @@ describe('Workspace Members E2E', () => {
 
     expect([200, 201]).toContain(addResponse.status);
 
-    const updateResponse = await updateWorkspaceMemberRole(
-      owner,
-      member.userId,
-      WorkspaceRole.DEVELOPER,
-    );
+    const updateResponse = await updateWorkspaceMemberRole(owner, member.userId, WorkspaceRole.DEVELOPER);
 
     expect(updateResponse.status).toBe(200);
 
@@ -163,9 +154,7 @@ describe('Workspace Members E2E', () => {
 
     expect([200, 201]).toContain(addResponse.status);
 
-    const accessBeforeRemoval = await member.agent
-      .get(workspaceRoutes.details(owner.workspaceId))
-      .set(withBearer(member.accessToken));
+    const accessBeforeRemoval = await member.agent.get(workspaceRoutes.details(owner.workspaceId)).set(withBearer(member.accessToken));
 
     expect(accessBeforeRemoval.status).toBe(200);
 
@@ -181,9 +170,7 @@ describe('Workspace Members E2E', () => {
 
     expect(membership).toBeNull();
 
-    const accessAfterRemoval = await member.agent
-      .get(workspaceRoutes.details(owner.workspaceId))
-      .set(withBearer(member.accessToken));
+    const accessAfterRemoval = await member.agent.get(workspaceRoutes.details(owner.workspaceId)).set(withBearer(member.accessToken));
 
     expectAccessDenied(accessAfterRemoval);
   });
@@ -203,27 +190,15 @@ describe('Workspace Members E2E', () => {
 
     expect([200, 201]).toContain(addResponse.status);
 
-    const foreignUpdateResponse = await updateWorkspaceMemberRole(
-      alphaOwner,
-      betaOwner.userId,
-      WorkspaceRole.ADMIN,
-    );
+    const foreignUpdateResponse = await updateWorkspaceMemberRole(alphaOwner, betaOwner.userId, WorkspaceRole.ADMIN);
 
     expectBusinessRuleRejected(foreignUpdateResponse);
 
-    const originalMembership = await getWorkspaceMembership(
-      prisma,
-      alphaOwner.workspaceId,
-      alphaMember.userId,
-    );
+    const originalMembership = await getWorkspaceMembership(prisma, alphaOwner.workspaceId, alphaMember.userId);
 
     expect(originalMembership?.role).toBe(WorkspaceRole.VIEWER);
 
-    const foreignMembership = await getWorkspaceMembership(
-      prisma,
-      alphaOwner.workspaceId,
-      betaOwner.userId,
-    );
+    const foreignMembership = await getWorkspaceMembership(prisma, alphaOwner.workspaceId, betaOwner.userId);
 
     expect(foreignMembership).toBeNull();
   });
@@ -233,14 +208,11 @@ describe('Workspace Members E2E', () => {
 
     const member = await registerWorkspaceTestUser(app, prisma);
 
-    const response = await owner.agent
-      .post(workspaceRoutes.members(owner.workspaceId))
-      .set(withBearer(owner.accessToken))
-      .send({
-        email: member.input.email,
+    const response = await owner.agent.post(workspaceRoutes.members(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
+      email: member.input.email,
 
-        role: 'SUPER_ADMIN',
-      });
+      role: 'SUPER_ADMIN',
+    });
 
     expect(response.status).toBe(400);
   });

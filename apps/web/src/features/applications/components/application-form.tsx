@@ -34,12 +34,7 @@ interface ApplicationFormProps {
   onSubmit: (payload: CreateApplicationPayload) => Promise<void>;
 }
 
-export function ApplicationForm({
-  application,
-  cancelHref,
-  submitLabel,
-  onSubmit,
-}: ApplicationFormProps) {
+export function ApplicationForm({ application, cancelHref, submitLabel, onSubmit }: ApplicationFormProps) {
   const [name, setName] = useState(application?.name ?? '');
 
   const [slug, setSlug] = useState(application?.slug ?? '');
@@ -56,9 +51,7 @@ export function ApplicationForm({
 
   const [startedAt, setStartedAt] = useState(toDateInputValue(application?.startedAt));
 
-  const [targetLaunchAt, setTargetLaunchAt] = useState(
-    toDateInputValue(application?.targetLaunchAt),
-  );
+  const [targetLaunchAt, setTargetLaunchAt] = useState(toDateInputValue(application?.targetLaunchAt));
 
   const [launchedAt, setLaunchedAt] = useState(toDateInputValue(application?.launchedAt));
 
@@ -105,30 +98,18 @@ export function ApplicationForm({
         <CardHeader>
           <h2 className="text-lg font-semibold text-slate-950">Application information</h2>
 
-          <p className="mt-1 text-sm leading-6 text-slate-500">
-            Add the main information used to organize and monitor this SaaS application.
-          </p>
+          <p className="mt-1 text-sm leading-6 text-slate-500">Add the main information used to organize and monitor this SaaS application.</p>
         </CardHeader>
 
         <CardContent className="space-y-6">
           {error ? (
-            <div
-              role="alert"
-              className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-            >
+            <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {error}
             </div>
           ) : null}
 
           <div className="grid gap-5 md:grid-cols-2">
-            <Input
-              name="name"
-              label="Application name"
-              placeholder="PriceScout AI"
-              value={name}
-              required
-              onChange={(event) => setName(event.target.value)}
-            />
+            <Input name="name" label="Application name" placeholder="PriceScout AI" value={name} required onChange={(event) => setName(event.target.value)} />
 
             <Input
               name="slug"
@@ -160,12 +141,7 @@ export function ApplicationForm({
           />
 
           <div className="grid gap-5 md:grid-cols-3">
-            <Select
-              name="category"
-              label="Category"
-              value={category}
-              onChange={(event) => setCategory(event.target.value as ApplicationCategory)}
-            >
+            <Select name="category" label="Category" value={category} onChange={(event) => setCategory(event.target.value as ApplicationCategory)}>
               {APPLICATION_CATEGORIES.map((item) => (
                 <option key={item} value={item}>
                   {CATEGORY_LABELS[item]}
@@ -173,12 +149,7 @@ export function ApplicationForm({
               ))}
             </Select>
 
-            <Select
-              name="status"
-              label="Status"
-              value={status}
-              onChange={(event) => setStatus(event.target.value as ApplicationStatus)}
-            >
+            <Select name="status" label="Status" value={status} onChange={(event) => setStatus(event.target.value as ApplicationStatus)}>
               {APPLICATION_STATUSES.map((item) => (
                 <option key={item} value={item}>
                   {STATUS_LABELS[item]}
@@ -186,12 +157,7 @@ export function ApplicationForm({
               ))}
             </Select>
 
-            <Select
-              name="priority"
-              label="Priority"
-              value={priority}
-              onChange={(event) => setPriority(event.target.value as ApplicationPriority)}
-            >
+            <Select name="priority" label="Priority" value={priority} onChange={(event) => setPriority(event.target.value as ApplicationPriority)}>
               {APPLICATION_PRIORITIES.map((item) => (
                 <option key={item} value={item}>
                   {PRIORITY_LABELS[item]}
@@ -201,13 +167,7 @@ export function ApplicationForm({
           </div>
 
           <div className="grid gap-5 md:grid-cols-3">
-            <Input
-              name="startedAt"
-              type="date"
-              label="Start date"
-              value={startedAt}
-              onChange={(event) => setStartedAt(event.target.value)}
-            />
+            <Input name="startedAt" type="date" label="Start date" value={startedAt} onChange={(event) => setStartedAt(event.target.value)} />
 
             <Input
               name="targetLaunchAt"
@@ -217,13 +177,7 @@ export function ApplicationForm({
               onChange={(event) => setTargetLaunchAt(event.target.value)}
             />
 
-            <Input
-              name="launchedAt"
-              type="date"
-              label="Actual launch date"
-              value={launchedAt}
-              onChange={(event) => setLaunchedAt(event.target.value)}
-            />
+            <Input name="launchedAt" type="date" label="Actual launch date" value={launchedAt} onChange={(event) => setLaunchedAt(event.target.value)} />
           </div>
         </CardContent>
 

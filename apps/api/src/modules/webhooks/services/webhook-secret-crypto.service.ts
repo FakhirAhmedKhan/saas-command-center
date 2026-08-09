@@ -67,10 +67,6 @@ export class WebhookSecretCryptoService {
 
     decipher.setAuthTag(Buffer.from(input.authTag, 'base64'));
 
-    return Buffer.concat([
-      decipher.update(Buffer.from(input.ciphertext, 'base64')),
-
-      decipher.final(),
-    ]).toString('utf8');
+    return Buffer.concat([decipher.update(Buffer.from(input.ciphertext, 'base64')), decipher.final()]).toString('utf8');
   }
 }

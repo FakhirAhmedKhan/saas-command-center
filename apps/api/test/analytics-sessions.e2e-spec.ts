@@ -6,13 +6,7 @@ import { PrismaService } from 'src/database/prisma.service';
 
 import { AnalyticsProcessingService } from 'src/modules/analytics-engine/services/analytics-processing.service';
 
-import {
-  buildTrackerEvent,
-  collectEvents,
-  createTrackedWebsite,
-  expectCollectionAccepted,
-  uniqueTrackerId,
-} from './helpers/analytics-ingestion';
+import { buildTrackerEvent, collectEvents, createTrackedWebsite, expectCollectionAccepted, uniqueTrackerId } from './helpers/analytics-ingestion';
 
 import { createTestApp } from './helpers/create-test-app';
 
@@ -66,12 +60,7 @@ describe('Analytics Sessions E2E', () => {
       events.length,
     );
 
-    await processingService.processForWorkspace(
-      owner.workspaceId,
-      trackedWebsite.id,
-      owner.userId,
-      100,
-    );
+    await processingService.processForWorkspace(owner.workspaceId, trackedWebsite.id, owner.userId, 100);
 
     const session = await prisma.analyticsSession.findFirstOrThrow({
       where: {
@@ -222,12 +211,7 @@ describe('Analytics Sessions E2E', () => {
       1,
     );
 
-    await processingService.processForWorkspace(
-      owner.workspaceId,
-      trackedWebsite.id,
-      owner.userId,
-      100,
-    );
+    await processingService.processForWorkspace(owner.workspaceId, trackedWebsite.id, owner.userId, 100);
 
     const earlier = new Date(middle.getTime() - 30_000);
 
@@ -252,12 +236,7 @@ describe('Analytics Sessions E2E', () => {
       2,
     );
 
-    await processingService.processForWorkspace(
-      owner.workspaceId,
-      trackedWebsite.id,
-      owner.userId,
-      100,
-    );
+    await processingService.processForWorkspace(owner.workspaceId, trackedWebsite.id, owner.userId, 100);
 
     const session = await prisma.analyticsSession.findFirstOrThrow({
       where: {

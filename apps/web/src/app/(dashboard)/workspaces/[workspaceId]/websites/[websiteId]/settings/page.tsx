@@ -6,18 +6,7 @@ import Link from 'next/link';
 
 import { useParams } from 'next/navigation';
 
-import {
-  Archive,
-  ArrowLeft,
-  Check,
-  Clipboard,
-  KeyRound,
-  Link2,
-  PauseCircle,
-  PlayCircle,
-  RotateCcw,
-  Unlink,
-} from 'lucide-react';
+import { Archive, ArrowLeft, Check, Clipboard, KeyRound, Link2, PauseCircle, PlayCircle, RotateCcw, Unlink } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
@@ -132,9 +121,7 @@ export default function WebsiteSettingsPage() {
   }
 
   async function rotateKey(): Promise<void> {
-    const confirmed = window.confirm(
-      'Rotate the tracking key? The old key will stop working immediately.',
-    );
+    const confirmed = window.confirm('Rotate the tracking key? The old key will stop working immediately.');
 
     if (!confirmed) {
       return;
@@ -181,21 +168,14 @@ export default function WebsiteSettingsPage() {
   }
 
   if (!website) {
-    return (
-      <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
-        {error}
-      </div>
-    );
+    return <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">{error}</div>;
   }
 
   const baseHref = `/workspaces/${workspaceId}/websites/${websiteId}`;
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <Link
-        href={baseHref}
-        className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900"
-      >
+      <Link href={baseHref} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900">
         <ArrowLeft className="size-4" />
         Back to website
       </Link>
@@ -203,16 +183,10 @@ export default function WebsiteSettingsPage() {
       <header>
         <h1 className="text-3xl font-bold tracking-tight text-slate-950">Website settings</h1>
 
-        <p className="mt-2 text-sm leading-6 text-slate-500">
-          Manage lifecycle, application connection and tracking-key security.
-        </p>
+        <p className="mt-2 text-sm leading-6 text-slate-500">Manage lifecycle, application connection and tracking-key security.</p>
       </header>
 
-      {error ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-          {error}
-        </div>
-      ) : null}
+      {error ? <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div> : null}
 
       {generatedKey ? (
         <Card className="border-emerald-200">
@@ -221,9 +195,7 @@ export default function WebsiteSettingsPage() {
           </CardHeader>
 
           <CardContent>
-            <code className="block break-all rounded-xl bg-slate-950 p-4 text-sm text-slate-100">
-              {generatedKey}
-            </code>
+            <code className="block break-all rounded-xl bg-slate-950 p-4 text-sm text-slate-100">{generatedKey}</code>
 
             <Button className="mt-4" variant="outline" onClick={() => void copyKey()}>
               {copied ? <Check className="size-4" /> : <Clipboard className="size-4" />}
@@ -264,11 +236,7 @@ export default function WebsiteSettingsPage() {
               <Button
                 loading={action === 'connect'}
                 disabled={Boolean(website.archivedAt)}
-                onClick={() =>
-                  void run('connect', () =>
-                    connectWebsite(workspaceId, websiteId, selectedApplicationId),
-                  )
-                }
+                onClick={() => void run('connect', () => connectWebsite(workspaceId, websiteId, selectedApplicationId))}
               >
                 <Link2 className="size-4" />
                 Connect application
@@ -280,9 +248,7 @@ export default function WebsiteSettingsPage() {
                 variant="outline"
                 loading={action === 'disconnect'}
                 disabled={Boolean(website.archivedAt)}
-                onClick={() =>
-                  void run('disconnect', () => disconnectWebsite(workspaceId, websiteId))
-                }
+                onClick={() => void run('disconnect', () => disconnectWebsite(workspaceId, websiteId))}
               >
                 <Unlink className="size-4" />
                 Disconnect
@@ -299,11 +265,7 @@ export default function WebsiteSettingsPage() {
 
         <CardContent>
           {website.enabled ? (
-            <Button
-              variant="outline"
-              loading={action === 'disable'}
-              onClick={() => void run('disable', () => disableWebsite(workspaceId, websiteId))}
-            >
+            <Button variant="outline" loading={action === 'disable'} onClick={() => void run('disable', () => disableWebsite(workspaceId, websiteId))}>
               <PauseCircle className="size-4" />
               Disable tracking
             </Button>
@@ -334,19 +296,12 @@ export default function WebsiteSettingsPage() {
         </CardHeader>
 
         <CardContent>
-          <Button
-            variant="outline"
-            loading={action === 'rotate'}
-            disabled={Boolean(website.archivedAt)}
-            onClick={() => void rotateKey()}
-          >
+          <Button variant="outline" loading={action === 'rotate'} disabled={Boolean(website.archivedAt)} onClick={() => void rotateKey()}>
             <RotateCcw className="size-4" />
             Rotate tracking key
           </Button>
 
-          <p className="mt-3 text-sm text-red-600">
-            Rotation immediately invalidates the previous key.
-          </p>
+          <p className="mt-3 text-sm text-red-600">Rotation immediately invalidates the previous key.</p>
         </CardContent>
       </Card>
 
@@ -354,18 +309,12 @@ export default function WebsiteSettingsPage() {
         <CardHeader>
           <h2 className="font-semibold text-slate-950">Archive website</h2>
 
-          <p className="mt-1 text-sm text-slate-500">
-            Archiving keeps future analytics history safe while disabling new tracking events.
-          </p>
+          <p className="mt-1 text-sm text-slate-500">Archiving keeps future analytics history safe while disabling new tracking events.</p>
         </CardHeader>
 
         <CardContent>
           {website.archivedAt ? (
-            <Button
-              variant="outline"
-              loading={action === 'restore'}
-              onClick={() => void run('restore', () => restoreWebsite(workspaceId, websiteId))}
-            >
+            <Button variant="outline" loading={action === 'restore'} onClick={() => void run('restore', () => restoreWebsite(workspaceId, websiteId))}>
               <RotateCcw className="size-4" />
               Restore website
             </Button>

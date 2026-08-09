@@ -132,5 +132,4 @@ export interface AnalyticsReportRequest {
   signal?: AbortSignal;
 }
 
-export type AnalyticsReportResponse =
-  PageReportResponse | EventReportResponse | DimensionReportResponse;
+export type AnalyticsReportResponse = PageReportResponse | EventReportResponse | DimensionReportResponse;

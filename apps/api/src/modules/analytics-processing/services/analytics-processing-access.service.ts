@@ -37,9 +37,7 @@ export class AnalyticsProcessingAccessService {
       },
     });
 
-    return (
-      membership?.role === WorkspaceRole.OWNER || membership?.role === WorkspaceRole.ADMIN
-    );
+    return membership?.role === WorkspaceRole.OWNER || membership?.role === WorkspaceRole.ADMIN;
   }
 
   private async assertCanManageProcessing(workspaceId: string, userId: string): Promise<void> {
@@ -60,8 +58,7 @@ export class AnalyticsProcessingAccessService {
       throw new ForbiddenException('You do not have access to this workspace.');
     }
 
-    const allowed =
-      membership.role === WorkspaceRole.OWNER || membership.role === WorkspaceRole.ADMIN;
+    const allowed = membership.role === WorkspaceRole.OWNER || membership.role === WorkspaceRole.ADMIN;
 
     if (!allowed) {
       throw new ForbiddenException('Your workspace role does not permit analytics reprocessing.');

@@ -49,11 +49,7 @@ export class WorkspacesController {
   @ApiOperation({
     summary: 'Transfer workspace ownership',
   })
-  transferOwnership(
-    @Param('workspaceId') workspaceId: string,
-    @Body() dto: TransferOwnershipDto,
-    @CurrentUser() user: AuthenticatedUser,
-  ) {
+  transferOwnership(@Param('workspaceId') workspaceId: string, @Body() dto: TransferOwnershipDto, @CurrentUser() user: AuthenticatedUser) {
     return this.workspacesService.transferOwnership(workspaceId, user.id, dto.newOwnerUserId);
   }
 }

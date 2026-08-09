@@ -113,9 +113,7 @@ export function ActivityFeed({
 
     async function load(): Promise<void> {
       try {
-        const response = applicationId
-          ? await getApplicationActivities(workspaceId, applicationId, query)
-          : await getWorkspaceActivities(workspaceId, query);
+        const response = applicationId ? await getApplicationActivities(workspaceId, applicationId, query) : await getWorkspaceActivities(workspaceId, query);
 
         if (cancelled) {
           return;
@@ -198,12 +196,7 @@ export function ActivityFeed({
         </CardHeader>
 
         <CardContent>
-          <ActivityFilters
-            value={filterDraft}
-            onChange={setFilterDraft}
-            onApply={applyFilters}
-            onReset={resetFilters}
-          />
+          <ActivityFilters value={filterDraft} onChange={setFilterDraft} onApply={applyFilters} onReset={resetFilters} />
         </CardContent>
       </Card>
 
@@ -231,22 +224,13 @@ export function ActivityFeed({
           </CardContent>
         </Card>
       ) : activities.length === 0 ? (
-        <EmptyState
-          icon={<Activity className="size-6" />}
-          title="No activity found"
-          description="Important application changes will appear here."
-        />
+        <EmptyState icon={<Activity className="size-6" />} title="No activity found" description="Important application changes will appear here." />
       ) : (
         <Card>
           <CardContent className="p-5 sm:p-6">
             <div>
               {activities.map((activity) => (
-                <ActivityItem
-                  key={activity.id}
-                  workspaceId={workspaceId}
-                  activity={activity}
-                  showApplication={showApplication}
-                />
+                <ActivityItem key={activity.id} workspaceId={workspaceId} activity={activity} showApplication={showApplication} />
               ))}
             </div>
 
@@ -257,20 +241,12 @@ export function ActivityFeed({
                 </p>
 
                 <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    disabled={!pagination.hasPreviousPage}
-                    onClick={() => changePage(pagination.page - 1)}
-                  >
+                  <Button variant="outline" disabled={!pagination.hasPreviousPage} onClick={() => changePage(pagination.page - 1)}>
                     <ChevronLeft className="size-4" />
                     Previous
                   </Button>
 
-                  <Button
-                    variant="outline"
-                    disabled={!pagination.hasNextPage}
-                    onClick={() => changePage(pagination.page + 1)}
-                  >
+                  <Button variant="outline" disabled={!pagination.hasNextPage} onClick={() => changePage(pagination.page + 1)}>
                     Next
                     <ChevronRight className="size-4" />
                   </Button>

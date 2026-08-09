@@ -1,8 +1,4 @@
-import type {
-  HealthCheckStatus,
-  HealthIncidentStatus,
-  HealthTargetType,
-} from '../../../generated/prisma/client';
+import type { HealthCheckStatus, HealthIncidentStatus, HealthTargetType } from '../../../generated/prisma/client';
 
 export interface MonitoringSummaryDto {
   canManage: boolean;

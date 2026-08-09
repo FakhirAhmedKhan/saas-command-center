@@ -1,24 +1,10 @@
-import {
-  BadRequestException,
-  ConflictException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 
-import {
-  InvitationDeliveryStatus,
-  NotificationType,
-  Prisma,
-  WorkspaceInvitationStatus,
-} from '../../../generated/prisma/client';
+import { InvitationDeliveryStatus, NotificationType, Prisma, WorkspaceInvitationStatus } from '../../../generated/prisma/client';
 
 import { PrismaService } from '../../../database/prisma.service';
 
-import type {
-  CreateWorkspaceInvitationDto,
-  InvitationListQueryDto,
-} from '../dto/workspace-invitation.dto';
+import type { CreateWorkspaceInvitationDto, InvitationListQueryDto } from '../dto/workspace-invitation.dto';
 
 import { InvitationMailer } from './invitation-mailer.service';
 
@@ -534,9 +520,7 @@ export class WorkspaceInvitationService {
         },
 
         data: {
-          deliveryStatus: result.sent
-            ? InvitationDeliveryStatus.SENT
-            : InvitationDeliveryStatus.NOT_REQUESTED,
+          deliveryStatus: result.sent ? InvitationDeliveryStatus.SENT : InvitationDeliveryStatus.NOT_REQUESTED,
 
           deliveryError: null,
         },
@@ -550,10 +534,7 @@ export class WorkspaceInvitationService {
         data: {
           deliveryStatus: InvitationDeliveryStatus.FAILED,
 
-          deliveryError:
-            error instanceof Error
-              ? error.message.slice(0, 1_000)
-              : 'Invitation email delivery failed.',
+          deliveryError: error instanceof Error ? error.message.slice(0, 1_000) : 'Invitation email delivery failed.',
         },
       });
     }
@@ -579,9 +560,7 @@ export class WorkspaceInvitationService {
     return invitation;
   }
 
-  private async assertUsable(
-    invitation: Awaited<ReturnType<WorkspaceInvitationService['findByToken']>>,
-  ): Promise<void> {
+  private async assertUsable(invitation: Awaited<ReturnType<WorkspaceInvitationService['findByToken']>>): Promise<void> {
     const status = await this.resolveCurrentStatus(invitation);
 
     if (status === WorkspaceInvitationStatus.EXPIRED) {
@@ -593,13 +572,8 @@ export class WorkspaceInvitationService {
     }
   }
 
-  private async resolveCurrentStatus(
-    invitation: Awaited<ReturnType<WorkspaceInvitationService['findByToken']>>,
-  ) {
-    if (
-      invitation.status === WorkspaceInvitationStatus.PENDING &&
-      invitation.expiresAt <= new Date()
-    ) {
+  private async resolveCurrentStatus(invitation: Awaited<ReturnType<WorkspaceInvitationService['findByToken']>>) {
+    if (invitation.status === WorkspaceInvitationStatus.PENDING && invitation.expiresAt <= new Date()) {
       await this.prisma.workspaceInvitation.updateMany({
         where: {
           id: invitation.id,
@@ -713,9 +687,7 @@ export class WorkspaceInvitationService {
     } as const;
   }
 
-  private mapInvitation(
-    invitation: Awaited<ReturnType<WorkspaceInvitationService['requireInvitation']>>,
-  ) {
+  private mapInvitation(invitation: Awaited<ReturnType<WorkspaceInvitationService['requireInvitation']>>) {
     return {
       id: invitation.id,
 

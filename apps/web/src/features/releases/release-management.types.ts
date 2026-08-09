@@ -1,5 +1,4 @@
-export type ReleaseStatus =
-  'DRAFT' | 'SCHEDULED' | 'IN_PROGRESS' | 'SUCCESSFUL' | 'FAILED' | 'ROLLED_BACK';
+export type ReleaseStatus = 'DRAFT' | 'SCHEDULED' | 'IN_PROGRESS' | 'SUCCESSFUL' | 'FAILED' | 'ROLLED_BACK';
 
 export type DeploymentStatus = ReleaseStatus;
 

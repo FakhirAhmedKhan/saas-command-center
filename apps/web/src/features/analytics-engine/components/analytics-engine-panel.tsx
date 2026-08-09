@@ -2,17 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import {
-  Activity,
-  CalendarClock,
-  Database,
-  Gauge,
-  Play,
-  RefreshCw,
-  Repeat2,
-  Trash2,
-  Users,
-} from 'lucide-react';
+import { Activity, CalendarClock, Database, Gauge, Play, RefreshCw, Repeat2, Trash2, Users } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 
@@ -26,27 +16,11 @@ import { Select } from '@/components/ui/select';
 
 import { Spinner } from '@/components/ui/spinner';
 
-import {
-  getAnalyticsAggregates,
-  getAnalyticsEngineStatus,
-  processAnalytics,
-  reprocessAnalytics,
-  runAnalyticsRetention,
-} from '../analytics-engine-api';
+import { getAnalyticsAggregates, getAnalyticsEngineStatus, processAnalytics, reprocessAnalytics, runAnalyticsRetention } from '../analytics-engine-api';
 
-import type {
-  AnalyticsAggregateDimension,
-  AnalyticsAggregatePeriod,
-  AnalyticsAggregateResponse,
-  AnalyticsEngineStatus,
-} from '../analytics-engine-types';
+import type { AnalyticsAggregateDimension, AnalyticsAggregatePeriod, AnalyticsAggregateResponse, AnalyticsEngineStatus } from '../analytics-engine-types';
 
-import {
-  calculateBounceRate,
-  formatAnalyticsDate,
-  formatDuration,
-  getAnalyticsEngineError,
-} from '../analytics-engine-utils';
+import { calculateBounceRate, formatAnalyticsDate, formatDuration, getAnalyticsEngineError } from '../analytics-engine-utils';
 
 interface AnalyticsEnginePanelProps {
   workspaceId: string;
@@ -238,11 +212,7 @@ export function AnalyticsEnginePanel({ workspaceId, websiteId }: AnalyticsEngine
 
   return (
     <div className="space-y-7">
-      {error ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-          {error}
-        </div>
-      ) : null}
+      {error ? <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div> : null}
 
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-card sm:p-8">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
@@ -253,14 +223,9 @@ export function AnalyticsEnginePanel({ workspaceId, websiteId }: AnalyticsEngine
               <ProcessingBadge status={status.processingState?.status ?? 'COMPLETED'} />
             </div>
 
-            <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
-              {status.website.name}
-            </h1>
+            <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">{status.website.name}</h1>
 
-            <p className="mt-2 text-sm text-slate-500">
-              Raw events are normalized into visitors, sessions, page views, dimensions, and
-              reporting aggregates.
-            </p>
+            <p className="mt-2 text-sm text-slate-500">Raw events are normalized into visitors, sessions, page views, dimensions, and reporting aggregates.</p>
           </div>
 
           <div className="flex flex-wrap gap-3">
@@ -269,12 +234,7 @@ export function AnalyticsEnginePanel({ workspaceId, websiteId }: AnalyticsEngine
               Refresh
             </Button>
 
-            <Button
-              loading={action === 'process'}
-              onClick={() =>
-                void runAction('process', () => processAnalytics(workspaceId, websiteId))
-              }
-            >
+            <Button loading={action === 'process'} onClick={() => void runAction('process', () => processAnalytics(workspaceId, websiteId))}>
               <Play className="size-4" />
               Process pending events
             </Button>
@@ -282,29 +242,13 @@ export function AnalyticsEnginePanel({ workspaceId, websiteId }: AnalyticsEngine
         </div>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <Metric
-            icon={<Database className="size-5" />}
-            label="Raw events"
-            value={status.counts.rawEvents}
-          />
+          <Metric icon={<Database className="size-5" />} label="Raw events" value={status.counts.rawEvents} />
 
-          <Metric
-            icon={<Activity className="size-5" />}
-            label="Pending"
-            value={status.counts.pendingRawEvents}
-          />
+          <Metric icon={<Activity className="size-5" />} label="Pending" value={status.counts.pendingRawEvents} />
 
-          <Metric
-            icon={<Users className="size-5" />}
-            label="Visitors"
-            value={status.counts.visitors}
-          />
+          <Metric icon={<Users className="size-5" />} label="Visitors" value={status.counts.visitors} />
 
-          <Metric
-            icon={<Gauge className="size-5" />}
-            label="Sessions"
-            value={status.counts.sessions}
-          />
+          <Metric icon={<Gauge className="size-5" />} label="Sessions" value={status.counts.sessions} />
 
           <Metric label="Page views" value={status.counts.pageViews} />
 
@@ -322,25 +266,13 @@ export function AnalyticsEnginePanel({ workspaceId, websiteId }: AnalyticsEngine
         </CardHeader>
 
         <CardContent className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <Detail
-            label="Last completed"
-            value={formatAnalyticsDate(status.processingState?.lastCompletedAt)}
-          />
+          <Detail label="Last completed" value={formatAnalyticsDate(status.processingState?.lastCompletedAt)} />
 
-          <Detail
-            label="Last processed event"
-            value={formatAnalyticsDate(status.processingState?.lastProcessedReceivedAt)}
-          />
+          <Detail label="Last processed event" value={formatAnalyticsDate(status.processingState?.lastProcessedReceivedAt)} />
 
-          <Detail
-            label="Latest run events"
-            value={String(status.latestRun?.rawEventsProcessed ?? 0)}
-          />
+          <Detail label="Latest run events" value={String(status.latestRun?.rawEventsProcessed ?? 0)} />
 
-          <Detail
-            label="Latest run buckets"
-            value={`${status.latestRun?.hourlyBuckets ?? 0} hourly / ${status.latestRun?.dailyBuckets ?? 0} daily`}
-          />
+          <Detail label="Latest run buckets" value={`${status.latestRun?.hourlyBuckets ?? 0} hourly / ${status.latestRun?.dailyBuckets ?? 0} daily`} />
 
           {status.processingState?.lastError ? (
             <div className="md:col-span-2 xl:col-span-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
@@ -358,34 +290,16 @@ export function AnalyticsEnginePanel({ workspaceId, websiteId }: AnalyticsEngine
             <h2 className="font-semibold text-slate-950">Reprocess a date range</h2>
           </div>
 
-          <p className="mt-2 text-sm text-slate-500">
-            Use this after normalization, session, source, or metric rules change. Maximum range: 31
-            days.
-          </p>
+          <p className="mt-2 text-sm text-slate-500">Use this after normalization, session, source, or metric rules change. Maximum range: 31 days.</p>
         </CardHeader>
 
         <CardContent>
           <div className="grid gap-4 md:grid-cols-[1fr_1fr_auto]">
-            <Input
-              type="date"
-              label="From"
-              value={reprocessFrom}
-              onChange={(event) => setReprocessFrom(event.target.value)}
-            />
+            <Input type="date" label="From" value={reprocessFrom} onChange={(event) => setReprocessFrom(event.target.value)} />
 
-            <Input
-              type="date"
-              label="To"
-              value={reprocessTo}
-              onChange={(event) => setReprocessTo(event.target.value)}
-            />
+            <Input type="date" label="To" value={reprocessTo} onChange={(event) => setReprocessTo(event.target.value)} />
 
-            <Button
-              className="self-end"
-              variant="outline"
-              loading={action === 'reprocess'}
-              onClick={() => void handleReprocess()}
-            >
+            <Button className="self-end" variant="outline" loading={action === 'reprocess'} onClick={() => void handleReprocess()}>
               <Repeat2 className="size-4" />
               Reprocess
             </Button>
@@ -484,18 +398,12 @@ export function AnalyticsEnginePanel({ workspaceId, websiteId }: AnalyticsEngine
                 <tbody>
                   {aggregates.data.map((aggregate) => (
                     <tr key={aggregate.id} className="border-b border-slate-100 last:border-0">
-                      <td className="whitespace-nowrap px-3 py-4">
-                        {formatAnalyticsDate(aggregate.bucketStart)}
-                      </td>
+                      <td className="whitespace-nowrap px-3 py-4">{formatAnalyticsDate(aggregate.bucketStart)}</td>
 
                       <td className="max-w-sm px-3 py-4">
-                        <p className="truncate font-semibold text-slate-800">
-                          {aggregate.dimensionLabel}
-                        </p>
+                        <p className="truncate font-semibold text-slate-800">{aggregate.dimensionLabel}</p>
 
-                        <p className="mt-1 truncate text-xs text-slate-400">
-                          {aggregate.dimensionValue}
-                        </p>
+                        <p className="mt-1 truncate text-xs text-slate-400">{aggregate.dimensionValue}</p>
                       </td>
 
                       <td className="px-3 py-4">{aggregate.visitors}</td>
@@ -506,9 +414,7 @@ export function AnalyticsEnginePanel({ workspaceId, websiteId }: AnalyticsEngine
 
                       <td className="px-3 py-4">{aggregate.events}</td>
 
-                      <td className="px-3 py-4">
-                        {calculateBounceRate(aggregate.sessions, aggregate.bounces)}
-                      </td>
+                      <td className="px-3 py-4">{calculateBounceRate(aggregate.sessions, aggregate.bounces)}</td>
 
                       <td className="px-3 py-4">{formatDuration(aggregate.totalDurationMs)}</td>
                     </tr>
@@ -527,9 +433,7 @@ export function AnalyticsEnginePanel({ workspaceId, websiteId }: AnalyticsEngine
 
         <CardContent>
           {status.recentSessions.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-slate-300 p-10 text-center text-sm text-slate-500">
-              No normalized sessions yet.
-            </div>
+            <div className="rounded-xl border border-dashed border-slate-300 p-10 text-center text-sm text-slate-500">No normalized sessions yet.</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1000px] border-collapse text-left text-sm">
@@ -549,9 +453,7 @@ export function AnalyticsEnginePanel({ workspaceId, websiteId }: AnalyticsEngine
                 <tbody>
                   {status.recentSessions.map((session) => (
                     <tr key={session.id} className="border-b border-slate-100 last:border-0">
-                      <td className="whitespace-nowrap px-3 py-4">
-                        {formatAnalyticsDate(session.startedAt)}
-                      </td>
+                      <td className="whitespace-nowrap px-3 py-4">{formatAnalyticsDate(session.startedAt)}</td>
 
                       <td className="max-w-xs px-3 py-4">
                         <p className="truncate">{session.entryPath ?? 'Unknown'}</p>
@@ -568,9 +470,7 @@ export function AnalyticsEnginePanel({ workspaceId, websiteId }: AnalyticsEngine
                       <td className="px-3 py-4">{formatDuration(session.durationMs)}</td>
 
                       <td className="px-3 py-4">
-                        <Badge variant={session.bounced ? 'orange' : 'green'}>
-                          {session.bounced ? 'Yes' : 'No'}
-                        </Badge>
+                        <Badge variant={session.bounced ? 'orange' : 'green'}>{session.bounced ? 'Yes' : 'No'}</Badge>
                       </td>
                     </tr>
                   ))}
@@ -589,9 +489,7 @@ export function AnalyticsEnginePanel({ workspaceId, websiteId }: AnalyticsEngine
             <h2 className="font-semibold text-slate-950">Retention cleanup</h2>
           </div>
 
-          <p className="mt-2 text-sm text-slate-500">
-            Delete records older than the configured retention periods.
-          </p>
+          <p className="mt-2 text-sm text-slate-500">Delete records older than the configured retention periods.</p>
         </CardHeader>
 
         <CardContent>

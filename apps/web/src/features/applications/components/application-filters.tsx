@@ -37,10 +37,7 @@ interface ApplicationFiltersProps {
 }
 
 export function ApplicationFilters({ value, onChange, onApply, onReset }: ApplicationFiltersProps) {
-  function updateValue<Key extends keyof ApplicationFilterValue>(
-    key: Key,
-    fieldValue: ApplicationFilterValue[Key],
-  ): void {
+  function updateValue<Key extends keyof ApplicationFilterValue>(key: Key, fieldValue: ApplicationFilterValue[Key]): void {
     onChange({
       ...value,
       [key]: fieldValue,
@@ -53,10 +50,7 @@ export function ApplicationFilters({ value, onChange, onApply, onReset }: Applic
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card"
-    >
+    <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
       <div className="grid gap-4 xl:grid-cols-[minmax(240px,1.5fr)_repeat(5,minmax(140px,1fr))]">
         <Input
           aria-label="Search applications"
@@ -66,11 +60,7 @@ export function ApplicationFilters({ value, onChange, onApply, onReset }: Applic
           onChange={(event) => updateValue('search', event.target.value)}
         />
 
-        <Select
-          aria-label="Status"
-          value={value.status}
-          onChange={(event) => updateValue('status', event.target.value as ApplicationStatus | '')}
-        >
+        <Select aria-label="Status" value={value.status} onChange={(event) => updateValue('status', event.target.value as ApplicationStatus | '')}>
           <option value="">All statuses</option>
 
           {APPLICATION_STATUSES.map((status) => (
@@ -80,13 +70,7 @@ export function ApplicationFilters({ value, onChange, onApply, onReset }: Applic
           ))}
         </Select>
 
-        <Select
-          aria-label="Priority"
-          value={value.priority}
-          onChange={(event) =>
-            updateValue('priority', event.target.value as ApplicationPriority | '')
-          }
-        >
+        <Select aria-label="Priority" value={value.priority} onChange={(event) => updateValue('priority', event.target.value as ApplicationPriority | '')}>
           <option value="">All priorities</option>
 
           {APPLICATION_PRIORITIES.map((priority) => (
@@ -96,13 +80,7 @@ export function ApplicationFilters({ value, onChange, onApply, onReset }: Applic
           ))}
         </Select>
 
-        <Select
-          aria-label="Category"
-          value={value.category}
-          onChange={(event) =>
-            updateValue('category', event.target.value as ApplicationCategory | '')
-          }
-        >
+        <Select aria-label="Category" value={value.category} onChange={(event) => updateValue('category', event.target.value as ApplicationCategory | '')}>
           <option value="">All categories</option>
 
           {APPLICATION_CATEGORIES.map((category) => (
@@ -115,9 +93,7 @@ export function ApplicationFilters({ value, onChange, onApply, onReset }: Applic
         <Select
           aria-label="Archive view"
           value={value.archiveView}
-          onChange={(event) =>
-            updateValue('archiveView', event.target.value as 'active' | 'archived')
-          }
+          onChange={(event) => updateValue('archiveView', event.target.value as 'active' | 'archived')}
         >
           <option value="active">Active</option>
           <option value="archived">Archived</option>
@@ -127,10 +103,7 @@ export function ApplicationFilters({ value, onChange, onApply, onReset }: Applic
           aria-label="Sort applications"
           value={`${value.sortBy}:${value.sortOrder}`}
           onChange={(event) => {
-            const [sortBy, sortOrder] = event.target.value.split(':') as [
-              ApplicationFilterValue['sortBy'],
-              ApplicationFilterValue['sortOrder'],
-            ];
+            const [sortBy, sortOrder] = event.target.value.split(':') as [ApplicationFilterValue['sortBy'], ApplicationFilterValue['sortOrder']];
 
             onChange({
               ...value,

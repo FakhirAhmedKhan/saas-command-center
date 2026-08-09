@@ -8,12 +8,7 @@ import { PrismaService } from '../src/database/prisma.service';
 
 import { createAgent, createTestUser, loginUser, registerUser, withBearer } from './helpers/auth';
 
-import {
-  buildCookieWithValue,
-  readCookiePair,
-  readCookieValue,
-  readFirstSetCookie,
-} from './helpers/cookie';
+import { buildCookieWithValue, readCookiePair, readCookieValue, readFirstSetCookie } from './helpers/cookie';
 
 import { TEST_ROUTES } from './helpers/contracts';
 
@@ -21,12 +16,7 @@ import { createTestApp } from './helpers/create-test-app';
 
 import { resetDatabase } from './helpers/database';
 
-import {
-  expectSuccessfulStatus,
-  readAccessToken,
-  readResponseEmail,
-  readSetCookies,
-} from './helpers/response';
+import { expectSuccessfulStatus, readAccessToken, readResponseEmail, readSetCookies } from './helpers/response';
 
 function hashRefreshToken(token: string): string {
   return createHash('sha256').update(token).digest('hex');
@@ -279,9 +269,7 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
 
       const tamperedAccessToken = tamperJwt(accessToken);
 
-      const protectedResponse = await request(app.getHttpServer())
-        .get(TEST_ROUTES.auth.me)
-        .set(withBearer(tamperedAccessToken));
+      const protectedResponse = await request(app.getHttpServer()).get(TEST_ROUTES.auth.me).set(withBearer(tamperedAccessToken));
 
       expect(protectedResponse.status).toBe(401);
     });
@@ -295,9 +283,7 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
 
       const refreshToken = readCookieValue(refreshCookie);
 
-      const protectedResponse = await request(app.getHttpServer())
-        .get(TEST_ROUTES.auth.me)
-        .set(withBearer(refreshToken));
+      const protectedResponse = await request(app.getHttpServer()).get(TEST_ROUTES.auth.me).set(withBearer(refreshToken));
 
       expect(protectedResponse.status).toBe(401);
     });
@@ -362,9 +348,7 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
 
       const tamperedCookie = buildCookieWithValue(validCookie, 'not-a-valid-refresh-token');
 
-      const response = await request(app.getHttpServer())
-        .post(TEST_ROUTES.auth.refresh)
-        .set('Cookie', tamperedCookie);
+      const response = await request(app.getHttpServer()).post(TEST_ROUTES.auth.refresh).set('Cookie', tamperedCookie);
 
       expect(response.status).toBe(401);
     });
@@ -439,9 +423,7 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
 
       expectSuccessfulStatus(firstRefreshResponse);
 
-      const replayResponse = await request(app.getHttpServer())
-        .post(TEST_ROUTES.auth.refresh)
-        .set('Cookie', oldCookie);
+      const replayResponse = await request(app.getHttpServer()).post(TEST_ROUTES.auth.refresh).set('Cookie', oldCookie);
 
       expect(replayResponse.status).toBe(401);
 
@@ -485,9 +467,7 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
         },
       });
 
-      const refreshResponse = await request(app.getHttpServer())
-        .post(TEST_ROUTES.auth.refresh)
-        .set('Cookie', refreshCookie);
+      const refreshResponse = await request(app.getHttpServer()).post(TEST_ROUTES.auth.refresh).set('Cookie', refreshCookie);
 
       expect(refreshResponse.status).toBe(401);
 
@@ -555,9 +535,7 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
 
       expect(refreshResponse.status).toBe(401);
 
-      const oldCookieReplayResponse = await request(app.getHttpServer())
-        .post(TEST_ROUTES.auth.refresh)
-        .set('Cookie', originalCookie);
+      const oldCookieReplayResponse = await request(app.getHttpServer()).post(TEST_ROUTES.auth.refresh).set('Cookie', originalCookie);
 
       expect(oldCookieReplayResponse.status).toBe(401);
     });
@@ -625,9 +603,7 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
 
       const accessToken = readAccessToken(firstLoginResponse);
 
-      const logoutAllResponse = await firstLoginAgent
-        .post(TEST_ROUTES.auth.logoutAll)
-        .set(withBearer(accessToken));
+      const logoutAllResponse = await firstLoginAgent.post(TEST_ROUTES.auth.logoutAll).set(withBearer(accessToken));
 
       expect(logoutAllResponse.status).toBe(200);
 

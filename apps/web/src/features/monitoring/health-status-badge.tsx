@@ -29,11 +29,5 @@ const STATUS_LABELS: Record<HealthCheckStatus, string> = {
 };
 
 export function HealthStatusBadge({ status }: HealthStatusBadgeProps) {
-  return (
-    <span
-      className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${STATUS_CLASSES[status]}`}
-    >
-      {STATUS_LABELS[status]}
-    </span>
-  );
+  return <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${STATUS_CLASSES[status]}`}>{STATUS_LABELS[status]}</span>;
 }

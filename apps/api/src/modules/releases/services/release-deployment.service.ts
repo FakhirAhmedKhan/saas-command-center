@@ -1,17 +1,6 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
-import {
-  DeploymentActivityAction,
-  DeploymentStatus,
-  HealthIncidentStatus,
-  Prisma,
-  ReleaseStatus,
-} from '../../../generated/prisma/client';
+import { DeploymentActivityAction, DeploymentStatus, HealthIncidentStatus, Prisma, ReleaseStatus } from '../../../generated/prisma/client';
 
 import { PrismaService } from '../../../database/prisma.service';
 
@@ -177,9 +166,7 @@ export class ReleaseDeploymentService {
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        throw new ConflictException(
-          `Release version ${input.version} already exists for this application.`,
-        );
+        throw new ConflictException(`Release version ${input.version} already exists for this application.`);
       }
 
       throw error;
@@ -201,11 +188,7 @@ export class ReleaseDeploymentService {
 
     const release = await this.requireRelease(workspaceId, applicationId, releaseId);
 
-    if (
-      input.version &&
-      input.version !== release.version &&
-      release.status !== ReleaseStatus.DRAFT
-    ) {
+    if (input.version && input.version !== release.version && release.status !== ReleaseStatus.DRAFT) {
       throw new BadRequestException('Version can only be changed while a release is Draft.');
     }
 
@@ -224,8 +207,7 @@ export class ReleaseDeploymentService {
 
           commitRef: input.commitRef === undefined ? undefined : input.commitRef.trim() || null,
 
-          repositoryUrl:
-            input.repositoryUrl === undefined ? undefined : input.repositoryUrl.trim() || null,
+          repositoryUrl: input.repositoryUrl === undefined ? undefined : input.repositoryUrl.trim() || null,
 
           scheduledAt: input.scheduledAt === undefined ? undefined : new Date(input.scheduledAt),
 
@@ -234,9 +216,7 @@ export class ReleaseDeploymentService {
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        throw new ConflictException(
-          `Release version ${input.version} already exists for this application.`,
-        );
+        throw new ConflictException(`Release version ${input.version} already exists for this application.`);
       }
 
       throw error;
@@ -461,11 +441,7 @@ export class ReleaseDeploymentService {
 
     this.transitions.assertTransition(deployment.status, input.status);
 
-    if (
-      input.status === DeploymentStatus.SCHEDULED &&
-      !input.scheduledAt &&
-      !deployment.scheduledAt
-    ) {
+    if (input.status === DeploymentStatus.SCHEDULED && !input.scheduledAt && !deployment.scheduledAt) {
       throw new BadRequestException('scheduledAt is required when scheduling a deployment.');
     }
 
@@ -473,8 +449,7 @@ export class ReleaseDeploymentService {
       throw new BadRequestException('failureReason is required when a deployment fails.');
     }
 
-    let rollbackTarget: Awaited<ReturnType<ReleaseDeploymentService['requireDeployment']>> | null =
-      null;
+    let rollbackTarget: Awaited<ReturnType<ReleaseDeploymentService['requireDeployment']>> | null = null;
 
     if (input.status === DeploymentStatus.ROLLED_BACK) {
       if (!input.rollbackToDeploymentId) {
@@ -485,11 +460,7 @@ export class ReleaseDeploymentService {
         throw new BadRequestException('A deployment cannot roll back to itself.');
       }
 
-      rollbackTarget = await this.requireDeployment(
-        workspaceId,
-        applicationId,
-        input.rollbackToDeploymentId,
-      );
+      rollbackTarget = await this.requireDeployment(workspaceId, applicationId, input.rollbackToDeploymentId);
 
       if (rollbackTarget.environmentId !== deployment.environmentId) {
         throw new BadRequestException('Rollback target must belong to the same environment.');
@@ -506,24 +477,13 @@ export class ReleaseDeploymentService {
 
     const now = new Date();
 
-    const terminal =
-      input.status === DeploymentStatus.SUCCESSFUL ||
-      input.status === DeploymentStatus.FAILED ||
-      input.status === DeploymentStatus.ROLLED_BACK;
+    const terminal = input.status === DeploymentStatus.SUCCESSFUL || input.status === DeploymentStatus.FAILED || input.status === DeploymentStatus.ROLLED_BACK;
 
-    const startedAt =
-      input.status === DeploymentStatus.IN_PROGRESS
-        ? (deployment.startedAt ?? now)
-        : deployment.startedAt;
+    const startedAt = input.status === DeploymentStatus.IN_PROGRESS ? (deployment.startedAt ?? now) : deployment.startedAt;
 
-    const finishedAt = terminal
-      ? now
-      : input.status === DeploymentStatus.DRAFT || input.status === DeploymentStatus.SCHEDULED
-        ? null
-        : deployment.finishedAt;
+    const finishedAt = terminal ? now : input.status === DeploymentStatus.DRAFT || input.status === DeploymentStatus.SCHEDULED ? null : deployment.finishedAt;
 
-    const durationMs =
-      terminal && startedAt ? Math.max(0, now.getTime() - startedAt.getTime()) : null;
+    const durationMs = terminal && startedAt ? Math.max(0, now.getTime() - startedAt.getTime()) : null;
 
     return this.prisma.$transaction(async (transaction) => {
       const changed = await transaction.deployment.updateMany({
@@ -538,12 +498,7 @@ export class ReleaseDeploymentService {
 
           statusChangedAt: now,
 
-          scheduledAt:
-            input.status === DeploymentStatus.DRAFT
-              ? null
-              : input.scheduledAt
-                ? new Date(input.scheduledAt)
-                : undefined,
+          scheduledAt: input.status === DeploymentStatus.DRAFT ? null : input.scheduledAt ? new Date(input.scheduledAt) : undefined,
 
           startedAt,
 
@@ -551,8 +506,7 @@ export class ReleaseDeploymentService {
 
           durationMs,
 
-          failureReason:
-            input.status === DeploymentStatus.FAILED ? input.failureReason?.trim() : null,
+          failureReason: input.status === DeploymentStatus.FAILED ? input.failureReason?.trim() : null,
 
           rollbackToDeploymentId: rollbackTarget?.id,
 
@@ -565,9 +519,7 @@ export class ReleaseDeploymentService {
       });
 
       if (changed.count === 0) {
-        throw new ConflictException(
-          'Deployment status changed before this request completed. Refresh and retry.',
-        );
+        throw new ConflictException('Deployment status changed before this request completed. Refresh and retry.');
       }
 
       await transaction.release.update({
@@ -592,10 +544,7 @@ export class ReleaseDeploymentService {
 
           actorId: userId,
 
-          action:
-            input.status === DeploymentStatus.ROLLED_BACK
-              ? DeploymentActivityAction.ROLLBACK_RECORDED
-              : DeploymentActivityAction.STATUS_CHANGED,
+          action: input.status === DeploymentStatus.ROLLED_BACK ? DeploymentActivityAction.ROLLBACK_RECORDED : DeploymentActivityAction.STATUS_CHANGED,
 
           fromStatus: deployment.status,
 
@@ -688,9 +637,7 @@ export class ReleaseDeploymentService {
 
     deploymentId: string,
   ) {
-    return this.mapDeployment(
-      await this.requireDeployment(workspaceId, applicationId, deploymentId),
-    );
+    return this.mapDeployment(await this.requireDeployment(workspaceId, applicationId, deploymentId));
   }
 
   async getCurrentVersions(
@@ -770,10 +717,7 @@ export class ReleaseDeploymentService {
           };
         }
 
-        const effective =
-          latestTerminal.status === DeploymentStatus.ROLLED_BACK && latestTerminal.rollbackTo
-            ? latestTerminal.rollbackTo
-            : latestTerminal;
+        const effective = latestTerminal.status === DeploymentStatus.ROLLED_BACK && latestTerminal.rollbackTo ? latestTerminal.rollbackTo : latestTerminal;
 
         return {
           environmentId: environment.id,
@@ -1032,9 +976,7 @@ export class ReleaseDeploymentService {
     return this.mapDeployment(deployment);
   }
 
-  private mapDeployment(
-    deployment: Awaited<ReturnType<ReleaseDeploymentService['requireDeployment']>>,
-  ) {
+  private mapDeployment(deployment: Awaited<ReturnType<ReleaseDeploymentService['requireDeployment']>>) {
     return {
       ...deployment,
 
@@ -1082,9 +1024,7 @@ export class ReleaseDeploymentService {
     rollbackVersion?: string,
   ): string {
     if (to === DeploymentStatus.ROLLED_BACK) {
-      return rollbackVersion
-        ? `Deployment rolled back to version ${rollbackVersion}.`
-        : 'Deployment rollback recorded.';
+      return rollbackVersion ? `Deployment rolled back to version ${rollbackVersion}.` : 'Deployment rollback recorded.';
     }
 
     return `Deployment changed from ${from} to ${to}.`;

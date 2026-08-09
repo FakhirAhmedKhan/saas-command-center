@@ -85,13 +85,7 @@ export class ActivityWriterService {
       data,
     });
 
-    const applicationIds = [
-      ...new Set(
-        inputs
-          .map((input) => input.applicationId)
-          .filter((applicationId): applicationId is string => Boolean(applicationId)),
-      ),
-    ];
+    const applicationIds = [...new Set(inputs.map((input) => input.applicationId).filter((applicationId): applicationId is string => Boolean(applicationId)))];
 
     for (const applicationId of applicationIds) {
       const relatedInput = inputs.find((input) => input.applicationId === applicationId);

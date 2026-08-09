@@ -10,11 +10,7 @@ import { PrismaService } from 'src/database/prisma.service';
 
 import { AnalyticsProcessingService } from 'src/modules/analytics-engine/services/analytics-processing.service';
 
-import {
-  analyticsEngineRoutes,
-  createRawAnalyticsEvent,
-  reprocessAnalytics,
-} from './helpers/analytics-engine';
+import { analyticsEngineRoutes, createRawAnalyticsEvent, reprocessAnalytics } from './helpers/analytics-engine';
 
 import { createTrackedWebsite, uniqueTrackerId } from './helpers/analytics-ingestion';
 
@@ -24,11 +20,7 @@ import { resetDatabase } from './helpers/database';
 
 import { archiveWebsite, disableWebsite, expectWebsiteSuccess } from './helpers/website';
 
-import {
-  addWorkspaceMember,
-  expectAccessDenied,
-  registerWorkspaceTestUser,
-} from './helpers/workspace';
+import { addWorkspaceMember, expectAccessDenied, registerWorkspaceTestUser } from './helpers/workspace';
 
 describe('Analytics Reprocessing E2E', () => {
   let app: INestApplication;
@@ -144,9 +136,7 @@ describe('Analytics Reprocessing E2E', () => {
     };
 
     for (let index = 0; index < 2; index += 1) {
-      expect((await reprocessAnalytics(owner, owner.workspaceId, website.id, body)).status).toBe(
-        201,
-      );
+      expect((await reprocessAnalytics(owner, owner.workspaceId, website.id, body)).status).toBe(201);
     }
 
     expect(
@@ -207,9 +197,7 @@ describe('Analytics Reprocessing E2E', () => {
     ];
 
     for (const body of invalidBodies) {
-      expect((await reprocessAnalytics(owner, owner.workspaceId, website.id, body)).status).toBe(
-        400,
-      );
+      expect((await reprocessAnalytics(owner, owner.workspaceId, website.id, body)).status).toBe(400);
     }
   });
 
@@ -319,9 +307,7 @@ describe('Analytics Reprocessing E2E', () => {
 
     expect(after.totalRawEventsProcessed).toBe(before.totalRawEventsProcessed);
 
-    expect(after.lastProcessedReceivedAt?.toISOString()).toBe(
-      before.lastProcessedReceivedAt?.toISOString(),
-    );
+    expect(after.lastProcessedReceivedAt?.toISOString()).toBe(before.lastProcessedReceivedAt?.toISOString());
   });
 
   it('rejects disabled and archived websites without deleting valid normalized data', async () => {

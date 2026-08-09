@@ -1,11 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import {
-  installMockApi,
-  makeWorkspace,
-  PRIMARY_WORKSPACE_ID,
-  SECONDARY_WORKSPACE_ID,
-} from './fixtures/mock-api';
+import { installMockApi, makeWorkspace, PRIMARY_WORKSPACE_ID, SECONDARY_WORKSPACE_ID } from './fixtures/mock-api';
 
 test.describe('Batch 10 dashboard and workspace flows', () => {
   test('renders account identity, workspace cards, and roles', async ({ page }) => {
@@ -92,13 +87,9 @@ test.describe('Batch 10 dashboard and workspace flows', () => {
       })
       .click();
 
-    await expect(page).toHaveURL(
-      /\/workspaces\/99999999-9999-4999-8999-999999999999\/applications$/,
-    );
+    await expect(page).toHaveURL(/\/workspaces\/99999999-9999-4999-8999-999999999999\/applications$/);
 
-    const request = state.requests.find(
-      (item) => item.method === 'POST' && item.path === '/workspaces',
-    );
+    const request = state.requests.find((item) => item.method === 'POST' && item.path === '/workspaces');
 
     expect(request?.body).toEqual({
       name: 'Analytics Team',
@@ -125,9 +116,7 @@ test.describe('Batch 10 dashboard and workspace flows', () => {
       })
       .click();
 
-    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toContainText(
-      'Workspace slug already exists',
-    );
+    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toContainText('Workspace slug already exists');
     await expect(page).toHaveURL(/\/workspaces\/new$/);
   });
 

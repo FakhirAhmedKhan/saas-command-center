@@ -81,9 +81,7 @@ test.describe('Batch 11 real workspace flows', () => {
       })
       .click();
 
-    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toContainText(
-      /slug|already|use/i,
-    );
+    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toContainText(/slug|already|use/i);
 
     await expect(page).toHaveURL(/\/workspaces\/new$/);
   });

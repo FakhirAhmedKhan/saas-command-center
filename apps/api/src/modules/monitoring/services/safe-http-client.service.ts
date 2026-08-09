@@ -38,17 +38,7 @@ export interface SafeHealthRequestResult {
   failureReason: string | null;
 }
 
-const BLOCKED_HOSTNAMES = new Set([
-  'localhost',
-
-  'localhost.localdomain',
-
-  'metadata.google.internal',
-
-  'metadata',
-
-  'host.docker.internal',
-]);
+const BLOCKED_HOSTNAMES = new Set(['localhost', 'localhost.localdomain', 'metadata.google.internal', 'metadata', 'host.docker.internal']);
 
 const BLOCKED_SUFFIXES = ['.localhost', '.local', '.internal', '.home', '.lan'];
 
@@ -201,9 +191,7 @@ export class SafeHttpClientService {
     }
 
     if (isBlockedHostname(url.hostname)) {
-      throw new BadRequestException(
-        'Private or internal health-check destinations are not allowed.',
-      );
+      throw new BadRequestException('Private or internal health-check destinations are not allowed.');
     }
 
     return url;
@@ -212,9 +200,7 @@ export class SafeHttpClientService {
   private async resolvePublicAddresses(hostname: string): Promise<ResolvedAddress[]> {
     if (isIP(hostname)) {
       if (!isPublicAddress(hostname)) {
-        throw new BadRequestException(
-          'Private, loopback, link-local, multicast, and reserved IP addresses are blocked.',
-        );
+        throw new BadRequestException('Private, loopback, link-local, multicast, and reserved IP addresses are blocked.');
       }
 
       return [
@@ -251,9 +237,7 @@ export class SafeHttpClientService {
     const unsafeAddress = addresses.find((item) => !isPublicAddress(item.address));
 
     if (unsafeAddress) {
-      throw new BadRequestException(
-        `Health-check destination resolved to a blocked address: ${unsafeAddress.address}`,
-      );
+      throw new BadRequestException(`Health-check destination resolved to a blocked address: ${unsafeAddress.address}`);
     }
 
     return addresses;

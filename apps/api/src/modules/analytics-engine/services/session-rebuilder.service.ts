@@ -19,20 +19,14 @@ export interface RebuiltSessionResult {
 @Injectable()
 export class SessionRebuilderService {
   rebuildRange(
-    transaction: Omit<
-      PrismaClient<never, Prisma.GlobalOmitConfig | undefined, DefaultArgs>,
-      '$connect' | '$disconnect' | '$on' | '$use' | '$extends'
-    >,
+    transaction: Omit<PrismaClient<never, Prisma.GlobalOmitConfig | undefined, DefaultArgs>, '$connect' | '$disconnect' | '$on' | '$use' | '$extends'>,
     input: ProcessAnalyticsRangeInput,
   ) {
     throw new Error('Method not implemented.');
   }
   constructor(private readonly pageViews: PageViewRebuilderService) {}
 
-  async rebuild(
-    transaction: Prisma.TransactionClient,
-    sessionId: string,
-  ): Promise<RebuiltSessionResult> {
+  async rebuild(transaction: Prisma.TransactionClient, sessionId: string): Promise<RebuiltSessionResult> {
     const existingSession = await transaction.analyticsSession.findUniqueOrThrow({
       where: {
         id: sessionId,
@@ -54,10 +48,7 @@ export class SessionRebuilderService {
       ],
     });
 
-    const { pageViews, firstPage, lastPage } = await this.pageViews.rebuildForSession(
-      transaction,
-      sessionId,
-    );
+    const { pageViews, firstPage, lastPage } = await this.pageViews.rebuildForSession(transaction, sessionId);
 
     const firstEvent = events[0];
 
@@ -134,17 +125,11 @@ export class SessionRebuilderService {
     };
   }
 
-  async rebuildSession(
-    transaction: Prisma.TransactionClient,
-    sessionId: string,
-  ): Promise<RebuiltSessionResult> {
+  async rebuildSession(transaction: Prisma.TransactionClient, sessionId: string): Promise<RebuiltSessionResult> {
     return this.rebuild(transaction, sessionId);
   }
 
-  async rebuildMany(
-    transaction: Prisma.TransactionClient,
-    sessionIds: readonly string[],
-  ): Promise<RebuiltSessionResult[]> {
+  async rebuildMany(transaction: Prisma.TransactionClient, sessionIds: readonly string[]): Promise<RebuiltSessionResult[]> {
     const results: RebuiltSessionResult[] = [];
 
     for (const sessionId of sessionIds) {

@@ -33,9 +33,7 @@ export function createCsv<T>(
 ): string {
   const header = columns.map((column) => escapeCsvValue(column.header)).join(',');
 
-  const content = rows.map((row) =>
-    columns.map((column) => escapeCsvValue(column.value(row))).join(','),
-  );
+  const content = rows.map((row) => columns.map((column) => escapeCsvValue(column.value(row))).join(','));
 
   return ['\uFEFF' + header, ...content].join('\r\n');
 }

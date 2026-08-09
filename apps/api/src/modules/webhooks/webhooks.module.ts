@@ -26,8 +26,7 @@ import { WebhookSecretCryptoService } from './services/webhook-secret-crypto.ser
 import { WebhookSignatureService } from './services/webhook-signature.service';
 
 @Module({
-  imports: [
-        WorkspaceMembersModule,DatabaseModule, SharedRateLimitModule],
+  imports: [WorkspaceMembersModule, DatabaseModule, SharedRateLimitModule],
 
   controllers: [WebhooksController],
 

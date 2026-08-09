@@ -1,20 +1,8 @@
 import type { Response } from 'supertest';
 
-import {
-  BlockerStatus,
-  DevelopmentTemplateType,
-  WorkItemPriority,
-} from 'src/generated/prisma/enums';
+import { BlockerStatus, DevelopmentTemplateType, WorkItemPriority } from 'src/generated/prisma/enums';
 
-import {
-  applicationRoutes,
-  asRecord,
-  enumValue,
-  readApiItems,
-  readApiRecord,
-  readEntityId,
-  recordString,
-} from './application';
+import { applicationRoutes, asRecord, enumValue, readApiItems, readApiRecord, readEntityId, recordString } from './application';
 
 import { withBearer } from './auth';
 
@@ -190,24 +178,15 @@ export function expectDevelopmentSuccess(response: Response): void {
   expect([200, 201, 202]).toContain(response.status);
 }
 
-export function readDevelopmentRecord(
-  response: Response,
-  preferredKeys: string[] = [],
-): Record<string, unknown> {
+export function readDevelopmentRecord(response: Response, preferredKeys: string[] = []): Record<string, unknown> {
   return readApiRecord(response, ['milestone', 'task', 'blocker', 'summary', ...preferredKeys]);
 }
 
-export function readDevelopmentItems(
-  response: Response,
-  preferredKeys: string[] = [],
-): Record<string, unknown>[] {
+export function readDevelopmentItems(response: Response, preferredKeys: string[] = []): Record<string, unknown>[] {
   return readApiItems(response, ['milestones', 'tasks', 'blockers', 'templates', ...preferredKeys]);
 }
 
-export function findRecordById(
-  records: Record<string, unknown>[],
-  id: string,
-): Record<string, unknown> | undefined {
+export function findRecordById(records: Record<string, unknown>[], id: string): Record<string, unknown> | undefined {
   for (const record of records) {
     if (recordString(record, 'id', 'milestoneId', 'taskId', 'blockerId') === id) {
       return record;
@@ -215,9 +194,7 @@ export function findRecordById(
 
     for (const value of Object.values(record)) {
       if (Array.isArray(value)) {
-        const nested = value
-          .map(asRecord)
-          .filter((item): item is Record<string, unknown> => item !== undefined);
+        const nested = value.map(asRecord).filter((item): item is Record<string, unknown> => item !== undefined);
 
         const found = findRecordById(nested, id);
 
@@ -308,18 +285,11 @@ export function findStringDeep(value: unknown, keys: string[]): string | undefin
 }
 
 export async function listTemplates(actor: WorkspaceTestUser): Promise<Response> {
-  return actor.agent
-    .get(developmentRoutes.templates(actor.workspaceId))
-    .set(withBearer(actor.accessToken));
+  return actor.agent.get(developmentRoutes.templates(actor.workspaceId)).set(withBearer(actor.accessToken));
 }
 
-export async function getDevelopmentSummary(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-): Promise<Response> {
-  return actor.agent
-    .get(developmentRoutes.summary(actor.workspaceId, applicationId))
-    .set(withBearer(actor.accessToken));
+export async function getDevelopmentSummary(actor: WorkspaceTestUser, applicationId: string): Promise<Response> {
+  return actor.agent.get(developmentRoutes.summary(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken));
 }
 
 export async function applyDevelopmentTemplate(
@@ -328,22 +298,14 @@ export async function applyDevelopmentTemplate(
   template: DevelopmentTemplateType = enumValue(DevelopmentTemplateType),
   replaceExisting = false,
 ): Promise<Response> {
-  return actor.agent
-    .post(developmentRoutes.applyTemplate(actor.workspaceId, applicationId))
-    .set(withBearer(actor.accessToken))
-    .send({
-      template,
-      replaceExisting,
-    });
+  return actor.agent.post(developmentRoutes.applyTemplate(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken)).send({
+    template,
+    replaceExisting,
+  });
 }
 
-export async function listMilestones(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-): Promise<Response> {
-  return actor.agent
-    .get(developmentRoutes.milestones(actor.workspaceId, applicationId))
-    .set(withBearer(actor.accessToken));
+export async function listMilestones(actor: WorkspaceTestUser, applicationId: string): Promise<Response> {
+  return actor.agent.get(developmentRoutes.milestones(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken));
 }
 
 export async function createMilestone(
@@ -353,10 +315,7 @@ export async function createMilestone(
 ): Promise<CreatedDevelopmentEntity<MilestonePayload>> {
   const payload = buildMilestonePayload(overrides);
 
-  const response = await actor.agent
-    .post(developmentRoutes.milestones(actor.workspaceId, applicationId))
-    .set(withBearer(actor.accessToken))
-    .send(payload);
+  const response = await actor.agent.post(developmentRoutes.milestones(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken)).send(payload);
 
   expectDevelopmentSuccess(response);
 
@@ -383,24 +342,12 @@ export async function updateMilestone(
     .send(payload);
 }
 
-export async function completeMilestone(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  milestoneId: string,
-): Promise<Response> {
-  return actor.agent
-    .post(developmentRoutes.completeMilestone(actor.workspaceId, applicationId, milestoneId))
-    .set(withBearer(actor.accessToken));
+export async function completeMilestone(actor: WorkspaceTestUser, applicationId: string, milestoneId: string): Promise<Response> {
+  return actor.agent.post(developmentRoutes.completeMilestone(actor.workspaceId, applicationId, milestoneId)).set(withBearer(actor.accessToken));
 }
 
-export async function reopenMilestone(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  milestoneId: string,
-): Promise<Response> {
-  return actor.agent
-    .post(developmentRoutes.reopenMilestone(actor.workspaceId, applicationId, milestoneId))
-    .set(withBearer(actor.accessToken));
+export async function reopenMilestone(actor: WorkspaceTestUser, applicationId: string, milestoneId: string): Promise<Response> {
+  return actor.agent.post(developmentRoutes.reopenMilestone(actor.workspaceId, applicationId, milestoneId)).set(withBearer(actor.accessToken));
 }
 
 export async function skipMilestone(
@@ -417,27 +364,14 @@ export async function skipMilestone(
     });
 }
 
-export async function deleteMilestone(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  milestoneId: string,
-): Promise<Response> {
-  return actor.agent
-    .delete(developmentRoutes.milestone(actor.workspaceId, applicationId, milestoneId))
-    .set(withBearer(actor.accessToken));
+export async function deleteMilestone(actor: WorkspaceTestUser, applicationId: string, milestoneId: string): Promise<Response> {
+  return actor.agent.delete(developmentRoutes.milestone(actor.workspaceId, applicationId, milestoneId)).set(withBearer(actor.accessToken));
 }
 
-export async function reorderMilestones(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  orderedIds: string[],
-): Promise<Response> {
-  return actor.agent
-    .post(developmentRoutes.reorderMilestones(actor.workspaceId, applicationId))
-    .set(withBearer(actor.accessToken))
-    .send({
-      orderedIds,
-    });
+export async function reorderMilestones(actor: WorkspaceTestUser, applicationId: string, orderedIds: string[]): Promise<Response> {
+  return actor.agent.post(developmentRoutes.reorderMilestones(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken)).send({
+    orderedIds,
+  });
 }
 
 export async function createTask(
@@ -466,24 +400,14 @@ export async function createTask(
   };
 }
 
-export async function updateTask(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  taskId: string,
-  payload: Partial<TaskPayload>,
-): Promise<Response> {
+export async function updateTask(actor: WorkspaceTestUser, applicationId: string, taskId: string, payload: Partial<TaskPayload>): Promise<Response> {
   return actor.agent
     .patch(developmentRoutes.task(actor.workspaceId, applicationId, taskId))
     .set(withBearer(actor.accessToken))
     .send(payload);
 }
 
-export async function setTaskStatus(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  taskId: string,
-  status: ActiveTaskStatus,
-): Promise<Response> {
+export async function setTaskStatus(actor: WorkspaceTestUser, applicationId: string, taskId: string, status: ActiveTaskStatus): Promise<Response> {
   return actor.agent
     .post(developmentRoutes.taskStatus(actor.workspaceId, applicationId, taskId))
     .set(withBearer(actor.accessToken))
@@ -492,32 +416,15 @@ export async function setTaskStatus(
     });
 }
 
-export async function completeTask(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  taskId: string,
-): Promise<Response> {
-  return actor.agent
-    .post(developmentRoutes.completeTask(actor.workspaceId, applicationId, taskId))
-    .set(withBearer(actor.accessToken));
+export async function completeTask(actor: WorkspaceTestUser, applicationId: string, taskId: string): Promise<Response> {
+  return actor.agent.post(developmentRoutes.completeTask(actor.workspaceId, applicationId, taskId)).set(withBearer(actor.accessToken));
 }
 
-export async function reopenTask(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  taskId: string,
-): Promise<Response> {
-  return actor.agent
-    .post(developmentRoutes.reopenTask(actor.workspaceId, applicationId, taskId))
-    .set(withBearer(actor.accessToken));
+export async function reopenTask(actor: WorkspaceTestUser, applicationId: string, taskId: string): Promise<Response> {
+  return actor.agent.post(developmentRoutes.reopenTask(actor.workspaceId, applicationId, taskId)).set(withBearer(actor.accessToken));
 }
 
-export async function skipTask(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  taskId: string,
-  reason = 'Removed from current scope',
-): Promise<Response> {
+export async function skipTask(actor: WorkspaceTestUser, applicationId: string, taskId: string, reason = 'Removed from current scope'): Promise<Response> {
   return actor.agent
     .post(developmentRoutes.skipTask(actor.workspaceId, applicationId, taskId))
     .set(withBearer(actor.accessToken))
@@ -550,12 +457,7 @@ export async function moveTask(
     .send(payload);
 }
 
-export async function reorderTasks(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  milestoneId: string,
-  orderedIds: string[],
-): Promise<Response> {
+export async function reorderTasks(actor: WorkspaceTestUser, applicationId: string, milestoneId: string, orderedIds: string[]): Promise<Response> {
   return actor.agent
     .post(developmentRoutes.reorderTasks(actor.workspaceId, applicationId, milestoneId))
     .set(withBearer(actor.accessToken))
@@ -564,25 +466,12 @@ export async function reorderTasks(
     });
 }
 
-export async function deleteTask(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  taskId: string,
-): Promise<Response> {
-  return actor.agent
-    .delete(developmentRoutes.task(actor.workspaceId, applicationId, taskId))
-    .set(withBearer(actor.accessToken));
+export async function deleteTask(actor: WorkspaceTestUser, applicationId: string, taskId: string): Promise<Response> {
+  return actor.agent.delete(developmentRoutes.task(actor.workspaceId, applicationId, taskId)).set(withBearer(actor.accessToken));
 }
 
-export async function listBlockers(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  query: Record<string, string | number> = {},
-): Promise<Response> {
-  return actor.agent
-    .get(developmentRoutes.blockers(actor.workspaceId, applicationId))
-    .set(withBearer(actor.accessToken))
-    .query(query);
+export async function listBlockers(actor: WorkspaceTestUser, applicationId: string, query: Record<string, string | number> = {}): Promise<Response> {
+  return actor.agent.get(developmentRoutes.blockers(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken)).query(query);
 }
 
 export async function createBlocker(
@@ -592,10 +481,7 @@ export async function createBlocker(
 ): Promise<CreatedDevelopmentEntity<BlockerPayload>> {
   const payload = buildBlockerPayload(overrides);
 
-  const response = await actor.agent
-    .post(developmentRoutes.blockers(actor.workspaceId, applicationId))
-    .set(withBearer(actor.accessToken))
-    .send(payload);
+  const response = await actor.agent.post(developmentRoutes.blockers(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken)).send(payload);
 
   expectDevelopmentSuccess(response);
 
@@ -610,12 +496,7 @@ export async function createBlocker(
   };
 }
 
-export async function updateBlocker(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  blockerId: string,
-  payload: Partial<BlockerPayload>,
-): Promise<Response> {
+export async function updateBlocker(actor: WorkspaceTestUser, applicationId: string, blockerId: string, payload: Partial<BlockerPayload>): Promise<Response> {
   return actor.agent
     .patch(developmentRoutes.blocker(actor.workspaceId, applicationId, blockerId))
     .set(withBearer(actor.accessToken))
@@ -636,24 +517,12 @@ export async function resolveBlocker(
     });
 }
 
-export async function reopenBlocker(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  blockerId: string,
-): Promise<Response> {
-  return actor.agent
-    .post(developmentRoutes.reopenBlocker(actor.workspaceId, applicationId, blockerId))
-    .set(withBearer(actor.accessToken));
+export async function reopenBlocker(actor: WorkspaceTestUser, applicationId: string, blockerId: string): Promise<Response> {
+  return actor.agent.post(developmentRoutes.reopenBlocker(actor.workspaceId, applicationId, blockerId)).set(withBearer(actor.accessToken));
 }
 
-export async function deleteBlocker(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  blockerId: string,
-): Promise<Response> {
-  return actor.agent
-    .delete(developmentRoutes.blocker(actor.workspaceId, applicationId, blockerId))
-    .set(withBearer(actor.accessToken));
+export async function deleteBlocker(actor: WorkspaceTestUser, applicationId: string, blockerId: string): Promise<Response> {
+  return actor.agent.delete(developmentRoutes.blocker(actor.workspaceId, applicationId, blockerId)).set(withBearer(actor.accessToken));
 }
 
 export const developmentEnums = {

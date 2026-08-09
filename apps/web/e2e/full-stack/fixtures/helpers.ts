@@ -44,11 +44,7 @@ export async function authorizedApiRequest(
   });
 }
 
-export async function expectMetric(
-  page: Page,
-  label: string,
-  value: string | number,
-): Promise<void> {
+export async function expectMetric(page: Page, label: string, value: string | number): Promise<void> {
   const labelElement = page
     .getByText(label, {
       exact: true,
@@ -65,9 +61,7 @@ export async function expectMetric(
 }
 
 export function trackerIdentifier(prefix: string): string {
-  const random = `${Date.now()}${Math.random().toString(36).slice(2)}`
-    .replace(/[^a-zA-Z0-9_-]/g, '')
-    .padEnd(20, 'x');
+  const random = `${Date.now()}${Math.random().toString(36).slice(2)}`.replace(/[^a-zA-Z0-9_-]/g, '').padEnd(20, 'x');
 
   return `${prefix}_${random}`.slice(0, 80);
 }

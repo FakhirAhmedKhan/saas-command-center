@@ -26,12 +26,6 @@ export function getTrackingStatus(workspaceId: string, websiteId: string) {
   return apiRequest<TrackingStatus>(`${basePath(workspaceId, websiteId)}/status`);
 }
 
-export function getRawTrackingEvents(
-  workspaceId: string,
-  websiteId: string,
-  query?: RawEventQuery,
-) {
-  return apiRequest<RawEventsResponse>(
-    `${basePath(workspaceId, websiteId)}/events${buildQuery(query)}`,
-  );
+export function getRawTrackingEvents(workspaceId: string, websiteId: string, query?: RawEventQuery) {
+  return apiRequest<RawEventsResponse>(`${basePath(workspaceId, websiteId)}/events${buildQuery(query)}`);
 }

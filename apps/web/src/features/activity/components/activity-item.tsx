@@ -26,20 +26,11 @@ import type { LucideIcon } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 
-import {
-  ACTIVITY_BADGE_VARIANTS,
-  ACTIVITY_TYPE_LABELS,
-  ENTITY_TYPE_LABELS,
-} from '../activity-constants';
+import { ACTIVITY_BADGE_VARIANTS, ACTIVITY_TYPE_LABELS, ENTITY_TYPE_LABELS } from '../activity-constants';
 
 import type { ApplicationActivity, ApplicationActivityType } from '../activity-types';
 
-import {
-  formatActivityDate,
-  formatRelativeActivityDate,
-  getActivityActorName,
-  getMetadataSummary,
-} from '../activity-utils';
+import { formatActivityDate, formatRelativeActivityDate, getActivityActorName, getMetadataSummary } from '../activity-utils';
 
 interface ActivityItemProps {
   workspaceId: string;
@@ -113,11 +104,7 @@ const ACTIVITY_ICONS = {
   WEBSITE_DISCONNECTED: Globe2,
 } satisfies Record<ApplicationActivityType, LucideIcon>;
 
-export function ActivityItem({
-  workspaceId,
-  activity,
-  showApplication = false,
-}: ActivityItemProps) {
+export function ActivityItem({ workspaceId, activity, showApplication = false }: ActivityItemProps) {
   const metadataSummary = getMetadataSummary(activity);
 
   const activityLabel = ACTIVITY_TYPE_LABELS[activity.activityType];
@@ -133,17 +120,12 @@ export function ActivityItem({
   const actorName = getActivityActorName(activity);
 
   const applicationUrl = activity.applicationId
-    ? `/workspaces/${encodeURIComponent(workspaceId)}/applications/${encodeURIComponent(
-        activity.applicationId,
-      )}`
+    ? `/workspaces/${encodeURIComponent(workspaceId)}/applications/${encodeURIComponent(activity.applicationId)}`
     : null;
 
   return (
     <article className="group relative flex gap-4 pb-8 last:pb-0">
-      <div
-        aria-hidden="true"
-        className="absolute bottom-0 left-5 top-11 w-px bg-slate-200 group-last:hidden"
-      />
+      <div aria-hidden="true" className="absolute bottom-0 left-5 top-11 w-px bg-slate-200 group-last:hidden" />
 
       <div className="relative z-10 flex size-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm">
         {createElement(ACTIVITY_ICONS[activity.activityType], {
@@ -164,17 +146,11 @@ export function ActivityItem({
               <Badge variant="slate">{entityLabel}</Badge>
             </div>
 
-            {activity.description ? (
-              <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-slate-600">
-                {activity.description}
-              </p>
-            ) : null}
+            {activity.description ? <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-slate-600">{activity.description}</p> : null}
 
             {metadataSummary ? (
               <div className="mt-2 rounded-lg bg-slate-50 px-3 py-2">
-                <p className="break-words text-xs font-medium leading-5 text-slate-600">
-                  {metadataSummary}
-                </p>
+                <p className="break-words text-xs font-medium leading-5 text-slate-600">{metadataSummary}</p>
               </div>
             ) : null}
 
@@ -198,11 +174,7 @@ export function ActivityItem({
           </div>
 
           <div className="shrink-0 text-left sm:text-right">
-            <time
-              dateTime={activity.createdAt}
-              title={formattedDate}
-              className="text-xs font-medium text-slate-500"
-            >
+            <time dateTime={activity.createdAt} title={formattedDate} className="text-xs font-medium text-slate-500">
               {relativeDate}
             </time>
 

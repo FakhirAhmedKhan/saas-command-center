@@ -24,11 +24,7 @@ import { WebsiteCard } from '@/features/websites/components/website-card';
 
 import { getWebsites } from '@/features/websites/website-api';
 
-import type {
-  Website,
-  WebsiteListQuery,
-  WebsitePagination,
-} from '@/features/websites/website-types';
+import type { Website, WebsiteListQuery, WebsitePagination } from '@/features/websites/website-types';
 
 import { getWebsiteError } from '@/features/websites/website-utils';
 
@@ -163,8 +159,7 @@ export default function WebsitesPage() {
           <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-950">Websites</h1>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-            Register domains, configure allowed origins, connect websites to SaaS products, and
-            manage tracking keys.
+            Register domains, configure allowed origins, connect websites to SaaS products, and manage tracking keys.
           </p>
         </div>
 
@@ -200,30 +195,19 @@ export default function WebsitesPage() {
               onChange={(event) => setSearch(event.target.value)}
             />
 
-            <Select
-              value={status}
-              onChange={(event) => setStatus(event.target.value as 'all' | 'enabled' | 'disabled')}
-            >
+            <Select value={status} onChange={(event) => setStatus(event.target.value as 'all' | 'enabled' | 'disabled')}>
               <option value="all">All states</option>
               <option value="enabled">Enabled</option>
               <option value="disabled">Disabled</option>
             </Select>
 
-            <Select
-              value={connection}
-              onChange={(event) =>
-                setConnection(event.target.value as 'all' | 'connected' | 'unconnected')
-              }
-            >
+            <Select value={connection} onChange={(event) => setConnection(event.target.value as 'all' | 'connected' | 'unconnected')}>
               <option value="all">All connections</option>
               <option value="connected">Connected</option>
               <option value="unconnected">Not connected</option>
             </Select>
 
-            <Select
-              value={archiveView}
-              onChange={(event) => setArchiveView(event.target.value as 'active' | 'archived')}
-            >
+            <Select value={archiveView} onChange={(event) => setArchiveView(event.target.value as 'active' | 'archived')}>
               <option value="active">Active</option>
               <option value="archived">Archived</option>
             </Select>
@@ -262,11 +246,7 @@ export default function WebsitesPage() {
         <EmptyState
           icon={<Globe2 className="size-6" />}
           title={query.archived ? 'No archived websites' : 'No websites connected'}
-          description={
-            query.archived
-              ? 'Archived websites will appear here.'
-              : 'Register your first analytics website and generate its tracking key.'
-          }
+          description={query.archived ? 'Archived websites will appear here.' : 'Register your first analytics website and generate its tracking key.'}
           action={
             !query.archived ? (
               <Link
@@ -282,8 +262,7 @@ export default function WebsitesPage() {
       ) : (
         <>
           <p className="text-sm text-slate-500">
-            Showing <strong className="text-slate-800">{websites.length}</strong> of{' '}
-            <strong className="text-slate-800">{pagination.total}</strong> websites
+            Showing <strong className="text-slate-800">{websites.length}</strong> of <strong className="text-slate-800">{pagination.total}</strong> websites
           </p>
 
           <div className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
@@ -299,20 +278,12 @@ export default function WebsitesPage() {
               </p>
 
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  disabled={!pagination.hasPreviousPage}
-                  onClick={() => changePage(pagination.page - 1)}
-                >
+                <Button variant="outline" disabled={!pagination.hasPreviousPage} onClick={() => changePage(pagination.page - 1)}>
                   <ChevronLeft className="size-4" />
                   Previous
                 </Button>
 
-                <Button
-                  variant="outline"
-                  disabled={!pagination.hasNextPage}
-                  onClick={() => changePage(pagination.page + 1)}
-                >
+                <Button variant="outline" disabled={!pagination.hasNextPage} onClick={() => changePage(pagination.page + 1)}>
                   Next
                   <ChevronRight className="size-4" />
                 </Button>

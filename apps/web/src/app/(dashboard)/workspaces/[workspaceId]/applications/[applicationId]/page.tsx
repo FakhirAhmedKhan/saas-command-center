@@ -17,13 +17,7 @@ import { getApplication } from '@/features/applications/application-api';
 import { TechnologyManager } from '@/features/applications/components/technology-manager';
 import { LinkManager } from '@/features/applications/components/link-manager';
 
-import {
-  CATEGORY_LABELS,
-  PRIORITY_BADGE_VARIANTS,
-  PRIORITY_LABELS,
-  STATUS_BADGE_VARIANTS,
-  STATUS_LABELS,
-} from '@/features/applications/application-constants';
+import { CATEGORY_LABELS, PRIORITY_BADGE_VARIANTS, PRIORITY_LABELS, STATUS_BADGE_VARIANTS, STATUS_LABELS } from '@/features/applications/application-constants';
 
 import type { SaasApplication } from '@/features/applications/application-types';
 
@@ -122,24 +116,16 @@ export default function ApplicationDetailsPage() {
         <div className="mt-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <Badge variant={STATUS_BADGE_VARIANTS[application.status]}>
-                {STATUS_LABELS[application.status]}
-              </Badge>
+              <Badge variant={STATUS_BADGE_VARIANTS[application.status]}>{STATUS_LABELS[application.status]}</Badge>
 
-              <Badge variant={PRIORITY_BADGE_VARIANTS[application.priority]}>
-                {PRIORITY_LABELS[application.priority]} priority
-              </Badge>
+              <Badge variant={PRIORITY_BADGE_VARIANTS[application.priority]}>{PRIORITY_LABELS[application.priority]} priority</Badge>
 
               {application.archivedAt ? <Badge variant="slate">Archived</Badge> : null}
             </div>
 
-            <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-950">
-              {application.name}
-            </h1>
+            <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-950">{application.name}</h1>
 
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
-              {application.shortDescription ?? 'No short description has been added.'}
-            </p>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">{application.shortDescription ?? 'No short description has been added.'}</p>
           </div>
 
           <div className="flex flex-wrap gap-3">
@@ -193,9 +179,7 @@ export default function ApplicationDetailsPage() {
           </CardHeader>
 
           <CardContent>
-            <p className="whitespace-pre-wrap text-sm leading-7 text-slate-600">
-              {application.longDescription ?? 'No detailed description has been added.'}
-            </p>
+            <p className="whitespace-pre-wrap text-sm leading-7 text-slate-600">{application.longDescription ?? 'No detailed description has been added.'}</p>
           </CardContent>
         </Card>
 
@@ -228,10 +212,7 @@ export default function ApplicationDetailsPage() {
         <CardContent className="grid gap-4 sm:grid-cols-3">
           <TimelineItem label="Started" value={formatApplicationDate(application.startedAt)} />
 
-          <TimelineItem
-            label="Target launch"
-            value={formatApplicationDate(application.targetLaunchAt)}
-          />
+          <TimelineItem label="Target launch" value={formatApplicationDate(application.targetLaunchAt)} />
 
           <TimelineItem label="Launched" value={formatApplicationDate(application.launchedAt)} />
         </CardContent>

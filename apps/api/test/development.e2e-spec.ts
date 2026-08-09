@@ -156,17 +156,11 @@ describe('Development E2E', () => {
       title: 'Second Task',
     });
 
-    expectDevelopmentSuccess(
-      await moveTask(owner, application.id, firstTask.id, secondMilestone.id, 0),
-    );
+    expectDevelopmentSuccess(await moveTask(owner, application.id, firstTask.id, secondMilestone.id, 0));
 
-    expectDevelopmentSuccess(
-      await reorderTasks(owner, application.id, secondMilestone.id, [secondTask.id, firstTask.id]),
-    );
+    expectDevelopmentSuccess(await reorderTasks(owner, application.id, secondMilestone.id, [secondTask.id, firstTask.id]));
 
-    expectDevelopmentSuccess(
-      await reorderMilestones(owner, application.id, [secondMilestone.id, firstMilestone.id]),
-    );
+    expectDevelopmentSuccess(await reorderMilestones(owner, application.id, [secondMilestone.id, firstMilestone.id]));
 
     const listResponse = await listMilestones(owner, application.id);
 
@@ -206,9 +200,7 @@ describe('Development E2E', () => {
 
     expect(updateResponse.status).toBe(200);
 
-    expectDevelopmentSuccess(
-      await resolveBlocker(owner, application.id, blocker.id, 'Production credentials received'),
-    );
+    expectDevelopmentSuccess(await resolveBlocker(owner, application.id, blocker.id, 'Production credentials received'));
 
     const resolvedResponse = await listBlockers(owner, application.id, {
       status: enumValue(BlockerStatus, 1),
@@ -230,9 +222,7 @@ describe('Development E2E', () => {
 
     const finalResponse = await listBlockers(owner, application.id);
 
-    expect(
-      findRecordById(readDevelopmentItems(finalResponse, ['blockers']), blocker.id),
-    ).toBeUndefined();
+    expect(findRecordById(readDevelopmentItems(finalResponse, ['blockers']), blocker.id)).toBeUndefined();
   });
 
   it('deletes tasks and milestones', async () => {
@@ -318,14 +308,9 @@ describe('Development E2E', () => {
 
     const firstTask = await createTask(owner, firstApplication.id, firstMilestone.id);
 
-    const milestoneResponse = await updateMilestone(
-      owner,
-      secondApplication.id,
-      firstMilestone.id,
-      {
-        title: 'Wrong Application',
-      },
-    );
+    const milestoneResponse = await updateMilestone(owner, secondApplication.id, firstMilestone.id, {
+      title: 'Wrong Application',
+    });
 
     expectBusinessRuleRejected(milestoneResponse);
 

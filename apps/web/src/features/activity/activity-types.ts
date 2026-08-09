@@ -2,15 +2,7 @@ export const ACTIVITY_ACTOR_TYPES = ['USER', 'SYSTEM'] as const;
 
 export type ActivityActorType = (typeof ACTIVITY_ACTOR_TYPES)[number];
 
-export const ACTIVITY_ENTITY_TYPES = [
-  'APPLICATION',
-  'TECHNOLOGY',
-  'LINK',
-  'MILESTONE',
-  'TASK',
-  'BLOCKER',
-  'WEBSITE',
-] as const;
+export const ACTIVITY_ENTITY_TYPES = ['APPLICATION', 'TECHNOLOGY', 'LINK', 'MILESTONE', 'TASK', 'BLOCKER', 'WEBSITE'] as const;
 
 export type ActivityEntityType = (typeof ACTIVITY_ENTITY_TYPES)[number];
 

@@ -74,10 +74,7 @@ function configureSwagger(app: INestApplication): void {
   });
 }
 
-export function configureApplication(
-  app: INestApplication,
-  options: ConfigureApplicationOptions = {},
-): void {
+export function configureApplication(app: INestApplication, options: ConfigureApplicationOptions = {}): void {
   const logger = new Logger('ApplicationBootstrap');
 
   const config = app.get<TypedConfigService>(ConfigService);

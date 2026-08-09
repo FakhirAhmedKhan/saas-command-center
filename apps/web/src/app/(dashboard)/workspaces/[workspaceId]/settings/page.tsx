@@ -115,20 +115,12 @@ export default function WorkspaceSettingsPage() {
 
           {success && <div className="alert alert-success">{success}</div>}
 
-          {!canEdit && (
-            <div className="alert">Your role has read-only access to workspace settings.</div>
-          )}
+          {!canEdit && <div className="alert">Your role has read-only access to workspace settings.</div>}
 
           <label className="field">
             <span>Workspace name</span>
 
-            <input
-              disabled={!canEdit}
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              minLength={2}
-              required
-            />
+            <input disabled={!canEdit} value={name} onChange={(event) => setName(event.target.value)} minLength={2} required />
           </label>
 
           <label className="field">
@@ -137,9 +129,7 @@ export default function WorkspaceSettingsPage() {
             <input
               disabled={!canEdit}
               value={slug}
-              onChange={(event) =>
-                setSlug(event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))
-              }
+              onChange={(event) => setSlug(event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
               minLength={2}
               required
             />

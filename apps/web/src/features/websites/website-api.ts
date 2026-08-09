@@ -1,13 +1,6 @@
 import { apiRequest } from '@/features/lib/api/api-client';
 
-import type {
-  CreateWebsitePayload,
-  UpdateWebsitePayload,
-  Website,
-  WebsiteListQuery,
-  WebsiteListResponse,
-  WebsiteWithKeyResponse,
-} from './website-types';
+import type { CreateWebsitePayload, UpdateWebsitePayload, Website, WebsiteListQuery, WebsiteListResponse, WebsiteWithKeyResponse } from './website-types';
 
 function buildQuery(query: WebsiteListQuery = {}): string {
   const parameters = new URLSearchParams();
@@ -44,11 +37,7 @@ export function createWebsite(workspaceId: string, payload: CreateWebsitePayload
   });
 }
 
-export function updateWebsite(
-  workspaceId: string,
-  websiteId: string,
-  payload: UpdateWebsitePayload,
-) {
+export function updateWebsite(workspaceId: string, websiteId: string, payload: UpdateWebsitePayload) {
   return apiRequest<Website>(`${basePath(workspaceId)}/${websiteId}`, {
     method: 'PATCH',
     body: JSON.stringify(payload),

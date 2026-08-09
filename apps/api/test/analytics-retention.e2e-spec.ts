@@ -6,11 +6,7 @@ import { PrismaService } from 'src/database/prisma.service';
 
 import { AnalyticsProcessingService } from 'src/modules/analytics-engine/services/analytics-processing.service';
 
-import {
-  createRawAnalyticsEvent,
-  runAnalyticsRetention,
-  runAnonymousAnalyticsRetention,
-} from './helpers/analytics-engine';
+import { createRawAnalyticsEvent, runAnalyticsRetention, runAnonymousAnalyticsRetention } from './helpers/analytics-engine';
 
 import { createTrackedWebsite, uniqueTrackerId } from './helpers/analytics-ingestion';
 
@@ -18,11 +14,7 @@ import { createTestApp } from './helpers/create-test-app';
 
 import { resetDatabase } from './helpers/database';
 
-import {
-  addWorkspaceMember,
-  expectAccessDenied,
-  registerWorkspaceTestUser,
-} from './helpers/workspace';
+import { addWorkspaceMember, expectAccessDenied, registerWorkspaceTestUser } from './helpers/workspace';
 
 function asNumber(value: unknown): number {
   if (typeof value !== 'number') {
@@ -351,8 +343,6 @@ describe('Analytics Retention E2E', () => {
 
     expectAccessDenied(await runAnalyticsRetention(foreignOwner, owner.workspaceId, website.id));
 
-    expect((await runAnonymousAnalyticsRetention(app, owner.workspaceId, website.id)).status).toBe(
-      401,
-    );
+    expect((await runAnonymousAnalyticsRetention(app, owner.workspaceId, website.id)).status).toBe(401);
   });
 });

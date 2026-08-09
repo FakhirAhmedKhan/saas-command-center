@@ -3,12 +3,7 @@ import { randomUUID } from 'node:crypto';
 import request, { type Response } from 'supertest';
 
 import { PrismaService } from '../src/database/prisma.service';
-import {
-  AnalyticsProcessingStatus,
-  AnalyticsProcessingTrigger,
-  RawAnalyticsEventType,
-  WorkspaceRole,
-} from '../src/generated/prisma/enums';
+import { AnalyticsProcessingStatus, AnalyticsProcessingTrigger, RawAnalyticsEventType, WorkspaceRole } from '../src/generated/prisma/enums';
 import { AnalyticsProcessingWorkerService } from '../src/modules/analytics-processing/services/analytics-processing-worker.service';
 import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
 import { createTestApp } from './helpers/create-test-app';
@@ -106,11 +101,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
     return `${API_PREFIX}/workspaces/${workspaceId}/websites/${websiteId}/analytics/processing/runs/${runId}/retry`;
   }
 
-  async function seedPendingRawEvent(
-    targetWebsiteId: string,
-    occurredAt: Date,
-    eventId: string,
-  ): Promise<void> {
+  async function seedPendingRawEvent(targetWebsiteId: string, occurredAt: Date, eventId: string): Promise<void> {
     await prisma.rawAnalyticsEvent.create({
       data: {
         websiteId: targetWebsiteId,
@@ -173,10 +164,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
       select: { workspaceId: true },
     });
 
-    workspaceId = requireValue(
-      ownerMembership?.workspaceId,
-      'Phase 14 owner workspace was not found',
-    );
+    workspaceId = requireValue(ownerMembership?.workspaceId, 'Phase 14 owner workspace was not found');
 
     const viewer = createTestUser({
       name: 'Phase 14 Viewer',
@@ -250,10 +238,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
       select: { workspaceId: true },
     });
 
-    const outsiderWorkspaceId = requireValue(
-      outsiderMembership?.workspaceId,
-      'Phase 14 outsider workspace was not found',
-    );
+    const outsiderWorkspaceId = requireValue(outsiderMembership?.workspaceId, 'Phase 14 outsider workspace was not found');
 
     const website = await prisma.website.create({
       data: {
@@ -305,17 +290,13 @@ describe('Phase 14 Analytics Processing E2E', () => {
   });
 
   it('allows a VIEWER to read processing status (no role restriction on GET status)', async () => {
-    const response = await request(app.getHttpServer())
-      .get(statusUrl())
-      .set(withBearer(viewerAccessToken));
+    const response = await request(app.getHttpServer()).get(statusUrl()).set(withBearer(viewerAccessToken));
 
     expect(response.status).toBe(200);
   });
 
   it('blocks an outsider from reading another workspace processing status', async () => {
-    const response = await request(app.getHttpServer())
-      .get(statusUrl())
-      .set(withBearer(outsiderAccessToken));
+    const response = await request(app.getHttpServer()).get(statusUrl()).set(withBearer(outsiderAccessToken));
 
     expect(response.status).toBe(403);
   });
@@ -352,9 +333,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
   // ---------------------------------------------------------------------------------------
 
   it('reports zero pending events, zero dead letters, and no runs for a fresh website', async () => {
-    const response = await request(app.getHttpServer())
-      .get(statusUrl())
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(statusUrl()).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
 
@@ -370,9 +349,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
   });
 
   it('reports canReprocess=false for a VIEWER', async () => {
-    const response = await request(app.getHttpServer())
-      .get(statusUrl())
-      .set(withBearer(viewerAccessToken));
+    const response = await request(app.getHttpServer()).get(statusUrl()).set(withBearer(viewerAccessToken));
 
     expect(response.status).toBe(200);
     expect(body(response).canReprocess).toBe(false);
@@ -383,24 +360,16 @@ describe('Phase 14 Analytics Processing E2E', () => {
     await seedPendingRawEvent(websiteId, new Date('2026-08-05T11:00:00.000Z'), 'phase14-pending-2');
 
     // A pending event on a different (outsider) website must never be counted here.
-    await seedPendingRawEvent(
-      otherWorkspaceWebsiteId,
-      new Date('2026-08-05T11:00:00.000Z'),
-      'phase14-pending-foreign',
-    );
+    await seedPendingRawEvent(otherWorkspaceWebsiteId, new Date('2026-08-05T11:00:00.000Z'), 'phase14-pending-foreign');
 
-    const response = await request(app.getHttpServer())
-      .get(statusUrl())
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(statusUrl()).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
     expect(body(response).pendingEvents).toBe(2);
   });
 
   it('returns 404 for a nonexistent website', async () => {
-    const response = await request(app.getHttpServer())
-      .get(statusUrl(randomUUID()))
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(statusUrl(randomUUID())).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(404);
   });
@@ -437,10 +406,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
   });
 
   it('rejects a reprocess request missing required fields', async () => {
-    const response = await request(app.getHttpServer())
-      .post(reprocessUrl())
-      .set(withBearer(ownerAccessToken))
-      .send({});
+    const response = await request(app.getHttpServer()).post(reprocessUrl()).set(withBearer(ownerAccessToken)).send({});
 
     expect(response.status).toBe(400);
   });
@@ -453,10 +419,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
     const from = '2026-08-10T00:00:00.000Z';
     const to = '2026-08-11T00:00:00.000Z';
 
-    const response = await request(app.getHttpServer())
-      .post(reprocessUrl())
-      .set(withBearer(ownerAccessToken))
-      .send({ from, to });
+    const response = await request(app.getHttpServer()).post(reprocessUrl()).set(withBearer(ownerAccessToken)).send({ from, to });
 
     expect(response.status).toBe(201);
 
@@ -482,9 +445,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
     expect(persisted?.websiteId).toBe(websiteId);
     expect(persisted?.status).toBe(AnalyticsProcessingStatus.QUEUED);
 
-    const statusResponse = await request(app.getHttpServer())
-      .get(statusUrl())
-      .set(withBearer(ownerAccessToken));
+    const statusResponse = await request(app.getHttpServer()).get(statusUrl()).set(withBearer(ownerAccessToken));
 
     expect(statusResponse.status).toBe(200);
     expect((body(statusResponse).activeRun as JsonRecord | null)?.id).toBe(runId);
@@ -499,17 +460,11 @@ describe('Phase 14 Analytics Processing E2E', () => {
     const from = '2026-08-15T00:00:00.000Z';
     const to = '2026-08-16T00:00:00.000Z';
 
-    const firstResponse = await request(app.getHttpServer())
-      .post(reprocessUrl())
-      .set(withBearer(ownerAccessToken))
-      .send({ from, to });
+    const firstResponse = await request(app.getHttpServer()).post(reprocessUrl()).set(withBearer(ownerAccessToken)).send({ from, to });
 
     expect(firstResponse.status).toBe(201);
 
-    const secondResponse = await request(app.getHttpServer())
-      .post(reprocessUrl())
-      .set(withBearer(ownerAccessToken))
-      .send({ from, to });
+    const secondResponse = await request(app.getHttpServer()).post(reprocessUrl()).set(withBearer(ownerAccessToken)).send({ from, to });
 
     expect(secondResponse.status).toBe(201);
 
@@ -534,10 +489,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
       const from = '2026-08-20T00:00:00.000Z';
       const to = '2026-08-21T00:00:00.000Z';
 
-      const queueResponse = await request(app.getHttpServer())
-        .post(reprocessUrl())
-        .set(withBearer(ownerAccessToken))
-        .send({ from, to });
+      const queueResponse = await request(app.getHttpServer()).post(reprocessUrl()).set(withBearer(ownerAccessToken)).send({ from, to });
 
       expect(queueResponse.status).toBe(201);
 
@@ -588,9 +540,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
       expect(deadLetter?.websiteId).toBe(websiteId);
       expect(deadLetter?.resolvedAt).toBeNull();
 
-      const statusResponse = await request(app.getHttpServer())
-        .get(statusUrl())
-        .set(withBearer(ownerAccessToken));
+      const statusResponse = await request(app.getHttpServer()).get(statusUrl()).set(withBearer(ownerAccessToken));
 
       expect(statusResponse.status).toBe(200);
       expect(body(statusResponse).unresolvedDeadLetters).toBeGreaterThanOrEqual(1);
@@ -608,9 +558,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
 
     const runId = requireValue(deadLetteredRun?.id, 'Expected a dead-lettered run to retry');
 
-    const response = await request(app.getHttpServer())
-      .post(retryUrl(runId))
-      .set(withBearer(viewerAccessToken));
+    const response = await request(app.getHttpServer()).post(retryUrl(runId)).set(withBearer(viewerAccessToken));
 
     expect(response.status).toBe(403);
   });
@@ -622,9 +570,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
 
     const runId = requireValue(activeRun?.id, 'Expected a queued run to attempt retrying');
 
-    const response = await request(app.getHttpServer())
-      .post(retryUrl(runId))
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).post(retryUrl(runId)).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(404);
   });
@@ -636,9 +582,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
 
     const originalRunId = requireValue(deadLetteredRun?.id, 'Expected a dead-lettered run to retry');
 
-    const response = await request(app.getHttpServer())
-      .post(retryUrl(originalRunId))
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).post(retryUrl(originalRunId)).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(201);
 
@@ -660,10 +604,10 @@ describe('Phase 14 Analytics Processing E2E', () => {
     'CONFIRMED PRODUCTION BUG (documented, not silently bypassed): retryDeadLetter looks up the ' +
       'run by id only and never verifies it belongs to the workspace in the URL — a caller with ' +
       'OWNER/ADMIN rights in their OWN workspace can retry/resolve a dead-lettered run belonging ' +
-      'to a completely different workspace by supplying that run\'s id. ' +
+      "to a completely different workspace by supplying that run's id. " +
       '(apps/api/src/modules/analytics-processing/services/analytics-processing-queue.service.ts ' +
       'retryDeadLetter: `this.prisma.analyticsProcessingRun.findUnique({ where: { id: runId } })`, ' +
-      'no workspaceId filter, while the controller only checks the caller\'s role in the URL ' +
+      "no workspaceId filter, while the controller only checks the caller's role in the URL " +
       'workspaceId via assertCanReprocess.) This test asserts the CURRENT (vulnerable) behavior ' +
       'so the gap is tracked by CI rather than silently passing; once the service is fixed to scope ' +
       'the lookup by workspaceId, this test must be updated to expect 404/403 instead.',
@@ -703,9 +647,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
       // ownerAccessToken belongs to `workspaceId`, NOT the outsider's workspace. The URL below
       // uses the OWNER's own workspaceId (so assertCanReprocess passes), while runId references
       // a run that belongs to a different workspace entirely.
-      const response = await request(app.getHttpServer())
-        .post(retryUrl(foreignRun.id))
-        .set(withBearer(ownerAccessToken));
+      const response = await request(app.getHttpServer()).post(retryUrl(foreignRun.id)).set(withBearer(ownerAccessToken));
 
       // Documents the current, unfixed behavior: the cross-tenant retry currently succeeds.
       expect(response.status).toBe(201);
@@ -726,9 +668,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
   // ---------------------------------------------------------------------------------------
 
   it('never mixes pending-event counts or runs between two different websites', async () => {
-    const websiteAStatus = await request(app.getHttpServer())
-      .get(statusUrl(websiteId))
-      .set(withBearer(ownerAccessToken));
+    const websiteAStatus = await request(app.getHttpServer()).get(statusUrl(websiteId)).set(withBearer(ownerAccessToken));
 
     expect(websiteAStatus.status).toBe(200);
 

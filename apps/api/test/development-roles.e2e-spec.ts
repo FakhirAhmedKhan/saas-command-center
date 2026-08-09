@@ -27,12 +27,7 @@ import {
 
 import { resetDatabase } from './helpers/database';
 
-import {
-  addWorkspaceMember,
-  expectAccessDenied,
-  registerWorkspaceTestUser,
-  type WorkspaceTestUser,
-} from './helpers/workspace';
+import { addWorkspaceMember, expectAccessDenied, registerWorkspaceTestUser, type WorkspaceTestUser } from './helpers/workspace';
 
 interface RoleMatrix {
   owner: WorkspaceTestUser;
@@ -69,9 +64,7 @@ describe('Development Roles E2E', () => {
 
     expectDevelopmentSuccess(await addWorkspaceMember(owner, rawAdmin, WorkspaceRole.ADMIN));
 
-    expectDevelopmentSuccess(
-      await addWorkspaceMember(owner, rawDeveloper, WorkspaceRole.DEVELOPER),
-    );
+    expectDevelopmentSuccess(await addWorkspaceMember(owner, rawDeveloper, WorkspaceRole.DEVELOPER));
 
     expectDevelopmentSuccess(await addWorkspaceMember(owner, rawViewer, WorkspaceRole.VIEWER));
 
@@ -180,9 +173,7 @@ describe('Development Roles E2E', () => {
 
     expectAccessDenied(outsiderResponse);
 
-    const anonymousResponse = await request(app.getHttpServer()).get(
-      developmentRoutes.summary(matrix.owner.workspaceId, application.id),
-    );
+    const anonymousResponse = await request(app.getHttpServer()).get(developmentRoutes.summary(matrix.owner.workspaceId, application.id));
 
     expect(anonymousResponse.status).toBe(401);
   });

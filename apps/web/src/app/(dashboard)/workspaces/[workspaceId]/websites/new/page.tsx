@@ -113,10 +113,7 @@ function NewWebsiteContent() {
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <header>
-        <Link
-          href={listHref}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900"
-        >
+        <Link href={listHref} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900">
           <ArrowLeft className="size-4" />
           Back to websites
         </Link>
@@ -129,17 +126,13 @@ function NewWebsiteContent() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-slate-950">Create website</h1>
 
-            <p className="mt-2 text-sm leading-6 text-slate-500">
-              Register an analytics website and generate its first secure tracking key.
-            </p>
+            <p className="mt-2 text-sm leading-6 text-slate-500">Register an analytics website and generate its first secure tracking key.</p>
           </div>
         </div>
       </header>
 
       {error ? (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-          Applications could not be loaded: {error}
-        </div>
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">Applications could not be loaded: {error}</div>
       ) : null}
 
       <WebsiteForm

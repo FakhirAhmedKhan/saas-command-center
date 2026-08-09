@@ -8,22 +8,10 @@ import { createTestApp } from './helpers/create-test-app';
 
 import { resetDatabase } from './helpers/database';
 
-import {
-  expectAccessDenied,
-  expectBusinessRuleRejected,
-  registerWorkspaceTestUser,
-} from './helpers/workspace';
+import { expectAccessDenied, expectBusinessRuleRejected, registerWorkspaceTestUser } from './helpers/workspace';
 import { recordString } from './helpers/application';
 import { findRecordById } from './helpers/development';
-import {
-  createWebsite,
-  getWebsite,
-  readWebsiteRecord,
-  websiteRoutes,
-  updateWebsite,
-  listWebsites,
-  readWebsiteItems,
-} from './helpers/website';
+import { createWebsite, getWebsite, readWebsiteRecord, websiteRoutes, updateWebsite, listWebsites, readWebsiteItems } from './helpers/website';
 
 describe('Websites E2E', () => {
   let app: INestApplication;
@@ -73,14 +61,11 @@ describe('Websites E2E', () => {
   it('creates a website using only required fields and applies defaults', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
 
-    const response = await owner.agent
-      .post(websiteRoutes.root(owner.workspaceId))
-      .set(withBearer(owner.accessToken))
-      .send({
-        name: 'Minimal Website',
+    const response = await owner.agent.post(websiteRoutes.root(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
+      name: 'Minimal Website',
 
-        domain: 'minimal.example.test',
-      });
+      domain: 'minimal.example.test',
+    });
 
     expect([200, 201]).toContain(response.status);
 
@@ -94,24 +79,14 @@ describe('Websites E2E', () => {
   it('rejects invalid domains and invalid DTO fields', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
 
-    const invalidDomains = [
-      '',
-      '*.example.com',
-      'https://user:pass@example.com',
-      'example.com/path',
-      'example.com?query=true',
-      'example.com#fragment',
-    ];
+    const invalidDomains = ['', '*.example.com', 'https://user:pass@example.com', 'example.com/path', 'example.com?query=true', 'example.com#fragment'];
 
     for (const domain of invalidDomains) {
-      const response = await owner.agent
-        .post(websiteRoutes.root(owner.workspaceId))
-        .set(withBearer(owner.accessToken))
-        .send({
-          name: 'Invalid Domain Website',
+      const response = await owner.agent.post(websiteRoutes.root(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
+        name: 'Invalid Domain Website',
 
-          domain,
-        });
+        domain,
+      });
 
       expect(response.status).toBe(400);
     }
@@ -134,29 +109,23 @@ describe('Websites E2E', () => {
 
     expect(invalidOrigins.status).toBe(400);
 
-    const invalidApplication = await owner.agent
-      .post(websiteRoutes.root(owner.workspaceId))
-      .set(withBearer(owner.accessToken))
-      .send({
-        name: 'Invalid App Website',
+    const invalidApplication = await owner.agent.post(websiteRoutes.root(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
+      name: 'Invalid App Website',
 
-        domain: 'invalid-app.example.test',
+      domain: 'invalid-app.example.test',
 
-        applicationId: 'not-a-uuid',
-      });
+      applicationId: 'not-a-uuid',
+    });
 
     expect(invalidApplication.status).toBe(400);
 
-    const unknownField = await owner.agent
-      .post(websiteRoutes.root(owner.workspaceId))
-      .set(withBearer(owner.accessToken))
-      .send({
-        name: 'Unknown Field Website',
+    const unknownField = await owner.agent.post(websiteRoutes.root(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
+      name: 'Unknown Field Website',
 
-        domain: 'unknown-field.example.test',
+      domain: 'unknown-field.example.test',
 
-        trackingKey: 'injected-key',
-      });
+      trackingKey: 'injected-key',
+    });
 
     expect(unknownField.status).toBe(400);
   });
@@ -277,9 +246,7 @@ describe('Websites E2E', () => {
 
     expect(secondPage).toHaveLength(1);
 
-    expect(recordString(firstPage[0] ?? {}, 'id')).not.toBe(
-      recordString(secondPage[0] ?? {}, 'id'),
-    );
+    expect(recordString(firstPage[0] ?? {}, 'id')).not.toBe(recordString(secondPage[0] ?? {}, 'id'));
 
     expect(
       (
@@ -305,9 +272,7 @@ describe('Websites E2E', () => {
 
     const website = await createWebsite(alphaOwner);
 
-    const response = await betaOwner.agent
-      .get(websiteRoutes.details(alphaOwner.workspaceId, website.id))
-      .set(withBearer(betaOwner.accessToken));
+    const response = await betaOwner.agent.get(websiteRoutes.details(alphaOwner.workspaceId, website.id)).set(withBearer(betaOwner.accessToken));
 
     expectAccessDenied(response);
   });

@@ -146,9 +146,7 @@ export class AnalyticsEngineQueryService {
 
     const defaultDays = query.period === AnalyticsAggregatePeriod.HOURLY ? 7 : 30;
 
-    const dateFrom = query.dateFrom
-      ? new Date(query.dateFrom)
-      : new Date(now.getTime() - defaultDays * 86_400_000);
+    const dateFrom = query.dateFrom ? new Date(query.dateFrom) : new Date(now.getTime() - defaultDays * 86_400_000);
 
     const dateTo = query.dateTo ? new Date(query.dateTo) : now;
 
@@ -243,8 +241,7 @@ export class AnalyticsEngineQueryService {
       ...aggregate,
 
       totalDurationMs:
-        aggregate.totalDurationMs <= BigInt(Number.MAX_SAFE_INTEGER) &&
-        aggregate.totalDurationMs >= BigInt(Number.MIN_SAFE_INTEGER)
+        aggregate.totalDurationMs <= BigInt(Number.MAX_SAFE_INTEGER) && aggregate.totalDurationMs >= BigInt(Number.MIN_SAFE_INTEGER)
           ? Number(aggregate.totalDurationMs)
           : aggregate.totalDurationMs.toString(),
     };

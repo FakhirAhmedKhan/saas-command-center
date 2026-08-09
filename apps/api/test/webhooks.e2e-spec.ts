@@ -65,10 +65,7 @@ describe('Phase 18 webhooks', () => {
   });
 
   it('keeps viewers read-only', async () => {
-    await request(app.getHttpServer())
-      .get(`/api/v1/workspaces/${workspaceId}/integrations/webhooks`)
-      .set('Authorization', `Bearer ${viewerToken}`)
-      .expect(200);
+    await request(app.getHttpServer()).get(`/api/v1/workspaces/${workspaceId}/integrations/webhooks`).set('Authorization', `Bearer ${viewerToken}`).expect(200);
 
     await request(app.getHttpServer())
       .post(`/api/v1/workspaces/${workspaceId}/integrations/webhooks`)

@@ -5,11 +5,7 @@ import { ConfigService } from '@nestjs/config';
 
 import { createHash } from 'node:crypto';
 
-import {
-  AnalyticsProcessingStatus,
-  AnalyticsProcessingTrigger,
-  Prisma,
-} from '../../../generated/prisma/client';
+import { AnalyticsProcessingStatus, AnalyticsProcessingTrigger, Prisma } from '../../../generated/prisma/client';
 
 import { PrismaService } from '../../../database/prisma.service';
 
@@ -61,12 +57,7 @@ export class AnalyticsProcessingQueueService {
       throw new NotFoundException('Website not found.');
     }
 
-    const lockKey = [
-      'analytics-processing',
-      input.websiteId,
-      input.from.toISOString(),
-      input.to.toISOString(),
-    ].join(':');
+    const lockKey = ['analytics-processing', input.websiteId, input.from.toISOString(), input.to.toISOString()].join(':');
 
     const activeKey = createHash('sha256').update(lockKey).digest('hex');
 

@@ -1,17 +1,8 @@
 export type AnalyticsDeviceType = 'DESKTOP' | 'MOBILE' | 'TABLET' | 'BOT' | 'OTHER';
 
-export type AnalyticsSourceType =
-  'DIRECT' | 'INTERNAL' | 'SEARCH' | 'SOCIAL' | 'REFERRAL' | 'UNKNOWN';
+export type AnalyticsSourceType = 'DIRECT' | 'INTERNAL' | 'SEARCH' | 'SOCIAL' | 'REFERRAL' | 'UNKNOWN';
 
-export type AnalyticsAggregateDimension =
-  | 'OVERVIEW'
-  | 'PAGE'
-  | 'SOURCE'
-  | 'COUNTRY'
-  | 'DEVICE'
-  | 'BROWSER'
-  | 'OPERATING_SYSTEM'
-  | 'CUSTOM_EVENT';
+export type AnalyticsAggregateDimension = 'OVERVIEW' | 'PAGE' | 'SOURCE' | 'COUNTRY' | 'DEVICE' | 'BROWSER' | 'OPERATING_SYSTEM' | 'CUSTOM_EVENT';
 
 export type AnalyticsAggregatePeriod = 'HOURLY' | 'DAILY';
 

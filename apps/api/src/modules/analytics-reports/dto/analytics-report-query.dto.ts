@@ -6,11 +6,7 @@ import { IsEnum, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-
 
 import { AnalyticsOverviewQueryDto } from '../../analytics-overview/dto/analytics-overview-query.dto';
 
-import {
-  ANALYTICS_REPORT_DEFAULT_LIMIT,
-  ANALYTICS_REPORT_MAX_LIMIT,
-  ANALYTICS_SEARCH_MAX_LENGTH,
-} from '../analytics-reports.constants';
+import { ANALYTICS_REPORT_DEFAULT_LIMIT, ANALYTICS_REPORT_MAX_LIMIT, ANALYTICS_SEARCH_MAX_LENGTH } from '../analytics-reports.constants';
 
 export enum AnalyticsSortDirection {
   ASC = 'asc',

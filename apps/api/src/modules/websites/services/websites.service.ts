@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { createHash, randomBytes } from 'node:crypto';
 
@@ -13,18 +8,9 @@ import { PrismaService } from 'src/database/prisma.service';
 
 import { Prisma } from 'src/generated/prisma/client';
 
-import {
-  ActivityActorType,
-  ActivityEntityType,
-  ApplicationActivityType,
-} from 'src/generated/prisma/enums';
+import { ActivityActorType, ActivityEntityType, ApplicationActivityType } from 'src/generated/prisma/enums';
 import { ActivityWriterService } from 'src/modules/activity/services/activity-writer.service';
-import {
-  CreateWebsiteDto,
-  WebsiteListQueryDto,
-  UpdateWebsiteDto,
-  ConnectWebsiteDto,
-} from '../dto/website.dto';
+import { CreateWebsiteDto, WebsiteListQueryDto, UpdateWebsiteDto, ConnectWebsiteDto } from '../dto/website.dto';
 
 const websiteSelect = {
   id: true,
@@ -287,12 +273,7 @@ export class WebsitesService {
     return this.requireWebsite(this.prisma, workspaceId, websiteId);
   }
 
-  async update(
-    workspaceId: string,
-    websiteId: string,
-    dto: UpdateWebsiteDto,
-    actorUserId: string,
-  ): Promise<WebsiteView> {
+  async update(workspaceId: string, websiteId: string, dto: UpdateWebsiteDto, actorUserId: string): Promise<WebsiteView> {
     const website = await this.requireWebsite(this.prisma, workspaceId, websiteId);
 
     this.ensureNotArchived(website);
@@ -576,12 +557,7 @@ export class WebsitesService {
     });
   }
 
-  async connect(
-    workspaceId: string,
-    websiteId: string,
-    dto: ConnectWebsiteDto,
-    actorUserId: string,
-  ): Promise<WebsiteView> {
+  async connect(workspaceId: string, websiteId: string, dto: ConnectWebsiteDto, actorUserId: string): Promise<WebsiteView> {
     const website = await this.requireWebsite(this.prisma, workspaceId, websiteId);
 
     this.ensureNotArchived(website);
@@ -625,11 +601,7 @@ export class WebsitesService {
     });
   }
 
-  async disconnect(
-    workspaceId: string,
-    websiteId: string,
-    actorUserId: string,
-  ): Promise<WebsiteView> {
+  async disconnect(workspaceId: string, websiteId: string, actorUserId: string): Promise<WebsiteView> {
     const website = await this.requireWebsite(this.prisma, workspaceId, websiteId);
 
     this.ensureNotArchived(website);
@@ -671,12 +643,7 @@ export class WebsitesService {
     });
   }
 
-  private async updateEnabledState(
-    workspaceId: string,
-    website: WebsiteView,
-    enabled: boolean,
-    actorUserId: string,
-  ): Promise<WebsiteView> {
+  private async updateEnabledState(workspaceId: string, website: WebsiteView, enabled: boolean, actorUserId: string): Promise<WebsiteView> {
     return this.prisma.$transaction(async (transaction) => {
       const updated = await transaction.website.update({
         where: {
@@ -691,15 +658,11 @@ export class WebsitesService {
       });
 
       await this.writeActivity(transaction, updated, actorUserId, {
-        activityType: enabled
-          ? ApplicationActivityType.WEBSITE_ENABLED
-          : ApplicationActivityType.WEBSITE_DISABLED,
+        activityType: enabled ? ApplicationActivityType.WEBSITE_ENABLED : ApplicationActivityType.WEBSITE_DISABLED,
 
         title: enabled ? 'Website enabled' : 'Website disabled',
 
-        description: enabled
-          ? `${updated.name} is ready to accept tracking events.`
-          : `${updated.name} will reject new tracking events.`,
+        description: enabled ? `${updated.name} is ready to accept tracking events.` : `${updated.name} will reject new tracking events.`,
 
         metadata: {
           enabled,
@@ -710,11 +673,7 @@ export class WebsitesService {
     });
   }
 
-  private async requireWebsite(
-    client: PrismaService | Prisma.TransactionClient,
-    workspaceId: string,
-    websiteId: string,
-  ): Promise<WebsiteView> {
+  private async requireWebsite(client: PrismaService | Prisma.TransactionClient, workspaceId: string, websiteId: string): Promise<WebsiteView> {
     const website = await client.website.findFirst({
       where: {
         id: websiteId,
@@ -800,16 +759,8 @@ export class WebsitesService {
       throw new BadRequestException('Website domain is invalid');
     }
 
-    if (
-      url.username ||
-      url.password ||
-      url.search ||
-      url.hash ||
-      (url.pathname !== '' && url.pathname !== '/')
-    ) {
-      throw new BadRequestException(
-        'Domain cannot include credentials, paths, query parameters, or fragments',
-      );
+    if (url.username || url.password || url.search || url.hash || (url.pathname !== '' && url.pathname !== '/')) {
+      throw new BadRequestException('Domain cannot include credentials, paths, query parameters, or fragments');
     }
 
     if (!url.hostname) {
@@ -841,16 +792,8 @@ export class WebsitesService {
         throw new BadRequestException('Allowed origins must use HTTP or HTTPS');
       }
 
-      if (
-        url.username ||
-        url.password ||
-        url.search ||
-        url.hash ||
-        (url.pathname !== '' && url.pathname !== '/')
-      ) {
-        throw new BadRequestException(
-          'Allowed origins cannot include paths, credentials, query parameters, or fragments',
-        );
+      if (url.username || url.password || url.search || url.hash || (url.pathname !== '' && url.pathname !== '/')) {
+        throw new BadRequestException('Allowed origins cannot include paths, credentials, query parameters, or fragments');
       }
 
       return url.origin.toLowerCase();
@@ -862,8 +805,7 @@ export class WebsitesService {
   private defaultOrigin(domain: string): string {
     const hostname = domain.split(':').at(0) ?? domain;
 
-    const local =
-      hostname === 'localhost' || hostname.endsWith('.localhost') || isIP(hostname) !== 0;
+    const local = hostname === 'localhost' || hostname.endsWith('.localhost') || isIP(hostname) !== 0;
 
     return `${local ? 'http' : 'https'}://${domain}`;
   }
@@ -942,9 +884,7 @@ export class WebsitesService {
 
   private handleUniqueConstraint(error: unknown): void {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-      throw new ConflictException(
-        'A website with this domain or tracking-key identifier already exists',
-      );
+      throw new ConflictException('A website with this domain or tracking-key identifier already exists');
     }
   }
 }

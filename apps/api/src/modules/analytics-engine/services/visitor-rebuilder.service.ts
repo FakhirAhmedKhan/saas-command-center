@@ -8,10 +8,7 @@ import { ProcessAnalyticsRangeInput } from 'src/modules/analytics-processing/ser
 @Injectable()
 export class VisitorRebuilderService {
   rebuildRange(
-    transaction: Omit<
-      PrismaClient<never, Prisma.GlobalOmitConfig | undefined, DefaultArgs>,
-      '$connect' | '$disconnect' | '$on' | '$use' | '$extends'
-    >,
+    transaction: Omit<PrismaClient<never, Prisma.GlobalOmitConfig | undefined, DefaultArgs>, '$connect' | '$disconnect' | '$on' | '$use' | '$extends'>,
     input: ProcessAnalyticsRangeInput,
   ) {
     throw new Error('Method not implemented.');
@@ -83,10 +80,7 @@ export class VisitorRebuilderService {
     await this.rebuild(transaction, visitorId);
   }
 
-  async rebuildMany(
-    transaction: Prisma.TransactionClient,
-    visitorIds: readonly string[],
-  ): Promise<void> {
+  async rebuildMany(transaction: Prisma.TransactionClient, visitorIds: readonly string[]): Promise<void> {
     for (const visitorId of visitorIds) {
       await this.rebuild(transaction, visitorId);
     }

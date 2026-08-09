@@ -31,15 +31,15 @@ The goal is to verify the complete product across:
 
 ## Already Verified / Mostly Green
 
-| Phase | Area | Status |
-|---|---|---|
-| Phase 1 | Monorepo Foundation | ✅ Passed |
-| Phase 2 | Backend Foundation | ✅ Core build/typecheck passed |
-| Phase 3 | Database Foundation | ✅ Passed |
-| Phase 4 | Authentication + Workspaces | ✅ 46/46 API E2E |
-| Phase 5 | Application Registry | ✅ 28/28 API E2E |
-| Phase 11 | Authentication Regression | ✅ Passed |
-| Phase 12 | Analytics Overview Regression | ✅ Passed |
+| Phase    | Area                          | Status                         |
+| -------- | ----------------------------- | ------------------------------ |
+| Phase 1  | Monorepo Foundation           | ✅ Passed                      |
+| Phase 2  | Backend Foundation            | ✅ Core build/typecheck passed |
+| Phase 3  | Database Foundation           | ✅ Passed                      |
+| Phase 4  | Authentication + Workspaces   | ✅ 46/46 API E2E               |
+| Phase 5  | Application Registry          | ✅ 28/28 API E2E               |
+| Phase 11 | Authentication Regression     | ✅ Passed                      |
+| Phase 12 | Analytics Overview Regression | ✅ Passed                      |
 
 ---
 
@@ -1386,19 +1386,19 @@ GitHub API calls             cached/rate-aware
 
 Every new repository feature should test:
 
-| Scenario | Expected |
-|---|---|
-| Anonymous | 401 |
-| Workspace outsider | 403/404 based on contract |
-| VIEWER write attempt | 403 |
-| Wrong repository workspace | 404 preferred |
-| Invalid GitHub signature | rejected |
-| Duplicate webhook delivery | ignored |
-| GitHub token leakage | never |
-| Path traversal | rejected |
-| Protected branch direct write | rejected |
-| Private/internal webhook URL | rejected |
-| AI access to secret file | blocked/redacted |
+| Scenario                      | Expected                  |
+| ----------------------------- | ------------------------- |
+| Anonymous                     | 401                       |
+| Workspace outsider            | 403/404 based on contract |
+| VIEWER write attempt          | 403                       |
+| Wrong repository workspace    | 404 preferred             |
+| Invalid GitHub signature      | rejected                  |
+| Duplicate webhook delivery    | ignored                   |
+| GitHub token leakage          | never                     |
+| Path traversal                | rejected                  |
+| Protected branch direct write | rejected                  |
+| Private/internal webhook URL  | rejected                  |
+| AI access to secret file      | blocked/redacted          |
 
 ---
 

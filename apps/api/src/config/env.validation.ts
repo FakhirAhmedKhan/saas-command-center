@@ -115,11 +115,7 @@ function getBoolean(config: Record<string, unknown>, key: string, defaultValue: 
   throw new Error(`Environment variable ${key} must be "true" or "false".`);
 }
 
-function getPositiveInteger(
-  config: Record<string, unknown>,
-  key: string,
-  defaultValue: number,
-): number {
+function getPositiveInteger(config: Record<string, unknown>, key: string, defaultValue: number): number {
   const value = getOptionalString(config, key);
 
   if (value === undefined) {
@@ -173,10 +169,7 @@ function validateSecret(key: string, value: string, environment: NodeEnvironment
     throw new Error(`${key} must contain at least 32 characters.`);
   }
 
-  if (
-    environment === 'production' &&
-    /change-me|replace-me|default|secret123|password123/i.test(value)
-  ) {
+  if (environment === 'production' && /change-me|replace-me|default|secret123|password123/i.test(value)) {
     throw new Error(`${key} contains an unsafe production placeholder.`);
   }
 }
@@ -246,9 +239,7 @@ export function validateEnvironment(config: Record<string, unknown>): Environmen
   const maximumInterval = getPositiveInteger(config, 'HEALTH_MAX_INTERVAL_SECONDS', 86_400);
 
   if (maximumInterval < minimumInterval) {
-    throw new Error(
-      'HEALTH_MAX_INTERVAL_SECONDS must be greater than or equal to HEALTH_MIN_INTERVAL_SECONDS.',
-    );
+    throw new Error('HEALTH_MAX_INTERVAL_SECONDS must be greater than or equal to HEALTH_MIN_INTERVAL_SECONDS.');
   }
 
   const minimumTimeout = getPositiveInteger(config, 'HEALTH_MIN_TIMEOUT_MS', 1_000);
@@ -256,9 +247,7 @@ export function validateEnvironment(config: Record<string, unknown>): Environmen
   const maximumTimeout = getPositiveInteger(config, 'HEALTH_MAX_TIMEOUT_MS', 30_000);
 
   if (maximumTimeout < minimumTimeout) {
-    throw new Error(
-      'HEALTH_MAX_TIMEOUT_MS must be greater than or equal to HEALTH_MIN_TIMEOUT_MS.',
-    );
+    throw new Error('HEALTH_MAX_TIMEOUT_MS must be greater than or equal to HEALTH_MIN_TIMEOUT_MS.');
   }
   const corsOrigins = getOptionalString(config, 'CORS_ORIGINS') ?? frontendUrl;
 
@@ -301,11 +290,7 @@ export function validateEnvironment(config: Record<string, unknown>): Environmen
 
     WEBHOOK_WORKER_CONCURRENCY: getPositiveInteger(config, 'WEBHOOK_WORKER_CONCURRENCY', 5),
 
-    WEBHOOK_PROCESSING_TIMEOUT_MS: getPositiveInteger(
-      config,
-      'WEBHOOK_PROCESSING_TIMEOUT_MS',
-      120_000,
-    ),
+    WEBHOOK_PROCESSING_TIMEOUT_MS: getPositiveInteger(config, 'WEBHOOK_PROCESSING_TIMEOUT_MS', 120_000),
 
     WEBHOOK_DEFAULT_TIMEOUT_MS: webhookDefaultTimeoutMs,
 
@@ -343,11 +328,7 @@ export function validateEnvironment(config: Record<string, unknown>): Environmen
 
     HEALTH_HISTORY_RETENTION_DAYS: getPositiveInteger(config, 'HEALTH_HISTORY_RETENTION_DAYS', 30),
 
-    HEALTH_DEFAULT_FAILURE_THRESHOLD: getPositiveInteger(
-      config,
-      'HEALTH_DEFAULT_FAILURE_THRESHOLD',
-      3,
-    ),
+    HEALTH_DEFAULT_FAILURE_THRESHOLD: getPositiveInteger(config, 'HEALTH_DEFAULT_FAILURE_THRESHOLD', 3),
     REDIS_URL: getRequiredString(config, 'REDIS_URL'),
 
     ANALYTICS_WORKER_ENABLED: getBoolean(config, 'ANALYTICS_WORKER_ENABLED', true),
@@ -360,19 +341,11 @@ export function validateEnvironment(config: Record<string, unknown>): Environmen
 
     ANALYTICS_REPROCESS_MAX_DAYS: getPositiveInteger(config, 'ANALYTICS_REPROCESS_MAX_DAYS', 31),
 
-    ANALYTICS_PROCESSING_TIMEOUT_MS: getPositiveInteger(
-      config,
-      'ANALYTICS_PROCESSING_TIMEOUT_MS',
-      120_000,
-    ),
+    ANALYTICS_PROCESSING_TIMEOUT_MS: getPositiveInteger(config, 'ANALYTICS_PROCESSING_TIMEOUT_MS', 120_000),
 
     ANALYTICS_INGESTION_LIMIT: getPositiveInteger(config, 'ANALYTICS_INGESTION_LIMIT', 120),
 
-    ANALYTICS_INGESTION_WINDOW_SECONDS: getPositiveInteger(
-      config,
-      'ANALYTICS_INGESTION_WINDOW_SECONDS',
-      60,
-    ),
+    ANALYTICS_INGESTION_WINDOW_SECONDS: getPositiveInteger(config, 'ANALYTICS_INGESTION_WINDOW_SECONDS', 60),
     NODE_ENV: nodeEnvironment,
 
     PORT: getPositiveInteger(config, 'PORT', 4000),

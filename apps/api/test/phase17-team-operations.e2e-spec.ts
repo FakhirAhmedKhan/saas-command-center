@@ -3,11 +3,7 @@ import { randomUUID } from 'node:crypto';
 import request, { type Response } from 'supertest';
 
 import { PrismaService } from '../src/database/prisma.service';
-import {
-  NotificationType,
-  WorkspaceInvitationStatus,
-  WorkspaceRole,
-} from '../src/generated/prisma/enums';
+import { NotificationType, WorkspaceInvitationStatus, WorkspaceRole } from '../src/generated/prisma/enums';
 import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
 import { createTestApp } from './helpers/create-test-app';
 import { resetDatabase } from './helpers/database';
@@ -146,10 +142,7 @@ describe('Phase 17 Team Operations E2E', () => {
     return `${API_PREFIX}/notifications`;
   }
 
-  async function createInvitation(
-    token: string,
-    overrides: Record<string, unknown> = {},
-  ): Promise<Response> {
+  async function createInvitation(token: string, overrides: Record<string, unknown> = {}): Promise<Response> {
     return request(app.getHttpServer())
       .post(invitationsUrl())
       .set(withBearer(token))
@@ -207,10 +200,7 @@ describe('Phase 17 Team Operations E2E', () => {
       select: { workspaceId: true },
     });
 
-    workspaceId = requireValue(
-      ownerMembership?.workspaceId,
-      'Phase 17 owner workspace was not found',
-    );
+    workspaceId = requireValue(ownerMembership?.workspaceId, 'Phase 17 owner workspace was not found');
 
     const admin = createTestUser({
       name: 'Phase 17 Admin',
@@ -298,9 +288,7 @@ describe('Phase 17 Team Operations E2E', () => {
   });
 
   it('rejects a DEVELOPER listing invitations (no read access for lower roles on this controller)', async () => {
-    const response = await request(app.getHttpServer())
-      .get(invitationsUrl())
-      .set(withBearer(developerAccessToken));
+    const response = await request(app.getHttpServer()).get(invitationsUrl()).set(withBearer(developerAccessToken));
 
     expect(response.status).toBe(403);
   });
@@ -344,19 +332,14 @@ describe('Phase 17 Team Operations E2E', () => {
     expect(response.status).toBe(201);
 
     // The invited existing user should receive an in-app notification.
-    const outsiderId = requireValue(
-      (await prisma.user.findUnique({ where: { email: outsider.email.toLowerCase() } }))?.id,
-      'Outsider user missing',
-    );
+    const outsiderId = requireValue((await prisma.user.findUnique({ where: { email: outsider.email.toLowerCase() } }))?.id, 'Outsider user missing');
 
     const notification = await prisma.notification.findFirst({
       where: { userId: outsiderId, type: NotificationType.WORKSPACE_INVITATION },
     });
 
     expect(notification).not.toBeNull();
-    expect(notification?.dedupeKey).toBe(
-      `workspace-invitation:${(body(response).invitation as JsonRecord).id as string}`,
-    );
+    expect(notification?.dedupeKey).toBe(`workspace-invitation:${(body(response).invitation as JsonRecord).id as string}`);
   });
 
   it('lists invitations scoped to the workspace, filterable by status', async () => {
@@ -369,15 +352,11 @@ describe('Phase 17 Team Operations E2E', () => {
     const invitations = response.body as JsonRecord[];
 
     expect(isRecordArray(invitations)).toBe(true);
-    expect(invitations.every((invitation) => invitation.status === WorkspaceInvitationStatus.PENDING)).toBe(
-      true,
-    );
+    expect(invitations.every((invitation) => invitation.status === WorkspaceInvitationStatus.PENDING)).toBe(true);
   });
 
   it('rejects an invalid status filter', async () => {
-    const response = await request(app.getHttpServer())
-      .get(`${invitationsUrl()}?status=NOT_A_REAL_STATUS`)
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(`${invitationsUrl()}?status=NOT_A_REAL_STATUS`).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(400);
   });
@@ -394,9 +373,7 @@ describe('Phase 17 Team Operations E2E', () => {
     const invitationId = (body(createResponse).invitation as JsonRecord).id as string;
     const originalHash = await findInvitationRawToken(invitationId);
 
-    const resendResponse = await request(app.getHttpServer())
-      .post(resendUrl(invitationId))
-      .set(withBearer(ownerAccessToken));
+    const resendResponse = await request(app.getHttpServer()).post(resendUrl(invitationId)).set(withBearer(ownerAccessToken));
 
     expect(resendResponse.status).toBe(201);
 
@@ -416,9 +393,7 @@ describe('Phase 17 Team Operations E2E', () => {
 
     const invitationId = (body(createResponse).invitation as JsonRecord).id as string;
 
-    const revokeResponse = await request(app.getHttpServer())
-      .post(revokeUrl(invitationId))
-      .set(withBearer(ownerAccessToken));
+    const revokeResponse = await request(app.getHttpServer()).post(revokeUrl(invitationId)).set(withBearer(ownerAccessToken));
 
     expect(revokeResponse.status).toBe(201);
     expect(body(revokeResponse)).toMatchObject({ success: true });
@@ -430,9 +405,7 @@ describe('Phase 17 Team Operations E2E', () => {
     expect(persisted.status).toBe(WorkspaceInvitationStatus.REVOKED);
     expect(persisted.revokedAt).not.toBeNull();
 
-    const resendResponse = await request(app.getHttpServer())
-      .post(resendUrl(invitationId))
-      .set(withBearer(ownerAccessToken));
+    const resendResponse = await request(app.getHttpServer()).post(resendUrl(invitationId)).set(withBearer(ownerAccessToken));
 
     expect(resendResponse.status).toBe(409);
   });
@@ -444,23 +417,17 @@ describe('Phase 17 Team Operations E2E', () => {
 
     const invitationId = (body(createResponse).invitation as JsonRecord).id as string;
 
-    const firstRevoke = await request(app.getHttpServer())
-      .post(revokeUrl(invitationId))
-      .set(withBearer(ownerAccessToken));
+    const firstRevoke = await request(app.getHttpServer()).post(revokeUrl(invitationId)).set(withBearer(ownerAccessToken));
 
     expect(firstRevoke.status).toBe(201);
 
-    const secondRevoke = await request(app.getHttpServer())
-      .post(revokeUrl(invitationId))
-      .set(withBearer(ownerAccessToken));
+    const secondRevoke = await request(app.getHttpServer()).post(revokeUrl(invitationId)).set(withBearer(ownerAccessToken));
 
     expect(secondRevoke.status).toBe(404);
   });
 
   it('returns 404 for a nonexistent invitation id', async () => {
-    const response = await request(app.getHttpServer())
-      .post(revokeUrl(randomUUID()))
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).post(revokeUrl(randomUUID())).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(404);
   });
@@ -499,9 +466,7 @@ describe('Phase 17 Team Operations E2E', () => {
     );
 
     const response = await request(app.getHttpServer())
-      .post(
-        `${API_PREFIX}/workspaces/${secondWorkspaceId}/invitations/${invitationId}/revoke`,
-      )
+      .post(`${API_PREFIX}/workspaces/${secondWorkspaceId}/invitations/${invitationId}/revoke`)
       .set(withBearer(secondOwnerAccessToken));
 
     // The caller IS an OWNER, just of a different workspace than the invitation belongs to —
@@ -558,9 +523,7 @@ describe('Phase 17 Team Operations E2E', () => {
     const rawToken = extractTokenFromUrl(body(createResponse).invitationUrl as string);
 
     // developerAccessToken belongs to a user whose email does not match the invited email above.
-    const response = await request(app.getHttpServer())
-      .post(acceptUrl(rawToken))
-      .set(withBearer(developerAccessToken));
+    const response = await request(app.getHttpServer()).post(acceptUrl(rawToken)).set(withBearer(developerAccessToken));
 
     expect(response.status).toBe(403);
   });
@@ -584,17 +547,12 @@ describe('Phase 17 Team Operations E2E', () => {
 
     const rawToken = extractTokenFromUrl(body(createResponse).invitationUrl as string);
 
-    const response = await request(app.getHttpServer())
-      .post(acceptUrl(rawToken))
-      .set(withBearer(inviteeAccessToken));
+    const response = await request(app.getHttpServer()).post(acceptUrl(rawToken)).set(withBearer(inviteeAccessToken));
 
     expect(response.status).toBe(201);
     expect(body(response)).toMatchObject({ success: true, workspaceId });
 
-    const inviteeId = requireValue(
-      (await prisma.user.findUnique({ where: { email: invitee.email.toLowerCase() } }))?.id,
-      'Invitee user missing',
-    );
+    const inviteeId = requireValue((await prisma.user.findUnique({ where: { email: invitee.email.toLowerCase() } }))?.id, 'Invitee user missing');
 
     const membership = await prisma.workspaceMember.findFirstOrThrow({
       where: { workspaceId, userId: inviteeId },
@@ -633,15 +591,11 @@ describe('Phase 17 Team Operations E2E', () => {
 
     const rawToken = extractTokenFromUrl(body(createResponse).invitationUrl as string);
 
-    const first = await request(app.getHttpServer())
-      .post(acceptUrl(rawToken))
-      .set(withBearer(inviteeAccessToken));
+    const first = await request(app.getHttpServer()).post(acceptUrl(rawToken)).set(withBearer(inviteeAccessToken));
 
     expect(first.status).toBe(201);
 
-    const second = await request(app.getHttpServer())
-      .post(acceptUrl(rawToken))
-      .set(withBearer(inviteeAccessToken));
+    const second = await request(app.getHttpServer()).post(acceptUrl(rawToken)).set(withBearer(inviteeAccessToken));
 
     expect(second.status).toBe(409);
   });
@@ -710,9 +664,7 @@ describe('Phase 17 Team Operations E2E', () => {
 
     const rawToken = extractTokenFromUrl(body(createResponse).invitationUrl as string);
 
-    const response = await request(app.getHttpServer())
-      .post(declineUrl(rawToken))
-      .set(withBearer(inviteeAccessToken));
+    const response = await request(app.getHttpServer()).post(declineUrl(rawToken)).set(withBearer(inviteeAccessToken));
 
     expect(response.status).toBe(201);
     expect(body(response)).toMatchObject({ success: true });
@@ -724,10 +676,7 @@ describe('Phase 17 Team Operations E2E', () => {
     expect(persisted.status).toBe(WorkspaceInvitationStatus.DECLINED);
     expect(persisted.declinedAt).not.toBeNull();
 
-    const inviteeId = requireValue(
-      (await prisma.user.findUnique({ where: { email: invitee.email.toLowerCase() } }))?.id,
-      'Decliner user missing',
-    );
+    const inviteeId = requireValue((await prisma.user.findUnique({ where: { email: invitee.email.toLowerCase() } }))?.id, 'Decliner user missing');
 
     const membership = await prisma.workspaceMember.findFirst({
       where: { workspaceId, userId: inviteeId },
@@ -783,9 +732,7 @@ describe('Phase 17 Team Operations E2E', () => {
       data: { expiresAt: new Date(Date.now() - 1_000) },
     });
 
-    const response = await request(app.getHttpServer())
-      .post(acceptUrl(rawToken))
-      .set(withBearer(inviteeAccessToken));
+    const response = await request(app.getHttpServer()).post(acceptUrl(rawToken)).set(withBearer(inviteeAccessToken));
 
     expect(response.status).toBe(409);
   });
@@ -806,9 +753,7 @@ describe('Phase 17 Team Operations E2E', () => {
     for (let attempt = 0; attempt < 6; attempt += 1) {
       // eslint-disable-next-line no-await-in-loop -- must run sequentially against a shared
       // rate-limit bucket keyed by identity; parallelizing would make the assertion racy.
-      const response = await request(app.getHttpServer())
-        .post(resendUrl(invitationId))
-        .set(withBearer(ownerAccessToken));
+      const response = await request(app.getHttpServer()).post(resendUrl(invitationId)).set(withBearer(ownerAccessToken));
 
       lastStatus = response.status;
     }
@@ -827,9 +772,7 @@ describe('Phase 17 Team Operations E2E', () => {
   });
 
   it('lists only the authenticated user own notifications', async () => {
-    const response = await request(app.getHttpServer())
-      .get(notificationsUrl())
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(notificationsUrl()).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
 
@@ -850,24 +793,18 @@ describe('Phase 17 Team Operations E2E', () => {
   });
 
   it('reports an accurate unread count and reduces it after marking all as read', async () => {
-    const unreadBefore = await request(app.getHttpServer())
-      .get(`${notificationsUrl()}/unread-count`)
-      .set(withBearer(ownerAccessToken));
+    const unreadBefore = await request(app.getHttpServer()).get(`${notificationsUrl()}/unread-count`).set(withBearer(ownerAccessToken));
 
     expect(unreadBefore.status).toBe(200);
     expect(typeof body(unreadBefore).count).toBe('number');
-    expect((body(unreadBefore).count as number)).toBeGreaterThan(0);
+    expect(body(unreadBefore).count as number).toBeGreaterThan(0);
 
-    const markAllResponse = await request(app.getHttpServer())
-      .post(`${notificationsUrl()}/mark-all-read`)
-      .set(withBearer(ownerAccessToken));
+    const markAllResponse = await request(app.getHttpServer()).post(`${notificationsUrl()}/mark-all-read`).set(withBearer(ownerAccessToken));
 
     expect(markAllResponse.status).toBe(201);
     expect(typeof body(markAllResponse).updated).toBe('number');
 
-    const unreadAfter = await request(app.getHttpServer())
-      .get(`${notificationsUrl()}/unread-count`)
-      .set(withBearer(ownerAccessToken));
+    const unreadAfter = await request(app.getHttpServer()).get(`${notificationsUrl()}/unread-count`).set(withBearer(ownerAccessToken));
 
     expect(body(unreadAfter).count).toBe(0);
   });
@@ -885,9 +822,7 @@ describe('Phase 17 Team Operations E2E', () => {
       },
     });
 
-    const response = await request(app.getHttpServer())
-      .post(`${notificationsUrl()}/${seeded.id}/read`)
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).post(`${notificationsUrl()}/${seeded.id}/read`).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(201);
     expect(body(response).readAt).not.toBeNull();
@@ -901,19 +836,14 @@ describe('Phase 17 Team Operations E2E', () => {
     const foreignNotification = await prisma.notification.create({
       data: {
         workspaceId,
-        userId: requireValue(
-          (await prisma.user.findFirst({ where: { name: 'Phase 17 Admin' } }))?.id,
-          'Admin user missing',
-        ),
+        userId: requireValue((await prisma.user.findFirst({ where: { name: 'Phase 17 Admin' } }))?.id, 'Admin user missing'),
         type: NotificationType.SYSTEM,
         title: 'Phase 17 foreign notification',
         message: 'Should not be readable by the owner',
       },
     });
 
-    const response = await request(app.getHttpServer())
-      .post(`${notificationsUrl()}/${foreignNotification.id}/read`)
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).post(`${notificationsUrl()}/${foreignNotification.id}/read`).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(404);
 
@@ -925,17 +855,13 @@ describe('Phase 17 Team Operations E2E', () => {
   });
 
   it('returns 400 for a malformed notification id', async () => {
-    const response = await request(app.getHttpServer())
-      .post(`${notificationsUrl()}/not-a-uuid/read`)
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).post(`${notificationsUrl()}/not-a-uuid/read`).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(400);
   });
 
   it('filters notifications by type', async () => {
-    const response = await request(app.getHttpServer())
-      .get(`${notificationsUrl()}?type=${NotificationType.SYSTEM}`)
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(`${notificationsUrl()}?type=${NotificationType.SYSTEM}`).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
 
@@ -945,9 +871,7 @@ describe('Phase 17 Team Operations E2E', () => {
   });
 
   it('rejects an invalid notification type filter', async () => {
-    const response = await request(app.getHttpServer())
-      .get(`${notificationsUrl()}?type=NOT_A_REAL_TYPE`)
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(`${notificationsUrl()}?type=NOT_A_REAL_TYPE`).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(400);
   });

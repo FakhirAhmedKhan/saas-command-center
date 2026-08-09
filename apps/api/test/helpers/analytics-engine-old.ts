@@ -43,21 +43,11 @@ export interface AnalyticsEngineStatusBody {
   recentSessions: Record<string, unknown>[];
 }
 
-export async function getAnalyticsEngineStatus(
-  actor: WorkspaceTestUser,
-  workspaceId: string,
-  websiteId: string,
-): Promise<Response> {
-  return actor.agent
-    .get(analyticsEngineRoutes.status(workspaceId, websiteId))
-    .set(withBearer(actor.accessToken));
+export async function getAnalyticsEngineStatus(actor: WorkspaceTestUser, workspaceId: string, websiteId: string): Promise<Response> {
+  return actor.agent.get(analyticsEngineRoutes.status(workspaceId, websiteId)).set(withBearer(actor.accessToken));
 }
 
-export async function getAnonymousAnalyticsEngineStatus(
-  app: INestApplication,
-  workspaceId: string,
-  websiteId: string,
-): Promise<Response> {
+export async function getAnonymousAnalyticsEngineStatus(app: INestApplication, workspaceId: string, websiteId: string): Promise<Response> {
   return request(app.getHttpServer()).get(analyticsEngineRoutes.status(workspaceId, websiteId));
 }
 
@@ -67,10 +57,7 @@ export async function processAnalytics(
   websiteId: string,
   body: Record<string, unknown> = {},
 ): Promise<Response> {
-  return actor.agent
-    .post(analyticsEngineRoutes.process(workspaceId, websiteId))
-    .set(withBearer(actor.accessToken))
-    .send(body);
+  return actor.agent.post(analyticsEngineRoutes.process(workspaceId, websiteId)).set(withBearer(actor.accessToken)).send(body);
 }
 
 export function readAnalyticsEngineStatus(response: Response): AnalyticsEngineStatusBody {
@@ -81,12 +68,7 @@ export function readAnalyticsEngineStatus(response: Response): AnalyticsEngineSt
   const countsRecord = asRecord(body?.counts);
 
   if (!body || !website || !countsRecord) {
-    throw new Error(
-      [
-        'Unexpected analytics-engine status response.',
-        `Received: ${JSON.stringify(response.body)}`,
-      ].join(' '),
-    );
+    throw new Error(['Unexpected analytics-engine status response.', `Received: ${JSON.stringify(response.body)}`].join(' '));
   }
 
   const counts: Record<string, number> = {};
@@ -98,9 +80,7 @@ export function readAnalyticsEngineStatus(response: Response): AnalyticsEngineSt
   }
 
   const recentSessions = Array.isArray(body.recentSessions)
-    ? body.recentSessions
-        .map(asRecord)
-        .filter((value): value is Record<string, unknown> => value !== undefined)
+    ? body.recentSessions.map(asRecord).filter((value): value is Record<string, unknown> => value !== undefined)
     : [];
 
   return {
@@ -114,11 +94,6 @@ export function readAnalyticsEngineStatus(response: Response): AnalyticsEngineSt
 
 export function expectAnalyticsSuccess(response: Response): void {
   if (![200, 201, 202].includes(response.status)) {
-    throw new Error(
-      [
-        `Expected analytics success but received ${response.status}.`,
-        `Response: ${JSON.stringify(response.body)}`,
-      ].join(' '),
-    );
+    throw new Error([`Expected analytics success but received ${response.status}.`, `Response: ${JSON.stringify(response.body)}`].join(' '));
   }
 }

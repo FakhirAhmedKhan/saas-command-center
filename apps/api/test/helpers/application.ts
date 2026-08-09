@@ -1,12 +1,6 @@
 import type { Response } from 'supertest';
 
-import {
-  ApplicationCategory,
-  ApplicationLinkType,
-  ApplicationPriority,
-  ApplicationStatus,
-  TechnologyType,
-} from 'src/generated/prisma/enums';
+import { ApplicationCategory, ApplicationLinkType, ApplicationPriority, ApplicationStatus, TechnologyType } from 'src/generated/prisma/enums';
 
 import { withBearer } from './auth';
 import { expectSuccessfulStatus } from './response';
@@ -50,32 +44,25 @@ export interface CreatedApplication {
 export const applicationRoutes = {
   root: (workspaceId: string): string => `/api/v1/workspaces/${workspaceId}/applications`,
 
-  details: (workspaceId: string, applicationId: string): string =>
-    `/api/v1/workspaces/${workspaceId}/applications/${applicationId}`,
+  details: (workspaceId: string, applicationId: string): string => `/api/v1/workspaces/${workspaceId}/applications/${applicationId}`,
 
-  archive: (workspaceId: string, applicationId: string): string =>
-    `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/archive`,
+  archive: (workspaceId: string, applicationId: string): string => `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/archive`,
 
-  restore: (workspaceId: string, applicationId: string): string =>
-    `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/restore`,
+  restore: (workspaceId: string, applicationId: string): string => `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/restore`,
 
-  technologies: (workspaceId: string, applicationId: string): string =>
-    `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/technologies`,
+  technologies: (workspaceId: string, applicationId: string): string => `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/technologies`,
 
   technology: (workspaceId: string, applicationId: string, technologyId: string): string =>
     `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/technologies/${technologyId}`,
 
-  links: (workspaceId: string, applicationId: string): string =>
-    `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/links`,
+  links: (workspaceId: string, applicationId: string): string => `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/links`,
 
   link: (workspaceId: string, applicationId: string, linkId: string): string =>
     `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/links/${linkId}`,
 
-  workspaceActivities: (workspaceId: string): string =>
-    `/api/v1/workspaces/${workspaceId}/activities`,
+  workspaceActivities: (workspaceId: string): string => `/api/v1/workspaces/${workspaceId}/activities`,
 
-  applicationActivities: (workspaceId: string, applicationId: string): string =>
-    `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/activities`,
+  applicationActivities: (workspaceId: string, applicationId: string): string => `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/activities`,
 } as const;
 
 function uniqueSuffix(): string {
@@ -94,9 +81,7 @@ export function enumValue<T extends string>(enumObject: StringEnumObject<T>, ind
   return value;
 }
 
-export function buildApplicationPayload(
-  overrides: Partial<CreateApplicationPayload> = {},
-): CreateApplicationPayload {
+export function buildApplicationPayload(overrides: Partial<CreateApplicationPayload> = {}): CreateApplicationPayload {
   const suffix = uniqueSuffix();
 
   return {
@@ -124,9 +109,7 @@ export function buildApplicationPayload(
   };
 }
 
-export function buildTechnologyPayload(
-  overrides: Partial<TechnologyPayload> = {},
-): TechnologyPayload {
+export function buildTechnologyPayload(overrides: Partial<TechnologyPayload> = {}): TechnologyPayload {
   return {
     name: `Technology ${uniqueSuffix()}`,
 
@@ -166,10 +149,7 @@ function asRecordArray(value: unknown): Record<string, unknown>[] | undefined {
   return value.map(asRecord).filter((item): item is Record<string, unknown> => item !== undefined);
 }
 
-export function recordString(
-  record: Record<string, unknown>,
-  ...keys: string[]
-): string | undefined {
+export function recordString(record: Record<string, unknown>, ...keys: string[]): string | undefined {
   for (const key of keys) {
     const value = record[key];
 
@@ -181,10 +161,7 @@ export function recordString(
   return undefined;
 }
 
-export function readApiRecord(
-  response: Response,
-  preferredKeys: string[] = [],
-): Record<string, unknown> {
+export function readApiRecord(response: Response, preferredKeys: string[] = []): Record<string, unknown> {
   const body = asRecord(response.body);
 
   const data = asRecord(body?.data);
@@ -214,15 +191,10 @@ export function readApiRecord(
     }
   }
 
-  throw new Error(
-    ['Expected an object response.', `Received: ${JSON.stringify(response.body)}`].join(' '),
-  );
+  throw new Error(['Expected an object response.', `Received: ${JSON.stringify(response.body)}`].join(' '));
 }
 
-export function readApiItems(
-  response: Response,
-  preferredKeys: string[] = [],
-): Record<string, unknown>[] {
+export function readApiItems(response: Response, preferredKeys: string[] = []): Record<string, unknown>[] {
   const body = asRecord(response.body);
 
   const data = asRecord(body?.data);
@@ -252,9 +224,7 @@ export function readApiItems(
     }
   }
 
-  throw new Error(
-    ['Expected an array response.', `Received: ${JSON.stringify(response.body)}`].join(' '),
-  );
+  throw new Error(['Expected an array response.', `Received: ${JSON.stringify(response.body)}`].join(' '));
 }
 
 export function readEntityId(response: Response, preferredKeys: string[] = []): string {
@@ -263,12 +233,7 @@ export function readEntityId(response: Response, preferredKeys: string[] = []): 
   const id = recordString(record, 'id', 'applicationId', 'technologyId', 'linkId');
 
   if (!id) {
-    throw new Error(
-      [
-        'Response does not contain an entity ID.',
-        `Received: ${JSON.stringify(response.body)}`,
-      ].join(' '),
-    );
+    throw new Error(['Response does not contain an entity ID.', `Received: ${JSON.stringify(response.body)}`].join(' '));
   }
 
   return id;
@@ -278,16 +243,10 @@ export function expectMutationSuccess(response: Response): void {
   expect([200, 201]).toContain(response.status);
 }
 
-export async function createApplication(
-  actor: WorkspaceTestUser,
-  overrides: Partial<CreateApplicationPayload> = {},
-): Promise<CreatedApplication> {
+export async function createApplication(actor: WorkspaceTestUser, overrides: Partial<CreateApplicationPayload> = {}): Promise<CreatedApplication> {
   const payload = buildApplicationPayload(overrides);
 
-  const response = await actor.agent
-    .post(applicationRoutes.root(actor.workspaceId))
-    .set(withBearer(actor.accessToken))
-    .send(payload);
+  const response = await actor.agent.post(applicationRoutes.root(actor.workspaceId)).set(withBearer(actor.accessToken)).send(payload);
 
   expectSuccessfulStatus(response);
 
@@ -302,68 +261,31 @@ export async function createApplication(
   };
 }
 
-export async function listApplications(
-  actor: WorkspaceTestUser,
-  query: Record<string, string | number | boolean> = {},
-): Promise<Response> {
-  return actor.agent
-    .get(applicationRoutes.root(actor.workspaceId))
-    .set(withBearer(actor.accessToken))
-    .query(query);
+export async function listApplications(actor: WorkspaceTestUser, query: Record<string, string | number | boolean> = {}): Promise<Response> {
+  return actor.agent.get(applicationRoutes.root(actor.workspaceId)).set(withBearer(actor.accessToken)).query(query);
 }
 
-export async function getApplication(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-): Promise<Response> {
-  return actor.agent
-    .get(applicationRoutes.details(actor.workspaceId, applicationId))
-    .set(withBearer(actor.accessToken));
+export async function getApplication(actor: WorkspaceTestUser, applicationId: string): Promise<Response> {
+  return actor.agent.get(applicationRoutes.details(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken));
 }
 
-export async function updateApplication(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  payload: Partial<CreateApplicationPayload>,
-): Promise<Response> {
-  return actor.agent
-    .patch(applicationRoutes.details(actor.workspaceId, applicationId))
-    .set(withBearer(actor.accessToken))
-    .send(payload);
+export async function updateApplication(actor: WorkspaceTestUser, applicationId: string, payload: Partial<CreateApplicationPayload>): Promise<Response> {
+  return actor.agent.patch(applicationRoutes.details(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken)).send(payload);
 }
 
-export async function archiveApplication(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-): Promise<Response> {
-  return actor.agent
-    .post(applicationRoutes.archive(actor.workspaceId, applicationId))
-    .set(withBearer(actor.accessToken));
+export async function archiveApplication(actor: WorkspaceTestUser, applicationId: string): Promise<Response> {
+  return actor.agent.post(applicationRoutes.archive(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken));
 }
 
-export async function restoreApplication(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-): Promise<Response> {
-  return actor.agent
-    .post(applicationRoutes.restore(actor.workspaceId, applicationId))
-    .set(withBearer(actor.accessToken));
+export async function restoreApplication(actor: WorkspaceTestUser, applicationId: string): Promise<Response> {
+  return actor.agent.post(applicationRoutes.restore(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken));
 }
 
-export async function permanentlyDeleteApplication(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-): Promise<Response> {
-  return actor.agent
-    .delete(applicationRoutes.details(actor.workspaceId, applicationId))
-    .set(withBearer(actor.accessToken));
+export async function permanentlyDeleteApplication(actor: WorkspaceTestUser, applicationId: string): Promise<Response> {
+  return actor.agent.delete(applicationRoutes.details(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken));
 }
 
-export async function addTechnology(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  overrides: Partial<TechnologyPayload> = {},
-): Promise<Response> {
+export async function addTechnology(actor: WorkspaceTestUser, applicationId: string, overrides: Partial<TechnologyPayload> = {}): Promise<Response> {
   return actor.agent
     .post(applicationRoutes.technologies(actor.workspaceId, applicationId))
     .set(withBearer(actor.accessToken))
@@ -382,47 +304,23 @@ export async function updateTechnology(
     .send(payload);
 }
 
-export async function removeTechnology(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  technologyId: string,
-): Promise<Response> {
-  return actor.agent
-    .delete(applicationRoutes.technology(actor.workspaceId, applicationId, technologyId))
-    .set(withBearer(actor.accessToken));
+export async function removeTechnology(actor: WorkspaceTestUser, applicationId: string, technologyId: string): Promise<Response> {
+  return actor.agent.delete(applicationRoutes.technology(actor.workspaceId, applicationId, technologyId)).set(withBearer(actor.accessToken));
 }
 
-export async function addLink(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  overrides: Partial<LinkPayload> = {},
-): Promise<Response> {
-  return actor.agent
-    .post(applicationRoutes.links(actor.workspaceId, applicationId))
-    .set(withBearer(actor.accessToken))
-    .send(buildLinkPayload(overrides));
+export async function addLink(actor: WorkspaceTestUser, applicationId: string, overrides: Partial<LinkPayload> = {}): Promise<Response> {
+  return actor.agent.post(applicationRoutes.links(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken)).send(buildLinkPayload(overrides));
 }
 
-export async function updateLink(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  linkId: string,
-  payload: Partial<LinkPayload>,
-): Promise<Response> {
+export async function updateLink(actor: WorkspaceTestUser, applicationId: string, linkId: string, payload: Partial<LinkPayload>): Promise<Response> {
   return actor.agent
     .patch(applicationRoutes.link(actor.workspaceId, applicationId, linkId))
     .set(withBearer(actor.accessToken))
     .send(payload);
 }
 
-export async function removeLink(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  linkId: string,
-): Promise<Response> {
-  return actor.agent
-    .delete(applicationRoutes.link(actor.workspaceId, applicationId, linkId))
-    .set(withBearer(actor.accessToken));
+export async function removeLink(actor: WorkspaceTestUser, applicationId: string, linkId: string): Promise<Response> {
+  return actor.agent.delete(applicationRoutes.link(actor.workspaceId, applicationId, linkId)).set(withBearer(actor.accessToken));
 }
 
 export function inWorkspace(user: WorkspaceTestUser, workspaceId: string): WorkspaceTestUser {

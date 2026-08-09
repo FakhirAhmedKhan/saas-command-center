@@ -25,9 +25,7 @@ export class AnalyticsOverviewQueryDto {
     example: '2026-08-01',
     description: 'Inclusive custom start date using YYYY-MM-DD.',
   })
-  @ValidateIf(
-    (query: AnalyticsOverviewQueryDto) => query.from !== undefined || query.to !== undefined,
-  )
+  @ValidateIf((query: AnalyticsOverviewQueryDto) => query.from !== undefined || query.to !== undefined)
   @Matches(DATE_KEY_PATTERN, {
     message: 'from must use YYYY-MM-DD format',
   })
@@ -37,9 +35,7 @@ export class AnalyticsOverviewQueryDto {
     example: '2026-08-07',
     description: 'Inclusive custom end date using YYYY-MM-DD.',
   })
-  @ValidateIf(
-    (query: AnalyticsOverviewQueryDto) => query.from !== undefined || query.to !== undefined,
-  )
+  @ValidateIf((query: AnalyticsOverviewQueryDto) => query.from !== undefined || query.to !== undefined)
   @Matches(DATE_KEY_PATTERN, {
     message: 'to must use YYYY-MM-DD format',
   })

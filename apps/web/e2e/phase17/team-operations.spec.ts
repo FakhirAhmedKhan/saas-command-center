@@ -468,9 +468,7 @@ test.describe('Phase 17 team operations', () => {
     expect(revokeCalled).toBe(true);
   });
 
-  test('does not revoke an invitation when the confirmation dialog is dismissed', async ({
-    page,
-  }) => {
+  test('does not revoke an invitation when the confirmation dialog is dismissed', async ({ page }) => {
     await page.route('**/workspaces/*/invitations', async (route) => {
       if (route.request().method() !== 'GET') {
         await route.fallback();
@@ -558,9 +556,7 @@ test.describe('Phase 17 team operations', () => {
     expect(revokeCalled).toBe(false);
   });
 
-  test('shows an empty state on the notifications page when there are no notifications', async ({
-    page,
-  }) => {
+  test('shows an empty state on the notifications page when there are no notifications', async ({ page }) => {
     await page.route('**/notifications?*', async (route) => {
       await route.fulfill({
         status: 200,
@@ -637,9 +633,7 @@ test.describe('Phase 17 team operations', () => {
 
     await page.getByText('Unread only').click();
 
-    await expect
-      .poll(() => lastUnreadOnlyParam)
-      .toBe('true');
+    await expect.poll(() => lastUnreadOnlyParam).toBe('true');
   });
 
   test('shows the unread count badge on the notification bell', async ({ page }) => {

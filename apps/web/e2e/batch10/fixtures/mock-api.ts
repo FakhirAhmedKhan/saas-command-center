@@ -214,10 +214,7 @@ export function makeWebsite(overrides: Partial<MockWebsite> = {}): MockWebsite {
   };
 }
 
-export async function installMockApi(
-  page: Page,
-  options: MockApiOptions = {},
-): Promise<MockApiState> {
+export async function installMockApi(page: Page, options: MockApiOptions = {}): Promise<MockApiState> {
   const primaryWorkspace = makeWorkspace();
 
   const secondaryWorkspace = makeWorkspace({
@@ -476,9 +473,7 @@ export async function installMockApi(
     const applicationMatch = path.match(/^\/workspaces\/([^/]+)\/applications\/([^/]+)$/);
 
     if (applicationMatch && method === 'GET') {
-      const application = state.applications.find(
-        (item) => item.workspaceId === applicationMatch[1] && item.id === applicationMatch[2],
-      );
+      const application = state.applications.find((item) => item.workspaceId === applicationMatch[1] && item.id === applicationMatch[2]);
 
       if (!application) {
         await fulfillJson(route, 404, {
@@ -506,13 +501,10 @@ export async function installMockApi(
         const filtered = state.websites.filter(
           (website) =>
             website.workspaceId === workspaceId &&
-            (!search ||
-              website.name.toLowerCase().includes(search) ||
-              website.domain.toLowerCase().includes(search)) &&
+            (!search || website.name.toLowerCase().includes(search) || website.domain.toLowerCase().includes(search)) &&
             Boolean(website.archivedAt) === archived &&
             (enabledValue === null || website.enabled === (enabledValue === 'true')) &&
-            (connectedValue === null ||
-              Boolean(website.applicationId) === (connectedValue === 'true')),
+            (connectedValue === null || Boolean(website.applicationId) === (connectedValue === 'true')),
         );
 
         await fulfillJson(route, 200, {
@@ -557,9 +549,7 @@ export async function installMockApi(
     const websiteMatch = path.match(/^\/workspaces\/([^/]+)\/websites\/([^/]+)$/);
 
     if (websiteMatch && method === 'GET') {
-      const website = state.websites.find(
-        (item) => item.workspaceId === websiteMatch[1] && item.id === websiteMatch[2],
-      );
+      const website = state.websites.find((item) => item.workspaceId === websiteMatch[1] && item.id === websiteMatch[2]);
 
       if (!website) {
         await fulfillJson(route, 404, {
@@ -573,9 +563,7 @@ export async function installMockApi(
       return;
     }
 
-    const trackingStatusMatch = path.match(
-      /^\/workspaces\/([^/]+)\/websites\/([^/]+)\/tracking\/status$/,
-    );
+    const trackingStatusMatch = path.match(/^\/workspaces\/([^/]+)\/websites\/([^/]+)\/tracking\/status$/);
 
     if (trackingStatusMatch && method === 'GET') {
       const website = state.websites.find((item) => item.id === trackingStatusMatch[2]);
@@ -599,9 +587,7 @@ export async function installMockApi(
       return;
     }
 
-    const applicationActivityMatch = path.match(
-      /^\/workspaces\/([^/]+)\/applications\/([^/]+)\/activities$/,
-    );
+    const applicationActivityMatch = path.match(/^\/workspaces\/([^/]+)\/applications\/([^/]+)\/activities$/);
 
     if (applicationActivityMatch && method === 'GET') {
       await fulfillJson(route, 200, {

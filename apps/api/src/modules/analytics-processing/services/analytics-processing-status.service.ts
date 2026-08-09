@@ -4,10 +4,7 @@ import { AnalyticsProcessingStatus } from '../../../generated/prisma/client';
 
 import { PrismaService } from '../../../database/prisma.service';
 
-import type {
-  AnalyticsProcessingStatusDto,
-  ProcessingRunDto,
-} from '../dto/analytics-processing-response.dto';
+import type { AnalyticsProcessingStatusDto, ProcessingRunDto } from '../dto/analytics-processing-response.dto';
 import { AnalyticsProcessingAccessService } from './analytics-processing-access.service';
 
 @Injectable()
@@ -17,11 +14,7 @@ export class AnalyticsProcessingStatusService {
     private readonly access: AnalyticsProcessingAccessService,
   ) {}
 
-  async getStatus(
-    workspaceId: string,
-    websiteId: string,
-    userId: string,
-  ): Promise<AnalyticsProcessingStatusDto> {
+  async getStatus(workspaceId: string, websiteId: string, userId: string): Promise<AnalyticsProcessingStatusDto> {
     const website = await this.prisma.website.findFirst({
       where: {
         id: websiteId,
@@ -40,15 +33,7 @@ export class AnalyticsProcessingStatusService {
       throw new NotFoundException('Website not found.');
     }
 
-    const [
-      canReprocess,
-      pendingEvents,
-      unresolvedDeadLetters,
-      activeRun,
-      latestRun,
-      lastSuccessfulRun,
-      recentRuns,
-    ] = await Promise.all([
+    const [canReprocess, pendingEvents, unresolvedDeadLetters, activeRun, latestRun, lastSuccessfulRun, recentRuns] = await Promise.all([
       this.access.getCanReprocess(workspaceId, userId),
 
       this.prisma.rawAnalyticsEvent.count({

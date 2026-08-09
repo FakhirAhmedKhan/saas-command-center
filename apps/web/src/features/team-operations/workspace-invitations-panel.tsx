@@ -2,12 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
-import {
-  createWorkspaceInvitation,
-  getWorkspaceInvitations,
-  resendWorkspaceInvitation,
-  revokeWorkspaceInvitation,
-} from './team-operations-api';
+import { createWorkspaceInvitation, getWorkspaceInvitations, resendWorkspaceInvitation, revokeWorkspaceInvitation } from './team-operations-api';
 
 import type { WorkspaceInvitation, WorkspaceRole } from './team-operations.types';
 import { getErrorMessage } from '../applications/application-utils';
@@ -26,10 +21,7 @@ function formatDateTime(value: string): string {
   }).format(new Date(value));
 }
 
-export function WorkspaceInvitationsPanel({
-  workspaceId,
-  canManageMembers,
-}: WorkspaceInvitationsPanelProps) {
+export function WorkspaceInvitationsPanel({ workspaceId, canManageMembers }: WorkspaceInvitationsPanelProps) {
   const [invitations, setInvitations] = useState<WorkspaceInvitation[]>([]);
 
   const [loading, setLoading] = useState(true);
@@ -184,16 +176,10 @@ export function WorkspaceInvitationsPanel({
         <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
           <p className="font-medium text-blue-950">Invitation created</p>
 
-          <p className="mt-1 text-sm text-blue-800">
-            This link is shown only for this request. Copy it now.
-          </p>
+          <p className="mt-1 text-sm text-blue-800">This link is shown only for this request. Copy it now.</p>
 
           <div className="mt-3 flex gap-2">
-            <input
-              readOnly
-              value={invitationUrl}
-              className="min-w-0 flex-1 rounded-lg border border-blue-200 bg-white px-3 py-2 text-sm"
-            />
+            <input readOnly value={invitationUrl} className="min-w-0 flex-1 rounded-lg border border-blue-200 bg-white px-3 py-2 text-sm" />
 
             <button
               type="button"
@@ -209,10 +195,7 @@ export function WorkspaceInvitationsPanel({
       ) : null}
 
       {error ? (
-        <div
-          role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"
-        >
+        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
           {error}
         </div>
       ) : null}
@@ -259,11 +242,7 @@ export function WorkspaceInvitationsPanel({
                     <td className="px-4 py-4">
                       <p>{invitation.deliveryStatus}</p>
 
-                      {invitation.deliveryError ? (
-                        <p className="mt-1 max-w-xs text-xs text-red-700">
-                          {invitation.deliveryError}
-                        </p>
-                      ) : null}
+                      {invitation.deliveryError ? <p className="mt-1 max-w-xs text-xs text-red-700">{invitation.deliveryError}</p> : null}
                     </td>
 
                     <td className="px-4 py-4">{formatDateTime(invitation.expiresAt)}</td>

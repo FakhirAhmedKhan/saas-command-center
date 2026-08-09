@@ -8,8 +8,7 @@ import { AnalyticsReportsController } from './controllers/analytics-reports.cont
 import { AnalyticsReportsService } from './services/analytics-reports.service';
 
 @Module({
-  imports: [
-        WorkspaceMembersModule,DatabaseModule],
+  imports: [WorkspaceMembersModule, DatabaseModule],
 
   controllers: [AnalyticsReportsController],
 

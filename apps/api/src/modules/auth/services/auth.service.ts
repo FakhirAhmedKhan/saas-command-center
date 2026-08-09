@@ -47,9 +47,7 @@ export class AuthService {
 
     const workspaceName = dto.workspaceName.trim();
 
-    const workspaceSlug = dto.workspaceSlug
-      ? this.normalizeSlug(dto.workspaceSlug)
-      : `${this.normalizeSlug(workspaceName)}-${randomUUID().slice(0, 6)}`;
+    const workspaceSlug = dto.workspaceSlug ? this.normalizeSlug(dto.workspaceSlug) : `${this.normalizeSlug(workspaceName)}-${randomUUID().slice(0, 6)}`;
 
     const tokens = await this.tokenService.issueTokenPair(userId, sessionId, familyId);
 
@@ -172,10 +170,7 @@ export class AuthService {
       throw new UnauthorizedException('Refresh session not found');
     }
 
-    const payloadMismatch =
-      currentSession.id !== payload.sid ||
-      currentSession.familyId !== payload.fid ||
-      currentSession.userId !== payload.sub;
+    const payloadMismatch = currentSession.id !== payload.sid || currentSession.familyId !== payload.fid || currentSession.userId !== payload.sub;
 
     if (payloadMismatch || currentSession.revokedAt) {
       await this.authSessionsService.revokeFamilyBySessionId(currentSession.id);
@@ -199,11 +194,7 @@ export class AuthService {
 
     const newSessionId = randomUUID();
 
-    const tokens = await this.tokenService.issueTokenPair(
-      user.id,
-      newSessionId,
-      currentSession.familyId,
-    );
+    const tokens = await this.tokenService.issueTokenPair(user.id, newSessionId, currentSession.familyId);
 
     const newRefreshTokenHash = this.tokenService.hashRefreshToken(tokens.refreshToken);
 
@@ -258,11 +249,7 @@ export class AuthService {
     };
   }
 
-  private createAuthResult(
-    tokens: TokenPair,
-    user: AuthResult['user'],
-    workspaces: AuthResult['workspaces'],
-  ): AuthResult {
+  private createAuthResult(tokens: TokenPair, user: AuthResult['user'], workspaces: AuthResult['workspaces']): AuthResult {
     return {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,

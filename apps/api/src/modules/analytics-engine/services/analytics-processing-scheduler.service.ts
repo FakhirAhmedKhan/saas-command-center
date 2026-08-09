@@ -29,10 +29,7 @@ export class AnalyticsProcessingSchedulerService implements OnModuleInit, OnModu
       return;
     }
 
-    const intervalMs = this.readPositiveInteger(
-      process.env.ANALYTICS_PROCESSING_INTERVAL_MS,
-      DEFAULT_INTERVAL_MS,
-    );
+    const intervalMs = this.readPositiveInteger(process.env.ANALYTICS_PROCESSING_INTERVAL_MS, DEFAULT_INTERVAL_MS);
 
     this.timer = setInterval(() => {
       void this.runOnce();
@@ -60,15 +57,9 @@ export class AnalyticsProcessingSchedulerService implements OnModuleInit, OnModu
     this.running = true;
 
     try {
-      const maxEvents = this.readPositiveInteger(
-        process.env.ANALYTICS_PROCESSING_MAX_EVENTS,
-        DEFAULT_MAX_EVENTS,
-      );
+      const maxEvents = this.readPositiveInteger(process.env.ANALYTICS_PROCESSING_MAX_EVENTS, DEFAULT_MAX_EVENTS);
 
-      const maxWebsites = this.readPositiveInteger(
-        process.env.ANALYTICS_PROCESSING_MAX_WEBSITES,
-        DEFAULT_MAX_WEBSITES,
-      );
+      const maxWebsites = this.readPositiveInteger(process.env.ANALYTICS_PROCESSING_MAX_WEBSITES, DEFAULT_MAX_WEBSITES);
 
       const websites = await this.prisma.website.findMany({
         where: {
@@ -93,9 +84,7 @@ export class AnalyticsProcessingSchedulerService implements OnModuleInit, OnModu
           const result = await this.processingService.processWebsiteById(website.id, maxEvents);
 
           if (result.rawEventsProcessed > 0) {
-            this.logger.log(
-              `Processed ${result.rawEventsProcessed} analytics events for ${website.name}`,
-            );
+            this.logger.log(`Processed ${result.rawEventsProcessed} analytics events for ${website.name}`);
           }
         } catch (error: unknown) {
           const message = error instanceof Error ? error.message : 'Unknown scheduler error';

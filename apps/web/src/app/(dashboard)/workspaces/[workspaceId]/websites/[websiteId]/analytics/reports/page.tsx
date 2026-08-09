@@ -10,7 +10,5 @@ export default function AnalyticsReportsPage() {
     websiteId: string;
   }>();
 
-  return (
-    <AnalyticsReportsDashboard workspaceId={params.workspaceId} websiteId={params.websiteId} />
-  );
+  return <AnalyticsReportsDashboard workspaceId={params.workspaceId} websiteId={params.websiteId} />;
 }

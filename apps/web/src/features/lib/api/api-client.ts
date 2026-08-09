@@ -99,11 +99,7 @@ async function refreshAccessToken(): Promise<string | null> {
   return refreshPromise;
 }
 
-export async function apiRequest<T>(
-  path: string,
-  options: RequestInit = {},
-  retryAfterUnauthorized = true,
-): Promise<T> {
+export async function apiRequest<T>(path: string, options: RequestInit = {}, retryAfterUnauthorized = true): Promise<T> {
   const headers = new Headers(options.headers);
 
   if (options.body && !(options.body instanceof FormData) && !headers.has('Content-Type')) {
@@ -131,11 +127,7 @@ export async function apiRequest<T>(
   const body = await readResponseBody(response);
 
   if (!response.ok) {
-    throw new ApiError(
-      resolveErrorMessage(body, `Request failed with status ${response.status}`),
-      response.status,
-      body,
-    );
+    throw new ApiError(resolveErrorMessage(body, `Request failed with status ${response.status}`), response.status, body);
   }
 
   return body as T;

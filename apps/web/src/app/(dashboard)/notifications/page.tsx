@@ -5,11 +5,7 @@ import { useEffect, useState } from 'react';
 
 import Link from 'next/link';
 
-import {
-  getNotifications,
-  markAllNotificationsRead,
-  markNotificationRead,
-} from '@/features/team-operations/team-operations-api';
+import { getNotifications, markAllNotificationsRead, markNotificationRead } from '@/features/team-operations/team-operations-api';
 
 import type { UserNotification } from '@/features/team-operations/team-operations.types';
 import { getErrorMessage } from '@/features/applications/application-utils';
@@ -73,9 +69,7 @@ export default function NotificationsPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-950">Notifications</h1>
 
-          <p className="mt-1 text-sm text-slate-600">
-            Invitations, incidents, deployments and processing failures.
-          </p>
+          <p className="mt-1 text-sm text-slate-600">Invitations, incidents, deployments and processing failures.</p>
         </div>
 
         <button
@@ -100,11 +94,7 @@ export default function NotificationsPage() {
         Unread only
       </label>
 
-      {error ? (
-        <div className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-          {error}
-        </div>
-      ) : null}
+      {error ? <div className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error}</div> : null}
 
       {loading ? (
         <div className="mt-5 h-72 animate-pulse rounded-2xl bg-slate-200" />
@@ -118,31 +108,21 @@ export default function NotificationsPage() {
         <section className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           {notifications.map((notification) => {
             const content = (
-              <article
-                className={`border-b border-slate-100 p-5 last:border-0 ${
-                  notification.readAt ? 'bg-white' : 'bg-blue-50/50'
-                }`}
-              >
+              <article className={`border-b border-slate-100 p-5 last:border-0 ${notification.readAt ? 'bg-white' : 'bg-blue-50/50'}`}>
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2">
-                      {!notification.readAt ? (
-                        <span className="h-2 w-2 rounded-full bg-blue-600" />
-                      ) : null}
+                      {!notification.readAt ? <span className="h-2 w-2 rounded-full bg-blue-600" /> : null}
 
                       <h2 className="font-semibold text-slate-950">{notification.title}</h2>
                     </div>
 
                     <p className="mt-2 text-sm text-slate-700">{notification.message}</p>
 
-                    <p className="mt-2 text-xs text-slate-500">
-                      {formatDateTime(notification.createdAt)}
-                    </p>
+                    <p className="mt-2 text-xs text-slate-500">{formatDateTime(notification.createdAt)}</p>
                   </div>
 
-                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium">
-                    {notification.priority}
-                  </span>
+                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium">{notification.priority}</span>
                 </div>
               </article>
             );

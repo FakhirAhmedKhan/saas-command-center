@@ -16,18 +16,12 @@ export interface RebuiltPageViews {
 @Injectable()
 export class PageViewRebuilderService {
   rebuildRange(
-    transaction: Omit<
-      PrismaClient<never, Prisma.GlobalOmitConfig | undefined, DefaultArgs>,
-      '$connect' | '$disconnect' | '$on' | '$use' | '$extends'
-    >,
+    transaction: Omit<PrismaClient<never, Prisma.GlobalOmitConfig | undefined, DefaultArgs>, '$connect' | '$disconnect' | '$on' | '$use' | '$extends'>,
     input: ProcessAnalyticsRangeInput,
   ) {
     throw new Error('Method not implemented.');
   }
-  async rebuildForSession(
-    transaction: Prisma.TransactionClient,
-    sessionId: string,
-  ): Promise<RebuiltPageViews> {
+  async rebuildForSession(transaction: Prisma.TransactionClient, sessionId: string): Promise<RebuiltPageViews> {
     const pageViews = await transaction.analyticsPageView.findMany({
       where: {
         sessionId,
@@ -104,17 +98,11 @@ export class PageViewRebuilderService {
     };
   }
 
-  async rebuild(
-    transaction: Prisma.TransactionClient,
-    sessionId: string,
-  ): Promise<RebuiltPageViews> {
+  async rebuild(transaction: Prisma.TransactionClient, sessionId: string): Promise<RebuiltPageViews> {
     return this.rebuildForSession(transaction, sessionId);
   }
 
-  async rebuildMany(
-    transaction: Prisma.TransactionClient,
-    sessionIds: readonly string[],
-  ): Promise<RebuiltPageViews[]> {
+  async rebuildMany(transaction: Prisma.TransactionClient, sessionIds: readonly string[]): Promise<RebuiltPageViews[]> {
     const results: RebuiltPageViews[] = [];
 
     for (const sessionId of sessionIds) {

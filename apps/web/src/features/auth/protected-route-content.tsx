@@ -32,11 +32,7 @@ export function ProtectedRoute({ children }: PropsWithChildren) {
   }, [pathname, router, searchParams, status]);
 
   if (status !== 'authenticated') {
-    return (
-      <PageLoading
-        label={status === 'loading' ? 'Restoring your session…' : 'Redirecting to login…'}
-      />
-    );
+    return <PageLoading label={status === 'loading' ? 'Restoring your session…' : 'Redirecting to login…'} />;
   }
 
   return children;

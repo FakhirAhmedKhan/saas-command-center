@@ -1,9 +1,5 @@
 import { apiDownload, apiRequest } from '../lib/api/http-client';
-import type {
-  AnalyticsDimension,
-  AnalyticsReportRequest,
-  AnalyticsReportResponse,
-} from './analytics-reports.types';
+import type { AnalyticsDimension, AnalyticsReportRequest, AnalyticsReportResponse } from './analytics-reports.types';
 
 function getReportDimension(request: AnalyticsReportRequest): AnalyticsDimension | null {
   switch (request.tab) {
@@ -42,14 +38,7 @@ function createSearchParams(request: AnalyticsReportRequest): URLSearchParams {
 }
 
 function createBasePath(request: AnalyticsReportRequest): string {
-  return [
-    '/workspaces',
-    request.workspaceId,
-    'websites',
-    request.websiteId,
-    'analytics',
-    'reports',
-  ].join('/');
+  return ['/workspaces', request.workspaceId, 'websites', request.websiteId, 'analytics', 'reports'].join('/');
 }
 
 function createReportPath(request: AnalyticsReportRequest, exportMode: boolean): string {
@@ -74,9 +63,7 @@ function createReportPath(request: AnalyticsReportRequest, exportMode: boolean):
   return `${prefix}/dimensions/${dimension}`;
 }
 
-export async function getAnalyticsReport(
-  request: AnalyticsReportRequest,
-): Promise<AnalyticsReportResponse> {
+export async function getAnalyticsReport(request: AnalyticsReportRequest): Promise<AnalyticsReportResponse> {
   const params = createSearchParams(request);
 
   const path = createReportPath(request, false);

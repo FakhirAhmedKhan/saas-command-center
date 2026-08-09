@@ -14,20 +14,8 @@ import { WorkspacesService } from '../service/workspaces.service';
 
   controllers: [WorkspacesController, WorkspaceMembersController, WorkspaceCreationController],
 
-  providers: [
-    WorkspacesService,
-    WorkspaceMembersService,
-    WorkspaceCreationService,
-    WorkspaceAccessGuard,
-    WorkspaceRolesGuard,
-  ],
+  providers: [WorkspacesService, WorkspaceMembersService, WorkspaceCreationService, WorkspaceAccessGuard, WorkspaceRolesGuard],
 
-  exports: [
-    WorkspacesService,
-    WorkspaceMembersService,
-    WorkspaceCreationService,
-    WorkspaceAccessGuard,
-    WorkspaceRolesGuard,
-  ],
+  exports: [WorkspacesService, WorkspaceMembersService, WorkspaceCreationService, WorkspaceAccessGuard, WorkspaceRolesGuard],
 })
 export class WorkspaceModule {}

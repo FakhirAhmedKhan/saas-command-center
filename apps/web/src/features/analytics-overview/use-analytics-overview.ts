@@ -27,13 +27,7 @@ interface AnalyticsOverviewState {
   error: unknown | null;
 }
 
-export function useAnalyticsOverview({
-  workspaceId,
-  websiteId,
-  preset,
-  from,
-  to,
-}: UseAnalyticsOverviewInput) {
+export function useAnalyticsOverview({ workspaceId, websiteId, preset, from, to }: UseAnalyticsOverviewInput) {
   const [reloadKey, setReloadKey] = useState(0);
 
   const [state, setState] = useState<AnalyticsOverviewState>({

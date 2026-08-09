@@ -17,14 +17,7 @@ import {
   updateWebhookEndpoint,
 } from './integrations-api';
 
-import type {
-  SaveWebhookInput,
-  WebhookDelivery,
-  WebhookEndpoint,
-  WebhookEventCatalogItem,
-  WebhookEventType,
-  WebhookListResponse,
-} from './integrations.types';
+import type { SaveWebhookInput, WebhookDelivery, WebhookEndpoint, WebhookEventCatalogItem, WebhookEventType, WebhookListResponse } from './integrations.types';
 import { ApiError } from 'next/dist/server/api-utils';
 import { getErrorMessage } from '../applications/application-utils';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -138,9 +131,7 @@ function WebhookForm({
     setForm((current) => ({
       ...current,
 
-      eventTypes: current.eventTypes.includes(eventType)
-        ? current.eventTypes.filter((value) => value !== eventType)
-        : [...current.eventTypes, eventType],
+      eventTypes: current.eventTypes.includes(eventType) ? current.eventTypes.filter((value) => value !== eventType) : [...current.eventTypes, eventType],
     }));
   }
 
@@ -154,14 +145,9 @@ function WebhookForm({
     <form onSubmit={submit} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="font-semibold text-slate-950">
-            {editing ? 'Edit webhook' : 'Create webhook'}
-          </h2>
+          <h2 className="font-semibold text-slate-950">{editing ? 'Edit webhook' : 'Create webhook'}</h2>
 
-          <p className="mt-1 text-sm text-slate-600">
-            Webhooks are signed with HMAC SHA-256. Redirects and private network destinations are
-            blocked.
-          </p>
+          <p className="mt-1 text-sm text-slate-600">Webhooks are signed with HMAC SHA-256. Redirects and private network destinations are blocked.</p>
         </div>
 
         <button type="button" onClick={onCancel} className="text-sm font-medium text-slate-500">
@@ -260,10 +246,7 @@ function WebhookForm({
 
         <div className="mt-3 grid gap-3 md:grid-cols-2">
           {catalog.map((event) => (
-            <label
-              key={event.type}
-              className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4"
-            >
+            <label key={event.type} className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4">
               <input
                 type="checkbox"
                 checked={form.eventTypes.includes(event.type)}
@@ -417,9 +400,7 @@ export function WebhookIntegrationsDashboard({ workspaceId }: WebhookIntegration
   async function toggleWebhook(endpoint: WebhookEndpoint): Promise<void> {
     try {
       if (endpoint.enabled) {
-        const confirmed = window.confirm(
-          `Disable ${endpoint.name}? New deliveries will stop immediately.`,
-        );
+        const confirmed = window.confirm(`Disable ${endpoint.name}? New deliveries will stop immediately.`);
 
         if (!confirmed) {
           return;
@@ -439,9 +420,7 @@ export function WebhookIntegrationsDashboard({ workspaceId }: WebhookIntegration
   }
 
   async function rotateSecret(endpoint: WebhookEndpoint): Promise<void> {
-    const confirmed = window.confirm(
-      'Rotate this webhook secret? The existing secret will stop working immediately.',
-    );
+    const confirmed = window.confirm('Rotate this webhook secret? The existing secret will stop working immediately.');
 
     if (!confirmed) {
       return;
@@ -471,13 +450,7 @@ export function WebhookIntegrationsDashboard({ workspaceId }: WebhookIntegration
       <PageError
         title="Integrations unavailable"
         message={getErrorMessage(error)}
-        requestId={
-          error instanceof ApiError
-            ? 'requestId' in error && typeof error.requestId === 'string'
-              ? error.requestId
-              : undefined
-            : undefined
-        }
+        requestId={error instanceof ApiError ? ('requestId' in error && typeof error.requestId === 'string' ? error.requestId : undefined) : undefined}
         onRetry={() => {
           void load();
         }}
@@ -493,9 +466,7 @@ export function WebhookIntegrationsDashboard({ workspaceId }: WebhookIntegration
 
           <h1 className="mt-1 text-2xl font-bold text-slate-950">Integrations</h1>
 
-          <p className="mt-2 text-sm text-slate-600">
-            Send selected operational events to external systems through signed webhooks.
-          </p>
+          <p className="mt-2 text-sm text-slate-600">Send selected operational events to external systems through signed webhooks.</p>
         </div>
 
         {data.canManage ? (
@@ -514,10 +485,7 @@ export function WebhookIntegrationsDashboard({ workspaceId }: WebhookIntegration
       </header>
 
       {actionError ? (
-        <div
-          role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"
-        >
+        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
           {actionError}
         </div>
       ) : null}
@@ -526,16 +494,10 @@ export function WebhookIntegrationsDashboard({ workspaceId }: WebhookIntegration
         <section className="rounded-2xl border border-amber-300 bg-amber-50 p-5">
           <h2 className="font-semibold text-amber-950">Save this signing secret</h2>
 
-          <p className="mt-1 text-sm text-amber-800">
-            This secret is shown only once. Store it securely before closing this message.
-          </p>
+          <p className="mt-1 text-sm text-amber-800">This secret is shown only once. Store it securely before closing this message.</p>
 
           <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-            <input
-              readOnly
-              value={secret}
-              className="min-w-0 flex-1 rounded-lg border border-amber-300 bg-white px-3 py-2 font-mono text-sm"
-            />
+            <input readOnly value={secret} className="min-w-0 flex-1 rounded-lg border border-amber-300 bg-white px-3 py-2 font-mono text-sm" />
 
             <button
               type="button"
@@ -604,16 +566,11 @@ const expected = "v1=" + digest;`}
       ) : (
         <section className="grid gap-4 lg:grid-cols-2">
           {data.items.map((endpoint) => (
-            <article
-              key={endpoint.id}
-              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-            >
+            <article key={endpoint.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <h2 className="truncate text-lg font-semibold text-slate-950">
-                      {endpoint.name}
-                    </h2>
+                    <h2 className="truncate text-lg font-semibold text-slate-950">{endpoint.name}</h2>
 
                     <span
                       className={
@@ -632,11 +589,7 @@ const expected = "v1=" + digest;`}
                 </div>
 
                 {endpoint.latestDelivery ? (
-                  <span
-                    className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${deliveryStatusClasses(
-                      endpoint.latestDelivery.status,
-                    )}`}
-                  >
+                  <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${deliveryStatusClasses(endpoint.latestDelivery.status)}`}>
                     {endpoint.latestDelivery.status}
                   </span>
                 ) : null}
@@ -737,9 +690,7 @@ const expected = "v1=" + digest;`}
             <div>
               <h2 className="font-semibold text-slate-950">{selectedEndpoint.name} deliveries</h2>
 
-              <p className="mt-1 text-xs text-slate-500">
-                Request bodies and signing secrets are not included in these logs.
-              </p>
+              <p className="mt-1 text-xs text-slate-500">Request bodies and signing secrets are not included in these logs.</p>
             </div>
 
             <button
@@ -786,11 +737,7 @@ const expected = "v1=" + digest;`}
                       <td className="px-4 py-4 font-medium">{delivery.event.type}</td>
 
                       <td className="px-4 py-4">
-                        <span
-                          className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${deliveryStatusClasses(
-                            delivery.status,
-                          )}`}
-                        >
+                        <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${deliveryStatusClasses(delivery.status)}`}>
                           {delivery.status}
                         </span>
                       </td>
@@ -801,15 +748,9 @@ const expected = "v1=" + digest;`}
 
                       <td className="px-4 py-4 text-right">{delivery.responseStatus ?? 'â€”'}</td>
 
-                      <td className="px-4 py-4 text-right">
-                        {delivery.responseDurationMs !== null
-                          ? `${delivery.responseDurationMs}ms`
-                          : 'â€”'}
-                      </td>
+                      <td className="px-4 py-4 text-right">{delivery.responseDurationMs !== null ? `${delivery.responseDurationMs}ms` : 'â€”'}</td>
 
-                      <td className="max-w-sm px-4 py-4 text-red-700">
-                        {delivery.failureReason ?? 'â€”'}
-                      </td>
+                      <td className="max-w-sm px-4 py-4 text-red-700">{delivery.failureReason ?? 'â€”'}</td>
 
                       <td className="px-4 py-4">{formatDateTime(delivery.createdAt)}</td>
                     </tr>

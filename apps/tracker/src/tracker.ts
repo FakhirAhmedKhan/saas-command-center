@@ -73,8 +73,7 @@ const MAX_BATCH_SIZE = 25;
 const SENSITIVE_QUERY_PARAMETER =
   /^(access_?token|refresh_?token|token|password|pass|secret|authorization|auth|api_?key|session|session_?id|jwt|email|code|otp)$/i;
 
-const SENSITIVE_PROPERTY_KEY =
-  /(password|passcode|token|secret|authorization|cookie|session|email|phone|address|credit|card|cvv|ssn|private|api.?key)/i;
+const SENSITIVE_PROPERTY_KEY = /(password|passcode|token|secret|authorization|cookie|session|email|phone|address|credit|card|cvv|ssn|private|api.?key)/i;
 
 function safely(operation: () => void): void {
   try {
@@ -148,9 +147,7 @@ function sanitizeUrl(rawValue: string): string {
   }
 }
 
-function sanitizeProperties(
-  source: Record<string, unknown> | undefined,
-): TrackerEvent['properties'] {
+function sanitizeProperties(source: Record<string, unknown> | undefined): TrackerEvent['properties'] {
   if (!source) {
     return undefined;
   }
@@ -185,9 +182,7 @@ function sanitizeProperties(
         .slice(0, 20)
         .filter(
           (item): item is string | number | boolean =>
-            typeof item === 'string' ||
-            (typeof item === 'number' && Number.isFinite(item)) ||
-            typeof item === 'boolean',
+            typeof item === 'string' || (typeof item === 'number' && Number.isFinite(item)) || typeof item === 'boolean',
         )
         .map((item) => (typeof item === 'string' ? item.slice(0, 200) : item));
     }

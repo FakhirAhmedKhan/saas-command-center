@@ -1,14 +1,7 @@
 export const WORKSPACE_ROLES = ['OWNER', 'ADMIN', 'DEVELOPER', 'VIEWER'] as const;
 export type WorkspaceRole = (typeof WORKSPACE_ROLES)[number];
 
-export const TASK_STATUSES = [
-  'NOT_STARTED',
-  'IN_PROGRESS',
-  'BLOCKED',
-  'IN_REVIEW',
-  'COMPLETED',
-  'SKIPPED',
-] as const;
+export const TASK_STATUSES = ['NOT_STARTED', 'IN_PROGRESS', 'BLOCKED', 'IN_REVIEW', 'COMPLETED', 'SKIPPED'] as const;
 export type TaskStatus = (typeof TASK_STATUSES)[number];
 
 export const APPLICATION_PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'] as const;

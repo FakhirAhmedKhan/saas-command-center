@@ -3,12 +3,7 @@ import { randomUUID } from 'node:crypto';
 import request, { type Response } from 'supertest';
 
 import { PrismaService } from '../src/database/prisma.service';
-import {
-  WebhookAttemptOutcome,
-  WebhookDeliveryStatus,
-  WebhookEventType,
-  WorkspaceRole,
-} from '../src/generated/prisma/enums';
+import { WebhookAttemptOutcome, WebhookDeliveryStatus, WebhookEventType, WorkspaceRole } from '../src/generated/prisma/enums';
 import { WebhookSecretCryptoService } from '../src/modules/webhooks/services/webhook-secret-crypto.service';
 import { WebhookSignatureService } from '../src/modules/webhooks/services/webhook-signature.service';
 import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
@@ -147,14 +142,8 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     return `${endpointUrl(endpointId)}/deliveries`;
   }
 
-  async function createEndpoint(
-    token: string,
-    overrides: Record<string, unknown> = {},
-  ): Promise<Response> {
-    return request(app.getHttpServer())
-      .post(webhooksUrl())
-      .set(withBearer(token))
-      .send(validCreatePayload(overrides));
+  async function createEndpoint(token: string, overrides: Record<string, unknown> = {}): Promise<Response> {
+    return request(app.getHttpServer()).post(webhooksUrl()).set(withBearer(token)).send(validCreatePayload(overrides));
   }
 
   beforeAll(async () => {
@@ -189,10 +178,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
       select: { workspaceId: true },
     });
 
-    workspaceId = requireValue(
-      ownerMembership?.workspaceId,
-      'Phase 18 owner workspace was not found',
-    );
+    workspaceId = requireValue(ownerMembership?.workspaceId, 'Phase 18 owner workspace was not found');
 
     const developer = createTestUser({
       name: 'Phase 18 Developer',
@@ -307,9 +293,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
   });
 
   it('lists endpoints scoped to the workspace, including the event catalog and canManage flag', async () => {
-    const response = await request(app.getHttpServer())
-      .get(webhooksUrl())
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(webhooksUrl()).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
 
@@ -371,9 +355,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
       },
     });
 
-    const response = await request(app.getHttpServer())
-      .post(disableUrl(endpointId))
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).post(disableUrl(endpointId)).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(201);
     expect(body(response)).toMatchObject({ enabled: false });
@@ -387,9 +369,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
   });
 
   it('returns 404 for a nonexistent endpoint', async () => {
-    const response = await request(app.getHttpServer())
-      .get(deliveriesUrl(randomUUID()))
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(deliveriesUrl(randomUUID())).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(404);
   });
@@ -511,9 +491,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     const secret = body(createResponse).secret as string;
     const endpointId = (body(createResponse).endpoint as JsonRecord).id as string;
 
-    const listResponse = await request(app.getHttpServer())
-      .get(webhooksUrl())
-      .set(withBearer(ownerAccessToken));
+    const listResponse = await request(app.getHttpServer()).get(webhooksUrl()).set(withBearer(ownerAccessToken));
 
     const raw = JSON.stringify(listResponse.body);
 
@@ -545,9 +523,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
       where: { id: endpointId },
     });
 
-    const response = await request(app.getHttpServer())
-      .post(rotateUrl(endpointId))
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).post(rotateUrl(endpointId)).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(201);
 
@@ -576,9 +552,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
   it('never logs or echoes the secret in activity/error responses on a failed rotation attempt', async () => {
     // Rotation against a nonexistent endpoint must 404, and the response must not somehow
     // reflect any prior secret material.
-    const response = await request(app.getHttpServer())
-      .post(rotateUrl(randomUUID()))
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).post(rotateUrl(randomUUID())).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(404);
     expect(JSON.stringify(response.body)).not.toMatch(/secret/i);
@@ -650,9 +624,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
 
     const endpointId = (body(createResponse).endpoint as JsonRecord).id as string;
 
-    const response = await request(app.getHttpServer())
-      .post(testDeliveryUrl(endpointId))
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).post(testDeliveryUrl(endpointId)).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(201);
     expect(body(response)).toMatchObject({ status: WebhookDeliveryStatus.PENDING });
@@ -676,9 +648,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
 
     const endpointId = (body(createResponse).endpoint as JsonRecord).id as string;
 
-    const response = await request(app.getHttpServer())
-      .post(testDeliveryUrl(endpointId))
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).post(testDeliveryUrl(endpointId)).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(400);
   });
@@ -734,9 +704,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
       },
     });
 
-    const response = await request(app.getHttpServer())
-      .get(deliveriesUrl(endpointId))
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(deliveriesUrl(endpointId)).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
 
@@ -875,9 +843,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
   // ---------------------------------------------------------------------------------------
 
   it('blocks an outsider from listing endpoints', async () => {
-    const response = await request(app.getHttpServer())
-      .get(webhooksUrl())
-      .set(withBearer(outsiderAccessToken));
+    const response = await request(app.getHttpServer()).get(webhooksUrl()).set(withBearer(outsiderAccessToken));
 
     expect(response.status).toBe(403);
   });
@@ -895,9 +861,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
 
     const endpointId = (body(createResponse).endpoint as JsonRecord).id as string;
 
-    const response = await request(app.getHttpServer())
-      .get(deliveriesUrl(endpointId))
-      .set(withBearer(outsiderAccessToken));
+    const response = await request(app.getHttpServer()).get(deliveriesUrl(endpointId)).set(withBearer(outsiderAccessToken));
 
     expect(response.status).toBe(403);
   });
@@ -919,9 +883,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
 
     expect(createResponse.status).toBe(403);
 
-    const listResponse = await request(app.getHttpServer())
-      .get(webhooksUrl())
-      .set(withBearer(viewerAccessToken));
+    const listResponse = await request(app.getHttpServer()).get(webhooksUrl()).set(withBearer(viewerAccessToken));
 
     expect(listResponse.status).toBe(200);
     expect(body(listResponse).canManage).toBe(false);
@@ -934,15 +896,11 @@ describe('Phase 18 Webhook Integrations E2E', () => {
 
     const endpointId = (body(createResponse).endpoint as JsonRecord).id as string;
 
-    const rotateResponse = await request(app.getHttpServer())
-      .post(rotateUrl(endpointId))
-      .set(withBearer(viewerAccessToken));
+    const rotateResponse = await request(app.getHttpServer()).post(rotateUrl(endpointId)).set(withBearer(viewerAccessToken));
 
     expect(rotateResponse.status).toBe(403);
 
-    const testResponse = await request(app.getHttpServer())
-      .post(testDeliveryUrl(endpointId))
-      .set(withBearer(viewerAccessToken));
+    const testResponse = await request(app.getHttpServer()).post(testDeliveryUrl(endpointId)).set(withBearer(viewerAccessToken));
 
     expect(testResponse.status).toBe(403);
   });
@@ -1003,9 +961,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     for (let attempt = 0; attempt < 6; attempt += 1) {
       // eslint-disable-next-line no-await-in-loop -- sequential against a shared rate-limit
       // bucket; parallelizing would make the assertion racy.
-      const response = await request(app.getHttpServer())
-        .post(rotateUrl(endpointId))
-        .set(withBearer(ownerAccessToken));
+      const response = await request(app.getHttpServer()).post(rotateUrl(endpointId)).set(withBearer(ownerAccessToken));
 
       lastStatus = response.status;
     }

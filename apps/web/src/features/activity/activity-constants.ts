@@ -1,11 +1,6 @@
-import type {
-  ActivityActorType,
-  ActivityEntityType,
-  ApplicationActivityType,
-} from './activity-types';
+import type { ActivityActorType, ActivityEntityType, ApplicationActivityType } from './activity-types';
 
-export type ActivityBadgeVariant =
-  'default' | 'blue' | 'green' | 'yellow' | 'orange' | 'red' | 'purple' | 'slate';
+export type ActivityBadgeVariant = 'default' | 'blue' | 'green' | 'yellow' | 'orange' | 'red' | 'purple' | 'slate';
 
 export const ACTIVITY_TYPE_LABELS: Record<ApplicationActivityType, string> = {
   // Application

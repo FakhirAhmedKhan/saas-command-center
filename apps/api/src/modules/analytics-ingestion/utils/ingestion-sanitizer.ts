@@ -5,8 +5,7 @@ import { Prisma } from 'src/generated/prisma/client';
 const SENSITIVE_QUERY_PARAMETER =
   /^(access_?token|refresh_?token|token|password|pass|secret|authorization|auth|api_?key|session|session_?id|jwt|email|code|otp)$/i;
 
-const SENSITIVE_PROPERTY_KEY =
-  /(password|passcode|token|secret|authorization|cookie|session|email|phone|address|credit|card|cvv|ssn|private|api.?key)/i;
+const SENSITIVE_PROPERTY_KEY = /(password|passcode|token|secret|authorization|cookie|session|email|phone|address|credit|card|cvv|ssn|private|api.?key)/i;
 
 const MAX_PROPERTY_KEYS = 20;
 const MAX_PROPERTY_STRING = 200;
@@ -84,9 +83,7 @@ export function sanitizeReferrerUrl(value?: string): string | null {
   }
 }
 
-export function sanitizeEventProperties(
-  properties?: Record<string, unknown>,
-): Prisma.InputJsonObject | undefined {
+export function sanitizeEventProperties(properties?: Record<string, unknown>): Prisma.InputJsonObject | undefined {
   if (!properties) {
     return undefined;
   }

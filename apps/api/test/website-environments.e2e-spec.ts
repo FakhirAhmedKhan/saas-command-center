@@ -185,12 +185,9 @@ describe('Website Operational State E2E', () => {
 
     expectBusinessRuleRejected(await connectWebsite(alphaOwner, website.id, betaApplication.id));
 
-    const malformed = await alphaOwner.agent
-      .post(websiteRoutes.connect(alphaOwner.workspaceId, website.id))
-      .set(withBearer(alphaOwner.accessToken))
-      .send({
-        applicationId: 'not-a-uuid',
-      });
+    const malformed = await alphaOwner.agent.post(websiteRoutes.connect(alphaOwner.workspaceId, website.id)).set(withBearer(alphaOwner.accessToken)).send({
+      applicationId: 'not-a-uuid',
+    });
 
     expect(malformed.status).toBe(400);
   });

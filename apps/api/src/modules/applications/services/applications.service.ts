@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { ActivityWriterService } from '../../activity/services/activity-writer.service';
 
@@ -13,24 +8,11 @@ import { PrismaService } from 'src/database/prisma.service';
 
 import { Prisma } from 'src/generated/prisma/client';
 
-import {
-  ActivityActorType,
-  ActivityEntityType,
-  ApplicationActivityType,
-} from 'src/generated/prisma/enums';
+import { ActivityActorType, ActivityEntityType, ApplicationActivityType } from 'src/generated/prisma/enums';
 
-import {
-  ApplicationListQueryDto,
-  ApplicationSortBy,
-  CreateApplicationDto,
-  SortOrder,
-  UpdateApplicationDto,
-} from '../dto/application.dto';
+import { ApplicationListQueryDto, ApplicationSortBy, CreateApplicationDto, SortOrder, UpdateApplicationDto } from '../dto/application.dto';
 
-import {
-  CreateApplicationTechnologyDto,
-  UpdateApplicationTechnologyDto,
-} from '../dto/application-technology.dto';
+import { CreateApplicationTechnologyDto, UpdateApplicationTechnologyDto } from '../dto/application-technology.dto';
 
 import { CreateApplicationLinkDto, UpdateApplicationLinkDto } from '../dto/application-link.dto';
 
@@ -78,11 +60,7 @@ export class ApplicationsService {
     private readonly activityWriter: ActivityWriterService,
   ) {}
 
-  async create(
-    workspaceId: string,
-    dto: CreateApplicationDto,
-    actorUserId: string,
-  ): Promise<ApplicationDetails> {
+  async create(workspaceId: string, dto: CreateApplicationDto, actorUserId: string): Promise<ApplicationDetails> {
     const name = this.normalizeRequiredText(dto.name, 'Application name');
 
     const requestedSlug = dto.slug ? this.normalizeSlug(dto.slug) : this.normalizeSlug(name);
@@ -299,12 +277,7 @@ export class ApplicationsService {
     return application;
   }
 
-  async update(
-    workspaceId: string,
-    applicationId: string,
-    dto: UpdateApplicationDto,
-    actorUserId: string,
-  ): Promise<ApplicationDetails> {
+  async update(workspaceId: string, applicationId: string, dto: UpdateApplicationDto, actorUserId: string): Promise<ApplicationDetails> {
     const existing = await this.findOne(workspaceId, applicationId);
 
     this.ensureNotArchived(existing);
@@ -371,16 +344,11 @@ export class ApplicationsService {
       changedFields.push('priority');
     }
 
-    const startedAt =
-      dto.startedAt !== undefined ? this.toNullableDate(dto.startedAt) : existing.startedAt;
+    const startedAt = dto.startedAt !== undefined ? this.toNullableDate(dto.startedAt) : existing.startedAt;
 
-    const targetLaunchAt =
-      dto.targetLaunchAt !== undefined
-        ? this.toNullableDate(dto.targetLaunchAt)
-        : existing.targetLaunchAt;
+    const targetLaunchAt = dto.targetLaunchAt !== undefined ? this.toNullableDate(dto.targetLaunchAt) : existing.targetLaunchAt;
 
-    const launchedAt =
-      dto.launchedAt !== undefined ? this.toNullableDate(dto.launchedAt) : existing.launchedAt;
+    const launchedAt = dto.launchedAt !== undefined ? this.toNullableDate(dto.launchedAt) : existing.launchedAt;
 
     this.validateDates(startedAt, targetLaunchAt, launchedAt);
 
@@ -390,10 +358,7 @@ export class ApplicationsService {
       changedFields.push('startedAt');
     }
 
-    if (
-      dto.targetLaunchAt !== undefined &&
-      !this.sameDate(targetLaunchAt, existing.targetLaunchAt)
-    ) {
+    if (dto.targetLaunchAt !== undefined && !this.sameDate(targetLaunchAt, existing.targetLaunchAt)) {
       data.targetLaunchAt = targetLaunchAt;
 
       changedFields.push('targetLaunchAt');
@@ -421,9 +386,7 @@ export class ApplicationsService {
 
         const events: ActivityWriteInput[] = [];
 
-        const generalFields = changedFields.filter(
-          (field) => field !== 'status' && field !== 'priority',
-        );
+        const generalFields = changedFields.filter((field) => field !== 'status' && field !== 'priority');
 
         if (generalFields.length > 0) {
           events.push({
@@ -454,9 +417,7 @@ export class ApplicationsService {
             entityType: ActivityEntityType.APPLICATION,
             entityId: applicationId,
             title: 'Application status changed',
-            description: `${updated.name} moved from ${this.humanizeEnum(
-              existing.status,
-            )} to ${this.humanizeEnum(updated.status)}.`,
+            description: `${updated.name} moved from ${this.humanizeEnum(existing.status)} to ${this.humanizeEnum(updated.status)}.`,
             metadata: {
               previousStatus: existing.status,
               currentStatus: updated.status,
@@ -475,9 +436,7 @@ export class ApplicationsService {
             entityType: ActivityEntityType.APPLICATION,
             entityId: applicationId,
             title: 'Application priority changed',
-            description: `${updated.name} priority changed from ${this.humanizeEnum(
-              existing.priority,
-            )} to ${this.humanizeEnum(updated.priority)}.`,
+            description: `${updated.name} priority changed from ${this.humanizeEnum(existing.priority)} to ${this.humanizeEnum(updated.priority)}.`,
             metadata: {
               previousPriority: existing.priority,
               currentPriority: updated.priority,
@@ -502,11 +461,7 @@ export class ApplicationsService {
     }
   }
 
-  async archive(
-    workspaceId: string,
-    applicationId: string,
-    actorUserId: string,
-  ): Promise<ApplicationDetails> {
+  async archive(workspaceId: string, applicationId: string, actorUserId: string): Promise<ApplicationDetails> {
     const application = await this.findOne(workspaceId, applicationId);
 
     if (application.archivedAt) {
@@ -547,11 +502,7 @@ export class ApplicationsService {
     });
   }
 
-  async restore(
-    workspaceId: string,
-    applicationId: string,
-    actorUserId: string,
-  ): Promise<ApplicationDetails> {
+  async restore(workspaceId: string, applicationId: string, actorUserId: string): Promise<ApplicationDetails> {
     const application = await this.findOne(workspaceId, applicationId);
 
     if (!application.archivedAt) {
@@ -592,11 +543,7 @@ export class ApplicationsService {
     });
   }
 
-  async permanentDelete(
-    workspaceId: string,
-    applicationId: string,
-    actorUserId: string,
-  ): Promise<void> {
+  async permanentDelete(workspaceId: string, applicationId: string, actorUserId: string): Promise<void> {
     const application = await this.findOne(workspaceId, applicationId);
 
     if (!application.archivedAt) {
@@ -625,12 +572,7 @@ export class ApplicationsService {
     });
   }
 
-  async addTechnology(
-    workspaceId: string,
-    applicationId: string,
-    dto: CreateApplicationTechnologyDto,
-    actorUserId: string,
-  ) {
+  async addTechnology(workspaceId: string, applicationId: string, dto: CreateApplicationTechnologyDto, actorUserId: string) {
     const application = await this.findOne(workspaceId, applicationId);
 
     this.ensureNotArchived(application);
@@ -676,13 +618,7 @@ export class ApplicationsService {
     }
   }
 
-  async updateTechnology(
-    workspaceId: string,
-    applicationId: string,
-    technologyId: string,
-    dto: UpdateApplicationTechnologyDto,
-    actorUserId: string,
-  ) {
+  async updateTechnology(workspaceId: string, applicationId: string, technologyId: string, dto: UpdateApplicationTechnologyDto, actorUserId: string) {
     const application = await this.findOne(workspaceId, applicationId);
 
     this.ensureNotArchived(application);
@@ -774,12 +710,7 @@ export class ApplicationsService {
     }
   }
 
-  async removeTechnology(
-    workspaceId: string,
-    applicationId: string,
-    technologyId: string,
-    actorUserId: string,
-  ): Promise<void> {
+  async removeTechnology(workspaceId: string, applicationId: string, technologyId: string, actorUserId: string): Promise<void> {
     const application = await this.findOne(workspaceId, applicationId);
 
     this.ensureNotArchived(application);
@@ -822,12 +753,7 @@ export class ApplicationsService {
     });
   }
 
-  async addLink(
-    workspaceId: string,
-    applicationId: string,
-    dto: CreateApplicationLinkDto,
-    actorUserId: string,
-  ) {
+  async addLink(workspaceId: string, applicationId: string, dto: CreateApplicationLinkDto, actorUserId: string) {
     const application = await this.findOne(workspaceId, applicationId);
 
     this.ensureNotArchived(application);
@@ -873,13 +799,7 @@ export class ApplicationsService {
     }
   }
 
-  async updateLink(
-    workspaceId: string,
-    applicationId: string,
-    linkId: string,
-    dto: UpdateApplicationLinkDto,
-    actorUserId: string,
-  ) {
+  async updateLink(workspaceId: string, applicationId: string, linkId: string, dto: UpdateApplicationLinkDto, actorUserId: string) {
     const application = await this.findOne(workspaceId, applicationId);
 
     this.ensureNotArchived(application);
@@ -971,12 +891,7 @@ export class ApplicationsService {
     }
   }
 
-  async removeLink(
-    workspaceId: string,
-    applicationId: string,
-    linkId: string,
-    actorUserId: string,
-  ): Promise<void> {
+  async removeLink(workspaceId: string, applicationId: string, linkId: string, actorUserId: string): Promise<void> {
     const application = await this.findOne(workspaceId, applicationId);
 
     this.ensureNotArchived(application);
@@ -1053,11 +968,7 @@ export class ApplicationsService {
     return slug;
   }
 
-  private async ensureSlugAvailable(
-    workspaceId: string,
-    applicationId: string,
-    slug: string,
-  ): Promise<void> {
+  private async ensureSlugAvailable(workspaceId: string, applicationId: string, slug: string): Promise<void> {
     const existing = await this.prisma.saasApplication.findFirst({
       where: {
         workspaceId,
@@ -1078,9 +989,7 @@ export class ApplicationsService {
     }
   }
 
-  private buildOrderBy(
-    query: ApplicationListQueryDto,
-  ): Prisma.SaasApplicationOrderByWithRelationInput {
+  private buildOrderBy(query: ApplicationListQueryDto): Prisma.SaasApplicationOrderByWithRelationInput {
     const order = query.sortOrder ?? SortOrder.DESC;
 
     switch (query.sortBy) {
@@ -1173,11 +1082,7 @@ export class ApplicationsService {
     return (first?.getTime() ?? null) === (second?.getTime() ?? null);
   }
 
-  private validateDates(
-    startedAt: Date | null,
-    targetLaunchAt: Date | null,
-    launchedAt: Date | null,
-  ): void {
+  private validateDates(startedAt: Date | null, targetLaunchAt: Date | null, launchedAt: Date | null): void {
     if (startedAt && targetLaunchAt && targetLaunchAt < startedAt) {
       throw new BadRequestException('Target launch date cannot be before the start date');
     }
@@ -1194,10 +1099,7 @@ export class ApplicationsService {
       .replace(/\b\w/g, (character) => character.toUpperCase());
   }
 
-  private handleUniqueConstraint(
-    error: unknown,
-    message = 'An application with this value already exists',
-  ): void {
+  private handleUniqueConstraint(error: unknown, message = 'An application with this value already exists'): void {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
       throw new ConflictException(message);
     }

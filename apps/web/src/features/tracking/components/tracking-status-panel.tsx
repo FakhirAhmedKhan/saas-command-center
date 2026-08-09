@@ -26,11 +26,7 @@ interface TrackingStatusPanelProps {
   autoRefresh?: boolean;
 }
 
-export function TrackingStatusPanel({
-  workspaceId,
-  websiteId,
-  autoRefresh = true,
-}: TrackingStatusPanelProps) {
+export function TrackingStatusPanel({ workspaceId, websiteId, autoRefresh = true }: TrackingStatusPanelProps) {
   const [status, setStatus] = useState<TrackingStatus | null>(null);
 
   const [loading, setLoading] = useState(true);
@@ -129,11 +125,7 @@ export function TrackingStatusPanel({
 
               <h2 className="text-lg font-semibold text-slate-950">Tracker connection</h2>
 
-              {status.connected ? (
-                <Badge variant="green">Receiving events</Badge>
-              ) : (
-                <Badge variant="orange">Waiting for first event</Badge>
-              )}
+              {status.connected ? <Badge variant="green">Receiving events</Badge> : <Badge variant="orange">Waiting for first event</Badge>}
             </div>
 
             <p className="mt-2 text-sm text-slate-500">This status refreshes every five seconds.</p>
@@ -147,44 +139,22 @@ export function TrackingStatusPanel({
       </CardHeader>
 
       <CardContent className="space-y-5">
-        {error ? (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-            {error}
-          </div>
-        ) : null}
+        {error ? <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div> : null}
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Metric
-            icon={<Activity className="size-5" />}
-            label="Total events"
-            value={status.totalEvents}
-          />
+          <Metric icon={<Activity className="size-5" />} label="Total events" value={status.totalEvents} />
 
-          <Metric
-            icon={<CheckCircle2 className="size-5" />}
-            label="Page views"
-            value={status.counts.PAGE_VIEW}
-          />
+          <Metric icon={<CheckCircle2 className="size-5" />} label="Page views" value={status.counts.PAGE_VIEW} />
 
-          <Metric
-            icon={<Clock3 className="size-5" />}
-            label="Heartbeats"
-            value={status.counts.HEARTBEAT}
-          />
+          <Metric icon={<Clock3 className="size-5" />} label="Heartbeats" value={status.counts.HEARTBEAT} />
 
-          <Metric
-            icon={<MousePointerClick className="size-5" />}
-            label="Custom events"
-            value={status.counts.CUSTOM}
-          />
+          <Metric icon={<MousePointerClick className="size-5" />} label="Custom events" value={status.counts.CUSTOM} />
         </div>
 
         <div className="rounded-xl bg-slate-50 p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Last event</p>
 
-          <p className="mt-2 text-sm font-semibold text-slate-800">
-            {formatTrackingDate(status.website.lastEventAt)}
-          </p>
+          <p className="mt-2 text-sm font-semibold text-slate-800">{formatTrackingDate(status.website.lastEventAt)}</p>
         </div>
 
         <Link

@@ -23,11 +23,7 @@ export function PageError({
       {requestId ? <p className="mt-2 text-xs text-red-700">Request ID: {requestId}</p> : null}
 
       {onRetry ? (
-        <button
-          type="button"
-          className="mt-4 rounded-lg bg-red-950 px-4 py-2 text-sm font-medium text-white"
-          onClick={onRetry}
-        >
+        <button type="button" className="mt-4 rounded-lg bg-red-950 px-4 py-2 text-sm font-medium text-white" onClick={onRetry}>
           Try again
         </button>
       ) : null}

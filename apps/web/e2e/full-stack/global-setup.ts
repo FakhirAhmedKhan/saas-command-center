@@ -3,12 +3,7 @@ import { resolve } from 'node:path';
 
 import { request } from '@playwright/test';
 
-import {
-  fullStackStateDirectory,
-  fullStackStatePath,
-  type FullStackState,
-  type SeedUser,
-} from './fixtures/state';
+import { fullStackStateDirectory, fullStackStatePath, type FullStackState, type SeedUser } from './fixtures/state';
 
 interface AuthResponse {
   accessToken: string;
@@ -84,9 +79,7 @@ async function globalSetup(): Promise<void> {
     });
 
     if (response.status() !== 201) {
-      throw new Error(
-        `Could not register ${roleName}: ${response.status()} ${await response.text()}`,
-      );
+      throw new Error(`Could not register ${roleName}: ${response.status()} ${await response.text()}`);
     }
 
     const body = (await response.json()) as AuthResponse;
@@ -154,54 +147,42 @@ async function globalSetup(): Promise<void> {
     });
 
     if (response.status() !== 201) {
-      throw new Error(
-        `Could not add ${member.role}: ${response.status()} ${await response.text()}`,
-      );
+      throw new Error(`Could not add ${member.role}: ${response.status()} ${await response.text()}`);
     }
   }
 
-  const applicationResponse = await ownerApi.post(
-    `${apiUrl}/workspaces/${owner.workspaceId}/applications`,
-    {
-      data: {
-        name: 'Batch 11 Baseline App',
-        slug: `batch11-baseline-app-${runId}`,
-        shortDescription: 'Real full-stack baseline application',
-        category: 'SAAS',
-        status: 'IN_DEVELOPMENT',
-        priority: 'HIGH',
-      },
+  const applicationResponse = await ownerApi.post(`${apiUrl}/workspaces/${owner.workspaceId}/applications`, {
+    data: {
+      name: 'Batch 11 Baseline App',
+      slug: `batch11-baseline-app-${runId}`,
+      shortDescription: 'Real full-stack baseline application',
+      category: 'SAAS',
+      status: 'IN_DEVELOPMENT',
+      priority: 'HIGH',
     },
-  );
+  });
 
   if (applicationResponse.status() !== 201) {
-    throw new Error(
-      `Could not create baseline application: ${applicationResponse.status()} ${await applicationResponse.text()}`,
-    );
+    throw new Error(`Could not create baseline application: ${applicationResponse.status()} ${await applicationResponse.text()}`);
   }
 
   const baselineApplication = (await applicationResponse.json()) as ApplicationResponse;
 
   const trackingOrigin = `https://batch11-${runId}.example.test`;
 
-  const websiteResponse = await ownerApi.post(
-    `${apiUrl}/workspaces/${owner.workspaceId}/websites`,
-    {
-      data: {
-        name: 'Batch 11 Baseline Website',
-        domain: `batch11-${runId}.example.test`,
-        timeZone: 'Asia/Dubai',
-        enabled: true,
-        allowedOrigins: [trackingOrigin],
-        applicationId: baselineApplication.id,
-      },
+  const websiteResponse = await ownerApi.post(`${apiUrl}/workspaces/${owner.workspaceId}/websites`, {
+    data: {
+      name: 'Batch 11 Baseline Website',
+      domain: `batch11-${runId}.example.test`,
+      timeZone: 'Asia/Dubai',
+      enabled: true,
+      allowedOrigins: [trackingOrigin],
+      applicationId: baselineApplication.id,
     },
-  );
+  });
 
   if (websiteResponse.status() !== 201) {
-    throw new Error(
-      `Could not create baseline website: ${websiteResponse.status()} ${await websiteResponse.text()}`,
-    );
+    throw new Error(`Could not create baseline website: ${websiteResponse.status()} ${await websiteResponse.text()}`);
   }
 
   const baselineWebsiteResponse = (await websiteResponse.json()) as WebsiteResponse;

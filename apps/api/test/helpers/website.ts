@@ -105,22 +105,14 @@ export function readWebsiteRecord(response: Response): Record<string, unknown> {
     }
   }
 
-  throw new Error(
-    [
-      'Expected a website object in the response.',
-      `Received: ${JSON.stringify(response.body)}`,
-    ].join(' '),
-  );
+  throw new Error(['Expected a website object in the response.', `Received: ${JSON.stringify(response.body)}`].join(' '));
 }
 
 export function readWebsiteItems(response: Response): Record<string, unknown>[] {
   return readApiItems(response, ['websites']);
 }
 
-export function findRecordById(
-  records: Record<string, unknown>[],
-  id: string,
-): Record<string, unknown> | undefined {
+export function findRecordById(records: Record<string, unknown>[], id: string): Record<string, unknown> | undefined {
   return records.find((record) => recordString(record, 'id', 'websiteId') === id);
 }
 
@@ -201,35 +193,19 @@ export function findBooleanDeep(value: unknown, keys: string[]): boolean | undef
 }
 
 export function readTrackingKey(response: Response): string {
-  const trackingKey = findStringDeep(response.body, [
-    'trackingKey',
-    'rawTrackingKey',
-    'writeKey',
-    'key',
-  ]);
+  const trackingKey = findStringDeep(response.body, ['trackingKey', 'rawTrackingKey', 'writeKey', 'key']);
 
   if (!trackingKey) {
-    throw new Error(
-      [
-        'Tracking key was not found in the response.',
-        `Received: ${JSON.stringify(response.body)}`,
-      ].join(' '),
-    );
+    throw new Error(['Tracking key was not found in the response.', `Received: ${JSON.stringify(response.body)}`].join(' '));
   }
 
   return trackingKey;
 }
 
-export async function createWebsite(
-  actor: WorkspaceTestUser,
-  overrides: Partial<WebsitePayload> = {},
-): Promise<CreatedWebsite> {
+export async function createWebsite(actor: WorkspaceTestUser, overrides: Partial<WebsitePayload> = {}): Promise<CreatedWebsite> {
   const payload = buildWebsitePayload(overrides);
 
-  const response = await actor.agent
-    .post(websiteRoutes.root(actor.workspaceId))
-    .set(withBearer(actor.accessToken))
-    .send(payload);
+  const response = await actor.agent.post(websiteRoutes.root(actor.workspaceId)).set(withBearer(actor.accessToken)).send(payload);
 
   expectWebsiteSuccess(response);
 
@@ -238,12 +214,7 @@ export async function createWebsite(
   const id = recordString(record, 'id', 'websiteId');
 
   if (!id) {
-    throw new Error(
-      [
-        'Website response does not contain an ID.',
-        `Received: ${JSON.stringify(response.body)}`,
-      ].join(' '),
-    );
+    throw new Error(['Website response does not contain an ID.', `Received: ${JSON.stringify(response.body)}`].join(' '));
   }
 
   return {
@@ -254,105 +225,51 @@ export async function createWebsite(
   };
 }
 
-export async function listWebsites(
-  actor: WorkspaceTestUser,
-  query: Record<string, string | number | boolean> = {},
-): Promise<Response> {
-  return actor.agent
-    .get(websiteRoutes.root(actor.workspaceId))
-    .set(withBearer(actor.accessToken))
-    .query(query);
+export async function listWebsites(actor: WorkspaceTestUser, query: Record<string, string | number | boolean> = {}): Promise<Response> {
+  return actor.agent.get(websiteRoutes.root(actor.workspaceId)).set(withBearer(actor.accessToken)).query(query);
 }
 
 export async function getWebsite(actor: WorkspaceTestUser, websiteId: string): Promise<Response> {
-  return actor.agent
-    .get(websiteRoutes.details(actor.workspaceId, websiteId))
-    .set(withBearer(actor.accessToken));
+  return actor.agent.get(websiteRoutes.details(actor.workspaceId, websiteId)).set(withBearer(actor.accessToken));
 }
 
-export async function updateWebsite(
-  actor: WorkspaceTestUser,
-  websiteId: string,
-  payload: Partial<WebsitePayload>,
-): Promise<Response> {
-  return actor.agent
-    .patch(websiteRoutes.details(actor.workspaceId, websiteId))
-    .set(withBearer(actor.accessToken))
-    .send(payload);
+export async function updateWebsite(actor: WorkspaceTestUser, websiteId: string, payload: Partial<WebsitePayload>): Promise<Response> {
+  return actor.agent.patch(websiteRoutes.details(actor.workspaceId, websiteId)).set(withBearer(actor.accessToken)).send(payload);
 }
 
-export async function enableWebsite(
-  actor: WorkspaceTestUser,
-  websiteId: string,
-): Promise<Response> {
-  return actor.agent
-    .post(websiteRoutes.enable(actor.workspaceId, websiteId))
-    .set(withBearer(actor.accessToken));
+export async function enableWebsite(actor: WorkspaceTestUser, websiteId: string): Promise<Response> {
+  return actor.agent.post(websiteRoutes.enable(actor.workspaceId, websiteId)).set(withBearer(actor.accessToken));
 }
 
-export async function disableWebsite(
-  actor: WorkspaceTestUser,
-  websiteId: string,
-): Promise<Response> {
-  return actor.agent
-    .post(websiteRoutes.disable(actor.workspaceId, websiteId))
-    .set(withBearer(actor.accessToken));
+export async function disableWebsite(actor: WorkspaceTestUser, websiteId: string): Promise<Response> {
+  return actor.agent.post(websiteRoutes.disable(actor.workspaceId, websiteId)).set(withBearer(actor.accessToken));
 }
 
-export async function archiveWebsite(
-  actor: WorkspaceTestUser,
-  websiteId: string,
-): Promise<Response> {
-  return actor.agent
-    .post(websiteRoutes.archive(actor.workspaceId, websiteId))
-    .set(withBearer(actor.accessToken));
+export async function archiveWebsite(actor: WorkspaceTestUser, websiteId: string): Promise<Response> {
+  return actor.agent.post(websiteRoutes.archive(actor.workspaceId, websiteId)).set(withBearer(actor.accessToken));
 }
 
-export async function restoreWebsite(
-  actor: WorkspaceTestUser,
-  websiteId: string,
-): Promise<Response> {
-  return actor.agent
-    .post(websiteRoutes.restore(actor.workspaceId, websiteId))
-    .set(withBearer(actor.accessToken));
+export async function restoreWebsite(actor: WorkspaceTestUser, websiteId: string): Promise<Response> {
+  return actor.agent.post(websiteRoutes.restore(actor.workspaceId, websiteId)).set(withBearer(actor.accessToken));
 }
 
-export async function rotateWebsiteKey(
-  actor: WorkspaceTestUser,
-  websiteId: string,
-): Promise<Response> {
-  return actor.agent
-    .post(websiteRoutes.rotateKey(actor.workspaceId, websiteId))
-    .set(withBearer(actor.accessToken));
+export async function rotateWebsiteKey(actor: WorkspaceTestUser, websiteId: string): Promise<Response> {
+  return actor.agent.post(websiteRoutes.rotateKey(actor.workspaceId, websiteId)).set(withBearer(actor.accessToken));
 }
 
-export async function connectWebsite(
-  actor: WorkspaceTestUser,
-  websiteId: string,
-  applicationId: string,
-): Promise<Response> {
-  return actor.agent
-    .post(websiteRoutes.connect(actor.workspaceId, websiteId))
-    .set(withBearer(actor.accessToken))
-    .send({
-      applicationId,
-    });
+export async function connectWebsite(actor: WorkspaceTestUser, websiteId: string, applicationId: string): Promise<Response> {
+  return actor.agent.post(websiteRoutes.connect(actor.workspaceId, websiteId)).set(withBearer(actor.accessToken)).send({
+    applicationId,
+  });
 }
 
-export async function disconnectWebsite(
-  actor: WorkspaceTestUser,
-  websiteId: string,
-): Promise<Response> {
-  return actor.agent
-    .post(websiteRoutes.disconnect(actor.workspaceId, websiteId))
-    .set(withBearer(actor.accessToken));
+export async function disconnectWebsite(actor: WorkspaceTestUser, websiteId: string): Promise<Response> {
+  return actor.agent.post(websiteRoutes.disconnect(actor.workspaceId, websiteId)).set(withBearer(actor.accessToken));
 }
 
 export function nestedRecords(value: unknown): Record<string, unknown>[] {
   if (Array.isArray(value)) {
-    return value
-      .map(asRecord)
-      .filter((item): item is Record<string, unknown> => item !== undefined);
+    return value.map(asRecord).filter((item): item is Record<string, unknown> => item !== undefined);
   }
 
   return [];

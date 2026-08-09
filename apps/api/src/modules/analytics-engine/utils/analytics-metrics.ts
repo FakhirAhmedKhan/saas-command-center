@@ -34,10 +34,7 @@ const BOUNCE_ENGAGEMENT_THRESHOLD_MS = 10_000;
  * - No custom events
  * - Less than 10 seconds of tracked engagement
  */
-export function calculateSessionMetrics(
-  events: readonly SessionMetricEvent[],
-  pageViews: readonly SessionMetricPageView[],
-): SessionMetrics {
+export function calculateSessionMetrics(events: readonly SessionMetricEvent[], pageViews: readonly SessionMetricPageView[]): SessionMetrics {
   if (events.length === 0) {
     throw new Error('Session metrics cannot be calculated without events');
   }
@@ -78,10 +75,7 @@ export function calculateSessionMetrics(
   const pageViewCount = pageViews.length;
   const eventCount = events.length;
 
-  const bounced =
-    pageViewCount <= 1 &&
-    customEventCount === 0 &&
-    engagedDurationMs < BOUNCE_ENGAGEMENT_THRESHOLD_MS;
+  const bounced = pageViewCount <= 1 && customEventCount === 0 && engagedDurationMs < BOUNCE_ENGAGEMENT_THRESHOLD_MS;
 
   return {
     startedAt: new Date(startedAtMs),

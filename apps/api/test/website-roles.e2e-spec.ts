@@ -14,12 +14,7 @@ import { createTestApp } from './helpers/create-test-app';
 
 import { resetDatabase } from './helpers/database';
 
-import {
-  addWorkspaceMember,
-  expectAccessDenied,
-  registerWorkspaceTestUser,
-  type WorkspaceTestUser,
-} from './helpers/workspace';
+import { addWorkspaceMember, expectAccessDenied, registerWorkspaceTestUser, type WorkspaceTestUser } from './helpers/workspace';
 
 import {
   archiveWebsite,
@@ -193,9 +188,7 @@ describe('Website Roles E2E', () => {
 
     expectAccessDenied(outsiderResponse);
 
-    const anonymousResponse = await request(app.getHttpServer()).get(
-      websiteRoutes.root(matrix.owner.workspaceId),
-    );
+    const anonymousResponse = await request(app.getHttpServer()).get(websiteRoutes.root(matrix.owner.workspaceId));
 
     expect(anonymousResponse.status).toBe(401);
   });

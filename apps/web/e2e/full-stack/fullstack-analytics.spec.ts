@@ -101,9 +101,7 @@ test.describe('Batch 11 real analytics pipeline', () => {
   });
 
   test('shows the raw events through the real tracking status UI', async () => {
-    await page.goto(
-      `/workspaces/${state.owner.workspaceId}/websites/${state.baselineWebsite.id}/installation`,
-    );
+    await page.goto(`/workspaces/${state.owner.workspaceId}/websites/${state.baselineWebsite.id}/installation`);
 
     await page
       .getByRole('button', {
@@ -123,16 +121,12 @@ test.describe('Batch 11 real analytics pipeline', () => {
   });
 
   test('processes the events and displays normalized analytics', async () => {
-    await page.goto(
-      `/workspaces/${state.owner.workspaceId}/websites/${state.baselineWebsite.id}/analytics-engine`,
-    );
+    await page.goto(`/workspaces/${state.owner.workspaceId}/websites/${state.baselineWebsite.id}/analytics-engine`);
 
     await expectMetric(page, 'Pending', 3);
 
     const processingResponse = page.waitForResponse(
-      (response) =>
-        response.url().endsWith('/analytics-engine/process') &&
-        response.request().method() === 'POST',
+      (response) => response.url().endsWith('/analytics-engine/process') && response.request().method() === 'POST',
     );
 
     await page

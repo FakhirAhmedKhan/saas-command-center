@@ -4,10 +4,7 @@ import type { HealthResponse } from '@command-center/shared-types';
 import { StatusBadge } from '@command-center/ui';
 import { useEffect, useState } from 'react';
 
-type HealthState =
-  | { kind: 'checking' }
-  | { kind: 'connected'; data: HealthResponse }
-  | { kind: 'unavailable'; message: string };
+type HealthState = { kind: 'checking' } | { kind: 'connected'; data: HealthResponse } | { kind: 'unavailable'; message: string };
 
 export function ApiHealthCard() {
   const [state, setState] = useState<HealthState>({ kind: 'checking' });
@@ -55,8 +52,7 @@ export function ApiHealthCard() {
 
       <p className="health-copy">
         {state.kind === 'checking' && 'Checking the NestJS health endpoint…'}
-        {state.kind === 'connected' &&
-          `${state.data.service} is healthy in ${state.data.environment}.`}
+        {state.kind === 'connected' && `${state.data.service} is healthy in ${state.data.environment}.`}
         {state.kind === 'unavailable' && `Start the API on port 4000. ${state.message}`}
       </p>
     </section>

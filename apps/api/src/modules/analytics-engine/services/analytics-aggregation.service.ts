@@ -1,17 +1,8 @@
 import { Injectable } from '@nestjs/common';
-
 import { createHash } from 'node:crypto';
-
-import {
-  AnalyticsAggregateDimension,
-  AnalyticsDeviceType,
-  RawAnalyticsEventType,
-} from 'src/generated/prisma/enums';
-
+import { AnalyticsAggregateDimension, AnalyticsDeviceType, RawAnalyticsEventType } from 'src/generated/prisma/enums';
 import { PrismaService } from 'src/database/prisma.service';
-
 import { AnalyticsAggregatePeriod } from '../dto/analytics-engine.dto';
-
 import { getAnalyticsBucket } from '../utils/analytics-time';
 import { DefaultArgs } from '@prisma/client/runtime/client';
 import { PrismaClient } from 'src/generated/prisma/internal/class';
@@ -25,40 +16,28 @@ export interface AnalyticsAggregationWebsite {
 
 interface MutableAggregate {
   dimension: AnalyticsAggregateDimension;
-
   value: string;
   label: string;
-
   visitors: Set<string>;
-
   sessions: Set<string>;
-
   pageViews: number;
   events: number;
   customEvents: number;
   bounces: number;
-
   totalDurationMs: bigint;
 }
 
 @Injectable()
 export class AnalyticsAggregationService {
   rebuildRange(
-    transaction: Omit<
-      PrismaClient<never, GlobalOmitConfig | undefined, DefaultArgs>,
-      '$connect' | '$disconnect' | '$on' | '$use' | '$extends'
-    >,
+    D: Omit<PrismaClient<never, GlobalOmitConfig | undefined, DefaultArgs>, '$connect' | '$disconnect' | '$on' | '$use' | '$extends'>,
     input: ProcessAnalyticsRangeInput,
   ) {
     throw new Error('Method not implemented.');
   }
   constructor(private readonly prisma: PrismaService) {}
 
-  async rebuildBucket(
-    website: AnalyticsAggregationWebsite,
-    period: AnalyticsAggregatePeriod,
-    bucketStart: Date,
-  ): Promise<void> {
+  async rebuildBucket(website: AnalyticsAggregationWebsite, period: AnalyticsAggregatePeriod, bucketStart: Date): Promise<void> {
     const bucket = getAnalyticsBucket(bucketStart, website.timeZone, period);
 
     const [events, pageViews, sessions] = await this.prisma.$transaction([
@@ -147,12 +126,7 @@ export class AnalyticsAggregationService {
 
     const aggregates = new Map<string, MutableAggregate>();
 
-    const overview = this.getAggregate(
-      aggregates,
-      AnalyticsAggregateDimension.OVERVIEW,
-      'overview',
-      'Overview',
-    );
+    const overview = this.getAggregate(aggregates, AnalyticsAggregateDimension.OVERVIEW, 'overview', 'Overview');
 
     for (const event of events) {
       overview.visitors.add(event.visitorId);
@@ -350,19 +324,11 @@ export class AnalyticsAggregationService {
     });
   }
 
-  async rebuild(
-    website: AnalyticsAggregationWebsite,
-    period: AnalyticsAggregatePeriod,
-    bucketStart: Date,
-  ): Promise<void> {
+  async rebuild(website: AnalyticsAggregationWebsite, period: AnalyticsAggregatePeriod, bucketStart: Date): Promise<void> {
     await this.rebuildBucket(website, period, bucketStart);
   }
 
-  async rebuildBuckets(
-    website: AnalyticsAggregationWebsite,
-    period: AnalyticsAggregatePeriod,
-    bucketStarts: readonly Date[],
-  ): Promise<void> {
+  async rebuildBuckets(website: AnalyticsAggregationWebsite, period: AnalyticsAggregatePeriod, bucketStarts: readonly Date[]): Promise<void> {
     for (const bucketStart of bucketStarts) {
       await this.rebuildBucket(website, period, bucketStart);
     }

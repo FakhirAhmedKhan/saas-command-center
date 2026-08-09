@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  NotFoundException,
-  Param,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { WorkspaceRole } from 'src/generated/prisma/enums';
 import { UsersService } from 'src/modules/users/users.service';
@@ -61,11 +51,7 @@ export class WorkspaceMembersController {
   @ApiOperation({
     summary: 'Update workspace member role',
   })
-  updateRole(
-    @Param('workspaceId') workspaceId: string,
-    @Param('userId') userId: string,
-    @Body() dto: UpdateWorkspaceMemberRoleDto,
-  ) {
+  updateRole(@Param('workspaceId') workspaceId: string, @Param('userId') userId: string, @Body() dto: UpdateWorkspaceMemberRoleDto) {
     return this.workspaceMembersService.updateRole(workspaceId, userId, dto.role);
   }
 

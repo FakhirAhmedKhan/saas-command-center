@@ -8,15 +8,9 @@ import { PrismaService } from 'src/database/prisma.service';
 
 import { resolveAnalyticsDateRange } from '../../analytics-overview/utils/analytics-date-range';
 
-import {
-  roundMetric,
-  toSafeNumber,
-} from '../../analytics-overview/utils/analytics-overview-metrics';
+import { roundMetric, toSafeNumber } from '../../analytics-overview/utils/analytics-overview-metrics';
 
-import {
-  ANALYTICS_EXPORT_MAX_DAYS,
-  ANALYTICS_EXPORT_MAX_ROWS,
-} from '../analytics-reports.constants';
+import { ANALYTICS_EXPORT_MAX_DAYS, ANALYTICS_EXPORT_MAX_ROWS } from '../analytics-reports.constants';
 
 import {
   AnalyticsReportDimension,
@@ -116,21 +110,13 @@ export interface CsvExportResult {
 export class AnalyticsReportsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getPagesReport(
-    workspaceId: string,
-    websiteId: string,
-    query: PageReportQueryDto,
-  ): Promise<PageReportResponseDto> {
+  async getPagesReport(workspaceId: string, websiteId: string, query: PageReportQueryDto): Promise<PageReportResponseDto> {
     const context = await this.resolveContext(workspaceId, websiteId, query);
 
     return this.loadPagesReport(context, query, query.page, query.limit);
   }
 
-  async getEventsReport(
-    workspaceId: string,
-    websiteId: string,
-    query: EventReportQueryDto,
-  ): Promise<EventReportResponseDto> {
+  async getEventsReport(workspaceId: string, websiteId: string, query: EventReportQueryDto): Promise<EventReportResponseDto> {
     const context = await this.resolveContext(workspaceId, websiteId, query);
 
     return this.loadEventsReport(context, query, query.page, query.limit);
@@ -147,11 +133,7 @@ export class AnalyticsReportsService {
     return this.loadDimensionReport(context, dimension, query, query.page, query.limit);
   }
 
-  async exportPages(
-    workspaceId: string,
-    websiteId: string,
-    query: PageReportQueryDto,
-  ): Promise<CsvExportResult> {
+  async exportPages(workspaceId: string, websiteId: string, query: PageReportQueryDto): Promise<CsvExportResult> {
     const context = await this.resolveContext(workspaceId, websiteId, query);
 
     this.assertExportRange(context);
@@ -223,11 +205,7 @@ export class AnalyticsReportsService {
     };
   }
 
-  async exportEvents(
-    workspaceId: string,
-    websiteId: string,
-    query: EventReportQueryDto,
-  ): Promise<CsvExportResult> {
+  async exportEvents(workspaceId: string, websiteId: string, query: EventReportQueryDto): Promise<CsvExportResult> {
     const context = await this.resolveContext(workspaceId, websiteId, query);
 
     this.assertExportRange(context);
@@ -269,23 +247,12 @@ export class AnalyticsReportsService {
     };
   }
 
-  async exportDimension(
-    workspaceId: string,
-    websiteId: string,
-    dimension: AnalyticsReportDimension,
-    query: DimensionReportQueryDto,
-  ): Promise<CsvExportResult> {
+  async exportDimension(workspaceId: string, websiteId: string, dimension: AnalyticsReportDimension, query: DimensionReportQueryDto): Promise<CsvExportResult> {
     const context = await this.resolveContext(workspaceId, websiteId, query);
 
     this.assertExportRange(context);
 
-    const report = await this.loadDimensionReport(
-      context,
-      dimension,
-      query,
-      1,
-      ANALYTICS_EXPORT_MAX_ROWS,
-    );
+    const report = await this.loadDimensionReport(context, dimension, query, 1, ANALYTICS_EXPORT_MAX_ROWS);
 
     return {
       filename: createCsvFilename(dimension, context.range.current.from, context.range.current.to),
@@ -370,10 +337,7 @@ export class AnalyticsReportsService {
 
       timeZone: website.timeZone,
 
-      range: resolveAnalyticsDateRange(
-        query as Parameters<typeof resolveAnalyticsDateRange>[0],
-        website.timeZone,
-      ),
+      range: resolveAnalyticsDateRange(query as Parameters<typeof resolveAnalyticsDateRange>[0], website.timeZone),
     };
   }
 
@@ -394,8 +358,7 @@ export class AnalyticsReportsService {
 
     const sortColumn = this.getPageSortColumn(query.sortBy);
 
-    const sortDirection =
-      query.sortDirection === AnalyticsSortDirection.ASC ? Prisma.sql`ASC` : Prisma.sql`DESC`;
+    const sortDirection = query.sortDirection === AnalyticsSortDirection.ASC ? Prisma.sql`ASC` : Prisma.sql`DESC`;
 
     const rows = await this.prisma.$queryRaw<PageDatabaseRow[]>(
       Prisma.sql`
@@ -570,8 +533,7 @@ export class AnalyticsReportsService {
 
     const sortColumn = this.getEventSortColumn(query.sortBy);
 
-    const sortDirection =
-      query.sortDirection === AnalyticsSortDirection.ASC ? Prisma.sql`ASC` : Prisma.sql`DESC`;
+    const sortDirection = query.sortDirection === AnalyticsSortDirection.ASC ? Prisma.sql`ASC` : Prisma.sql`DESC`;
 
     const [rows, summaryRows] = await Promise.all([
       this.prisma.$queryRaw<EventDatabaseRow[]>(
@@ -830,12 +792,7 @@ export class AnalyticsReportsService {
 
         ...value,
       }))
-      .filter(
-        (item) =>
-          search === '' ||
-          item.key.toLowerCase().includes(search) ||
-          item.label.toLowerCase().includes(search),
-      );
+      .filter((item) => search === '' || item.key.toLowerCase().includes(search) || item.label.toLowerCase().includes(search));
 
     const totalSessions = filtered.reduce(
       (total, item) => total + item.sessions,
@@ -1011,18 +968,10 @@ export class AnalyticsReportsService {
       }
 
       const firstValue =
-        field === DimensionReportSortField.VISITORS
-          ? first.visitors
-          : field === DimensionReportSortField.PAGE_VIEWS
-            ? first.pageViews
-            : first.sessions;
+        field === DimensionReportSortField.VISITORS ? first.visitors : field === DimensionReportSortField.PAGE_VIEWS ? first.pageViews : first.sessions;
 
       const secondValue =
-        field === DimensionReportSortField.VISITORS
-          ? second.visitors
-          : field === DimensionReportSortField.PAGE_VIEWS
-            ? second.pageViews
-            : second.sessions;
+        field === DimensionReportSortField.VISITORS ? second.visitors : field === DimensionReportSortField.PAGE_VIEWS ? second.pageViews : second.sessions;
 
       if (firstValue === secondValue) {
         return first.label.localeCompare(second.label);

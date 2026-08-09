@@ -105,10 +105,7 @@ export function uniqueOrigin(prefix = 'analytics'): string {
   return `https://${prefix}-${Date.now()}-${randomPart()}.example.test`;
 }
 
-export function buildTrackerEvent(
-  origin: string,
-  overrides: Partial<TrackerEventPayload> = {},
-): TrackerEventPayload {
+export function buildTrackerEvent(origin: string, overrides: Partial<TrackerEventPayload> = {}): TrackerEventPayload {
   const type = overrides.type ?? RawAnalyticsEventType.PAGE_VIEW;
 
   const event: TrackerEventPayload = {
@@ -195,12 +192,7 @@ export async function createTrackedWebsite(
   const trackingKey = recordString(responseBody ?? {}, 'trackingKey');
 
   if (!trackingKey || !trackingKey.startsWith('cc_live_')) {
-    throw new Error(
-      [
-        'Website creation did not return a raw tracking key.',
-        `Response: ${JSON.stringify(website.response.body)}`,
-      ].join(' '),
-    );
+    throw new Error(['Website creation did not return a raw tracking key.', `Response: ${JSON.stringify(website.response.body)}`].join(' '));
   }
 
   return {
@@ -257,15 +249,8 @@ export async function collectEvents(
 export function readCollectResult(response: Response): CollectResponseBody {
   const body = asRecord(response.body);
 
-  if (
-    !body ||
-    typeof body.accepted !== 'number' ||
-    typeof body.duplicates !== 'number' ||
-    typeof body.receivedAt !== 'string'
-  ) {
-    throw new Error(
-      ['Unexpected collection response.', `Received: ${JSON.stringify(response.body)}`].join(' '),
-    );
+  if (!body || typeof body.accepted !== 'number' || typeof body.duplicates !== 'number' || typeof body.receivedAt !== 'string') {
+    throw new Error(['Unexpected collection response.', `Received: ${JSON.stringify(response.body)}`].join(' '));
   }
 
   return {
@@ -277,24 +262,12 @@ export function readCollectResult(response: Response): CollectResponseBody {
   };
 }
 
-export async function getTrackingStatus(
-  actor: WorkspaceTestUser,
-  websiteId: string,
-): Promise<Response> {
-  return actor.agent
-    .get(analyticsIngestionRoutes.status(actor.workspaceId, websiteId))
-    .set(withBearer(actor.accessToken));
+export async function getTrackingStatus(actor: WorkspaceTestUser, websiteId: string): Promise<Response> {
+  return actor.agent.get(analyticsIngestionRoutes.status(actor.workspaceId, websiteId)).set(withBearer(actor.accessToken));
 }
 
-export async function listRawEvents(
-  actor: WorkspaceTestUser,
-  websiteId: string,
-  query: Record<string, string | number> = {},
-): Promise<Response> {
-  return actor.agent
-    .get(analyticsIngestionRoutes.events(actor.workspaceId, websiteId))
-    .set(withBearer(actor.accessToken))
-    .query(query);
+export async function listRawEvents(actor: WorkspaceTestUser, websiteId: string, query: Record<string, string | number> = {}): Promise<Response> {
+  return actor.agent.get(analyticsIngestionRoutes.events(actor.workspaceId, websiteId)).set(withBearer(actor.accessToken)).query(query);
 }
 
 export function readTrackingStatus(response: Response): TrackingStatusBody {
@@ -305,23 +278,11 @@ export function readTrackingStatus(response: Response): TrackingStatusBody {
   const counts = asRecord(body?.counts);
 
   const recentEvents = Array.isArray(body?.recentEvents)
-    ? body.recentEvents
-        .map(asRecord)
-        .filter((item): item is Record<string, unknown> => item !== undefined)
+    ? body.recentEvents.map(asRecord).filter((item): item is Record<string, unknown> => item !== undefined)
     : [];
 
-  if (
-    !body ||
-    !website ||
-    !counts ||
-    typeof body.connected !== 'boolean' ||
-    typeof body.totalEvents !== 'number'
-  ) {
-    throw new Error(
-      ['Unexpected tracking status response.', `Received: ${JSON.stringify(response.body)}`].join(
-        ' ',
-      ),
-    );
+  if (!body || !website || !counts || typeof body.connected !== 'boolean' || typeof body.totalEvents !== 'number') {
+    throw new Error(['Unexpected tracking status response.', `Received: ${JSON.stringify(response.body)}`].join(' '));
   }
 
   const normalizedCounts: Record<string, number> = {};
@@ -350,9 +311,7 @@ export function readRawEventList(response: Response): RawEventListBody {
 
   const meta = asRecord(body?.meta);
 
-  const data = Array.isArray(body?.data)
-    ? body.data.map(asRecord).filter((item): item is Record<string, unknown> => item !== undefined)
-    : [];
+  const data = Array.isArray(body?.data) ? body.data.map(asRecord).filter((item): item is Record<string, unknown> => item !== undefined) : [];
 
   if (
     !body ||
@@ -364,11 +323,7 @@ export function readRawEventList(response: Response): RawEventListBody {
     typeof meta.hasNextPage !== 'boolean' ||
     typeof meta.hasPreviousPage !== 'boolean'
   ) {
-    throw new Error(
-      ['Unexpected raw-event list response.', `Received: ${JSON.stringify(response.body)}`].join(
-        ' ',
-      ),
-    );
+    throw new Error(['Unexpected raw-event list response.', `Received: ${JSON.stringify(response.body)}`].join(' '));
   }
 
   return {
@@ -390,18 +345,11 @@ export function readRawEventList(response: Response): RawEventListBody {
   };
 }
 
-export function findRawEvent(
-  events: Record<string, unknown>[],
-  eventId: string,
-): Record<string, unknown> | undefined {
+export function findRawEvent(events: Record<string, unknown>[], eventId: string): Record<string, unknown> | undefined {
   return events.find((event) => recordString(event, 'eventId') === eventId);
 }
 
-export function expectCollectionAccepted(
-  response: Response,
-  accepted: number,
-  duplicates = 0,
-): void {
+export function expectCollectionAccepted(response: Response, accepted: number, duplicates = 0): void {
   if (response.status !== 202) {
     throw new Error(`Collect failed: ${response.status}. Body: ${JSON.stringify(response.body)}`);
   }
@@ -417,11 +365,7 @@ export function expectCollectionAccepted(
   expect(Number.isNaN(Date.parse(result.receivedAt))).toBe(false);
 }
 
-export function buildEventBatch(
-  origin: string,
-  count: number,
-  overrides: Partial<TrackerEventPayload> = {},
-): TrackerEventPayload[] {
+export function buildEventBatch(origin: string, count: number, overrides: Partial<TrackerEventPayload> = {}): TrackerEventPayload[] {
   return Array.from(
     {
       length: count,

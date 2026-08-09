@@ -22,14 +22,9 @@ import { TeamOperationsCleanupService } from './services/team-operations-cleanup
 import { WorkspaceInvitationService } from './services/workspace-invitation.service';
 
 @Module({
-  imports: [
-        WorkspaceMembersModule,DatabaseModule, SharedRateLimitModule],
+  imports: [WorkspaceMembersModule, DatabaseModule, SharedRateLimitModule],
 
-  controllers: [
-    WorkspaceInvitationsController,
-    InvitationResponseController,
-    NotificationsController,
-  ],
+  controllers: [WorkspaceInvitationsController, InvitationResponseController, NotificationsController],
 
   providers: [
     InvitationTokenService,

@@ -14,8 +14,7 @@ import { ReleaseAccessService } from './services/release-access.service';
 import { ReleaseDeploymentService } from './services/release-deployment.service';
 
 @Module({
-  imports: [
-        WorkspaceMembersModule,DatabaseModule],
+  imports: [WorkspaceMembersModule, DatabaseModule],
 
   controllers: [ReleasesController, DeploymentsController],
 

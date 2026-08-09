@@ -114,12 +114,7 @@ const PRESET_OPTIONS: Array<{
 ];
 
 function normalizeTab(value: string | null): AnalyticsReportTab {
-  if (
-    value === 'sources' ||
-    value === 'geography' ||
-    value === 'technology' ||
-    value === 'events'
-  ) {
+  if (value === 'sources' || value === 'geography' || value === 'technology' || value === 'events') {
     return value;
   }
 
@@ -305,10 +300,7 @@ function PageReportTable({ report }: { report: PageReportResponse }) {
               Exits
             </th>
 
-            <th
-              className="px-4 py-3 text-right"
-              title="Bounced entrance sessions divided by entrance sessions."
-            >
+            <th className="px-4 py-3 text-right" title="Bounced entrance sessions divided by entrance sessions.">
               Bounce rate
             </th>
 
@@ -343,9 +335,7 @@ function PageReportTable({ report }: { report: PageReportResponse }) {
 
               <td className="px-4 py-4 text-right">{item.bounceRate}%</td>
 
-              <td className="px-4 py-4 text-right">
-                {formatDuration(item.averageDurationSeconds)}
-              </td>
+              <td className="px-4 py-4 text-right">{formatDuration(item.averageDurationSeconds)}</td>
             </tr>
           ))}
         </tbody>
@@ -361,27 +351,19 @@ function EventReportTable({ report }: { report: EventReportResponse }) {
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Total events</p>
 
-          <p className="mt-1 text-2xl font-bold text-slate-950">
-            {numberFormatter.format(report.summary.totalEvents)}
-          </p>
+          <p className="mt-1 text-2xl font-bold text-slate-950">{numberFormatter.format(report.summary.totalEvents)}</p>
         </div>
 
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-            Unique visitors
-          </p>
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Unique visitors</p>
 
-          <p className="mt-1 text-2xl font-bold text-slate-950">
-            {numberFormatter.format(report.summary.uniqueVisitors)}
-          </p>
+          <p className="mt-1 text-2xl font-bold text-slate-950">{numberFormatter.format(report.summary.uniqueVisitors)}</p>
         </div>
 
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Sessions</p>
 
-          <p className="mt-1 text-2xl font-bold text-slate-950">
-            {numberFormatter.format(report.summary.uniqueSessions)}
-          </p>
+          <p className="mt-1 text-2xl font-bold text-slate-950">{numberFormatter.format(report.summary.uniqueSessions)}</p>
         </div>
       </div>
 
@@ -456,10 +438,7 @@ function DimensionReportTable({ report }: { report: DimensionReportResponse }) {
   );
 }
 
-export function AnalyticsReportsDashboard({
-  workspaceId,
-  websiteId,
-}: AnalyticsReportsDashboardProps) {
+export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsReportsDashboardProps) {
   const router = useRouter();
 
   const pathname = usePathname();
@@ -618,9 +597,7 @@ export function AnalyticsReportsDashboard({
           <div>
             <p className="text-sm font-medium text-slate-500">Analytics reports</p>
 
-            <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-950">
-              Detailed analytics
-            </h1>
+            <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-950">Detailed analytics</h1>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -663,9 +640,7 @@ export function AnalyticsReportsDashboard({
                 });
               }}
               className={`whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium ${
-                tab === item.value
-                  ? 'border-slate-950 text-slate-950'
-                  : 'border-transparent text-slate-500 hover:text-slate-900'
+                tab === item.value ? 'border-slate-950 text-slate-950' : 'border-transparent text-slate-500 hover:text-slate-900'
               }`}
             >
               {item.label}
@@ -677,9 +652,7 @@ export function AnalyticsReportsDashboard({
       <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
           <label className="xl:col-span-2">
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Search
-            </span>
+            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Search</span>
 
             <input
               type="search"
@@ -693,9 +666,7 @@ export function AnalyticsReportsDashboard({
           </label>
 
           <label>
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Date range
-            </span>
+            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Date range</span>
 
             <select
               value={preset}
@@ -716,9 +687,7 @@ export function AnalyticsReportsDashboard({
 
           {tab === 'technology' ? (
             <label>
-              <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                Technology
-              </span>
+              <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Technology</span>
 
               <select
                 value={dimension}
@@ -739,9 +708,7 @@ export function AnalyticsReportsDashboard({
           ) : null}
 
           <label>
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Sort by
-            </span>
+            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Sort by</span>
 
             <select
               value={sortBy}
@@ -761,9 +728,7 @@ export function AnalyticsReportsDashboard({
           </label>
 
           <label>
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Direction
-            </span>
+            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Direction</span>
 
             <select
               value={sortDirection}
@@ -794,11 +759,7 @@ export function AnalyticsReportsDashboard({
           }}
         />
       ) : !report || report.items.length === 0 ? (
-        <EmptyState
-          title="No report data"
-          description="No matching analytics data was found for the selected filters and date range."
-          icon={undefined}
-        />
+        <EmptyState title="No report data" description="No matching analytics data was found for the selected filters and date range." icon={undefined} />
       ) : (
         <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3 text-sm text-slate-500">

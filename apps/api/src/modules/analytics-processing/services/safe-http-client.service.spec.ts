@@ -25,14 +25,10 @@ describe(SafeHttpClientService.name, () => {
   });
 
   it('rejects embedded credentials', async () => {
-    await expect(
-      service.validateUrl('https://user:password@example.com/health'),
-    ).rejects.toBeInstanceOf(BadRequestException);
+    await expect(service.validateUrl('https://user:password@example.com/health')).rejects.toBeInstanceOf(BadRequestException);
   });
 
   it('rejects non-HTTP protocols', async () => {
-    await expect(service.validateUrl('file:///etc/passwd')).rejects.toBeInstanceOf(
-      BadRequestException,
-    );
+    await expect(service.validateUrl('file:///etc/passwd')).rejects.toBeInstanceOf(BadRequestException);
   });
 });

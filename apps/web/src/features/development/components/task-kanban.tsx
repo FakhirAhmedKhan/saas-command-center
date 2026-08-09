@@ -9,11 +9,7 @@ import { completeTask, reopenTask, setTaskStatus } from '../development-api';
 
 import { PRIORITY_LABELS, PRIORITY_VARIANTS } from '../development-constants';
 
-import type {
-  ApplicationMilestone,
-  ApplicationTask,
-  ApplicationTaskStatus,
-} from '../development-types';
+import type { ApplicationMilestone, ApplicationTask, ApplicationTaskStatus } from '../development-types';
 
 import { formatDevelopmentDate } from '../development-utils';
 
@@ -54,10 +50,7 @@ export function TaskKanban({ workspaceId, applicationId, milestones, onChanged }
     })),
   );
 
-  async function changeStatus(
-    task: ApplicationTask,
-    status: Exclude<ApplicationTaskStatus, 'SKIPPED'>,
-  ): Promise<void> {
+  async function changeStatus(task: ApplicationTask, status: Exclude<ApplicationTaskStatus, 'SKIPPED'>): Promise<void> {
     if (status === 'COMPLETED') {
       await completeTask(workspaceId, applicationId, task.id);
     } else if (task.status === 'COMPLETED' || task.status === 'SKIPPED') {
@@ -86,10 +79,7 @@ export function TaskKanban({ workspaceId, applicationId, milestones, onChanged }
           const columnTasks = tasks.filter((task) => task.status === column.status);
 
           return (
-            <div
-              key={column.status}
-              className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
-            >
+            <div key={column.status} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-slate-900">{column.label}</h3>
 
@@ -98,46 +88,28 @@ export function TaskKanban({ workspaceId, applicationId, milestones, onChanged }
 
               <div className="mt-4 space-y-3">
                 {columnTasks.length === 0 ? (
-                  <p className="rounded-xl border border-dashed border-slate-300 px-3 py-6 text-center text-xs text-slate-400">
-                    No tasks
-                  </p>
+                  <p className="rounded-xl border border-dashed border-slate-300 px-3 py-6 text-center text-xs text-slate-400">No tasks</p>
                 ) : (
                   columnTasks.map((task) => (
-                    <article
-                      key={task.id}
-                      className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
-                    >
+                    <article key={task.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                       <p className="font-semibold text-slate-900">{task.title}</p>
 
                       <p className="mt-1 text-xs text-slate-500">{task.milestoneTitle}</p>
 
                       <div className="mt-3 flex flex-wrap gap-2">
-                        <Badge variant={PRIORITY_VARIANTS[task.priority]}>
-                          {PRIORITY_LABELS[task.priority]}
-                        </Badge>
+                        <Badge variant={PRIORITY_VARIANTS[task.priority]}>{PRIORITY_LABELS[task.priority]}</Badge>
 
                         <Badge variant="slate">Weight {task.weight}</Badge>
                       </div>
 
-                      <p className="mt-3 text-xs text-slate-400">
-                        Due {formatDevelopmentDate(task.dueAt)}
-                      </p>
+                      <p className="mt-3 text-xs text-slate-400">Due {formatDevelopmentDate(task.dueAt)}</p>
 
                       <div className="mt-4 flex flex-wrap gap-2">
                         {COLUMNS.filter((target) => target.status !== task.status)
                           .slice(0, 3)
                           .map((target) => (
-                            <Button
-                              key={target.status}
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => void changeStatus(task, target.status)}
-                            >
-                              {target.status === 'COMPLETED' ? (
-                                <Check className="size-3.5" />
-                              ) : (
-                                <RotateCcw className="size-3.5" />
-                              )}
+                            <Button key={target.status} size="sm" variant="ghost" onClick={() => void changeStatus(task, target.status)}>
+                              {target.status === 'COMPLETED' ? <Check className="size-3.5" /> : <RotateCcw className="size-3.5" />}
 
                               {target.label}
                             </Button>

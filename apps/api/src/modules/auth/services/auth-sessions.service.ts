@@ -107,10 +107,7 @@ export class AuthSessionsService {
     return result.count;
   }
 
-  async revokeFamilyBySessionId(
-    sessionId: string,
-    reason = 'TOKEN_REUSE_DETECTED',
-  ): Promise<number> {
+  async revokeFamilyBySessionId(sessionId: string, reason = 'TOKEN_REUSE_DETECTED'): Promise<number> {
     const session = await this.prisma.authSession.findUnique({
       where: {
         id: sessionId,

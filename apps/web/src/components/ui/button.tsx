@@ -16,11 +16,9 @@ const variantClasses: Record<ButtonVariant, string> = {
 
   secondary: 'bg-slate-900 text-white shadow-sm hover:bg-slate-800 focus-visible:ring-slate-500',
 
-  outline:
-    'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-brand-500',
+  outline: 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-brand-500',
 
-  ghost:
-    'bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-slate-400',
+  ghost: 'bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-slate-400',
 
   danger: 'bg-red-600 text-white shadow-sm hover:bg-red-700 focus-visible:ring-red-500',
 };
@@ -33,16 +31,7 @@ const sizeClasses: Record<ButtonSize, string> = {
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  {
-    className,
-    variant = 'primary',
-    size = 'md',
-    loading = false,
-    disabled,
-    children,
-    type = 'button',
-    ...props
-  },
+  { className, variant = 'primary', size = 'md', loading = false, disabled, children, type = 'button', ...props },
   ref,
 ) {
   return (
@@ -62,10 +51,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     >
       {loading ? (
         <>
-          <span
-            aria-hidden="true"
-            className="size-4 animate-spin rounded-full border-2 border-current border-r-transparent"
-          />
+          <span aria-hidden="true" className="size-4 animate-spin rounded-full border-2 border-current border-r-transparent" />
 
           <span>Loading...</span>
         </>

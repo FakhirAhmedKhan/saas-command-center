@@ -17,13 +17,7 @@ import {
 
 import { DeploymentStatusBadge } from './deployment-status-badge';
 
-import type {
-  CurrentEnvironmentVersion,
-  Deployment,
-  DeploymentOptions,
-  DeploymentStatus,
-  Release,
-} from './release-management.types';
+import type { CurrentEnvironmentVersion, Deployment, DeploymentOptions, DeploymentStatus, Release } from './release-management.types';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ApiError } from 'next/dist/server/api-utils';
 import { getErrorMessage } from '../applications/application-utils';
@@ -44,14 +38,7 @@ interface DashboardData {
   currentVersions: CurrentEnvironmentVersion[];
 }
 
-const STATUS_OPTIONS: DeploymentStatus[] = [
-  'DRAFT',
-  'SCHEDULED',
-  'IN_PROGRESS',
-  'SUCCESSFUL',
-  'FAILED',
-  'ROLLED_BACK',
-];
+const STATUS_OPTIONS: DeploymentStatus[] = ['DRAFT', 'SCHEDULED', 'IN_PROGRESS', 'SUCCESSFUL', 'FAILED', 'ROLLED_BACK'];
 
 function formatDateTime(value: string | null): string {
   if (!value) {
@@ -90,14 +77,7 @@ function ReleaseForm({
 }: {
   submitting: boolean;
 
-  onSave: (input: {
-    version: string;
-    name?: string;
-    notes?: string;
-    commitRef?: string;
-    repositoryUrl?: string;
-    scheduledAt?: string;
-  }) => Promise<void>;
+  onSave: (input: { version: string; name?: string; notes?: string; commitRef?: string; repositoryUrl?: string; scheduledAt?: string }) => Promise<void>;
 
   onCancel: () => void;
 }) {
@@ -138,9 +118,7 @@ function ReleaseForm({
         <div>
           <h2 className="font-semibold text-slate-950">Create release</h2>
 
-          <p className="mt-1 text-sm text-slate-600">
-            Create the version before deploying it to an environment.
-          </p>
+          <p className="mt-1 text-sm text-slate-600">Create the version before deploying it to an environment.</p>
         </div>
 
         <button type="button" onClick={onCancel} className="text-sm font-medium text-slate-500">
@@ -229,11 +207,7 @@ function ReleaseForm({
         </label>
       </div>
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="mt-5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
-      >
+      <button type="submit" disabled={submitting} className="mt-5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">
         {submitting ? 'Creatingâ€¦' : 'Create release'}
       </button>
     </form>
@@ -411,11 +385,7 @@ function DeploymentForm({
         </label>
       </div>
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="mt-5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
-      >
+      <button type="submit" disabled={submitting} className="mt-5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">
         {submitting ? 'Creatingâ€¦' : 'Create deployment'}
       </button>
     </form>
@@ -493,10 +463,7 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
     void load();
   }, [load]);
 
-  const successfulDeployments = useMemo(
-    () => (data?.deployments ?? []).filter((deployment) => deployment.status === 'SUCCESSFUL'),
-    [data],
-  );
+  const successfulDeployments = useMemo(() => (data?.deployments ?? []).filter((deployment) => deployment.status === 'SUCCESSFUL'), [data]);
 
   async function saveRelease(input: Parameters<typeof createRelease>[2]): Promise<void> {
     setSubmitting(true);
@@ -552,9 +519,7 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
     };
 
     if (target === 'SCHEDULED') {
-      const value = window.prompt(
-        'Enter scheduled date and time, for example 2026-08-10T10:00:00Z',
-      );
+      const value = window.prompt('Enter scheduled date and time, for example 2026-08-10T10:00:00Z');
 
       if (!value) {
         return;
@@ -574,10 +539,7 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
     }
 
     if (target === 'ROLLED_BACK') {
-      const candidates = successfulDeployments.filter(
-        (candidate) =>
-          candidate.environmentId === deployment.environmentId && candidate.id !== deployment.id,
-      );
+      const candidates = successfulDeployments.filter((candidate) => candidate.environmentId === deployment.environmentId && candidate.id !== deployment.id);
 
       if (candidates.length === 0) {
         setActionError('No earlier successful deployment exists for this environment.');
@@ -585,9 +547,7 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
         return;
       }
 
-      const list = candidates
-        .map((candidate, index) => `${index + 1}. ${candidate.release.version}`)
-        .join('\n');
+      const list = candidates.map((candidate, index) => `${index + 1}. ${candidate.release.version}`).join('\n');
 
       const selection = window.prompt(`Select rollback target:\n${list}`, '1');
 
@@ -634,13 +594,7 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
       <PageError
         title="Release tracking unavailable"
         message={getErrorMessage(error)}
-        requestId={
-          error instanceof ApiError
-            ? 'requestId' in error && typeof error.requestId === 'string'
-              ? error.requestId
-              : undefined
-            : undefined
-        }
+        requestId={error instanceof ApiError ? ('requestId' in error && typeof error.requestId === 'string' ? error.requestId : undefined) : undefined}
         onRetry={() => {
           void load();
         }}
@@ -656,9 +610,7 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
 
           <h1 className="mt-1 text-2xl font-bold text-slate-950">Releases and deployments</h1>
 
-          <p className="mt-2 text-sm text-slate-600">
-            Track which version is running in each environment.
-          </p>
+          <p className="mt-2 text-sm text-slate-600">Track which version is running in each environment.</p>
         </div>
 
         {data.options.canManage ? (
@@ -688,10 +640,7 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
       </header>
 
       {actionError ? (
-        <div
-          role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"
-        >
+        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
           {actionError}
         </div>
       ) : null}
@@ -723,24 +672,15 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
 
         {data.currentVersions.length === 0 ? (
           <div className="mt-3">
-            <EmptyState
-              title="No environments"
-              description="Create an application environment before recording deployments."
-              icon={undefined}
-            />
+            <EmptyState title="No environments" description="Create an application environment before recording deployments." icon={undefined} />
           </div>
         ) : (
           <div className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {data.currentVersions.map((item) => (
-              <article
-                key={item.environmentId}
-                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-              >
+              <article key={item.environmentId} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <p className="text-sm font-medium text-slate-500">{item.environmentName}</p>
 
-                <p className="mt-2 text-2xl font-bold text-slate-950">
-                  {item.version ?? 'Not deployed'}
-                </p>
+                <p className="mt-2 text-2xl font-bold text-slate-950">{item.version ?? 'Not deployed'}</p>
 
                 {item.status ? (
                   <div className="mt-3">
@@ -751,12 +691,7 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
                 <p className="mt-3 text-xs text-slate-500">{formatDateTime(item.deployedAt)}</p>
 
                 {item.liveUrl ? (
-                  <a
-                    href={item.liveUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-3 inline-block text-sm font-medium text-blue-700 underline"
-                  >
+                  <a href={item.liveUrl} target="_blank" rel="noreferrer" className="mt-3 inline-block text-sm font-medium text-blue-700 underline">
                     Open environment
                   </a>
                 ) : null}
@@ -769,9 +704,7 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
       <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="grid gap-3 sm:grid-cols-2">
           <label>
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Environment
-            </span>
+            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Environment</span>
 
             <select
               value={environmentFilter}
@@ -791,9 +724,7 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
           </label>
 
           <label>
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Status
-            </span>
+            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Status</span>
 
             <select
               value={statusFilter}
@@ -815,26 +746,17 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
       </section>
 
       {data.deployments.length === 0 ? (
-        <EmptyState
-          title="No deployments"
-          description="Create a release and record its first deployment."
-          icon={undefined}
-        />
+        <EmptyState title="No deployments" description="Create a release and record its first deployment." icon={undefined} />
       ) : (
         <section className="space-y-4">
           <h2 className="text-lg font-semibold text-slate-950">Deployment timeline</h2>
 
           {data.deployments.map((deployment) => (
-            <article
-              key={deployment.id}
-              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-            >
+            <article key={deployment.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-lg font-semibold text-slate-950">
-                      {deployment.release.version}
-                    </h3>
+                    <h3 className="text-lg font-semibold text-slate-950">{deployment.release.version}</h3>
 
                     <DeploymentStatusBadge status={deployment.status} />
 
@@ -843,9 +765,7 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
 
                   <p className="mt-2 text-sm text-slate-600">{deployment.environment.name}</p>
 
-                  <p className="mt-1 text-xs text-slate-500">
-                    Changed {formatDateTime(deployment.statusChangedAt)}
-                  </p>
+                  <p className="mt-1 text-xs text-slate-500">Changed {formatDateTime(deployment.statusChangedAt)}</p>
                 </div>
 
                 {data.options.canManage && deployment.allowedTransitions.length > 0 ? (
@@ -870,59 +790,43 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
                 <div>
                   <dt className="text-slate-500">Commit</dt>
 
-                  <dd className="mt-1 font-medium text-slate-900">
-                    {deployment.commitRef ?? 'â€”'}
-                  </dd>
+                  <dd className="mt-1 font-medium text-slate-900">{deployment.commitRef ?? 'â€”'}</dd>
                 </div>
 
                 <div>
                   <dt className="text-slate-500">Duration</dt>
 
-                  <dd className="mt-1 font-medium text-slate-900">
-                    {formatDuration(deployment.durationMs)}
-                  </dd>
+                  <dd className="mt-1 font-medium text-slate-900">{formatDuration(deployment.durationMs)}</dd>
                 </div>
 
                 <div>
                   <dt className="text-slate-500">Started</dt>
 
-                  <dd className="mt-1 font-medium text-slate-900">
-                    {formatDateTime(deployment.startedAt)}
-                  </dd>
+                  <dd className="mt-1 font-medium text-slate-900">{formatDateTime(deployment.startedAt)}</dd>
                 </div>
 
                 <div>
                   <dt className="text-slate-500">Finished</dt>
 
-                  <dd className="mt-1 font-medium text-slate-900">
-                    {formatDateTime(deployment.finishedAt)}
-                  </dd>
+                  <dd className="mt-1 font-medium text-slate-900">{formatDateTime(deployment.finishedAt)}</dd>
                 </div>
               </dl>
 
               {deployment.release.notes ? (
                 <div className="mt-5 rounded-xl bg-slate-50 p-4">
-                  <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                    Release notes
-                  </p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Release notes</p>
 
-                  <p className="mt-2 whitespace-pre-wrap text-sm text-slate-700">
-                    {deployment.release.notes}
-                  </p>
+                  <p className="mt-2 whitespace-pre-wrap text-sm text-slate-700">{deployment.release.notes}</p>
                 </div>
               ) : null}
 
               {deployment.failureReason ? (
-                <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-                  {deployment.failureReason}
-                </div>
+                <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{deployment.failureReason}</div>
               ) : null}
 
               {deployment.healthIncident ? (
                 <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
-                  <p className="text-xs font-medium uppercase tracking-wide text-amber-700">
-                    Related health incident
-                  </p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-amber-700">Related health incident</p>
 
                   <p className="mt-2 text-sm text-amber-900">{deployment.healthIncident.summary}</p>
                 </div>
@@ -938,34 +842,19 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
 
               <div className="mt-4 flex flex-wrap gap-4 text-sm">
                 {deployment.repositoryUrl ? (
-                  <a
-                    href={deployment.repositoryUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="font-medium text-blue-700 underline"
-                  >
+                  <a href={deployment.repositoryUrl} target="_blank" rel="noreferrer" className="font-medium text-blue-700 underline">
                     Repository
                   </a>
                 ) : null}
 
                 {deployment.ciJobUrl ? (
-                  <a
-                    href={deployment.ciJobUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="font-medium text-blue-700 underline"
-                  >
+                  <a href={deployment.ciJobUrl} target="_blank" rel="noreferrer" className="font-medium text-blue-700 underline">
                     CI job
                   </a>
                 ) : null}
 
                 {deployment.liveUrl ? (
-                  <a
-                    href={deployment.liveUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="font-medium text-blue-700 underline"
-                  >
+                  <a href={deployment.liveUrl} target="_blank" rel="noreferrer" className="font-medium text-blue-700 underline">
                     Live environment
                   </a>
                 ) : null}
@@ -973,9 +862,7 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
 
               {deployment.activities.length > 0 ? (
                 <div className="mt-5 border-t border-slate-200 pt-4">
-                  <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                    Activity
-                  </p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Activity</p>
 
                   <div className="mt-3 space-y-3">
                     {deployment.activities.map((activity) => (

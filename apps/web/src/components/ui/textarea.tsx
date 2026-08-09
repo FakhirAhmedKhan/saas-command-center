@@ -7,10 +7,7 @@ export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElemen
   hint?: string;
 }
 
-export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function Textarea(
-  { className, label, error, hint, id, rows = 5, ...props },
-  ref,
-) {
+export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function Textarea({ className, label, error, hint, id, rows = 5, ...props }, ref) {
   const textareaId = id ?? props.name ?? undefined;
 
   return (
@@ -37,11 +34,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
         {...props}
       />
 
-      {error ? (
-        <p className="text-sm text-red-600">{error}</p>
-      ) : hint ? (
-        <p className="text-sm text-slate-500">{hint}</p>
-      ) : null}
+      {error ? <p className="text-sm text-red-600">{error}</p> : hint ? <p className="text-sm text-slate-500">{hint}</p> : null}
     </div>
   );
 });

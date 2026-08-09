@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  Query,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
 
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -24,11 +14,7 @@ import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.gu
 
 import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
 
-import {
-  AnalyticsAggregateQueryDto,
-  ProcessAnalyticsDto,
-  ReprocessAnalyticsDto,
-} from '../dto/analytics-engine.dto';
+import { AnalyticsAggregateQueryDto, ProcessAnalyticsDto, ReprocessAnalyticsDto } from '../dto/analytics-engine.dto';
 
 import { AnalyticsEngineQueryService } from '../services/analytics-engine-query.service';
 
@@ -101,12 +87,7 @@ export class AnalyticsEngineController {
     @Body()
     dto: ProcessAnalyticsDto,
   ) {
-    const run = await this.processingService.processForWorkspace(
-      workspaceId,
-      websiteId,
-      request.user.id,
-      dto.maxEvents,
-    );
+    const run = await this.processingService.processForWorkspace(workspaceId, websiteId, request.user.id, dto.maxEvents);
 
     const status = await this.queryService.getStatus(workspaceId, websiteId);
 
@@ -131,12 +112,7 @@ export class AnalyticsEngineController {
     @Body()
     dto: ReprocessAnalyticsDto,
   ) {
-    const run = await this.processingService.reprocessRange(
-      workspaceId,
-      websiteId,
-      dto,
-      request.user.id,
-    );
+    const run = await this.processingService.reprocessRange(workspaceId, websiteId, dto, request.user.id);
 
     const status = await this.queryService.getStatus(workspaceId, websiteId);
 

@@ -17,11 +17,7 @@ import {
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 
-import {
-  BlockerStatus,
-  DevelopmentTemplateType,
-  WorkItemPriority,
-} from 'src/generated/prisma/enums';
+import { BlockerStatus, DevelopmentTemplateType, WorkItemPriority } from 'src/generated/prisma/enums';
 
 export enum ActiveTaskStatus {
   TODO = 'TODO',

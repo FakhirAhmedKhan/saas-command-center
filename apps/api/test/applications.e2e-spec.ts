@@ -1,10 +1,6 @@
 import type { INestApplication } from '@nestjs/common';
 
-import {
-  ApplicationCategory,
-  ApplicationPriority,
-  ApplicationStatus,
-} from 'src/generated/prisma/enums';
+import { ApplicationCategory, ApplicationPriority, ApplicationStatus } from 'src/generated/prisma/enums';
 
 import { PrismaService } from 'src/database/prisma.service';
 
@@ -30,11 +26,7 @@ import { createTestApp } from './helpers/create-test-app';
 
 import { resetDatabase } from './helpers/database';
 
-import {
-  expectAccessDenied,
-  expectBusinessRuleRejected,
-  registerWorkspaceTestUser,
-} from './helpers/workspace';
+import { expectAccessDenied, expectBusinessRuleRejected, registerWorkspaceTestUser } from './helpers/workspace';
 
 describe('Applications E2E', () => {
   let app: INestApplication;
@@ -80,12 +72,9 @@ describe('Applications E2E', () => {
   it('creates an application using only required fields', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
 
-    const response = await owner.agent
-      .post(applicationRoutes.root(owner.workspaceId))
-      .set(withBearer(owner.accessToken))
-      .send({
-        name: 'Minimal Application',
-      });
+    const response = await owner.agent.post(applicationRoutes.root(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
+      name: 'Minimal Application',
+    });
 
     expectMutationSuccess(response);
 
@@ -103,49 +92,37 @@ describe('Applications E2E', () => {
   it('rejects invalid application payloads', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
 
-    const invalidName = await owner.agent
-      .post(applicationRoutes.root(owner.workspaceId))
-      .set(withBearer(owner.accessToken))
-      .send({
-        name: '',
-      });
+    const invalidName = await owner.agent.post(applicationRoutes.root(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
+      name: '',
+    });
 
     expect(invalidName.status).toBe(400);
 
-    const invalidSlug = await owner.agent
-      .post(applicationRoutes.root(owner.workspaceId))
-      .set(withBearer(owner.accessToken))
-      .send({
-        name: 'Invalid Slug',
+    const invalidSlug = await owner.agent.post(applicationRoutes.root(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
+      name: 'Invalid Slug',
 
-        slug: 'Invalid Slug!',
-      });
+      slug: 'Invalid Slug!',
+    });
 
     expect(invalidSlug.status).toBe(400);
 
-    const invalidEnums = await owner.agent
-      .post(applicationRoutes.root(owner.workspaceId))
-      .set(withBearer(owner.accessToken))
-      .send({
-        name: 'Invalid Enums',
+    const invalidEnums = await owner.agent.post(applicationRoutes.root(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
+      name: 'Invalid Enums',
 
-        status: 'INVALID_STATUS',
+      status: 'INVALID_STATUS',
 
-        priority: 'INVALID_PRIORITY',
+      priority: 'INVALID_PRIORITY',
 
-        category: 'INVALID_CATEGORY',
-      });
+      category: 'INVALID_CATEGORY',
+    });
 
     expect(invalidEnums.status).toBe(400);
 
-    const unknownField = await owner.agent
-      .post(applicationRoutes.root(owner.workspaceId))
-      .set(withBearer(owner.accessToken))
-      .send({
-        name: 'Unknown Field',
+    const unknownField = await owner.agent.post(applicationRoutes.root(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
+      name: 'Unknown Field',
 
-        ownerId: owner.userId,
-      });
+      ownerId: owner.userId,
+    });
 
     expect(unknownField.status).toBe(400);
   });
@@ -358,9 +335,7 @@ describe('Applications E2E', () => {
 
     const alphaApp = await createApplication(alphaOwner);
 
-    const response = await betaOwner.agent
-      .get(applicationRoutes.details(alphaOwner.workspaceId, alphaApp.id))
-      .set(withBearer(betaOwner.accessToken));
+    const response = await betaOwner.agent.get(applicationRoutes.details(alphaOwner.workspaceId, alphaApp.id)).set(withBearer(betaOwner.accessToken));
 
     expectAccessDenied(response);
   });

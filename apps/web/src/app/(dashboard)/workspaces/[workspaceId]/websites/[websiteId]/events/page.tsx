@@ -22,11 +22,7 @@ import { Spinner } from '@/components/ui/spinner';
 
 import { getRawTrackingEvents } from '@/features/tracking/tracking-api';
 
-import type {
-  RawEventQuery,
-  RawEventsResponse,
-  RawEventType,
-} from '@/features/tracking/tracking-types';
+import type { RawEventQuery, RawEventsResponse, RawEventType } from '@/features/tracking/tracking-types';
 
 import { formatTrackingDate, getTrackingError } from '@/features/tracking/tracking-utils';
 
@@ -144,14 +140,11 @@ export default function RawEventsPage() {
           <div className="flex items-center gap-3">
             <Radio className="size-6 text-brand-600" />
 
-            <h1 className="text-3xl font-bold tracking-tight text-slate-950">
-              Raw tracking events
-            </h1>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-950">Raw tracking events</h1>
           </div>
 
           <p className="mt-2 text-sm leading-6 text-slate-500">
-            Inspect the raw stream before Phase 10 converts it into visitors, sessions, page views,
-            and reports.
+            Inspect the raw stream before Phase 10 converts it into visitors, sessions, page views, and reports.
           </p>
         </div>
 
@@ -177,10 +170,7 @@ export default function RawEventsPage() {
               applyFilters();
             }}
           >
-            <Select
-              value={type}
-              onChange={(event) => setType(event.target.value as RawEventType | '')}
-            >
+            <Select value={type} onChange={(event) => setType(event.target.value as RawEventType | '')}>
               <option value="">All event types</option>
 
               <option value="PAGE_VIEW">Page view</option>
@@ -190,11 +180,7 @@ export default function RawEventsPage() {
               <option value="CUSTOM">Custom event</option>
             </Select>
 
-            <Input
-              placeholder="Custom event name..."
-              value={eventName}
-              onChange={(event) => setEventName(event.target.value)}
-            />
+            <Input placeholder="Custom event name..." value={eventName} onChange={(event) => setEventName(event.target.value)} />
 
             <Button type="submit">Apply</Button>
 
@@ -223,17 +209,14 @@ export default function RawEventsPage() {
 
             <h2 className="mt-4 font-semibold text-slate-900">No tracking events found</h2>
 
-            <p className="mt-2 text-sm text-slate-500">
-              Install the tracker and visit the external website.
-            </p>
+            <p className="mt-2 text-sm text-slate-500">Install the tracker and visit the external website.</p>
           </CardContent>
         </Card>
       ) : (
         <Card>
           <CardHeader>
             <p className="text-sm text-slate-500">
-              Showing <strong>{response.data.length}</strong> of{' '}
-              <strong>{response.meta.total}</strong> events
+              Showing <strong>{response.data.length}</strong> of <strong>{response.meta.total}</strong> events
             </p>
           </CardHeader>
 
@@ -260,35 +243,24 @@ export default function RawEventsPage() {
 
                 <tbody>
                   {response.data.map((event) => (
-                    <tr
-                      key={event.id}
-                      className="border-b border-slate-100 align-top last:border-0"
-                    >
+                    <tr key={event.id} className="border-b border-slate-100 align-top last:border-0">
                       <td className="px-3 py-4">
                         <EventBadge type={event.type} />
                       </td>
 
                       <td className="max-w-xs px-3 py-4">
-                        <p className="truncate font-medium text-slate-800">
-                          {event.pageTitle ?? event.pagePath}
-                        </p>
+                        <p className="truncate font-medium text-slate-800">{event.pageTitle ?? event.pagePath}</p>
 
                         <p className="mt-1 truncate text-xs text-slate-400">{event.pagePath}</p>
                       </td>
 
                       <td className="px-3 py-4">{event.eventName ?? '—'}</td>
 
-                      <td className="px-3 py-4 font-mono text-xs">
-                        {event.visitorId.slice(0, 12)}…
-                      </td>
+                      <td className="px-3 py-4 font-mono text-xs">{event.visitorId.slice(0, 12)}…</td>
 
-                      <td className="px-3 py-4 font-mono text-xs">
-                        {event.sessionId.slice(0, 12)}…
-                      </td>
+                      <td className="px-3 py-4 font-mono text-xs">{event.sessionId.slice(0, 12)}…</td>
 
-                      <td className="whitespace-nowrap px-3 py-4 text-xs text-slate-500">
-                        {formatTrackingDate(event.occurredAt)}
-                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-xs text-slate-500">{formatTrackingDate(event.occurredAt)}</td>
 
                       <td className="px-3 py-4">{event.sdkVersion}</td>
                     </tr>
@@ -304,20 +276,12 @@ export default function RawEventsPage() {
                 </p>
 
                 <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    disabled={!response.meta.hasPreviousPage}
-                    onClick={() => changePage(response.meta.page - 1)}
-                  >
+                  <Button variant="outline" disabled={!response.meta.hasPreviousPage} onClick={() => changePage(response.meta.page - 1)}>
                     <ChevronLeft className="size-4" />
                     Previous
                   </Button>
 
-                  <Button
-                    variant="outline"
-                    disabled={!response.meta.hasNextPage}
-                    onClick={() => changePage(response.meta.page + 1)}
-                  >
+                  <Button variant="outline" disabled={!response.meta.hasNextPage} onClick={() => changePage(response.meta.page + 1)}>
                     Next
                     <ChevronRight className="size-4" />
                   </Button>

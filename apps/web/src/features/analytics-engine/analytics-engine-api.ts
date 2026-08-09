@@ -41,9 +41,7 @@ export function getAnalyticsAggregates(
     }
   });
 
-  return apiRequest<AnalyticsAggregateResponse>(
-    `${basePath(workspaceId, websiteId)}/aggregates?${parameters.toString()}`,
-  );
+  return apiRequest<AnalyticsAggregateResponse>(`${basePath(workspaceId, websiteId)}/aggregates?${parameters.toString()}`);
 }
 
 export function processAnalytics(workspaceId: string, websiteId: string, maxEvents = 5000) {
@@ -60,11 +58,7 @@ export function processAnalytics(workspaceId: string, websiteId: string, maxEven
   });
 }
 
-export function reprocessAnalytics(
-  workspaceId: string,
-  websiteId: string,
-  payload: ReprocessAnalyticsPayload,
-) {
+export function reprocessAnalytics(workspaceId: string, websiteId: string, payload: ReprocessAnalyticsPayload) {
   return apiRequest<{
     run: AnalyticsProcessingRun;
 

@@ -18,8 +18,7 @@ import { MonitoringService } from './services/monitoring.service';
 import { SafeHttpClientService } from './services/safe-http-client.service';
 
 @Module({
-  imports: [
-        WorkspaceMembersModule,DatabaseModule],
+  imports: [WorkspaceMembersModule, DatabaseModule],
 
   controllers: [MonitoringController],
 

@@ -24,22 +24,9 @@ module.exports = {
 
   setupFiles: ['<rootDir>/test/setup-env.ts'],
 
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.spec.ts',
-    '!src/**/*.test.ts',
-    '!src/main.ts',
-    '!src/generated/**',
-    '!src/**/*.module.ts',
-  ],
+  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.spec.ts', '!src/**/*.test.ts', '!src/main.ts', '!src/generated/**', '!src/**/*.module.ts'],
 
-  coveragePathIgnorePatterns: [
-    '/node_modules/',
-    '/dist/',
-    '/src/generated/',
-    '\\.spec\\.ts$',
-    '\\.test\\.ts$',
-  ],
+  coveragePathIgnorePatterns: ['/node_modules/', '/dist/', '/src/generated/', '\\.spec\\.ts$', '\\.test\\.ts$'],
 
   coverageDirectory: '<rootDir>/coverage/e2e',
 

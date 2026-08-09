@@ -98,8 +98,6 @@ test.describe('Batch 11 real application flows', () => {
       })
       .click();
 
-    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toContainText(
-      /slug|already|use/i,
-    );
+    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toContainText(/slug|already|use/i);
   });
 });

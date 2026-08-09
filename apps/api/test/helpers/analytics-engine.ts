@@ -50,24 +50,12 @@ export interface AnalyticsEngineStatusBody {
   recentSessions: Record<string, unknown>[];
 }
 
-export async function getAnalyticsEngineStatus(
-  actor: WorkspaceTestUser,
-  workspaceId: string,
-  websiteId: string,
-): Promise<Response> {
-  return actor.agent
-    .get(analyticsEngineRoutes.status(workspaceId, websiteId))
-    .set(withBearer(actor.accessToken));
+export async function getAnalyticsEngineStatus(actor: WorkspaceTestUser, workspaceId: string, websiteId: string): Promise<Response> {
+  return actor.agent.get(analyticsEngineRoutes.status(workspaceId, websiteId)).set(withBearer(actor.accessToken));
 }
 
-export async function getAnonymousAnalyticsEngineStatus(
-  app: INestApplication,
-  workspaceId: string,
-  websiteId: string,
-): Promise<Response> {
-  return request(app.getHttpServer() as Server).get(
-    analyticsEngineRoutes.status(workspaceId, websiteId),
-  );
+export async function getAnonymousAnalyticsEngineStatus(app: INestApplication, workspaceId: string, websiteId: string): Promise<Response> {
+  return request(app.getHttpServer() as Server).get(analyticsEngineRoutes.status(workspaceId, websiteId));
 }
 
 export async function processAnalytics(
@@ -76,10 +64,7 @@ export async function processAnalytics(
   websiteId: string,
   body: Record<string, unknown> = {},
 ): Promise<Response> {
-  return actor.agent
-    .post(analyticsEngineRoutes.process(workspaceId, websiteId))
-    .set(withBearer(actor.accessToken))
-    .send(body);
+  return actor.agent.post(analyticsEngineRoutes.process(workspaceId, websiteId)).set(withBearer(actor.accessToken)).send(body);
 }
 
 export function readAnalyticsEngineStatus(response: Response): AnalyticsEngineStatusBody {
@@ -90,12 +75,7 @@ export function readAnalyticsEngineStatus(response: Response): AnalyticsEngineSt
   const countsRecord = asRecord(body?.counts);
 
   if (!body || !website || !countsRecord) {
-    throw new Error(
-      [
-        'Unexpected analytics-engine status response.',
-        `Received: ${JSON.stringify(response.body)}`,
-      ].join(' '),
-    );
+    throw new Error(['Unexpected analytics-engine status response.', `Received: ${JSON.stringify(response.body)}`].join(' '));
   }
 
   const counts: Record<string, number> = {};
@@ -107,9 +87,7 @@ export function readAnalyticsEngineStatus(response: Response): AnalyticsEngineSt
   }
 
   const recentSessions = Array.isArray(body.recentSessions)
-    ? body.recentSessions
-        .map(asRecord)
-        .filter((value): value is Record<string, unknown> => value !== undefined)
+    ? body.recentSessions.map(asRecord).filter((value): value is Record<string, unknown> => value !== undefined)
     : [];
 
   return {
@@ -123,12 +101,7 @@ export function readAnalyticsEngineStatus(response: Response): AnalyticsEngineSt
 
 export function expectAnalyticsSuccess(response: Response): void {
   if (![200, 201, 202].includes(response.status)) {
-    throw new Error(
-      [
-        `Expected analytics success but received ${response.status}.`,
-        `Response: ${JSON.stringify(response.body)}`,
-      ].join(' '),
-    );
+    throw new Error([`Expected analytics success but received ${response.status}.`, `Response: ${JSON.stringify(response.body)}`].join(' '));
   }
 }
 
@@ -144,10 +117,7 @@ export async function listAnalyticsAggregates(
   websiteId: string,
   query: Record<string, string | number> = {},
 ): Promise<Response> {
-  return actor.agent
-    .get(analyticsEngineRoutes.aggregates(workspaceId, websiteId))
-    .set(withBearer(actor.accessToken))
-    .query(query);
+  return actor.agent.get(analyticsEngineRoutes.aggregates(workspaceId, websiteId)).set(withBearer(actor.accessToken)).query(query);
 }
 
 export async function getAnonymousAnalyticsAggregates(
@@ -161,52 +131,25 @@ export async function getAnonymousAnalyticsAggregates(
     .query(query);
 }
 
-export async function reprocessAnalytics(
-  actor: WorkspaceTestUser,
-  workspaceId: string,
-  websiteId: string,
-  body: Record<string, unknown>,
-): Promise<Response> {
-  return actor.agent
-    .post(analyticsEngineRoutes.reprocess(workspaceId, websiteId))
-    .set(withBearer(actor.accessToken))
-    .send(body);
+export async function reprocessAnalytics(actor: WorkspaceTestUser, workspaceId: string, websiteId: string, body: Record<string, unknown>): Promise<Response> {
+  return actor.agent.post(analyticsEngineRoutes.reprocess(workspaceId, websiteId)).set(withBearer(actor.accessToken)).send(body);
 }
 
-export async function runAnalyticsRetention(
-  actor: WorkspaceTestUser,
-  workspaceId: string,
-  websiteId: string,
-): Promise<Response> {
-  return actor.agent
-    .post(analyticsEngineRoutes.retention(workspaceId, websiteId))
-    .set(withBearer(actor.accessToken));
+export async function runAnalyticsRetention(actor: WorkspaceTestUser, workspaceId: string, websiteId: string): Promise<Response> {
+  return actor.agent.post(analyticsEngineRoutes.retention(workspaceId, websiteId)).set(withBearer(actor.accessToken));
 }
 
-export async function runAnonymousAnalyticsRetention(
-  app: INestApplication,
-  workspaceId: string,
-  websiteId: string,
-): Promise<Response> {
-  return request(app.getHttpServer() as Server).post(
-    analyticsEngineRoutes.retention(workspaceId, websiteId),
-  );
+export async function runAnonymousAnalyticsRetention(app: INestApplication, workspaceId: string, websiteId: string): Promise<Response> {
+  return request(app.getHttpServer() as Server).post(analyticsEngineRoutes.retention(workspaceId, websiteId));
 }
 
 export function readAnalyticsAggregateList(response: Response): AnalyticsAggregateListBody {
   const body = asRecord(response.body);
 
-  const data = Array.isArray(body?.data)
-    ? body.data.map(asRecord).filter((item): item is Record<string, unknown> => item !== undefined)
-    : [];
+  const data = Array.isArray(body?.data) ? body.data.map(asRecord).filter((item): item is Record<string, unknown> => item !== undefined) : [];
 
   if (!body || typeof body.period !== 'string' || typeof body.dimension !== 'string') {
-    throw new Error(
-      [
-        'Unexpected analytics aggregate response.',
-        `Received: ${JSON.stringify(response.body)}`,
-      ].join(' '),
-    );
+    throw new Error(['Unexpected analytics aggregate response.', `Received: ${JSON.stringify(response.body)}`].join(' '));
   }
 
   return {
@@ -216,10 +159,7 @@ export function readAnalyticsAggregateList(response: Response): AnalyticsAggrega
   };
 }
 
-export function findAggregate(
-  data: Record<string, unknown>[],
-  dimensionValue: string,
-): Record<string, unknown> | undefined {
+export function findAggregate(data: Record<string, unknown>[], dimensionValue: string): Record<string, unknown> | undefined {
   return data.find((item) => recordString(item, 'dimensionValue') === dimensionValue);
 }
 
@@ -240,23 +180,14 @@ export interface RawAnalyticsEventOverrides {
   sdkVersion: string;
 }
 
-export async function createRawAnalyticsEvent(
-  prisma: PrismaService,
-  trackedWebsite: TrackedWebsite,
-  overrides: Partial<RawAnalyticsEventOverrides> = {},
-) {
+export async function createRawAnalyticsEvent(prisma: PrismaService, trackedWebsite: TrackedWebsite, overrides: Partial<RawAnalyticsEventOverrides> = {}) {
   const pageUrl = overrides.pageUrl ?? `${trackedWebsite.origin}/dashboard`;
 
   const parsedUrl = new URL(pageUrl);
 
   const type = overrides.type ?? RawAnalyticsEventType.PAGE_VIEW;
 
-  const eventName =
-    overrides.eventName !== undefined
-      ? overrides.eventName
-      : type === RawAnalyticsEventType.CUSTOM
-        ? 'custom_event'
-        : null;
+  const eventName = overrides.eventName !== undefined ? overrides.eventName : type === RawAnalyticsEventType.CUSTOM ? 'custom_event' : null;
 
   return prisma.rawAnalyticsEvent.create({
     data: {

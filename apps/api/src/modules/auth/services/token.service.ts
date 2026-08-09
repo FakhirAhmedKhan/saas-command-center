@@ -29,13 +29,9 @@ export class TokenService {
 
     this.refreshSecret = configService.getOrThrow<string>('JWT_REFRESH_SECRET');
 
-    this.accessExpiresInSeconds = this.parseDuration(
-      configService.get<string>('ACCESS_TOKEN_TTL') ?? '15m',
-    );
+    this.accessExpiresInSeconds = this.parseDuration(configService.get<string>('ACCESS_TOKEN_TTL') ?? '15m');
 
-    this.refreshExpiresInSeconds = this.parseDuration(
-      configService.get<string>('REFRESH_TOKEN_TTL') ?? '30d',
-    );
+    this.refreshExpiresInSeconds = this.parseDuration(configService.get<string>('REFRESH_TOKEN_TTL') ?? '30d');
   }
 
   async issueTokenPair(userId: string, sessionId: string, familyId: string): Promise<TokenPair> {

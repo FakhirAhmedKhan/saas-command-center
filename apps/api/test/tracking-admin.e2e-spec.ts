@@ -24,11 +24,7 @@ import { createTestApp } from './helpers/create-test-app';
 
 import { resetDatabase } from './helpers/database';
 
-import {
-  addWorkspaceMember,
-  expectAccessDenied,
-  registerWorkspaceTestUser,
-} from './helpers/workspace';
+import { addWorkspaceMember, expectAccessDenied, registerWorkspaceTestUser } from './helpers/workspace';
 
 describe('Tracking Admin E2E', () => {
   let app: INestApplication;
@@ -156,9 +152,7 @@ describe('Tracking Admin E2E', () => {
 
     expectAccessDenied(outsiderResponse);
 
-    const anonymousResponse = await request(app.getHttpServer()).get(
-      analyticsIngestionRoutes.status(owner.workspaceId, trackedWebsite.id),
-    );
+    const anonymousResponse = await request(app.getHttpServer()).get(analyticsIngestionRoutes.status(owner.workspaceId, trackedWebsite.id));
 
     expect(anonymousResponse.status).toBe(401);
   });
@@ -172,9 +166,7 @@ describe('Tracking Admin E2E', () => {
 
     expect((await getTrackingStatus(alphaOwner, 'not-a-uuid')).status).toBe(400);
 
-    expect(
-      (await getTrackingStatus(alphaOwner, '11111111-1111-4111-8111-111111111111')).status,
-    ).toBe(404);
+    expect((await getTrackingStatus(alphaOwner, '11111111-1111-4111-8111-111111111111')).status).toBe(404);
 
     expect((await getTrackingStatus(alphaOwner, betaWebsite.id)).status).toBe(404);
   });

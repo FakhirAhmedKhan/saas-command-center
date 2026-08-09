@@ -1,7 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const databaseUrl =
-  'postgresql://command_center_full_e2e:command_center_full_e2e@127.0.0.1:5435/command_center_full_e2e?schema=public';
+const databaseUrl = 'postgresql://command_center_full_e2e:command_center_full_e2e@127.0.0.1:5435/command_center_full_e2e?schema=public';
 
 const apiUrl = process.env.FULLSTACK_API_URL ?? 'http://127.0.0.1:4100/api/v1';
 

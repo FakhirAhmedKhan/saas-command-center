@@ -117,9 +117,7 @@ export class AnalyticsProcessingSchedulerService {
       },
     });
 
-    const workspaceByWebsiteId = new Map(
-      websites.map((website) => [website.id, website.workspaceId]),
-    );
+    const workspaceByWebsiteId = new Map(websites.map((website) => [website.id, website.workspaceId]));
 
     return groups.flatMap((group) => {
       const firstOccurredAt = group._min.occurredAt;

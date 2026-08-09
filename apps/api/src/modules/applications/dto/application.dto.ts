@@ -1,24 +1,8 @@
 import { Transform, Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsEnum,
-  IsInt,
-  IsISO8601,
-  IsOptional,
-  IsString,
-  Length,
-  Matches,
-  Max,
-  MaxLength,
-  Min,
-} from 'class-validator';
+import { IsBoolean, IsEnum, IsInt, IsISO8601, IsOptional, IsString, Length, Matches, Max, MaxLength, Min } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 
-import {
-  ApplicationCategory,
-  ApplicationPriority,
-  ApplicationStatus,
-} from 'src/generated/prisma/enums';
+import { ApplicationCategory, ApplicationPriority, ApplicationStatus } from 'src/generated/prisma/enums';
 
 export enum ApplicationSortBy {
   NAME = 'name',

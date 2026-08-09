@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -22,11 +12,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
 import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
 
-import {
-  CreateWebhookEndpointDto,
-  UpdateWebhookEndpointDto,
-  WebhookDeliveryListQueryDto,
-} from '../dto/webhook.dto';
+import { CreateWebhookEndpointDto, UpdateWebhookEndpointDto, WebhookDeliveryListQueryDto } from '../dto/webhook.dto';
 
 import { WebhookManagementService } from '../services/webhook-management.service';
 import { AuthenticatedUser } from 'src/modules/auth/interfaces/authenticated-user.interface';

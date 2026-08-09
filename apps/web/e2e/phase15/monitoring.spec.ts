@@ -305,9 +305,7 @@ test.describe('Phase 15 monitoring', () => {
     await navigation;
   });
 
-  test('shows an error state with a retry action when monitoring data fails to load', async ({
-    page,
-  }) => {
+  test('shows an error state with a retry action when monitoring data fails to load', async ({ page }) => {
     await page.route('**/monitoring/summary', async (route) => {
       await route.fulfill({
         status: 500,
@@ -348,14 +346,10 @@ test.describe('Phase 15 monitoring', () => {
 
     await expect(page.getByText('Monitoring is not configured')).toBeVisible();
 
-    await expect(
-      page.getByText('Add a health check to begin tracking application or website availability.'),
-    ).toBeVisible();
+    await expect(page.getByText('Add a health check to begin tracking application or website availability.')).toBeVisible();
   });
 
-  test('shows an empty state for the incident timeline when there are no incidents', async ({
-    page,
-  }) => {
+  test('shows an empty state for the incident timeline when there are no incidents', async ({ page }) => {
     await page.route('**/monitoring/incidents', async (route) => {
       await route.fulfill({
         status: 200,
@@ -374,34 +368,31 @@ test.describe('Phase 15 monitoring', () => {
   test('runs a health check immediately via "Run now"', async ({ page }) => {
     let runCalled = false;
 
-    await page.route(
-      '**/monitoring/checks/55555555-5555-4555-8555-555555555555/run',
-      async (route) => {
-        runCalled = true;
+    await page.route('**/monitoring/checks/55555555-5555-4555-8555-555555555555/run', async (route) => {
+      runCalled = true;
 
-        await route.fulfill({
-          status: 201,
+      await route.fulfill({
+        status: 201,
 
-          contentType: 'application/json',
+        contentType: 'application/json',
 
-          body: JSON.stringify({
-            healthCheckId: '55555555-5555-4555-8555-555555555555',
+        body: JSON.stringify({
+          healthCheckId: '55555555-5555-4555-8555-555555555555',
 
-            status: 'HEALTHY',
+          status: 'HEALTHY',
 
-            statusCode: 200,
+          statusCode: 200,
 
-            responseTimeMs: 120,
+          responseTimeMs: 120,
 
-            failureReason: null,
+          failureReason: null,
 
-            consecutiveFailures: 0,
+          consecutiveFailures: 0,
 
-            nextRunAt: '2026-08-07T01:10:00.000Z',
-          }),
-        });
-      },
-    );
+          nextRunAt: '2026-08-07T01:10:00.000Z',
+        }),
+      });
+    });
 
     await page.goto(`/workspaces/${workspaceId}/monitoring`);
 
@@ -414,31 +405,26 @@ test.describe('Phase 15 monitoring', () => {
     expect(runCalled).toBe(true);
   });
 
-  test('toggles a health check via "Disable", then shows an inline alert on failure', async ({
-    page,
-  }) => {
-    await page.route(
-      '**/monitoring/checks/55555555-5555-4555-8555-555555555555',
-      async (route) => {
-        if (route.request().method() === 'PATCH') {
-          await route.fulfill({
-            status: 400,
+  test('toggles a health check via "Disable", then shows an inline alert on failure', async ({ page }) => {
+    await page.route('**/monitoring/checks/55555555-5555-4555-8555-555555555555', async (route) => {
+      if (route.request().method() === 'PATCH') {
+        await route.fulfill({
+          status: 400,
 
-            contentType: 'application/json',
+          contentType: 'application/json',
 
-            body: JSON.stringify({
-              statusCode: 400,
+          body: JSON.stringify({
+            statusCode: 400,
 
-              message: 'Unable to disable this health check right now.',
-            }),
-          });
+            message: 'Unable to disable this health check right now.',
+          }),
+        });
 
-          return;
-        }
+        return;
+      }
 
-        await route.fallback();
-      },
-    );
+      await route.fallback();
+    });
 
     await page.goto(`/workspaces/${workspaceId}/monitoring`);
 
@@ -452,32 +438,29 @@ test.describe('Phase 15 monitoring', () => {
   });
 
   test('opens the health-check history view', async ({ page }) => {
-    await page.route(
-      '**/monitoring/checks/55555555-5555-4555-8555-555555555555/history',
-      async (route) => {
-        await route.fulfill({
-          status: 200,
+    await page.route('**/monitoring/checks/55555555-5555-4555-8555-555555555555/history', async (route) => {
+      await route.fulfill({
+        status: 200,
 
-          contentType: 'application/json',
+        contentType: 'application/json',
 
-          body: JSON.stringify([
-            {
-              id: 'history-1',
+        body: JSON.stringify([
+          {
+            id: 'history-1',
 
-              status: 'HEALTHY',
+            status: 'HEALTHY',
 
-              statusCode: 200,
+            statusCode: 200,
 
-              responseTimeMs: 118,
+            responseTimeMs: 118,
 
-              failureReason: null,
+            failureReason: null,
 
-              checkedAt: '2026-08-07T01:00:00.000Z',
-            },
-          ]),
-        });
-      },
-    );
+            checkedAt: '2026-08-07T01:00:00.000Z',
+          },
+        ]),
+      });
+    });
 
     await page.goto(`/workspaces/${workspaceId}/monitoring`);
 

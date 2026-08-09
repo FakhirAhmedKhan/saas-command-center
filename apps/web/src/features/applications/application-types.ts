@@ -1,12 +1,4 @@
-export const APPLICATION_STATUSES = [
-  'IDEA',
-  'PLANNING',
-  'IN_DEVELOPMENT',
-  'TESTING',
-  'LIVE',
-  'MAINTENANCE',
-  'PAUSED',
-] as const;
+export const APPLICATION_STATUSES = ['IDEA', 'PLANNING', 'IN_DEVELOPMENT', 'TESTING', 'LIVE', 'MAINTENANCE', 'PAUSED'] as const;
 
 export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
 
@@ -14,39 +6,15 @@ export const APPLICATION_PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'] as c
 
 export type ApplicationPriority = (typeof APPLICATION_PRIORITIES)[number];
 
-export const APPLICATION_CATEGORIES = [
-  'SAAS',
-  'AI',
-  'MOBILE',
-  'ECOMMERCE',
-  'API',
-  'INTERNAL_TOOL',
-  'OTHER',
-] as const;
+export const APPLICATION_CATEGORIES = ['SAAS', 'AI', 'MOBILE', 'ECOMMERCE', 'API', 'INTERNAL_TOOL', 'OTHER'] as const;
 
 export type ApplicationCategory = (typeof APPLICATION_CATEGORIES)[number];
 
-export const TECHNOLOGY_TYPES = [
-  'FRONTEND',
-  'BACKEND',
-  'DATABASE',
-  'MOBILE',
-  'AI',
-  'INFRASTRUCTURE',
-  'OTHER',
-] as const;
+export const TECHNOLOGY_TYPES = ['FRONTEND', 'BACKEND', 'DATABASE', 'MOBILE', 'AI', 'INFRASTRUCTURE', 'OTHER'] as const;
 
 export type TechnologyType = (typeof TECHNOLOGY_TYPES)[number];
 
-export const APPLICATION_LINK_TYPES = [
-  'PRODUCTION',
-  'STAGING',
-  'REPOSITORY',
-  'DOCUMENTATION',
-  'DESIGN',
-  'API',
-  'OTHER',
-] as const;
+export const APPLICATION_LINK_TYPES = ['PRODUCTION', 'STAGING', 'REPOSITORY', 'DOCUMENTATION', 'DESIGN', 'API', 'OTHER'] as const;
 
 export type ApplicationLinkType = (typeof APPLICATION_LINK_TYPES)[number];
 

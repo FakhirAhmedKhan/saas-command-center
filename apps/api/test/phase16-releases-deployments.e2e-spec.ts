@@ -132,36 +132,22 @@ describe('Phase 16 Releases & Deployments E2E', () => {
     return `${deploymentUrl(deploymentId)}/transition`;
   }
 
-  async function createRelease(
-    token: string,
-    overrides: Record<string, unknown> = {},
-  ): Promise<Response> {
+  async function createRelease(token: string, overrides: Record<string, unknown> = {}): Promise<Response> {
     return request(app.getHttpServer())
       .post(releasesUrl())
       .set(withBearer(token))
       .send({ version: `1.0.${Date.now()}-${randomUUID().slice(0, 6)}`, ...overrides });
   }
 
-  async function createDeployment(
-    token: string,
-    releaseId: string,
-    overrides: Record<string, unknown> = {},
-  ): Promise<Response> {
+  async function createDeployment(token: string, releaseId: string, overrides: Record<string, unknown> = {}): Promise<Response> {
     return request(app.getHttpServer())
       .post(deploymentsUrl())
       .set(withBearer(token))
       .send({ releaseId, environmentId, ...overrides });
   }
 
-  async function transition(
-    token: string,
-    deploymentId: string,
-    payload: Record<string, unknown>,
-  ): Promise<Response> {
-    return request(app.getHttpServer())
-      .post(transitionUrl(deploymentId))
-      .set(withBearer(token))
-      .send(payload);
+  async function transition(token: string, deploymentId: string, payload: Record<string, unknown>): Promise<Response> {
+    return request(app.getHttpServer()).post(transitionUrl(deploymentId)).set(withBearer(token)).send(payload);
   }
 
   beforeAll(async () => {
@@ -194,10 +180,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
       select: { workspaceId: true },
     });
 
-    workspaceId = requireValue(
-      ownerMembership?.workspaceId,
-      'Phase 16 owner workspace was not found',
-    );
+    workspaceId = requireValue(ownerMembership?.workspaceId, 'Phase 16 owner workspace was not found');
 
     const developer = createTestUser({
       name: 'Phase 16 Developer',
@@ -347,9 +330,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   });
 
   it('lists releases scoped to the application', async () => {
-    const response = await request(app.getHttpServer())
-      .get(releasesUrl())
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(releasesUrl()).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
 
@@ -361,9 +342,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   });
 
   it('searches releases by version', async () => {
-    const response = await request(app.getHttpServer())
-      .get(`${releasesUrl()}?search=1.0.1`)
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(`${releasesUrl()}?search=1.0.1`).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
 
@@ -377,9 +356,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
 
     const releaseId = body(createResponse).id as string;
 
-    const response = await request(app.getHttpServer())
-      .get(releaseUrl(releaseId))
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(releaseUrl(releaseId)).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
     expect(body(response)).toMatchObject({ id: releaseId, version: '1.0.2' });
@@ -401,9 +378,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   });
 
   it('returns 404 for a nonexistent release', async () => {
-    const response = await request(app.getHttpServer())
-      .get(releaseUrl(randomUUID()))
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(releaseUrl(randomUUID())).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(404);
   });
@@ -477,10 +452,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
 
     expect(releaseAfter.status).toBe('SUCCESSFUL');
 
-    const updateResponse = await request(app.getHttpServer())
-      .patch(releaseUrl(releaseId))
-      .set(withBearer(ownerAccessToken))
-      .send({ version: '3.0.0-changed' });
+    const updateResponse = await request(app.getHttpServer()).patch(releaseUrl(releaseId)).set(withBearer(ownerAccessToken)).send({ version: '3.0.0-changed' });
 
     expect(updateResponse.status).toBe(400);
   });
@@ -600,9 +572,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   });
 
   it('returns 404 for a nonexistent deployment', async () => {
-    const response = await request(app.getHttpServer())
-      .get(deploymentUrl(randomUUID()))
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(deploymentUrl(randomUUID())).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(404);
   });
@@ -658,10 +628,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   it('rejects an invalid transition (DRAFT -> SUCCESSFUL is not a legal transition)', async () => {
     const releaseResponse = await createRelease(ownerAccessToken, { version: '5.0.1' });
 
-    const deploymentResponse = await createDeployment(
-      ownerAccessToken,
-      body(releaseResponse).id as string,
-    );
+    const deploymentResponse = await createDeployment(ownerAccessToken, body(releaseResponse).id as string);
 
     const response = await transition(ownerAccessToken, body(deploymentResponse).id as string, {
       status: DeploymentStatus.SUCCESSFUL,
@@ -673,10 +640,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   it('rejects transitioning a deployment to its own current status', async () => {
     const releaseResponse = await createRelease(ownerAccessToken, { version: '5.0.2' });
 
-    const deploymentResponse = await createDeployment(
-      ownerAccessToken,
-      body(releaseResponse).id as string,
-    );
+    const deploymentResponse = await createDeployment(ownerAccessToken, body(releaseResponse).id as string);
 
     const response = await transition(ownerAccessToken, body(deploymentResponse).id as string, {
       status: DeploymentStatus.DRAFT,
@@ -726,10 +690,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   it('requires scheduledAt when transitioning to SCHEDULED', async () => {
     const releaseResponse = await createRelease(ownerAccessToken, { version: '5.0.4' });
 
-    const deploymentResponse = await createDeployment(
-      ownerAccessToken,
-      body(releaseResponse).id as string,
-    );
+    const deploymentResponse = await createDeployment(ownerAccessToken, body(releaseResponse).id as string);
 
     const response = await transition(ownerAccessToken, body(deploymentResponse).id as string, {
       status: DeploymentStatus.SCHEDULED,
@@ -741,10 +702,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   it('accepts a SCHEDULED transition when scheduledAt is provided', async () => {
     const releaseResponse = await createRelease(ownerAccessToken, { version: '5.0.5' });
 
-    const deploymentResponse = await createDeployment(
-      ownerAccessToken,
-      body(releaseResponse).id as string,
-    );
+    const deploymentResponse = await createDeployment(ownerAccessToken, body(releaseResponse).id as string);
 
     const response = await transition(ownerAccessToken, body(deploymentResponse).id as string, {
       status: DeploymentStatus.SCHEDULED,
@@ -761,10 +719,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   it('requires failureReason when transitioning to FAILED', async () => {
     const releaseResponse = await createRelease(ownerAccessToken, { version: '5.0.6' });
 
-    const deploymentResponse = await createDeployment(
-      ownerAccessToken,
-      body(releaseResponse).id as string,
-    );
+    const deploymentResponse = await createDeployment(ownerAccessToken, body(releaseResponse).id as string);
 
     const deploymentId = body(deploymentResponse).id as string;
 
@@ -780,10 +735,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   it('records a FAILED deployment with its failure reason, then allows retry via IN_PROGRESS', async () => {
     const releaseResponse = await createRelease(ownerAccessToken, { version: '5.0.7' });
 
-    const deploymentResponse = await createDeployment(
-      ownerAccessToken,
-      body(releaseResponse).id as string,
-    );
+    const deploymentResponse = await createDeployment(ownerAccessToken, body(releaseResponse).id as string);
 
     const deploymentId = body(deploymentResponse).id as string;
 
@@ -872,10 +824,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   it('rejects a deployment rolling back to itself', async () => {
     const releaseResponse = await createRelease(ownerAccessToken, { version: '5.0.10' });
 
-    const deploymentResponse = await createDeployment(
-      ownerAccessToken,
-      body(releaseResponse).id as string,
-    );
+    const deploymentResponse = await createDeployment(ownerAccessToken, body(releaseResponse).id as string);
 
     const deploymentId = body(deploymentResponse).id as string;
 
@@ -909,9 +858,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
     });
 
     const response = await request(app.getHttpServer())
-      .get(
-        `${API_PREFIX}/workspaces/${workspaceId}/applications/${otherApplication.id}/deployments`,
-      )
+      .get(`${API_PREFIX}/workspaces/${workspaceId}/applications/${otherApplication.id}/deployments`)
       .set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
@@ -948,15 +895,11 @@ describe('Phase 16 Releases & Deployments E2E', () => {
       rollbackToDeploymentId: baseDeploymentId,
     });
 
-    const response = await request(app.getHttpServer())
-      .get(`${deploymentsUrl()}/current`)
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(`${deploymentsUrl()}/current`).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
 
-    const stagingEntry = (response.body as JsonRecord[]).find(
-      (entry) => entry.environmentId === secondEnvironmentId,
-    );
+    const stagingEntry = (response.body as JsonRecord[]).find((entry) => entry.environmentId === secondEnvironmentId);
 
     expect(stagingEntry).toMatchObject({
       status: DeploymentStatus.ROLLED_BACK,
@@ -992,10 +935,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   it('rejects a VIEWER transitioning a deployment', async () => {
     const releaseResponse = await createRelease(ownerAccessToken, { version: '7.0.3' });
 
-    const deploymentResponse = await createDeployment(
-      ownerAccessToken,
-      body(releaseResponse).id as string,
-    );
+    const deploymentResponse = await createDeployment(ownerAccessToken, body(releaseResponse).id as string);
 
     const response = await transition(viewerAccessToken, body(deploymentResponse).id as string, {
       status: DeploymentStatus.IN_PROGRESS,
@@ -1005,15 +945,11 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   });
 
   it('allows a VIEWER to read releases and deployments', async () => {
-    const releasesResponse = await request(app.getHttpServer())
-      .get(releasesUrl())
-      .set(withBearer(viewerAccessToken));
+    const releasesResponse = await request(app.getHttpServer()).get(releasesUrl()).set(withBearer(viewerAccessToken));
 
     expect(releasesResponse.status).toBe(200);
 
-    const deploymentsResponse = await request(app.getHttpServer())
-      .get(deploymentsUrl())
-      .set(withBearer(viewerAccessToken));
+    const deploymentsResponse = await request(app.getHttpServer()).get(deploymentsUrl()).set(withBearer(viewerAccessToken));
 
     expect(deploymentsResponse.status).toBe(200);
   });
@@ -1023,9 +959,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   // ---------------------------------------------------------------------------------------
 
   it('blocks an outsider from listing releases', async () => {
-    const response = await request(app.getHttpServer())
-      .get(releasesUrl())
-      .set(withBearer(outsiderAccessToken));
+    const response = await request(app.getHttpServer()).get(releasesUrl()).set(withBearer(outsiderAccessToken));
 
     expect(response.status).toBe(403);
   });
@@ -1039,10 +973,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   it('blocks an outsider from reading a specific deployment', async () => {
     const releaseResponse = await createRelease(ownerAccessToken, { version: '8.0.1' });
 
-    const deploymentResponse = await createDeployment(
-      ownerAccessToken,
-      body(releaseResponse).id as string,
-    );
+    const deploymentResponse = await createDeployment(ownerAccessToken, body(releaseResponse).id as string);
 
     const response = await request(app.getHttpServer())
       .get(deploymentUrl(body(deploymentResponse).id as string))
@@ -1056,23 +987,17 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   // ---------------------------------------------------------------------------------------
 
   it('filters deployments by environmentId', async () => {
-    const response = await request(app.getHttpServer())
-      .get(`${deploymentsUrl()}?environmentId=${secondEnvironmentId}`)
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(`${deploymentsUrl()}?environmentId=${secondEnvironmentId}`).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
 
     const items = body(response).items as JsonRecord[];
 
-    expect(items.every((deployment) => deployment.environmentId === secondEnvironmentId)).toBe(
-      true,
-    );
+    expect(items.every((deployment) => deployment.environmentId === secondEnvironmentId)).toBe(true);
   });
 
   it('filters deployments by status', async () => {
-    const response = await request(app.getHttpServer())
-      .get(`${deploymentsUrl()}?status=${DeploymentStatus.DRAFT}`)
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(`${deploymentsUrl()}?status=${DeploymentStatus.DRAFT}`).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
 
@@ -1082,9 +1007,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   });
 
   it('paginates deployments', async () => {
-    const response = await request(app.getHttpServer())
-      .get(`${deploymentsUrl()}?page=1&limit=1`)
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(`${deploymentsUrl()}?page=1&limit=1`).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
     expect((body(response).items as JsonRecord[]).length).toBeLessThanOrEqual(1);
@@ -1098,10 +1021,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   it('rejects a transition whose precondition status no longer matches (optimistic concurrency)', async () => {
     const releaseResponse = await createRelease(ownerAccessToken, { version: '9.0.0' });
 
-    const deploymentResponse = await createDeployment(
-      ownerAccessToken,
-      body(releaseResponse).id as string,
-    );
+    const deploymentResponse = await createDeployment(ownerAccessToken, body(releaseResponse).id as string);
 
     const deploymentId = body(deploymentResponse).id as string;
 
@@ -1126,10 +1046,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   it('preserves deployment history: transitions never delete or overwrite prior activity entries', async () => {
     const releaseResponse = await createRelease(ownerAccessToken, { version: '9.0.1' });
 
-    const deploymentResponse = await createDeployment(
-      ownerAccessToken,
-      body(releaseResponse).id as string,
-    );
+    const deploymentResponse = await createDeployment(ownerAccessToken, body(releaseResponse).id as string);
 
     const deploymentId = body(deploymentResponse).id as string;
 

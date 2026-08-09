@@ -8,30 +8,15 @@ import { AnalyticsProcessingService } from 'src/modules/analytics-engine/service
 
 import { recordString } from './helpers/application';
 
-import {
-  analyticsEngineRoutes,
-  getAnalyticsEngineStatus,
-  getAnonymousAnalyticsEngineStatus,
-  readAnalyticsEngineStatus,
-} from './helpers/analytics-engine-old';
+import { analyticsEngineRoutes, getAnalyticsEngineStatus, getAnonymousAnalyticsEngineStatus, readAnalyticsEngineStatus } from './helpers/analytics-engine-old';
 
-import {
-  buildTrackerEvent,
-  collectEvents,
-  createTrackedWebsite,
-  expectCollectionAccepted,
-  uniqueTrackerId,
-} from './helpers/analytics-ingestion';
+import { buildTrackerEvent, collectEvents, createTrackedWebsite, expectCollectionAccepted, uniqueTrackerId } from './helpers/analytics-ingestion';
 
 import { createTestApp } from './helpers/create-test-app';
 
 import { resetDatabase } from './helpers/database';
 
-import {
-  addWorkspaceMember,
-  expectAccessDenied,
-  registerWorkspaceTestUser,
-} from './helpers/workspace';
+import { addWorkspaceMember, expectAccessDenied, registerWorkspaceTestUser } from './helpers/workspace';
 
 describe('Analytics Engine Status E2E', () => {
   let app: INestApplication;
@@ -105,12 +90,7 @@ describe('Analytics Engine Status E2E', () => {
       1,
     );
 
-    await processingService.processForWorkspace(
-      owner.workspaceId,
-      trackedWebsite.id,
-      owner.userId,
-      100,
-    );
+    await processingService.processForWorkspace(owner.workspaceId, trackedWebsite.id, owner.userId, 100);
 
     const response = await getAnalyticsEngineStatus(owner, owner.workspaceId, trackedWebsite.id);
 
@@ -144,9 +124,7 @@ describe('Analytics Engine Status E2E', () => {
 
     const trackedWebsite = await createTrackedWebsite(owner);
 
-    expect([200, 201]).toContain(
-      (await addWorkspaceMember(owner, viewer, WorkspaceRole.VIEWER)).status,
-    );
+    expect([200, 201]).toContain((await addWorkspaceMember(owner, viewer, WorkspaceRole.VIEWER)).status);
 
     const response = await getAnalyticsEngineStatus(viewer, owner.workspaceId, trackedWebsite.id);
 
@@ -160,13 +138,9 @@ describe('Analytics Engine Status E2E', () => {
 
     const trackedWebsite = await createTrackedWebsite(owner);
 
-    expectAccessDenied(
-      await getAnalyticsEngineStatus(outsider, owner.workspaceId, trackedWebsite.id),
-    );
+    expectAccessDenied(await getAnalyticsEngineStatus(outsider, owner.workspaceId, trackedWebsite.id));
 
-    expect(
-      (await getAnonymousAnalyticsEngineStatus(app, owner.workspaceId, trackedWebsite.id)).status,
-    ).toBe(401);
+    expect((await getAnonymousAnalyticsEngineStatus(app, owner.workspaceId, trackedWebsite.id)).status).toBe(401);
   });
 
   it('rejects malformed IDs and hides a foreign website', async () => {
@@ -176,19 +150,11 @@ describe('Analytics Engine Status E2E', () => {
 
     const betaWebsite = await createTrackedWebsite(beta);
 
-    expect(
-      (
-        await alpha.agent
-          .get(analyticsEngineRoutes.status('not-a-uuid', betaWebsite.id))
-          .set('Authorization', `Bearer ${alpha.accessToken}`)
-      ).status,
-    ).toBe(400);
-
-    const foreignResponse = await getAnalyticsEngineStatus(
-      alpha,
-      alpha.workspaceId,
-      betaWebsite.id,
+    expect((await alpha.agent.get(analyticsEngineRoutes.status('not-a-uuid', betaWebsite.id)).set('Authorization', `Bearer ${alpha.accessToken}`)).status).toBe(
+      400,
     );
+
+    const foreignResponse = await getAnalyticsEngineStatus(alpha, alpha.workspaceId, betaWebsite.id);
 
     expect(foreignResponse.status).toBe(404);
   });

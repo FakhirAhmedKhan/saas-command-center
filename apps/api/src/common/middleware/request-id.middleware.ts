@@ -20,11 +20,7 @@ function getExistingRequestId(value: string | string[] | undefined): string | un
   return normalizedValue || undefined;
 }
 
-export function requestIdMiddleware(
-  request: Request,
-  response: Response,
-  next: NextFunction,
-): void {
+export function requestIdMiddleware(request: Request, response: Response, next: NextFunction): void {
   const existingRequestId = getExistingRequestId(request.headers[REQUEST_ID_HEADER]);
 
   const requestId = existingRequestId ?? randomUUID();

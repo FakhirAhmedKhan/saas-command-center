@@ -1,10 +1,6 @@
 import type { INestApplication } from '@nestjs/common';
 
-import {
-  AnalyticsAggregateDimension,
-  RawAnalyticsEventType,
-  WorkspaceRole,
-} from 'src/generated/prisma/enums';
+import { AnalyticsAggregateDimension, RawAnalyticsEventType, WorkspaceRole } from 'src/generated/prisma/enums';
 
 import { PrismaService } from 'src/database/prisma.service';
 
@@ -24,11 +20,7 @@ import { createTestApp } from './helpers/create-test-app';
 
 import { resetDatabase } from './helpers/database';
 
-import {
-  addWorkspaceMember,
-  expectAccessDenied,
-  registerWorkspaceTestUser,
-} from './helpers/workspace';
+import { addWorkspaceMember, expectAccessDenied, registerWorkspaceTestUser } from './helpers/workspace';
 
 function readNumber(record: Record<string, unknown>, key: string): number {
   const value = record[key];
@@ -204,8 +196,7 @@ describe('Analytics Aggregates E2E', () => {
 
     const website = await createTrackedWebsite(owner);
 
-    const userAgent =
-      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 Version/17.5 Mobile/15E148 Safari/604.1';
+    const userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 Version/17.5 Mobile/15E148 Safari/604.1';
 
     await createRawAnalyticsEvent(prisma, website, {
       referrerUrl: 'https://www.google.com/search?q=command+center',
@@ -342,17 +333,13 @@ describe('Analytics Aggregates E2E', () => {
 
     const website = await createTrackedWebsite(owner);
 
-    expect([200, 201]).toContain(
-      (await addWorkspaceMember(owner, viewer, WorkspaceRole.VIEWER)).status,
-    );
+    expect([200, 201]).toContain((await addWorkspaceMember(owner, viewer, WorkspaceRole.VIEWER)).status);
 
     expect((await listAnalyticsAggregates(viewer, owner.workspaceId, website.id)).status).toBe(200);
 
     expectAccessDenied(await listAnalyticsAggregates(outsider, owner.workspaceId, website.id));
 
-    expect((await getAnonymousAnalyticsAggregates(app, owner.workspaceId, website.id)).status).toBe(
-      401,
-    );
+    expect((await getAnonymousAnalyticsAggregates(app, owner.workspaceId, website.id)).status).toBe(401);
   });
 
   it('rejects malformed aggregate queries and hides foreign websites', async () => {
@@ -383,16 +370,10 @@ describe('Analytics Aggregates E2E', () => {
         dateTo: '2026-08-01T00:00:00.000Z',
       },
     ]) {
-      expect(
-        (await listAnalyticsAggregates(owner, owner.workspaceId, website.id, query)).status,
-      ).toBe(400);
+      expect((await listAnalyticsAggregates(owner, owner.workspaceId, website.id, query)).status).toBe(400);
     }
 
-    const foreignResponse = await listAnalyticsAggregates(
-      foreignOwner,
-      owner.workspaceId,
-      website.id,
-    );
+    const foreignResponse = await listAnalyticsAggregates(foreignOwner, owner.workspaceId, website.id);
 
     expectAccessDenied(foreignResponse);
   });

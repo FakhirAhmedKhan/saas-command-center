@@ -199,9 +199,7 @@ test.describe('Phase 18 webhook integrations', () => {
     await navigation;
   });
 
-  test('shows an error state with a retry action when webhook data fails to load', async ({
-    page,
-  }) => {
+  test('shows an error state with a retry action when webhook data fails to load', async ({ page }) => {
     await page.route('**/integrations/webhooks', async (route) => {
       if (route.request().method() === 'POST') {
         await route.fallback();
@@ -260,11 +258,7 @@ test.describe('Phase 18 webhook integrations', () => {
 
     await expect(page.getByText('No integrations configured')).toBeVisible();
 
-    await expect(
-      page.getByText(
-        'Create a webhook to deliver selected Command Center events to another system.',
-      ),
-    ).toBeVisible();
+    await expect(page.getByText('Create a webhook to deliver selected Command Center events to another system.')).toBeVisible();
   });
 
   test('shows an inline alert when webhook creation fails', async ({ page }) => {
@@ -332,9 +326,7 @@ test.describe('Phase 18 webhook integrations', () => {
       })
       .click();
 
-    await expect(
-      page.getByText('Private or internal webhook destinations are not allowed.'),
-    ).toBeVisible();
+    await expect(page.getByText('Private or internal webhook destinations are not allowed.')).toBeVisible();
   });
 
   test('rotates a webhook secret after the confirmation dialog is accepted', async ({ page }) => {
@@ -429,9 +421,7 @@ test.describe('Phase 18 webhook integrations', () => {
     await expect(page.locator('input[value="rotated-webhook-secret"]')).toBeVisible();
   });
 
-  test('does not rotate a webhook secret when the confirmation dialog is dismissed', async ({
-    page,
-  }) => {
+  test('does not rotate a webhook secret when the confirmation dialog is dismissed', async ({ page }) => {
     await page.route('**/integrations/webhooks', async (route) => {
       if (route.request().method() === 'POST') {
         await route.fallback();
@@ -720,9 +710,7 @@ test.describe('Phase 18 webhook integrations', () => {
     expect(testDeliveryCalled).toBe(true);
   });
 
-  test('opens the delivery-log viewer and shows an empty state with no deliveries', async ({
-    page,
-  }) => {
+  test('opens the delivery-log viewer and shows an empty state with no deliveries', async ({ page }) => {
     await page.route('**/integrations/webhooks', async (route) => {
       if (route.request().method() === 'POST') {
         await route.fallback();
@@ -816,9 +804,7 @@ test.describe('Phase 18 webhook integrations', () => {
 
     await expect(page.getByText('No webhook deliveries have been recorded.')).toBeVisible();
 
-    await expect(
-      page.getByText('Request bodies and signing secrets are not included in these logs.'),
-    ).toBeVisible();
+    await expect(page.getByText('Request bodies and signing secrets are not included in these logs.')).toBeVisible();
   });
 
   test('the delivery-log viewer never renders a secret or ciphertext value', async ({ page }) => {

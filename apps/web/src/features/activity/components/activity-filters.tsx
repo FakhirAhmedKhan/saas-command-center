@@ -46,10 +46,7 @@ interface ActivityFiltersProps {
 }
 
 export function ActivityFilters({ value, onChange, onApply, onReset }: ActivityFiltersProps) {
-  function update<Key extends keyof ActivityFilterValue>(
-    key: Key,
-    fieldValue: ActivityFilterValue[Key],
-  ): void {
+  function update<Key extends keyof ActivityFilterValue>(key: Key, fieldValue: ActivityFilterValue[Key]): void {
     onChange({
       ...value,
       [key]: fieldValue,
@@ -62,10 +59,7 @@ export function ActivityFilters({ value, onChange, onApply, onReset }: ActivityF
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card"
-    >
+    <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
       <div className="grid gap-4 xl:grid-cols-[minmax(220px,1.5fr)_repeat(3,minmax(150px,1fr))_170px_170px]">
         <Input
           aria-label="Search activity"
@@ -78,9 +72,7 @@ export function ActivityFilters({ value, onChange, onApply, onReset }: ActivityF
         <Select
           aria-label="Activity type"
           value={value.activityType}
-          onChange={(event) =>
-            update('activityType', event.target.value as ApplicationActivityType | '')
-          }
+          onChange={(event) => update('activityType', event.target.value as ApplicationActivityType | '')}
         >
           <option value="">All activities</option>
 
@@ -91,11 +83,7 @@ export function ActivityFilters({ value, onChange, onApply, onReset }: ActivityF
           ))}
         </Select>
 
-        <Select
-          aria-label="Actor type"
-          value={value.actorType}
-          onChange={(event) => update('actorType', event.target.value as ActivityActorType | '')}
-        >
+        <Select aria-label="Actor type" value={value.actorType} onChange={(event) => update('actorType', event.target.value as ActivityActorType | '')}>
           <option value="">All actors</option>
 
           {ACTIVITY_ACTOR_TYPES.map((type) => (
@@ -105,11 +93,7 @@ export function ActivityFilters({ value, onChange, onApply, onReset }: ActivityF
           ))}
         </Select>
 
-        <Select
-          aria-label="Entity type"
-          value={value.entityType}
-          onChange={(event) => update('entityType', event.target.value as ActivityEntityType | '')}
-        >
+        <Select aria-label="Entity type" value={value.entityType} onChange={(event) => update('entityType', event.target.value as ActivityEntityType | '')}>
           <option value="">All entities</option>
 
           {ACTIVITY_ENTITY_TYPES.map((type) => (
@@ -119,19 +103,9 @@ export function ActivityFilters({ value, onChange, onApply, onReset }: ActivityF
           ))}
         </Select>
 
-        <Input
-          type="date"
-          aria-label="From date"
-          value={value.dateFrom}
-          onChange={(event) => update('dateFrom', event.target.value)}
-        />
+        <Input type="date" aria-label="From date" value={value.dateFrom} onChange={(event) => update('dateFrom', event.target.value)} />
 
-        <Input
-          type="date"
-          aria-label="To date"
-          value={value.dateTo}
-          onChange={(event) => update('dateTo', event.target.value)}
-        />
+        <Input type="date" aria-label="To date" value={value.dateTo} onChange={(event) => update('dateTo', event.target.value)} />
       </div>
 
       <div className="mt-4 flex flex-wrap justify-end gap-3">

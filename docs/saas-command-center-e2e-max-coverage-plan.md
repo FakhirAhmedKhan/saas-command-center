@@ -97,12 +97,12 @@ Validate p95 latency, worker concurrency, queue backlogs, pagination/index perfo
 
 ## Backend Code Coverage
 
-| Metric | Minimum | Preferred |
-|---|---:|---:|
-| Statements | 90% | 95%+ |
-| Branches | 85% | 90–95%+ |
-| Functions | 90% | 95%+ |
-| Lines | 90% | 95%+ |
+| Metric     | Minimum | Preferred |
+| ---------- | ------: | --------: |
+| Statements |     90% |      95%+ |
+| Branches   |     85% |   90–95%+ |
+| Functions  |     90% |      95%+ |
+| Lines      |     90% |      95%+ |
 
 Critical modules should target **95%+ branches**.
 
@@ -269,25 +269,25 @@ apps/web/e2e/
 
 # 7. Business Logic Coverage Matrix
 
-| Domain | Rule | Required Coverage |
-|---|---|---|
-| Auth | Refresh rotates; old token reuse fails | Unit + API E2E + Browser |
-| Workspace | Foreign workspace inaccessible | API E2E + Browser |
-| Roles | Viewer read-only | API E2E + Frontend E2E |
-| Analytics | Duplicate source event never duplicates normalized record | Integration + E2E |
-| Processing | Same range is idempotent | Integration + E2E |
-| Processing | Failure preserves prior valid analytics | Integration + E2E |
-| Monitoring | Incident opens only at threshold | Unit + Integration + E2E |
-| Monitoring | Recovery resolves incident | Integration + E2E |
-| Deployment | Invalid transition impossible | Unit + API E2E |
-| Rollback | Effective version uses rollback target | Unit + E2E |
-| Invitation | Token one-time, hashed, email-bound | Unit + API E2E + Browser |
-| Notification | User cannot access another user's notification | API E2E |
-| Webhook | Secret encrypted and never listed | Integration + E2E |
-| Webhook | Exact raw body HMAC signed | Unit + Delivery E2E |
-| Webhook | Retry only retryable failures | Unit + Worker E2E |
-| SSRF | Internal/private targets blocked | Unit + E2E |
-| Concurrency | Same job never executes twice | Multi-instance E2E |
+| Domain       | Rule                                                      | Required Coverage        |
+| ------------ | --------------------------------------------------------- | ------------------------ |
+| Auth         | Refresh rotates; old token reuse fails                    | Unit + API E2E + Browser |
+| Workspace    | Foreign workspace inaccessible                            | API E2E + Browser        |
+| Roles        | Viewer read-only                                          | API E2E + Frontend E2E   |
+| Analytics    | Duplicate source event never duplicates normalized record | Integration + E2E        |
+| Processing   | Same range is idempotent                                  | Integration + E2E        |
+| Processing   | Failure preserves prior valid analytics                   | Integration + E2E        |
+| Monitoring   | Incident opens only at threshold                          | Unit + Integration + E2E |
+| Monitoring   | Recovery resolves incident                                | Integration + E2E        |
+| Deployment   | Invalid transition impossible                             | Unit + API E2E           |
+| Rollback     | Effective version uses rollback target                    | Unit + E2E               |
+| Invitation   | Token one-time, hashed, email-bound                       | Unit + API E2E + Browser |
+| Notification | User cannot access another user's notification            | API E2E                  |
+| Webhook      | Secret encrypted and never listed                         | Integration + E2E        |
+| Webhook      | Exact raw body HMAC signed                                | Unit + Delivery E2E      |
+| Webhook      | Retry only retryable failures                             | Unit + Worker E2E        |
+| SSRF         | Internal/private targets blocked                          | Unit + E2E               |
+| Concurrency  | Same job never executes twice                             | Multi-instance E2E       |
 
 ---
 
@@ -713,17 +713,17 @@ Explicitly test every invalid transition too.
 
 ## Retry Policy
 
-| Response | Expected |
-|---|---|
-| 2xx | SUCCEEDED |
-| 400 | non-retryable/dead-letter according to policy |
-| 401/403 | non-retryable according to policy |
-| 408 | retry |
-| 425 | retry |
-| 429 | retry |
-| 5xx | retry |
-| network error | retry |
-| timeout | retry |
+| Response      | Expected                                      |
+| ------------- | --------------------------------------------- |
+| 2xx           | SUCCEEDED                                     |
+| 400           | non-retryable/dead-letter according to policy |
+| 401/403       | non-retryable according to policy             |
+| 408           | retry                                         |
+| 425           | retry                                         |
+| 429           | retry                                         |
+| 5xx           | retry                                         |
+| network error | retry                                         |
+| timeout       | retry                                         |
 
 ## Worker
 
@@ -1020,15 +1020,15 @@ For every protected route:
 
 # 22. Performance & Scalability
 
-| Operation | Preferred p95 |
-|---|---:|
-| Login | < 300 ms |
-| Workspace list | < 300 ms |
-| Analytics overview | < 800 ms |
-| Detailed report | < 1,500 ms |
-| Notification unread count | < 200 ms |
-| Monitoring list | < 500 ms |
-| Webhook integration list | < 500 ms |
+| Operation                 | Preferred p95 |
+| ------------------------- | ------------: |
+| Login                     |      < 300 ms |
+| Workspace list            |      < 300 ms |
+| Analytics overview        |      < 800 ms |
+| Detailed report           |    < 1,500 ms |
+| Notification unread count |      < 200 ms |
+| Monitoring list           |      < 500 ms |
+| Webhook integration list  |      < 500 ms |
 
 Load scenarios:
 
@@ -1121,13 +1121,13 @@ No data loss or invalid null migration is acceptable.
 
 ## Standard Users
 
-| User | Role |
-|---|---|
-| Owner A | OWNER |
-| Admin A | ADMIN |
-| Developer A | DEVELOPER |
-| Viewer A | VIEWER |
-| Owner B | OWNER |
+| User         | Role           |
+| ------------ | -------------- |
+| Owner A      | OWNER          |
+| Admin A      | ADMIN          |
+| Developer A  | DEVELOPER      |
+| Viewer A     | VIEWER         |
+| Owner B      | OWNER          |
 | Invited User | none initially |
 
 ## Standard Workspaces

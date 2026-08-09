@@ -14,12 +14,7 @@ export class ApiError extends Error {
   static fromResponse(response: Response): ApiError {
     const requestId = response.headers.get('x-request-id') ?? undefined;
 
-    return new ApiError(
-      `Request failed with status ${response.status}.`,
-      response.status,
-      undefined,
-      requestId,
-    );
+    return new ApiError(`Request failed with status ${response.status}.`, response.status, undefined, requestId);
   }
 }
 

@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  PayloadTooLargeException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, PayloadTooLargeException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { plainToInstance } from 'class-transformer';
@@ -19,12 +13,7 @@ import { PrismaService } from 'src/database/prisma.service';
 
 import { CollectEventsDto } from '../dto/collect-events.dto';
 
-import {
-  normalizeRequestOrigin,
-  sanitizeEventProperties,
-  sanitizeReferrerUrl,
-  sanitizeTrackedUrl,
-} from '../utils/ingestion-sanitizer';
+import { normalizeRequestOrigin, sanitizeEventProperties, sanitizeReferrerUrl, sanitizeTrackedUrl } from '../utils/ingestion-sanitizer';
 
 import { IngestionRateLimitService } from './ingestion-rate-limit.service';
 
@@ -68,18 +57,11 @@ export class AnalyticsIngestionService {
     private readonly rateLimit: IngestionRateLimitService,
     private readonly configService: ConfigService,
   ) {
-    this.trustCountryHeader = this.isEnabled(
-      this.configService.get('ANALYTICS_TRUST_COUNTRY_HEADER'),
-    );
+    this.trustCountryHeader = this.isEnabled(this.configService.get('ANALYTICS_TRUST_COUNTRY_HEADER'));
 
-    this.allowOriginless = this.isEnabled(
-      process.env.ANALYTICS_ALLOW_ORIGINLESS ??
-        this.configService.get<string>('ANALYTICS_ALLOW_ORIGINLESS'),
-    );
+    this.allowOriginless = this.isEnabled(process.env.ANALYTICS_ALLOW_ORIGINLESS ?? this.configService.get<string>('ANALYTICS_ALLOW_ORIGINLESS'));
 
-    this.ipHashSalt =
-      this.configService.get<string>('ANALYTICS_IP_HASH_SALT')?.trim() ||
-      'local-development-change-this';
+    this.ipHashSalt = this.configService.get<string>('ANALYTICS_IP_HASH_SALT')?.trim() || 'local-development-change-this';
   }
 
   async collect(rawBody: unknown, context: CollectionContext): Promise<CollectEventsResult> {
@@ -350,10 +332,7 @@ export class AnalyticsIngestionService {
     }
   }
 
-  private resolveAndValidateOrigin(
-    rawOrigin: string | undefined,
-    allowedOrigins: string[],
-  ): string {
+  private resolveAndValidateOrigin(rawOrigin: string | undefined, allowedOrigins: string[]): string {
     const suppliedOrigin = rawOrigin?.trim();
 
     if (!suppliedOrigin || suppliedOrigin === 'null') {
@@ -367,9 +346,7 @@ export class AnalyticsIngestionService {
     const requestOrigin = normalizeRequestOrigin(suppliedOrigin);
 
     const normalizedAllowedOrigins = new Set(
-      allowedOrigins
-        .map((allowedOrigin) => this.tryNormalizeOrigin(allowedOrigin))
-        .filter((allowedOrigin): allowedOrigin is string => allowedOrigin !== null),
+      allowedOrigins.map((allowedOrigin) => this.tryNormalizeOrigin(allowedOrigin)).filter((allowedOrigin): allowedOrigin is string => allowedOrigin !== null),
     );
 
     if (!normalizedAllowedOrigins.has(requestOrigin)) {

@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 
 import type { WorkspaceRequest } from '../interfaces/workspace-request.interface';
 import { WorkspaceMembersService } from '../service/workspace-members.service';
@@ -27,19 +21,11 @@ export class WorkspaceAccessGuard implements CanActivate {
     if (!request.user?.id) {
       throw new ForbiddenException('Authenticated user is required');
     }
-    if (
-      typeof workspaceId !== 'string' ||
-      !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-        workspaceId,
-      )
-    ) {
+    if (typeof workspaceId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(workspaceId)) {
       throw new BadRequestException('Invalid workspace ID');
     }
 
-    const membership = await this.workspaceMembersService.findMembership(
-      workspaceId.trim(),
-      request.user.id,
-    );
+    const membership = await this.workspaceMembersService.findMembership(workspaceId.trim(), request.user.id);
 
     if (!membership) {
       throw new ForbiddenException('You do not have access to this workspace');

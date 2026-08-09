@@ -1,8 +1,5 @@
 import { apiRequest } from '../lib/api/api-client';
-import type {
-  AnalyticsOverviewResponse,
-  GetAnalyticsOverviewInput,
-} from './analytics-overview.types';
+import type { AnalyticsOverviewResponse, GetAnalyticsOverviewInput } from './analytics-overview.types';
 
 export async function getAnalyticsOverview({
   workspaceId,
@@ -22,9 +19,7 @@ export async function getAnalyticsOverview({
     searchParams.set('preset', preset);
   }
 
-  const path = ['/workspaces', workspaceId, 'websites', websiteId, 'analytics', 'overview'].join(
-    '/',
-  );
+  const path = ['/workspaces', workspaceId, 'websites', websiteId, 'analytics', 'overview'].join('/');
 
   return apiRequest<AnalyticsOverviewResponse>(`${path}?${searchParams.toString()}`, {
     method: 'GET',
