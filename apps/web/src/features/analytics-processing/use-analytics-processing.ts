@@ -74,14 +74,15 @@ export function useAnalyticsProcessing(
       }
     }
 
-    setState((previous) => ({
-      ...previous,
+    queueMicrotask(() => {
+      setState((previous) => ({
+        ...previous,
 
-      loading: previous.data === null,
+        loading: previous.data === null,
 
-      error: null,
-    }));
-
+        error: null,
+      }));
+    });
     void load();
 
     return () => {

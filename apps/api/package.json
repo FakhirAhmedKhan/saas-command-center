@@ -49,7 +49,13 @@
     "test:e2e:analytics-timezones": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-timezones.e2e-spec.ts",
     "test:e2e:analytics-late-events": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-late-events.e2e-spec.ts",
     "test:e2e:analytics-reprocessing": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-reprocessing.e2e-spec.ts",
-    "test:e2e:analytics-retention": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-retention.e2e-spec.ts"
+    "test:e2e:analytics-retention": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-retention.e2e-spec.ts",
+    "test:e2e:phase13": "jest --config ./test/jest-e2e.config.cjs --runInBand phase13-analytics-reports.e2e-spec.ts",
+    "test:e2e:phase14": "jest --config ./test/jest-e2e.config.cjs --runInBand phase14-analytics-processing.e2e-spec.ts",
+    "test:e2e:phase15": "jest --config ./test/jest-e2e.config.cjs --runInBand phase15-monitoring.e2e-spec.ts",
+    "test:e2e:phase16": "jest --config ./test/jest-e2e.config.cjs --runInBand phase16-releases-deployments.e2e-spec.ts",
+    "test:cover": "jest --coverage",
+    "test:e2e:cover": "jest --config ./test/jest-e2e.config.cjs --runInBand --coverage"
   },
   "dependencies": {
     "@command-center/shared-types": "workspace:*",

@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { AnalyticsProcessingStatus } from '../../../generated/prisma/client';
@@ -151,9 +147,6 @@ export class AnalyticsProcessingStatusService {
         }) => this.mapRun(run),
       ),
     };
-  }
-  getCanReprocess(_workspaceId: string, _userId: string): any {
-    throw new Error('Method not implemented.');
   }
 
   private mapRun(run: {

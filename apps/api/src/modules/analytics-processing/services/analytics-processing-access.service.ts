@@ -6,9 +6,6 @@ import { PrismaService } from '../../../database/prisma.service';
 
 @Injectable()
 export class AnalyticsProcessingAccessService {
-  getCanReprocess(workspaceId: string, userId: string): any {
-    throw new Error('Method not implemented.');
-  }
   constructor(private readonly prisma: PrismaService) {}
 
   async assertCanReprocess(workspaceId: string, userId: string): Promise<void> {
@@ -17,6 +14,32 @@ export class AnalyticsProcessingAccessService {
 
   async assertCanRetry(workspaceId: string, userId: string): Promise<void> {
     await this.assertCanManageProcessing(workspaceId, userId);
+  }
+
+  /**
+   * Non-throwing variant of assertCanReprocess used by AnalyticsProcessingStatusService to
+   * populate AnalyticsProcessingStatusDto.canReprocess. A membership lookup miss (outsider)
+   * is treated as "cannot reprocess" rather than throwing, since WorkspaceAccessGuard already
+   * rejects outsiders before this ever runs; a member simply lacking OWNER/ADMIN role also
+   * resolves to false instead of throwing, matching the read-only nature of the status endpoint.
+   */
+  async getCanReprocess(workspaceId: string, userId: string): Promise<boolean> {
+    const membership = await this.prisma.workspaceMember.findUnique({
+      where: {
+        workspaceId_userId: {
+          workspaceId,
+          userId,
+        },
+      },
+
+      select: {
+        role: true,
+      },
+    });
+
+    return (
+      membership?.role === WorkspaceRole.OWNER || membership?.role === WorkspaceRole.ADMIN
+    );
   }
 
   private async assertCanManageProcessing(workspaceId: string, userId: string): Promise<void> {

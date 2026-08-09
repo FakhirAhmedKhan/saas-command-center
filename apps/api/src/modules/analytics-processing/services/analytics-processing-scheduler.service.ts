@@ -75,7 +75,7 @@ export class AnalyticsProcessingSchedulerService {
 
   private async getPendingRanges(): Promise<PendingWebsiteRange[]> {
     const groups = await this.prisma.rawAnalyticsEvent.groupBy({
-      by: ['workspaceId', 'websiteId'],
+      by: ['websiteId'],
 
       where: {
         processedAt: null,
@@ -98,27 +98,46 @@ export class AnalyticsProcessingSchedulerService {
       take: 20,
     });
 
-    return (
-      groups as Array<{
-        workspaceId: string;
-        websiteId: string;
-        _min: {
-          occurredAt: Date | null;
-        };
-        _max: {
-          occurredAt: Date | null;
-        };
-      }>
-    )
-      .filter((group) => group._min.occurredAt !== null && group._max.occurredAt !== null)
-      .map((group) => ({
-        workspaceId: group.workspaceId,
+    if (groups.length === 0) {
+      return [];
+    }
 
-        websiteId: group.websiteId,
+    const websiteIds = groups.map((group) => group.websiteId);
 
-        firstOccurredAt: group._min.occurredAt!,
+    const websites = await this.prisma.website.findMany({
+      where: {
+        id: {
+          in: websiteIds,
+        },
+      },
 
-        lastOccurredAt: group._max.occurredAt!,
-      }));
+      select: {
+        id: true,
+        workspaceId: true,
+      },
+    });
+
+    const workspaceByWebsiteId = new Map(
+      websites.map((website) => [website.id, website.workspaceId]),
+    );
+
+    return groups.flatMap((group) => {
+      const firstOccurredAt = group._min.occurredAt;
+      const lastOccurredAt = group._max.occurredAt;
+      const workspaceId = workspaceByWebsiteId.get(group.websiteId);
+
+      if (!workspaceId || !firstOccurredAt || !lastOccurredAt) {
+        return [];
+      }
+
+      return [
+        {
+          workspaceId,
+          websiteId: group.websiteId,
+          firstOccurredAt,
+          lastOccurredAt,
+        },
+      ];
+    });
   }
 }
