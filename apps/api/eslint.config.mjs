@@ -1,4 +1,5 @@
 import eslint from '@eslint/js';
+import stylistic from '@stylistic/eslint-plugin';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
@@ -11,6 +12,10 @@ export default tseslint.config(
 
   {
     files: ['src/**/*.ts', 'test/**/*.ts'],
+
+    plugins: {
+      '@stylistic': stylistic,
+    },
 
     languageOptions: {
       parserOptions: {
@@ -25,6 +30,24 @@ export default tseslint.config(
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
+
+      '@stylistic/padding-line-between-statements': [
+        'error',
+
+        // No empty lines between imports
+        {
+          blankLine: 'never',
+          prev: 'import',
+          next: 'import',
+        },
+
+        // One empty line after all imports
+        {
+          blankLine: 'always',
+          prev: 'import',
+          next: '*',
+        },
+      ],
     },
   },
 );
