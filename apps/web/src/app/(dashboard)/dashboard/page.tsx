@@ -107,9 +107,7 @@ export default function DashboardPage() {
                         href={`/workspaces/${workspace.id}/repositories`}
                         className="inline-flex h-11 items-center justify-between rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
                       >
-                        <span>
-                          Repositories
-                        </span>
+                        <span>Repositories</span>
 
                         <ArrowRight className="size-4" />
                       </Link>

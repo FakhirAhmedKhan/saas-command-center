@@ -103,8 +103,7 @@ export class RepositoriesService {
   }> {
     const installation = await this.githubApp.getInstallation(externalInstallationId);
 
-    const repositories =
-      await this.githubApp.listInstallationRepositories(externalInstallationId);
+    const repositories = await this.githubApp.listInstallationRepositories(externalInstallationId);
 
     const now = new Date();
 
@@ -213,10 +212,7 @@ export class RepositoriesService {
     let repositoryCount = 0;
 
     for (const installation of installations) {
-      const result = await this.syncInstallation(
-        workspaceId,
-        installation.externalInstallationId,
-      );
+      const result = await this.syncInstallation(workspaceId, installation.externalInstallationId);
 
       repositoryCount += result.repositoryCount;
     }
@@ -230,19 +226,12 @@ export class RepositoriesService {
   async syncOne(workspaceId: string, repositoryId: string) {
     const repository = await this.findOne(workspaceId, repositoryId);
 
-    await this.syncInstallation(
-      workspaceId,
-      repository.installation.externalInstallationId,
-    );
+    await this.syncInstallation(workspaceId, repository.installation.externalInstallationId);
 
     return this.findOne(workspaceId, repositoryId);
   }
 
-  async linkApplication(
-    workspaceId: string,
-    repositoryId: string,
-    applicationId: string,
-  ) {
+  async linkApplication(workspaceId: string, repositoryId: string, applicationId: string) {
     await this.findOne(workspaceId, repositoryId);
 
     const application = await this.prisma.saasApplication.findFirst({
@@ -349,10 +338,7 @@ export class RepositoriesService {
     }
   }
 
-  async touchRepositoryEverywhere(
-    externalInstallationId: string,
-    externalRepoId: string,
-  ): Promise<void> {
+  async touchRepositoryEverywhere(externalInstallationId: string, externalRepoId: string): Promise<void> {
     const installations = await this.prisma.repositoryInstallation.findMany({
       where: {
         provider: RepositoryProvider.GITHUB,

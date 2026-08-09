@@ -1,21 +1,17 @@
-import {
-    Suspense,
-} from 'react';
+import { Suspense } from 'react';
 
-import {
-    GithubSetupClient,
-} from './github-setup-client';
+import { GithubSetupClient } from './github-setup-client';
 
 export default function GithubSetupPage() {
-    return (
-        <Suspense
-            fallback={
-                <main className="flex min-h-[70vh] items-center justify-center p-6">
-                    <div className="size-8 animate-spin rounded-full border-2 border-slate-200 border-t-slate-950" />
-                </main>
-            }
-        >
-            <GithubSetupClient />
-        </Suspense>
-    );
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-[70vh] items-center justify-center p-6">
+          <div className="size-8 animate-spin rounded-full border-2 border-slate-200 border-t-slate-950" />
+        </main>
+      }
+    >
+      <GithubSetupClient />
+    </Suspense>
+  );
 }

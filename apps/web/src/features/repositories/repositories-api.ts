@@ -1,33 +1,19 @@
 import { getAccessToken } from '@/features/lib/api/api-client';
 
-import type {
-    GithubCallbackResult,
-    GithubConnectStart,
-    GithubSetupResult,
-    RepositoryConnection,
-    RepositoryListResponse,
-} from './repository.types';
+import type { GithubCallbackResult, GithubConnectStart, GithubSetupResult, RepositoryConnection, RepositoryListResponse } from './repository.types';
 
 interface ApiErrorBody {
     message?: string | string[];
     error?: string;
 }
 
-const API_BASE_URL =
-    process.env.NEXT_PUBLIC_API_BASE_URL ??
-    process.env.NEXT_PUBLIC_API_URL ??
-    'http://localhost:4000/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api/v1';
 
-async function repositoryRequest<T>(
-    path: string,
-    init: RequestInit = {},
-): Promise<T> {
+export async function repositoryRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
     const accessToken = getAccessToken();
 
     if (!accessToken) {
-        throw new Error(
-            'Your session is not available. Please sign in and try again.',
-        );
+        throw new Error('Your session is not available. Please sign in and try again.');
     }
 
     const headers = new Headers(init.headers);
@@ -39,15 +25,12 @@ async function repositoryRequest<T>(
         headers.set('Content-Type', 'application/json');
     }
 
-    const response = await fetch(
-        `${API_BASE_URL.replace(/\/$/, '')}${path}`,
-        {
-            ...init,
-            headers,
-            credentials: 'include',
-            cache: 'no-store',
-        },
-    );
+    const response = await fetch(`${API_BASE_URL.replace(/\/$/, '')}${path}`, {
+        ...init,
+        headers,
+        credentials: 'include',
+        cache: 'no-store',
+    });
 
     let body: unknown;
 
@@ -64,16 +47,11 @@ async function repositoryRequest<T>(
     }
 
     if (!response.ok) {
-        const apiError =
-            body && typeof body === 'object'
-                ? (body as ApiErrorBody)
-                : undefined;
+        const apiError = body && typeof body === 'object' ? (body as ApiErrorBody) : undefined;
 
         const message = Array.isArray(apiError?.message)
             ? apiError.message.join(', ')
-            : apiError?.message ??
-            apiError?.error ??
-            `Request failed with status ${response.status}.`;
+            : (apiError?.message ?? apiError?.error ?? `Request failed with status ${response.status}.`);
 
         throw new Error(message);
     }
@@ -85,12 +63,8 @@ async function repositoryRequest<T>(
  * Get all GitHub installations and repositories
  * connected to a workspace.
  */
-export function listRepositories(
-    workspaceId: string,
-): Promise<RepositoryListResponse> {
-    return repositoryRequest<RepositoryListResponse>(
-        `/workspaces/${workspaceId}/repositories`,
-    );
+export function listRepositories(workspaceId: string): Promise<RepositoryListResponse> {
+    return repositoryRequest<RepositoryListResponse>(`/workspaces/${workspaceId}/repositories`);
 }
 
 /**
@@ -98,15 +72,10 @@ export function listRepositories(
  *
  * Backend returns the GitHub installation URL.
  */
-export function beginGithubConnect(
-    workspaceId: string,
-): Promise<GithubConnectStart> {
-    return repositoryRequest<GithubConnectStart>(
-        `/workspaces/${workspaceId}/repositories/github/connect`,
-        {
-            method: 'POST',
-        },
-    );
+export function beginGithubConnect(workspaceId: string): Promise<GithubConnectStart> {
+    return repositoryRequest<GithubConnectStart>(`/workspaces/${workspaceId}/repositories/github/connect`, {
+        method: 'POST',
+    });
 }
 
 /**
@@ -117,21 +86,15 @@ export function beginGithubConnect(
  * It validates the installation state and returns
  * the GitHub OAuth authorization URL.
  */
-export function completeGithubSetup(
-    installState: string,
-    installationId: string,
-): Promise<GithubSetupResult> {
-    return repositoryRequest<GithubSetupResult>(
-        '/repositories/github/setup',
-        {
-            method: 'POST',
+export function completeGithubSetup(installState: string, installationId: string): Promise<GithubSetupResult> {
+    return repositoryRequest<GithubSetupResult>('/repositories/github/setup', {
+        method: 'POST',
 
-            body: JSON.stringify({
-                installState,
-                installationId,
-            }),
-        },
-    );
+        body: JSON.stringify({
+            installState,
+            installationId,
+        }),
+    });
 }
 
 /**
@@ -141,30 +104,22 @@ export function completeGithubSetup(
  *
  * Backend verifies the GitHub user and synchronizes repositories.
  */
-export function completeGithubCallback(
-    code: string,
-    state: string,
-): Promise<GithubCallbackResult> {
-    return repositoryRequest<GithubCallbackResult>(
-        '/repositories/github/callback',
-        {
-            method: 'POST',
+export function completeGithubCallback(code: string, state: string): Promise<GithubCallbackResult> {
+    return repositoryRequest<GithubCallbackResult>('/repositories/github/callback', {
+        method: 'POST',
 
-            body: JSON.stringify({
-                code,
-                state,
-            }),
-        },
-    );
+        body: JSON.stringify({
+            code,
+            state,
+        }),
+    });
 }
 
 /**
  * Synchronize all GitHub installations/repositories
  * connected to the workspace.
  */
-export function syncRepositories(
-    workspaceId: string,
-): Promise<{
+export function syncRepositories(workspaceId: string): Promise<{
     installationCount: number;
     repositoryCount: number;
 }> {
@@ -179,64 +134,40 @@ export function syncRepositories(
 /**
  * Synchronize a single repository.
  */
-export function syncRepository(
-    workspaceId: string,
-    repositoryId: string,
-): Promise<RepositoryConnection> {
-    return repositoryRequest<RepositoryConnection>(
-        `/workspaces/${workspaceId}/repositories/${repositoryId}/sync`,
-        {
-            method: 'POST',
-        },
-    );
+export function syncRepository(workspaceId: string, repositoryId: string): Promise<RepositoryConnection> {
+    return repositoryRequest<RepositoryConnection>(`/workspaces/${workspaceId}/repositories/${repositoryId}/sync`, {
+        method: 'POST',
+    });
 }
 
 /**
  * Get a single repository connection.
  */
-export function getRepository(
-    workspaceId: string,
-    repositoryId: string,
-): Promise<RepositoryConnection> {
-    return repositoryRequest<RepositoryConnection>(
-        `/workspaces/${workspaceId}/repositories/${repositoryId}`,
-    );
+export function getRepository(workspaceId: string, repositoryId: string): Promise<RepositoryConnection> {
+    return repositoryRequest<RepositoryConnection>(`/workspaces/${workspaceId}/repositories/${repositoryId}`);
 }
 
 /**
  * Link a repository to one SaaS application.
  */
-export function linkRepositoryApplication(
-    workspaceId: string,
-    repositoryId: string,
-    applicationId: string,
-): Promise<RepositoryConnection> {
-    return repositoryRequest<RepositoryConnection>(
-        `/workspaces/${workspaceId}/repositories/${repositoryId}/application`,
-        {
-            method: 'PATCH',
+export function linkRepositoryApplication(workspaceId: string, repositoryId: string, applicationId: string): Promise<RepositoryConnection> {
+    return repositoryRequest<RepositoryConnection>(`/workspaces/${workspaceId}/repositories/${repositoryId}/application`, {
+        method: 'PATCH',
 
-            body: JSON.stringify({
-                applicationId,
-            }),
-        },
-    );
+        body: JSON.stringify({
+            applicationId,
+        }),
+    });
 }
 
 /**
  * Remove the SaaS application association
  * from a repository.
  */
-export function unlinkRepositoryApplication(
-    workspaceId: string,
-    repositoryId: string,
-): Promise<RepositoryConnection> {
-    return repositoryRequest<RepositoryConnection>(
-        `/workspaces/${workspaceId}/repositories/${repositoryId}/application`,
-        {
-            method: 'DELETE',
-        },
-    );
+export function unlinkRepositoryApplication(workspaceId: string, repositoryId: string): Promise<RepositoryConnection> {
+    return repositoryRequest<RepositoryConnection>(`/workspaces/${workspaceId}/repositories/${repositoryId}/application`, {
+        method: 'DELETE',
+    });
 }
 
 /**
@@ -252,10 +183,7 @@ export function disconnectGithubInstallation(
 }> {
     return repositoryRequest<{
         success: true;
-    }>(
-        `/workspaces/${workspaceId}/repositories/github/installations/${installationRecordId}`,
-        {
-            method: 'DELETE',
-        },
-    );
+    }>(`/workspaces/${workspaceId}/repositories/github/installations/${installationRecordId}`, {
+        method: 'DELETE',
+    });
 }
