@@ -262,4 +262,241 @@ test.describe('Phase 15 monitoring', () => {
       }),
     ).toHaveCount(0);
   });
+
+  test('shows a loading skeleton before monitoring data arrives', async ({ page }) => {
+    let resolveRoute: (() => void) | undefined;
+
+    await page.route('**/monitoring/summary', async (route) => {
+      await new Promise<void>((resolve) => {
+        resolveRoute = resolve;
+      });
+
+      await route.fulfill({
+        status: 200,
+
+        contentType: 'application/json',
+
+        body: JSON.stringify({
+          canManage: true,
+
+          total: 0,
+
+          healthy: 0,
+
+          degraded: 0,
+
+          down: 0,
+
+          unknown: 0,
+
+          disabled: 0,
+
+          activeIncidents: 0,
+        }),
+      });
+    });
+
+    const navigation = page.goto(`/workspaces/${workspaceId}/monitoring`);
+
+    await expect(page.locator('.animate-pulse').first()).toBeVisible();
+
+    resolveRoute?.();
+
+    await navigation;
+  });
+
+  test('shows an error state with a retry action when monitoring data fails to load', async ({
+    page,
+  }) => {
+    await page.route('**/monitoring/summary', async (route) => {
+      await route.fulfill({
+        status: 500,
+
+        contentType: 'application/json',
+
+        body: JSON.stringify({
+          statusCode: 500,
+
+          message: 'Internal server error',
+        }),
+      });
+    });
+
+    await page.goto(`/workspaces/${workspaceId}/monitoring`);
+
+    await expect(page.getByText('Monitoring unavailable')).toBeVisible();
+
+    await expect(
+      page.getByRole('button', {
+        name: 'Retry',
+      }),
+    ).toBeVisible();
+  });
+
+  test('shows an empty state when no health checks are configured', async ({ page }) => {
+    await page.route('**/monitoring/checks', async (route) => {
+      await route.fulfill({
+        status: 200,
+
+        contentType: 'application/json',
+
+        body: JSON.stringify([]),
+      });
+    });
+
+    await page.goto(`/workspaces/${workspaceId}/monitoring`);
+
+    await expect(page.getByText('Monitoring is not configured')).toBeVisible();
+
+    await expect(
+      page.getByText('Add a health check to begin tracking application or website availability.'),
+    ).toBeVisible();
+  });
+
+  test('shows an empty state for the incident timeline when there are no incidents', async ({
+    page,
+  }) => {
+    await page.route('**/monitoring/incidents', async (route) => {
+      await route.fulfill({
+        status: 200,
+
+        contentType: 'application/json',
+
+        body: JSON.stringify([]),
+      });
+    });
+
+    await page.goto(`/workspaces/${workspaceId}/monitoring`);
+
+    await expect(page.getByText('No monitoring incidents have been recorded.')).toBeVisible();
+  });
+
+  test('runs a health check immediately via "Run now"', async ({ page }) => {
+    let runCalled = false;
+
+    await page.route(
+      '**/monitoring/checks/55555555-5555-4555-8555-555555555555/run',
+      async (route) => {
+        runCalled = true;
+
+        await route.fulfill({
+          status: 201,
+
+          contentType: 'application/json',
+
+          body: JSON.stringify({
+            healthCheckId: '55555555-5555-4555-8555-555555555555',
+
+            status: 'HEALTHY',
+
+            statusCode: 200,
+
+            responseTimeMs: 120,
+
+            failureReason: null,
+
+            consecutiveFailures: 0,
+
+            nextRunAt: '2026-08-07T01:10:00.000Z',
+          }),
+        });
+      },
+    );
+
+    await page.goto(`/workspaces/${workspaceId}/monitoring`);
+
+    await page
+      .getByRole('button', {
+        name: 'Run now',
+      })
+      .click();
+
+    expect(runCalled).toBe(true);
+  });
+
+  test('toggles a health check via "Disable", then shows an inline alert on failure', async ({
+    page,
+  }) => {
+    await page.route(
+      '**/monitoring/checks/55555555-5555-4555-8555-555555555555',
+      async (route) => {
+        if (route.request().method() === 'PATCH') {
+          await route.fulfill({
+            status: 400,
+
+            contentType: 'application/json',
+
+            body: JSON.stringify({
+              statusCode: 400,
+
+              message: 'Unable to disable this health check right now.',
+            }),
+          });
+
+          return;
+        }
+
+        await route.fallback();
+      },
+    );
+
+    await page.goto(`/workspaces/${workspaceId}/monitoring`);
+
+    await page
+      .getByRole('button', {
+        name: 'Disable',
+      })
+      .click();
+
+    await expect(page.getByRole('alert')).toHaveText('Unable to disable this health check right now.');
+  });
+
+  test('opens the health-check history view', async ({ page }) => {
+    await page.route(
+      '**/monitoring/checks/55555555-5555-4555-8555-555555555555/history',
+      async (route) => {
+        await route.fulfill({
+          status: 200,
+
+          contentType: 'application/json',
+
+          body: JSON.stringify([
+            {
+              id: 'history-1',
+
+              status: 'HEALTHY',
+
+              statusCode: 200,
+
+              responseTimeMs: 118,
+
+              failureReason: null,
+
+              checkedAt: '2026-08-07T01:00:00.000Z',
+            },
+          ]),
+        });
+      },
+    );
+
+    await page.goto(`/workspaces/${workspaceId}/monitoring`);
+
+    await page
+      .getByRole('button', {
+        name: 'History',
+      })
+      .click();
+
+    await expect(
+      page.getByRole('heading', {
+        name: 'Production API history',
+      }),
+    ).toBeVisible();
+
+    await expect(
+      page.getByText('118ms', {
+        exact: true,
+      }),
+    ).toBeVisible();
+  });
 });

@@ -282,4 +282,259 @@ test.describe('Phase 16 releases and deployments', () => {
       }),
     ).toHaveCount(0);
   });
+
+  test('shows a loading skeleton before release data arrives', async ({ page }) => {
+    let resolveRoute: (() => void) | undefined;
+
+    await page.route('**/deployments/options', async (route) => {
+      await new Promise<void>((resolve) => {
+        resolveRoute = resolve;
+      });
+
+      await route.fulfill({
+        status: 200,
+
+        contentType: 'application/json',
+
+        body: JSON.stringify({
+          canManage: true,
+
+          environments: [],
+
+          openIncidents: [],
+        }),
+      });
+    });
+
+    const navigation = page.goto(
+      `/workspaces/${workspaceId}/applications/${applicationId}/releases`,
+    );
+
+    await expect(page.locator('.animate-pulse').first()).toBeVisible();
+
+    resolveRoute?.();
+
+    await navigation;
+  });
+
+  test('shows an error state with a retry action when release data fails to load', async ({
+    page,
+  }) => {
+    await page.route('**/deployments/options', async (route) => {
+      await route.fulfill({
+        status: 500,
+
+        contentType: 'application/json',
+
+        body: JSON.stringify({
+          statusCode: 500,
+
+          message: 'Internal server error',
+        }),
+      });
+    });
+
+    await page.goto(`/workspaces/${workspaceId}/applications/${applicationId}/releases`);
+
+    await expect(page.getByText('Release tracking unavailable')).toBeVisible();
+
+    await expect(
+      page.getByRole('button', {
+        name: 'Retry',
+      }),
+    ).toBeVisible();
+  });
+
+  test('shows an empty state when no environments are configured', async ({ page }) => {
+    await page.route('**/deployments/options', async (route) => {
+      await route.fulfill({
+        status: 200,
+
+        contentType: 'application/json',
+
+        body: JSON.stringify({
+          canManage: true,
+
+          environments: [],
+
+          openIncidents: [],
+        }),
+      });
+    });
+
+    await page.route('**/deployments/current', async (route) => {
+      await route.fulfill({
+        status: 200,
+
+        contentType: 'application/json',
+
+        body: JSON.stringify([]),
+      });
+    });
+
+    await page.goto(`/workspaces/${workspaceId}/applications/${applicationId}/releases`);
+
+    await expect(page.getByText('No environments')).toBeVisible();
+
+    await expect(
+      page.getByText('Create an application environment before recording deployments.'),
+    ).toBeVisible();
+  });
+
+  test('shows an empty state when no deployments exist', async ({ page }) => {
+    await page.route('**/deployments?*', async (route) => {
+      await route.fulfill({
+        status: 200,
+
+        contentType: 'application/json',
+
+        body: JSON.stringify({
+          items: [],
+
+          pagination: {
+            page: 1,
+            limit: 100,
+            total: 0,
+            totalPages: 1,
+            hasPreviousPage: false,
+            hasNextPage: false,
+          },
+        }),
+      });
+    });
+
+    await page.goto(`/workspaces/${workspaceId}/applications/${applicationId}/releases`);
+
+    await expect(page.getByText('No deployments')).toBeVisible();
+
+    await expect(page.getByText('Create a release and record its first deployment.')).toBeVisible();
+  });
+
+  test('transitions a deployment forward after the confirmation dialog is accepted', async ({
+    page,
+  }) => {
+    let transitionCalled = false;
+
+    await page.route('**/deployments/deployment-1/transition', async (route) => {
+      transitionCalled = true;
+
+      const requestBody = route.request().postDataJSON() as { status: string };
+
+      expect(requestBody.status).toBe('ROLLED_BACK');
+
+      await route.fulfill({
+        status: 201,
+
+        contentType: 'application/json',
+
+        body: JSON.stringify({
+          id: 'deployment-1',
+
+          status: 'ROLLED_BACK',
+        }),
+      });
+    });
+
+    page.once('dialog', (dialog) => {
+      void dialog.accept();
+    });
+
+    await page.goto(`/workspaces/${workspaceId}/applications/${applicationId}/releases`);
+
+    await page
+      .getByRole('button', {
+        name: 'Mark ROLLED BACK',
+      })
+      .click();
+
+    expect(transitionCalled).toBe(true);
+  });
+
+  test('does not transition a deployment when the confirmation dialog is dismissed', async ({
+    page,
+  }) => {
+    let transitionCalled = false;
+
+    await page.route('**/deployments/deployment-1/transition', async (route) => {
+      transitionCalled = true;
+
+      await route.fulfill({
+        status: 201,
+
+        contentType: 'application/json',
+
+        body: JSON.stringify({}),
+      });
+    });
+
+    page.once('dialog', (dialog) => {
+      void dialog.dismiss();
+    });
+
+    await page.goto(`/workspaces/${workspaceId}/applications/${applicationId}/releases`);
+
+    await page
+      .getByRole('button', {
+        name: 'Mark ROLLED BACK',
+      })
+      .click();
+
+    expect(transitionCalled).toBe(false);
+  });
+
+  test('shows an inline alert when a deployment transition fails', async ({ page }) => {
+    await page.route('**/deployments/deployment-1/transition', async (route) => {
+      await route.fulfill({
+        status: 400,
+
+        contentType: 'application/json',
+
+        body: JSON.stringify({
+          statusCode: 400,
+
+          message: 'Rollback target must be a successful deployment.',
+        }),
+      });
+    });
+
+    page.once('dialog', (dialog) => {
+      void dialog.accept();
+    });
+
+    await page.goto(`/workspaces/${workspaceId}/applications/${applicationId}/releases`);
+
+    await page
+      .getByRole('button', {
+        name: 'Mark ROLLED BACK',
+      })
+      .click();
+
+    await expect(page.getByRole('alert')).toHaveText('Rollback target must be a successful deployment.');
+  });
+
+  test('filters deployments by status', async ({ page }) => {
+    await page.goto(`/workspaces/${workspaceId}/applications/${applicationId}/releases`);
+
+    await page.getByLabel('Status').selectOption('SUCCESSFUL');
+
+    await expect(
+      page
+        .getByText('1.3.0', {
+          exact: true,
+        })
+        .first(),
+    ).toBeVisible();
+  });
+
+  test('opens an external live URL link for a deployed environment', async ({ page }) => {
+    await page.goto(`/workspaces/${workspaceId}/applications/${applicationId}/releases`);
+
+    const link = page.getByRole('link', {
+      name: 'Open environment',
+    });
+
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute('href', 'https://example.com');
+    await expect(link).toHaveAttribute('target', '_blank');
+  });
 });

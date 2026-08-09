@@ -24,6 +24,8 @@
     "dev:web": "pnpm --filter @command-center/web dev",
     "dev:tracker": "pnpm --filter @command-center/tracker dev",
     "test:full": "powershell -ExecutionPolicy Bypass -File scripts/test-full.ps1",
+    "test:fast-all": "powershell -ExecutionPolicy Bypass -File scripts/test-fast-all.ps1",
+    "test:fast-all:backend": "powershell -ExecutionPolicy Bypass -File scripts/test-fast-all.ps1 -Fast",
     "test:e2e:cover": "pnpm --filter @command-center/api test:e2e:cover",
     "test:e2e:fullstack": "powershell -ExecutionPolicy Bypass -File scripts/test-fullstack-e2e.ps1",
     "test:cover": "pnpm --filter @command-center/api test:cover",

@@ -10,7 +10,7 @@ import { resetDatabase } from './helpers/database';
 import { readAccessToken } from './helpers/response';
 
 /**
- * Phase 16 â€” Releases & Deployments E2E
+ * Phase 16 — Releases & Deployments E2E
  *
  * No prior e2e coverage exists for this module (confirmed: no *release* or *deployment* named
  * spec file under apps/api/test before this one).
@@ -51,7 +51,7 @@ import { readAccessToken } from './helpers/response';
  * scheduledAt/healthIncidentId. A new deployment always starts at DeploymentStatus.DRAFT with an
  * auto-incremented `attempt` number scoped to (releaseId, environmentId).
  *
- * Deployment state machine (deployment-transition.service.ts, TRANSITIONS map â€” this is the
+ * Deployment state machine (deployment-transition.service.ts, TRANSITIONS map — this is the
  * authoritative, real contract; DO NOT assume any other pairs are valid):
  *   DRAFT       -> SCHEDULED | IN_PROGRESS
  *   SCHEDULED   -> DRAFT | IN_PROGRESS
@@ -132,10 +132,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
     return `${deploymentUrl(deploymentId)}/transition`;
   }
 
-  async function createRelease(
-    token: string,
-    overrides: Record<string, unknown> = {},
-  ): Promise<Response> {
+  async function createRelease(token: string, overrides: Record<string, unknown> = {}): Promise<Response> {
     return request(app.getHttpServer())
       .post(releasesUrl())
       .set(withBearer(token))
@@ -263,8 +260,8 @@ describe('Phase 16 Releases & Deployments E2E', () => {
         workspaceId,
         name: 'Phase 16 Application',
         slug: `phase16-application-${randomUUID()}`,
-        category: 'SAAS',
-        status: 'LIVE',
+        category: 'WEB_APP',
+        status: 'ACTIVE',
         priority: 'MEDIUM',
         createdById: ownerId,
       },
@@ -324,9 +321,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
     expect(created).toMatchObject({ version: '1.0.0', name: 'First cut', status: 'DRAFT' });
     expect(created.scheduledAt).toBeNull();
 
-    const persisted = await prisma.release.findUniqueOrThrow({
-      where: { id: created.id as string },
-    });
+    const persisted = await prisma.release.findUniqueOrThrow({ where: { id: created.id as string } });
 
     expect(persisted.workspaceId).toBe(workspaceId);
     expect(persisted.applicationId).toBe(applicationId);
@@ -340,10 +335,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
     });
 
     expect(response.status).toBe(201);
-    expect(body(response)).toMatchObject({
-      status: 'SCHEDULED',
-      scheduledAt: '2026-09-01T00:00:00.000Z',
-    });
+    expect(body(response)).toMatchObject({ status: 'SCHEDULED', scheduledAt: '2026-09-01T00:00:00.000Z' });
   });
 
   it('lists releases scoped to the application', async () => {
@@ -428,8 +420,8 @@ describe('Phase 16 Releases & Deployments E2E', () => {
         workspaceId,
         name: 'Phase 16 Second Application',
         slug: `phase16-second-application-${randomUUID()}`,
-        category: 'SAAS',
-        status: 'LIVE',
+        category: 'WEB_APP',
+        status: 'ACTIVE',
         priority: 'MEDIUM',
         createdById: ownerId,
       },
@@ -437,7 +429,9 @@ describe('Phase 16 Releases & Deployments E2E', () => {
     });
 
     const response = await request(app.getHttpServer())
-      .post(`${API_PREFIX}/workspaces/${workspaceId}/applications/${otherApplication.id}/releases`)
+      .post(
+        `${API_PREFIX}/workspaces/${workspaceId}/applications/${otherApplication.id}/releases`,
+      )
       .set(withBearer(ownerAccessToken))
       .send({ version: '2.0.0' });
 
@@ -486,7 +480,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // C. Deployment CRUD/state â€” belongs to release/environment/application
+  // C. Deployment CRUD/state — belongs to release/environment/application
   // ---------------------------------------------------------------------------------------
 
   it('creates a deployment in DRAFT status with attempt=1, and records a CREATED activity entry', async () => {
@@ -540,8 +534,8 @@ describe('Phase 16 Releases & Deployments E2E', () => {
         workspaceId,
         name: 'Phase 16 Foreign Application',
         slug: `phase16-foreign-application-${randomUUID()}`,
-        category: 'SAAS',
-        status: 'LIVE',
+        category: 'WEB_APP',
+        status: 'ACTIVE',
         priority: 'MEDIUM',
         createdById: ownerId,
       },
@@ -571,8 +565,8 @@ describe('Phase 16 Releases & Deployments E2E', () => {
         workspaceId,
         name: 'Phase 16 Foreign Env Application',
         slug: `phase16-foreign-env-application-${randomUUID()}`,
-        category: 'SAAS',
-        status: 'LIVE',
+        category: 'WEB_APP',
+        status: 'ACTIVE',
         priority: 'MEDIUM',
         createdById: ownerId,
       },
@@ -819,12 +813,8 @@ describe('Phase 16 Releases & Deployments E2E', () => {
 
     const stagingDeploymentId = body(stagingDeployment).id as string;
 
-    await transition(ownerAccessToken, stagingDeploymentId, {
-      status: DeploymentStatus.IN_PROGRESS,
-    });
-    await transition(ownerAccessToken, stagingDeploymentId, {
-      status: DeploymentStatus.SUCCESSFUL,
-    });
+    await transition(ownerAccessToken, stagingDeploymentId, { status: DeploymentStatus.IN_PROGRESS });
+    await transition(ownerAccessToken, stagingDeploymentId, { status: DeploymentStatus.SUCCESSFUL });
 
     const productionDeployment = await createDeployment(ownerAccessToken, releaseId);
 
@@ -856,9 +846,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
 
     const activeDeploymentId = body(activeDeployment).id as string;
 
-    await transition(ownerAccessToken, activeDeploymentId, {
-      status: DeploymentStatus.IN_PROGRESS,
-    });
+    await transition(ownerAccessToken, activeDeploymentId, { status: DeploymentStatus.IN_PROGRESS });
     await transition(ownerAccessToken, activeDeploymentId, { status: DeploymentStatus.SUCCESSFUL });
 
     const response = await transition(ownerAccessToken, activeDeploymentId, {
@@ -900,8 +888,8 @@ describe('Phase 16 Releases & Deployments E2E', () => {
         workspaceId,
         name: 'Phase 16 Isolation Application',
         slug: `phase16-isolation-application-${randomUUID()}`,
-        category: 'SAAS',
-        status: 'LIVE',
+        category: 'WEB_APP',
+        status: 'ACTIVE',
         priority: 'MEDIUM',
         createdById: ownerId,
       },
@@ -915,7 +903,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
       .set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
-    expect(body(response).items as JsonRecord[]).toHaveLength(0);
+    expect((body(response).items as JsonRecord[])).toHaveLength(0);
   });
 
   it('getCurrentVersions resolves the effective version through a rollback correctly', async () => {
@@ -1064,9 +1052,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
 
     const items = body(response).items as JsonRecord[];
 
-    expect(items.every((deployment) => deployment.environmentId === secondEnvironmentId)).toBe(
-      true,
-    );
+    expect(items.every((deployment) => deployment.environmentId === secondEnvironmentId)).toBe(true);
   });
 
   it('filters deployments by status', async () => {
@@ -1092,7 +1078,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // H. Data integrity â€” optimistic concurrency
+  // H. Data integrity — optimistic concurrency
   // ---------------------------------------------------------------------------------------
 
   it('rejects a transition whose precondition status no longer matches (optimistic concurrency)', async () => {
