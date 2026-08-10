@@ -1,22 +1,12 @@
-import { ConfigService } from '@nestjs/config';
-
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-import { BadRequestException, Injectable, NotFoundException, Inject } from '@nestjs/common';
-
-import { HealthCheckStatus, HealthIncidentStatus, HealthTargetType, Prisma } from '../../../generated/prisma/client';
-
-import { PrismaService } from '../../../database/prisma.service';
-
-import type { TypedConfigService } from '../../../config/runtime-config';
-
-import type { CreateHealthCheckDto, HealthCheckListQueryDto, IncidentListQueryDto, UpdateHealthCheckDto } from '../dto/health-check.dto';
-
-import type { HealthCheckDto, HealthCheckHistoryDto, HealthIncidentDto, MonitoringSummaryDto, MonitoringTargetDto } from '../dto/monitoring-response.dto';
-
 import { MonitoringAccessService } from './monitoring-access.service';
-
 import { SafeHttpClientService } from './safe-http-client.service';
+import type { TypedConfigService } from '../../../config/runtime-config';
+import { PrismaService } from '../../../database/prisma.service';
+import { HealthCheckStatus, HealthIncidentStatus, HealthTargetType, Prisma } from '../../../generated/prisma/client';
+import type { CreateHealthCheckDto, HealthCheckListQueryDto, IncidentListQueryDto, UpdateHealthCheckDto } from '../dto/health-check.dto';
+import type { HealthCheckDto, HealthCheckHistoryDto, HealthIncidentDto, MonitoringSummaryDto, MonitoringTargetDto } from '../dto/monitoring-response.dto';
+import { BadRequestException, Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 type HealthCheckWithTarget = Prisma.HealthCheckGetPayload<{
   include: {

@@ -1,31 +1,22 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
-
-import Link from 'next/link';
-
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
-
 import { ArrowLeft, Globe2 } from 'lucide-react';
-
+import Link from 'next/link';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 import { Spinner } from '@/components/ui/spinner';
-
 import { getApplications } from '@/features/applications/application-api';
-
 import type { SaasApplication } from '@/features/applications/application-types';
-
-import { createWebsite } from '@/features/websites/website-api';
-
-import type { CreateWebsitePayload } from '@/features/websites/website-types';
-
-import { websiteKeyStorageName } from '@/features/websites/website-utils';
 import { WebsiteForm } from '@/features/websites/components/website-form';
+import { createWebsite } from '@/features/websites/website-api';
+import type { CreateWebsitePayload } from '@/features/websites/website-types';
+import { websiteKeyStorageName } from '@/features/websites/website-utils';
 
 export default function NewWebsitePage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-80 items-center justify-center">
+        <div className='flex min-h-80 items-center justify-center'>
           <Spinner />
         </div>
       }
@@ -104,42 +95,42 @@ function NewWebsiteContent() {
 
   if (loading) {
     return (
-      <div className="flex min-h-80 items-center justify-center">
+      <div className='flex min-h-80 items-center justify-center'>
         <Spinner />
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className='mx-auto max-w-4xl space-y-6'>
       <header>
-        <Link href={listHref} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900">
-          <ArrowLeft className="size-4" />
+        <Link href={listHref} className='inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900'>
+          <ArrowLeft className='size-4' />
           Back to websites
         </Link>
 
-        <div className="mt-6 flex items-start gap-4">
-          <div className="flex size-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
-            <Globe2 className="size-6" />
+        <div className='mt-6 flex items-start gap-4'>
+          <div className='flex size-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-600'>
+            <Globe2 className='size-6' />
           </div>
 
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-950">Create website</h1>
+            <h1 className='text-3xl font-bold tracking-tight text-slate-950'>Create website</h1>
 
-            <p className="mt-2 text-sm leading-6 text-slate-500">Register an analytics website and generate its first secure tracking key.</p>
+            <p className='mt-2 text-sm leading-6 text-slate-500'>Register an analytics website and generate its first secure tracking key.</p>
           </div>
         </div>
       </header>
 
       {error ? (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">Applications could not be loaded: {error}</div>
+        <div className='rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800'>Applications could not be loaded: {error}</div>
       ) : null}
 
       <WebsiteForm
         applications={applications}
         initialApplicationId={initialApplicationId}
         cancelHref={listHref}
-        submitLabel="Create website"
+        submitLabel='Create website'
         onSubmit={handleCreate}
       />
     </div>

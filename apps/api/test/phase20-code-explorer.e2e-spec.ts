@@ -1,17 +1,16 @@
+import { AppModule } from '../src/app.module';
+import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
+import { resetDatabase } from './helpers/database';
+import { readAccessToken } from './helpers/response';
+import { PrismaService } from '../src/database/prisma.service';
+import { WorkspaceRole } from '../src/generated/prisma/enums';
+import { GithubAppService } from '../src/modules/repositories/services/github-app.service';
+import { GithubCodeService } from '../src/modules/repositories/services/github-code.service';
 import { ValidationPipe, type INestApplication } from '@nestjs/common';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import cookieParser from 'cookie-parser';
 import request, { type Response } from 'supertest';
-
-import { AppModule } from '../src/app.module';
-import { PrismaService } from '../src/database/prisma.service';
-import { WorkspaceRole } from '../src/generated/prisma/enums';
-import { GithubAppService } from '../src/modules/repositories/services/github-app.service';
-import { GithubCodeService } from '../src/modules/repositories/services/github-code.service';
-import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
-import { resetDatabase } from './helpers/database';
-import { readAccessToken } from './helpers/response';
 
 const API_PREFIX = '/api/v1';
 
@@ -49,9 +48,7 @@ const DEFAULT_GITHUB_FIXTURE: GithubFixture = {
 
 const githubAppMock = {
   buildInstallationUrl: jest.fn((state: string): string => {
-    return `https://github.test/apps/command-center/installations/new?state=${encodeURIComponent(
-      state,
-    )}`;
+    return `https://github.test/apps/command-center/installations/new?state=${encodeURIComponent(state)}`;
   }),
 
   buildUserAuthorizationUrl: jest.fn((state: string, codeChallenge: string): string => {
@@ -78,9 +75,7 @@ const githubAppMock = {
     };
   }),
 
-  userCanAccessInstallation: jest.fn(
-    async (_userAccessToken: string, _installationId: string): Promise<boolean> => true,
-  ),
+  userCanAccessInstallation: jest.fn(async (_userAccessToken: string, _installationId: string): Promise<boolean> => true),
 
   listInstallationRepositories: jest.fn(async (_installationId: string) => {
     return [
@@ -106,92 +101,75 @@ const githubAppMock = {
 };
 
 const githubCodeMock = {
-  listBranches: jest.fn(
-    async (_installationId: string, _owner: string, _repository: string) => {
-      return [
+  listBranches: jest.fn(async (_installationId: string, _owner: string, _repository: string) => {
+    return [
+      {
+        name: 'main',
+        sha: 'sha-main',
+        protected: true,
+        isProtected: true,
+      },
+      {
+        name: 'develop',
+        sha: 'sha-develop',
+        protected: false,
+        isProtected: false,
+      },
+    ];
+  }),
+
+  getTree: jest.fn(async (_installationId: string, _owner: string, _repository: string, _branch: string) => {
+    return {
+      sha: 'tree-main',
+      truncated: false,
+      entries: [
         {
-          name: 'main',
-          sha: 'sha-main',
-          protected: true,
-          isProtected: true,
+          path: 'README.md',
+          type: 'file',
+          sha: 'sha-readme',
+          size: 120,
         },
         {
-          name: 'develop',
-          sha: 'sha-develop',
-          protected: false,
-          isProtected: false,
+          path: 'src',
+          type: 'directory',
+          sha: 'sha-src',
+          size: null,
         },
-      ];
-    },
-  ),
+        {
+          path: 'src/index.ts',
+          type: 'file',
+          sha: 'sha-index',
+          size: 64,
+        },
+        {
+          path: 'src/nested',
+          type: 'directory',
+          sha: 'sha-nested',
+          size: null,
+        },
+        {
+          path: 'src/nested/service.ts',
+          type: 'file',
+          sha: 'sha-service',
+          size: 96,
+        },
+      ],
+    };
+  }),
 
-  getTree: jest.fn(
-    async (
-      _installationId: string,
-      _owner: string,
-      _repository: string,
-      _branch: string,
-    ) => {
-      return {
-        sha: 'tree-main',
-        truncated: false,
-        entries: [
-          {
-            path: 'README.md',
-            type: 'file',
-            sha: 'sha-readme',
-            size: 120,
-          },
-          {
-            path: 'src',
-            type: 'directory',
-            sha: 'sha-src',
-            size: null,
-          },
-          {
-            path: 'src/index.ts',
-            type: 'file',
-            sha: 'sha-index',
-            size: 64,
-          },
-          {
-            path: 'src/nested',
-            type: 'directory',
-            sha: 'sha-nested',
-            size: null,
-          },
-          {
-            path: 'src/nested/service.ts',
-            type: 'file',
-            sha: 'sha-service',
-            size: 96,
-          },
-        ],
-      };
-    },
-  ),
+  getFile: jest.fn(async (_installationId: string, _owner: string, _repository: string, path: string, ref: string): Promise<GithubFileMock | null> => {
+    const text = `// ${ref}\nexport const filePath = '${path}';\n`;
 
-  getFile: jest.fn(
-    async (
-      _installationId: string,
-      _owner: string,
-      _repository: string,
-      path: string,
-      ref: string,
-    ): Promise<GithubFileMock | null> => {
-      const text = `// ${ref}\nexport const filePath = '${path}';\n`;
-
-      return {
-        name: path.split('/').at(-1) ?? path,
-        path,
-        sha: `sha-${ref}-${path.replaceAll('/', '-')}`,
-        size: Buffer.byteLength(text, 'utf8'),
-        encoding: 'base64',
-        content: Buffer.from(text, 'utf8').toString('base64'),
-        type: 'file',
-      };
-    },
-  ),
+    return {
+      name: path.split('/').at(-1) ?? path,
+      path,
+      sha: `sha-${ref}-${path.replaceAll('/', '-')}`,
+      size: Buffer.byteLength(text, 'utf8'),
+      encoding: 'base64',
+      content: Buffer.from(text, 'utf8').toString('base64'),
+      type: 'file',
+    };
+  }),
 };
 
 function repositoriesRoute(workspaceId: string): string {
@@ -349,11 +327,7 @@ async function createPhase20TestApp(): Promise<INestApplication> {
   return app;
 }
 
-async function registerIdentity(
-  app: INestApplication,
-  prisma: PrismaService,
-  label: string,
-): Promise<Identity> {
+async function registerIdentity(app: INestApplication, prisma: PrismaService, label: string): Promise<Identity> {
   const userInput = createTestUser({
     name: `${label} User`,
     workspaceName: `${label} Workspace`,
@@ -396,12 +370,7 @@ async function registerIdentity(
   };
 }
 
-async function addWorkspaceRole(
-  prisma: PrismaService,
-  workspaceId: string,
-  identity: Identity,
-  role: WorkspaceRole,
-): Promise<void> {
+async function addWorkspaceRole(prisma: PrismaService, workspaceId: string, identity: Identity, role: WorkspaceRole): Promise<void> {
   await prisma.workspaceMember.create({
     data: {
       workspaceId,
@@ -426,33 +395,21 @@ async function connectRepository(
 
   expect(beginResponse.status).toBe(201);
 
-  const installationState = queryParameter(
-    requireString(responseRecord(beginResponse), 'installationUrl'),
-    'state',
-  );
+  const installationState = queryParameter(requireString(responseRecord(beginResponse), 'installationUrl'), 'state');
 
-  const setupResponse = await request(app.getHttpServer())
-    .post(`${API_PREFIX}/repositories/github/setup`)
-    .set(withBearer(identity.token))
-    .send({
-      state: installationState,
-      installationId: fixture.installationId,
-    });
+  const setupResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/setup`).set(withBearer(identity.token)).send({
+    state: installationState,
+    installationId: fixture.installationId,
+  });
 
   expect(setupResponse.status).toBe(201);
 
-  const oauthState = queryParameter(
-    requireString(responseRecord(setupResponse), 'authorizationUrl'),
-    'state',
-  );
+  const oauthState = queryParameter(requireString(responseRecord(setupResponse), 'authorizationUrl'), 'state');
 
-  const callbackResponse = await request(app.getHttpServer())
-    .post(`${API_PREFIX}/repositories/github/callback`)
-    .set(withBearer(identity.token))
-    .send({
-      code: 'phase20-oauth-code',
-      state: oauthState,
-    });
+  const callbackResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/callback`).set(withBearer(identity.token)).send({
+    code: 'phase20-oauth-code',
+    state: oauthState,
+  });
 
   expect(callbackResponse.status).toBe(201);
 
@@ -526,13 +483,7 @@ describe('Phase 20 - Code Explorer E2E', () => {
     });
 
     githubCodeMock.getFile.mockImplementation(
-      async (
-        _installationId: string,
-        _owner: string,
-        _repository: string,
-        path: string,
-        ref: string,
-      ): Promise<GithubFileMock | null> => {
+      async (_installationId: string, _owner: string, _repository: string, path: string, ref: string): Promise<GithubFileMock | null> => {
         const text = `// ${ref}\nexport const filePath = '${path}';\n`;
 
         return {
@@ -559,9 +510,7 @@ describe('Phase 20 - Code Explorer E2E', () => {
       const owner = await registerIdentity(app, prisma, 'Anonymous Code Owner');
       const repositoryId = await connectRepository(app, prisma, owner, owner.workspaceId);
 
-      const response = await request(app.getHttpServer()).get(
-        `${codeRoute(owner.workspaceId, repositoryId)}/branches`,
-      );
+      const response = await request(app.getHttpServer()).get(`${codeRoute(owner.workspaceId, repositoryId)}/branches`);
 
       expect(response.status).toBe(401);
     });
@@ -588,13 +537,7 @@ describe('Phase 20 - Code Explorer E2E', () => {
         name: 'private-b',
         fullName: 'phase20-org-b/private-b',
       };
-      const repositoryB = await connectRepository(
-        app,
-        prisma,
-        ownerB,
-        ownerB.workspaceId,
-        fixtureB,
-      );
+      const repositoryB = await connectRepository(app, prisma, ownerB, ownerB.workspaceId, fixtureB);
 
       const response = await request(app.getHttpServer())
         .get(`${codeRoute(ownerA.workspaceId, repositoryB)}/branches`)
@@ -796,7 +739,7 @@ describe('Phase 20 - Code Explorer E2E', () => {
     it('decodes a UTF-8 text file from GitHub base64 content', async () => {
       const owner = await registerIdentity(app, prisma, 'Text File Owner');
       const repositoryId = await connectRepository(app, prisma, owner, owner.workspaceId);
-      const source = "export const answer = 42;\n";
+      const source = 'export const answer = 42;\n';
 
       githubCodeMock.getFile.mockResolvedValueOnce({
         name: 'answer.ts',

@@ -1,7 +1,6 @@
-import { BadRequestException, Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
-
-import { Prisma, WorkspaceRole } from '../../../generated/prisma/client';
 import { PrismaService } from '../../../database/prisma.service';
+import { Prisma, WorkspaceRole } from '../../../generated/prisma/client';
+import { BadRequestException, Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 
 const workspaceSummarySelect = {
   id: true,

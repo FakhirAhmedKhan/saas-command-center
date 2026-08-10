@@ -1,22 +1,13 @@
-import { createHash } from 'node:crypto';
-
-import type { INestApplication } from '@nestjs/common';
-
-import request from 'supertest';
-
-import { PrismaService } from '../src/database/prisma.service';
-
 import { createAgent, createTestUser, loginUser, registerUser, withBearer } from './helpers/auth';
-
-import { buildCookieWithValue, readCookiePair, readCookieValue, readFirstSetCookie } from './helpers/cookie';
-
 import { TEST_ROUTES } from './helpers/contracts';
-
+import { buildCookieWithValue, readCookiePair, readCookieValue, readFirstSetCookie } from './helpers/cookie';
 import { createTestApp } from './helpers/create-test-app';
-
 import { resetDatabase } from './helpers/database';
-
 import { expectSuccessfulStatus, readAccessToken, readResponseEmail, readSetCookies } from './helpers/response';
+import { PrismaService } from '../src/database/prisma.service';
+import type { INestApplication } from '@nestjs/common';
+import { createHash } from 'node:crypto';
+import request from 'supertest';
 
 function hashRefreshToken(token: string): string {
   return createHash('sha256').update(token).digest('hex');

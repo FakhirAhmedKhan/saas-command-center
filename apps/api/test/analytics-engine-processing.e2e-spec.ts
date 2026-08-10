@@ -1,13 +1,4 @@
-import type { INestApplication } from '@nestjs/common';
-
-import { AnalyticsProcessingStatus, RawAnalyticsEventType, WorkspaceRole } from 'src/generated/prisma/enums';
-
-import { PrismaService } from 'src/database/prisma.service';
-
-import { AnalyticsProcessingService } from 'src/modules/analytics-engine/services/analytics-processing.service';
-
 import { processAnalytics } from './helpers/analytics-engine-old';
-
 import {
   buildEventBatch,
   buildTrackerEvent,
@@ -16,14 +7,14 @@ import {
   expectCollectionAccepted,
   uniqueTrackerId,
 } from './helpers/analytics-ingestion';
-
 import { createTestApp } from './helpers/create-test-app';
-
 import { resetDatabase } from './helpers/database';
-
 import { archiveWebsite, disableWebsite, expectWebsiteSuccess } from './helpers/website';
-
 import { addWorkspaceMember, expectAccessDenied, registerWorkspaceTestUser } from './helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { AnalyticsProcessingStatus, RawAnalyticsEventType, WorkspaceRole } from 'src/generated/prisma/enums';
+import { AnalyticsProcessingService } from 'src/modules/analytics-engine/services/analytics-processing.service';
 
 describe('Analytics Engine Processing E2E', () => {
   let app: INestApplication;

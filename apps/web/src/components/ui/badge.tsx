@@ -1,5 +1,5 @@
-import { cn } from '@/features/lib/api/cn';
 import { type HTMLAttributes } from 'react';
+import { cn } from '@/features/lib/api/cn';
 
 type BadgeVariant = 'default' | 'blue' | 'green' | 'yellow' | 'orange' | 'red' | 'purple' | 'slate';
 

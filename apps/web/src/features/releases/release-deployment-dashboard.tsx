@@ -1,10 +1,12 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
+import { ApiError } from 'next/dist/server/api-utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-
 import { PageError } from '@/components/states/page-error';
-
+import { EmptyState } from '@/components/ui/empty-state';
+import { getErrorMessage } from '../applications/application-utils';
+import { DeploymentStatusBadge } from './deployment-status-badge';
 import {
   createDeployment,
   createRelease,
@@ -14,13 +16,7 @@ import {
   getReleases,
   transitionDeployment,
 } from './release-management-api';
-
-import { DeploymentStatusBadge } from './deployment-status-badge';
-
 import type { CurrentEnvironmentVersion, Deployment, DeploymentOptions, DeploymentStatus, Release } from './release-management.types';
-import { EmptyState } from '@/components/ui/empty-state';
-import { ApiError } from 'next/dist/server/api-utils';
-import { getErrorMessage } from '../applications/application-utils';
 
 interface DashboardProps {
   workspaceId: string;
@@ -95,7 +91,7 @@ function ReleaseForm({
 
   return (
     <form
-      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+      className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'
       onSubmit={(event) => {
         event.preventDefault();
 
@@ -114,21 +110,21 @@ function ReleaseForm({
         });
       }}
     >
-      <div className="flex items-start justify-between gap-4">
+      <div className='flex items-start justify-between gap-4'>
         <div>
-          <h2 className="font-semibold text-slate-950">Create release</h2>
+          <h2 className='font-semibold text-slate-950'>Create release</h2>
 
-          <p className="mt-1 text-sm text-slate-600">Create the version before deploying it to an environment.</p>
+          <p className='mt-1 text-sm text-slate-600'>Create the version before deploying it to an environment.</p>
         </div>
 
-        <button type="button" onClick={onCancel} className="text-sm font-medium text-slate-500">
+        <button type='button' onClick={onCancel} className='text-sm font-medium text-slate-500'>
           Cancel
         </button>
       </div>
 
-      <div className="mt-5 grid gap-4 md:grid-cols-2">
+      <div className='mt-5 grid gap-4 md:grid-cols-2'>
         <label>
-          <span className="text-sm font-medium">Version</span>
+          <span className='text-sm font-medium'>Version</span>
 
           <input
             required
@@ -136,65 +132,65 @@ function ReleaseForm({
             onChange={(event) => {
               setVersion(event.target.value);
             }}
-            placeholder="1.4.0"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            placeholder='1.4.0'
+            className='mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
           />
         </label>
 
         <label>
-          <span className="text-sm font-medium">Release name</span>
+          <span className='text-sm font-medium'>Release name</span>
 
           <input
             value={name}
             onChange={(event) => {
               setName(event.target.value);
             }}
-            placeholder="August release"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            placeholder='August release'
+            className='mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
           />
         </label>
 
         <label>
-          <span className="text-sm font-medium">Commit reference</span>
+          <span className='text-sm font-medium'>Commit reference</span>
 
           <input
             value={commitRef}
             onChange={(event) => {
               setCommitRef(event.target.value);
             }}
-            placeholder="a8f21d4"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            placeholder='a8f21d4'
+            className='mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
           />
         </label>
 
         <label>
-          <span className="text-sm font-medium">Repository URL</span>
+          <span className='text-sm font-medium'>Repository URL</span>
 
           <input
-            type="url"
+            type='url'
             value={repositoryUrl}
             onChange={(event) => {
               setRepositoryUrl(event.target.value);
             }}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className='mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
           />
         </label>
 
         <label>
-          <span className="text-sm font-medium">Scheduled time</span>
+          <span className='text-sm font-medium'>Scheduled time</span>
 
           <input
-            type="datetime-local"
+            type='datetime-local'
             value={scheduledAt}
             onChange={(event) => {
               setScheduledAt(event.target.value);
             }}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className='mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
           />
         </label>
 
-        <label className="md:col-span-2">
-          <span className="text-sm font-medium">Release notes</span>
+        <label className='md:col-span-2'>
+          <span className='text-sm font-medium'>Release notes</span>
 
           <textarea
             rows={5}
@@ -202,12 +198,12 @@ function ReleaseForm({
             onChange={(event) => {
               setNotes(event.target.value);
             }}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className='mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
           />
         </label>
       </div>
 
-      <button type="submit" disabled={submitting} className="mt-5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">
+      <button type='submit' disabled={submitting} className='mt-5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50'>
         {submitting ? 'Creatingâ€¦' : 'Create release'}
       </button>
     </form>
@@ -252,7 +248,7 @@ function DeploymentForm({
 
   return (
     <form
-      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+      className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'
       onSubmit={(event) => {
         event.preventDefault();
 
@@ -271,17 +267,17 @@ function DeploymentForm({
         });
       }}
     >
-      <div className="flex items-start justify-between">
-        <h2 className="font-semibold text-slate-950">Create deployment</h2>
+      <div className='flex items-start justify-between'>
+        <h2 className='font-semibold text-slate-950'>Create deployment</h2>
 
-        <button type="button" onClick={onCancel} className="text-sm font-medium text-slate-500">
+        <button type='button' onClick={onCancel} className='text-sm font-medium text-slate-500'>
           Cancel
         </button>
       </div>
 
-      <div className="mt-5 grid gap-4 md:grid-cols-2">
+      <div className='mt-5 grid gap-4 md:grid-cols-2'>
         <label>
-          <span className="text-sm font-medium">Release</span>
+          <span className='text-sm font-medium'>Release</span>
 
           <select
             required
@@ -289,9 +285,9 @@ function DeploymentForm({
             onChange={(event) => {
               setReleaseId(event.target.value);
             }}
-            className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
+            className='mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2'
           >
-            <option value="">Select release</option>
+            <option value=''>Select release</option>
 
             {releases.map((release) => (
               <option key={release.id} value={release.id}>
@@ -303,7 +299,7 @@ function DeploymentForm({
         </label>
 
         <label>
-          <span className="text-sm font-medium">Environment</span>
+          <span className='text-sm font-medium'>Environment</span>
 
           <select
             required
@@ -311,9 +307,9 @@ function DeploymentForm({
             onChange={(event) => {
               setEnvironmentId(event.target.value);
             }}
-            className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
+            className='mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2'
           >
-            <option value="">Select environment</option>
+            <option value=''>Select environment</option>
 
             {options.environments.map((environment) => (
               <option key={environment.id} value={environment.id}>
@@ -324,42 +320,42 @@ function DeploymentForm({
         </label>
 
         <label>
-          <span className="text-sm font-medium">CI job URL</span>
+          <span className='text-sm font-medium'>CI job URL</span>
 
           <input
-            type="url"
+            type='url'
             value={ciJobUrl}
             onChange={(event) => {
               setCiJobUrl(event.target.value);
             }}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className='mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
           />
         </label>
 
         <label>
-          <span className="text-sm font-medium">Live environment URL</span>
+          <span className='text-sm font-medium'>Live environment URL</span>
 
           <input
-            type="url"
+            type='url'
             value={liveUrl}
             onChange={(event) => {
               setLiveUrl(event.target.value);
             }}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className='mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
           />
         </label>
 
-        <label className="md:col-span-2">
-          <span className="text-sm font-medium">Related health incident</span>
+        <label className='md:col-span-2'>
+          <span className='text-sm font-medium'>Related health incident</span>
 
           <select
             value={healthIncidentId}
             onChange={(event) => {
               setHealthIncidentId(event.target.value);
             }}
-            className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
+            className='mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2'
           >
-            <option value="">No linked incident</option>
+            <option value=''>No linked incident</option>
 
             {options.openIncidents.map((incident) => (
               <option key={incident.id} value={incident.id}>
@@ -371,8 +367,8 @@ function DeploymentForm({
           </select>
         </label>
 
-        <label className="md:col-span-2">
-          <span className="text-sm font-medium">Deployment notes</span>
+        <label className='md:col-span-2'>
+          <span className='text-sm font-medium'>Deployment notes</span>
 
           <textarea
             rows={4}
@@ -380,12 +376,12 @@ function DeploymentForm({
             onChange={(event) => {
               setDeploymentNotes(event.target.value);
             }}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className='mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
           />
         </label>
       </div>
 
-      <button type="submit" disabled={submitting} className="mt-5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">
+      <button type='submit' disabled={submitting} className='mt-5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50'>
         {submitting ? 'Creatingâ€¦' : 'Create deployment'}
       </button>
     </form>
@@ -581,10 +577,10 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
 
   if (loading && !data) {
     return (
-      <div className="space-y-5">
-        <div className="h-24 animate-pulse rounded-2xl bg-slate-200" />
+      <div className='space-y-5'>
+        <div className='h-24 animate-pulse rounded-2xl bg-slate-200' />
 
-        <div className="h-80 animate-pulse rounded-2xl bg-slate-200" />
+        <div className='h-80 animate-pulse rounded-2xl bg-slate-200' />
       </div>
     );
   }
@@ -592,7 +588,7 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
   if (error || !data) {
     return (
       <PageError
-        title="Release tracking unavailable"
+        title='Release tracking unavailable'
         message={getErrorMessage(error)}
         requestId={error instanceof ApiError ? ('requestId' in error && typeof error.requestId === 'string' ? error.requestId : undefined) : undefined}
         onRetry={() => {
@@ -603,35 +599,35 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
   }
 
   return (
-    <main className="space-y-6">
-      <header className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between">
+    <main className='space-y-6'>
+      <header className='flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between'>
         <div>
-          <p className="text-sm font-medium text-slate-500">Application operations</p>
+          <p className='text-sm font-medium text-slate-500'>Application operations</p>
 
-          <h1 className="mt-1 text-2xl font-bold text-slate-950">Releases and deployments</h1>
+          <h1 className='mt-1 text-2xl font-bold text-slate-950'>Releases and deployments</h1>
 
-          <p className="mt-2 text-sm text-slate-600">Track which version is running in each environment.</p>
+          <p className='mt-2 text-sm text-slate-600'>Track which version is running in each environment.</p>
         </div>
 
         {data.options.canManage ? (
-          <div className="flex flex-wrap gap-2">
+          <div className='flex flex-wrap gap-2'>
             <button
-              type="button"
+              type='button'
               onClick={() => {
                 setShowReleaseForm(true);
               }}
-              className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium"
+              className='rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium'
             >
               New release
             </button>
 
             <button
-              type="button"
+              type='button'
               disabled={data.releases.length === 0 || data.options.environments.length === 0}
               onClick={() => {
                 setShowDeploymentForm(true);
               }}
-              className="rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+              className='rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50'
             >
               New deployment
             </button>
@@ -640,7 +636,7 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
       </header>
 
       {actionError ? (
-        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+        <div role='alert' className='rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800'>
           {actionError}
         </div>
       ) : null}
@@ -668,30 +664,30 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
       ) : null}
 
       <section>
-        <h2 className="text-lg font-semibold text-slate-950">Current versions</h2>
+        <h2 className='text-lg font-semibold text-slate-950'>Current versions</h2>
 
         {data.currentVersions.length === 0 ? (
-          <div className="mt-3">
-            <EmptyState title="No environments" description="Create an application environment before recording deployments." icon={undefined} />
+          <div className='mt-3'>
+            <EmptyState title='No environments' description='Create an application environment before recording deployments.' icon={undefined} />
           </div>
         ) : (
-          <div className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className='mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-4'>
             {data.currentVersions.map((item) => (
-              <article key={item.environmentId} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <p className="text-sm font-medium text-slate-500">{item.environmentName}</p>
+              <article key={item.environmentId} className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+                <p className='text-sm font-medium text-slate-500'>{item.environmentName}</p>
 
-                <p className="mt-2 text-2xl font-bold text-slate-950">{item.version ?? 'Not deployed'}</p>
+                <p className='mt-2 text-2xl font-bold text-slate-950'>{item.version ?? 'Not deployed'}</p>
 
                 {item.status ? (
-                  <div className="mt-3">
+                  <div className='mt-3'>
                     <DeploymentStatusBadge status={item.status} />
                   </div>
                 ) : null}
 
-                <p className="mt-3 text-xs text-slate-500">{formatDateTime(item.deployedAt)}</p>
+                <p className='mt-3 text-xs text-slate-500'>{formatDateTime(item.deployedAt)}</p>
 
                 {item.liveUrl ? (
-                  <a href={item.liveUrl} target="_blank" rel="noreferrer" className="mt-3 inline-block text-sm font-medium text-blue-700 underline">
+                  <a href={item.liveUrl} target='_blank' rel='noreferrer' className='mt-3 inline-block text-sm font-medium text-blue-700 underline'>
                     Open environment
                   </a>
                 ) : null}
@@ -701,19 +697,19 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
         )}
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="grid gap-3 sm:grid-cols-2">
+      <section className='rounded-2xl border border-slate-200 bg-white p-4 shadow-sm'>
+        <div className='grid gap-3 sm:grid-cols-2'>
           <label>
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Environment</span>
+            <span className='text-xs font-medium uppercase tracking-wide text-slate-500'>Environment</span>
 
             <select
               value={environmentFilter}
               onChange={(event) => {
                 setEnvironmentFilter(event.target.value);
               }}
-              className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
+              className='mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2'
             >
-              <option value="">All environments</option>
+              <option value=''>All environments</option>
 
               {data.options.environments.map((environment) => (
                 <option key={environment.id} value={environment.id}>
@@ -724,16 +720,16 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
           </label>
 
           <label>
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Status</span>
+            <span className='text-xs font-medium uppercase tracking-wide text-slate-500'>Status</span>
 
             <select
               value={statusFilter}
               onChange={(event) => {
                 setStatusFilter(event.target.value as DeploymentStatus | '');
               }}
-              className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
+              className='mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2'
             >
-              <option value="">All statuses</option>
+              <option value=''>All statuses</option>
 
               {STATUS_OPTIONS.map((status) => (
                 <option key={status} value={status}>
@@ -746,38 +742,38 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
       </section>
 
       {data.deployments.length === 0 ? (
-        <EmptyState title="No deployments" description="Create a release and record its first deployment." icon={undefined} />
+        <EmptyState title='No deployments' description='Create a release and record its first deployment.' icon={undefined} />
       ) : (
-        <section className="space-y-4">
-          <h2 className="text-lg font-semibold text-slate-950">Deployment timeline</h2>
+        <section className='space-y-4'>
+          <h2 className='text-lg font-semibold text-slate-950'>Deployment timeline</h2>
 
           {data.deployments.map((deployment) => (
-            <article key={deployment.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <article key={deployment.id} className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+              <div className='flex flex-col gap-4 md:flex-row md:items-start md:justify-between'>
                 <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-lg font-semibold text-slate-950">{deployment.release.version}</h3>
+                  <div className='flex flex-wrap items-center gap-2'>
+                    <h3 className='text-lg font-semibold text-slate-950'>{deployment.release.version}</h3>
 
                     <DeploymentStatusBadge status={deployment.status} />
 
-                    <span className="text-xs text-slate-500">Attempt {deployment.attempt}</span>
+                    <span className='text-xs text-slate-500'>Attempt {deployment.attempt}</span>
                   </div>
 
-                  <p className="mt-2 text-sm text-slate-600">{deployment.environment.name}</p>
+                  <p className='mt-2 text-sm text-slate-600'>{deployment.environment.name}</p>
 
-                  <p className="mt-1 text-xs text-slate-500">Changed {formatDateTime(deployment.statusChangedAt)}</p>
+                  <p className='mt-1 text-xs text-slate-500'>Changed {formatDateTime(deployment.statusChangedAt)}</p>
                 </div>
 
                 {data.options.canManage && deployment.allowedTransitions.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
+                  <div className='flex flex-wrap gap-2'>
                     {deployment.allowedTransitions.map((status) => (
                       <button
                         key={status}
-                        type="button"
+                        type='button'
                         onClick={() => {
                           void changeStatus(deployment, status);
                         }}
-                        className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium"
+                        className='rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium'
                       >
                         Mark {status.replace(/_/g, ' ')}
                       </button>
@@ -786,90 +782,90 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
                 ) : null}
               </div>
 
-              <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
+              <dl className='mt-5 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4'>
                 <div>
-                  <dt className="text-slate-500">Commit</dt>
+                  <dt className='text-slate-500'>Commit</dt>
 
-                  <dd className="mt-1 font-medium text-slate-900">{deployment.commitRef ?? 'â€”'}</dd>
+                  <dd className='mt-1 font-medium text-slate-900'>{deployment.commitRef ?? 'â€”'}</dd>
                 </div>
 
                 <div>
-                  <dt className="text-slate-500">Duration</dt>
+                  <dt className='text-slate-500'>Duration</dt>
 
-                  <dd className="mt-1 font-medium text-slate-900">{formatDuration(deployment.durationMs)}</dd>
+                  <dd className='mt-1 font-medium text-slate-900'>{formatDuration(deployment.durationMs)}</dd>
                 </div>
 
                 <div>
-                  <dt className="text-slate-500">Started</dt>
+                  <dt className='text-slate-500'>Started</dt>
 
-                  <dd className="mt-1 font-medium text-slate-900">{formatDateTime(deployment.startedAt)}</dd>
+                  <dd className='mt-1 font-medium text-slate-900'>{formatDateTime(deployment.startedAt)}</dd>
                 </div>
 
                 <div>
-                  <dt className="text-slate-500">Finished</dt>
+                  <dt className='text-slate-500'>Finished</dt>
 
-                  <dd className="mt-1 font-medium text-slate-900">{formatDateTime(deployment.finishedAt)}</dd>
+                  <dd className='mt-1 font-medium text-slate-900'>{formatDateTime(deployment.finishedAt)}</dd>
                 </div>
               </dl>
 
               {deployment.release.notes ? (
-                <div className="mt-5 rounded-xl bg-slate-50 p-4">
-                  <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Release notes</p>
+                <div className='mt-5 rounded-xl bg-slate-50 p-4'>
+                  <p className='text-xs font-medium uppercase tracking-wide text-slate-500'>Release notes</p>
 
-                  <p className="mt-2 whitespace-pre-wrap text-sm text-slate-700">{deployment.release.notes}</p>
+                  <p className='mt-2 whitespace-pre-wrap text-sm text-slate-700'>{deployment.release.notes}</p>
                 </div>
               ) : null}
 
               {deployment.failureReason ? (
-                <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{deployment.failureReason}</div>
+                <div className='mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800'>{deployment.failureReason}</div>
               ) : null}
 
               {deployment.healthIncident ? (
-                <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
-                  <p className="text-xs font-medium uppercase tracking-wide text-amber-700">Related health incident</p>
+                <div className='mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4'>
+                  <p className='text-xs font-medium uppercase tracking-wide text-amber-700'>Related health incident</p>
 
-                  <p className="mt-2 text-sm text-amber-900">{deployment.healthIncident.summary}</p>
+                  <p className='mt-2 text-sm text-amber-900'>{deployment.healthIncident.summary}</p>
                 </div>
               ) : null}
 
               {deployment.rollbackTo ? (
-                <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+                <div className='mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900'>
                   Rolled back to version <strong>{deployment.rollbackTo.release.version}</strong>
                   {' in '}
                   {deployment.rollbackTo.environment.name}.
                 </div>
               ) : null}
 
-              <div className="mt-4 flex flex-wrap gap-4 text-sm">
+              <div className='mt-4 flex flex-wrap gap-4 text-sm'>
                 {deployment.repositoryUrl ? (
-                  <a href={deployment.repositoryUrl} target="_blank" rel="noreferrer" className="font-medium text-blue-700 underline">
+                  <a href={deployment.repositoryUrl} target='_blank' rel='noreferrer' className='font-medium text-blue-700 underline'>
                     Repository
                   </a>
                 ) : null}
 
                 {deployment.ciJobUrl ? (
-                  <a href={deployment.ciJobUrl} target="_blank" rel="noreferrer" className="font-medium text-blue-700 underline">
+                  <a href={deployment.ciJobUrl} target='_blank' rel='noreferrer' className='font-medium text-blue-700 underline'>
                     CI job
                   </a>
                 ) : null}
 
                 {deployment.liveUrl ? (
-                  <a href={deployment.liveUrl} target="_blank" rel="noreferrer" className="font-medium text-blue-700 underline">
+                  <a href={deployment.liveUrl} target='_blank' rel='noreferrer' className='font-medium text-blue-700 underline'>
                     Live environment
                   </a>
                 ) : null}
               </div>
 
               {deployment.activities.length > 0 ? (
-                <div className="mt-5 border-t border-slate-200 pt-4">
-                  <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Activity</p>
+                <div className='mt-5 border-t border-slate-200 pt-4'>
+                  <p className='text-xs font-medium uppercase tracking-wide text-slate-500'>Activity</p>
 
-                  <div className="mt-3 space-y-3">
+                  <div className='mt-3 space-y-3'>
                     {deployment.activities.map((activity) => (
-                      <div key={activity.id} className="text-sm">
-                        <p className="text-slate-800">{activity.message ?? activity.action}</p>
+                      <div key={activity.id} className='text-sm'>
+                        <p className='text-slate-800'>{activity.message ?? activity.action}</p>
 
-                        <p className="mt-1 text-xs text-slate-500">
+                        <p className='mt-1 text-xs text-slate-500'>
                           {activity.actor.name ?? activity.actor.email}
                           {' Â· '}
                           {formatDateTime(activity.createdAt)}

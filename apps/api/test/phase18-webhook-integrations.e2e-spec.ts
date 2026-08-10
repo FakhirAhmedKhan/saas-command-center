@@ -1,15 +1,14 @@
-import type { INestApplication } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
-import request, { type Response } from 'supertest';
-
-import { PrismaService } from '../src/database/prisma.service';
-import { WebhookAttemptOutcome, WebhookDeliveryStatus, WebhookEventType, WorkspaceRole } from '../src/generated/prisma/enums';
-import { WebhookSecretCryptoService } from '../src/modules/webhooks/services/webhook-secret-crypto.service';
-import { WebhookSignatureService } from '../src/modules/webhooks/services/webhook-signature.service';
 import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
 import { createTestApp } from './helpers/create-test-app';
 import { resetDatabase } from './helpers/database';
 import { readAccessToken } from './helpers/response';
+import { PrismaService } from '../src/database/prisma.service';
+import { WebhookAttemptOutcome, WebhookDeliveryStatus, WebhookEventType, WorkspaceRole } from '../src/generated/prisma/enums';
+import { WebhookSecretCryptoService } from '../src/modules/webhooks/services/webhook-secret-crypto.service';
+import { WebhookSignatureService } from '../src/modules/webhooks/services/webhook-signature.service';
+import type { INestApplication } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
+import request, { type Response } from 'supertest';
 
 /**
  * Phase 18 — Webhook Integrations E2E
@@ -959,7 +958,6 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     let lastStatus = 0;
 
     for (let attempt = 0; attempt < 6; attempt += 1) {
-      // eslint-disable-next-line no-await-in-loop -- sequential against a shared rate-limit
       // bucket; parallelizing would make the assertion racy.
       const response = await request(app.getHttpServer()).post(rotateUrl(endpointId)).set(withBearer(ownerAccessToken));
 

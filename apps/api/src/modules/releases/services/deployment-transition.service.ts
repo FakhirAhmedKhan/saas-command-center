@@ -1,6 +1,5 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-
 import { DeploymentStatus } from '../../../generated/prisma/client';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 const TRANSITIONS: Record<DeploymentStatus, readonly DeploymentStatus[]> = {
   DRAFT: [DeploymentStatus.SCHEDULED, DeploymentStatus.IN_PROGRESS],

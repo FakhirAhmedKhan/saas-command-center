@@ -1,11 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-import { HealthStatusBadge } from './health-status-badge';
-
-import type { HealthCheckStatus } from './monitoring.types';
 import { apiRequest } from '../lib/api/api-client';
+import { HealthStatusBadge } from './health-status-badge';
+import type { HealthCheckStatus } from './monitoring.types';
 
 interface ApplicationHealthSummary {
   status: HealthCheckStatus;

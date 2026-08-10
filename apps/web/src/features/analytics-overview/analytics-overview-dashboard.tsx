@@ -1,17 +1,13 @@
 ﻿'use client';
 
-import { useMemo } from 'react';
-
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-
+import { useMemo } from 'react';
 import { PageError } from '@/components/states/page-error';
-
-import type { AnalyticsBreakdownItem, AnalyticsMetric, AnalyticsOverviewResponse, AnalyticsPreset, AnalyticsTrendPoint } from './analytics-overview.types';
-
-import { useAnalyticsOverview } from './use-analytics-overview';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ApiError } from '@/features/lib/api/api-error';
 import { getErrorMessage } from '../applications/application-utils';
+import { useAnalyticsOverview } from './use-analytics-overview';
+import type { AnalyticsBreakdownItem, AnalyticsMetric, AnalyticsOverviewResponse, AnalyticsPreset, AnalyticsTrendPoint } from './analytics-overview.types';
 
 interface AnalyticsOverviewDashboardProps {
   workspaceId: string;
@@ -117,18 +113,18 @@ function MetricCard({ title, metric, formattedValue, description }: MetricCardPr
   const change = formatMetricChange(metric.changePercent);
 
   return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="flex items-start justify-between gap-3">
+    <article className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+      <div className='flex items-start justify-between gap-3'>
         <div>
-          <p className="text-sm font-medium text-slate-600">{title}</p>
+          <p className='text-sm font-medium text-slate-600'>{title}</p>
 
-          <p className="mt-2 text-3xl font-bold tracking-tight text-slate-950">{formattedValue}</p>
+          <p className='mt-2 text-3xl font-bold tracking-tight text-slate-950'>{formattedValue}</p>
         </div>
 
         <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${change.className}`}>{change.label}</span>
       </div>
 
-      <p className="mt-3 text-xs text-slate-500">{description}</p>
+      <p className='mt-3 text-xs text-slate-500'>{description}</p>
     </article>
   );
 }
@@ -137,13 +133,13 @@ function BreakdownPanel({ title, items, emptyLabel }: BreakdownPanelProps) {
   const maximumValue = Math.max(...items.map((item) => item.value), 1);
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h2 className="text-base font-semibold text-slate-950">{title}</h2>
+    <section className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+      <h2 className='text-base font-semibold text-slate-950'>{title}</h2>
 
       {items.length === 0 ? (
-        <p className="mt-5 text-sm text-slate-500">{emptyLabel}</p>
+        <p className='mt-5 text-sm text-slate-500'>{emptyLabel}</p>
       ) : (
-        <div className="mt-5 space-y-4">
+        <div className='mt-5 space-y-4'>
           {items.map((item) => {
             const barWidth = Math.max(
               4,
@@ -153,21 +149,21 @@ function BreakdownPanel({ title, items, emptyLabel }: BreakdownPanelProps) {
 
             return (
               <div key={item.key}>
-                <div className="mb-1.5 flex items-center justify-between gap-3 text-sm">
-                  <span className="min-w-0 truncate font-medium text-slate-800" title={item.label}>
+                <div className='mb-1.5 flex items-center justify-between gap-3 text-sm'>
+                  <span className='min-w-0 truncate font-medium text-slate-800' title={item.label}>
                     {item.label}
                   </span>
 
-                  <span className="shrink-0 text-slate-500">
+                  <span className='shrink-0 text-slate-500'>
                     {formatNumber(item.value)}
                     {' Â· '}
                     {item.percentage}%
                   </span>
                 </div>
 
-                <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                <div className='h-2 overflow-hidden rounded-full bg-slate-100'>
                   <div
-                    className="h-full rounded-full bg-slate-900"
+                    className='h-full rounded-full bg-slate-900'
                     style={{
                       width: `${barWidth}%`,
                     }}
@@ -261,27 +257,27 @@ function TrafficChart({
   const labelIndexes = points.length <= 3 ? points.map((_point, index) => index) : [0, Math.floor((points.length - 1) / 2), points.length - 1];
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <section className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2'>
+      <div className='flex flex-wrap items-start justify-between gap-3'>
         <div>
-          <h2 className="text-base font-semibold text-slate-950">Traffic trend</h2>
+          <h2 className='text-base font-semibold text-slate-950'>Traffic trend</h2>
 
-          <p className="mt-1 text-sm text-slate-500">Page views by {granularity}</p>
+          <p className='mt-1 text-sm text-slate-500'>Page views by {granularity}</p>
         </div>
 
-        <div className="text-right">
-          <p className="text-xs text-slate-500">Peak</p>
+        <div className='text-right'>
+          <p className='text-xs text-slate-500'>Peak</p>
 
-          <p className="font-semibold text-slate-900">{formatNumber(maximumValue)}</p>
+          <p className='font-semibold text-slate-900'>{formatNumber(maximumValue)}</p>
         </div>
       </div>
 
       {points.length === 0 ? (
-        <div className="flex h-64 items-center justify-center text-sm text-slate-500">No traffic was recorded in this range.</div>
+        <div className='flex h-64 items-center justify-center text-sm text-slate-500'>No traffic was recorded in this range.</div>
       ) : (
         <>
-          <div className="mt-6 overflow-hidden">
-            <svg viewBox={`0 0 ${width} ${height}`} className="h-64 w-full" role="img" aria-label="Page views trend chart" preserveAspectRatio="none">
+          <div className='mt-6 overflow-hidden'>
+            <svg viewBox={`0 0 ${width} ${height}`} className='h-64 w-full' role='img' aria-label='Page views trend chart' preserveAspectRatio='none'>
               {[0.25, 0.5, 0.75].map((ratio) => (
                 <line
                   key={ratio}
@@ -289,25 +285,25 @@ function TrafficChart({
                   x2={width - padding}
                   y1={height * ratio}
                   y2={height * ratio}
-                  stroke="currentColor"
-                  className="text-slate-100"
-                  strokeWidth="1"
+                  stroke='currentColor'
+                  className='text-slate-100'
+                  strokeWidth='1'
                 />
               ))}
 
               <polyline
-                fill="none"
-                stroke="currentColor"
-                className="text-slate-950"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                fill='none'
+                stroke='currentColor'
+                className='text-slate-950'
+                strokeWidth='4'
+                strokeLinecap='round'
+                strokeLinejoin='round'
                 points={pageViewPoints}
               />
             </svg>
           </div>
 
-          <div className="flex justify-between gap-3 text-xs text-slate-500">
+          <div className='flex justify-between gap-3 text-xs text-slate-500'>
             {labelIndexes.map((index) => {
               const point = points[index];
 
@@ -326,18 +322,18 @@ function TrafficChart({
 
 function AnalyticsSkeleton() {
   return (
-    <div className="space-y-6" aria-busy="true" aria-label="Loading analytics">
-      <div className="h-16 animate-pulse rounded-2xl bg-slate-200" />
+    <div className='space-y-6' aria-busy='true' aria-label='Loading analytics'>
+      <div className='h-16 animate-pulse rounded-2xl bg-slate-200' />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      <div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-5'>
         {Array.from({
           length: 5,
         }).map((_item, index) => (
-          <div key={index} className="h-36 animate-pulse rounded-2xl bg-slate-200" />
+          <div key={index} className='h-36 animate-pulse rounded-2xl bg-slate-200' />
         ))}
       </div>
 
-      <div className="h-80 animate-pulse rounded-2xl bg-slate-200" />
+      <div className='h-80 animate-pulse rounded-2xl bg-slate-200' />
     </div>
   );
 }
@@ -345,59 +341,59 @@ function AnalyticsSkeleton() {
 function AnalyticsContent({ data }: { data: AnalyticsOverviewResponse }) {
   return (
     <>
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      <div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-5'>
         <MetricCard
-          title="Visitors"
+          title='Visitors'
           metric={data.metrics.visitors}
           formattedValue={formatNumber(data.metrics.visitors.value)}
-          description="Unique visitors with activity during this period."
+          description='Unique visitors with activity during this period.'
         />
 
         <MetricCard
-          title="Sessions"
+          title='Sessions'
           metric={data.metrics.sessions}
           formattedValue={formatNumber(data.metrics.sessions.value)}
-          description="Distinct active sessions during this period."
+          description='Distinct active sessions during this period.'
         />
 
         <MetricCard
-          title="Page views"
+          title='Page views'
           metric={data.metrics.pageViews}
           formattedValue={formatNumber(data.metrics.pageViews.value)}
-          description="Processed page-view events during this period."
+          description='Processed page-view events during this period.'
         />
 
         <MetricCard
-          title="Bounce rate"
+          title='Bounce rate'
           metric={data.metrics.bounceRate}
           formattedValue={`${data.metrics.bounceRate.value}%`}
-          description="Percentage of measured sessions that bounced."
+          description='Percentage of measured sessions that bounced.'
         />
 
         <MetricCard
-          title="Avg. duration"
+          title='Avg. duration'
           metric={data.metrics.averageDurationSeconds}
           formattedValue={formatDuration(data.metrics.averageDurationSeconds.value)}
-          description="Average duration of sessions started in this period."
+          description='Average duration of sessions started in this period.'
         />
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+      <div className='mt-6 grid gap-6 lg:grid-cols-2'>
         <TrafficChart points={data.trend} timeZone={data.website.timeZone} granularity={data.range.granularity} />
       </div>
 
-      <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        <BreakdownPanel title="Top pages" items={data.topPages} emptyLabel="No page data available." />
+      <div className='mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3'>
+        <BreakdownPanel title='Top pages' items={data.topPages} emptyLabel='No page data available.' />
 
-        <BreakdownPanel title="Top sources" items={data.topSources} emptyLabel="No source data available." />
+        <BreakdownPanel title='Top sources' items={data.topSources} emptyLabel='No source data available.' />
 
-        <BreakdownPanel title="Countries" items={data.topCountries} emptyLabel="No country data available." />
+        <BreakdownPanel title='Countries' items={data.topCountries} emptyLabel='No country data available.' />
 
-        <BreakdownPanel title="Devices" items={data.topDevices} emptyLabel="No device data available." />
+        <BreakdownPanel title='Devices' items={data.topDevices} emptyLabel='No device data available.' />
 
-        <BreakdownPanel title="Browsers" items={data.topBrowsers} emptyLabel="No browser data available." />
+        <BreakdownPanel title='Browsers' items={data.topBrowsers} emptyLabel='No browser data available.' />
 
-        <BreakdownPanel title="Operating systems" items={data.topOperatingSystems} emptyLabel="No operating-system data available." />
+        <BreakdownPanel title='Operating systems' items={data.topOperatingSystems} emptyLabel='No operating-system data available.' />
       </div>
     </>
   );
@@ -439,7 +435,7 @@ export function AnalyticsOverviewDashboard({ workspaceId, websiteId }: Analytics
   if (error) {
     return (
       <PageError
-        title="Analytics unavailable"
+        title='Analytics unavailable'
         message={getErrorMessage(error)}
         requestId={error instanceof ApiError ? error.requestId : undefined}
         onRetry={reload}
@@ -448,25 +444,25 @@ export function AnalyticsOverviewDashboard({ workspaceId, websiteId }: Analytics
   }
 
   if (!data) {
-    return <PageError message="The analytics API returned no data." onRetry={reload} />;
+    return <PageError message='The analytics API returned no data.' onRetry={reload} />;
   }
 
   return (
-    <main className="space-y-6">
-      <header className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between">
+    <main className='space-y-6'>
+      <header className='flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between'>
         <div>
-          <p className="text-sm font-medium text-slate-500">Analytics</p>
+          <p className='text-sm font-medium text-slate-500'>Analytics</p>
 
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-950">{data.website.name}</h1>
+          <h1 className='mt-1 text-2xl font-bold tracking-tight text-slate-950'>{data.website.name}</h1>
 
-          <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-500">
+          <div className='mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-500'>
             <span>{data.website.domain}</span>
 
-            <span aria-hidden="true">â€¢</span>
+            <span aria-hidden='true'>â€¢</span>
 
             <span>{data.website.timeZone}</span>
 
-            <span aria-hidden="true">â€¢</span>
+            <span aria-hidden='true'>â€¢</span>
 
             <span>
               {data.range.from}
@@ -476,7 +472,7 @@ export function AnalyticsOverviewDashboard({ workspaceId, websiteId }: Analytics
           </div>
         </div>
 
-        <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+        <label className='flex items-center gap-2 text-sm font-medium text-slate-700'>
           <span>Date range</span>
 
           <select
@@ -484,7 +480,7 @@ export function AnalyticsOverviewDashboard({ workspaceId, websiteId }: Analytics
             onChange={(event) => {
               updatePreset(event.target.value as AnalyticsPreset);
             }}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none focus:border-slate-950"
+            className='rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none focus:border-slate-950'
           >
             {PRESETS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -497,8 +493,8 @@ export function AnalyticsOverviewDashboard({ workspaceId, websiteId }: Analytics
 
       {data.empty ? (
         <EmptyState
-          title="No analytics yet"
-          description="Tracking is connected, but no processed visitor sessions or page views were found for this date range."
+          title='No analytics yet'
+          description='Tracking is connected, but no processed visitor sessions or page views were found for this date range.'
           icon={undefined}
         />
       ) : (

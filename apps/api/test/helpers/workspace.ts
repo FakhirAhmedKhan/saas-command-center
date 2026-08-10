@@ -1,16 +1,10 @@
-import type { INestApplication } from '@nestjs/common';
-
-import type { Response, SuperAgentTest } from 'supertest';
-
-import { WorkspaceRole } from 'src/generated/prisma/enums';
-
-import { PrismaService } from 'src/database/prisma.service';
-
 import { createAgent, createTestUser, registerUser, withBearer } from './auth';
-
 import type { TestUserInput } from './contracts';
-
 import { expectSuccessfulStatus, readAccessToken, readResponseArray } from './response';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
+import type { Response, SuperAgentTest } from 'supertest';
 
 export const workspaceRoutes = {
   root: '/api/v1/workspaces',

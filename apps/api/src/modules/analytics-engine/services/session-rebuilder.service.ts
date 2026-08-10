@@ -1,11 +1,8 @@
-import { Injectable } from '@nestjs/common';
-
-import { Prisma } from 'src/generated/prisma/client';
-
-import { calculateSessionMetrics } from '../utils/analytics-metrics';
-
 import { PageViewRebuilderService } from './page-view-rebuilder.service';
+import { calculateSessionMetrics } from '../utils/analytics-metrics';
+import { Injectable } from '@nestjs/common';
 import { DefaultArgs } from '@prisma/client/runtime/client';
+import { Prisma } from 'src/generated/prisma/client';
 import { PrismaClient } from 'src/generated/prisma/internal/class';
 import { ProcessAnalyticsRangeInput } from 'src/modules/analytics-processing/services/analytics-range-processor.service';
 

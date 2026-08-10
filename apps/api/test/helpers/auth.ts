@@ -1,9 +1,6 @@
-﻿/* eslint-disable @typescript-eslint/no-unsafe-argument */
-import request, { type Response, type SuperAgentTest } from 'supertest';
-
+﻿import { buildLoginPayload, buildRegisterPayload, TEST_ROUTES, type TestUserInput } from './contracts';
 import type { INestApplication } from '@nestjs/common';
-
-import { buildLoginPayload, buildRegisterPayload, TEST_ROUTES, type TestUserInput } from './contracts';
+import request, { type Response, type SuperAgentTest } from 'supertest';
 
 export interface RegisteredTestUser extends TestUserInput {
   registerResponse: Response;

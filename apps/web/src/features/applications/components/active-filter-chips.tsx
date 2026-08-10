@@ -1,9 +1,7 @@
 'use client';
 
 import { X } from 'lucide-react';
-
 import { CATEGORY_LABELS, PRIORITY_LABELS, STATUS_LABELS } from '../application-constants';
-
 import type { ApplicationFilterValue } from './application-filters';
 
 interface ActiveFilterChip {
@@ -54,23 +52,23 @@ export function ActiveFilterChips({ value, onChange, onClearAll }: ActiveFilterC
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2 text-sm">
-      <span className="text-xs font-medium text-slate-400">Active filters:</span>
+    <div className='flex flex-wrap items-center gap-2 text-sm'>
+      <span className='text-xs font-medium text-slate-400'>Active filters:</span>
 
       {chips.map((chip) => (
         <button
           key={chip.key}
-          type="button"
+          type='button'
           onClick={() => clearChip(chip.key)}
-          className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 py-1 pl-3 pr-2 text-xs font-medium text-brand-700 transition hover:bg-brand-100"
+          className='inline-flex items-center gap-1.5 rounded-full bg-brand-50 py-1 pl-3 pr-2 text-xs font-medium text-brand-700 transition hover:bg-brand-100'
         >
           {chip.label}
-          <X className="size-3.5" aria-hidden="true" />
-          <span className="sr-only">Remove filter</span>
+          <X className='size-3.5' aria-hidden='true' />
+          <span className='sr-only'>Remove filter</span>
         </button>
       ))}
 
-      <button type="button" onClick={onClearAll} className="text-xs font-semibold text-slate-500 underline-offset-2 hover:text-slate-700 hover:underline">
+      <button type='button' onClick={onClearAll} className='text-xs font-semibold text-slate-500 underline-offset-2 hover:text-slate-700 hover:underline'>
         Clear all
       </button>
     </div>

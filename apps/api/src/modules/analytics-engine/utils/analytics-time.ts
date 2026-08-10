@@ -1,6 +1,5 @@
-import { DateTime } from 'luxon';
-
 import { AnalyticsAggregatePeriod } from '../dto/analytics-engine.dto';
+import { DateTime } from 'luxon';
 
 export interface AnalyticsBucket {
   start: Date;

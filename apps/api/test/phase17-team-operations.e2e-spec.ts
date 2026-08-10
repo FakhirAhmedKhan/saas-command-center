@@ -1,13 +1,12 @@
-import type { INestApplication } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
-import request, { type Response } from 'supertest';
-
-import { PrismaService } from '../src/database/prisma.service';
-import { NotificationType, WorkspaceInvitationStatus, WorkspaceRole } from '../src/generated/prisma/enums';
 import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
 import { createTestApp } from './helpers/create-test-app';
 import { resetDatabase } from './helpers/database';
 import { readAccessToken } from './helpers/response';
+import { PrismaService } from '../src/database/prisma.service';
+import { NotificationType, WorkspaceInvitationStatus, WorkspaceRole } from '../src/generated/prisma/enums';
+import type { INestApplication } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
+import request, { type Response } from 'supertest';
 
 /**
  * Phase 17 — Team Operations E2E
@@ -751,7 +750,6 @@ describe('Phase 17 Team Operations E2E', () => {
     let lastStatus = 0;
 
     for (let attempt = 0; attempt < 6; attempt += 1) {
-      // eslint-disable-next-line no-await-in-loop -- must run sequentially against a shared
       // rate-limit bucket keyed by identity; parallelizing would make the assertion racy.
       const response = await request(app.getHttpServer()).post(resendUrl(invitationId)).set(withBearer(ownerAccessToken));
 

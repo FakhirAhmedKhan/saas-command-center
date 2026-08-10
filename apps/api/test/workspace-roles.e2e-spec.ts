@@ -1,15 +1,6 @@
-import type { INestApplication } from '@nestjs/common';
-
-import { WorkspaceRole } from 'src/generated/prisma/enums';
-
-import { PrismaService } from 'src/database/prisma.service';
-
 import { withBearer } from './helpers/auth';
-
 import { createTestApp } from './helpers/create-test-app';
-
 import { resetDatabase } from './helpers/database';
-
 import {
   addWorkspaceMember,
   expectAccessDenied,
@@ -20,6 +11,9 @@ import {
   updateWorkspaceMemberRole,
   workspaceRoutes,
 } from './helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
 
 describe('Workspace Roles and Ownership E2E', () => {
   let app: INestApplication;

@@ -1,10 +1,7 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-
-import { HealthCheckStatus, HealthIncidentStatus } from '../../../generated/prisma/client';
-
-import { PrismaService } from '../../../database/prisma.service';
-
 import { SafeHttpClientService } from './safe-http-client.service';
+import { PrismaService } from '../../../database/prisma.service';
+import { HealthCheckStatus, HealthIncidentStatus } from '../../../generated/prisma/client';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class HealthCheckRunnerService {

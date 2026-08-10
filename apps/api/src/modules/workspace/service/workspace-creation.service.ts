@@ -1,12 +1,8 @@
-import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
-
-import { PrismaService } from 'src/database/prisma.service';
-
-import { Prisma } from 'src/generated/prisma/client';
-
-import { WorkspaceRole } from 'src/generated/prisma/enums';
-
 import { CreateWorkspaceDto } from '../dto/create-workspace.dto';
+import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { Prisma } from 'src/generated/prisma/client';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
 
 @Injectable()
 export class WorkspaceCreationService {

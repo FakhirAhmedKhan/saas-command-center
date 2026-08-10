@@ -1,6 +1,5 @@
-import { forwardRef, type SelectHTMLAttributes } from 'react';
-
 import { ChevronDown } from 'lucide-react';
+import { forwardRef, type SelectHTMLAttributes } from 'react';
 import { cn } from '@/features/lib/api/cn';
 
 export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
@@ -13,14 +12,14 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
   const selectId = id ?? props.name ?? undefined;
 
   return (
-    <div className="space-y-1.5">
+    <div className='space-y-1.5'>
       {label ? (
-        <label htmlFor={selectId} className="block text-[13px] font-medium text-slate-700">
+        <label htmlFor={selectId} className='block text-[13px] font-medium text-slate-700'>
           {label}
         </label>
       ) : null}
 
-      <div className="relative">
+      <div className='relative'>
         <select
           ref={ref}
           id={selectId}
@@ -37,10 +36,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
           {children}
         </select>
 
-        <ChevronDown aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+        <ChevronDown aria-hidden='true' className='pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-slate-400' />
       </div>
 
-      {error ? <p className="text-xs text-red-600">{error}</p> : hint ? <p className="text-xs text-slate-500">{hint}</p> : null}
+      {error ? <p className='text-xs text-red-600'>{error}</p> : hint ? <p className='text-xs text-slate-500'>{hint}</p> : null}
     </div>
   );
 });

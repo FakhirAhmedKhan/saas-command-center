@@ -1,6 +1,5 @@
-import type { Response } from 'supertest';
-
 import { readSetCookies } from './response';
+import type { Response } from 'supertest';
 
 export function readFirstSetCookie(response: Response): string {
   const cookies = readSetCookies(response);

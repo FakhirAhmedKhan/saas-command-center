@@ -1,5 +1,4 @@
 import { apiRequest } from '@/features/lib/api/api-client';
-
 import type { ActivityListQuery, ActivityListResponse } from './activity-types';
 
 function buildActivityQuery(query: ActivityListQuery = {}): string {

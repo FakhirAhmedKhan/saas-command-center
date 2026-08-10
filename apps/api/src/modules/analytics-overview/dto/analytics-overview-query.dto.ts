@@ -1,5 +1,4 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-
 import { IsEnum, IsOptional, Matches, ValidateIf } from 'class-validator';
 
 export enum AnalyticsDatePreset {

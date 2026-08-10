@@ -1,3 +1,4 @@
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   ArrayMinSize,
@@ -15,8 +16,6 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-
 import { BlockerStatus, DevelopmentTemplateType, WorkItemPriority } from 'src/generated/prisma/enums';
 
 export enum ActiveTaskStatus {

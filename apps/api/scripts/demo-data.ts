@@ -1,12 +1,9 @@
 import 'dotenv/config';
 
-import { createHash } from 'node:crypto';
-
-import { argon2id, hash } from 'argon2';
-
-import { PrismaPg } from '@prisma/adapter-pg';
-
 import { PrismaClient } from '../src/generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { argon2id, hash } from 'argon2';
+import { createHash } from 'node:crypto';
 
 const DEMO_EMAIL = 'demo@saas-command-center.local';
 

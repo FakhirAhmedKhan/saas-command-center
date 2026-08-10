@@ -1,9 +1,6 @@
-import { Transform, Type } from 'class-transformer';
-
-import { IsDateString, IsEnum, IsInt, IsOptional, IsString, IsUUID, Max, MaxLength, Min } from 'class-validator';
-
 import { ApiPropertyOptional } from '@nestjs/swagger';
-
+import { Transform, Type } from 'class-transformer';
+import { IsDateString, IsEnum, IsInt, IsOptional, IsString, IsUUID, Max, MaxLength, Min } from 'class-validator';
 import { ActivityActorType, ActivityEntityType, ApplicationActivityType } from 'src/generated/prisma/enums';
 
 function trimString(value: unknown): unknown {

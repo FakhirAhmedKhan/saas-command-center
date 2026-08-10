@@ -1,8 +1,8 @@
-import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
 import { WorkspaceRole } from '../../../generated/prisma/client';
 import { WORKSPACE_ROLES_KEY } from '../decorators/workspace-roles.decorator';
 import type { WorkspaceRequest } from '../interfaces/workspace-request.interface';
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 
 @Injectable()
 export class WorkspaceRolesGuard implements CanActivate {

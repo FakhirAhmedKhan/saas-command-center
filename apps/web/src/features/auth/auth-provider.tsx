@@ -1,10 +1,8 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
-import { createContext, type PropsWithChildren, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type PropsWithChildren } from 'react';
 import { apiRequest, setAccessToken, setUnauthorizedHandler } from '../lib/api/api-client';
-
 import type { AuthResponse, CurrentUserResponse, LoginInput, RegisterInput, User, Workspace } from './auth.types';
 
 export type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';

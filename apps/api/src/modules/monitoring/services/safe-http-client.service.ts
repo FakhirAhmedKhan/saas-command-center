@@ -1,14 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-
-import { lookup } from 'node:dns/promises';
-
-import { isIP } from 'node:net';
-
-import ipaddr from 'ipaddr.js';
-
-import { Agent, request } from 'undici';
-
 import { HealthCheckStatus } from '../../../generated/prisma/client';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import ipaddr from 'ipaddr.js';
+import { lookup } from 'node:dns/promises';
+import { isIP } from 'node:net';
+import { Agent, request } from 'undici';
 
 interface ResolvedAddress {
   address: string;

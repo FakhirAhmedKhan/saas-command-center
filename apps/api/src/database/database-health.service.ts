@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
+import { Injectable, Logger } from '@nestjs/common';
 
 export interface DatabaseHealthResult {
   status: 'up' | 'down';

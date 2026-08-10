@@ -8,11 +8,14 @@
     "build": "node scripts/build.mjs",
     "start": "node scripts/server.mjs",
     "typecheck": "tsc --noEmit",
-    "lint": "tsc --noEmit",
-    "test": "pnpm build && node scripts/test.mjs"
+    "test": "pnpm build && node scripts/test.mjs",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
+    "@command-center/eslint-config": "workspace:*",
     "esbuild": "^0.25.12",
+    "globals": "^17.9.0",
     "typescript": "^5.9.2"
   }
 }

@@ -4,11 +4,15 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./base": "./base.mjs"
+    "./base": "./base.mjs",
+    "./import-rules": "./import-rules.mjs"
   },
   "peerDependencies": {
     "@eslint/js": "^9.0.0",
     "eslint": "^9.0.0",
     "typescript-eslint": "^8.0.0"
+  },
+  "devDependencies": {
+    "eslint-plugin-import": "^2.32.0"
   }
 }

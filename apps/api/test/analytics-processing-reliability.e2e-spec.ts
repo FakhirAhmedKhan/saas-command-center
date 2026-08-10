@@ -1,8 +1,6 @@
-import type { INestApplication } from '@nestjs/common';
-
-import request from 'supertest';
-
 import { createTestApplication } from './helpers/create-test-application';
+import type { INestApplication } from '@nestjs/common';
+import request from 'supertest';
 
 describe('Analytics processing reliability', () => {
   let app: INestApplication;

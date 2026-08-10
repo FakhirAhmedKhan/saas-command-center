@@ -1,6 +1,5 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-
 import { createTrackerHarness } from '../test-support/tracker-harness.mjs';
 
 async function collectCustomEvent(harness, name, properties) {

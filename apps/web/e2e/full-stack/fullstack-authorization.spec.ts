@@ -1,5 +1,4 @@
 import { expect, test, type BrowserContext, type Page } from '@playwright/test';
-
 import { authorizedApiRequest, loginThroughUi, uniqueValue } from './fixtures/helpers';
 import { readFullStackState, type FullStackState } from './fixtures/state';
 

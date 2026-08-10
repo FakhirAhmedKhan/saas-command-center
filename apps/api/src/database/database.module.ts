@@ -1,7 +1,7 @@
-import { Global, Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { DatabaseHealthService } from './database-health.service';
 import { PrismaService } from './prisma.service';
+import { Global, Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 
 @Global()
 @Module({

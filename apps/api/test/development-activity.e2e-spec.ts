@@ -1,18 +1,11 @@
-import type { INestApplication } from '@nestjs/common';
-
-import { PrismaService } from 'src/database/prisma.service';
-
 import { applicationRoutes, createApplication, readApiItems } from './helpers/application';
-
 import { withBearer } from './helpers/auth';
-
 import { createTestApp } from './helpers/create-test-app';
-
-import { completeTask, createBlocker, createMilestone, createTask, expectDevelopmentSuccess, resolveBlocker, updateMilestone } from './helpers/development';
-
 import { resetDatabase } from './helpers/database';
-
+import { completeTask, createBlocker, createMilestone, createTask, expectDevelopmentSuccess, resolveBlocker, updateMilestone } from './helpers/development';
 import { expectAccessDenied, registerWorkspaceTestUser, type WorkspaceTestUser } from './helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
 
 describe('Development Activity E2E', () => {
   let app: INestApplication;

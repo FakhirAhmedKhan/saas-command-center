@@ -1,21 +1,14 @@
+import { IngestionRateLimitService } from './ingestion-rate-limit.service';
+import { CollectEventsDto } from '../dto/collect-events.dto';
+import { normalizeRequestOrigin, sanitizeEventProperties, sanitizeReferrerUrl, sanitizeTrackedUrl } from '../utils/ingestion-sanitizer';
 import { BadRequestException, ForbiddenException, Injectable, PayloadTooLargeException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-
 import { createHash, timingSafeEqual } from 'node:crypto';
-
+import { PrismaService } from 'src/database/prisma.service';
 import { Prisma } from 'src/generated/prisma/client';
 import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
-
-import { PrismaService } from 'src/database/prisma.service';
-
-import { CollectEventsDto } from '../dto/collect-events.dto';
-
-import { normalizeRequestOrigin, sanitizeEventProperties, sanitizeReferrerUrl, sanitizeTrackedUrl } from '../utils/ingestion-sanitizer';
-
-import { IngestionRateLimitService } from './ingestion-rate-limit.service';
 
 const MAX_BODY_BYTES = 64 * 1024;
 const MAX_FUTURE_EVENT_AGE_MS = 5 * 60 * 1000;

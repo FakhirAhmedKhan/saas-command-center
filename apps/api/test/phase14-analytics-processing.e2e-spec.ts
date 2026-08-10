@@ -1,14 +1,13 @@
-import type { INestApplication } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
-import request, { type Response } from 'supertest';
-
-import { PrismaService } from '../src/database/prisma.service';
-import { AnalyticsProcessingStatus, AnalyticsProcessingTrigger, RawAnalyticsEventType, WorkspaceRole } from '../src/generated/prisma/enums';
-import { AnalyticsProcessingWorkerService } from '../src/modules/analytics-processing/services/analytics-processing-worker.service';
 import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
 import { createTestApp } from './helpers/create-test-app';
 import { resetDatabase } from './helpers/database';
 import { readAccessToken } from './helpers/response';
+import { PrismaService } from '../src/database/prisma.service';
+import { AnalyticsProcessingStatus, AnalyticsProcessingTrigger, RawAnalyticsEventType, WorkspaceRole } from '../src/generated/prisma/enums';
+import { AnalyticsProcessingWorkerService } from '../src/modules/analytics-processing/services/analytics-processing-worker.service';
+import type { INestApplication } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
+import request, { type Response } from 'supertest';
 
 /**
  * Phase 14 — Analytics Processing E2E
@@ -510,7 +509,6 @@ describe('Phase 14 Analytics Processing E2E', () => {
           data: { nextAttemptAt: new Date() },
         });
 
-        // eslint-disable-next-line no-await-in-loop -- must run strictly sequentially: each
         // tick's outcome (retry backoff / dead-letter) determines the next iteration's setup.
         await worker.tick();
 

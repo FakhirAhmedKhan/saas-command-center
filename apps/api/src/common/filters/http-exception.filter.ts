@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
+import type { ApiErrorResponse } from '@command-center/shared-types';
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import type { ApiErrorResponse } from '@command-center/shared-types';
 
 interface ErrorBody {
   message?: string | string[];

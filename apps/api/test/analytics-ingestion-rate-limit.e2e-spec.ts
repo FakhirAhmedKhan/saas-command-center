@@ -1,14 +1,9 @@
-import type { INestApplication } from '@nestjs/common';
-
-import { PrismaService } from 'src/database/prisma.service';
-
 import { buildEventBatch, buildTrackerEvent, collectEvents, createTrackedWebsite, expectCollectionAccepted } from './helpers/analytics-ingestion';
-
 import { createTestApp } from './helpers/create-test-app';
-
 import { resetDatabase } from './helpers/database';
-
 import { registerWorkspaceTestUser } from './helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
 
 describe('Analytics Ingestion Rate Limit E2E', () => {
   let app: INestApplication;

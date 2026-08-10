@@ -1,35 +1,20 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-  PayloadTooLargeException,
-} from '@nestjs/common';
-
+import { GithubCodeService, GithubRepositoryContent, GithubTreeEntry } from './github-code.service';
 import { RepositoriesService } from './repositories.service';
-import {
-  GithubCodeService,
-  GithubRepositoryContent,
-  GithubTreeEntry,
-} from './github-code.service';
+import { BadRequestException, Injectable, NotFoundException, PayloadTooLargeException } from '@nestjs/common';
 
-const MAX_CODE_FILE_SIZE =
-  1_000_000;
+const MAX_CODE_FILE_SIZE = 1_000_000;
 
 export interface CodeTreeNode {
   name: string;
   path: string;
 
-  type:
-    | 'file'
-    | 'directory'
-    | 'submodule';
+  type: 'file' | 'directory' | 'submodule';
 
   sha: string | null;
 
   size: number | null;
 
-  children?:
-    CodeTreeNode[];
+  children?: CodeTreeNode[];
 }
 
 export interface CodeFile {
@@ -42,10 +27,7 @@ export interface CodeFile {
 
   size: number;
 
-  kind:
-    | 'text'
-    | 'image'
-    | 'binary';
+  kind: 'text' | 'image' | 'binary';
 
   language: string;
 
@@ -53,216 +35,144 @@ export interface CodeFile {
 
   content: string | null;
 
-  encoding:
-    | 'utf8'
-    | 'base64'
-    | null;
+  encoding: 'utf8' | 'base64' | null;
 }
 
 @Injectable()
 export class CodeExplorerService {
   constructor(
-    private readonly repositoriesService:
-      RepositoriesService,
+    private readonly repositoriesService: RepositoriesService,
 
-    private readonly githubCodeService:
-      GithubCodeService,
+    private readonly githubCodeService: GithubCodeService,
   ) {}
 
-  async listBranches(
-    workspaceId: string,
-    repositoryId: string,
-  ) {
-    const repository =
-      await this.repositoriesService.findOne(
-        workspaceId,
-        repositoryId,
-      );
+  async listBranches(workspaceId: string, repositoryId: string) {
+    const repository = await this.repositoriesService.findOne(workspaceId, repositoryId);
 
     return {
-      defaultBranch:
-        repository.defaultBranch,
+      defaultBranch: repository.defaultBranch,
 
-      branches:
-        await this.githubCodeService.listBranches(
-          repository.installation
-            .externalInstallationId,
-
-          repository.owner,
-
-          repository.name,
-        ),
-    };
-  }
-
-  async getTree(
-    workspaceId: string,
-    repositoryId: string,
-    branch?: string,
-  ) {
-    const repository =
-      await this.repositoriesService.findOne(
-        workspaceId,
-        repositoryId,
-      );
-
-    const selectedBranch =
-      this.cleanBranch(
-        branch ??
-          repository.defaultBranch,
-      );
-
-    const tree =
-      await this.githubCodeService.getTree(
-        repository.installation
-          .externalInstallationId,
+      branches: await this.githubCodeService.listBranches(
+        repository.installation.externalInstallationId,
 
         repository.owner,
 
         repository.name,
-
-        selectedBranch,
-      );
-
-    return {
-      repositoryId:
-        repository.id,
-
-      branch:
-        selectedBranch,
-
-      sha:
-        tree.sha,
-
-      truncated:
-        tree.truncated,
-
-      nodes:
-        this.buildTree(
-          tree.entries,
-        ),
+      ),
     };
   }
 
-  async search(
-    workspaceId: string,
-    repositoryId: string,
-    query: string,
-    branch?: string,
-  ) {
-    const repository =
-      await this.repositoriesService.findOne(
-        workspaceId,
-        repositoryId,
-      );
+  async getTree(workspaceId: string, repositoryId: string, branch?: string) {
+    const repository = await this.repositoriesService.findOne(workspaceId, repositoryId);
 
-    const selectedBranch =
-      this.cleanBranch(
-        branch ??
-          repository.defaultBranch,
-      );
+    const selectedBranch = this.cleanBranch(branch ?? repository.defaultBranch);
 
-    const cleanedQuery =
-      query
-        .trim()
-        .toLowerCase();
+    const tree = await this.githubCodeService.getTree(
+      repository.installation.externalInstallationId,
 
-    if (
-      cleanedQuery.length <
-      1
-    ) {
-      throw new BadRequestException(
-        'Search query is required.',
-      );
+      repository.owner,
+
+      repository.name,
+
+      selectedBranch,
+    );
+
+    return {
+      repositoryId: repository.id,
+
+      branch: selectedBranch,
+
+      sha: tree.sha,
+
+      truncated: tree.truncated,
+
+      nodes: this.buildTree(tree.entries),
+    };
+  }
+
+  async search(workspaceId: string, repositoryId: string, query: string, branch?: string) {
+    const repository = await this.repositoriesService.findOne(workspaceId, repositoryId);
+
+    const selectedBranch = this.cleanBranch(branch ?? repository.defaultBranch);
+
+    const cleanedQuery = query.trim().toLowerCase();
+
+    if (cleanedQuery.length < 1) {
+      throw new BadRequestException('Search query is required.');
     }
 
-    const tree =
-      await this.githubCodeService.getTree(
-        repository.installation
-          .externalInstallationId,
+    const tree = await this.githubCodeService.getTree(
+      repository.installation.externalInstallationId,
 
-        repository.owner,
+      repository.owner,
 
-        repository.name,
+      repository.name,
 
-        selectedBranch,
-      );
+      selectedBranch,
+    );
 
-    const matches =
-      tree.entries
-        .filter(
-          (entry) =>
-            entry.type ===
-              'file' &&
-            entry.path
-              .toLowerCase()
-              .includes(
-                cleanedQuery,
-              ),
-        )
-        .slice(
-          0,
-          100,
-        )
-        .map(
-          (entry) => ({
-            name:
-              this.fileName(
-                entry.path,
-              ),
+    const matches = tree.entries
+      .filter((entry) => entry.type === 'file' && entry.path.toLowerCase().includes(cleanedQuery))
+      .slice(0, 100)
+      .map((entry) => ({
+        name: this.fileName(entry.path),
 
-            path:
-              entry.path,
+        path: entry.path,
 
-            sha:
-              entry.sha,
+        sha: entry.sha,
 
-            size:
-              entry.size,
-          }),
-        );
+        size: entry.size,
+      }));
 
     return {
-      branch:
-        selectedBranch,
+      branch: selectedBranch,
 
-      query:
-        query.trim(),
+      query: query.trim(),
 
-      truncated:
-        tree.truncated,
+      truncated: tree.truncated,
 
       matches,
     };
   }
 
-  async getFile(
-    workspaceId: string,
-    repositoryId: string,
-    path: string,
-    branch?: string,
-  ): Promise<CodeFile> {
-    const repository =
-      await this.repositoriesService.findOne(
-        workspaceId,
-        repositoryId,
-      );
+  async getFile(workspaceId: string, repositoryId: string, path: string, branch?: string): Promise<CodeFile> {
+    const repository = await this.repositoriesService.findOne(workspaceId, repositoryId);
 
-    const safePath =
-      this.validatePath(
-        path,
-      );
+    const safePath = this.validatePath(path);
 
-    const selectedBranch =
-      this.cleanBranch(
-        branch ??
-          repository.defaultBranch,
-      );
+    const selectedBranch = this.cleanBranch(branch ?? repository.defaultBranch);
 
-    const file =
-      await this.githubCodeService.getFile(
-        repository.installation
-          .externalInstallationId,
+    const file = await this.githubCodeService.getFile(
+      repository.installation.externalInstallationId,
+
+      repository.owner,
+
+      repository.name,
+
+      safePath,
+
+      selectedBranch,
+    );
+
+    if (!file) {
+      throw new NotFoundException('Repository file was not found.');
+    }
+
+    return this.transformFile(file, selectedBranch);
+  }
+
+  async getDiff(workspaceId: string, repositoryId: string, base: string, head: string, path: string) {
+    const repository = await this.repositoriesService.findOne(workspaceId, repositoryId);
+
+    const safePath = this.validatePath(path);
+
+    const baseBranch = this.cleanBranch(base);
+
+    const headBranch = this.cleanBranch(head);
+
+    const [baseFile, headFile] = await Promise.all([
+      this.githubCodeService.getFile(
+        repository.installation.externalInstallationId,
 
         repository.owner,
 
@@ -270,130 +180,42 @@ export class CodeExplorerService {
 
         safePath,
 
-        selectedBranch,
-      );
+        baseBranch,
+      ),
 
-    if (!file) {
-      throw new NotFoundException(
-        'Repository file was not found.',
-      );
-    }
+      this.githubCodeService.getFile(
+        repository.installation.externalInstallationId,
 
-    return this.transformFile(
-      file,
-      selectedBranch,
-    );
-  }
+        repository.owner,
 
-  async getDiff(
-    workspaceId: string,
-    repositoryId: string,
-    base: string,
-    head: string,
-    path: string,
-  ) {
-    const repository =
-      await this.repositoriesService.findOne(
-        workspaceId,
-        repositoryId,
-      );
+        repository.name,
 
-    const safePath =
-      this.validatePath(
-        path,
-      );
-
-    const baseBranch =
-      this.cleanBranch(
-        base,
-      );
-
-    const headBranch =
-      this.cleanBranch(
-        head,
-      );
-
-    const [
-      baseFile,
-      headFile,
-    ] =
-      await Promise.all([
-        this.githubCodeService.getFile(
-          repository.installation
-            .externalInstallationId,
-
-          repository.owner,
-
-          repository.name,
-
-          safePath,
-
-          baseBranch,
-        ),
-
-        this.githubCodeService.getFile(
-          repository.installation
-            .externalInstallationId,
-
-          repository.owner,
-
-          repository.name,
-
-          safePath,
-
-          headBranch,
-        ),
-      ]);
-
-    if (
-      !baseFile &&
-      !headFile
-    ) {
-      throw new NotFoundException(
-        'The file does not exist in either branch.',
-      );
-    }
-
-    const original =
-      baseFile
-        ? this.transformFile(
-            baseFile,
-            baseBranch,
-          )
-        : null;
-
-    const modified =
-      headFile
-        ? this.transformFile(
-            headFile,
-            headBranch,
-          )
-        : null;
-
-    const textDiff =
-      (!original ||
-        original.kind ===
-          'text') &&
-      (!modified ||
-        modified.kind ===
-          'text');
-
-    return {
-      path:
         safePath,
 
-      base:
-        baseBranch,
-
-      head:
         headBranch,
+      ),
+    ]);
+
+    if (!baseFile && !headFile) {
+      throw new NotFoundException('The file does not exist in either branch.');
+    }
+
+    const original = baseFile ? this.transformFile(baseFile, baseBranch) : null;
+
+    const modified = headFile ? this.transformFile(headFile, headBranch) : null;
+
+    const textDiff = (!original || original.kind === 'text') && (!modified || modified.kind === 'text');
+
+    return {
+      path: safePath,
+
+      base: baseBranch,
+
+      head: headBranch,
 
       textDiff,
 
-      language:
-        modified?.language ??
-        original?.language ??
-        'plaintext',
+      language: modified?.language ?? original?.language ?? 'plaintext',
 
       original,
 
@@ -402,682 +224,358 @@ export class CodeExplorerService {
   }
 
   private transformFile(
-    file:
-      GithubRepositoryContent,
+    file: GithubRepositoryContent,
 
-    branch:
-      string,
+    branch: string,
   ): CodeFile {
-    if (
-      file.size >
-      MAX_CODE_FILE_SIZE
-    ) {
-      throw new PayloadTooLargeException(
-        'Files larger than 1 MB are not opened in the Code Explorer.',
-      );
+    if (file.size > MAX_CODE_FILE_SIZE) {
+      throw new PayloadTooLargeException('Files larger than 1 MB are not opened in the Code Explorer.');
     }
 
-    const language =
-      this.languageForFile(
-        file.name,
-      );
+    const language = this.languageForFile(file.name);
 
-    const imageMimeType =
-      this.imageMimeType(
-        file.name,
-      );
+    const imageMimeType = this.imageMimeType(file.name);
 
-    if (
-      file.encoding !==
-        'base64' ||
-      !file.content
-    ) {
+    if (file.encoding !== 'base64' || !file.content) {
       return {
-        name:
-          file.name,
+        name: file.name,
 
-        path:
-          file.path,
+        path: file.path,
 
         branch,
 
-        sha:
-          file.sha,
+        sha: file.sha,
 
-        size:
-          file.size,
+        size: file.size,
 
-        kind:
-          'binary',
+        kind: 'binary',
 
         language,
 
-        mimeType:
-          null,
+        mimeType: null,
 
-        content:
-          null,
+        content: null,
 
-        encoding:
-          null,
+        encoding: null,
       };
     }
 
-    const base64 =
-      file.content.replace(
-        /\s/g,
-        '',
-      );
+    const base64 = file.content.replace(/\s/g, '');
 
-    if (
-      imageMimeType
-    ) {
+    if (imageMimeType) {
       return {
-        name:
-          file.name,
+        name: file.name,
 
-        path:
-          file.path,
+        path: file.path,
 
         branch,
 
-        sha:
-          file.sha,
+        sha: file.sha,
 
-        size:
-          file.size,
+        size: file.size,
 
-        kind:
-          'image',
+        kind: 'image',
 
-        language:
-          'plaintext',
+        language: 'plaintext',
 
-        mimeType:
-          imageMimeType,
+        mimeType: imageMimeType,
 
-        content:
-          base64,
+        content: base64,
 
-        encoding:
-          'base64',
+        encoding: 'base64',
       };
     }
 
-    const buffer =
-      Buffer.from(
-        base64,
-        'base64',
-      );
+    const buffer = Buffer.from(base64, 'base64');
 
-    if (
-      this.isBinary(
-        buffer,
-      )
-    ) {
+    if (this.isBinary(buffer)) {
       return {
-        name:
-          file.name,
+        name: file.name,
 
-        path:
-          file.path,
+        path: file.path,
 
         branch,
 
-        sha:
-          file.sha,
+        sha: file.sha,
 
-        size:
-          file.size,
+        size: file.size,
 
-        kind:
-          'binary',
+        kind: 'binary',
 
         language,
 
-        mimeType:
-          null,
+        mimeType: null,
 
-        content:
-          null,
+        content: null,
 
-        encoding:
-          null,
+        encoding: null,
       };
     }
 
     return {
-      name:
-        file.name,
+      name: file.name,
 
-      path:
-        file.path,
+      path: file.path,
 
       branch,
 
-      sha:
-        file.sha,
+      sha: file.sha,
 
-      size:
-        file.size,
+      size: file.size,
 
-      kind:
-        'text',
+      kind: 'text',
 
       language,
 
-      mimeType:
-        'text/plain',
+      mimeType: 'text/plain',
 
-      content:
-        buffer.toString(
-          'utf8',
-        ),
+      content: buffer.toString('utf8'),
 
-      encoding:
-        'utf8',
+      encoding: 'utf8',
     };
   }
 
-  private buildTree(
-    entries:
-      GithubTreeEntry[],
-  ): CodeTreeNode[] {
-    const roots:
-      CodeTreeNode[] = [];
+  private buildTree(entries: GithubTreeEntry[]): CodeTreeNode[] {
+    const roots: CodeTreeNode[] = [];
 
-    const directoryMap =
-      new Map<
-        string,
-        CodeTreeNode
-      >();
+    const directoryMap = new Map<string, CodeTreeNode>();
 
-    const sorted =
-      [...entries].sort(
-        (
-          left,
-          right,
-        ) => {
-          const leftDepth =
-            left.path.split(
-              '/',
-            ).length;
+    const sorted = [...entries].sort((left, right) => {
+      const leftDepth = left.path.split('/').length;
 
-          const rightDepth =
-            right.path.split(
-              '/',
-            ).length;
+      const rightDepth = right.path.split('/').length;
 
-          if (
-            leftDepth !==
-            rightDepth
-          ) {
-            return (
-              leftDepth -
-              rightDepth
-            );
-          }
+      if (leftDepth !== rightDepth) {
+        return leftDepth - rightDepth;
+      }
 
-          return left.path.localeCompare(
-            right.path,
-          );
-        },
-      );
+      return left.path.localeCompare(right.path);
+    });
 
-    for (
-      const entry
-      of sorted
-    ) {
-      const node:
-        CodeTreeNode = {
-        name:
-          this.fileName(
-            entry.path,
-          ),
+    for (const entry of sorted) {
+      const node: CodeTreeNode = {
+        name: this.fileName(entry.path),
 
-        path:
-          entry.path,
+        path: entry.path,
 
-        type:
-          entry.type,
+        type: entry.type,
 
-        sha:
-          entry.sha,
+        sha: entry.sha,
 
-        size:
-          entry.size,
+        size: entry.size,
 
-        ...(entry.type ===
-        'directory'
+        ...(entry.type === 'directory'
           ? {
-              children:
-                [],
+              children: [],
             }
           : {}),
       };
 
-      const slash =
-        entry.path.lastIndexOf(
-          '/',
-        );
+      const slash = entry.path.lastIndexOf('/');
 
-      const parentPath =
-        slash === -1
-          ? null
-          : entry.path.slice(
-              0,
-              slash,
-            );
+      const parentPath = slash === -1 ? null : entry.path.slice(0, slash);
 
-      if (
-        parentPath
-      ) {
-        const parent =
-          directoryMap.get(
-            parentPath,
-          );
+      if (parentPath) {
+        const parent = directoryMap.get(parentPath);
 
-        if (
-          parent?.children
-        ) {
-          parent.children.push(
-            node,
-          );
+        if (parent?.children) {
+          parent.children.push(node);
         } else {
-          roots.push(
-            node,
-          );
+          roots.push(node);
         }
       } else {
-        roots.push(
-          node,
-        );
+        roots.push(node);
       }
 
-      if (
-        entry.type ===
-        'directory'
-      ) {
-        directoryMap.set(
-          entry.path,
-          node,
-        );
+      if (entry.type === 'directory') {
+        directoryMap.set(entry.path, node);
       }
     }
 
-    this.sortNodes(
-      roots,
-    );
+    this.sortNodes(roots);
 
     return roots;
   }
 
-  private sortNodes(
-    nodes:
-      CodeTreeNode[],
-  ): void {
-    nodes.sort(
-      (
-        left,
-        right,
-      ) => {
-        if (
-          left.type ===
-            'directory' &&
-          right.type !==
-            'directory'
-        ) {
-          return -1;
-        }
+  private sortNodes(nodes: CodeTreeNode[]): void {
+    nodes.sort((left, right) => {
+      if (left.type === 'directory' && right.type !== 'directory') {
+        return -1;
+      }
 
-        if (
-          left.type !==
-            'directory' &&
-          right.type ===
-            'directory'
-        ) {
-          return 1;
-        }
+      if (left.type !== 'directory' && right.type === 'directory') {
+        return 1;
+      }
 
-        return left.name.localeCompare(
-          right.name,
-        );
-      },
-    );
+      return left.name.localeCompare(right.name);
+    });
 
-    for (
-      const node
-      of nodes
-    ) {
-      if (
-        node.children
-      ) {
-        this.sortNodes(
-          node.children,
-        );
+    for (const node of nodes) {
+      if (node.children) {
+        this.sortNodes(node.children);
       }
     }
   }
 
-  private validatePath(
-    path: string,
-  ): string {
-    const cleaned =
-      path
-        .trim()
-        .replace(
-          /\\/g,
-          '/',
-        );
+  private validatePath(path: string): string {
+    const cleaned = path.trim().replace(/\\/g, '/');
 
-    if (
-      !cleaned ||
-      cleaned.startsWith(
-        '/',
-      ) ||
-      cleaned.includes(
-        '\0',
-      )
-    ) {
-      throw new BadRequestException(
-        'Invalid repository path.',
-      );
+    if (!cleaned || cleaned.startsWith('/') || cleaned.includes('\0')) {
+      throw new BadRequestException('Invalid repository path.');
     }
 
-    const segments =
-      cleaned.split(
-        '/',
-      );
+    const segments = cleaned.split('/');
 
-    if (
-      segments.some(
-        (segment) =>
-          !segment ||
-          segment ===
-            '.' ||
-          segment ===
-            '..',
-      )
-    ) {
-      throw new BadRequestException(
-        'Invalid repository path.',
-      );
+    if (segments.some((segment) => !segment || segment === '.' || segment === '..')) {
+      throw new BadRequestException('Invalid repository path.');
     }
 
     return cleaned;
   }
 
-  private cleanBranch(
-    branch: string,
-  ): string {
-    const value =
-      branch.trim();
+  private cleanBranch(branch: string): string {
+    const value = branch.trim();
 
-    if (
-      !value ||
-      value.length >
-        255 ||
-      value.includes(
-        '\0',
-      )
-    ) {
-      throw new BadRequestException(
-        'Invalid branch name.',
-      );
+    if (!value || value.length > 255 || value.includes('\0')) {
+      throw new BadRequestException('Invalid branch name.');
     }
 
     return value;
   }
 
-  private fileName(
-    path: string,
-  ): string {
-    return (
-      path
-        .split('/')
-        .pop() ??
-      path
-    );
+  private fileName(path: string): string {
+    return path.split('/').pop() ?? path;
   }
 
-  private isBinary(
-    buffer: Buffer,
-  ): boolean {
-    const sample =
-      buffer.subarray(
-        0,
-        Math.min(
-          buffer.length,
-          8000,
-        ),
-      );
+  private isBinary(buffer: Buffer): boolean {
+    const sample = buffer.subarray(0, Math.min(buffer.length, 8000));
 
-    return (
-      sample.indexOf(
-        0,
-      ) !== -1
-    );
+    return sample.indexOf(0) !== -1;
   }
 
-  private imageMimeType(
-    fileName: string,
-  ): string | null {
-    const extension =
-      this.extension(
-        fileName,
-      );
+  private imageMimeType(fileName: string): string | null {
+    const extension = this.extension(fileName);
 
-    const types:
-      Record<
-        string,
-        string
-      > = {
-      png:
-        'image/png',
+    const types: Record<string, string> = {
+      png: 'image/png',
 
-      jpg:
-        'image/jpeg',
+      jpg: 'image/jpeg',
 
-      jpeg:
-        'image/jpeg',
+      jpeg: 'image/jpeg',
 
-      gif:
-        'image/gif',
+      gif: 'image/gif',
 
-      webp:
-        'image/webp',
+      webp: 'image/webp',
 
-      svg:
-        'image/svg+xml',
+      svg: 'image/svg+xml',
     };
 
-    return (
-      types[
-        extension
-      ] ??
-      null
-    );
+    return types[extension] ?? null;
   }
 
-  private languageForFile(
-    fileName: string,
-  ): string {
-    const lower =
-      fileName.toLowerCase();
+  private languageForFile(fileName: string): string {
+    const lower = fileName.toLowerCase();
 
-    const exact:
-      Record<
-        string,
-        string
-      > = {
-      dockerfile:
-        'dockerfile',
+    const exact: Record<string, string> = {
+      dockerfile: 'dockerfile',
 
-      makefile:
-        'makefile',
+      makefile: 'makefile',
 
-      '.gitignore':
-        'plaintext',
+      '.gitignore': 'plaintext',
 
-      '.env':
-        'plaintext',
+      '.env': 'plaintext',
     };
 
-    if (
-      exact[
-        lower
-      ]
-    ) {
-      return exact[
-        lower
-      ];
+    if (exact[lower]) {
+      return exact[lower];
     }
 
-    const extension =
-      this.extension(
-        lower,
-      );
+    const extension = this.extension(lower);
 
-    const languages:
-      Record<
-        string,
-        string
-      > = {
-      ts:
-        'typescript',
+    const languages: Record<string, string> = {
+      ts: 'typescript',
 
-      tsx:
-        'typescript',
+      tsx: 'typescript',
 
-      js:
-        'javascript',
+      js: 'javascript',
 
-      jsx:
-        'javascript',
+      jsx: 'javascript',
 
-      json:
-        'json',
+      json: 'json',
 
-      jsonc:
-        'json',
+      jsonc: 'json',
 
-      css:
-        'css',
+      css: 'css',
 
-      scss:
-        'scss',
+      scss: 'scss',
 
-      less:
-        'less',
+      less: 'less',
 
-      html:
-        'html',
+      html: 'html',
 
-      htm:
-        'html',
+      htm: 'html',
 
-      md:
-        'markdown',
+      md: 'markdown',
 
-      markdown:
-        'markdown',
+      markdown: 'markdown',
 
-      prisma:
-        'plaintext',
+      prisma: 'plaintext',
 
-      sql:
-        'sql',
+      sql: 'sql',
 
-      py:
-        'python',
+      py: 'python',
 
-      java:
-        'java',
+      java: 'java',
 
-      kt:
-        'kotlin',
+      kt: 'kotlin',
 
-      kts:
-        'kotlin',
+      kts: 'kotlin',
 
-      go:
-        'go',
+      go: 'go',
 
-      rs:
-        'rust',
+      rs: 'rust',
 
-      php:
-        'php',
+      php: 'php',
 
-      rb:
-        'ruby',
+      rb: 'ruby',
 
-      sh:
-        'shell',
+      sh: 'shell',
 
-      bash:
-        'shell',
+      bash: 'shell',
 
-      yml:
-        'yaml',
+      yml: 'yaml',
 
-      yaml:
-        'yaml',
+      yaml: 'yaml',
 
-      xml:
-        'xml',
+      xml: 'xml',
 
-      graphql:
-        'graphql',
+      graphql: 'graphql',
 
-      gql:
-        'graphql',
+      gql: 'graphql',
 
-      c:
-        'c',
+      c: 'c',
 
-      cpp:
-        'cpp',
+      cpp: 'cpp',
 
-      cc:
-        'cpp',
+      cc: 'cpp',
 
-      h:
-        'cpp',
+      h: 'cpp',
 
-      hpp:
-        'cpp',
+      hpp: 'cpp',
 
-      cs:
-        'csharp',
+      cs: 'csharp',
     };
 
-    return (
-      languages[
-        extension
-      ] ??
-      'plaintext'
-    );
+    return languages[extension] ?? 'plaintext';
   }
 
-  private extension(
-    fileName: string,
-  ): string {
-    const index =
-      fileName.lastIndexOf(
-        '.',
-      );
+  private extension(fileName: string): string {
+    const index = fileName.lastIndexOf('.');
 
-    if (
-      index === -1
-    ) {
+    if (index === -1) {
       return '';
     }
 
-    return fileName
-      .slice(
-        index + 1,
-      )
-      .toLowerCase();
+    return fileName.slice(index + 1).toLowerCase();
   }
 }

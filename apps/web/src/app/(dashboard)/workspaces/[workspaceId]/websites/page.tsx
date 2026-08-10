@@ -1,33 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
-import Link from 'next/link';
-
-import { useParams } from 'next/navigation';
-
 import { ChevronLeft, ChevronRight, Globe2, Plus, RefreshCw } from 'lucide-react';
-
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-
 import { Card } from '@/components/ui/card';
-
 import { EmptyState } from '@/components/ui/empty-state';
-
 import { ErrorState } from '@/components/ui/error-state';
-
-import { Select } from '@/components/ui/select';
-
 import { SearchInput } from '@/components/ui/search-input';
-
+import { Select } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-
 import { WebsiteCard } from '@/features/websites/components/website-card';
-
 import { getWebsites } from '@/features/websites/website-api';
-
 import type { Website, WebsiteListQuery, WebsitePagination } from '@/features/websites/website-types';
-
 import { getWebsiteError } from '@/features/websites/website-utils';
 
 const DEFAULT_PAGINATION: WebsitePagination = {
@@ -149,74 +135,90 @@ export default function WebsitesPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1600px] space-y-6 p-4 sm:p-6 lg:p-8">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div className='mx-auto w-full max-w-[1600px] space-y-6 p-4 sm:p-6 lg:p-8'>
+      <header className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Analytics configuration</p>
+          <p className='text-xs font-semibold uppercase tracking-wide text-slate-400'>Analytics configuration</p>
 
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-[28px]">Websites</h1>
+          <h1 className='mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-[28px]'>Websites</h1>
 
-          <p className="mt-1.5 max-w-2xl text-sm leading-6 text-slate-500">
+          <p className='mt-1.5 max-w-2xl text-sm leading-6 text-slate-500'>
             Register domains, configure allowed origins, connect websites to SaaS products, and manage tracking keys.
           </p>
         </div>
 
-        <div className="flex shrink-0 gap-2.5">
-          <Button variant="outline" onClick={refresh} loading={loading}>
-            <RefreshCw className="size-4" />
+        <div className='flex shrink-0 gap-2.5'>
+          <Button variant='outline' onClick={refresh} loading={loading}>
+            <RefreshCw className='size-4' />
             Refresh
           </Button>
 
           <Link
             href={`/workspaces/${workspaceId}/websites/new`}
-            className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700"
+            className='inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700'
           >
-            <Plus className="size-4" />
+            <Plus className='size-4' />
             New website
           </Link>
         </div>
       </header>
 
-      <Card className="p-3">
+      <Card className='p-3'>
         <form
-          className="flex flex-wrap items-center gap-2.5"
+          className='flex flex-wrap items-center gap-2.5'
           onSubmit={(event) => {
             event.preventDefault();
             applyFilters();
           }}
         >
-          <div className="min-w-60 flex-1">
-            <SearchInput aria-label="Search websites" placeholder="Search websites..." className="h-10" value={search} onChange={(event) => setSearch(event.target.value)} />
+          <div className='min-w-60 flex-1'>
+            <SearchInput
+              aria-label='Search websites'
+              placeholder='Search websites...'
+              className='h-10'
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
           </div>
 
-          <Select aria-label="Status" className="h-10 w-36 shrink-0" value={status} onChange={(event) => setStatus(event.target.value as 'all' | 'enabled' | 'disabled')}>
-            <option value="all">All states</option>
-            <option value="enabled">Enabled</option>
-            <option value="disabled">Disabled</option>
+          <Select
+            aria-label='Status'
+            className='h-10 w-36 shrink-0'
+            value={status}
+            onChange={(event) => setStatus(event.target.value as 'all' | 'enabled' | 'disabled')}
+          >
+            <option value='all'>All states</option>
+            <option value='enabled'>Enabled</option>
+            <option value='disabled'>Disabled</option>
           </Select>
 
           <Select
-            aria-label="Connection"
-            className="h-10 w-44 shrink-0"
+            aria-label='Connection'
+            className='h-10 w-44 shrink-0'
             value={connection}
             onChange={(event) => setConnection(event.target.value as 'all' | 'connected' | 'unconnected')}
           >
-            <option value="all">All connections</option>
-            <option value="connected">Connected</option>
-            <option value="unconnected">Not connected</option>
+            <option value='all'>All connections</option>
+            <option value='connected'>Connected</option>
+            <option value='unconnected'>Not connected</option>
           </Select>
 
-          <Select aria-label="Archive view" className="h-10 w-36 shrink-0" value={archiveView} onChange={(event) => setArchiveView(event.target.value as 'active' | 'archived')}>
-            <option value="active">Active</option>
-            <option value="archived">Archived</option>
+          <Select
+            aria-label='Archive view'
+            className='h-10 w-36 shrink-0'
+            value={archiveView}
+            onChange={(event) => setArchiveView(event.target.value as 'active' | 'archived')}
+          >
+            <option value='active'>Active</option>
+            <option value='archived'>Archived</option>
           </Select>
 
-          <div className="ml-auto flex shrink-0 items-center gap-1.5">
-            <Button type="button" variant="ghost" size="sm" onClick={resetFilters}>
+          <div className='ml-auto flex shrink-0 items-center gap-1.5'>
+            <Button type='button' variant='ghost' size='sm' onClick={resetFilters}>
               Reset
             </Button>
 
-            <Button type="submit" size="sm">
+            <Button type='submit' size='sm'>
               Apply
             </Button>
           </div>
@@ -224,25 +226,25 @@ export default function WebsitesPage() {
       </Card>
 
       {loading ? (
-        <div className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
+        <div className='grid gap-5 md:grid-cols-2 2xl:grid-cols-3'>
           {Array.from({ length: 3 }).map((_, index) => (
-            <Skeleton key={index} className="h-56 w-full rounded-xl" />
+            <Skeleton key={index} className='h-56 w-full rounded-xl' />
           ))}
         </div>
       ) : error ? (
         <ErrorState message={error} onRetry={refresh} />
       ) : websites.length === 0 ? (
         <EmptyState
-          icon={<Globe2 className="size-5" />}
+          icon={<Globe2 className='size-5' />}
           title={query.archived ? 'No archived websites' : 'No websites connected'}
           description={query.archived ? 'Archived websites will appear here.' : 'Add a website to start collecting analytics.'}
           action={
             !query.archived ? (
               <Link
                 href={`/workspaces/${workspaceId}/websites/new`}
-                className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white hover:bg-brand-700"
+                className='inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white hover:bg-brand-700'
               >
-                <Plus className="size-4" />
+                <Plus className='size-4' />
                 Create website
               </Link>
             ) : undefined
@@ -250,31 +252,31 @@ export default function WebsitesPage() {
         />
       ) : (
         <>
-          <p className="text-xs font-medium text-slate-500">
-            Showing <span className="text-slate-800">{websites.length}</span> of <span className="text-slate-800">{pagination.total}</span> websites
+          <p className='text-xs font-medium text-slate-500'>
+            Showing <span className='text-slate-800'>{websites.length}</span> of <span className='text-slate-800'>{pagination.total}</span> websites
           </p>
 
-          <div className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
+          <div className='grid gap-5 md:grid-cols-2 2xl:grid-cols-3'>
             {websites.map((website) => (
               <WebsiteCard key={website.id} workspaceId={workspaceId} website={website} />
             ))}
           </div>
 
           {pagination.totalPages > 1 ? (
-            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3.5">
-              <p className="text-sm text-slate-500">
+            <div className='flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3.5'>
+              <p className='text-sm text-slate-500'>
                 Page {pagination.page} of {pagination.totalPages}
               </p>
 
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" disabled={!pagination.hasPreviousPage} onClick={() => changePage(pagination.page - 1)}>
-                  <ChevronLeft className="size-3.5" />
+              <div className='flex gap-2'>
+                <Button variant='outline' size='sm' disabled={!pagination.hasPreviousPage} onClick={() => changePage(pagination.page - 1)}>
+                  <ChevronLeft className='size-3.5' />
                   Previous
                 </Button>
 
-                <Button variant="outline" size="sm" disabled={!pagination.hasNextPage} onClick={() => changePage(pagination.page + 1)}>
+                <Button variant='outline' size='sm' disabled={!pagination.hasNextPage} onClick={() => changePage(pagination.page + 1)}>
                   Next
-                  <ChevronRight className="size-3.5" />
+                  <ChevronRight className='size-3.5' />
                 </Button>
               </div>
             </div>

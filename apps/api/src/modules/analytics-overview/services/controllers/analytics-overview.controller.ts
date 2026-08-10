@@ -1,11 +1,10 @@
-import { Controller, Get, Param, ParseUUIDPipe, Query, UseGuards } from '@nestjs/common';
-
-import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
-import { WorkspaceAccessGuard } from 'src/modules/workspace/guards/workspace-access.guard';
 import { AnalyticsOverviewQueryDto } from '../../dto/analytics-overview-query.dto';
 import { AnalyticsOverviewResponseDto } from '../../dto/analytics-overview-response.dto';
 import { AnalyticsOverviewService } from '../analytics-overview.service';
+import { Controller, Get, Param, ParseUUIDPipe, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
+import { WorkspaceAccessGuard } from 'src/modules/workspace/guards/workspace-access.guard';
 
 @ApiTags('Analytics Overview')
 @ApiBearerAuth('access-token')

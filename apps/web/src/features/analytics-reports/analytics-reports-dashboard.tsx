@@ -1,18 +1,15 @@
 ﻿'use client';
-import { ApiError } from '@/features/lib/api/api-error';
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import { useEffect, useMemo, useState } from 'react';
-
 import Link from 'next/link';
-
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-
+import { useEffect, useMemo, useState } from 'react';
 import { PageError } from '@/components/states/page-error';
-
+import { EmptyState } from '@/components/ui/empty-state';
+import { ApiError } from '@/features/lib/api/api-error';
+import { getErrorMessage } from '../applications/application-utils';
 import { downloadAnalyticsReport, getAnalyticsReport } from './analytics-reports-api';
-
 import type {
   AnalyticsPreset,
   AnalyticsReportRequest,
@@ -24,8 +21,6 @@ import type {
   SortDirection,
   TechnologyDimension,
 } from './analytics-reports.types';
-import { EmptyState } from '@/components/ui/empty-state';
-import { getErrorMessage } from '../applications/application-utils';
 
 interface AnalyticsReportsDashboardProps {
   workspaceId: string;
@@ -270,41 +265,41 @@ function isEventReport(report: AnalyticsReportResponse): report is EventReportRe
 
 function ReportSkeleton() {
   return (
-    <div className="space-y-4" aria-busy="true">
-      <div className="h-14 animate-pulse rounded-xl bg-slate-200" />
+    <div className='space-y-4' aria-busy='true'>
+      <div className='h-14 animate-pulse rounded-xl bg-slate-200' />
 
-      <div className="h-96 animate-pulse rounded-xl bg-slate-200" />
+      <div className='h-96 animate-pulse rounded-xl bg-slate-200' />
     </div>
   );
 }
 
 function PageReportTable({ report }: { report: PageReportResponse }) {
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-262.5 w-full border-collapse text-sm">
+    <div className='overflow-x-auto'>
+      <table className='min-w-262.5 w-full border-collapse text-sm'>
         <thead>
-          <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-            <th className="px-4 py-3">Page</th>
+          <tr className='border-b border-slate-200 bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500'>
+            <th className='px-4 py-3'>Page</th>
 
-            <th className="px-4 py-3 text-right">Views</th>
+            <th className='px-4 py-3 text-right'>Views</th>
 
-            <th className="px-4 py-3 text-right">Visitors</th>
+            <th className='px-4 py-3 text-right'>Visitors</th>
 
-            <th className="px-4 py-3 text-right">Sessions</th>
+            <th className='px-4 py-3 text-right'>Sessions</th>
 
-            <th className="px-4 py-3 text-right" title="Sessions that began on this page.">
+            <th className='px-4 py-3 text-right' title='Sessions that began on this page.'>
               Entrances
             </th>
 
-            <th className="px-4 py-3 text-right" title="Sessions whose final page was this page.">
+            <th className='px-4 py-3 text-right' title='Sessions whose final page was this page.'>
               Exits
             </th>
 
-            <th className="px-4 py-3 text-right" title="Bounced entrance sessions divided by entrance sessions.">
+            <th className='px-4 py-3 text-right' title='Bounced entrance sessions divided by entrance sessions.'>
               Bounce rate
             </th>
 
-            <th className="px-4 py-3 text-right" title="Average recorded page duration.">
+            <th className='px-4 py-3 text-right' title='Average recorded page duration.'>
               Avg. duration
             </th>
           </tr>
@@ -312,30 +307,30 @@ function PageReportTable({ report }: { report: PageReportResponse }) {
 
         <tbody>
           {report.items.map((item) => (
-            <tr key={item.path} className="border-b border-slate-100 last:border-0">
-              <td className="max-w-sm px-4 py-4">
-                <p className="truncate font-medium text-slate-900" title={item.title}>
+            <tr key={item.path} className='border-b border-slate-100 last:border-0'>
+              <td className='max-w-sm px-4 py-4'>
+                <p className='truncate font-medium text-slate-900' title={item.title}>
                   {item.title}
                 </p>
 
-                <p className="mt-1 truncate text-xs text-slate-500" title={item.path}>
+                <p className='mt-1 truncate text-xs text-slate-500' title={item.path}>
                   {item.path}
                 </p>
               </td>
 
-              <td className="px-4 py-4 text-right">{numberFormatter.format(item.views)}</td>
+              <td className='px-4 py-4 text-right'>{numberFormatter.format(item.views)}</td>
 
-              <td className="px-4 py-4 text-right">{numberFormatter.format(item.visitors)}</td>
+              <td className='px-4 py-4 text-right'>{numberFormatter.format(item.visitors)}</td>
 
-              <td className="px-4 py-4 text-right">{numberFormatter.format(item.sessions)}</td>
+              <td className='px-4 py-4 text-right'>{numberFormatter.format(item.sessions)}</td>
 
-              <td className="px-4 py-4 text-right">{numberFormatter.format(item.entrances)}</td>
+              <td className='px-4 py-4 text-right'>{numberFormatter.format(item.entrances)}</td>
 
-              <td className="px-4 py-4 text-right">{numberFormatter.format(item.exits)}</td>
+              <td className='px-4 py-4 text-right'>{numberFormatter.format(item.exits)}</td>
 
-              <td className="px-4 py-4 text-right">{item.bounceRate}%</td>
+              <td className='px-4 py-4 text-right'>{item.bounceRate}%</td>
 
-              <td className="px-4 py-4 text-right">{formatDuration(item.averageDurationSeconds)}</td>
+              <td className='px-4 py-4 text-right'>{formatDuration(item.averageDurationSeconds)}</td>
             </tr>
           ))}
         </tbody>
@@ -347,50 +342,50 @@ function PageReportTable({ report }: { report: PageReportResponse }) {
 function EventReportTable({ report }: { report: EventReportResponse }) {
   return (
     <>
-      <div className="grid gap-4 border-b border-slate-200 p-4 sm:grid-cols-3">
+      <div className='grid gap-4 border-b border-slate-200 p-4 sm:grid-cols-3'>
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Total events</p>
+          <p className='text-xs font-medium uppercase tracking-wide text-slate-500'>Total events</p>
 
-          <p className="mt-1 text-2xl font-bold text-slate-950">{numberFormatter.format(report.summary.totalEvents)}</p>
+          <p className='mt-1 text-2xl font-bold text-slate-950'>{numberFormatter.format(report.summary.totalEvents)}</p>
         </div>
 
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Unique visitors</p>
+          <p className='text-xs font-medium uppercase tracking-wide text-slate-500'>Unique visitors</p>
 
-          <p className="mt-1 text-2xl font-bold text-slate-950">{numberFormatter.format(report.summary.uniqueVisitors)}</p>
+          <p className='mt-1 text-2xl font-bold text-slate-950'>{numberFormatter.format(report.summary.uniqueVisitors)}</p>
         </div>
 
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Sessions</p>
+          <p className='text-xs font-medium uppercase tracking-wide text-slate-500'>Sessions</p>
 
-          <p className="mt-1 text-2xl font-bold text-slate-950">{numberFormatter.format(report.summary.uniqueSessions)}</p>
+          <p className='mt-1 text-2xl font-bold text-slate-950'>{numberFormatter.format(report.summary.uniqueSessions)}</p>
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-162.5 w-full border-collapse text-sm">
+      <div className='overflow-x-auto'>
+        <table className='min-w-162.5 w-full border-collapse text-sm'>
           <thead>
-            <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-              <th className="px-4 py-3">Event</th>
+            <tr className='border-b border-slate-200 bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500'>
+              <th className='px-4 py-3'>Event</th>
 
-              <th className="px-4 py-3 text-right">Total</th>
+              <th className='px-4 py-3 text-right'>Total</th>
 
-              <th className="px-4 py-3 text-right">Visitors</th>
+              <th className='px-4 py-3 text-right'>Visitors</th>
 
-              <th className="px-4 py-3 text-right">Sessions</th>
+              <th className='px-4 py-3 text-right'>Sessions</th>
             </tr>
           </thead>
 
           <tbody>
             {report.items.map((item) => (
-              <tr key={item.name} className="border-b border-slate-100 last:border-0">
-                <td className="px-4 py-4 font-medium text-slate-900">{item.name}</td>
+              <tr key={item.name} className='border-b border-slate-100 last:border-0'>
+                <td className='px-4 py-4 font-medium text-slate-900'>{item.name}</td>
 
-                <td className="px-4 py-4 text-right">{numberFormatter.format(item.events)}</td>
+                <td className='px-4 py-4 text-right'>{numberFormatter.format(item.events)}</td>
 
-                <td className="px-4 py-4 text-right">{numberFormatter.format(item.visitors)}</td>
+                <td className='px-4 py-4 text-right'>{numberFormatter.format(item.visitors)}</td>
 
-                <td className="px-4 py-4 text-right">{numberFormatter.format(item.sessions)}</td>
+                <td className='px-4 py-4 text-right'>{numberFormatter.format(item.sessions)}</td>
               </tr>
             ))}
           </tbody>
@@ -402,34 +397,34 @@ function EventReportTable({ report }: { report: EventReportResponse }) {
 
 function DimensionReportTable({ report }: { report: DimensionReportResponse }) {
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-175 w-full border-collapse text-sm">
+    <div className='overflow-x-auto'>
+      <table className='min-w-175 w-full border-collapse text-sm'>
         <thead>
-          <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-            <th className="px-4 py-3">Value</th>
+          <tr className='border-b border-slate-200 bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500'>
+            <th className='px-4 py-3'>Value</th>
 
-            <th className="px-4 py-3 text-right">Visitors</th>
+            <th className='px-4 py-3 text-right'>Visitors</th>
 
-            <th className="px-4 py-3 text-right">Sessions</th>
+            <th className='px-4 py-3 text-right'>Sessions</th>
 
-            <th className="px-4 py-3 text-right">Page views</th>
+            <th className='px-4 py-3 text-right'>Page views</th>
 
-            <th className="px-4 py-3 text-right">Share</th>
+            <th className='px-4 py-3 text-right'>Share</th>
           </tr>
         </thead>
 
         <tbody>
           {report.items.map((item) => (
-            <tr key={item.key} className="border-b border-slate-100 last:border-0">
-              <td className="px-4 py-4 font-medium text-slate-900">{item.label}</td>
+            <tr key={item.key} className='border-b border-slate-100 last:border-0'>
+              <td className='px-4 py-4 font-medium text-slate-900'>{item.label}</td>
 
-              <td className="px-4 py-4 text-right">{numberFormatter.format(item.visitors)}</td>
+              <td className='px-4 py-4 text-right'>{numberFormatter.format(item.visitors)}</td>
 
-              <td className="px-4 py-4 text-right">{numberFormatter.format(item.sessions)}</td>
+              <td className='px-4 py-4 text-right'>{numberFormatter.format(item.sessions)}</td>
 
-              <td className="px-4 py-4 text-right">{numberFormatter.format(item.pageViews)}</td>
+              <td className='px-4 py-4 text-right'>{numberFormatter.format(item.pageViews)}</td>
 
-              <td className="px-4 py-4 text-right">{item.percentage}%</td>
+              <td className='px-4 py-4 text-right'>{item.percentage}%</td>
             </tr>
           ))}
         </tbody>
@@ -591,28 +586,28 @@ export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsR
   const pagination = report?.pagination;
 
   return (
-    <main className="space-y-5">
-      <header className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <main className='space-y-5'>
+      <header className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+        <div className='flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
           <div>
-            <p className="text-sm font-medium text-slate-500">Analytics reports</p>
+            <p className='text-sm font-medium text-slate-500'>Analytics reports</p>
 
-            <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-950">Detailed analytics</h1>
+            <h1 className='mt-1 text-2xl font-bold tracking-tight text-slate-950'>Detailed analytics</h1>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className='flex flex-wrap gap-2'>
             <Link
               href={`/workspaces/${workspaceId}/websites/${websiteId}/analytics?range=${preset}`}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              className='rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50'
             >
               Overview
             </Link>
 
             <button
-              type="button"
+              type='button'
               disabled={exporting}
               onClick={() => void handleExport()}
-              className="rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
+              className='rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60'
             >
               {exporting ? 'Exportingâ€¦' : 'Export CSV'}
             </button>
@@ -620,16 +615,16 @@ export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsR
         </div>
 
         {exportError ? (
-          <p role="alert" className="mt-3 text-sm text-red-700">
+          <p role='alert' className='mt-3 text-sm text-red-700'>
             {exportError}
           </p>
         ) : null}
 
-        <nav className="mt-5 flex gap-1 overflow-x-auto border-b border-slate-200">
+        <nav className='mt-5 flex gap-1 overflow-x-auto border-b border-slate-200'>
           {MAIN_TABS.map((item) => (
             <button
               key={item.value}
-              type="button"
+              type='button'
               onClick={() => {
                 updateUrl({
                   tab: item.value,
@@ -649,24 +644,24 @@ export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsR
         </nav>
       </header>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-          <label className="xl:col-span-2">
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Search</span>
+      <section className='rounded-2xl border border-slate-200 bg-white p-4 shadow-sm'>
+        <div className='grid gap-3 md:grid-cols-2 xl:grid-cols-5'>
+          <label className='xl:col-span-2'>
+            <span className='text-xs font-medium uppercase tracking-wide text-slate-500'>Search</span>
 
             <input
-              type="search"
+              type='search'
               value={searchInput}
               onChange={(event) => {
                 setSearchInput(event.target.value);
               }}
-              placeholder="Search report"
-              className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-950"
+              placeholder='Search report'
+              className='mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-950'
             />
           </label>
 
           <label>
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Date range</span>
+            <span className='text-xs font-medium uppercase tracking-wide text-slate-500'>Date range</span>
 
             <select
               value={preset}
@@ -675,7 +670,7 @@ export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsR
                   range: event.target.value,
                 });
               }}
-              className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-950"
+              className='mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-950'
             >
               {PRESET_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -687,7 +682,7 @@ export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsR
 
           {tab === 'technology' ? (
             <label>
-              <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Technology</span>
+              <span className='text-xs font-medium uppercase tracking-wide text-slate-500'>Technology</span>
 
               <select
                 value={dimension}
@@ -696,7 +691,7 @@ export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsR
                     dimension: event.target.value,
                   });
                 }}
-                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-950"
+                className='mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-950'
               >
                 {TECHNOLOGY_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -708,7 +703,7 @@ export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsR
           ) : null}
 
           <label>
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Sort by</span>
+            <span className='text-xs font-medium uppercase tracking-wide text-slate-500'>Sort by</span>
 
             <select
               value={sortBy}
@@ -717,7 +712,7 @@ export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsR
                   sort: event.target.value,
                 });
               }}
-              className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-950"
+              className='mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-950'
             >
               {sortOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -728,7 +723,7 @@ export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsR
           </label>
 
           <label>
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Direction</span>
+            <span className='text-xs font-medium uppercase tracking-wide text-slate-500'>Direction</span>
 
             <select
               value={sortDirection}
@@ -737,11 +732,11 @@ export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsR
                   direction: event.target.value,
                 });
               }}
-              className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-950"
+              className='mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-950'
             >
-              <option value="desc">Highest first</option>
+              <option value='desc'>Highest first</option>
 
-              <option value="asc">Lowest first</option>
+              <option value='asc'>Lowest first</option>
             </select>
           </label>
         </div>
@@ -751,7 +746,7 @@ export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsR
         <ReportSkeleton />
       ) : error ? (
         <PageError
-          title="Unable to load analytics report"
+          title='Unable to load analytics report'
           message={getErrorMessage(error)}
           requestId={error instanceof ApiError ? error.requestId : undefined}
           onRetry={() => {
@@ -759,10 +754,10 @@ export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsR
           }}
         />
       ) : !report || report.items.length === 0 ? (
-        <EmptyState title="No report data" description="No matching analytics data was found for the selected filters and date range." icon={undefined} />
+        <EmptyState title='No report data' description='No matching analytics data was found for the selected filters and date range.' icon={undefined} />
       ) : (
-        <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3 text-sm text-slate-500">
+        <section className='overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm'>
+          <div className='flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3 text-sm text-slate-500'>
             <span>
               {report.range.from}
               {' â€” '}
@@ -782,9 +777,9 @@ export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsR
             <DimensionReportTable report={report} />
           )}
 
-          <div className="flex items-center justify-between gap-4 border-t border-slate-200 px-4 py-4">
+          <div className='flex items-center justify-between gap-4 border-t border-slate-200 px-4 py-4'>
             <button
-              type="button"
+              type='button'
               disabled={!pagination?.hasPreviousPage}
               onClick={() => {
                 updateUrl(
@@ -795,17 +790,17 @@ export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsR
                   false,
                 );
               }}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+              className='rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50'
             >
               Previous
             </button>
 
-            <span className="text-sm text-slate-600">
+            <span className='text-sm text-slate-600'>
               Page {pagination?.page} of {pagination?.totalPages}
             </span>
 
             <button
-              type="button"
+              type='button'
               disabled={!pagination?.hasNextPage}
               onClick={() => {
                 updateUrl(
@@ -816,7 +811,7 @@ export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsR
                   false,
                 );
               }}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+              className='rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50'
             >
               Next
             </button>

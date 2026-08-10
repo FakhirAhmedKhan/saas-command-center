@@ -1,14 +1,13 @@
-import type { INestApplication } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
-import request, { type Response } from 'supertest';
-
-import { PrismaService } from '../src/database/prisma.service';
-import { HealthCheckStatus, HealthIncidentStatus, HealthTargetType, WorkspaceRole } from '../src/generated/prisma/enums';
-import { HealthCheckRunnerService } from '../src/modules/monitoring/services/health-check-runner.service';
 import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
 import { createTestApp } from './helpers/create-test-app';
 import { resetDatabase } from './helpers/database';
 import { readAccessToken } from './helpers/response';
+import { PrismaService } from '../src/database/prisma.service';
+import { HealthCheckStatus, HealthIncidentStatus, HealthTargetType, WorkspaceRole } from '../src/generated/prisma/enums';
+import { HealthCheckRunnerService } from '../src/modules/monitoring/services/health-check-runner.service';
+import type { INestApplication } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
+import request, { type Response } from 'supertest';
 
 /**
  * Phase 15 — Monitoring E2E

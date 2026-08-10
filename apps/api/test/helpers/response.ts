@@ -1,5 +1,4 @@
-﻿/* eslint-disable @typescript-eslint/no-unsafe-return */
-import type { Response } from 'supertest';
+﻿import type { Response } from 'supertest';
 
 export function readAccessToken(response: Response): string {
   const body = response.body as Record<string, any>;

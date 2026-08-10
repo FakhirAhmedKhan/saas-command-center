@@ -1,15 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-
-import type { INestApplication } from '@nestjs/common';
-
-import request from 'supertest';
-
-import { RawAnalyticsEventType, WorkspaceRole } from 'src/generated/prisma/enums';
-
-import { PrismaService } from 'src/database/prisma.service';
-
-import { inWorkspace, recordString } from './helpers/application';
-
 import {
   analyticsIngestionRoutes,
   buildTrackerEvent,
@@ -19,12 +7,14 @@ import {
   getTrackingStatus,
   readTrackingStatus,
 } from './helpers/analytics-ingestion';
-
+import { inWorkspace, recordString } from './helpers/application';
 import { createTestApp } from './helpers/create-test-app';
-
 import { resetDatabase } from './helpers/database';
-
 import { addWorkspaceMember, expectAccessDenied, registerWorkspaceTestUser } from './helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { RawAnalyticsEventType, WorkspaceRole } from 'src/generated/prisma/enums';
+import request from 'supertest';
 
 describe('Tracking Admin E2E', () => {
   let app: INestApplication;

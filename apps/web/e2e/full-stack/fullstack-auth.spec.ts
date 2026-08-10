@@ -1,5 +1,4 @@
 import { expect, test } from '@playwright/test';
-
 import { loginThroughUi } from './fixtures/helpers';
 import { readFullStackState, type FullStackState } from './fixtures/state';
 

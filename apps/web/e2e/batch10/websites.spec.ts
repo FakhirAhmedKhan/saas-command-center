@@ -1,5 +1,4 @@
 import { expect, test } from '@playwright/test';
-
 import { APPLICATION_ID, installMockApi, PRIMARY_WORKSPACE_ID, WEBSITE_ID } from './fixtures/mock-api';
 
 test.describe('Batch 10 website and tracker setup flows', () => {

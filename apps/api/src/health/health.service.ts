@@ -1,7 +1,7 @@
+import { DatabaseHealthService } from '../database/database-health.service';
+import type { HealthResponse } from '@command-center/shared-types';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { HealthResponse } from '@command-center/shared-types';
-import { DatabaseHealthService } from '../database/database-health.service';
 
 @Injectable()
 export class HealthService {

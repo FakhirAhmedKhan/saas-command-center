@@ -1,11 +1,9 @@
+import type { RequestWithId } from '../middleware/request-id.middleware';
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common';
-
 import type {
   //   Request,
   Response,
 } from 'express';
-
-import type { RequestWithId } from '../middleware/request-id.middleware';
 
 interface ErrorResponse {
   statusCode: number;

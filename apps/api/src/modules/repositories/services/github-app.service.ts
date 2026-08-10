@@ -1,6 +1,5 @@
-import { createSign } from 'node:crypto';
-
 import { BadGatewayException, Injectable, ServiceUnavailableException } from '@nestjs/common';
+import { createSign } from 'node:crypto';
 
 interface GithubInstallationResponse {
   id: number;
@@ -61,16 +60,14 @@ export interface GithubInstallation {
 
 @Injectable()
 export class GithubAppService {
-  getInstallationAccessToken(
-    installationId: string,
-  ): Promise<string> {
+  getInstallationAccessToken(installationId: string): Promise<string> {
     return this.createInstallationAccessToken(installationId);
   }
   private readonly apiVersion = '2026-03-10';
 
   buildInstallationUrl(state: string): string {
     // const slug = this.required('GITHUB_APP_SLUG' );
-    const slug = "saas-command-center-dev";
+    const slug = 'saas-command-center-dev';
 
     return `https://github.com/apps/${encodeURIComponent(slug)}` + `/installations/new?state=${encodeURIComponent(state)}`;
   }

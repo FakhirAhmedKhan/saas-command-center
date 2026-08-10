@@ -1,115 +1,97 @@
 export interface RepositoryBranch {
-    name: string;
+  name: string;
 
-    sha: string;
+  sha: string;
 
-    protected: boolean;
+  protected: boolean;
 }
 
 export interface RepositoryBranchesResponse {
-    defaultBranch: string;
+  defaultBranch: string;
 
-    branches:
-    RepositoryBranch[];
+  branches: RepositoryBranch[];
 }
 
 export interface CodeTreeNode {
-    name: string;
+  name: string;
 
-    path: string;
+  path: string;
 
-    type:
-    | 'file'
-    | 'directory'
-    | 'submodule';
+  type: 'file' | 'directory' | 'submodule';
 
-    sha: string | null;
+  sha: string | null;
 
-    size: number | null;
+  size: number | null;
 
-    children?:
-    CodeTreeNode[];
+  children?: CodeTreeNode[];
 }
 
 export interface RepositoryTreeResponse {
-    repositoryId: string;
+  repositoryId: string;
 
-    branch: string;
+  branch: string;
 
-    sha: string;
+  sha: string;
 
-    truncated: boolean;
+  truncated: boolean;
 
-    nodes:
-    CodeTreeNode[];
+  nodes: CodeTreeNode[];
 }
 
 export interface RepositoryCodeFile {
-    name: string;
+  name: string;
 
-    path: string;
+  path: string;
 
-    branch: string;
+  branch: string;
 
-    sha: string;
+  sha: string;
 
-    size: number;
+  size: number;
 
-    kind:
-    | 'text'
-    | 'image'
-    | 'binary';
+  kind: 'text' | 'image' | 'binary';
 
-    language: string;
+  language: string;
 
-    mimeType:
-    string | null;
+  mimeType: string | null;
 
-    content:
-    string | null;
+  content: string | null;
 
-    encoding:
-    | 'utf8'
-    | 'base64'
-    | null;
+  encoding: 'utf8' | 'base64' | null;
 }
 
 export interface RepositorySearchMatch {
-    name: string;
+  name: string;
 
-    path: string;
+  path: string;
 
-    sha: string;
+  sha: string;
 
-    size:
-    number | null;
+  size: number | null;
 }
 
 export interface RepositorySearchResponse {
-    branch: string;
+  branch: string;
 
-    query: string;
+  query: string;
 
-    truncated: boolean;
+  truncated: boolean;
 
-    matches:
-    RepositorySearchMatch[];
+  matches: RepositorySearchMatch[];
 }
 
 export interface RepositoryDiffResponse {
-    path: string;
+  path: string;
 
-    base: string;
+  base: string;
 
-    head: string;
+  head: string;
 
-    textDiff: boolean;
+  textDiff: boolean;
 
-    language: string;
+  language: string;
 
-    original:
-    RepositoryCodeFile | null;
+  original: RepositoryCodeFile | null;
 
-    modified:
-    RepositoryCodeFile | null;
+  modified: RepositoryCodeFile | null;
 }

@@ -1,6 +1,5 @@
 import { apiRequest } from '@/features/lib/api/api-client';
-
-import type { CreateWorkspacePayload, CreatedWorkspace } from './workspace-types';
+import type { CreatedWorkspace, CreateWorkspacePayload } from './workspace-types';
 
 export function createWorkspace(payload: CreateWorkspacePayload) {
   return apiRequest<CreatedWorkspace>('/workspaces', {

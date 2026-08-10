@@ -1,24 +1,16 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-
-import { useParams, useRouter } from 'next/navigation';
-
 import { Archive, RotateCcw, Trash2 } from 'lucide-react';
-
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
-
-import { apiRequest } from '@/features/lib/api/api-client';
-
 import { archiveApplication, getApplication, permanentlyDeleteApplication, restoreApplication } from '@/features/applications/application-api';
-
-import { ApplicationSubNav } from '@/features/applications/components/application-sub-nav';
-
 import type { SaasApplication } from '@/features/applications/application-types';
-
 import { getErrorMessage } from '@/features/applications/application-utils';
+import { ApplicationSubNav } from '@/features/applications/components/application-sub-nav';
+import { apiRequest } from '@/features/lib/api/api-client';
 
 type WorkspaceRole = 'OWNER' | 'ADMIN' | 'DEVELOPER' | 'VIEWER';
 
@@ -163,67 +155,67 @@ export default function ApplicationSettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-80 items-center justify-center">
+      <div className='flex min-h-80 items-center justify-center'>
         <Spinner />
       </div>
     );
   }
 
   if (!application) {
-    return <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error ?? 'Application was not found.'}</div>;
+    return <div className='rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700'>{error ?? 'Application was not found.'}</div>;
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1600px] space-y-5 p-4 sm:p-6 lg:p-8">
+    <div className='mx-auto w-full max-w-[1600px] space-y-5 p-4 sm:p-6 lg:p-8'>
       <ApplicationSubNav workspaceId={workspaceId} applicationId={applicationId} />
 
-      <div className="mx-auto max-w-2xl space-y-5">
+      <div className='mx-auto max-w-2xl space-y-5'>
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-slate-950">Settings</h1>
-          <p className="mt-1 text-sm leading-6 text-slate-500">Manage the application lifecycle and deletion settings.</p>
+          <h1 className='text-xl font-semibold tracking-tight text-slate-950'>Settings</h1>
+          <p className='mt-1 text-sm leading-6 text-slate-500'>Manage the application lifecycle and deletion settings.</p>
         </div>
 
-        {error ? <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div> : null}
+        {error ? <div className='rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700'>{error}</div> : null}
 
         <Card>
           <CardHeader>
-            <h2 className="text-[15px] font-semibold text-slate-950">Archive application</h2>
+            <h2 className='text-[15px] font-semibold text-slate-950'>Archive application</h2>
 
-            <p className="mt-1 text-sm text-slate-500">Archived applications remain in the database but cannot be edited.</p>
+            <p className='mt-1 text-sm text-slate-500'>Archived applications remain in the database but cannot be edited.</p>
           </CardHeader>
 
           <CardContent>
             {!canArchive ? (
-              <p className="text-sm text-slate-500">Only workspace owners and administrators can archive or restore applications.</p>
+              <p className='text-sm text-slate-500'>Only workspace owners and administrators can archive or restore applications.</p>
             ) : application.archivedAt ? (
-              <Button variant="outline" size="sm" loading={actionLoading === 'restore'} onClick={() => void handleRestore()}>
-                <RotateCcw className="size-3.5" />
+              <Button variant='outline' size='sm' loading={actionLoading === 'restore'} onClick={() => void handleRestore()}>
+                <RotateCcw className='size-3.5' />
                 Restore application
               </Button>
             ) : (
-              <Button variant="outline" size="sm" loading={actionLoading === 'archive'} onClick={() => void handleArchive()}>
-                <Archive className="size-3.5" />
+              <Button variant='outline' size='sm' loading={actionLoading === 'archive'} onClick={() => void handleArchive()}>
+                <Archive className='size-3.5' />
                 Archive application
               </Button>
             )}
           </CardContent>
         </Card>
 
-        <Card className="border-red-200">
+        <Card className='border-red-200'>
           <CardHeader>
-            <h2 className="text-[15px] font-semibold text-red-700">Danger zone</h2>
+            <h2 className='text-[15px] font-semibold text-red-700'>Danger zone</h2>
 
-            <p className="mt-1 text-sm text-slate-500">Permanent deletion removes the application, technology stack and links forever.</p>
+            <p className='mt-1 text-sm text-slate-500'>Permanent deletion removes the application, technology stack and links forever.</p>
           </CardHeader>
 
           <CardContent>
             {!canDelete ? (
-              <p className="text-sm text-slate-500">Only the workspace owner can permanently delete an application.</p>
+              <p className='text-sm text-slate-500'>Only the workspace owner can permanently delete an application.</p>
             ) : !application.archivedAt ? (
-              <p className="text-sm text-amber-700">Archive the application before permanently deleting it.</p>
+              <p className='text-sm text-amber-700'>Archive the application before permanently deleting it.</p>
             ) : (
-              <Button variant="danger" size="sm" loading={actionLoading === 'delete'} onClick={() => void handleDelete()}>
-                <Trash2 className="size-3.5" />
+              <Button variant='danger' size='sm' loading={actionLoading === 'delete'} onClick={() => void handleDelete()}>
+                <Trash2 className='size-3.5' />
                 Permanently delete
               </Button>
             )}

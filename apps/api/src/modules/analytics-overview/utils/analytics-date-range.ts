@@ -1,6 +1,5 @@
-import { BadRequestException } from '@nestjs/common';
-
 import { AnalyticsDatePreset, AnalyticsOverviewQueryDto } from '../dto/analytics-overview-query.dto';
+import { BadRequestException } from '@nestjs/common';
 
 const MILLISECONDS_PER_DAY = 86_400_000;
 

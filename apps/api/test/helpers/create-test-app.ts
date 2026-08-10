@@ -1,12 +1,8 @@
-import { ValidationPipe, type INestApplication } from '@nestjs/common';
-
-import { Test } from '@nestjs/testing';
-
-import { type NestExpressApplication } from '@nestjs/platform-express';
-
-import cookieParser from 'cookie-parser';
-
 import { AppModule } from '../../src/app.module';
+import { ValidationPipe, type INestApplication } from '@nestjs/common';
+import { type NestExpressApplication } from '@nestjs/platform-express';
+import { Test } from '@nestjs/testing';
+import cookieParser from 'cookie-parser';
 
 export async function createTestApp(): Promise<INestApplication> {
   const testingModule = await Test.createTestingModule({

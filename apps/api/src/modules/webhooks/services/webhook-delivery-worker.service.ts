@@ -1,23 +1,14 @@
-import { ConfigService } from '@nestjs/config';
-import { Injectable, Logger, Inject } from '@nestjs/common';
-
-import { Interval } from '@nestjs/schedule';
-
-import { WebhookAttemptOutcome, WebhookDeliveryStatus } from '../../../generated/prisma/client';
-
-import type { TypedConfigService } from '../../../config/runtime-config';
-
-import { PrismaService } from '../../../database/prisma.service';
-
-import { PostgresAdvisoryLockService } from '../../../infrastructure/database/postgres-advisory-lock.service';
-
-import { WEBHOOK_RETRY_BASE_DELAY_MS, WEBHOOK_RETRY_MAX_DELAY_MS } from '../webhooks.constants';
-
 import { WebhookOutboundClientService } from './webhook-outbound-client.service';
-
 import { WebhookSecretCryptoService } from './webhook-secret-crypto.service';
-
 import { WebhookSignatureService } from './webhook-signature.service';
+import type { TypedConfigService } from '../../../config/runtime-config';
+import { PrismaService } from '../../../database/prisma.service';
+import { WebhookAttemptOutcome, WebhookDeliveryStatus } from '../../../generated/prisma/client';
+import { PostgresAdvisoryLockService } from '../../../infrastructure/database/postgres-advisory-lock.service';
+import { WEBHOOK_RETRY_BASE_DELAY_MS, WEBHOOK_RETRY_MAX_DELAY_MS } from '../webhooks.constants';
+import { Injectable, Logger, Inject } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Interval } from '@nestjs/schedule';
 
 @Injectable()
 export class WebhookDeliveryWorkerService {

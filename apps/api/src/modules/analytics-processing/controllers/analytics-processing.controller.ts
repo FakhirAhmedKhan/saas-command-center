@@ -1,24 +1,14 @@
-import { AnalyticsProcessingAccessService } from '../services/analytics-processing-access.service';
-
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, UseGuards } from '@nestjs/common';
-
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-
 import { AnalyticsProcessingTrigger } from '../../../generated/prisma/client';
-
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
-
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-
 import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
-
 import { AnalyticsProcessingStatusDto, ProcessingRunDto } from '../dto/analytics-processing-response.dto';
-
 import { ReprocessAnalyticsDto } from '../dto/reprocess-analytics.dto';
-
+import { AnalyticsProcessingAccessService } from '../services/analytics-processing-access.service';
 import { AnalyticsProcessingQueueService } from '../services/analytics-processing-queue.service';
-
 import { AnalyticsProcessingStatusService } from '../services/analytics-processing-status.service';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthenticatedUser } from 'src/modules/auth/interfaces/authenticated-user.interface';
 
 @ApiTags('Analytics Processing')

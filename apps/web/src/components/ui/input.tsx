@@ -1,5 +1,5 @@
-import { cn } from '@/features/lib/api/cn';
 import { forwardRef, type InputHTMLAttributes, type ReactNode } from 'react';
+import { cn } from '@/features/lib/api/cn';
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -12,15 +12,15 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ c
   const inputId = id ?? props.name ?? undefined;
 
   return (
-    <div className="space-y-1.5">
+    <div className='space-y-1.5'>
       {label ? (
-        <label htmlFor={inputId} className="block text-[13px] font-medium text-slate-700">
+        <label htmlFor={inputId} className='block text-[13px] font-medium text-slate-700'>
           {label}
         </label>
       ) : null}
 
-      <div className="relative">
-        {leadingIcon ? <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">{leadingIcon}</div> : null}
+      <div className='relative'>
+        {leadingIcon ? <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400'>{leadingIcon}</div> : null}
 
         <input
           ref={ref}
@@ -39,7 +39,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ c
         />
       </div>
 
-      {error ? <p className="text-xs text-red-600">{error}</p> : hint ? <p className="text-xs text-slate-500">{hint}</p> : null}
+      {error ? <p className='text-xs text-red-600'>{error}</p> : hint ? <p className='text-xs text-slate-500'>{hint}</p> : null}
     </div>
   );
 });

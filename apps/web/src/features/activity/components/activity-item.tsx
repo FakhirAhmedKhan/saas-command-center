@@ -1,6 +1,3 @@
-import Link from 'next/link';
-import { createElement } from 'react';
-
 import {
   Archive,
   ArrowUpDown,
@@ -20,17 +17,14 @@ import {
   RotateCcw,
   SkipForward,
   Trash2,
+  type LucideIcon,
 } from 'lucide-react';
-
-import type { LucideIcon } from 'lucide-react';
-
+import Link from 'next/link';
+import { createElement } from 'react';
 import { Badge } from '@/components/ui/badge';
-
 import { ACTIVITY_BADGE_VARIANTS, ACTIVITY_TYPE_LABELS, ENTITY_TYPE_LABELS } from '../activity-constants';
-
-import type { ApplicationActivity, ApplicationActivityType } from '../activity-types';
-
 import { formatActivityDate, formatRelativeActivityDate, getActivityActorName, getMetadataSummary } from '../activity-utils';
+import type { ApplicationActivity, ApplicationActivityType } from '../activity-types';
 
 interface ActivityItemProps {
   workspaceId: string;
@@ -124,10 +118,10 @@ export function ActivityItem({ workspaceId, activity, showApplication = false }:
     : null;
 
   return (
-    <article className="group relative flex gap-4 pb-8 last:pb-0">
-      <div aria-hidden="true" className="absolute bottom-0 left-5 top-11 w-px bg-slate-200 group-last:hidden" />
+    <article className='group relative flex gap-4 pb-8 last:pb-0'>
+      <div aria-hidden='true' className='absolute bottom-0 left-5 top-11 w-px bg-slate-200 group-last:hidden' />
 
-      <div className="relative z-10 flex size-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm">
+      <div className='relative z-10 flex size-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm'>
         {createElement(ACTIVITY_ICONS[activity.activityType], {
           'aria-hidden': true,
           className: 'size-[18px]',
@@ -135,22 +129,22 @@ export function ActivityItem({ workspaceId, activity, showApplication = false }:
         })}
       </div>
 
-      <div className="min-w-0 flex-1 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h3 className="break-words font-semibold text-slate-950">{activity.title}</h3>
+      <div className='min-w-0 flex-1 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm'>
+        <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
+          <div className='min-w-0 flex-1'>
+            <div className='flex flex-wrap items-center gap-2'>
+              <h3 className='break-words font-semibold text-slate-950'>{activity.title}</h3>
 
               <Badge variant={badgeVariant}>{activityLabel}</Badge>
 
-              <Badge variant="slate">{entityLabel}</Badge>
+              <Badge variant='slate'>{entityLabel}</Badge>
             </div>
 
-            {activity.description ? <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-slate-600">{activity.description}</p> : null}
+            {activity.description ? <p className='mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-slate-600'>{activity.description}</p> : null}
 
             {metadataSummary ? (
-              <div className="mt-2 rounded-lg bg-slate-50 px-3 py-2">
-                <p className="break-words text-xs font-medium leading-5 text-slate-600">{metadataSummary}</p>
+              <div className='mt-2 rounded-lg bg-slate-50 px-3 py-2'>
+                <p className='break-words text-xs font-medium leading-5 text-slate-600'>{metadataSummary}</p>
               </div>
             ) : null}
 
@@ -158,27 +152,27 @@ export function ActivityItem({ workspaceId, activity, showApplication = false }:
               applicationUrl ? (
                 <Link
                   href={applicationUrl}
-                  className="mt-3 inline-flex max-w-full items-center gap-1.5 text-sm font-semibold text-brand-700 transition-colors hover:text-brand-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+                  className='mt-3 inline-flex max-w-full items-center gap-1.5 text-sm font-semibold text-brand-700 transition-colors hover:text-brand-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2'
                 >
-                  <span className="truncate">{activity.applicationName}</span>
+                  <span className='truncate'>{activity.applicationName}</span>
 
-                  <ExternalLink aria-hidden="true" className="size-3.5 shrink-0" />
+                  <ExternalLink aria-hidden='true' className='size-3.5 shrink-0' />
                 </Link>
               ) : (
-                <p className="mt-3 text-sm font-medium text-slate-500">
+                <p className='mt-3 text-sm font-medium text-slate-500'>
                   {activity.applicationName}
-                  <span className="font-normal"> — deleted</span>
+                  <span className='font-normal'> — deleted</span>
                 </p>
               )
             ) : null}
           </div>
 
-          <div className="shrink-0 text-left sm:text-right">
-            <time dateTime={activity.createdAt} title={formattedDate} className="text-xs font-medium text-slate-500">
+          <div className='shrink-0 text-left sm:text-right'>
+            <time dateTime={activity.createdAt} title={formattedDate} className='text-xs font-medium text-slate-500'>
               {relativeDate}
             </time>
 
-            <p className="mt-1 text-xs text-slate-400">by {actorName}</p>
+            <p className='mt-1 text-xs text-slate-400'>by {actorName}</p>
           </div>
         </div>
       </div>

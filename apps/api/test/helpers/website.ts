@@ -1,10 +1,7 @@
-import type { Response } from 'supertest';
-
 import { applicationRoutes, asRecord, readApiItems, recordString } from './application';
-
 import { withBearer } from './auth';
-
 import type { WorkspaceTestUser } from './workspace';
+import type { Response } from 'supertest';
 
 export interface WebsitePayload {
   name: string;

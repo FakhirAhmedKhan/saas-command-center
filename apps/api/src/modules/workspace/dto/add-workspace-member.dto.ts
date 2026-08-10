@@ -1,6 +1,6 @@
+import { WorkspaceRole } from '../../../generated/prisma/client';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEmail, IsEnum, IsOptional } from 'class-validator';
-import { WorkspaceRole } from '../../../generated/prisma/client';
 
 export class AddWorkspaceMemberDto {
   @ApiProperty({

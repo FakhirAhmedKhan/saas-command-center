@@ -6,7 +6,6 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --max-warnings=0",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "node --test",
     "test:e2e": "playwright test --config=playwright.config.ts",
@@ -14,7 +13,9 @@
     "test:e2e:debug": "playwright test --config=playwright.config.ts --debug",
     "test:e2e:list": "playwright test --config=playwright.config.ts --list",
     "test:phase4": "pnpm typecheck && pnpm build",
-    "test:e2e:batch10": "playwright test --config=playwright.config.ts e2e/batch10"
+    "test:e2e:batch10": "playwright test --config=playwright.config.ts e2e/batch10",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@command-center/shared-types": "workspace:*",
@@ -29,6 +30,7 @@
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
+    "@command-center/eslint-config": "workspace:*",
     "@eslint/js": "^9.34.0",
     "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4.3.3",

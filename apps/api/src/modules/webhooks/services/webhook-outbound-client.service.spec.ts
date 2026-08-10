@@ -1,6 +1,5 @@
-import { BadRequestException } from '@nestjs/common';
-
 import { WebhookOutboundClientService } from './webhook-outbound-client.service';
+import { BadRequestException } from '@nestjs/common';
 
 describe(WebhookOutboundClientService.name, () => {
   const service = new WebhookOutboundClientService();

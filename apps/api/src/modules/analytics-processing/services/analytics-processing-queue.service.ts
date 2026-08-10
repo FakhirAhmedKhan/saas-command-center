@@ -1,15 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-import { BadRequestException, Injectable, NotFoundException, Inject } from '@nestjs/common';
-
-import { ConfigService } from '@nestjs/config';
-
-import { createHash } from 'node:crypto';
-
-import { AnalyticsProcessingStatus, AnalyticsProcessingTrigger, Prisma } from '../../../generated/prisma/client';
-
-import { PrismaService } from '../../../database/prisma.service';
-
 import type { TypedConfigService } from '../../../config/runtime-config';
+import { PrismaService } from '../../../database/prisma.service';
+import { AnalyticsProcessingStatus, AnalyticsProcessingTrigger, Prisma } from '../../../generated/prisma/client';
+import { BadRequestException, Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { createHash } from 'node:crypto';
 
 const MILLISECONDS_PER_DAY = 86_400_000;
 

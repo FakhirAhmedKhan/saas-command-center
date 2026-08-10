@@ -1,5 +1,4 @@
 import { expect, test } from '@playwright/test';
-
 import { installMockApi, PRIMARY_WORKSPACE_ID } from './fixtures/mock-api';
 
 test.describe('Batch 10 navigation, responsiveness, and accessibility', () => {

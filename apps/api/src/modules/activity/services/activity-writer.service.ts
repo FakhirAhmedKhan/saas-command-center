@@ -1,12 +1,8 @@
-import { Injectable } from '@nestjs/common';
-
-import { PrismaService } from 'src/database/prisma.service';
-
-import { Prisma } from 'src/generated/prisma/client';
-
 import type { ActivityWriteInput } from '../interfaces/activity-writer.interface';
-
 import { sanitizeActivityMetadata } from '../utils/activity-metadata-sanitizer';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { Prisma } from 'src/generated/prisma/client';
 
 @Injectable()
 export class ActivityWriterService {

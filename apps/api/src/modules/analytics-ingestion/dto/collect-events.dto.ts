@@ -1,5 +1,4 @@
 import { Type } from 'class-transformer';
-
 import {
   ArrayMaxSize,
   ArrayMinSize,
@@ -17,7 +16,6 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-
 import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
 
 export class TrackerEventDto {

@@ -1,14 +1,14 @@
-import { randomUUID } from 'node:crypto';
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
-import { Prisma } from 'src/generated/prisma/client';
-import { WorkspacesService } from 'src/modules/workspace/service/workspaces.service';
-import { LoginDto } from '../dto/login.dto';
-import { RegisterDto } from '../dto/register.dto';
 import { AuthSessionsService } from './auth-sessions.service';
 import { PasswordService } from './password.service';
 import { TokenService, TokenPair } from './token.service';
+import { LoginDto } from '../dto/login.dto';
+import { RegisterDto } from '../dto/register.dto';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
+import { PrismaService } from 'src/database/prisma.service';
+import { Prisma } from 'src/generated/prisma/client';
 import { UsersService, publicUserSelect } from 'src/modules/users/users.service';
+import { WorkspacesService } from 'src/modules/workspace/service/workspaces.service';
 
 export interface AuthRequestMetadata {
   userAgent?: string | null;

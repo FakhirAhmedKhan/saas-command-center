@@ -1,6 +1,5 @@
 ﻿import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsEnum, IsString, IsUrl, Length } from 'class-validator';
-
 import { ApplicationLinkType } from 'src/generated/prisma/enums';
 
 export class CreateApplicationLinkDto {

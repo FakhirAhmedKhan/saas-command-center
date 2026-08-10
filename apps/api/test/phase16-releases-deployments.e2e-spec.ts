@@ -1,13 +1,12 @@
-import type { INestApplication } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
-import request, { type Response } from 'supertest';
-
-import { PrismaService } from '../src/database/prisma.service';
-import { DeploymentStatus, WorkspaceRole } from '../src/generated/prisma/enums';
 import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
 import { createTestApp } from './helpers/create-test-app';
 import { resetDatabase } from './helpers/database';
 import { readAccessToken } from './helpers/response';
+import { PrismaService } from '../src/database/prisma.service';
+import { DeploymentStatus, WorkspaceRole } from '../src/generated/prisma/enums';
+import type { INestApplication } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
+import request, { type Response } from 'supertest';
 
 /**
  * Phase 16 â€” Releases & Deployments E2E
@@ -815,7 +814,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
 
     const response = await transition(ownerAccessToken, activeDeploymentId, {
       status: DeploymentStatus.ROLLED_BACK,
-      rollbackToDeploymentId: body(draftTarget).id as string,
+      rollbackToDeploymentId: body(draftTarget).id,
     });
 
     expect(response.status).toBe(400);

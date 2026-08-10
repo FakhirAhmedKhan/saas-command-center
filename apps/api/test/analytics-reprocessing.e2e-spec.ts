@@ -1,26 +1,15 @@
-import type { Server } from 'node:http';
-
-import type { INestApplication } from '@nestjs/common';
-
-import request from 'supertest';
-
-import { WorkspaceRole } from 'src/generated/prisma/enums';
-
-import { PrismaService } from 'src/database/prisma.service';
-
-import { AnalyticsProcessingService } from 'src/modules/analytics-engine/services/analytics-processing.service';
-
 import { analyticsEngineRoutes, createRawAnalyticsEvent, reprocessAnalytics } from './helpers/analytics-engine';
-
 import { createTrackedWebsite, uniqueTrackerId } from './helpers/analytics-ingestion';
-
 import { createTestApp } from './helpers/create-test-app';
-
 import { resetDatabase } from './helpers/database';
-
 import { archiveWebsite, disableWebsite, expectWebsiteSuccess } from './helpers/website';
-
 import { addWorkspaceMember, expectAccessDenied, registerWorkspaceTestUser } from './helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import type { Server } from 'node:http';
+import { PrismaService } from 'src/database/prisma.service';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
+import { AnalyticsProcessingService } from 'src/modules/analytics-engine/services/analytics-processing.service';
+import request from 'supertest';
 
 describe('Analytics Reprocessing E2E', () => {
   let app: INestApplication;

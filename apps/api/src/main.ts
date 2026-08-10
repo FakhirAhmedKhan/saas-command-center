@@ -1,16 +1,10 @@
-import { Logger } from '@nestjs/common';
-
-import { ConfigService } from '@nestjs/config';
-
-import { NestFactory } from '@nestjs/core';
-
 import { AppModule } from './app.module';
-
 import { configureApplication } from './bootstrap/configure-application';
-
 import { assertStartupRequirements } from './bootstrap/startup-checks';
-
 import type { TypedConfigService } from './config/runtime-config';
+import { Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, {

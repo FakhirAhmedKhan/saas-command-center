@@ -1,5 +1,4 @@
 import { BadRequestException } from '@nestjs/common';
-
 import { Prisma } from 'src/generated/prisma/client';
 
 const SENSITIVE_QUERY_PARAMETER =

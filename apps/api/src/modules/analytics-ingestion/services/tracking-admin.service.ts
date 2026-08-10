@@ -1,12 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-
-import { Prisma } from 'src/generated/prisma/client';
-
-import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
-
-import { PrismaService } from 'src/database/prisma.service';
-
 import { RawEventQueryDto } from '../dto/raw-event-query.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { Prisma } from 'src/generated/prisma/client';
+import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
 
 const rawEventSelect = {
   id: true,
@@ -86,7 +82,7 @@ export class TrackingAdminService {
     };
 
     for (const item of grouped) {
-      counts[item.type as RawAnalyticsEventType] = typeof item._count === 'object' && item._count !== null ? (item._count.id ?? 0) : 0;
+      counts[item.type] = typeof item._count === 'object' && item._count !== null ? (item._count.id ?? 0) : 0;
     }
 
     return {

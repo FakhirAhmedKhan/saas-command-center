@@ -1,18 +1,11 @@
-﻿/* eslint-disable @typescript-eslint/no-unsafe-argument */
-import type { INestApplication } from '@nestjs/common';
-
-import request from 'supertest';
-
-import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
-
+﻿import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
 import { buildWorkspacePayload, TEST_ROUTES } from './helpers/contracts';
-
 import { createTestApp } from './helpers/create-test-app';
-
 import { resetDatabase } from './helpers/database';
-
 import { expectSuccessfulStatus, readAccessToken, readResourceId, readResponseArray } from './helpers/response';
 import { PrismaService } from '../src/database/prisma.service';
+import type { INestApplication } from '@nestjs/common';
+import request from 'supertest';
 
 interface WorkspaceResponse {
   id: string;

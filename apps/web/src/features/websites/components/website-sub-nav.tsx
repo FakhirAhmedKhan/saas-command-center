@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
 import { cn } from '@/features/lib/api/cn';
 
 interface WebsiteSubNavProps {
@@ -25,7 +24,7 @@ export function WebsiteSubNav({ workspaceId, websiteId }: WebsiteSubNavProps) {
   ];
 
   return (
-    <nav aria-label="Website sections" className="flex gap-1 overflow-x-auto border-b border-slate-200">
+    <nav aria-label='Website sections' className='flex gap-1 overflow-x-auto border-b border-slate-200'>
       {tabs.map((tab) => {
         const isActive = tab.href === baseHref ? pathname === baseHref : pathname.startsWith(tab.href);
 
@@ -40,7 +39,7 @@ export function WebsiteSubNav({ workspaceId, websiteId }: WebsiteSubNavProps) {
             )}
           >
             {tab.label}
-            {isActive ? <span className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-brand-600" aria-hidden="true" /> : null}
+            {isActive ? <span className='absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-brand-600' aria-hidden='true' /> : null}
           </Link>
         );
       })}

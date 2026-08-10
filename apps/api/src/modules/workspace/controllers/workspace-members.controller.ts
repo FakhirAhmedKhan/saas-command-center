@@ -1,13 +1,13 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { WorkspaceRole } from 'src/generated/prisma/enums';
-import { UsersService } from 'src/modules/users/users.service';
 import { WorkspaceRoles } from '../decorators/workspace-roles.decorator';
 import { AddWorkspaceMemberDto } from '../dto/add-workspace-member.dto';
 import { UpdateWorkspaceMemberRoleDto } from '../dto/update-workspace-member-role.dto';
 import { WorkspaceAccessGuard } from '../guards/workspace-access.guard';
 import { WorkspaceRolesGuard } from '../guards/workspace-roles.guard';
 import { WorkspaceMembersService } from '../service/workspace-members.service';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
+import { UsersService } from 'src/modules/users/users.service';
 
 @ApiTags('Workspace Members')
 @ApiBearerAuth('access-token')

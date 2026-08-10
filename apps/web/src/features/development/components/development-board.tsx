@@ -1,28 +1,21 @@
 'use client';
 
-import { useEffect, useState, type FormEvent } from 'react';
-
 import { AlertTriangle, CalendarClock, CheckCircle2, Flag, ListChecks, Plus, Sparkles } from 'lucide-react';
-
+import { useEffect, useState, type FormEvent } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-
 import { applyDevelopmentTemplate, createMilestone, getDevelopmentSummary, getDevelopmentTemplates, reorderMilestones } from '../development-api';
-
-import type { DevelopmentSummary, DevelopmentTemplate, DevelopmentTemplateType } from '../development-types';
-
 import { TEMPLATE_LABELS } from '../development-constants';
-
 import { getDevelopmentError, toApiDate } from '../development-utils';
-
 import { BlockerPanel } from './blocker-panel';
 import { DevelopmentTimeline } from './development-timeline';
 import { MilestoneCard } from './milestone-card';
 import { TaskKanban } from './task-kanban';
+import type { DevelopmentSummary, DevelopmentTemplate, DevelopmentTemplateType } from '../development-types';
 
 interface DevelopmentBoardProps {
   workspaceId: string;
@@ -159,8 +152,8 @@ export function DevelopmentBoard({ workspaceId, applicationId }: DevelopmentBoar
 
   if (loading) {
     return (
-      <div className="flex min-h-96 items-center justify-center">
-        <div className="flex items-center gap-3 text-sm text-slate-600">
+      <div className='flex min-h-96 items-center justify-center'>
+        <div className='flex items-center gap-3 text-sm text-slate-600'>
           <Spinner />
           Loading development status...
         </div>
@@ -171,12 +164,12 @@ export function DevelopmentBoard({ workspaceId, applicationId }: DevelopmentBoar
   if (!summary) {
     return (
       <Card>
-        <CardContent className="p-10 text-center">
-          <h2 className="text-lg font-semibold text-slate-900">Unable to load development status</h2>
+        <CardContent className='p-10 text-center'>
+          <h2 className='text-lg font-semibold text-slate-900'>Unable to load development status</h2>
 
-          <p className="mt-2 text-sm text-red-600">{error ?? 'Development data was not found.'}</p>
+          <p className='mt-2 text-sm text-red-600'>{error ?? 'Development data was not found.'}</p>
 
-          <Button className="mt-6" variant="outline" onClick={refresh}>
+          <Button className='mt-6' variant='outline' onClick={refresh}>
             Try again
           </Button>
         </CardContent>
@@ -185,68 +178,68 @@ export function DevelopmentBoard({ workspaceId, applicationId }: DevelopmentBoar
   }
 
   return (
-    <div className="space-y-6">
-      {error ? <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div> : null}
+    <div className='space-y-6'>
+      {error ? <div className='rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700'>{error}</div> : null}
 
-      <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+      <section className='rounded-xl border border-slate-200 bg-white p-4 sm:p-5'>
+        <div className='flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between'>
           <div>
-            <p className="text-sm leading-6 text-slate-500">Progress is calculated from applicable weighted tasks and milestones.</p>
+            <p className='text-sm leading-6 text-slate-500'>Progress is calculated from applicable weighted tasks and milestones.</p>
           </div>
 
-          <div className="min-w-64 shrink-0">
-            <div className="flex items-end justify-between">
-              <span className="text-xs font-medium text-slate-500">Overall progress</span>
+          <div className='min-w-64 shrink-0'>
+            <div className='flex items-end justify-between'>
+              <span className='text-xs font-medium text-slate-500'>Overall progress</span>
 
-              <strong className="text-2xl font-semibold text-slate-950">{summary.progress.percentage}%</strong>
+              <strong className='text-2xl font-semibold text-slate-950'>{summary.progress.percentage}%</strong>
             </div>
 
-            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
+            <div className='mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100'>
               <div
-                className="h-full rounded-full bg-brand-600 transition-all"
+                className='h-full rounded-full bg-brand-600 transition-all'
                 style={{
                   width: `${summary.progress.percentage}%`,
                 }}
               />
             </div>
 
-            <p className="mt-1.5 text-xs text-slate-400">
+            <p className='mt-1.5 text-xs text-slate-400'>
               {summary.progress.includedMilestones} applicable milestones · {summary.progress.excludedMilestones} skipped
             </p>
           </div>
         </div>
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        <Metric icon={<Flag className="size-4" />} label="Milestones" value={summary.counts.milestones} />
+      <section className='grid gap-3 sm:grid-cols-2 xl:grid-cols-5'>
+        <Metric icon={<Flag className='size-4' />} label='Milestones' value={summary.counts.milestones} />
 
-        <Metric icon={<ListChecks className="size-4" />} label="Tasks" value={summary.counts.tasks} />
+        <Metric icon={<ListChecks className='size-4' />} label='Tasks' value={summary.counts.tasks} />
 
-        <Metric icon={<CheckCircle2 className="size-4" />} label="Completed" value={summary.counts.completedTasks} />
+        <Metric icon={<CheckCircle2 className='size-4' />} label='Completed' value={summary.counts.completedTasks} />
 
-        <Metric icon={<AlertTriangle className="size-4" />} label="Blockers" value={summary.counts.openBlockers} />
+        <Metric icon={<AlertTriangle className='size-4' />} label='Blockers' value={summary.counts.openBlockers} />
 
-        <Metric icon={<CalendarClock className="size-4" />} label="Overdue" value={summary.counts.overdueTasks} />
+        <Metric icon={<CalendarClock className='size-4' />} label='Overdue' value={summary.counts.overdueTasks} />
       </section>
 
       <Card>
         <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="flex size-11 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
-              <Sparkles className="size-5" />
+          <div className='flex items-center gap-3'>
+            <div className='flex size-11 items-center justify-center rounded-xl bg-purple-50 text-purple-600'>
+              <Sparkles className='size-5' />
             </div>
 
             <div>
-              <h2 className="font-semibold text-slate-950">Development template</h2>
+              <h2 className='font-semibold text-slate-950'>Development template</h2>
 
-              <p className="mt-1 text-sm text-slate-500">Apply a ready-made milestone and task structure.</p>
+              <p className='mt-1 text-sm text-slate-500'>Apply a ready-made milestone and task structure.</p>
             </div>
           </div>
         </CardHeader>
 
         <CardContent>
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
-            <Select label="Template" value={selectedTemplate} onChange={(event) => setSelectedTemplate(event.target.value as DevelopmentTemplateType)}>
+          <div className='flex flex-col gap-3 lg:flex-row lg:items-end'>
+            <Select label='Template' value={selectedTemplate} onChange={(event) => setSelectedTemplate(event.target.value as DevelopmentTemplateType)}>
               {templates.map((template) => (
                 <option key={template.type} value={template.type}>
                   {template.label} · {template.milestoneCount} milestones · {template.taskCount} tasks
@@ -267,15 +260,15 @@ export function DevelopmentBoard({ workspaceId, applicationId }: DevelopmentBoar
                 }
               }}
             >
-              <Sparkles className="size-4" />
+              <Sparkles className='size-4' />
               Apply template
             </Button>
           </div>
 
-          <p className="mt-3 text-sm text-slate-500">{templates.find((template) => template.type === selectedTemplate)?.description}</p>
+          <p className='mt-3 text-sm text-slate-500'>{templates.find((template) => template.type === selectedTemplate)?.description}</p>
 
           {summary.application.developmentTemplate ? (
-            <Badge className="mt-4" variant="purple">
+            <Badge className='mt-4' variant='purple'>
               Current: {TEMPLATE_LABELS[summary.application.developmentTemplate]}
             </Badge>
           ) : null}
@@ -284,41 +277,41 @@ export function DevelopmentBoard({ workspaceId, applicationId }: DevelopmentBoar
 
       <Card>
         <CardHeader>
-          <h2 className="font-semibold text-slate-950">Add milestone</h2>
+          <h2 className='font-semibold text-slate-950'>Add milestone</h2>
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleCreateMilestone} className="grid gap-4 lg:grid-cols-[minmax(220px,1fr)_120px_180px_180px_auto]">
-            <Input placeholder="Milestone title" value={milestoneTitle} disabled={saving} onChange={(event) => setMilestoneTitle(event.target.value)} />
+          <form onSubmit={handleCreateMilestone} className='grid gap-4 lg:grid-cols-[minmax(220px,1fr)_120px_180px_180px_auto]'>
+            <Input placeholder='Milestone title' value={milestoneTitle} disabled={saving} onChange={(event) => setMilestoneTitle(event.target.value)} />
 
-            <Input type="number" min={1} max={100} value={milestoneWeight} disabled={saving} onChange={(event) => setMilestoneWeight(event.target.value)} />
+            <Input type='number' min={1} max={100} value={milestoneWeight} disabled={saving} onChange={(event) => setMilestoneWeight(event.target.value)} />
 
-            <Input type="date" value={milestoneStart} disabled={saving} onChange={(event) => setMilestoneStart(event.target.value)} />
+            <Input type='date' value={milestoneStart} disabled={saving} onChange={(event) => setMilestoneStart(event.target.value)} />
 
-            <Input type="date" value={milestoneDue} disabled={saving} onChange={(event) => setMilestoneDue(event.target.value)} />
+            <Input type='date' value={milestoneDue} disabled={saving} onChange={(event) => setMilestoneDue(event.target.value)} />
 
-            <Button type="submit" loading={saving}>
-              <Plus className="size-4" />
+            <Button type='submit' loading={saving}>
+              <Plus className='size-4' />
               Add
             </Button>
           </form>
         </CardContent>
       </Card>
 
-      <section className="space-y-5">
+      <section className='space-y-5'>
         <div>
-          <h2 className="text-xl font-bold text-slate-950">Milestones</h2>
+          <h2 className='text-xl font-bold text-slate-950'>Milestones</h2>
 
-          <p className="mt-1 text-sm text-slate-500">Progress recalculates whenever tasks or milestone weights change.</p>
+          <p className='mt-1 text-sm text-slate-500'>Progress recalculates whenever tasks or milestone weights change.</p>
         </div>
 
         {summary.milestones.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
-            <Flag className="mx-auto size-8 text-slate-400" />
+          <div className='rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center'>
+            <Flag className='mx-auto size-8 text-slate-400' />
 
-            <h3 className="mt-4 font-semibold text-slate-900">No milestones yet</h3>
+            <h3 className='mt-4 font-semibold text-slate-900'>No milestones yet</h3>
 
-            <p className="mt-2 text-sm text-slate-500">Apply a template or create your first milestone.</p>
+            <p className='mt-2 text-sm text-slate-500'>Apply a template or create your first milestone.</p>
           </div>
         ) : (
           summary.milestones.map((milestone, index) => (
@@ -349,15 +342,15 @@ export function DevelopmentBoard({ workspaceId, applicationId }: DevelopmentBoar
 function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
   return (
     <Card>
-      <CardContent className="p-3.5">
-        <div className="flex items-start justify-between">
+      <CardContent className='p-3.5'>
+        <div className='flex items-start justify-between'>
           <div>
-            <p className="text-xs font-medium text-slate-500">{label}</p>
+            <p className='text-xs font-medium text-slate-500'>{label}</p>
 
-            <p className="mt-1.5 text-xl font-semibold text-slate-950">{value}</p>
+            <p className='mt-1.5 text-xl font-semibold text-slate-950'>{value}</p>
           </div>
 
-          <div className="flex size-8 items-center justify-center rounded-lg bg-brand-50 text-brand-600">{icon}</div>
+          <div className='flex size-8 items-center justify-center rounded-lg bg-brand-50 text-brand-600'>{icon}</div>
         </div>
       </CardContent>
     </Card>

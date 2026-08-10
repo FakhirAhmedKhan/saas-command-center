@@ -1,9 +1,7 @@
+import { GithubAppService } from './github-app.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
-
 import { PrismaService } from 'src/database/prisma.service';
 import { RepositoryProvider } from 'src/generated/prisma/enums';
-
-import { GithubAppService } from './github-app.service';
 
 const repositoryInclude = {
   application: {

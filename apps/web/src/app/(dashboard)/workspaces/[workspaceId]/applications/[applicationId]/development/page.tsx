@@ -1,9 +1,8 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-
-import { DevelopmentBoard } from '@/features/development/components/development-board';
 import { ApplicationSubNav } from '@/features/applications/components/application-sub-nav';
+import { DevelopmentBoard } from '@/features/development/components/development-board';
 
 export default function ApplicationDevelopmentPage() {
   const params = useParams<{
@@ -14,7 +13,7 @@ export default function ApplicationDevelopmentPage() {
   const { workspaceId, applicationId } = params;
 
   return (
-    <div className="mx-auto w-full max-w-[1600px] space-y-5 p-4 sm:p-6 lg:p-8">
+    <div className='mx-auto w-full max-w-[1600px] space-y-5 p-4 sm:p-6 lg:p-8'>
       <ApplicationSubNav workspaceId={workspaceId} applicationId={applicationId} />
 
       <DevelopmentBoard workspaceId={workspaceId} applicationId={applicationId} />

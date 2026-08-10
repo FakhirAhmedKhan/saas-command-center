@@ -1,13 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-
-import type { INestApplication } from '@nestjs/common';
-
-import request from 'supertest';
-
-import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
-
-import { PrismaService } from 'src/database/prisma.service';
-
 import {
   analyticsIngestionRoutes,
   buildCollectPayload,
@@ -16,14 +6,14 @@ import {
   createTrackedWebsite,
   expectCollectionAccepted,
 } from './helpers/analytics-ingestion';
-
 import { createTestApp } from './helpers/create-test-app';
-
 import { resetDatabase } from './helpers/database';
-
-import { registerWorkspaceTestUser } from './helpers/workspace';
-
 import { archiveWebsite, disableWebsite, expectWebsiteSuccess } from './helpers/website';
+import { registerWorkspaceTestUser } from './helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
+import request from 'supertest';
 
 describe('Analytics Ingestion Security E2E', () => {
   let app: INestApplication;

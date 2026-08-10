@@ -1,17 +1,12 @@
-import type { INestApplication } from '@nestjs/common';
-
-import { PrismaService } from 'src/database/prisma.service';
-
-import { withBearer } from './helpers/auth';
-
-import { createTestApp } from './helpers/create-test-app';
-
-import { resetDatabase } from './helpers/database';
-
-import { expectAccessDenied, expectBusinessRuleRejected, registerWorkspaceTestUser } from './helpers/workspace';
 import { recordString } from './helpers/application';
+import { withBearer } from './helpers/auth';
+import { createTestApp } from './helpers/create-test-app';
+import { resetDatabase } from './helpers/database';
 import { findRecordById } from './helpers/development';
 import { createWebsite, getWebsite, readWebsiteRecord, websiteRoutes, updateWebsite, listWebsites, readWebsiteItems } from './helpers/website';
+import { expectAccessDenied, expectBusinessRuleRejected, registerWorkspaceTestUser } from './helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
 
 describe('Websites E2E', () => {
   let app: INestApplication;

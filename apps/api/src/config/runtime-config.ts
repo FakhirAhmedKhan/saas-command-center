@@ -1,6 +1,5 @@
-import { ConfigService } from '@nestjs/config';
-
 import type { EnvironmentVariables } from './env.validation';
+import { ConfigService } from '@nestjs/config';
 
 export type TypedConfigService = ConfigService<EnvironmentVariables, true>;
 

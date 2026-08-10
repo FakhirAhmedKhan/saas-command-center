@@ -1,14 +1,10 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
-
-import Link from 'next/link';
-
 import { ArrowLeft } from 'lucide-react';
-
+import Link from 'next/link';
+import { useState, type FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-
 import { createWorkspace } from '@/features/workspaces/workspace-api';
 
 function getErrorMessage(error: unknown): string {
@@ -73,27 +69,27 @@ export default function NewWorkspacePage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-md p-4 pt-16 sm:p-6 sm:pt-24">
-      <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-500 transition hover:text-slate-800">
-        <ArrowLeft className="size-3.5" aria-hidden="true" />
+    <div className='mx-auto w-full max-w-md p-4 pt-16 sm:p-6 sm:pt-24'>
+      <Link href='/dashboard' className='inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-500 transition hover:text-slate-800'>
+        <ArrowLeft className='size-3.5' aria-hidden='true' />
         Back to dashboard
       </Link>
 
-      <h1 className="mt-5 text-2xl font-semibold tracking-tight text-slate-950">Create your workspace</h1>
+      <h1 className='mt-5 text-2xl font-semibold tracking-tight text-slate-950'>Create your workspace</h1>
 
-      <p className="mt-1.5 text-sm leading-6 text-slate-500">A workspace contains your applications, websites, analytics, repositories and team.</p>
+      <p className='mt-1.5 text-sm leading-6 text-slate-500'>A workspace contains your applications, websites, analytics, repositories and team.</p>
 
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+      <form onSubmit={handleSubmit} className='mt-6 space-y-4'>
         {error ? (
-          <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+          <div role='alert' className='rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800'>
             {error}
           </div>
         ) : null}
 
         <Input
-          name="workspaceName"
-          label="Workspace name"
-          placeholder="Demo Command Center"
+          name='workspaceName'
+          label='Workspace name'
+          placeholder='Demo Command Center'
           value={name}
           required
           minLength={2}
@@ -103,9 +99,9 @@ export default function NewWorkspacePage() {
         />
 
         <Input
-          name="workspaceSlug"
-          label="Workspace URL"
-          placeholder="demo-command-center"
+          name='workspaceSlug'
+          label='Workspace URL'
+          placeholder='demo-command-center'
           value={slug}
           maxLength={120}
           disabled={submitting}
@@ -113,12 +109,12 @@ export default function NewWorkspacePage() {
           onChange={(event) => setSlug(event.target.value)}
         />
 
-        <div className="flex items-center gap-3 pt-1">
-          <Button type="submit" loading={submitting}>
+        <div className='flex items-center gap-3 pt-1'>
+          <Button type='submit' loading={submitting}>
             Create workspace
           </Button>
 
-          <Link href="/dashboard" className="text-sm font-medium text-slate-500 transition hover:text-slate-800">
+          <Link href='/dashboard' className='text-sm font-medium text-slate-500 transition hover:text-slate-800'>
             Cancel
           </Link>
         </div>

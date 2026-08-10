@@ -1,7 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-
 import type { Prisma } from 'src/generated/prisma/client';
-
 import { ApplicationTaskStatus, MilestoneStatus } from 'src/generated/prisma/enums';
 
 interface ProgressTask {

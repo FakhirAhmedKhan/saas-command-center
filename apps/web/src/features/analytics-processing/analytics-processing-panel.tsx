@@ -1,16 +1,12 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-
-import { PageError } from '@/components/states/page-error';
-
-import { queueAnalyticsReprocessing, retryAnalyticsProcessingRun } from './analytics-processing-api';
-
-import type { ProcessingRun } from './analytics-processing.types';
-
-import { useAnalyticsProcessing } from './use-analytics-processing';
 import { ApiError } from 'next/dist/server/api-utils';
+import { useMemo, useState } from 'react';
+import { PageError } from '@/components/states/page-error';
 import { getErrorMessage } from '../applications/application-utils';
+import { queueAnalyticsReprocessing, retryAnalyticsProcessingRun } from './analytics-processing-api';
+import { useAnalyticsProcessing } from './use-analytics-processing';
+import type { ProcessingRun } from './analytics-processing.types';
 
 interface AnalyticsProcessingPanelProps {
   workspaceId: string;
@@ -84,36 +80,36 @@ function RunRow({
   onRetry: (runId: string) => void;
 }) {
   return (
-    <tr className="border-b border-slate-100 last:border-0">
-      <td className="px-4 py-4">
+    <tr className='border-b border-slate-100 last:border-0'>
+      <td className='px-4 py-4'>
         <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${getStatusClasses(run.status)}`}>{run.status}</span>
       </td>
 
-      <td className="px-4 py-4 text-sm text-slate-700">{run.trigger}</td>
+      <td className='px-4 py-4 text-sm text-slate-700'>{run.trigger}</td>
 
-      <td className="px-4 py-4 text-sm text-slate-700">
+      <td className='px-4 py-4 text-sm text-slate-700'>
         <div>{formatDateTime(run.rangeStart)}</div>
 
-        <div className="mt-1 text-xs text-slate-500">to {formatDateTime(run.rangeEnd)}</div>
+        <div className='mt-1 text-xs text-slate-500'>to {formatDateTime(run.rangeEnd)}</div>
       </td>
 
-      <td className="px-4 py-4 text-right text-sm">{numberFormatter.format(run.processedEvents)}</td>
+      <td className='px-4 py-4 text-right text-sm'>{numberFormatter.format(run.processedEvents)}</td>
 
-      <td className="px-4 py-4 text-right text-sm">
+      <td className='px-4 py-4 text-right text-sm'>
         {run.retryCount}/{run.maxRetries}
       </td>
 
-      <td className="max-w-xs px-4 py-4 text-sm text-red-700">{run.errorMessage ?? 'â€”'}</td>
+      <td className='max-w-xs px-4 py-4 text-sm text-red-700'>{run.errorMessage ?? 'â€”'}</td>
 
-      <td className="px-4 py-4 text-right">
+      <td className='px-4 py-4 text-right'>
         {canRetry && run.status === 'DEAD_LETTERED' ? (
           <button
-            type="button"
+            type='button'
             disabled={retrying}
             onClick={() => {
               onRetry(run.id);
             }}
-            className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium disabled:opacity-50"
+            className='rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium disabled:opacity-50'
           >
             {retrying ? 'Retryingâ€¦' : 'Retry'}
           </button>
@@ -207,13 +203,13 @@ export function AnalyticsProcessingPanel({ workspaceId, websiteId }: AnalyticsPr
   }
 
   if (loading && !data) {
-    return <div className="h-80 animate-pulse rounded-2xl bg-slate-200" aria-label="Loading processing status" />;
+    return <div className='h-80 animate-pulse rounded-2xl bg-slate-200' aria-label='Loading processing status' />;
   }
 
   if (error) {
     return (
       <PageError
-        title="Processing status unavailable"
+        title='Processing status unavailable'
         message={getErrorMessage(error)}
         requestId={error instanceof ApiError ? ('requestId' in error && typeof error.requestId === 'string' ? error.requestId : undefined) : undefined}
         onRetry={reload}
@@ -226,50 +222,50 @@ export function AnalyticsProcessingPanel({ workspaceId, websiteId }: AnalyticsPr
   }
 
   return (
-    <main className="space-y-6">
-      <header className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <p className="text-sm font-medium text-slate-500">Analytics processing</p>
+    <main className='space-y-6'>
+      <header className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+        <p className='text-sm font-medium text-slate-500'>Analytics processing</p>
 
-        <h1 className="mt-1 text-2xl font-bold text-slate-950">Processing status</h1>
+        <h1 className='mt-1 text-2xl font-bold text-slate-950'>Processing status</h1>
 
-        <p className="mt-2 text-sm text-slate-600">View processing health, queued work, retries and failed batches.</p>
+        <p className='mt-2 text-sm text-slate-600'>View processing health, queued work, retries and failed batches.</p>
       </header>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Pending events</p>
+      <section className='grid gap-4 sm:grid-cols-2 xl:grid-cols-4'>
+        <article className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+          <p className='text-sm text-slate-500'>Pending events</p>
 
-          <p className="mt-2 text-3xl font-bold text-slate-950">{numberFormatter.format(data.pendingEvents)}</p>
+          <p className='mt-2 text-3xl font-bold text-slate-950'>{numberFormatter.format(data.pendingEvents)}</p>
         </article>
 
-        <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Failed batches</p>
+        <article className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+          <p className='text-sm text-slate-500'>Failed batches</p>
 
-          <p className="mt-2 text-3xl font-bold text-slate-950">{numberFormatter.format(data.unresolvedDeadLetters)}</p>
+          <p className='mt-2 text-3xl font-bold text-slate-950'>{numberFormatter.format(data.unresolvedDeadLetters)}</p>
         </article>
 
-        <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Current status</p>
+        <article className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+          <p className='text-sm text-slate-500'>Current status</p>
 
-          <p className="mt-2 text-xl font-bold text-slate-950">{data.activeRun?.status ?? 'Idle'}</p>
+          <p className='mt-2 text-xl font-bold text-slate-950'>{data.activeRun?.status ?? 'Idle'}</p>
         </article>
 
-        <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Last successful run</p>
+        <article className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+          <p className='text-sm text-slate-500'>Last successful run</p>
 
-          <p className="mt-2 text-sm font-semibold text-slate-950">{formatDateTime(data.lastSuccessfulRun?.finishedAt ?? null)}</p>
+          <p className='mt-2 text-sm font-semibold text-slate-950'>{formatDateTime(data.lastSuccessfulRun?.finishedAt ?? null)}</p>
         </article>
       </section>
 
       {data.activeRun ? (
-        <section className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
-          <div className="flex items-center gap-3">
-            <span className="h-5 w-5 animate-spin rounded-full border-2 border-blue-200 border-t-blue-700" aria-hidden="true" />
+        <section className='rounded-2xl border border-blue-200 bg-blue-50 p-5'>
+          <div className='flex items-center gap-3'>
+            <span className='h-5 w-5 animate-spin rounded-full border-2 border-blue-200 border-t-blue-700' aria-hidden='true' />
 
             <div>
-              <h2 className="font-semibold text-blue-950">{data.activeRun.status === 'QUEUED' ? 'Processing queued' : 'Processing analytics'}</h2>
+              <h2 className='font-semibold text-blue-950'>{data.activeRun.status === 'QUEUED' ? 'Processing queued' : 'Processing analytics'}</h2>
 
-              <p className="mt-1 text-sm text-blue-800">
+              <p className='mt-1 text-sm text-blue-800'>
                 Retry {data.activeRun.retryCount} of {data.activeRun.maxRetries}
               </p>
             </div>
@@ -278,91 +274,91 @@ export function AnalyticsProcessingPanel({ workspaceId, websiteId }: AnalyticsPr
       ) : null}
 
       {data.canReprocess ? (
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="font-semibold text-slate-950">Manual reprocessing</h2>
+        <section className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+          <h2 className='font-semibold text-slate-950'>Manual reprocessing</h2>
 
-          <p className="mt-1 text-sm text-slate-600">Rebuild a limited analytics date range. Existing valid data is preserved when the rebuild fails.</p>
+          <p className='mt-1 text-sm text-slate-600'>Rebuild a limited analytics date range. Existing valid data is preserved when the rebuild fails.</p>
 
-          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto]">
+          <div className='mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto]'>
             <label>
-              <span className="text-sm font-medium text-slate-700">From</span>
+              <span className='text-sm font-medium text-slate-700'>From</span>
 
               <input
-                type="date"
+                type='date'
                 value={from}
                 max={to}
                 onChange={(event) => {
                   setFrom(event.target.value);
                 }}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+                className='mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
               />
             </label>
 
             <label>
-              <span className="text-sm font-medium text-slate-700">To</span>
+              <span className='text-sm font-medium text-slate-700'>To</span>
 
               <input
-                type="date"
+                type='date'
                 value={to}
                 min={from}
                 onChange={(event) => {
                   setTo(event.target.value);
                 }}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+                className='mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
               />
             </label>
 
             <button
-              type="button"
+              type='button'
               disabled={submitting || Boolean(data.activeRun)}
               onClick={() => {
                 void reprocess();
               }}
-              className="self-end rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+              className='self-end rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50'
             >
               {submitting ? 'Queueingâ€¦' : 'Reprocess'}
             </button>
           </div>
 
           {actionError ? (
-            <p role="alert" className="mt-4 text-sm text-red-700">
+            <p role='alert' className='mt-4 text-sm text-red-700'>
               {actionError}
             </p>
           ) : null}
 
           {successMessage ? (
-            <p role="status" className="mt-4 text-sm text-emerald-700">
+            <p role='status' className='mt-4 text-sm text-emerald-700'>
               {successMessage}
             </p>
           ) : null}
         </section>
       ) : null}
 
-      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="border-b border-slate-200 px-5 py-4">
-          <h2 className="font-semibold text-slate-950">Recent processing runs</h2>
+      <section className='overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm'>
+        <div className='border-b border-slate-200 px-5 py-4'>
+          <h2 className='font-semibold text-slate-950'>Recent processing runs</h2>
         </div>
 
         {data.recentRuns.length === 0 ? (
-          <p className="p-5 text-sm text-slate-500">No processing runs have been recorded.</p>
+          <p className='p-5 text-sm text-slate-500'>No processing runs have been recorded.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-[1000px] w-full border-collapse">
+          <div className='overflow-x-auto'>
+            <table className='min-w-[1000px] w-full border-collapse'>
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
-                  <th className="px-4 py-3">Status</th>
+                <tr className='border-b border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500'>
+                  <th className='px-4 py-3'>Status</th>
 
-                  <th className="px-4 py-3">Trigger</th>
+                  <th className='px-4 py-3'>Trigger</th>
 
-                  <th className="px-4 py-3">Range</th>
+                  <th className='px-4 py-3'>Range</th>
 
-                  <th className="px-4 py-3 text-right">Processed</th>
+                  <th className='px-4 py-3 text-right'>Processed</th>
 
-                  <th className="px-4 py-3 text-right">Retries</th>
+                  <th className='px-4 py-3 text-right'>Retries</th>
 
-                  <th className="px-4 py-3">Last error</th>
+                  <th className='px-4 py-3'>Last error</th>
 
-                  <th className="px-4 py-3" />
+                  <th className='px-4 py-3' />
                 </tr>
               </thead>
 

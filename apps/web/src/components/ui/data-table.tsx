@@ -1,6 +1,5 @@
-import type { ReactNode } from 'react';
-
 import { cn } from '@/features/lib/api/cn';
+import type { ReactNode } from 'react';
 
 export interface DataTableColumn<Row> {
   key: string;
@@ -30,9 +29,9 @@ const HIDE_BELOW_CLASS: Record<NonNullable<DataTableColumn<unknown>['hideBelow']
 export function DataTable<Row>({ columns, rows, getRowKey, onRowClick, className }: DataTableProps<Row>) {
   return (
     <div className={cn('overflow-x-auto rounded-xl border border-slate-200 bg-white', className)}>
-      <table className="w-full min-w-[560px] border-collapse text-left text-sm">
+      <table className='w-full min-w-[560px] border-collapse text-left text-sm'>
         <thead>
-          <tr className="border-b border-slate-100">
+          <tr className='border-b border-slate-100'>
             {columns.map((column) => (
               <th
                 key={column.key}
@@ -53,10 +52,7 @@ export function DataTable<Row>({ columns, rows, getRowKey, onRowClick, className
             <tr
               key={getRowKey(row)}
               onClick={onRowClick ? () => onRowClick(row) : undefined}
-              className={cn(
-                'border-b border-slate-50 last:border-b-0',
-                onRowClick && 'cursor-pointer transition hover:bg-slate-50',
-              )}
+              className={cn('border-b border-slate-50 last:border-b-0', onRowClick && 'cursor-pointer transition hover:bg-slate-50')}
             >
               {columns.map((column) => (
                 <td

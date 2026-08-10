@@ -1,9 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
 import Link from 'next/link';
-
+import { useEffect, useState } from 'react';
 import { getUnreadNotificationCount } from './team-operations-api';
 
 export function NotificationBell() {
@@ -45,16 +43,16 @@ export function NotificationBell() {
 
   return (
     <Link
-      href="/notifications"
+      href='/notifications'
       aria-label={`Notifications, ${count} unread`}
-      className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 bg-white"
+      className='relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 bg-white'
     >
-      <span aria-hidden="true" className="text-lg">
+      <span aria-hidden='true' className='text-lg'>
         🔔
       </span>
 
       {count > 0 ? (
-        <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-red-600 px-1.5 py-0.5 text-center text-[10px] font-bold text-white">
+        <span className='absolute -right-1 -top-1 min-w-5 rounded-full bg-red-600 px-1.5 py-0.5 text-center text-[10px] font-bold text-white'>
           {count > 99 ? '99+' : count}
         </span>
       ) : null}

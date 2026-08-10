@@ -2,9 +2,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-
 import { getAnalyticsOverview } from './analytics-overview-api';
-
 import type { AnalyticsOverviewResponse, AnalyticsPreset } from './analytics-overview.types';
 
 interface UseAnalyticsOverviewInput {

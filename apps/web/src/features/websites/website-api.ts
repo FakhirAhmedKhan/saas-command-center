@@ -1,5 +1,4 @@
 import { apiRequest } from '@/features/lib/api/api-client';
-
 import type { CreateWebsitePayload, UpdateWebsitePayload, Website, WebsiteListQuery, WebsiteListResponse, WebsiteWithKeyResponse } from './website-types';
 
 function buildQuery(query: WebsiteListQuery = {}): string {

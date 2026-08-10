@@ -1,9 +1,6 @@
-import { Type } from 'class-transformer';
-
-import { IsDateString, IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
-
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-
+import { Type } from 'class-transformer';
+import { IsDateString, IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
 import { AnalyticsAggregateDimension } from 'src/generated/prisma/enums';
 
 export enum AnalyticsAggregatePeriod {

@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { DefaultArgs } from '@prisma/client/runtime/client';
-
 import { Prisma } from 'src/generated/prisma/client';
 import { PrismaClient } from 'src/generated/prisma/internal/class';
 import { ProcessAnalyticsRangeInput } from 'src/modules/analytics-processing/services/analytics-range-processor.service';

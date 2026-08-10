@@ -1,11 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-
-import { AnalyticsProcessingStatus } from '../../../generated/prisma/client';
-
-import { PrismaService } from '../../../database/prisma.service';
-
-import type { AnalyticsProcessingStatusDto, ProcessingRunDto } from '../dto/analytics-processing-response.dto';
 import { AnalyticsProcessingAccessService } from './analytics-processing-access.service';
+import { PrismaService } from '../../../database/prisma.service';
+import { AnalyticsProcessingStatus } from '../../../generated/prisma/client';
+import type { AnalyticsProcessingStatusDto, ProcessingRunDto } from '../dto/analytics-processing-response.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class AnalyticsProcessingStatusService {

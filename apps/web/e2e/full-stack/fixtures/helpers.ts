@@ -1,5 +1,4 @@
 import { expect, type APIRequestContext, type Page } from '@playwright/test';
-
 import type { FullStackState, SeedUser } from './state';
 
 export async function loginThroughUi(page: Page, user: SeedUser): Promise<void> {

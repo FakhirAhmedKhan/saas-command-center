@@ -1,13 +1,12 @@
-import type { INestApplication } from '@nestjs/common';
-import { createHash, randomBytes, randomUUID } from 'node:crypto';
-import request, { type Response } from 'supertest';
-
-import { PrismaService } from '../src/database/prisma.service';
-import { AnalyticsAggregateDimension, AnalyticsDeviceType, AnalyticsSourceType, RawAnalyticsEventType, WorkspaceRole } from '../src/generated/prisma/enums';
 import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
 import { createTestApp } from './helpers/create-test-app';
 import { resetDatabase } from './helpers/database';
 import { readAccessToken } from './helpers/response';
+import { PrismaService } from '../src/database/prisma.service';
+import { AnalyticsAggregateDimension, AnalyticsDeviceType, AnalyticsSourceType, RawAnalyticsEventType, WorkspaceRole } from '../src/generated/prisma/enums';
+import type { INestApplication } from '@nestjs/common';
+import { createHash, randomBytes, randomUUID } from 'node:crypto';
+import request, { type Response } from 'supertest';
 
 /**
  * Phase 13 — Analytics Reports E2E

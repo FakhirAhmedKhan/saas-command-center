@@ -1,24 +1,17 @@
-import { createHmac } from 'node:crypto';
-
+import { AppModule } from '../src/app.module';
+import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
+import { resetDatabase } from './helpers/database';
+import { readAccessToken } from './helpers/response';
+import { PrismaService } from '../src/database/prisma.service';
+import { ApplicationCategory, ApplicationPriority, ApplicationStatus, WorkspaceRole } from '../src/generated/prisma/enums';
+import { GithubAppService } from '../src/modules/repositories/services/github-app.service';
 import { ValidationPipe, type INestApplication } from '@nestjs/common';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import cookieParser from 'cookie-parser';
 import { json, raw, urlencoded } from 'express';
+import { createHmac } from 'node:crypto';
 import request, { type Response } from 'supertest';
-
-import { AppModule } from '../src/app.module';
-import { PrismaService } from '../src/database/prisma.service';
-import {
-  ApplicationCategory,
-  ApplicationPriority,
-  ApplicationStatus,
-  WorkspaceRole,
-} from '../src/generated/prisma/enums';
-import { GithubAppService } from '../src/modules/repositories/services/github-app.service';
-import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
-import { resetDatabase } from './helpers/database';
-import { readAccessToken } from './helpers/response';
 
 const API_PREFIX = '/api/v1';
 const WEBHOOK_SECRET = 'phase19-e2e-webhook-secret';
@@ -48,9 +41,7 @@ const DEFAULT_GITHUB_FIXTURE: GithubFixture = {
 
 const githubAppMock = {
   buildInstallationUrl: jest.fn((state: string): string => {
-    return `https://github.test/apps/command-center/installations/new?state=${encodeURIComponent(
-      state,
-    )}`;
+    return `https://github.test/apps/command-center/installations/new?state=${encodeURIComponent(state)}`;
   }),
 
   buildUserAuthorizationUrl: jest.fn((state: string, codeChallenge: string): string => {
@@ -77,9 +68,7 @@ const githubAppMock = {
     };
   }),
 
-  userCanAccessInstallation: jest.fn(
-    async (_userAccessToken: string, _installationId: string): Promise<boolean> => true,
-  ),
+  userCanAccessInstallation: jest.fn(async (_userAccessToken: string, _installationId: string): Promise<boolean> => true),
 
   listInstallationRepositories: jest.fn(async (_installationId: string) => {
     return [
@@ -99,23 +88,21 @@ const githubAppMock = {
     ];
   }),
 
-  getRepository: jest.fn(
-    async (_installationId: string, _owner: string, _repository: string) => {
-      return {
-        id: DEFAULT_GITHUB_FIXTURE.repositoryId,
-        externalRepoId: DEFAULT_GITHUB_FIXTURE.repositoryId,
-        owner: DEFAULT_GITHUB_FIXTURE.owner,
-        name: DEFAULT_GITHUB_FIXTURE.name,
-        fullName: DEFAULT_GITHUB_FIXTURE.fullName,
-        defaultBranch: 'main',
-        private: true,
-        isPrivate: true,
-        htmlUrl: `https://github.com/${DEFAULT_GITHUB_FIXTURE.fullName}`,
-        archived: false,
-        pushedAt: '2026-08-09T12:00:00.000Z',
-      };
-    },
-  ),
+  getRepository: jest.fn(async (_installationId: string, _owner: string, _repository: string) => {
+    return {
+      id: DEFAULT_GITHUB_FIXTURE.repositoryId,
+      externalRepoId: DEFAULT_GITHUB_FIXTURE.repositoryId,
+      owner: DEFAULT_GITHUB_FIXTURE.owner,
+      name: DEFAULT_GITHUB_FIXTURE.name,
+      fullName: DEFAULT_GITHUB_FIXTURE.fullName,
+      defaultBranch: 'main',
+      private: true,
+      isPrivate: true,
+      htmlUrl: `https://github.com/${DEFAULT_GITHUB_FIXTURE.fullName}`,
+      archived: false,
+      pushedAt: '2026-08-09T12:00:00.000Z',
+    };
+  }),
 
   getInstallationAccessToken: jest.fn(async (_installationId: string): Promise<string> => {
     return 'ghs_phase19_test_installation_token';
@@ -125,9 +112,7 @@ const githubAppMock = {
 
   verifyWebhookSignature: jest.fn((body: Buffer | string, signature: string): boolean => {
     const rawBody = Buffer.isBuffer(body) ? body : Buffer.from(body, 'utf8');
-    const expected = `sha256=${createHmac('sha256', WEBHOOK_SECRET)
-      .update(rawBody)
-      .digest('hex')}`;
+    const expected = `sha256=${createHmac('sha256', WEBHOOK_SECRET).update(rawBody).digest('hex')}`;
 
     return signature === expected;
   }),
@@ -244,11 +229,7 @@ async function createRepositoryTestApp(): Promise<INestApplication> {
   return app;
 }
 
-async function registerIdentity(
-  app: INestApplication,
-  prisma: PrismaService,
-  label: string,
-): Promise<Identity> {
+async function registerIdentity(app: INestApplication, prisma: PrismaService, label: string): Promise<Identity> {
   const userInput = createTestUser({
     name: `${label} User`,
     workspaceName: `${label} Workspace`,
@@ -293,12 +274,7 @@ async function registerIdentity(
   };
 }
 
-async function addWorkspaceRole(
-  prisma: PrismaService,
-  workspaceId: string,
-  identity: Identity,
-  role: WorkspaceRole,
-): Promise<void> {
+async function addWorkspaceRole(prisma: PrismaService, workspaceId: string, identity: Identity, role: WorkspaceRole): Promise<void> {
   await prisma.workspaceMember.create({
     data: {
       workspaceId,
@@ -340,11 +316,7 @@ function configureGithubFixture(fixture: GithubFixture): void {
   githubAppMock.exchangeUserCode.mockResolvedValue('ghu_phase19_test_user_token');
 }
 
-async function beginGithubConnect(
-  app: INestApplication,
-  identity: Identity,
-  workspaceId: string,
-): Promise<string> {
+async function beginGithubConnect(app: INestApplication, identity: Identity, workspaceId: string): Promise<string> {
   const response = await request(app.getHttpServer())
     .post(`${routeForWorkspace(workspaceId)}/github/connect`)
     .set(withBearer(identity.token));
@@ -355,19 +327,11 @@ async function beginGithubConnect(
   return queryParameter(installationUrl, 'state');
 }
 
-async function completeGithubSetup(
-  app: INestApplication,
-  identity: Identity,
-  installationState: string,
-  installationId: string,
-): Promise<string> {
-  const response = await request(app.getHttpServer())
-    .post(`${API_PREFIX}/repositories/github/setup`)
-    .set(withBearer(identity.token))
-    .send({
-      state: installationState,
-      installationId,
-    });
+async function completeGithubSetup(app: INestApplication, identity: Identity, installationState: string, installationId: string): Promise<string> {
+  const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/setup`).set(withBearer(identity.token)).send({
+    state: installationState,
+    installationId,
+  });
 
   expect(response.status).toBe(201);
 
@@ -375,18 +339,11 @@ async function completeGithubSetup(
   return queryParameter(authorizationUrl, 'state');
 }
 
-async function finishGithubCallback(
-  app: INestApplication,
-  identity: Identity,
-  oauthState: string,
-): Promise<Response> {
-  return request(app.getHttpServer())
-    .post(`${API_PREFIX}/repositories/github/callback`)
-    .set(withBearer(identity.token))
-    .send({
-      code: 'phase19-oauth-code',
-      state: oauthState,
-    });
+async function finishGithubCallback(app: INestApplication, identity: Identity, oauthState: string): Promise<Response> {
+  return request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/callback`).set(withBearer(identity.token)).send({
+    code: 'phase19-oauth-code',
+    state: oauthState,
+  });
 }
 
 async function connectRepository(
@@ -402,12 +359,7 @@ async function connectRepository(
   configureGithubFixture(fixture);
 
   const installationState = await beginGithubConnect(app, identity, workspaceId);
-  const oauthState = await completeGithubSetup(
-    app,
-    identity,
-    installationState,
-    fixture.installationId,
-  );
+  const oauthState = await completeGithubSetup(app, identity, installationState, fixture.installationId);
 
   const callbackResponse = await finishGithubCallback(app, identity, oauthState);
   expect(callbackResponse.status).toBe(201);
@@ -464,9 +416,7 @@ describe('Phase 19 - Repository Integrations E2E', () => {
     it('rejects anonymous GitHub connection attempts', async () => {
       const owner = await registerIdentity(app, prisma, 'Anonymous Connect Owner');
 
-      const response = await request(app.getHttpServer()).post(
-        `${routeForWorkspace(owner.workspaceId)}/github/connect`,
-      );
+      const response = await request(app.getHttpServer()).post(`${routeForWorkspace(owner.workspaceId)}/github/connect`);
 
       expect(response.status).toBe(401);
     });
@@ -537,12 +487,10 @@ describe('Phase 19 - Repository Integrations E2E', () => {
 
   describe('GitHub setup and OAuth callback', () => {
     it('rejects setup without authentication', async () => {
-      const response = await request(app.getHttpServer())
-        .post(`${API_PREFIX}/repositories/github/setup`)
-        .send({
-          state: 'missing-authentication-state-value-1234567890',
-          installationId: DEFAULT_GITHUB_FIXTURE.installationId,
-        });
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/setup`).send({
+        state: 'missing-authentication-state-value-1234567890',
+        installationId: DEFAULT_GITHUB_FIXTURE.installationId,
+      });
 
       expect(response.status).toBe(401);
     });
@@ -550,13 +498,10 @@ describe('Phase 19 - Repository Integrations E2E', () => {
     it('rejects an unknown installation state', async () => {
       const owner = await registerIdentity(app, prisma, 'Unknown State Owner');
 
-      const response = await request(app.getHttpServer())
-        .post(`${API_PREFIX}/repositories/github/setup`)
-        .set(withBearer(owner.token))
-        .send({
-          state: 'unknown-installation-state-value-1234567890',
-          installationId: DEFAULT_GITHUB_FIXTURE.installationId,
-        });
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/setup`).set(withBearer(owner.token)).send({
+        state: 'unknown-installation-state-value-1234567890',
+        installationId: DEFAULT_GITHUB_FIXTURE.installationId,
+      });
 
       expect(response.status).toBe(401);
     });
@@ -566,13 +511,10 @@ describe('Phase 19 - Repository Integrations E2E', () => {
       const attacker = await registerIdentity(app, prisma, 'State Attacker');
       const installationState = await beginGithubConnect(app, owner, owner.workspaceId);
 
-      const response = await request(app.getHttpServer())
-        .post(`${API_PREFIX}/repositories/github/setup`)
-        .set(withBearer(attacker.token))
-        .send({
-          state: installationState,
-          installationId: DEFAULT_GITHUB_FIXTURE.installationId,
-        });
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/setup`).set(withBearer(attacker.token)).send({
+        state: installationState,
+        installationId: DEFAULT_GITHUB_FIXTURE.installationId,
+      });
 
       expect(response.status).toBe(401);
     });
@@ -580,12 +522,7 @@ describe('Phase 19 - Repository Integrations E2E', () => {
     it('creates OAuth authorization state without storing the raw state', async () => {
       const owner = await registerIdentity(app, prisma, 'OAuth State Owner');
       const installationState = await beginGithubConnect(app, owner, owner.workspaceId);
-      const oauthState = await completeGithubSetup(
-        app,
-        owner,
-        installationState,
-        DEFAULT_GITHUB_FIXTURE.installationId,
-      );
+      const oauthState = await completeGithubSetup(app, owner, installationState, DEFAULT_GITHUB_FIXTURE.installationId);
 
       expect(oauthState.length).toBeGreaterThan(20);
       expect(githubAppMock.buildUserAuthorizationUrl).toHaveBeenCalledTimes(1);
@@ -604,12 +541,7 @@ describe('Phase 19 - Repository Integrations E2E', () => {
     it('rejects callback when the authenticated GitHub user cannot access the installation', async () => {
       const owner = await registerIdentity(app, prisma, 'Denied Callback Owner');
       const installationState = await beginGithubConnect(app, owner, owner.workspaceId);
-      const oauthState = await completeGithubSetup(
-        app,
-        owner,
-        installationState,
-        DEFAULT_GITHUB_FIXTURE.installationId,
-      );
+      const oauthState = await completeGithubSetup(app, owner, installationState, DEFAULT_GITHUB_FIXTURE.installationId);
 
       githubAppMock.userCanAccessInstallation.mockResolvedValueOnce(false);
 
@@ -660,12 +592,7 @@ describe('Phase 19 - Repository Integrations E2E', () => {
     it('prevents OAuth callback replay after the intent has been consumed', async () => {
       const owner = await registerIdentity(app, prisma, 'Replay Owner');
       const installationState = await beginGithubConnect(app, owner, owner.workspaceId);
-      const oauthState = await completeGithubSetup(
-        app,
-        owner,
-        installationState,
-        DEFAULT_GITHUB_FIXTURE.installationId,
-      );
+      const oauthState = await completeGithubSetup(app, owner, installationState, DEFAULT_GITHUB_FIXTURE.installationId);
 
       const first = await finishGithubCallback(app, owner, oauthState);
       const second = await finishGithubCallback(app, owner, oauthState);
@@ -680,9 +607,7 @@ describe('Phase 19 - Repository Integrations E2E', () => {
       const owner = await registerIdentity(app, prisma, 'List Owner');
       const connected = await connectRepository(app, prisma, owner, owner.workspaceId);
 
-      const response = await request(app.getHttpServer())
-        .get(routeForWorkspace(owner.workspaceId))
-        .set(withBearer(owner.token));
+      const response = await request(app.getHttpServer()).get(routeForWorkspace(owner.workspaceId)).set(withBearer(owner.token));
 
       expect(response.status).toBe(200);
 
@@ -698,9 +623,7 @@ describe('Phase 19 - Repository Integrations E2E', () => {
       await addWorkspaceRole(prisma, owner.workspaceId, viewer, WorkspaceRole.VIEWER);
       await connectRepository(app, prisma, owner, owner.workspaceId);
 
-      const response = await request(app.getHttpServer())
-        .get(routeForWorkspace(owner.workspaceId))
-        .set(withBearer(viewer.token));
+      const response = await request(app.getHttpServer()).get(routeForWorkspace(owner.workspaceId)).set(withBearer(viewer.token));
 
       expect(response.status).toBe(200);
       expect(responseItems(response)).toHaveLength(1);
@@ -711,9 +634,7 @@ describe('Phase 19 - Repository Integrations E2E', () => {
       const outsider = await registerIdentity(app, prisma, 'Repository Outsider');
       await connectRepository(app, prisma, owner, owner.workspaceId);
 
-      const response = await request(app.getHttpServer())
-        .get(routeForWorkspace(owner.workspaceId))
-        .set(withBearer(outsider.token));
+      const response = await request(app.getHttpServer()).get(routeForWorkspace(owner.workspaceId)).set(withBearer(outsider.token));
 
       expect(response.status).toBe(403);
     });
@@ -730,13 +651,7 @@ describe('Phase 19 - Repository Integrations E2E', () => {
         fullName: 'phase19-org-b/private-b',
       };
 
-      const repositoryB = await connectRepository(
-        app,
-        prisma,
-        ownerB,
-        ownerB.workspaceId,
-        fixtureB,
-      );
+      const repositoryB = await connectRepository(app, prisma, ownerB, ownerB.workspaceId, fixtureB);
 
       const response = await request(app.getHttpServer())
         .get(`${routeForWorkspace(ownerA.workspaceId)}/${repositoryB.repositoryId}`)
@@ -881,9 +796,7 @@ describe('Phase 19 - Repository Integrations E2E', () => {
       const connected = await connectRepository(app, prisma, owner, owner.workspaceId);
 
       const response = await request(app.getHttpServer())
-        .delete(
-          `${routeForWorkspace(owner.workspaceId)}/github/installations/${connected.installationRecordId}`,
-        )
+        .delete(`${routeForWorkspace(owner.workspaceId)}/github/installations/${connected.installationRecordId}`)
         .set(withBearer(developer.token));
 
       expect(response.status).toBe(403);
@@ -894,9 +807,7 @@ describe('Phase 19 - Repository Integrations E2E', () => {
       const connected = await connectRepository(app, prisma, owner, owner.workspaceId);
 
       const response = await request(app.getHttpServer())
-        .delete(
-          `${routeForWorkspace(owner.workspaceId)}/github/installations/${connected.installationRecordId}`,
-        )
+        .delete(`${routeForWorkspace(owner.workspaceId)}/github/installations/${connected.installationRecordId}`)
         .set(withBearer(owner.token));
 
       expect(response.status).toBe(200);
@@ -948,10 +859,7 @@ describe('Phase 19 - Repository Integrations E2E', () => {
     it('rejects a webhook when GitHub delivery headers are missing', async () => {
       const rawBody = JSON.stringify(webhookPayload());
 
-      const response = await request(app.getHttpServer())
-        .post(webhookRoute)
-        .set('content-type', 'application/json')
-        .send(rawBody);
+      const response = await request(app.getHttpServer()).post(webhookRoute).set('content-type', 'application/json').send(rawBody);
 
       expect(response.status).toBe(401);
     });

@@ -1,9 +1,3 @@
-import type { INestApplication } from '@nestjs/common';
-
-import { TechnologyType } from 'src/generated/prisma/enums';
-
-import { PrismaService } from 'src/database/prisma.service';
-
 import {
   addTechnology,
   archiveApplication,
@@ -16,12 +10,12 @@ import {
   removeTechnology,
   updateTechnology,
 } from './helpers/application';
-
 import { createTestApp } from './helpers/create-test-app';
-
 import { resetDatabase } from './helpers/database';
-
 import { expectBusinessRuleRejected, registerWorkspaceTestUser } from './helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { TechnologyType } from 'src/generated/prisma/enums';
 
 describe('Application Technologies E2E', () => {
   let app: INestApplication;

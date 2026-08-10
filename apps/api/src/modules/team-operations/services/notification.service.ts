@@ -1,8 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-
-import { NotificationPriority, NotificationType, Prisma } from '../../../generated/prisma/client';
-
 import { PrismaService } from '../../../database/prisma.service';
+import { NotificationPriority, NotificationType, Prisma } from '../../../generated/prisma/client';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 export interface CreateNotificationInput {
   workspaceId: string;

@@ -1,9 +1,9 @@
+import { JWT_AUDIENCE, JWT_ISSUER } from '../auth.constants';
+import type { AccessTokenPayload } from '../interfaces/jwt-payload.interface';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { JWT_AUDIENCE, JWT_ISSUER } from '../auth.constants';
-import type { AccessTokenPayload } from '../interfaces/jwt-payload.interface';
 import { UsersService } from 'src/modules/users/users.service';
 
 @Injectable()

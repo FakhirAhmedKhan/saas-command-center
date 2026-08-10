@@ -1,10 +1,7 @@
-import { Injectable } from '@nestjs/common';
-
-import { Prisma, WebhookDeliveryStatus, WebhookEventType } from '../../../generated/prisma/client';
-
 import { PrismaService } from '../../../database/prisma.service';
-
+import { Prisma, WebhookDeliveryStatus, WebhookEventType } from '../../../generated/prisma/client';
 import { WEBHOOK_PAYLOAD_VERSION } from '../webhooks.constants';
+import { Injectable } from '@nestjs/common';
 
 export interface PublishWebhookEventInput {
   workspaceId: string;

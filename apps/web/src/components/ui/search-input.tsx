@@ -1,7 +1,5 @@
-import { forwardRef, type InputHTMLAttributes } from 'react';
-
 import { Search } from 'lucide-react';
-
+import { forwardRef, type InputHTMLAttributes } from 'react';
 import { Input } from './input';
 
 export interface SearchInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
@@ -9,5 +7,5 @@ export interface SearchInputProps extends Omit<InputHTMLAttributes<HTMLInputElem
 }
 
 export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(function SearchInput({ label, ...props }, ref) {
-  return <Input ref={ref} type="search" label={label} leadingIcon={<Search className="size-4" aria-hidden="true" />} {...props} />;
+  return <Input ref={ref} type='search' label={label} leadingIcon={<Search className='size-4' aria-hidden='true' />} {...props} />;
 });

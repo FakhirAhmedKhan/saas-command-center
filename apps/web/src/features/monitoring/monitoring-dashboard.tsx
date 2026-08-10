@@ -1,10 +1,12 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
+import { ApiError } from 'next/dist/server/api-utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-
 import { PageError } from '@/components/states/page-error';
-
+import { EmptyState } from '@/components/ui/empty-state';
+import { getErrorMessage } from '../applications/application-utils';
+import { HealthStatusBadge } from './health-status-badge';
 import {
   createHealthCheck,
   getHealthCheckHistory,
@@ -15,9 +17,6 @@ import {
   runHealthCheckNow,
   updateHealthCheck,
 } from './monitoring-api';
-
-import { HealthStatusBadge } from './health-status-badge';
-
 import type {
   HealthCheck,
   HealthCheckHistory,
@@ -28,9 +27,6 @@ import type {
   MonitoringTarget,
   SaveHealthCheckInput,
 } from './monitoring.types';
-import { EmptyState } from '@/components/ui/empty-state';
-import { ApiError } from 'next/dist/server/api-utils';
-import { getErrorMessage } from '../applications/application-utils';
 
 interface MonitoringDashboardProps {
   workspaceId: string;
@@ -117,10 +113,10 @@ function SummaryCard({
   value: number;
 }) {
   return (
-    <article className="rounded-xl border border-slate-200 bg-white p-3.5">
-      <p className="text-xs font-medium text-slate-500">{label}</p>
+    <article className='rounded-xl border border-slate-200 bg-white p-3.5'>
+      <p className='text-xs font-medium text-slate-500'>{label}</p>
 
-      <p className="mt-1.5 text-xl font-semibold text-slate-950">{numberFormatter.format(value)}</p>
+      <p className='mt-1.5 text-xl font-semibold text-slate-950'>{numberFormatter.format(value)}</p>
     </article>
   );
 }
@@ -209,22 +205,22 @@ function MonitoringForm({
   }
 
   return (
-    <form onSubmit={submit} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="flex items-start justify-between gap-4">
+    <form onSubmit={submit} className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+      <div className='flex items-start justify-between gap-4'>
         <div>
-          <h2 className="font-semibold text-slate-950">{editing ? 'Edit health check' : 'Add health check'}</h2>
+          <h2 className='font-semibold text-slate-950'>{editing ? 'Edit health check' : 'Add health check'}</h2>
 
-          <p className="mt-1 text-sm text-slate-600">Only public HTTP and HTTPS destinations are allowed.</p>
+          <p className='mt-1 text-sm text-slate-600'>Only public HTTP and HTTPS destinations are allowed.</p>
         </div>
 
-        <button type="button" onClick={onCancel} className="text-sm font-medium text-slate-500 hover:text-slate-950">
+        <button type='button' onClick={onCancel} className='text-sm font-medium text-slate-500 hover:text-slate-950'>
           Cancel
         </button>
       </div>
 
-      <div className="mt-5 grid gap-4 md:grid-cols-2">
+      <div className='mt-5 grid gap-4 md:grid-cols-2'>
         <label>
-          <span className="text-sm font-medium">Target type</span>
+          <span className='text-sm font-medium'>Target type</span>
 
           <select
             value={form.targetType}
@@ -237,16 +233,16 @@ function MonitoringForm({
                 targetId: '',
               }));
             }}
-            className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
+            className='mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2'
           >
-            <option value="APPLICATION">Application</option>
+            <option value='APPLICATION'>Application</option>
 
-            <option value="WEBSITE">Website</option>
+            <option value='WEBSITE'>Website</option>
           </select>
         </label>
 
         <label>
-          <span className="text-sm font-medium">Target</span>
+          <span className='text-sm font-medium'>Target</span>
 
           <select
             required
@@ -258,9 +254,9 @@ function MonitoringForm({
                 targetId: event.target.value,
               }));
             }}
-            className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
+            className='mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2'
           >
-            <option value="">Select target</option>
+            <option value=''>Select target</option>
 
             {filteredTargets.map((target) => (
               <option key={target.id} value={target.id}>
@@ -272,7 +268,7 @@ function MonitoringForm({
         </label>
 
         <label>
-          <span className="text-sm font-medium">Check name</span>
+          <span className='text-sm font-medium'>Check name</span>
 
           <input
             required
@@ -285,17 +281,17 @@ function MonitoringForm({
                 name: event.target.value,
               }));
             }}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-            placeholder="Production API"
+            className='mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
+            placeholder='Production API'
           />
         </label>
 
         <label>
-          <span className="text-sm font-medium">Health URL</span>
+          <span className='text-sm font-medium'>Health URL</span>
 
           <input
             required
-            type="url"
+            type='url'
             value={form.url}
             onChange={(event) => {
               setForm((current) => ({
@@ -304,17 +300,17 @@ function MonitoringForm({
                 url: event.target.value,
               }));
             }}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-            placeholder="https://api.example.com/health"
+            className='mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
+            placeholder='https://api.example.com/health'
           />
         </label>
 
         <label>
-          <span className="text-sm font-medium">Interval seconds</span>
+          <span className='text-sm font-medium'>Interval seconds</span>
 
           <input
             required
-            type="number"
+            type='number'
             min={60}
             max={86_400}
             value={form.intervalSeconds}
@@ -325,16 +321,16 @@ function MonitoringForm({
                 intervalSeconds: Number(event.target.value),
               }));
             }}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className='mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
           />
         </label>
 
         <label>
-          <span className="text-sm font-medium">Timeout milliseconds</span>
+          <span className='text-sm font-medium'>Timeout milliseconds</span>
 
           <input
             required
-            type="number"
+            type='number'
             min={1_000}
             max={30_000}
             value={form.timeoutMs}
@@ -345,16 +341,16 @@ function MonitoringForm({
                 timeoutMs: Number(event.target.value),
               }));
             }}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className='mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
           />
         </label>
 
         <label>
-          <span className="text-sm font-medium">Expected status minimum</span>
+          <span className='text-sm font-medium'>Expected status minimum</span>
 
           <input
             required
-            type="number"
+            type='number'
             min={100}
             max={599}
             value={form.expectedStatusMin}
@@ -365,16 +361,16 @@ function MonitoringForm({
                 expectedStatusMin: Number(event.target.value),
               }));
             }}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className='mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
           />
         </label>
 
         <label>
-          <span className="text-sm font-medium">Expected status maximum</span>
+          <span className='text-sm font-medium'>Expected status maximum</span>
 
           <input
             required
-            type="number"
+            type='number'
             min={100}
             max={599}
             value={form.expectedStatusMax}
@@ -385,16 +381,16 @@ function MonitoringForm({
                 expectedStatusMax: Number(event.target.value),
               }));
             }}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className='mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
           />
         </label>
 
         <label>
-          <span className="text-sm font-medium">Degraded after milliseconds</span>
+          <span className='text-sm font-medium'>Degraded after milliseconds</span>
 
           <input
             required
-            type="number"
+            type='number'
             min={1}
             max={30_000}
             value={form.degradedAfterMs}
@@ -405,16 +401,16 @@ function MonitoringForm({
                 degradedAfterMs: Number(event.target.value),
               }));
             }}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className='mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
           />
         </label>
 
         <label>
-          <span className="text-sm font-medium">Failures before incident</span>
+          <span className='text-sm font-medium'>Failures before incident</span>
 
           <input
             required
-            type="number"
+            type='number'
             min={1}
             max={20}
             value={form.failureThreshold}
@@ -425,14 +421,14 @@ function MonitoringForm({
                 failureThreshold: Number(event.target.value),
               }));
             }}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className='mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
           />
         </label>
       </div>
 
-      <label className="mt-4 flex items-center gap-2 text-sm font-medium">
+      <label className='mt-4 flex items-center gap-2 text-sm font-medium'>
         <input
-          type="checkbox"
+          type='checkbox'
           checked={form.enabled}
           onChange={(event) => {
             setForm((current) => ({
@@ -445,7 +441,7 @@ function MonitoringForm({
         Monitoring enabled
       </label>
 
-      <button type="submit" disabled={submitting} className="mt-5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">
+      <button type='submit' disabled={submitting} className='mt-5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50'>
         {submitting ? 'Savingâ€¦' : editing ? 'Save changes' : 'Create health check'}
       </button>
     </form>
@@ -594,14 +590,14 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
 
   if (loading && !data) {
     return (
-      <div className="space-y-5">
-        <div className="h-24 animate-pulse rounded-2xl bg-slate-200" />
+      <div className='space-y-5'>
+        <div className='h-24 animate-pulse rounded-2xl bg-slate-200' />
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+        <div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-6'>
           {Array.from({
             length: 6,
           }).map((_item, index) => (
-            <div key={index} className="h-28 animate-pulse rounded-2xl bg-slate-200" />
+            <div key={index} className='h-28 animate-pulse rounded-2xl bg-slate-200' />
           ))}
         </div>
       </div>
@@ -611,7 +607,7 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
   if (error || !data) {
     return (
       <PageError
-        title="Monitoring unavailable"
+        title='Monitoring unavailable'
         message={getErrorMessage(error)}
         requestId={error instanceof ApiError ? ('requestId' in error && typeof error.requestId === 'string' ? error.requestId : undefined) : undefined}
         onRetry={() => {
@@ -622,47 +618,47 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
   }
 
   return (
-    <main className="mx-auto w-full max-w-[1600px] space-y-5 p-4 sm:p-6 lg:p-8">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <main className='mx-auto w-full max-w-[1600px] space-y-5 p-4 sm:p-6 lg:p-8'>
+      <header className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
         <div>
-          <h1 className="text-[26px] font-semibold tracking-tight text-slate-950">Monitoring</h1>
+          <h1 className='text-[26px] font-semibold tracking-tight text-slate-950'>Monitoring</h1>
 
-          <p className="mt-1 text-sm leading-6 text-slate-500">Application and website availability, response times and incidents.</p>
+          <p className='mt-1 text-sm leading-6 text-slate-500'>Application and website availability, response times and incidents.</p>
         </div>
 
         {data.summary.canManage ? (
           <button
-            type="button"
+            type='button'
             onClick={() => {
               setEditing(null);
 
               setShowForm(true);
             }}
-            className="inline-flex h-9 shrink-0 items-center justify-center rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white transition hover:bg-brand-700"
+            className='inline-flex h-9 shrink-0 items-center justify-center rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white transition hover:bg-brand-700'
           >
             Add health check
           </button>
         ) : null}
       </header>
 
-      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
-        <SummaryCard label="Total" value={data.summary.total} />
+      <section className='grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7'>
+        <SummaryCard label='Total' value={data.summary.total} />
 
-        <SummaryCard label="Healthy" value={data.summary.healthy} />
+        <SummaryCard label='Healthy' value={data.summary.healthy} />
 
-        <SummaryCard label="Degraded" value={data.summary.degraded} />
+        <SummaryCard label='Degraded' value={data.summary.degraded} />
 
-        <SummaryCard label="Down" value={data.summary.down} />
+        <SummaryCard label='Down' value={data.summary.down} />
 
-        <SummaryCard label="Unknown" value={data.summary.unknown} />
+        <SummaryCard label='Unknown' value={data.summary.unknown} />
 
-        <SummaryCard label="Disabled" value={data.summary.disabled} />
+        <SummaryCard label='Disabled' value={data.summary.disabled} />
 
-        <SummaryCard label="Incidents" value={data.summary.activeIncidents} />
+        <SummaryCard label='Incidents' value={data.summary.activeIncidents} />
       </section>
 
       {actionError ? (
-        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+        <div role='alert' className='rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800'>
           {actionError}
         </div>
       ) : null}
@@ -681,47 +677,47 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
         />
       ) : null}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="grid gap-3 sm:grid-cols-2">
+      <section className='rounded-2xl border border-slate-200 bg-white p-4 shadow-sm'>
+        <div className='grid gap-3 sm:grid-cols-2'>
           <label>
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Status</span>
+            <span className='text-xs font-medium uppercase tracking-wide text-slate-500'>Status</span>
 
             <select
               value={statusFilter}
               onChange={(event) => {
                 setStatusFilter(event.target.value as HealthCheckStatus | 'ALL');
               }}
-              className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
+              className='mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2'
             >
-              <option value="ALL">All statuses</option>
+              <option value='ALL'>All statuses</option>
 
-              <option value="HEALTHY">Healthy</option>
+              <option value='HEALTHY'>Healthy</option>
 
-              <option value="DEGRADED">Degraded</option>
+              <option value='DEGRADED'>Degraded</option>
 
-              <option value="DOWN">Down</option>
+              <option value='DOWN'>Down</option>
 
-              <option value="UNKNOWN">Unknown</option>
+              <option value='UNKNOWN'>Unknown</option>
 
-              <option value="DISABLED">Disabled</option>
+              <option value='DISABLED'>Disabled</option>
             </select>
           </label>
 
           <label>
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Target type</span>
+            <span className='text-xs font-medium uppercase tracking-wide text-slate-500'>Target type</span>
 
             <select
               value={targetFilter}
               onChange={(event) => {
                 setTargetFilter(event.target.value as HealthTargetType | 'ALL');
               }}
-              className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
+              className='mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2'
             >
-              <option value="ALL">All targets</option>
+              <option value='ALL'>All targets</option>
 
-              <option value="APPLICATION">Applications</option>
+              <option value='APPLICATION'>Applications</option>
 
-              <option value="WEBSITE">Websites</option>
+              <option value='WEBSITE'>Websites</option>
             </select>
           </label>
         </div>
@@ -729,27 +725,27 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
 
       {data.checks.length === 0 ? (
         <EmptyState
-          title="Monitoring is not configured"
-          description="Add a health check to begin tracking application or website availability."
+          title='Monitoring is not configured'
+          description='Add a health check to begin tracking application or website availability.'
           icon={undefined}
         />
       ) : filteredChecks.length === 0 ? (
-        <EmptyState title="No matching health checks" description="No health checks match the selected filters." icon={undefined} />
+        <EmptyState title='No matching health checks' description='No health checks match the selected filters.' icon={undefined} />
       ) : (
-        <section className="grid gap-4 lg:grid-cols-2">
+        <section className='grid gap-4 lg:grid-cols-2'>
           {filteredChecks.map((check) => (
-            <article key={check.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+            <article key={check.id} className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+              <div className='flex items-start justify-between gap-4'>
+                <div className='min-w-0'>
+                  <p className='text-xs font-medium uppercase tracking-wide text-slate-500'>
                     {check.targetType}
                     {' Â· '}
                     {check.targetName}
                   </p>
 
-                  <h2 className="mt-1 truncate text-lg font-semibold text-slate-950">{check.name}</h2>
+                  <h2 className='mt-1 truncate text-lg font-semibold text-slate-950'>{check.name}</h2>
 
-                  <p title={check.url} className="mt-1 truncate text-sm text-slate-500">
+                  <p title={check.url} className='mt-1 truncate text-sm text-slate-500'>
                     {check.url}
                   </p>
                 </div>
@@ -757,43 +753,43 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
                 <HealthStatusBadge status={check.latestStatus} />
               </div>
 
-              <dl className="mt-5 grid grid-cols-2 gap-4 text-sm">
+              <dl className='mt-5 grid grid-cols-2 gap-4 text-sm'>
                 <div>
-                  <dt className="text-slate-500">Response</dt>
+                  <dt className='text-slate-500'>Response</dt>
 
-                  <dd className="mt-1 font-semibold text-slate-900">{check.lastResponseTimeMs !== null ? `${check.lastResponseTimeMs}ms` : 'â€”'}</dd>
+                  <dd className='mt-1 font-semibold text-slate-900'>{check.lastResponseTimeMs !== null ? `${check.lastResponseTimeMs}ms` : 'â€”'}</dd>
                 </div>
 
                 <div>
-                  <dt className="text-slate-500">HTTP status</dt>
+                  <dt className='text-slate-500'>HTTP status</dt>
 
-                  <dd className="mt-1 font-semibold text-slate-900">{check.lastStatusCode ?? 'â€”'}</dd>
+                  <dd className='mt-1 font-semibold text-slate-900'>{check.lastStatusCode ?? 'â€”'}</dd>
                 </div>
 
                 <div>
-                  <dt className="text-slate-500">Last checked</dt>
+                  <dt className='text-slate-500'>Last checked</dt>
 
-                  <dd className="mt-1 font-semibold text-slate-900">{formatDateTime(check.lastCheckedAt)}</dd>
+                  <dd className='mt-1 font-semibold text-slate-900'>{formatDateTime(check.lastCheckedAt)}</dd>
                 </div>
 
                 <div>
-                  <dt className="text-slate-500">Failures</dt>
+                  <dt className='text-slate-500'>Failures</dt>
 
-                  <dd className="mt-1 font-semibold text-slate-900">
+                  <dd className='mt-1 font-semibold text-slate-900'>
                     {check.consecutiveFailures}/{check.failureThreshold}
                   </dd>
                 </div>
               </dl>
 
-              {check.lastFailureReason ? <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-800">{check.lastFailureReason}</p> : null}
+              {check.lastFailureReason ? <p className='mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-800'>{check.lastFailureReason}</p> : null}
 
-              <div className="mt-5 flex flex-wrap gap-2">
+              <div className='mt-5 flex flex-wrap gap-2'>
                 <button
-                  type="button"
+                  type='button'
                   onClick={() => {
                     void showHistory(check);
                   }}
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium"
+                  className='rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium'
                 >
                   History
                 </button>
@@ -801,34 +797,34 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
                 {data.summary.canManage ? (
                   <>
                     <button
-                      type="button"
+                      type='button'
                       onClick={() => {
                         void runNow(check);
                       }}
                       disabled={!check.enabled}
-                      className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium disabled:opacity-50"
+                      className='rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium disabled:opacity-50'
                     >
                       Run now
                     </button>
 
                     <button
-                      type="button"
+                      type='button'
                       onClick={() => {
                         setEditing(check);
 
                         setShowForm(true);
                       }}
-                      className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium"
+                      className='rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium'
                     >
                       Edit
                     </button>
 
                     <button
-                      type="button"
+                      type='button'
                       onClick={() => {
                         void toggleEnabled(check);
                       }}
-                      className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium"
+                      className='rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium'
                     >
                       {check.enabled ? 'Disable' : 'Enable'}
                     </button>
@@ -840,22 +836,22 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
         </section>
       )}
 
-      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="border-b border-slate-200 px-5 py-4">
-          <h2 className="font-semibold text-slate-950">Incident timeline</h2>
+      <section className='overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm'>
+        <div className='border-b border-slate-200 px-5 py-4'>
+          <h2 className='font-semibold text-slate-950'>Incident timeline</h2>
         </div>
 
         {data.incidents.length === 0 ? (
-          <p className="p-5 text-sm text-slate-500">No monitoring incidents have been recorded.</p>
+          <p className='p-5 text-sm text-slate-500'>No monitoring incidents have been recorded.</p>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className='divide-y divide-slate-100'>
             {data.incidents.map((incident) => (
-              <article key={incident.id} className="p-5">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <article key={incident.id} className='p-5'>
+                <div className='flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
                   <div>
-                    <p className="font-semibold text-slate-950">{incident.healthCheckName}</p>
+                    <p className='font-semibold text-slate-950'>{incident.healthCheckName}</p>
 
-                    <p className="mt-1 text-sm text-slate-500">{incident.targetName}</p>
+                    <p className='mt-1 text-sm text-slate-500'>{incident.targetName}</p>
                   </div>
 
                   <span
@@ -869,9 +865,9 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
                   </span>
                 </div>
 
-                <p className="mt-3 text-sm text-slate-700">{incident.summary}</p>
+                <p className='mt-3 text-sm text-slate-700'>{incident.summary}</p>
 
-                <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-xs text-slate-500">
+                <div className='mt-3 flex flex-wrap gap-x-5 gap-y-1 text-xs text-slate-500'>
                   <span>Started: {formatDateTime(incident.startedAt)}</span>
 
                   <span>Failures: {incident.failureCount}</span>
@@ -885,62 +881,62 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
       </section>
 
       {selectedCheck ? (
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex items-start justify-between gap-4">
+        <section className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+          <div className='flex items-start justify-between gap-4'>
             <div>
-              <h2 className="font-semibold text-slate-950">{selectedCheck.name} history</h2>
+              <h2 className='font-semibold text-slate-950'>{selectedCheck.name} history</h2>
 
-              <p className="mt-1 text-sm text-slate-500">Last 100 checks</p>
+              <p className='mt-1 text-sm text-slate-500'>Last 100 checks</p>
             </div>
 
             <button
-              type="button"
+              type='button'
               onClick={() => {
                 setSelectedCheck(null);
 
                 setHistory([]);
               }}
-              className="text-sm font-medium text-slate-500"
+              className='text-sm font-medium text-slate-500'
             >
               Close
             </button>
           </div>
 
           {historyLoading ? (
-            <div className="mt-5 h-40 animate-pulse rounded-xl bg-slate-200" />
+            <div className='mt-5 h-40 animate-pulse rounded-xl bg-slate-200' />
           ) : history.length === 0 ? (
-            <p className="mt-5 text-sm text-slate-500">No health-check history is available.</p>
+            <p className='mt-5 text-sm text-slate-500'>No health-check history is available.</p>
           ) : (
-            <div className="mt-5 overflow-x-auto">
-              <table className="min-w-[750px] w-full text-sm">
+            <div className='mt-5 overflow-x-auto'>
+              <table className='min-w-[750px] w-full text-sm'>
                 <thead>
-                  <tr className="border-b border-slate-200 text-left text-xs uppercase tracking-wide text-slate-500">
-                    <th className="px-3 py-3">Status</th>
+                  <tr className='border-b border-slate-200 text-left text-xs uppercase tracking-wide text-slate-500'>
+                    <th className='px-3 py-3'>Status</th>
 
-                    <th className="px-3 py-3">Checked</th>
+                    <th className='px-3 py-3'>Checked</th>
 
-                    <th className="px-3 py-3 text-right">HTTP</th>
+                    <th className='px-3 py-3 text-right'>HTTP</th>
 
-                    <th className="px-3 py-3 text-right">Response</th>
+                    <th className='px-3 py-3 text-right'>Response</th>
 
-                    <th className="px-3 py-3">Reason</th>
+                    <th className='px-3 py-3'>Reason</th>
                   </tr>
                 </thead>
 
                 <tbody>
                   {history.map((item) => (
-                    <tr key={item.id} className="border-b border-slate-100">
-                      <td className="px-3 py-3">
+                    <tr key={item.id} className='border-b border-slate-100'>
+                      <td className='px-3 py-3'>
                         <HealthStatusBadge status={item.status} />
                       </td>
 
-                      <td className="px-3 py-3">{formatDateTime(item.checkedAt)}</td>
+                      <td className='px-3 py-3'>{formatDateTime(item.checkedAt)}</td>
 
-                      <td className="px-3 py-3 text-right">{item.statusCode ?? 'â€”'}</td>
+                      <td className='px-3 py-3 text-right'>{item.statusCode ?? 'â€”'}</td>
 
-                      <td className="px-3 py-3 text-right">{item.responseTimeMs !== null ? `${item.responseTimeMs}ms` : 'â€”'}</td>
+                      <td className='px-3 py-3 text-right'>{item.responseTimeMs !== null ? `${item.responseTimeMs}ms` : 'â€”'}</td>
 
-                      <td className="max-w-sm px-3 py-3 text-slate-600">{item.failureReason ?? 'â€”'}</td>
+                      <td className='max-w-sm px-3 py-3 text-slate-600'>{item.failureReason ?? 'â€”'}</td>
                     </tr>
                   ))}
                 </tbody>

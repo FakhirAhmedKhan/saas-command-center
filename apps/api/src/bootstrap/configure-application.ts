@@ -1,26 +1,12 @@
-import { Logger, ValidationPipe } from '@nestjs/common';
-
-import type { INestApplication } from '@nestjs/common';
-
-import { ConfigService } from '@nestjs/config';
-
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-
-import cookieParser from 'cookie-parser';
-
-import type { Express } from 'express';
-
-import { json, raw, urlencoded } from 'express';
-
-import helmet from 'helmet';
-
-import { getAllowedOrigins, parseTrustProxy } from '../config/runtime-config';
-
-import type { TypedConfigService } from '../config/runtime-config';
-
 import { AllExceptionsFilter } from '../common/filters/all-exceptions.filter';
-
 import { requestIdMiddleware } from '../common/middleware/request-id.middleware';
+import { getAllowedOrigins, parseTrustProxy, type TypedConfigService } from '../config/runtime-config';
+import { Logger, ValidationPipe, type INestApplication } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
+import { type Express, json, raw, urlencoded } from 'express';
+import helmet from 'helmet';
 
 export interface ConfigureApplicationOptions {
   enableSwagger?: boolean;

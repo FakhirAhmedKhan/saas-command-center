@@ -1,13 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-import type { INestApplication } from '@nestjs/common';
-
-import request, { type Response } from 'supertest';
-
 import { asRecord } from './application';
-
 import { withBearer } from './auth';
-
 import type { WorkspaceTestUser } from './workspace';
+import type { INestApplication } from '@nestjs/common';
+import request, { type Response } from 'supertest';
 
 export const analyticsEngineRoutes = {
   root(workspaceId: string, websiteId: string): string {

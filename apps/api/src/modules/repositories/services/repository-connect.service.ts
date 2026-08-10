@@ -1,14 +1,10 @@
-import { createHash, randomBytes } from 'node:crypto';
-
-import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
-
-import { PrismaService } from 'src/database/prisma.service';
-import { WorkspaceRole } from 'src/generated/prisma/enums';
-
-import { CompleteGithubCallbackDto, CompleteGithubSetupDto } from '../dto/repository.dto';
-
 import { GithubAppService } from './github-app.service';
 import { RepositoriesService } from './repositories.service';
+import { CompleteGithubCallbackDto, CompleteGithubSetupDto } from '../dto/repository.dto';
+import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { createHash, randomBytes } from 'node:crypto';
+import { PrismaService } from 'src/database/prisma.service';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
 
 const CONNECT_TTL_MS = 10 * 60 * 1000;
 

@@ -1,11 +1,8 @@
-import type { Response } from 'supertest';
-
-import { ApplicationCategory, ApplicationLinkType, ApplicationPriority, ApplicationStatus, TechnologyType } from 'src/generated/prisma/enums';
-
 import { withBearer } from './auth';
 import { expectSuccessfulStatus } from './response';
-
 import type { WorkspaceTestUser } from './workspace';
+import { ApplicationCategory, ApplicationLinkType, ApplicationPriority, ApplicationStatus, TechnologyType } from 'src/generated/prisma/enums';
+import type { Response } from 'supertest';
 
 type StringEnumObject<T extends string> = Readonly<Record<string, T>>;
 

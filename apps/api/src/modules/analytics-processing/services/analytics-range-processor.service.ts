@@ -1,10 +1,7 @@
-import { ConfigService } from '@nestjs/config';
-
-import { Injectable, Inject } from '@nestjs/common';
-
-import { PrismaService } from '../../../database/prisma.service';
-
 import type { TypedConfigService } from '../../../config/runtime-config';
+import { PrismaService } from '../../../database/prisma.service';
+import { Injectable, Inject } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { AnalyticsAggregationService } from 'src/modules/analytics-engine/services/analytics-aggregation.service';
 import { PageViewRebuilderService } from 'src/modules/analytics-engine/services/page-view-rebuilder.service';
 import { RawEventProcessingService } from 'src/modules/analytics-engine/services/raw-event-processing.service';

@@ -19,27 +19,32 @@ These issues are **not closed**. They must be fixed during the final Phase 1–2
 ## Deferred Issues
 
 ### Phase 1 — Runner Verification
+
 - Shared Types Build reported failed in the fast runner.
 - Validation Build reported failed in the fast runner.
 - Tracker Build reported failed even though the tracker later built successfully and all 56 tracker tests passed.
 - Re-run Phase 1 commands independently during final verification.
 
 ### Phase 6 — Activity / Audit
+
 - Filters/pagination test returns `400` instead of expected `200`.
 - Cross-workspace activity isolation returns `200` instead of expected `404`.
 - The cross-workspace result may be a real security issue and must not be weakened just to make the test pass.
 
 ### Phase 13 — Analytics Reports
+
 - API E2E suite currently fails.
 - Review route/query DTO contract.
 - Verify report filters, pagination, dimensions, exports, website isolation, and workspace isolation.
 
 ### Phase 14 — Analytics Processing
+
 - API E2E suite currently fails.
 - Some fixtures use stale Prisma JSON behavior such as `properties: null`.
 - Processing status/reprocessing behavior must be reverified.
 
 ### Phase 15 — Monitoring
+
 - `phase15-monitoring.e2e-spec.ts` contains stale fixtures.
 - Legacy `monitoring.e2e-spec.ts` has missing setup variables such as:
   - `workspaceId`
@@ -49,15 +54,18 @@ These issues are **not closed**. They must be fixed during the final Phase 1–2
 - Monitoring security and SSRF protections must be reverified.
 
 ### Phase 16 — Releases & Deployments
+
 - Fixture still sends `createdById` while the current `SaasApplication` Prisma model does not contain this field.
 - This setup failure causes many Phase 16 tests to fail before they reach actual release/deployment logic.
 
 ### Phase 17 — Team Operations
+
 - API E2E suite currently fails.
 - Known stale user lookup uses `name` while the current user field is `displayName`.
 - Notification filtering/contract should be reverified.
 
 ### Phase 18 — Webhook Integrations
+
 - Primary Phase 18 API E2E suite currently fails and needs later review.
 - Legacy `webhooks.e2e-spec.ts` is incomplete and references missing setup variables such as:
   - `workspaceId`
@@ -67,6 +75,7 @@ These issues are **not closed**. They must be fixed during the final Phase 1–2
 - Webhook cross-workspace security, destination validation, and secret handling must be reverified.
 
 ### Frontend Playwright Runner
+
 - Web typecheck, lint, and production build pass.
 - Combined Playwright command returned `No tests found`.
 - This is a runner/configuration issue, so frontend E2E was not actually verified by that run.

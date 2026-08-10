@@ -1,18 +1,10 @@
-﻿/* eslint-disable @typescript-eslint/no-unsafe-argument */
-
-import type { INestApplication } from '@nestjs/common';
-
-import request, { type Response } from 'supertest';
-
-import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
-
-import { asRecord, recordString } from './application';
-
+﻿import { asRecord, recordString } from './application';
 import { withBearer } from './auth';
-
-import type { WorkspaceTestUser } from './workspace';
-
 import { createWebsite, type CreatedWebsite } from './website';
+import type { WorkspaceTestUser } from './workspace';
+import type { INestApplication } from '@nestjs/common';
+import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
+import request, { type Response } from 'supertest';
 
 export interface TrackerEventPayload {
   eventId: string;

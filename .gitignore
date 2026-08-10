@@ -12,3 +12,4 @@ coverage/
 .idea/
 .vscode/
 apps/api/src/generated/prisma/
+.pnpm-lock.yaml

@@ -1,20 +1,12 @@
-import type { Server } from 'node:http';
-
-import type { INestApplication } from '@nestjs/common';
-
-import request, { type Response } from 'supertest';
-
-import { asRecord, recordString } from './application';
-
-import { withBearer } from './auth';
-
-import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
-
-import { PrismaService } from 'src/database/prisma.service';
-
-import type { WorkspaceTestUser } from './workspace';
-
 import { type TrackedWebsite, uniqueTrackerId } from './analytics-ingestion';
+import { asRecord, recordString } from './application';
+import { withBearer } from './auth';
+import type { WorkspaceTestUser } from './workspace';
+import type { INestApplication } from '@nestjs/common';
+import type { Server } from 'node:http';
+import { PrismaService } from 'src/database/prisma.service';
+import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
+import request, { type Response } from 'supertest';
 
 export const analyticsEngineRoutes = {
   root(workspaceId: string, websiteId: string): string {

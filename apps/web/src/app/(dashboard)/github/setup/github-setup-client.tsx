@@ -1,13 +1,11 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-
+import { FolderGit2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-
+import { useEffect, useRef, useState } from 'react';
 import { useSession } from '@/features/auth/use-session';
 import { completeGithubSetup } from '@/features/repositories/repositories-api';
-import { FolderGit2 } from 'lucide-react';
 
 export function GithubSetupClient() {
   const router = useRouter();
@@ -63,25 +61,25 @@ export function GithubSetupClient() {
   }, [router, searchParams, status]);
 
   return (
-    <main className="flex min-h-[70vh] items-center justify-center p-6">
-      <section className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-6 text-center">
-        <div className="mx-auto flex size-11 items-center justify-center rounded-xl bg-slate-950 text-white">
-          <FolderGit2 className="size-5" />
+    <main className='flex min-h-[70vh] items-center justify-center p-6'>
+      <section className='w-full max-w-sm rounded-xl border border-slate-200 bg-white p-6 text-center'>
+        <div className='mx-auto flex size-11 items-center justify-center rounded-xl bg-slate-950 text-white'>
+          <FolderGit2 className='size-5' />
         </div>
 
         {error ? (
           <>
-            <h1 className="mt-4 text-lg font-semibold text-slate-950">GitHub connection failed</h1>
+            <h1 className='mt-4 text-lg font-semibold text-slate-950'>GitHub connection failed</h1>
 
-            <p className="mt-2 text-sm leading-6 text-red-700">{error}</p>
+            <p className='mt-2 text-sm leading-6 text-red-700'>{error}</p>
           </>
         ) : (
           <>
-            <h1 className="mt-4 text-lg font-semibold text-slate-950">Connecting GitHub</h1>
+            <h1 className='mt-4 text-lg font-semibold text-slate-950'>Connecting GitHub</h1>
 
-            <p className="mt-2 text-sm leading-6 text-slate-500">Verifying the installation and preparing secure authorization.</p>
+            <p className='mt-2 text-sm leading-6 text-slate-500'>Verifying the installation and preparing secure authorization.</p>
 
-            <div className="mx-auto mt-5 size-6 animate-spin rounded-full border-2 border-slate-200 border-t-slate-950" />
+            <div className='mx-auto mt-5 size-6 animate-spin rounded-full border-2 border-slate-200 border-t-slate-950' />
           </>
         )}
       </section>

@@ -1,9 +1,6 @@
-import { Type } from 'class-transformer';
-
-import { IsDateString, IsEnum, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
-
 import { ApiPropertyOptional } from '@nestjs/swagger';
-
+import { Type } from 'class-transformer';
+import { IsDateString, IsEnum, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
 
 export class RawEventQueryDto {

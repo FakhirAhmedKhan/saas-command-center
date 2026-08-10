@@ -1,5 +1,4 @@
 import { expect, test } from '@playwright/test';
-
 import { installMockApi } from './fixtures/mock-api';
 
 test.describe('Batch 10 authentication flows', () => {

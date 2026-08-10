@@ -1,13 +1,6 @@
-import type { INestApplication } from '@nestjs/common';
-
-import { BlockerStatus, WorkItemPriority } from 'src/generated/prisma/enums';
-
-import { PrismaService } from 'src/database/prisma.service';
-
 import { createApplication, enumValue, recordString } from './helpers/application';
-
 import { createTestApp } from './helpers/create-test-app';
-
+import { resetDatabase } from './helpers/database';
 import {
   createBlocker,
   createMilestone,
@@ -33,10 +26,10 @@ import {
   updateMilestone,
   updateTask,
 } from './helpers/development';
-
-import { resetDatabase } from './helpers/database';
-
 import { expectBusinessRuleRejected, registerWorkspaceTestUser } from './helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { BlockerStatus, WorkItemPriority } from 'src/generated/prisma/enums';
 
 describe('Development E2E', () => {
   let app: INestApplication;

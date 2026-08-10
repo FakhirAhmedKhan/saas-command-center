@@ -1,5 +1,5 @@
-import { cn } from '@/features/lib/api/cn';
 import { forwardRef, type ButtonHTMLAttributes } from 'react';
+import { cn } from '@/features/lib/api/cn';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
 
@@ -51,7 +51,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     >
       {loading ? (
         <>
-          <span aria-hidden="true" className="size-4 animate-spin rounded-full border-2 border-current border-r-transparent" />
+          <span aria-hidden='true' className='size-4 animate-spin rounded-full border-2 border-current border-r-transparent' />
 
           <span>Loading...</span>
         </>

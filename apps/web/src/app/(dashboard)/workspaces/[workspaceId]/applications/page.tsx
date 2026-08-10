@@ -1,15 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
-import { useParams } from 'next/navigation';
-
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-
 import { getApplications } from '@/features/applications/application-api';
-
+import type { ApplicationListQuery, ApplicationPagination, SaasApplication } from '@/features/applications/application-types';
+import { getErrorMessage } from '@/features/applications/application-utils';
 import { ActiveFilterChips } from '@/features/applications/components/active-filter-chips';
 import { ApplicationFilters, type ApplicationFilterValue } from '@/features/applications/components/application-filters';
 import { ApplicationsEmptyState } from '@/features/applications/components/applications-empty-state';
@@ -18,10 +15,6 @@ import { ApplicationsGrid } from '@/features/applications/components/application
 import { ApplicationsHeader } from '@/features/applications/components/applications-header';
 import { ApplicationsResultSummary } from '@/features/applications/components/applications-result-summary';
 import { ApplicationsSkeleton } from '@/features/applications/components/applications-skeleton';
-
-import type { ApplicationListQuery, ApplicationPagination, SaasApplication } from '@/features/applications/application-types';
-
-import { getErrorMessage } from '@/features/applications/application-utils';
 
 const DEFAULT_FILTERS: ApplicationFilterValue = {
   search: '',
@@ -145,10 +138,10 @@ export default function ApplicationsPage() {
   const showEmptyState = !loading && !error && applications.length === 0;
 
   return (
-    <div className="mx-auto w-full max-w-[1600px] space-y-6 p-4 sm:p-6 lg:p-8">
+    <div className='mx-auto w-full max-w-[1600px] space-y-6 p-4 sm:p-6 lg:p-8'>
       <ApplicationsHeader workspaceId={workspaceId} onRefresh={refresh} refreshing={loading} />
 
-      <div className="space-y-3">
+      <div className='space-y-3'>
         <ApplicationFilters value={filterDraft} onChange={setFilterDraft} onApply={() => applyFilters()} onReset={resetFilters} />
 
         <ActiveFilterChips value={appliedFilters} onChange={applyFilters} onClearAll={resetFilters} />
@@ -172,20 +165,20 @@ export default function ApplicationsPage() {
           <ApplicationsGrid workspaceId={workspaceId} applications={applications} />
 
           {pagination.totalPages > 1 ? (
-            <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4">
-              <p className="text-sm text-slate-500">
+            <div className='flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4'>
+              <p className='text-sm text-slate-500'>
                 Page {pagination.page} of {pagination.totalPages}
               </p>
 
-              <div className="flex gap-2">
-                <Button variant="outline" disabled={!pagination.hasPreviousPage} onClick={() => changePage(pagination.page - 1)}>
-                  <ChevronLeft className="size-4" />
+              <div className='flex gap-2'>
+                <Button variant='outline' disabled={!pagination.hasPreviousPage} onClick={() => changePage(pagination.page - 1)}>
+                  <ChevronLeft className='size-4' />
                   Previous
                 </Button>
 
-                <Button variant="outline" disabled={!pagination.hasNextPage} onClick={() => changePage(pagination.page + 1)}>
+                <Button variant='outline' disabled={!pagination.hasNextPage} onClick={() => changePage(pagination.page + 1)}>
                   Next
-                  <ChevronRight className="size-4" />
+                  <ChevronRight className='size-4' />
                 </Button>
               </div>
             </div>

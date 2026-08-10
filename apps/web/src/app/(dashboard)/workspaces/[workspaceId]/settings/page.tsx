@@ -1,12 +1,10 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { type FormEvent, useEffect, useState } from 'react';
-
+import { useEffect, useState, type FormEvent } from 'react';
+import { PageLoading } from '@/components/states/page-loading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { PageLoading } from '@/components/states/page-loading';
-
 import { useAuth } from '@/features/auth/auth-provider';
 import type { Workspace } from '@/features/auth/auth.types';
 import { apiRequest } from '@/features/lib/api/api-client';
@@ -90,7 +88,7 @@ export default function WorkspaceSettingsPage() {
   }
 
   if (!workspace && !error) {
-    return <PageLoading label="Loading workspace settings…" />;
+    return <PageLoading label='Loading workspace settings…' />;
   }
 
   const role = workspace?.members?.[0]?.role ?? 'VIEWER';
@@ -98,50 +96,53 @@ export default function WorkspaceSettingsPage() {
   const canEdit = role === 'OWNER' || role === 'ADMIN';
 
   return (
-    <div className="mx-auto w-full max-w-[1600px] space-y-5 p-4 sm:p-6 lg:p-8">
+    <div className='mx-auto w-full max-w-[1600px] space-y-5 p-4 sm:p-6 lg:p-8'>
       <div>
-        <h1 className="text-[26px] font-semibold tracking-tight text-slate-950">Settings</h1>
-        <p className="mt-1 text-sm leading-6 text-slate-500">Manage workspace information, members and integrations.</p>
+        <h1 className='text-[26px] font-semibold tracking-tight text-slate-950'>Settings</h1>
+        <p className='mt-1 text-sm leading-6 text-slate-500'>Manage workspace information, members and integrations.</p>
       </div>
 
       <WorkspaceSettingsNav workspaceId={workspaceId} />
 
-      <div className="max-w-lg space-y-4">
+      <div className='max-w-lg space-y-4'>
         <div>
-          <h2 className="text-[15px] font-semibold text-slate-950">General information</h2>
-          <p className="mt-1 text-sm leading-6 text-slate-500">Keep the workspace name and URL identifier clear and consistent.</p>
+          <h2 className='text-[15px] font-semibold text-slate-950'>General information</h2>
+          <p className='mt-1 text-sm leading-6 text-slate-500'>Keep the workspace name and URL identifier clear and consistent.</p>
         </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          {error ? <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</div> : null}
-
-          {success ? <div role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">{success}</div> : null}
-
-          {!canEdit ? (
-            <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">Your role has read-only access to workspace settings.</div>
+        <form className='space-y-4' onSubmit={handleSubmit}>
+          {error ? (
+            <div role='alert' className='rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800'>
+              {error}
+            </div>
           ) : null}
 
-          <Input
-            label="Workspace name"
-            disabled={!canEdit}
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            minLength={2}
-            required
-          />
+          {success ? (
+            <div role='status' className='rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800'>
+              {success}
+            </div>
+          ) : null}
+
+          {!canEdit ? (
+            <div className='rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600'>
+              Your role has read-only access to workspace settings.
+            </div>
+          ) : null}
+
+          <Input label='Workspace name' disabled={!canEdit} value={name} onChange={(event) => setName(event.target.value)} minLength={2} required />
 
           <Input
-            label="Workspace slug"
+            label='Workspace slug'
             disabled={!canEdit}
             value={slug}
             onChange={(event) => setSlug(event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
             minLength={2}
             required
-            hint="Lowercase letters, numbers and hyphens only."
+            hint='Lowercase letters, numbers and hyphens only.'
           />
 
           {canEdit ? (
-            <Button type="submit" loading={submitting}>
+            <Button type='submit' loading={submitting}>
               Save changes
             </Button>
           ) : null}

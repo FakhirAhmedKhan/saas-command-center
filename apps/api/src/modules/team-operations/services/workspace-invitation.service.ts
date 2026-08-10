@@ -1,16 +1,10 @@
-import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-
-import { InvitationDeliveryStatus, NotificationType, Prisma, WorkspaceInvitationStatus } from '../../../generated/prisma/client';
-
-import { PrismaService } from '../../../database/prisma.service';
-
-import type { CreateWorkspaceInvitationDto, InvitationListQueryDto } from '../dto/workspace-invitation.dto';
-
 import { InvitationMailer } from './invitation-mailer.service';
-
 import { InvitationTokenService } from './invitation-token.service';
-
 import { NotificationService } from './notification.service';
+import { PrismaService } from '../../../database/prisma.service';
+import { InvitationDeliveryStatus, NotificationType, Prisma, WorkspaceInvitationStatus } from '../../../generated/prisma/client';
+import type { CreateWorkspaceInvitationDto, InvitationListQueryDto } from '../dto/workspace-invitation.dto';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class WorkspaceInvitationService {

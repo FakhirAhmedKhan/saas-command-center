@@ -1,7 +1,6 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-
 import { RepositoriesDashboard } from '@/features/repositories/repositories-dashboard';
 
 type RouteParameters = Record<string, string | string[]> & {

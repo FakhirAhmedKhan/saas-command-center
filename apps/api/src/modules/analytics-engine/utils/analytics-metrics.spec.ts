@@ -1,6 +1,5 @@
-import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
-
 import { calculateSessionMetrics } from './analytics-metrics';
+import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
 
 describe('calculateSessionMetrics', () => {
   it('marks a single unengaged page view as a bounce', () => {
