@@ -2,11 +2,9 @@
 
 import { useEffect, useState } from 'react';
 
-import Link from 'next/link';
-
 import { useParams } from 'next/navigation';
 
-import { Archive, ArrowLeft, Check, Clipboard, KeyRound, Link2, PauseCircle, PlayCircle, RotateCcw, Unlink } from 'lucide-react';
+import { Archive, Check, Clipboard, KeyRound, Link2, PauseCircle, PlayCircle, RotateCcw, Unlink } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
@@ -14,7 +12,9 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 import { Select } from '@/components/ui/select';
 
-import { Spinner } from '@/components/ui/spinner';
+import { PageLoading } from '@/components/states/page-loading';
+
+import { WebsiteSubNav } from '@/features/websites/components/website-sub-nav';
 
 import { getApplications } from '@/features/applications/application-api';
 
@@ -160,33 +160,25 @@ export default function WebsiteSettingsPage() {
   }
 
   if (loading) {
-    return (
-      <div className="flex min-h-80 items-center justify-center">
-        <Spinner />
-      </div>
-    );
+    return <PageLoading label="Loading website settings…" />;
   }
 
   if (!website) {
-    return <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">{error}</div>;
+    return <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>;
   }
 
-  const baseHref = `/workspaces/${workspaceId}/websites/${websiteId}`;
-
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <Link href={baseHref} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900">
-        <ArrowLeft className="size-4" />
-        Back to website
-      </Link>
+    <div className="mx-auto w-full max-w-[1600px] space-y-5 p-4 sm:p-6 lg:p-8">
+      <WebsiteSubNav workspaceId={workspaceId} websiteId={websiteId} />
 
-      <header>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-950">Website settings</h1>
+      <div className="mx-auto max-w-2xl space-y-5">
+        <header>
+          <h1 className="text-xl font-semibold tracking-tight text-slate-950">Settings</h1>
 
-        <p className="mt-2 text-sm leading-6 text-slate-500">Manage lifecycle, application connection and tracking-key security.</p>
-      </header>
+          <p className="mt-1 text-sm leading-6 text-slate-500">Manage lifecycle, application connection and tracking-key security.</p>
+        </header>
 
-      {error ? <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div> : null}
+        {error ? <div className="rounded-lg border border-red-200 bg-red-50 p-3.5 text-sm text-red-700">{error}</div> : null}
 
       {generatedKey ? (
         <Card className="border-emerald-200">
@@ -336,6 +328,7 @@ export default function WebsiteSettingsPage() {
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

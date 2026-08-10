@@ -1,15 +1,27 @@
 import { ApiError } from './api-error';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api/v1';
-
-let accessToken: string | null = null;
-
-let refreshPromise: Promise<string | null> | null = null;
+const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api/v1';
 
 interface ApiErrorBody {
   message?: string | string[];
   error?: string;
 }
+
+interface RequestOptions extends Omit<RequestInit, 'body'> {
+  body?: unknown;
+  skipAuthentication?: boolean;
+  skipRefresh?: boolean;
+}
+
+interface RefreshResponse {
+  accessToken: string;
+}
+
+let accessToken: string | null = null;
+
+let refreshPromise: Promise<string | null> | null = null;
+
+let unauthorizedHandler: (() => void) | null = null;
 
 export function setAccessToken(token: string | null): void {
   accessToken = token;
@@ -17,6 +29,50 @@ export function setAccessToken(token: string | null): void {
 
 export function getAccessToken(): string | null {
   return accessToken;
+}
+
+export function setUnauthorizedHandler(handler: (() => void) | null): void {
+  unauthorizedHandler = handler;
+}
+
+function buildUrl(path: string): string {
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path;
+  }
+
+  const normalizedBaseUrl = API_URL.replace(/\/+$/, '');
+
+  const normalizedPath = path.replace(/^\/+/, '');
+
+  return `${normalizedBaseUrl}/${normalizedPath}`;
+}
+
+function serializeBody(body: unknown): BodyInit | undefined {
+  if (body === undefined) {
+    return undefined;
+  }
+
+  if (body instanceof FormData || body instanceof Blob || body instanceof URLSearchParams || typeof body === 'string') {
+    return body;
+  }
+
+  return JSON.stringify(body);
+}
+
+function buildHeaders(options: RequestOptions): Headers {
+  const headers = new Headers(options.headers);
+
+  headers.set('Accept', 'application/json');
+
+  if (options.body !== undefined && !(options.body instanceof FormData)) {
+    headers.set('Content-Type', 'application/json');
+  }
+
+  if (!options.skipAuthentication && accessToken) {
+    headers.set('Authorization', `Bearer ${accessToken}`);
+  }
+
+  return headers;
 }
 
 async function readResponseBody(response: Response): Promise<unknown> {
@@ -62,34 +118,42 @@ async function refreshAccessToken(): Promise<string | null> {
 
   refreshPromise = (async () => {
     try {
-      const response = await fetch(`${API_URL}/auth/refresh`, {
+      const response = await fetch(buildUrl('/auth/refresh'), {
         method: 'POST',
+
         credentials: 'include',
+
         headers: {
-          'Content-Type': 'application/json',
+          Accept: 'application/json',
         },
-        body: JSON.stringify({}),
       });
 
       if (!response.ok) {
         setAccessToken(null);
+
+        unauthorizedHandler?.();
+
         return null;
       }
 
-      const body = (await response.json()) as {
-        accessToken?: string;
-      };
+      const payload = (await response.json()) as RefreshResponse;
 
-      if (!body.accessToken) {
+      if (typeof payload.accessToken !== 'string' || payload.accessToken.length === 0) {
         setAccessToken(null);
+
+        unauthorizedHandler?.();
+
         return null;
       }
 
-      setAccessToken(body.accessToken);
+      setAccessToken(payload.accessToken);
 
-      return body.accessToken;
+      return payload.accessToken;
     } catch {
       setAccessToken(null);
+
+      unauthorizedHandler?.();
+
       return null;
     } finally {
       refreshPromise = null;
@@ -99,41 +163,113 @@ async function refreshAccessToken(): Promise<string | null> {
   return refreshPromise;
 }
 
-export async function apiRequest<T>(path: string, options: RequestInit = {}, retryAfterUnauthorized = true): Promise<T> {
-  const headers = new Headers(options.headers);
+export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const { body, skipAuthentication, skipRefresh, ...requestInit } = options;
 
-  if (options.body && !(options.body instanceof FormData) && !headers.has('Content-Type')) {
-    headers.set('Content-Type', 'application/json');
+  const execute = (): Promise<Response> =>
+    fetch(buildUrl(path), {
+      ...requestInit,
+
+      body: serializeBody(body),
+
+      headers: buildHeaders({
+        ...options,
+        body,
+        skipAuthentication,
+        skipRefresh,
+      }),
+
+      credentials: 'include',
+    });
+
+  let response = await execute();
+
+  if (response.status === 401 && !skipAuthentication && !skipRefresh && path !== '/auth/refresh') {
+    const refreshedToken = await refreshAccessToken();
+
+    if (refreshedToken) {
+      response = await execute();
+    }
   }
+
+  const responseBody = await readResponseBody(response);
+
+  if (!response.ok) {
+    throw new ApiError(resolveErrorMessage(responseBody, `Request failed with status ${response.status}.`), response.status, responseBody);
+  }
+
+  return responseBody as T;
+}
+
+function getDownloadFilename(response: Response, fallback: string): string {
+  const disposition = response.headers.get('content-disposition');
+
+  const match = disposition?.match(/filename="?([^"]+)"?/i);
+
+  return match?.[1] ?? fallback;
+}
+
+async function executeDownloadRequest(path: string): Promise<Response> {
+  const headers = new Headers({
+    Accept: 'text/csv',
+  });
 
   if (accessToken) {
     headers.set('Authorization', `Bearer ${accessToken}`);
   }
 
-  const response = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers,
-    credentials: 'include',
-  });
+  return fetch(buildUrl(path), {
+    method: 'GET',
 
-  if (response.status === 401 && retryAfterUnauthorized && path !== '/auth/refresh') {
+    credentials: 'include',
+
+    headers,
+  });
+}
+
+export async function apiDownload(path: string, fallbackFilename: string): Promise<void> {
+  let response = await executeDownloadRequest(path);
+
+  if (response.status === 401) {
     const refreshedToken = await refreshAccessToken();
 
     if (refreshedToken) {
-      return apiRequest<T>(path, options, false);
+      response = await executeDownloadRequest(path);
     }
   }
 
-  const body = await readResponseBody(response);
-
   if (!response.ok) {
-    throw new ApiError(resolveErrorMessage(body, `Request failed with status ${response.status}`), response.status, body);
+    const responseBody = await readResponseBody(response);
+
+    throw new ApiError(resolveErrorMessage(responseBody, `Download failed with status ${response.status}.`), response.status, responseBody);
   }
 
-  return body as T;
+  const blob = await response.blob();
+
+  const filename = getDownloadFilename(response, fallbackFilename);
+
+  const objectUrl = URL.createObjectURL(blob);
+
+  try {
+    const link = document.createElement('a');
+
+    link.href = objectUrl;
+
+    link.download = filename;
+
+    link.style.display = 'none';
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
 }
 
 /**
- * Alias used by the Phase 5 application API.
+ * Backward-compatible alias used by existing feature APIs.
  */
 export const apiClient = apiRequest;

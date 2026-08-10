@@ -2,27 +2,33 @@
 
 import { useEffect, useState } from 'react';
 
-import Link from 'next/link';
-
 import { useParams } from 'next/navigation';
 
-import { ArrowLeft, ChevronLeft, ChevronRight, Radio, RefreshCw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Radio, RefreshCw } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 
 import { Button } from '@/components/ui/button';
 
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
+
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+
+import { EmptyState } from '@/components/ui/empty-state';
+
+import { ErrorState } from '@/components/ui/error-state';
 
 import { Input } from '@/components/ui/input';
 
 import { Select } from '@/components/ui/select';
 
-import { Spinner } from '@/components/ui/spinner';
+import { Skeleton } from '@/components/ui/skeleton';
+
+import { WebsiteSubNav } from '@/features/websites/components/website-sub-nav';
 
 import { getRawTrackingEvents } from '@/features/tracking/tracking-api';
 
-import type { RawEventQuery, RawEventsResponse, RawEventType } from '@/features/tracking/tracking-types';
+import type { RawEventQuery, RawEventsResponse, RawEventType, RawTrackingEvent } from '@/features/tracking/tracking-types';
 
 import { formatTrackingDate, getTrackingError } from '@/features/tracking/tracking-utils';
 
@@ -38,6 +44,18 @@ const EMPTY_RESPONSE: RawEventsResponse = {
     hasPreviousPage: false,
   },
 };
+
+function EventBadge({ type }: { type: RawEventType }) {
+  if (type === 'PAGE_VIEW') {
+    return <Badge variant="blue">Page view</Badge>;
+  }
+
+  if (type === 'HEARTBEAT') {
+    return <Badge variant="green">Heartbeat</Badge>;
+  }
+
+  return <Badge variant="purple">Custom</Badge>;
+}
 
 export default function RawEventsPage() {
   const params = useParams<{
@@ -97,9 +115,7 @@ export default function RawEventsPage() {
 
     setQuery({
       type: type || undefined,
-
       eventName: eventName.trim() || undefined,
-
       page: 1,
       limit: 50,
     });
@@ -125,184 +141,120 @@ export default function RawEventsPage() {
     }));
   }
 
+  function refresh(): void {
+    setLoading(true);
+    setReloadKey((current) => current + 1);
+  }
+
+  const columns: DataTableColumn<RawTrackingEvent>[] = [
+    { key: 'type', header: 'Type', cell: (event) => <EventBadge type={event.type} /> },
+    {
+      key: 'page',
+      header: 'Page',
+      cell: (event) => (
+        <div className="max-w-xs">
+          <p className="truncate font-medium text-slate-800">{event.pageTitle ?? event.pagePath}</p>
+          <p className="mt-0.5 truncate text-xs text-slate-400">{event.pagePath}</p>
+        </div>
+      ),
+    },
+    { key: 'event', header: 'Event', cell: (event) => event.eventName ?? '—', hideBelow: 'md' },
+    { key: 'visitor', header: 'Visitor', cell: (event) => <span className="font-mono text-xs">{event.visitorId.slice(0, 12)}…</span>, hideBelow: 'lg' },
+    { key: 'session', header: 'Session', cell: (event) => <span className="font-mono text-xs">{event.sessionId.slice(0, 12)}…</span>, hideBelow: 'lg' },
+    {
+      key: 'occurred',
+      header: 'Occurred',
+      cell: (event) => <span className="whitespace-nowrap text-xs text-slate-500">{formatTrackingDate(event.occurredAt)}</span>,
+    },
+    { key: 'sdk', header: 'SDK', cell: (event) => event.sdkVersion, hideBelow: 'xl' },
+  ];
+
   return (
-    <div className="space-y-6">
-      <Link
-        href={`/workspaces/${workspaceId}/websites/${websiteId}`}
-        className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900"
-      >
-        <ArrowLeft className="size-4" />
-        Back to website
-      </Link>
+    <div className="mx-auto w-full max-w-[1600px] space-y-5 p-4 sm:p-6 lg:p-8">
+      <WebsiteSubNav workspaceId={workspaceId} websiteId={websiteId} />
 
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <div className="flex items-center gap-3">
-            <Radio className="size-6 text-brand-600" />
-
-            <h1 className="text-3xl font-bold tracking-tight text-slate-950">Raw tracking events</h1>
-          </div>
-
-          <p className="mt-2 text-sm leading-6 text-slate-500">
-            Inspect the raw stream before Phase 10 converts it into visitors, sessions, page views, and reports.
-          </p>
+          <h1 className="text-xl font-semibold tracking-tight text-slate-950">Raw events</h1>
+          <p className="mt-1 text-sm leading-6 text-slate-500">Inspect the raw tracking stream before it&apos;s converted into visitors, sessions and reports.</p>
         </div>
 
-        <Button
-          variant="outline"
-          onClick={() => {
-            setLoading(true);
-
-            setReloadKey((current) => current + 1);
-          }}
-        >
-          <RefreshCw className="size-4" />
+        <Button variant="outline" size="sm" onClick={refresh} loading={loading}>
+          <RefreshCw className="size-3.5" />
           Refresh
         </Button>
       </header>
 
-      <Card>
-        <CardContent className="p-4">
-          <form
-            className="grid gap-4 md:grid-cols-[200px_minmax(220px,1fr)_auto_auto]"
-            onSubmit={(event) => {
-              event.preventDefault();
-              applyFilters();
-            }}
-          >
-            <Select value={type} onChange={(event) => setType(event.target.value as RawEventType | '')}>
-              <option value="">All event types</option>
+      <Card className="p-3">
+        <form
+          className="flex flex-wrap items-center gap-2.5"
+          onSubmit={(event) => {
+            event.preventDefault();
+            applyFilters();
+          }}
+        >
+          <Select aria-label="Event type" className="h-10 w-44 shrink-0" value={type} onChange={(event) => setType(event.target.value as RawEventType | '')}>
+            <option value="">All event types</option>
+            <option value="PAGE_VIEW">Page view</option>
+            <option value="HEARTBEAT">Heartbeat</option>
+            <option value="CUSTOM">Custom event</option>
+          </Select>
 
-              <option value="PAGE_VIEW">Page view</option>
+          <div className="min-w-56 flex-1">
+            <Input aria-label="Custom event name" placeholder="Custom event name..." value={eventName} onChange={(event) => setEventName(event.target.value)} />
+          </div>
 
-              <option value="HEARTBEAT">Heartbeat</option>
-
-              <option value="CUSTOM">Custom event</option>
-            </Select>
-
-            <Input placeholder="Custom event name..." value={eventName} onChange={(event) => setEventName(event.target.value)} />
-
-            <Button type="submit">Apply</Button>
-
-            <Button type="button" variant="ghost" onClick={resetFilters}>
+          <div className="flex shrink-0 items-center gap-1.5">
+            <Button type="button" variant="ghost" size="sm" onClick={resetFilters}>
               Reset
             </Button>
-          </form>
-        </CardContent>
+
+            <Button type="submit" size="sm">
+              Apply
+            </Button>
+          </div>
+        </form>
       </Card>
 
       {loading ? (
-        <div className="flex min-h-72 items-center justify-center">
-          <div className="flex items-center gap-3 text-sm text-slate-600">
-            <Spinner />
-            Loading events...
-          </div>
+        <div className="space-y-2">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <Skeleton key={index} className="h-10 w-full rounded-lg" />
+          ))}
         </div>
       ) : error ? (
-        <Card>
-          <CardContent className="p-8 text-center text-sm text-red-600">{error}</CardContent>
-        </Card>
+        <ErrorState message={error} onRetry={refresh} />
       ) : response.data.length === 0 ? (
-        <Card>
-          <CardContent className="p-12 text-center">
-            <Radio className="mx-auto size-8 text-slate-400" />
-
-            <h2 className="mt-4 font-semibold text-slate-900">No tracking events found</h2>
-
-            <p className="mt-2 text-sm text-slate-500">Install the tracker and visit the external website.</p>
-          </CardContent>
-        </Card>
+        <EmptyState icon={<Radio className="size-5" />} title="No tracking events found" description="Install the tracker and visit the external website." />
       ) : (
-        <Card>
-          <CardHeader>
-            <p className="text-sm text-slate-500">
-              Showing <strong>{response.data.length}</strong> of <strong>{response.meta.total}</strong> events
-            </p>
-          </CardHeader>
+        <>
+          <p className="text-xs font-medium text-slate-500">
+            Showing <span className="text-slate-800">{response.data.length}</span> of <span className="text-slate-800">{response.meta.total}</span> events
+          </p>
 
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[1050px] border-collapse text-left text-sm">
-                <thead>
-                  <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-400">
-                    <th className="px-3 py-3">Type</th>
+          <DataTable columns={columns} rows={response.data} getRowKey={(event) => event.id} />
 
-                    <th className="px-3 py-3">Page</th>
+          {response.meta.totalPages > 1 ? (
+            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3.5">
+              <p className="text-sm text-slate-500">
+                Page {response.meta.page} of {response.meta.totalPages}
+              </p>
 
-                    <th className="px-3 py-3">Event</th>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" disabled={!response.meta.hasPreviousPage} onClick={() => changePage(response.meta.page - 1)}>
+                  <ChevronLeft className="size-3.5" />
+                  Previous
+                </Button>
 
-                    <th className="px-3 py-3">Visitor</th>
-
-                    <th className="px-3 py-3">Session</th>
-
-                    <th className="px-3 py-3">Occurred</th>
-
-                    <th className="px-3 py-3">SDK</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {response.data.map((event) => (
-                    <tr key={event.id} className="border-b border-slate-100 align-top last:border-0">
-                      <td className="px-3 py-4">
-                        <EventBadge type={event.type} />
-                      </td>
-
-                      <td className="max-w-xs px-3 py-4">
-                        <p className="truncate font-medium text-slate-800">{event.pageTitle ?? event.pagePath}</p>
-
-                        <p className="mt-1 truncate text-xs text-slate-400">{event.pagePath}</p>
-                      </td>
-
-                      <td className="px-3 py-4">{event.eventName ?? '—'}</td>
-
-                      <td className="px-3 py-4 font-mono text-xs">{event.visitorId.slice(0, 12)}…</td>
-
-                      <td className="px-3 py-4 font-mono text-xs">{event.sessionId.slice(0, 12)}…</td>
-
-                      <td className="whitespace-nowrap px-3 py-4 text-xs text-slate-500">{formatTrackingDate(event.occurredAt)}</td>
-
-                      <td className="px-3 py-4">{event.sdkVersion}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {response.meta.totalPages > 1 ? (
-              <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-5">
-                <p className="text-sm text-slate-500">
-                  Page {response.meta.page} of {response.meta.totalPages}
-                </p>
-
-                <div className="flex gap-2">
-                  <Button variant="outline" disabled={!response.meta.hasPreviousPage} onClick={() => changePage(response.meta.page - 1)}>
-                    <ChevronLeft className="size-4" />
-                    Previous
-                  </Button>
-
-                  <Button variant="outline" disabled={!response.meta.hasNextPage} onClick={() => changePage(response.meta.page + 1)}>
-                    Next
-                    <ChevronRight className="size-4" />
-                  </Button>
-                </div>
+                <Button variant="outline" size="sm" disabled={!response.meta.hasNextPage} onClick={() => changePage(response.meta.page + 1)}>
+                  Next
+                  <ChevronRight className="size-3.5" />
+                </Button>
               </div>
-            ) : null}
-          </CardContent>
-        </Card>
+            </div>
+          ) : null}
+        </>
       )}
     </div>
   );
-}
-
-function EventBadge({ type }: { type: RawEventType }) {
-  if (type === 'PAGE_VIEW') {
-    return <Badge variant="blue">Page view</Badge>;
-  }
-
-  if (type === 'HEARTBEAT') {
-    return <Badge variant="green">Heartbeat</Badge>;
-  }
-
-  return <Badge variant="purple">Custom</Badge>;
 }

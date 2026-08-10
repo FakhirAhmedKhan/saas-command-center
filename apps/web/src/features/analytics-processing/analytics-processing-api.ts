@@ -1,4 +1,4 @@
-import { apiRequest } from '../auth/auth.types';
+import { apiRequest } from '../lib/api/api-client';
 import type { AnalyticsProcessingStatus, ProcessingRun, ReprocessAnalyticsInput } from './analytics-processing.types';
 
 function createBasePath(

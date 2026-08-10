@@ -71,30 +71,30 @@ export function GithubCallbackClient() {
 
   return (
     <main className="flex min-h-[70vh] items-center justify-center p-6">
-      <section className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-        <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-slate-950 text-white">
-          {connected ? <CheckCircle2 className="size-7" /> : <FolderGit2 className="size-7" />}
+      <section className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-6 text-center">
+        <div className="mx-auto flex size-11 items-center justify-center rounded-xl bg-slate-950 text-white">
+          {connected ? <CheckCircle2 className="size-5" /> : <FolderGit2 className="size-5" />}
         </div>
 
         {error ? (
           <>
-            <h1 className="mt-5 text-xl font-bold text-slate-950">Authorization failed</h1>
+            <h1 className="mt-4 text-lg font-semibold text-slate-950">Authorization failed</h1>
 
-            <p className="mt-3 text-sm text-red-700">{error}</p>
+            <p className="mt-2 text-sm leading-6 text-red-700">{error}</p>
           </>
         ) : connected ? (
           <>
-            <h1 className="mt-5 text-xl font-bold text-slate-950">GitHub connected</h1>
+            <h1 className="mt-4 text-lg font-semibold text-slate-950">GitHub connected</h1>
 
-            <p className="mt-3 text-sm text-slate-500">Your repositories are ready. Redirecting to the workspace.</p>
+            <p className="mt-2 text-sm leading-6 text-slate-500">Your repositories are ready. Redirecting to the workspace.</p>
           </>
         ) : (
           <>
-            <h1 className="mt-5 text-xl font-bold text-slate-950">Finalizing GitHub connection</h1>
+            <h1 className="mt-4 text-lg font-semibold text-slate-950">Finalizing GitHub connection</h1>
 
-            <p className="mt-3 text-sm text-slate-500">Verifying repository access and synchronizing your installation.</p>
+            <p className="mt-2 text-sm leading-6 text-slate-500">Verifying repository access and synchronizing your installation.</p>
 
-            <div className="mx-auto mt-6 size-7 animate-spin rounded-full border-2 border-slate-200 border-t-slate-950" />
+            <div className="mx-auto mt-5 size-6 animate-spin rounded-full border-2 border-slate-200 border-t-slate-950" />
           </>
         )}
       </section>

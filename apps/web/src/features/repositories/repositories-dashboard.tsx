@@ -164,74 +164,64 @@ export function RepositoriesDashboard({ workspaceId }: RepositoriesDashboardProp
   }
 
   return (
-    <div className="space-y-6">
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="flex size-11 items-center justify-center rounded-xl bg-slate-950 text-white">
-                <FolderGit2 className="size-5" />
-              </div>
+    <div className="mx-auto w-full max-w-[1600px] space-y-5 p-4 sm:p-6 lg:p-8">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="text-[26px] font-semibold tracking-tight text-slate-950">Repositories</h1>
 
-              <div>
-                <h1 className="text-2xl font-bold text-slate-950">Repositories</h1>
-
-                <p className="mt-1 text-sm text-slate-500">Connect GitHub repositories to this workspace.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                void handleSyncAll();
-              }}
-              disabled={busyKey !== null || installations.length === 0}
-              className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <RefreshCw className={`size-4 ${busyKey === 'sync-all' ? 'animate-spin' : ''}`} />
-              Sync
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                void handleConnect();
-              }}
-              disabled={busyKey !== null}
-              className="inline-flex h-10 items-center gap-2 rounded-xl bg-slate-950 px-4 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <FolderGit2 className="size-4" />
-              Connect GitHub
-            </button>
-          </div>
+          <p className="mt-1 text-sm leading-6 text-slate-500">Connect and manage repositories for this workspace.</p>
         </div>
-      </section>
+
+        <div className="flex shrink-0 gap-2.5">
+          <button
+            type="button"
+            onClick={() => {
+              void handleSyncAll();
+            }}
+            disabled={busyKey !== null || installations.length === 0}
+            className="inline-flex h-9 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <RefreshCw className={`size-3.5 ${busyKey === 'sync-all' ? 'animate-spin' : ''}`} />
+            Sync
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              void handleConnect();
+            }}
+            disabled={busyKey !== null}
+            className="inline-flex h-9 items-center gap-2 rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <FolderGit2 className="size-3.5" />
+            Connect GitHub
+          </button>
+        </div>
+      </header>
 
       {error ? (
-        <section className="rounded-2xl border border-red-200 bg-red-50 p-4">
+        <section className="rounded-lg border border-red-200 bg-red-50 p-3.5">
           <p className="text-sm font-medium text-red-800">{error}</p>
         </section>
       ) : null}
 
-      <section className="grid gap-4 md:grid-cols-3">
-        <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm font-medium text-slate-500">Connected repositories</p>
+      <section className="grid gap-3 md:grid-cols-3">
+        <article className="rounded-xl border border-slate-200 bg-white p-3.5">
+          <p className="text-xs font-medium text-slate-500">Connected repositories</p>
 
-          <p className="mt-2 text-3xl font-bold text-slate-950">{repositories.length}</p>
+          <p className="mt-1.5 text-xl font-semibold text-slate-950">{repositories.length}</p>
         </article>
 
-        <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm font-medium text-slate-500">Private repositories</p>
+        <article className="rounded-xl border border-slate-200 bg-white p-3.5">
+          <p className="text-xs font-medium text-slate-500">Private repositories</p>
 
-          <p className="mt-2 text-3xl font-bold text-slate-950">{privateRepositoryCount}</p>
+          <p className="mt-1.5 text-xl font-semibold text-slate-950">{privateRepositoryCount}</p>
         </article>
 
-        <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm font-medium text-slate-500">GitHub installations</p>
+        <article className="rounded-xl border border-slate-200 bg-white p-3.5">
+          <p className="text-xs font-medium text-slate-500">GitHub installations</p>
 
-          <p className="mt-2 text-3xl font-bold text-slate-950">{installations.length}</p>
+          <p className="mt-1.5 text-xl font-semibold text-slate-950">{installations.length}</p>
         </article>
       </section>
 

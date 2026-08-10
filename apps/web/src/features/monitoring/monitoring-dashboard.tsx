@@ -117,10 +117,10 @@ function SummaryCard({
   value: number;
 }) {
   return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <p className="text-sm font-medium text-slate-500">{label}</p>
+    <article className="rounded-xl border border-slate-200 bg-white p-3.5">
+      <p className="text-xs font-medium text-slate-500">{label}</p>
 
-      <p className="mt-2 text-3xl font-bold text-slate-950">{numberFormatter.format(value)}</p>
+      <p className="mt-1.5 text-xl font-semibold text-slate-950">{numberFormatter.format(value)}</p>
     </article>
   );
 }
@@ -622,14 +622,12 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
   }
 
   return (
-    <main className="space-y-6">
-      <header className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between">
+    <main className="mx-auto w-full max-w-[1600px] space-y-5 p-4 sm:p-6 lg:p-8">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-sm font-medium text-slate-500">Command center</p>
+          <h1 className="text-[26px] font-semibold tracking-tight text-slate-950">Monitoring</h1>
 
-          <h1 className="mt-1 text-2xl font-bold text-slate-950">Health monitoring</h1>
-
-          <p className="mt-2 text-sm text-slate-600">Application and website availability, response times and incidents.</p>
+          <p className="mt-1 text-sm leading-6 text-slate-500">Application and website availability, response times and incidents.</p>
         </div>
 
         {data.summary.canManage ? (
@@ -640,14 +638,14 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
 
               setShowForm(true);
             }}
-            className="rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white"
+            className="inline-flex h-9 shrink-0 items-center justify-center rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white transition hover:bg-brand-700"
           >
             Add health check
           </button>
         ) : null}
       </header>
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
         <SummaryCard label="Total" value={data.summary.total} />
 
         <SummaryCard label="Healthy" value={data.summary.healthy} />

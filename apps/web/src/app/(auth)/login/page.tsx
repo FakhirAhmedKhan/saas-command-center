@@ -8,6 +8,9 @@ import Link from 'next/link';
 
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+
 import { useSession } from '@/features/auth/use-session';
 import { getErrorMessage } from '@/features/lib/api/api-error';
 
@@ -49,72 +52,50 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-6">
-      <section className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
-        <h1 className="text-2xl font-bold">Welcome back</h1>
+    <div>
+      <h1 className="text-xl font-semibold text-slate-950">Welcome back</h1>
 
-        <p className="mt-2 text-sm text-slate-600">Sign in to your command center.</p>
+      <p className="mt-1.5 text-sm text-slate-500">Sign in to your command center.</p>
 
-        <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="email" className="text-sm font-medium">
-              Email
-            </label>
+      <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+        <Input
+          id="email"
+          type="email"
+          label="Email"
+          autoComplete="email"
+          required
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
 
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={(event) => {
-                setEmail(event.target.value);
-              }}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-slate-950"
-            />
+        <Input
+          id="password"
+          type="password"
+          label="Password"
+          autoComplete="current-password"
+          required
+          minLength={8}
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+        />
+
+        {error ? (
+          <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+            {error}
           </div>
+        ) : null}
 
-          <div>
-            <label htmlFor="password" className="text-sm font-medium">
-              Password
-            </label>
+        <Button type="submit" size="lg" loading={submitting} className="w-full">
+          Sign in
+        </Button>
+      </form>
 
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              minLength={8}
-              value={password}
-              onChange={(event) => {
-                setPassword(event.target.value);
-              }}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-slate-950"
-            />
-          </div>
-
-          {error ? (
-            <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
-              {error}
-            </div>
-          ) : null}
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full rounded-lg bg-slate-950 px-4 py-2.5 font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {submitting ? 'Signing in…' : 'Sign in'}
-          </button>
-        </form>
-
-        <p className="mt-5 text-center text-sm text-slate-600">
-          No account?{' '}
-          <Link href="/register" className="font-medium text-slate-950 underline">
-            Create one
-          </Link>
-        </p>
-      </section>
-    </main>
+      <p className="mt-5 text-center text-sm text-slate-500">
+        No account?{' '}
+        <Link href="/register" className="font-medium text-brand-700 hover:text-brand-800">
+          Create one
+        </Link>
+      </p>
+    </div>
   );
 }

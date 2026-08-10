@@ -30,16 +30,16 @@ export default function NewApplicationPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="mx-auto w-full max-w-2xl space-y-5 p-4 pt-8 sm:p-6 sm:pt-10 lg:p-8">
       <header>
-        <Link href={applicationsHref} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-slate-900">
-          <ArrowLeft className="size-4" />
+        <Link href={applicationsHref} className="inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-500 transition hover:text-slate-800">
+          <ArrowLeft className="size-3.5" aria-hidden="true" />
           Back to applications
         </Link>
 
-        <h1 className="mt-5 text-3xl font-bold tracking-tight text-slate-950">Create application</h1>
+        <h1 className="mt-4 text-2xl font-semibold tracking-tight text-slate-950">Create application</h1>
 
-        <p className="mt-2 text-sm leading-6 text-slate-500">Register a SaaS product in your command center.</p>
+        <p className="mt-1.5 text-sm leading-6 text-slate-500">Register a SaaS product in your command center.</p>
       </header>
 
       <ApplicationForm cancelHref={applicationsHref} submitLabel="Create application" onSubmit={handleCreate} />

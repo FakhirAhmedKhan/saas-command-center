@@ -1,4 +1,4 @@
-import { apiRequest } from '../auth/auth.types';
+import { apiRequest } from '../lib/api/api-client';
 import type { SaveWebhookInput, WebhookDelivery, WebhookEndpoint, WebhookListResponse } from './integrations.types';
 
 function createBasePath(workspaceId: string): string {

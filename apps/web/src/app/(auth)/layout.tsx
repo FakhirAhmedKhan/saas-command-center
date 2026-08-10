@@ -9,20 +9,25 @@ interface AuthLayoutProps {
 export default function AuthLayout({ children }: AuthLayoutProps) {
   return (
     <GuestOnly>
-      <main className="auth-page">
-        <section className="auth-brand">
-          <div className="brand-mark">SC</div>
+      <main className="flex min-h-screen w-full bg-app-bg">
+        <section className="hidden w-[42%] max-w-md flex-col justify-between bg-slate-950 px-10 py-10 text-white lg:flex">
+          <span className="flex items-center gap-2.5 text-sm font-semibold">
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-white text-[11px] font-bold text-slate-950">SC</span>
+            SaaS Command Center
+          </span>
 
           <div>
-            <p className="eyebrow">SaaS Command Center</p>
+            <h1 className="text-3xl font-semibold leading-tight tracking-tight">Know what needs your attention.</h1>
 
-            <h1>Know what needs your attention.</h1>
-
-            <p className="auth-brand-copy">Keep projects, teams and workspace activity organized in one clear command center.</p>
+            <p className="mt-3 max-w-xs text-sm leading-6 text-slate-400">One place for every SaaS product you operate.</p>
           </div>
+
+          <p className="text-xs text-slate-500">&copy; {new Date().getFullYear()} SaaS Command Center</p>
         </section>
 
-        <section className="auth-content">{children}</section>
+        <section className="flex flex-1 items-center justify-center px-6 py-10 sm:px-10">
+          <div className="w-full max-w-sm">{children}</div>
+        </section>
       </main>
     </GuestOnly>
   );

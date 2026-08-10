@@ -50,17 +50,25 @@ export function ApplicationFilters({ value, onChange, onApply, onReset }: Applic
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
-      <div className="grid gap-4 xl:grid-cols-[minmax(240px,1.5fr)_repeat(5,minmax(140px,1fr))]">
-        <Input
-          aria-label="Search applications"
-          placeholder="Search applications..."
-          value={value.search}
-          leadingIcon={<Search className="size-4" />}
-          onChange={(event) => updateValue('search', event.target.value)}
-        />
+    <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200 bg-white p-3 shadow-card">
+      <div className="flex flex-wrap items-center gap-2.5">
+        <div className="min-w-60 flex-1">
+          <Input
+            aria-label="Search applications"
+            placeholder="Search applications..."
+            value={value.search}
+            leadingIcon={<Search className="size-4" />}
+            className="h-10"
+            onChange={(event) => updateValue('search', event.target.value)}
+          />
+        </div>
 
-        <Select aria-label="Status" value={value.status} onChange={(event) => updateValue('status', event.target.value as ApplicationStatus | '')}>
+        <Select
+          aria-label="Status"
+          value={value.status}
+          className="h-10 w-35 shrink-0"
+          onChange={(event) => updateValue('status', event.target.value as ApplicationStatus | '')}
+        >
           <option value="">All statuses</option>
 
           {APPLICATION_STATUSES.map((status) => (
@@ -70,7 +78,12 @@ export function ApplicationFilters({ value, onChange, onApply, onReset }: Applic
           ))}
         </Select>
 
-        <Select aria-label="Priority" value={value.priority} onChange={(event) => updateValue('priority', event.target.value as ApplicationPriority | '')}>
+        <Select
+          aria-label="Priority"
+          value={value.priority}
+          className="h-10 w-37.5 shrink-0"
+          onChange={(event) => updateValue('priority', event.target.value as ApplicationPriority | '')}
+        >
           <option value="">All priorities</option>
 
           {APPLICATION_PRIORITIES.map((priority) => (
@@ -80,7 +93,12 @@ export function ApplicationFilters({ value, onChange, onApply, onReset }: Applic
           ))}
         </Select>
 
-        <Select aria-label="Category" value={value.category} onChange={(event) => updateValue('category', event.target.value as ApplicationCategory | '')}>
+        <Select
+          aria-label="Category"
+          value={value.category}
+          className="h-10 w-45 shrink-0"
+          onChange={(event) => updateValue('category', event.target.value as ApplicationCategory | '')}
+        >
           <option value="">All categories</option>
 
           {APPLICATION_CATEGORIES.map((category) => (
@@ -93,6 +111,7 @@ export function ApplicationFilters({ value, onChange, onApply, onReset }: Applic
         <Select
           aria-label="Archive view"
           value={value.archiveView}
+          className="h-10 w-35 shrink-0"
           onChange={(event) => updateValue('archiveView', event.target.value as 'active' | 'archived')}
         >
           <option value="active">Active</option>
@@ -102,6 +121,7 @@ export function ApplicationFilters({ value, onChange, onApply, onReset }: Applic
         <Select
           aria-label="Sort applications"
           value={`${value.sortBy}:${value.sortOrder}`}
+          className="h-10 w-42.5 shrink-0"
           onChange={(event) => {
             const [sortBy, sortOrder] = event.target.value.split(':') as [ApplicationFilterValue['sortBy'], ApplicationFilterValue['sortOrder']];
 
@@ -119,18 +139,18 @@ export function ApplicationFilters({ value, onChange, onApply, onReset }: Applic
           <option value="priority:desc">Highest priority</option>
           <option value="targetLaunchAt:asc">Launch date</option>
         </Select>
-      </div>
 
-      <div className="mt-4 flex flex-wrap justify-end gap-3">
-        <Button type="button" variant="ghost" onClick={onReset}>
-          <RotateCcw className="size-4" />
-          Reset
-        </Button>
+        <div className="ml-auto flex shrink-0 items-center gap-1.5">
+          <Button type="button" variant="ghost" size="sm" onClick={onReset}>
+            <RotateCcw className="size-3.5" />
+            Reset
+          </Button>
 
-        <Button type="submit">
-          <Search className="size-4" />
-          Apply filters
-        </Button>
+          <Button type="submit" size="sm">
+            <Search className="size-3.5" />
+            Apply filters
+          </Button>
+        </div>
       </div>
     </form>
   );

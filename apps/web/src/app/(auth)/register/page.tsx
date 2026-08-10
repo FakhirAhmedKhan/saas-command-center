@@ -8,6 +8,9 @@ import Link from 'next/link';
 
 import { useRouter } from 'next/navigation';
 
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+
 import { useSession } from '@/features/auth/use-session';
 import { getErrorMessage } from '@/features/lib/api/api-error';
 
@@ -48,91 +51,53 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-6">
-      <section className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
-        <h1 className="text-2xl font-bold">Create your account</h1>
+    <div>
+      <h1 className="text-xl font-semibold text-slate-950">Create your account</h1>
 
-        <p className="mt-2 text-sm text-slate-600">Start managing your SaaS applications.</p>
+      <p className="mt-1.5 text-sm text-slate-500">Start managing your SaaS applications.</p>
 
-        <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="name" className="text-sm font-medium">
-              Name
-            </label>
+      <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+        <Input id="name" type="text" label="Name" autoComplete="name" required minLength={2} value={name} onChange={(event) => setName(event.target.value)} />
 
-            <input
-              id="name"
-              type="text"
-              autoComplete="name"
-              required
-              minLength={2}
-              value={name}
-              onChange={(event) => {
-                setName(event.target.value);
-              }}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-slate-950"
-            />
+        <Input
+          id="email"
+          type="email"
+          label="Email"
+          autoComplete="email"
+          required
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
+
+        <Input
+          id="password"
+          type="password"
+          label="Password"
+          hint="At least 8 characters."
+          autoComplete="new-password"
+          required
+          minLength={8}
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+        />
+
+        {error ? (
+          <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+            {error}
           </div>
+        ) : null}
 
-          <div>
-            <label htmlFor="email" className="text-sm font-medium">
-              Email
-            </label>
+        <Button type="submit" size="lg" loading={submitting} className="w-full">
+          Create account
+        </Button>
+      </form>
 
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={(event) => {
-                setEmail(event.target.value);
-              }}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-slate-950"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="text-sm font-medium">
-              Password
-            </label>
-
-            <input
-              id="password"
-              type="password"
-              autoComplete="new-password"
-              required
-              minLength={8}
-              value={password}
-              onChange={(event) => {
-                setPassword(event.target.value);
-              }}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-slate-950"
-            />
-          </div>
-
-          {error ? (
-            <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
-              {error}
-            </div>
-          ) : null}
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full rounded-lg bg-slate-950 px-4 py-2.5 font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {submitting ? 'Creating accountâ€¦' : 'Create account'}
-          </button>
-        </form>
-
-        <p className="mt-5 text-center text-sm text-slate-600">
-          Already registered?{' '}
-          <Link href="/login" className="font-medium text-slate-950 underline">
-            Sign in
-          </Link>
-        </p>
-      </section>
-    </main>
+      <p className="mt-5 text-center text-sm text-slate-500">
+        Already registered?{' '}
+        <Link href="/login" className="font-medium text-brand-700 hover:text-brand-800">
+          Sign in
+        </Link>
+      </p>
+    </div>
   );
 }

@@ -57,7 +57,9 @@
     "test:e2e:phase17": "jest --config ./test/jest-e2e.config.cjs --runInBand phase17-team-operations.e2e-spec.ts",
     "test:e2e:phase18": "jest --config ./test/jest-e2e.config.cjs --runInBand phase18-webhook-integrations.e2e-spec.ts",
     "test:cover": "jest --coverage",
-    "test:e2e:cover": "jest --config ./test/jest-e2e.config.cjs --runInBand --coverage"
+    "test:e2e:cover": "jest --config ./test/jest-e2e.config.cjs --runInBand --coverage",
+    "demo:seed": "prisma generate && tsx scripts/demo-data.ts seed",
+    "demo:reset": "prisma generate && tsx scripts/demo-data.ts reset"
   },
   "dependencies": {
     "@command-center/shared-types": "workspace:*",

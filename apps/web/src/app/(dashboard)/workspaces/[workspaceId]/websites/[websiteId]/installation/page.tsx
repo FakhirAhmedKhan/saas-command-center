@@ -6,13 +6,15 @@ import Link from 'next/link';
 
 import { useParams } from 'next/navigation';
 
-import { ArrowLeft, Check, Clipboard, Code2, KeyRound } from 'lucide-react';
+import { Check, Clipboard, KeyRound } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
-import { Spinner } from '@/components/ui/spinner';
+import { PageLoading } from '@/components/states/page-loading';
+
+import { WebsiteSubNav } from '@/features/websites/components/website-sub-nav';
 
 import { TrackingStatusPanel } from '@/features/tracking/components/tracking-status-panel';
 
@@ -112,115 +114,99 @@ export default function WebsiteInstallationPage() {
   }
 
   if (loading) {
-    return (
-      <div className="flex min-h-80 items-center justify-center">
-        <Spinner />
-      </div>
-    );
+    return <PageLoading label="Loading installation…" />;
   }
 
   if (!website) {
-    return <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">{error}</div>;
+    return <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>;
   }
 
   const baseHref = `/workspaces/${workspaceId}/websites/${websiteId}`;
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
-      <Link href={baseHref} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900">
-        <ArrowLeft className="size-4" />
-        Back to website
-      </Link>
+    <div className="mx-auto w-full max-w-[1600px] space-y-5 p-4 sm:p-6 lg:p-8">
+      <WebsiteSubNav workspaceId={workspaceId} websiteId={websiteId} />
 
-      <header>
-        <div className="flex items-start gap-4">
-          <div className="flex size-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
-            <Code2 className="size-6" />
+      <div className="mx-auto max-w-3xl space-y-5">
+        <header>
+          <h1 className="text-xl font-semibold tracking-tight text-slate-950">Install tracking</h1>
+
+          <p className="mt-1 text-sm leading-6 text-slate-500">
+            Install the lightweight tracker on <strong className="font-medium text-slate-700">{website.domain}</strong>.
+          </p>
+        </header>
+
+        {!trackingKey ? (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-3.5 text-sm leading-6 text-amber-900">
+            The complete key is shown only after website creation or key rotation. Open{' '}
+            <Link href={`${baseHref}/settings`} className="font-semibold underline">
+              Website Settings
+            </Link>{' '}
+            and rotate the key.
           </div>
+        ) : (
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <KeyRound className="size-4 text-brand-600" aria-hidden="true" />
 
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-950">Tracker installation</h1>
+                <h2 className="text-[15px] font-semibold text-slate-950">Tracking key</h2>
+              </div>
+            </CardHeader>
 
-            <p className="mt-2 text-sm leading-6 text-slate-500">
-              Install the lightweight tracker on <strong>{website.domain}</strong>.
-            </p>
-          </div>
-        </div>
-      </header>
+            <CardContent>
+              <div className="flex flex-col gap-2.5 sm:flex-row">
+                <code className="min-w-0 flex-1 break-all rounded-lg bg-slate-950 p-3.5 text-sm text-slate-100">{trackingKey}</code>
 
-      {!trackingKey ? (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-900">
-          The complete key is shown only after website creation or key rotation. Open{' '}
-          <Link href={`${baseHref}/settings`} className="font-semibold underline">
-            Website Settings
-          </Link>{' '}
-          and rotate the key.
-        </div>
-      ) : (
+                <Button variant="outline" size="sm" onClick={() => void copy('key', trackingKey)}>
+                  {copied === 'key' ? <Check className="size-3.5" /> : <Clipboard className="size-3.5" />}
+                  {copied === 'key' ? 'Copied' : 'Copy'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <Card>
           <CardHeader>
-            <div className="flex items-center gap-2">
-              <KeyRound className="size-5 text-brand-600" />
+            <h2 className="text-[15px] font-semibold text-slate-950">HTML installation</h2>
 
-              <h2 className="font-semibold text-slate-950">Tracking key</h2>
-            </div>
+            <p className="mt-1 text-sm text-slate-500">Add this code before the closing body tag.</p>
           </CardHeader>
 
           <CardContent>
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <code className="min-w-0 flex-1 break-all rounded-xl bg-slate-950 p-4 text-sm text-slate-100">{trackingKey}</code>
+            <pre className="overflow-x-auto rounded-lg bg-slate-950 p-4 text-sm leading-6 text-slate-100">
+              <code>{snippet}</code>
+            </pre>
 
-              <Button variant="outline" onClick={() => void copy('key', trackingKey)}>
-                {copied === 'key' ? <Check className="size-4" /> : <Clipboard className="size-4" />}
-
-                {copied === 'key' ? 'Copied' : 'Copy'}
-              </Button>
-            </div>
+            <Button className="mt-3" variant="outline" size="sm" onClick={() => void copy('snippet', snippet)}>
+              {copied === 'snippet' ? <Check className="size-3.5" /> : <Clipboard className="size-3.5" />}
+              {copied === 'snippet' ? 'Copied' : 'Copy snippet'}
+            </Button>
           </CardContent>
         </Card>
-      )}
 
-      <Card>
-        <CardHeader>
-          <h2 className="font-semibold text-slate-950">HTML installation</h2>
+        <Card>
+          <CardHeader>
+            <h2 className="text-[15px] font-semibold text-slate-950">Custom events</h2>
 
-          <p className="mt-1 text-sm text-slate-500">Add this code before the closing body tag.</p>
-        </CardHeader>
+            <p className="mt-1 text-sm text-slate-500">Form values are never captured automatically. Send only safe, non-sensitive properties.</p>
+          </CardHeader>
 
-        <CardContent>
-          <pre className="overflow-x-auto rounded-2xl bg-slate-950 p-5 text-sm leading-6 text-slate-100">
-            <code>{snippet}</code>
-          </pre>
+          <CardContent>
+            <pre className="overflow-x-auto rounded-lg bg-slate-950 p-4 text-sm leading-6 text-slate-100">
+              <code>{customEventSnippet}</code>
+            </pre>
 
-          <Button className="mt-4" variant="outline" onClick={() => void copy('snippet', snippet)}>
-            {copied === 'snippet' ? <Check className="size-4" /> : <Clipboard className="size-4" />}
+            <Button className="mt-3" variant="outline" size="sm" onClick={() => void copy('custom', customEventSnippet)}>
+              {copied === 'custom' ? <Check className="size-3.5" /> : <Clipboard className="size-3.5" />}
+              {copied === 'custom' ? 'Copied' : 'Copy example'}
+            </Button>
+          </CardContent>
+        </Card>
 
-            {copied === 'snippet' ? 'Copied' : 'Copy snippet'}
-          </Button>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <h2 className="font-semibold text-slate-950">Custom events</h2>
-
-          <p className="mt-1 text-sm text-slate-500">Form values are never captured automatically. Send only safe, non-sensitive properties.</p>
-        </CardHeader>
-
-        <CardContent>
-          <pre className="overflow-x-auto rounded-2xl bg-slate-950 p-5 text-sm leading-6 text-slate-100">
-            <code>{customEventSnippet}</code>
-          </pre>
-
-          <Button className="mt-4" variant="outline" onClick={() => void copy('custom', customEventSnippet)}>
-            {copied === 'custom' ? <Check className="size-4" /> : <Clipboard className="size-4" />}
-
-            {copied === 'custom' ? 'Copied' : 'Copy example'}
-          </Button>
-        </CardContent>
-      </Card>
-
-      <TrackingStatusPanel workspaceId={workspaceId} websiteId={websiteId} />
+        <TrackingStatusPanel workspaceId={workspaceId} websiteId={websiteId} />
+      </div>
     </div>
   );
 }

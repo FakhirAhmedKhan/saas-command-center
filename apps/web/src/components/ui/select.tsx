@@ -15,7 +15,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
   return (
     <div className="space-y-1.5">
       {label ? (
-        <label htmlFor={selectId} className="block text-sm font-medium text-slate-700">
+        <label htmlFor={selectId} className="block text-[13px] font-medium text-slate-700">
           {label}
         </label>
       ) : null}
@@ -25,7 +25,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
           ref={ref}
           id={selectId}
           className={cn(
-            'h-11 w-full appearance-none rounded-xl border bg-white px-3 pr-10 text-sm text-slate-900 outline-none transition',
+            'h-10 w-full appearance-none rounded-lg border bg-white px-3 pr-10 text-sm text-slate-900 outline-none transition',
             'focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10',
             'disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500',
             error ? 'border-red-400 focus:border-red-500 focus:ring-red-500/10' : 'border-slate-300',
@@ -40,7 +40,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
         <ChevronDown aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
       </div>
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : hint ? <p className="text-sm text-slate-500">{hint}</p> : null}
+      {error ? <p className="text-xs text-red-600">{error}</p> : hint ? <p className="text-xs text-slate-500">{hint}</p> : null}
     </div>
   );
 });

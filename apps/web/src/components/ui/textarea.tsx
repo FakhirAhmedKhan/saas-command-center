@@ -13,7 +13,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
   return (
     <div className="space-y-1.5">
       {label ? (
-        <label htmlFor={textareaId} className="block text-sm font-medium text-slate-700">
+        <label htmlFor={textareaId} className="block text-[13px] font-medium text-slate-700">
           {label}
         </label>
       ) : null}
@@ -23,7 +23,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
         id={textareaId}
         rows={rows}
         className={cn(
-          'w-full resize-y rounded-xl border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition',
+          'w-full resize-y rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition',
           'placeholder:text-slate-400',
           'focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10',
           'disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500',
@@ -34,7 +34,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
         {...props}
       />
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : hint ? <p className="text-sm text-slate-500">{hint}</p> : null}
+      {error ? <p className="text-xs text-red-600">{error}</p> : hint ? <p className="text-xs text-slate-500">{hint}</p> : null}
     </div>
   );
 });

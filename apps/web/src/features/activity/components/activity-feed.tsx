@@ -223,13 +223,13 @@ export function ActivityFeed({
             </Button>
           </CardContent>
         </Card>
-      ) : activities.length === 0 ? (
+      ) : (activities ?? []).length === 0 ? (
         <EmptyState icon={<Activity className="size-6" />} title="No activity found" description="Important application changes will appear here." />
       ) : (
         <Card>
           <CardContent className="p-5 sm:p-6">
             <div>
-              {activities.map((activity) => (
+              {(activities ?? []).map((activity) => (
                 <ActivityItem key={activity.id} workspaceId={workspaceId} activity={activity} showApplication={showApplication} />
               ))}
             </div>
@@ -237,7 +237,7 @@ export function ActivityFeed({
             {pagination.totalPages > 1 ? (
               <div className="mt-6 flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-slate-500">
-                  Page {pagination.page} of {pagination.totalPages} · {pagination.total} activities
+                  Page {pagination.page} of {pagination.totalPages} Ã‚Â· {pagination.total} activities
                 </p>
 
                 <div className="flex gap-2">

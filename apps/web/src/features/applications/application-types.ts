@@ -55,6 +55,8 @@ export interface SaasApplication {
   archivedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  progressPercent: number;
+  progressUpdatedAt: string | null;
   technologies: ApplicationTechnology[];
   links: ApplicationLink[];
   _count?: {

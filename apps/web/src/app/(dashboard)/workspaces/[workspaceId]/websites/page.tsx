@@ -6,19 +6,21 @@ import Link from 'next/link';
 
 import { useParams } from 'next/navigation';
 
-import { ChevronLeft, ChevronRight, Globe2, Plus, RefreshCw, Search } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Globe2, Plus, RefreshCw } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 
 import { EmptyState } from '@/components/ui/empty-state';
 
-import { Input } from '@/components/ui/input';
+import { ErrorState } from '@/components/ui/error-state';
 
 import { Select } from '@/components/ui/select';
 
-import { Spinner } from '@/components/ui/spinner';
+import { SearchInput } from '@/components/ui/search-input';
+
+import { Skeleton } from '@/components/ui/skeleton';
 
 import { WebsiteCard } from '@/features/websites/components/website-card';
 
@@ -109,13 +111,9 @@ export default function WebsitesPage() {
 
     setQuery({
       search: search.trim() || undefined,
-
       enabled: status === 'all' ? undefined : status === 'enabled',
-
       connected: connection === 'all' ? undefined : connection === 'connected',
-
       archived: archiveView === 'archived',
-
       page: 1,
       limit: 12,
     });
@@ -151,27 +149,27 @@ export default function WebsitesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto w-full max-w-[1600px] space-y-6 p-4 sm:p-6 lg:p-8">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-sm font-semibold text-brand-600">Analytics configuration</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Analytics configuration</p>
 
-          <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-950">Websites</h1>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-[28px]">Websites</h1>
 
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+          <p className="mt-1.5 max-w-2xl text-sm leading-6 text-slate-500">
             Register domains, configure allowed origins, connect websites to SaaS products, and manage tracking keys.
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-3">
-          <Button variant="outline" onClick={refresh}>
+        <div className="flex shrink-0 gap-2.5">
+          <Button variant="outline" onClick={refresh} loading={loading}>
             <RefreshCw className="size-4" />
             Refresh
           </Button>
 
           <Link
             href={`/workspaces/${workspaceId}/websites/new`}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white transition hover:bg-brand-700"
+            className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700"
           >
             <Plus className="size-4" />
             New website
@@ -179,79 +177,70 @@ export default function WebsitesPage() {
         </div>
       </header>
 
-      <Card>
-        <CardContent className="p-4">
-          <form
-            className="grid gap-4 xl:grid-cols-[minmax(240px,1fr)_180px_190px_170px_auto_auto]"
-            onSubmit={(event) => {
-              event.preventDefault();
-              applyFilters();
-            }}
+      <Card className="p-3">
+        <form
+          className="flex flex-wrap items-center gap-2.5"
+          onSubmit={(event) => {
+            event.preventDefault();
+            applyFilters();
+          }}
+        >
+          <div className="min-w-60 flex-1">
+            <SearchInput aria-label="Search websites" placeholder="Search websites..." className="h-10" value={search} onChange={(event) => setSearch(event.target.value)} />
+          </div>
+
+          <Select aria-label="Status" className="h-10 w-36 shrink-0" value={status} onChange={(event) => setStatus(event.target.value as 'all' | 'enabled' | 'disabled')}>
+            <option value="all">All states</option>
+            <option value="enabled">Enabled</option>
+            <option value="disabled">Disabled</option>
+          </Select>
+
+          <Select
+            aria-label="Connection"
+            className="h-10 w-44 shrink-0"
+            value={connection}
+            onChange={(event) => setConnection(event.target.value as 'all' | 'connected' | 'unconnected')}
           >
-            <Input
-              placeholder="Search websites..."
-              value={search}
-              leadingIcon={<Search className="size-4" />}
-              onChange={(event) => setSearch(event.target.value)}
-            />
+            <option value="all">All connections</option>
+            <option value="connected">Connected</option>
+            <option value="unconnected">Not connected</option>
+          </Select>
 
-            <Select value={status} onChange={(event) => setStatus(event.target.value as 'all' | 'enabled' | 'disabled')}>
-              <option value="all">All states</option>
-              <option value="enabled">Enabled</option>
-              <option value="disabled">Disabled</option>
-            </Select>
+          <Select aria-label="Archive view" className="h-10 w-36 shrink-0" value={archiveView} onChange={(event) => setArchiveView(event.target.value as 'active' | 'archived')}>
+            <option value="active">Active</option>
+            <option value="archived">Archived</option>
+          </Select>
 
-            <Select value={connection} onChange={(event) => setConnection(event.target.value as 'all' | 'connected' | 'unconnected')}>
-              <option value="all">All connections</option>
-              <option value="connected">Connected</option>
-              <option value="unconnected">Not connected</option>
-            </Select>
-
-            <Select value={archiveView} onChange={(event) => setArchiveView(event.target.value as 'active' | 'archived')}>
-              <option value="active">Active</option>
-              <option value="archived">Archived</option>
-            </Select>
-
-            <Button type="submit">Apply</Button>
-
-            <Button type="button" variant="ghost" onClick={resetFilters}>
+          <div className="ml-auto flex shrink-0 items-center gap-1.5">
+            <Button type="button" variant="ghost" size="sm" onClick={resetFilters}>
               Reset
             </Button>
-          </form>
-        </CardContent>
+
+            <Button type="submit" size="sm">
+              Apply
+            </Button>
+          </div>
+        </form>
       </Card>
 
       {loading ? (
-        <div className="flex min-h-80 items-center justify-center">
-          <div className="flex items-center gap-3 text-sm text-slate-600">
-            <Spinner />
-            Loading websites...
-          </div>
+        <div className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <Skeleton key={index} className="h-56 w-full rounded-xl" />
+          ))}
         </div>
       ) : error ? (
-        <Card>
-          <CardContent className="flex min-h-72 flex-col items-center justify-center text-center">
-            <Globe2 className="size-8 text-red-500" />
-
-            <h2 className="mt-4 text-lg font-semibold text-slate-900">Unable to load websites</h2>
-
-            <p className="mt-2 text-sm text-slate-500">{error}</p>
-
-            <Button className="mt-5" variant="outline" onClick={refresh}>
-              Try again
-            </Button>
-          </CardContent>
-        </Card>
+        <ErrorState message={error} onRetry={refresh} />
       ) : websites.length === 0 ? (
         <EmptyState
-          icon={<Globe2 className="size-6" />}
+          icon={<Globe2 className="size-5" />}
           title={query.archived ? 'No archived websites' : 'No websites connected'}
-          description={query.archived ? 'Archived websites will appear here.' : 'Register your first analytics website and generate its tracking key.'}
+          description={query.archived ? 'Archived websites will appear here.' : 'Add a website to start collecting analytics.'}
           action={
             !query.archived ? (
               <Link
                 href={`/workspaces/${workspaceId}/websites/new`}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700"
+                className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white hover:bg-brand-700"
               >
                 <Plus className="size-4" />
                 Create website
@@ -261,8 +250,8 @@ export default function WebsitesPage() {
         />
       ) : (
         <>
-          <p className="text-sm text-slate-500">
-            Showing <strong className="text-slate-800">{websites.length}</strong> of <strong className="text-slate-800">{pagination.total}</strong> websites
+          <p className="text-xs font-medium text-slate-500">
+            Showing <span className="text-slate-800">{websites.length}</span> of <span className="text-slate-800">{pagination.total}</span> websites
           </p>
 
           <div className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
@@ -272,20 +261,20 @@ export default function WebsitesPage() {
           </div>
 
           {pagination.totalPages > 1 ? (
-            <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4">
+            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3.5">
               <p className="text-sm text-slate-500">
                 Page {pagination.page} of {pagination.totalPages}
               </p>
 
               <div className="flex gap-2">
-                <Button variant="outline" disabled={!pagination.hasPreviousPage} onClick={() => changePage(pagination.page - 1)}>
-                  <ChevronLeft className="size-4" />
+                <Button variant="outline" size="sm" disabled={!pagination.hasPreviousPage} onClick={() => changePage(pagination.page - 1)}>
+                  <ChevronLeft className="size-3.5" />
                   Previous
                 </Button>
 
-                <Button variant="outline" disabled={!pagination.hasNextPage} onClick={() => changePage(pagination.page + 1)}>
+                <Button variant="outline" size="sm" disabled={!pagination.hasNextPage} onClick={() => changePage(pagination.page + 1)}>
                   Next
-                  <ChevronRight className="size-4" />
+                  <ChevronRight className="size-3.5" />
                 </Button>
               </div>
             </div>

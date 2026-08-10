@@ -4,7 +4,7 @@ import { ArrowRight, Clock3, Globe2, KeyRound, Link2 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 
 import type { Website } from '../website-types';
 
@@ -16,78 +16,72 @@ interface WebsiteCardProps {
 }
 
 export function WebsiteCard({ workspaceId, website }: WebsiteCardProps) {
+  const href = `/workspaces/${workspaceId}/websites/${website.id}`;
+
   return (
-    <Card className="flex h-full flex-col transition duration-200 hover:-translate-y-0.5 hover:shadow-card-hover">
-      <CardHeader>
-        <div className="flex items-start gap-4">
-          <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
-            <Globe2 className="size-5" />
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <div className="min-w-0">
-                <h2 className="truncate text-lg font-semibold text-slate-950">{website.name}</h2>
-
-                <p className="mt-1 truncate text-sm text-slate-500">{website.domain}</p>
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                {website.archivedAt ? (
-                  <Badge variant="slate">Archived</Badge>
-                ) : website.enabled ? (
-                  <Badge variant="green">Enabled</Badge>
-                ) : (
-                  <Badge variant="orange">Disabled</Badge>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </CardHeader>
-
-      <CardContent className="flex-1 space-y-4">
-        <div className="rounded-xl bg-slate-50 p-4">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-            <Link2 className="size-3.5" />
-            Application
-          </div>
-
-          <p className="mt-2 text-sm font-semibold text-slate-800">{website.application?.name ?? 'Not connected'}</p>
+    <Card className="group flex h-full flex-col gap-4 p-5 transition duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-card-hover">
+      <div className="flex items-start gap-3">
+        <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+          <Globe2 className="size-4" aria-hidden="true" />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-xl bg-slate-50 p-3">
-            <div className="flex items-center gap-1.5 text-xs text-slate-400">
-              <Clock3 className="size-3.5" />
-              Time zone
-            </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-2">
+            <h2 className="truncate text-[17px] font-semibold leading-tight text-slate-950">{website.name}</h2>
 
-            <p className="mt-1 truncate text-sm font-medium text-slate-700">{website.timeZone}</p>
+            {website.archivedAt ? (
+              <Badge variant="slate" className="shrink-0">
+                Archived
+              </Badge>
+            ) : website.enabled ? (
+              <Badge variant="green" className="shrink-0">
+                Enabled
+              </Badge>
+            ) : (
+              <Badge variant="orange" className="shrink-0">
+                Disabled
+              </Badge>
+            )}
           </div>
 
-          <div className="rounded-xl bg-slate-50 p-3">
-            <div className="flex items-center gap-1.5 text-xs text-slate-400">
-              <KeyRound className="size-3.5" />
-              Key prefix
-            </div>
+          <p className="mt-0.5 truncate text-sm text-slate-500">{website.domain}</p>
+        </div>
+      </div>
 
-            <p className="mt-1 truncate font-mono text-sm font-medium text-slate-700">{website.trackingKeyPrefix}</p>
+      <div className="flex items-center gap-1.5 text-sm">
+        <Link2 className="size-3.5 shrink-0 text-slate-400" aria-hidden="true" />
+        <span className="text-slate-500">Application:</span>
+        <span className="truncate font-medium text-slate-800">{website.application?.name ?? 'Not connected'}</span>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 text-sm">
+        <div>
+          <div className="flex items-center gap-1 text-xs text-slate-400">
+            <Clock3 className="size-3.5" aria-hidden="true" />
+            Time zone
           </div>
+
+          <p className="mt-0.5 truncate font-medium text-slate-700">{website.timeZone}</p>
         </div>
 
-        <p className="text-xs text-slate-400">Last event: {formatWebsiteDate(website.lastEventAt)}</p>
-      </CardContent>
+        <div>
+          <div className="flex items-center gap-1 text-xs text-slate-400">
+            <KeyRound className="size-3.5" aria-hidden="true" />
+            Key prefix
+          </div>
 
-      <CardFooter>
-        <Link
-          href={`/workspaces/${workspaceId}/websites/${website.id}`}
-          className="inline-flex w-full items-center justify-between text-sm font-semibold text-brand-700 hover:text-brand-800"
-        >
-          View website
-          <ArrowRight className="size-4" />
+          <p className="mt-0.5 truncate font-mono text-xs font-medium text-slate-700">{website.trackingKeyPrefix}</p>
+        </div>
+      </div>
+
+      <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-3">
+        <span className="text-xs text-slate-400">Last event: {formatWebsiteDate(website.lastEventAt)}</span>
+
+        <Link href={href} className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700 transition group-hover:gap-2.5 hover:text-brand-800">
+          View
+          <ArrowRight className="size-4" aria-hidden="true" />
         </Link>
-      </CardFooter>
+      </div>
     </Card>
   );
 }

@@ -2,21 +2,22 @@
 
 import { useEffect, useState } from 'react';
 
-import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
-import { Boxes, ChevronLeft, ChevronRight, Plus, RefreshCw } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { EmptyState } from '@/components/ui/empty-state';
-import { Spinner } from '@/components/ui/spinner';
 
 import { getApplications } from '@/features/applications/application-api';
 
-import { ApplicationCard } from '@/features/applications/components/application-card';
-
+import { ActiveFilterChips } from '@/features/applications/components/active-filter-chips';
 import { ApplicationFilters, type ApplicationFilterValue } from '@/features/applications/components/application-filters';
+import { ApplicationsEmptyState } from '@/features/applications/components/applications-empty-state';
+import { ApplicationsErrorState } from '@/features/applications/components/applications-error-state';
+import { ApplicationsGrid } from '@/features/applications/components/applications-grid';
+import { ApplicationsHeader } from '@/features/applications/components/applications-header';
+import { ApplicationsResultSummary } from '@/features/applications/components/applications-result-summary';
+import { ApplicationsSkeleton } from '@/features/applications/components/applications-skeleton';
 
 import type { ApplicationListQuery, ApplicationPagination, SaasApplication } from '@/features/applications/application-types';
 
@@ -55,6 +56,10 @@ function filtersToQuery(filters: ApplicationFilterValue): ApplicationListQuery {
   };
 }
 
+function hasActiveFilters(filters: ApplicationFilterValue): boolean {
+  return Boolean(filters.search.trim() || filters.status || filters.priority || filters.category || filters.archiveView === 'archived');
+}
+
 export default function ApplicationsPage() {
   const params = useParams<{
     workspaceId: string;
@@ -63,6 +68,8 @@ export default function ApplicationsPage() {
   const workspaceId = params.workspaceId;
 
   const [filterDraft, setFilterDraft] = useState<ApplicationFilterValue>(DEFAULT_FILTERS);
+
+  const [appliedFilters, setAppliedFilters] = useState<ApplicationFilterValue>(DEFAULT_FILTERS);
 
   const [query, setQuery] = useState<ApplicationListQuery>(filtersToQuery(DEFAULT_FILTERS));
 
@@ -110,15 +117,15 @@ export default function ApplicationsPage() {
     };
   }, [workspaceId, query, reloadKey]);
 
-  function applyFilters(): void {
+  function applyFilters(nextFilters: ApplicationFilterValue = filterDraft): void {
+    setFilterDraft(nextFilters);
+    setAppliedFilters(nextFilters);
     setLoading(true);
-    setQuery(filtersToQuery(filterDraft));
+    setQuery(filtersToQuery(nextFilters));
   }
 
   function resetFilters(): void {
-    setFilterDraft(DEFAULT_FILTERS);
-    setLoading(true);
-    setQuery(filtersToQuery(DEFAULT_FILTERS));
+    applyFilters(DEFAULT_FILTERS);
   }
 
   function changePage(page: number): void {
@@ -135,91 +142,34 @@ export default function ApplicationsPage() {
     setReloadKey((currentValue) => currentValue + 1);
   }
 
+  const showEmptyState = !loading && !error && applications.length === 0;
+
   return (
-    <div className="space-y-6">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-sm font-semibold text-brand-600">SaaS registry</p>
+    <div className="mx-auto w-full max-w-[1600px] space-y-6 p-4 sm:p-6 lg:p-8">
+      <ApplicationsHeader workspaceId={workspaceId} onRefresh={refresh} refreshing={loading} />
 
-          <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-950">Applications</h1>
+      <div className="space-y-3">
+        <ApplicationFilters value={filterDraft} onChange={setFilterDraft} onApply={() => applyFilters()} onReset={resetFilters} />
 
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-            Manage your SaaS products, technology stacks, important links, status and launch dates.
-          </p>
-        </div>
-
-        <div className="flex gap-3">
-          <Button variant="outline" onClick={refresh}>
-            <RefreshCw className="size-4" />
-            Refresh
-          </Button>
-
-          <Link
-            href={`/workspaces/${workspaceId}/applications/new`}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700"
-          >
-            <Plus className="size-4" />
-            New application
-          </Link>
-        </div>
-      </header>
-
-      <ApplicationFilters value={filterDraft} onChange={setFilterDraft} onApply={applyFilters} onReset={resetFilters} />
+        <ActiveFilterChips value={appliedFilters} onChange={applyFilters} onClearAll={resetFilters} />
+      </div>
 
       {loading ? (
-        <div className="flex min-h-80 items-center justify-center">
-          <div className="flex items-center gap-3 text-sm text-slate-600">
-            <Spinner />
-            Loading applications...
-          </div>
-        </div>
+        <ApplicationsSkeleton />
       ) : error ? (
-        <Card>
-          <CardContent className="flex min-h-72 flex-col items-center justify-center text-center">
-            <div className="flex size-14 items-center justify-center rounded-2xl bg-red-50 text-red-600">
-              <Boxes className="size-6" />
-            </div>
-
-            <h2 className="mt-5 text-lg font-semibold text-slate-900">Unable to load applications</h2>
-
-            <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">{error}</p>
-
-            <Button className="mt-6" variant="outline" onClick={refresh}>
-              Try again
-            </Button>
-          </CardContent>
-        </Card>
-      ) : applications.length === 0 ? (
-        <EmptyState
-          icon={<Boxes className="size-6" />}
-          title={query.archived ? 'No archived applications' : 'No applications yet'}
-          description={query.archived ? 'Archived applications will appear here.' : 'Create your first SaaS application and start tracking its progress.'}
-          action={
-            !query.archived ? (
-              <Link
-                href={`/workspaces/${workspaceId}/applications/new`}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700"
-              >
-                <Plus className="size-4" />
-                Create application
-              </Link>
-            ) : undefined
-          }
+        <ApplicationsErrorState message={error} onRetry={refresh} />
+      ) : showEmptyState ? (
+        <ApplicationsEmptyState
+          workspaceId={workspaceId}
+          hasActiveFilters={hasActiveFilters(appliedFilters)}
+          isArchivedView={appliedFilters.archiveView === 'archived'}
+          onClearFilters={resetFilters}
         />
       ) : (
         <>
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-slate-500">
-              Showing <strong className="text-slate-800">{applications.length}</strong> of <strong className="text-slate-800">{pagination.total}</strong>{' '}
-              applications
-            </p>
-          </div>
+          <ApplicationsResultSummary shown={applications.length} total={pagination.total} />
 
-          <div className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
-            {applications.map((application) => (
-              <ApplicationCard key={application.id} workspaceId={workspaceId} application={application} />
-            ))}
-          </div>
+          <ApplicationsGrid workspaceId={workspaceId} applications={applications} />
 
           {pagination.totalPages > 1 ? (
             <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4">

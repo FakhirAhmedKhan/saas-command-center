@@ -1,4 +1,4 @@
-import { apiRequest } from '../auth/auth.types';
+import { apiRequest } from '../lib/api/api-client';
 import type { CurrentEnvironmentVersion, Deployment, DeploymentOptions, DeploymentStatus, PaginatedResponse, Release } from './release-management.types';
 
 function createApplicationPath(

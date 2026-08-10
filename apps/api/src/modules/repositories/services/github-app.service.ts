@@ -69,7 +69,8 @@ export class GithubAppService {
   private readonly apiVersion = '2026-03-10';
 
   buildInstallationUrl(state: string): string {
-    const slug = this.required('GITHUB_APP_SLUG');
+    // const slug = this.required('GITHUB_APP_SLUG' );
+    const slug = "saas-command-center-dev";
 
     return `https://github.com/apps/${encodeURIComponent(slug)}` + `/installations/new?state=${encodeURIComponent(state)}`;
   }

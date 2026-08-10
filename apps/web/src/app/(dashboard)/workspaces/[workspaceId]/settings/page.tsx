@@ -3,10 +3,15 @@
 import { useParams } from 'next/navigation';
 import { type FormEvent, useEffect, useState } from 'react';
 
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { PageLoading } from '@/components/states/page-loading';
+
 import { useAuth } from '@/features/auth/auth-provider';
 import type { Workspace } from '@/features/auth/auth.types';
 import { apiRequest } from '@/features/lib/api/api-client';
 import { getErrorMessage } from '@/features/lib/api/api-error';
+import { WorkspaceSettingsNav } from '@/features/workspaces/components/workspace-settings-nav';
 
 export default function WorkspaceSettingsPage() {
   const params = useParams<{
@@ -85,12 +90,7 @@ export default function WorkspaceSettingsPage() {
   }
 
   if (!workspace && !error) {
-    return (
-      <div className="inline-loader">
-        <div className="spinner" />
-        Loading workspace settings…
-      </div>
-    );
+    return <PageLoading label="Loading workspace settings…" />;
   }
 
   const role = workspace?.members?.[0]?.role ?? 'VIEWER';
@@ -98,54 +98,55 @@ export default function WorkspaceSettingsPage() {
   const canEdit = role === 'OWNER' || role === 'ADMIN';
 
   return (
-    <div className="page-stack narrow">
-      <section className="page-heading">
+    <div className="mx-auto w-full max-w-[1600px] space-y-5 p-4 sm:p-6 lg:p-8">
+      <div>
+        <h1 className="text-[26px] font-semibold tracking-tight text-slate-950">Settings</h1>
+        <p className="mt-1 text-sm leading-6 text-slate-500">Manage workspace information, members and integrations.</p>
+      </div>
+
+      <WorkspaceSettingsNav workspaceId={workspaceId} />
+
+      <div className="max-w-lg space-y-4">
         <div>
-          <p className="eyebrow">Workspace settings</p>
-
-          <h1>General information</h1>
-
-          <p>Keep the workspace name and URL identifier clear and consistent.</p>
+          <h2 className="text-[15px] font-semibold text-slate-950">General information</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-500">Keep the workspace name and URL identifier clear and consistent.</p>
         </div>
-      </section>
 
-      <section className="section-card">
-        <form className="form-stack" onSubmit={handleSubmit}>
-          {error && <div className="alert alert-error">{error}</div>}
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          {error ? <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</div> : null}
 
-          {success && <div className="alert alert-success">{success}</div>}
+          {success ? <div role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">{success}</div> : null}
 
-          {!canEdit && <div className="alert">Your role has read-only access to workspace settings.</div>}
+          {!canEdit ? (
+            <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">Your role has read-only access to workspace settings.</div>
+          ) : null}
 
-          <label className="field">
-            <span>Workspace name</span>
+          <Input
+            label="Workspace name"
+            disabled={!canEdit}
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            minLength={2}
+            required
+          />
 
-            <input disabled={!canEdit} value={name} onChange={(event) => setName(event.target.value)} minLength={2} required />
-          </label>
+          <Input
+            label="Workspace slug"
+            disabled={!canEdit}
+            value={slug}
+            onChange={(event) => setSlug(event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+            minLength={2}
+            required
+            hint="Lowercase letters, numbers and hyphens only."
+          />
 
-          <label className="field">
-            <span>Workspace slug</span>
-
-            <input
-              disabled={!canEdit}
-              value={slug}
-              onChange={(event) => setSlug(event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-              minLength={2}
-              required
-            />
-
-            <small>Lowercase letters, numbers and hyphens only.</small>
-          </label>
-
-          {canEdit && (
-            <div className="form-actions">
-              <button className="button button-primary" disabled={submitting} type="submit">
-                {submitting ? 'Saving…' : 'Save changes'}
-              </button>
-            </div>
-          )}
+          {canEdit ? (
+            <Button type="submit" loading={submitting}>
+              Save changes
+            </Button>
+          ) : null}
         </form>
-      </section>
+      </div>
     </div>
   );
 }

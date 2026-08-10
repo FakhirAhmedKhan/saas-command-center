@@ -6,15 +6,19 @@ import Link from 'next/link';
 
 import { useParams } from 'next/navigation';
 
-import { ArrowLeft, Clock3, Code2, DatabaseZap, Globe2, KeyRound, Link2, Pencil, Radio, Settings } from 'lucide-react';
+import { ArrowLeft, Clock3, Code2, Globe2, KeyRound, Link2, Pencil } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
-import { Spinner } from '@/components/ui/spinner';
+import { ErrorState } from '@/components/ui/error-state';
+
+import { PageLoading } from '@/components/states/page-loading';
 
 import { getWebsite } from '@/features/websites/website-api';
+
+import { WebsiteSubNav } from '@/features/websites/components/website-sub-nav';
 
 import type { Website } from '@/features/websites/website-types';
 
@@ -64,38 +68,30 @@ export default function WebsiteDetailsPage() {
   }, [workspaceId, websiteId]);
 
   if (loading) {
-    return (
-      <div className="flex min-h-80 items-center justify-center">
-        <Spinner />
-      </div>
-    );
+    return <PageLoading label="Loading website…" />;
   }
 
   if (!website) {
     return (
-      <Card>
-        <CardContent className="p-10 text-center">
-          <h2 className="text-lg font-semibold">Website not available</h2>
-
-          <p className="mt-2 text-sm text-red-600">{error}</p>
-        </CardContent>
-      </Card>
+      <div className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">
+        <ErrorState message={error ?? 'Website was not found.'} />
+      </div>
     );
   }
 
   const baseHref = `/workspaces/${workspaceId}/websites/${websiteId}`;
 
   return (
-    <div className="space-y-6">
-      <header>
-        <Link href={`/workspaces/${workspaceId}/websites`} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900">
-          <ArrowLeft className="size-4" />
+    <div className="mx-auto w-full max-w-[1600px] space-y-5 p-4 sm:p-6 lg:p-8">
+      <div>
+        <Link href={`/workspaces/${workspaceId}/websites`} className="inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-500 transition hover:text-slate-800">
+          <ArrowLeft className="size-3.5" aria-hidden="true" />
           Back to websites
         </Link>
 
-        <div className="mt-6 flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-          <div>
-            <div className="flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-1.5">
               {website.archivedAt ? (
                 <Badge variant="slate">Archived</Badge>
               ) : website.enabled ? (
@@ -107,74 +103,54 @@ export default function WebsiteDetailsPage() {
               {website.application ? <Badge variant="blue">{website.application.name}</Badge> : <Badge variant="slate">Not connected</Badge>}
             </div>
 
-            <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-950">{website.name}</h1>
+            <h1 className="mt-2 truncate text-xl font-semibold tracking-tight text-slate-950">{website.name}</h1>
 
             <a
               href={`https://${website.domain}`}
               target="_blank"
               rel="noreferrer"
-              className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-brand-700 hover:underline"
+              className="mt-1.5 inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:underline"
             >
-              <Globe2 className="size-4" />
+              <Globe2 className="size-3.5" aria-hidden="true" />
               {website.domain}
             </a>
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex shrink-0 gap-2">
             {!website.archivedAt ? (
               <Link
                 href={`${baseHref}/edit`}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
               >
-                <Pencil className="size-4" />
+                <Pencil className="size-3.5" aria-hidden="true" />
                 Edit
               </Link>
             ) : null}
 
             <Link
               href={`${baseHref}/installation`}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700"
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white transition hover:bg-brand-700"
             >
-              <Code2 className="size-4" />
+              <Code2 className="size-3.5" aria-hidden="true" />
               Installation
-            </Link>
-
-            <Link
-              href={`${baseHref}/settings`}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 text-sm font-semibold text-white hover:bg-slate-800"
-            >
-              <Settings className="size-4" />
-              Settings
-            </Link>
-            <Link
-              href={`${baseHref}/events`}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-            >
-              <Radio className="size-4" />
-              Raw events
-            </Link>
-            <Link
-              href={`${baseHref}/analytics-engine`}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white transition hover:bg-brand-700"
-            >
-              <DatabaseZap className="size-4" />
-              Analytics engine
             </Link>
           </div>
         </div>
-      </header>
+      </div>
+
+      <WebsiteSubNav workspaceId={workspaceId} websiteId={websiteId} />
 
       <div className="grid gap-5 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
-            <h2 className="font-semibold text-slate-950">Allowed origins</h2>
+            <h2 className="text-[15px] font-semibold text-slate-950">Allowed origins</h2>
           </CardHeader>
 
           <CardContent>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {website.allowedOrigins.map((origin) => (
-                <div key={origin} className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3">
-                  <Globe2 className="size-4 text-slate-400" />
+                <div key={origin} className="flex items-center gap-2.5 rounded-lg bg-slate-50 px-3.5 py-2.5">
+                  <Globe2 className="size-3.5 shrink-0 text-slate-400" aria-hidden="true" />
 
                   <code className="break-all text-sm text-slate-700">{origin}</code>
                 </div>
@@ -185,15 +161,15 @@ export default function WebsiteDetailsPage() {
 
         <Card>
           <CardHeader>
-            <h2 className="font-semibold text-slate-950">Configuration</h2>
+            <h2 className="text-[15px] font-semibold text-slate-950">Configuration</h2>
           </CardHeader>
 
-          <CardContent className="space-y-4">
-            <DetailRow icon={<Clock3 className="size-4" />} label="Time zone" value={website.timeZone} />
+          <CardContent className="space-y-3">
+            <DetailRow icon={<Clock3 className="size-3.5" />} label="Time zone" value={website.timeZone} />
 
-            <DetailRow icon={<KeyRound className="size-4" />} label="Key prefix" value={website.trackingKeyPrefix} mono />
+            <DetailRow icon={<KeyRound className="size-3.5" />} label="Key prefix" value={website.trackingKeyPrefix} mono />
 
-            <DetailRow icon={<Link2 className="size-4" />} label="Application" value={website.application?.name ?? 'Not connected'} />
+            <DetailRow icon={<Link2 className="size-3.5" />} label="Application" value={website.application?.name ?? 'Not connected'} />
 
             <DetailRow label="Key rotated" value={formatWebsiteDate(website.trackingKeyRotatedAt)} />
 
@@ -209,13 +185,13 @@ export default function WebsiteDetailsPage() {
 
 function DetailRow({ icon, label, value, mono = false }: { icon?: React.ReactNode; label: string; value: string; mono?: boolean }) {
   return (
-    <div className="border-b border-slate-100 pb-3 last:border-0 last:pb-0">
-      <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
+    <div>
+      <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
         {icon}
         {label}
       </div>
 
-      <p className={`mt-1 break-all text-sm font-semibold text-slate-800 ${mono ? 'font-mono' : ''}`}>{value}</p>
+      <p className={`mt-0.5 break-all text-sm font-medium text-slate-800 ${mono ? 'font-mono text-xs' : ''}`}>{value}</p>
     </div>
   );
 }

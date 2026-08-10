@@ -13,9 +13,5 @@ export default function RepositoriesPage() {
 
   const workspaceId = params.workspaceId;
 
-  return (
-    <div className="mx-auto w-full max-w-7xl p-6 lg:p-8">
-      <RepositoriesDashboard workspaceId={workspaceId} />
-    </div>
-  );
+  return <RepositoriesDashboard workspaceId={workspaceId} />;
 }

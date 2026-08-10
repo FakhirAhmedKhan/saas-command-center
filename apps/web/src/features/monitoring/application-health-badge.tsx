@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { HealthStatusBadge } from './health-status-badge';
 
 import type { HealthCheckStatus } from './monitoring.types';
-import { apiRequest } from '../auth/auth.types';
+import { apiRequest } from '../lib/api/api-client';
 
 interface ApplicationHealthSummary {
   status: HealthCheckStatus;

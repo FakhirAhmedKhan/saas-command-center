@@ -185,27 +185,23 @@ export function DevelopmentBoard({ workspaceId, applicationId }: DevelopmentBoar
   }
 
   return (
-    <div className="space-y-8">
-      {error ? <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
+    <div className="space-y-6">
+      {error ? <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div> : null}
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-card sm:p-8">
-        <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
+      <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-sm font-semibold text-brand-600">Development status</p>
-
-            <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-950">{summary.application.name}</h1>
-
-            <p className="mt-2 text-sm text-slate-500">Progress is calculated from applicable weighted tasks and milestones.</p>
+            <p className="text-sm leading-6 text-slate-500">Progress is calculated from applicable weighted tasks and milestones.</p>
           </div>
 
-          <div className="min-w-72">
+          <div className="min-w-64 shrink-0">
             <div className="flex items-end justify-between">
-              <span className="text-sm font-medium text-slate-500">Overall progress</span>
+              <span className="text-xs font-medium text-slate-500">Overall progress</span>
 
-              <strong className="text-4xl font-bold text-slate-950">{summary.progress.percentage}%</strong>
+              <strong className="text-2xl font-semibold text-slate-950">{summary.progress.percentage}%</strong>
             </div>
 
-            <div className="mt-3 h-3 overflow-hidden rounded-full bg-slate-100">
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
               <div
                 className="h-full rounded-full bg-brand-600 transition-all"
                 style={{
@@ -214,23 +210,23 @@ export function DevelopmentBoard({ workspaceId, applicationId }: DevelopmentBoar
               />
             </div>
 
-            <p className="mt-2 text-xs text-slate-400">
+            <p className="mt-1.5 text-xs text-slate-400">
               {summary.progress.includedMilestones} applicable milestones · {summary.progress.excludedMilestones} skipped
             </p>
           </div>
         </div>
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-        <Metric icon={<Flag className="size-5" />} label="Milestones" value={summary.counts.milestones} />
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <Metric icon={<Flag className="size-4" />} label="Milestones" value={summary.counts.milestones} />
 
-        <Metric icon={<ListChecks className="size-5" />} label="Tasks" value={summary.counts.tasks} />
+        <Metric icon={<ListChecks className="size-4" />} label="Tasks" value={summary.counts.tasks} />
 
-        <Metric icon={<CheckCircle2 className="size-5" />} label="Completed" value={summary.counts.completedTasks} />
+        <Metric icon={<CheckCircle2 className="size-4" />} label="Completed" value={summary.counts.completedTasks} />
 
-        <Metric icon={<AlertTriangle className="size-5" />} label="Blockers" value={summary.counts.openBlockers} />
+        <Metric icon={<AlertTriangle className="size-4" />} label="Blockers" value={summary.counts.openBlockers} />
 
-        <Metric icon={<CalendarClock className="size-5" />} label="Overdue" value={summary.counts.overdueTasks} />
+        <Metric icon={<CalendarClock className="size-4" />} label="Overdue" value={summary.counts.overdueTasks} />
       </section>
 
       <Card>
@@ -353,15 +349,15 @@ export function DevelopmentBoard({ workspaceId, applicationId }: DevelopmentBoar
 function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
   return (
     <Card>
-      <CardContent className="p-5">
+      <CardContent className="p-3.5">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-sm text-slate-500">{label}</p>
+            <p className="text-xs font-medium text-slate-500">{label}</p>
 
-            <p className="mt-2 text-3xl font-bold text-slate-950">{value}</p>
+            <p className="mt-1.5 text-xl font-semibold text-slate-950">{value}</p>
           </div>
 
-          <div className="flex size-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600">{icon}</div>
+          <div className="flex size-8 items-center justify-center rounded-lg bg-brand-50 text-brand-600">{icon}</div>
         </div>
       </CardContent>
     </Card>

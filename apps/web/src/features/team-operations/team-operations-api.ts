@@ -1,4 +1,4 @@
-import { apiRequest } from '../auth/auth.types';
+import { apiRequest } from '../lib/api/api-client';
 import type { InvitationMutationResponse, InvitationPreview, UserNotification, WorkspaceInvitation, WorkspaceRole } from './team-operations.types';
 
 export function getWorkspaceInvitations(
