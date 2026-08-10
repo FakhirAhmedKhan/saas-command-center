@@ -1,8 +1,8 @@
-import { RawEventQueryDto } from '../dto/raw-event-query.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { Prisma } from 'src/generated/prisma/client';
 import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
+import { RawEventQueryDto } from '../dto/raw-event-query.dto';
 
 const rawEventSelect = {
   id: true,

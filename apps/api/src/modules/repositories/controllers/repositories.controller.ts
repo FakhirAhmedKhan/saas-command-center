@@ -1,12 +1,12 @@
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { WorkspaceRoles } from '../../workspace/decorators/workspace-roles.decorator';
 import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
 import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
 import { LinkRepositoryApplicationDto } from '../dto/repository.dto';
 import { RepositoriesService } from '../services/repositories.service';
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { WorkspaceRole } from 'src/generated/prisma/enums';
 
 const WRITE_ROLES = [WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER];
 

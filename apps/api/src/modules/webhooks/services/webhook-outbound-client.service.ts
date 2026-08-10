@@ -1,7 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import ipaddr from 'ipaddr.js';
+
 import { lookup } from 'node:dns/promises';
 import { isIP } from 'node:net';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import ipaddr from 'ipaddr.js';
 import { Agent, request } from 'undici';
 
 interface ResolvedAddress {

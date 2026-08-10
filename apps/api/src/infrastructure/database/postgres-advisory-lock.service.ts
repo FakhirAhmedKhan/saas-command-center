@@ -1,7 +1,7 @@
-import type { TypedConfigService } from '../../config/runtime-config';
-import { Injectable, Logger, OnModuleDestroy, Inject } from '@nestjs/common';
+import { Inject, Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { type PoolClient, Pool } from 'pg';
+import { Pool ,type  PoolClient } from 'pg';
+import type { TypedConfigService } from '../../config/runtime-config';
 
 export interface DistributedLockResult<T> {
   acquired: boolean;

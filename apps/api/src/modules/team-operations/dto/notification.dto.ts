@@ -1,7 +1,7 @@
-import { NotificationType } from '../../../generated/prisma/client';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
+import { NotificationType } from '../../../generated/prisma/client';
 
 function parseBoolean(value: unknown): unknown {
   if (value === true || value === 'true') {

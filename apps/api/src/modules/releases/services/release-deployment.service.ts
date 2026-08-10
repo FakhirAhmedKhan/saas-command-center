@@ -1,7 +1,8 @@
-import { DeploymentTransitionService } from './deployment-transition.service';
-import { ReleaseAccessService } from './release-access.service';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../database/prisma.service';
 import { DeploymentActivityAction, DeploymentStatus, HealthIncidentStatus, Prisma, ReleaseStatus } from '../../../generated/prisma/client';
+import { DeploymentTransitionService } from './deployment-transition.service';
+import { ReleaseAccessService } from './release-access.service';
 import type {
   CreateDeploymentDto,
   CreateReleaseDto,
@@ -10,7 +11,6 @@ import type {
   TransitionDeploymentDto,
   UpdateReleaseDto,
 } from '../dto/release-deployment.dto';
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class ReleaseDeploymentService {

@@ -1,8 +1,9 @@
-import { Public } from '../../auth/decorators/public.decorator';
+
 import { Body, Controller, Headers, HttpCode, Post, Req } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
-import type { Request } from 'express';
 import { AnalyticsIngestionService } from 'src/modules/analytics-ingestion/services/analytics-ingestion.service';
+import { Public } from '../../auth/decorators/public.decorator';
+import type { Request } from 'express';
 
 @ApiExcludeController()
 @Public()

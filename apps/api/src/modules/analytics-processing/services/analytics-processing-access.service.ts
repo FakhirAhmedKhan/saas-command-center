@@ -1,6 +1,6 @@
-﻿import { PrismaService } from '../../../database/prisma.service';
+﻿import { ForbiddenException, Injectable } from '@nestjs/common';
+import { PrismaService } from '../../../database/prisma.service';
 import { WorkspaceRole } from '../../../generated/prisma/client';
-import { ForbiddenException, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AnalyticsProcessingAccessService {

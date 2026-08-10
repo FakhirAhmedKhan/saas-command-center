@@ -1,8 +1,8 @@
-import { HealthService } from './health.service';
-import { Public } from '../modules/auth/decorators/public.decorator';
-import type { HealthResponse } from '@command-center/shared-types';
 import { Controller, Get, HttpStatus, Res } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiServiceUnavailableResponse, ApiTags } from '@nestjs/swagger';
+import { Public } from '../modules/auth/decorators/public.decorator';
+import { HealthService } from './health.service';
+import type { HealthResponse } from '@command-center/shared-types';
 import type { Response } from 'express';
 
 @Public()

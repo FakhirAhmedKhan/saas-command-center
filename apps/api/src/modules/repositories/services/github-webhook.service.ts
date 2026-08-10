@@ -1,8 +1,8 @@
+import { createHmac, timingSafeEqual } from 'node:crypto';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
 import { GithubAppService } from './github-app.service';
 import { RepositoriesService } from './repositories.service';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { createHmac, timingSafeEqual } from 'node:crypto';
-import { PrismaService } from 'src/database/prisma.service';
 
 interface GithubWebhookPayload {
   action?: string;

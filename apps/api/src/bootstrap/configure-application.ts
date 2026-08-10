@@ -1,12 +1,12 @@
-import { AllExceptionsFilter } from '../common/filters/all-exceptions.filter';
-import { requestIdMiddleware } from '../common/middleware/request-id.middleware';
-import { getAllowedOrigins, parseTrustProxy, type TypedConfigService } from '../config/runtime-config';
-import { Logger, ValidationPipe, type INestApplication } from '@nestjs/common';
+import { Logger, ValidationPipe ,type  INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
-import { type Express, json, raw, urlencoded } from 'express';
+import { json, raw, urlencoded, type Express } from 'express';
 import helmet from 'helmet';
+import { AllExceptionsFilter } from '../common/filters/all-exceptions.filter';
+import { requestIdMiddleware } from '../common/middleware/request-id.middleware';
+import { getAllowedOrigins, parseTrustProxy ,type  TypedConfigService } from '../config/runtime-config';
 
 export interface ConfigureApplicationOptions {
   enableSwagger?: boolean;

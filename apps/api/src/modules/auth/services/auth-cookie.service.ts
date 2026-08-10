@@ -1,7 +1,8 @@
-import type { TypedConfigService } from '../../../config/runtime-config';
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import type { TypedConfigService } from '../../../config/runtime-config';
 import type { CookieOptions, Request, Response } from 'express';
+
 
 @Injectable()
 export class AuthCookieService {

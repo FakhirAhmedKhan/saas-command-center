@@ -1,7 +1,7 @@
-import { Public } from '../../auth/decorators/public.decorator';
-import { GithubWebhookService } from '../services/github-webhook.service';
 import { Controller, Headers, Post, Req, UnauthorizedException } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Public } from '../../auth/decorators/public.decorator';
+import { GithubWebhookService } from '../services/github-webhook.service';
 import type { Request } from 'express';
 
 type GithubWebhookRequest = Request<Record<string, never>, unknown, Buffer>;

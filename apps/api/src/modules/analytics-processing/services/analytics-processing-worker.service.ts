@@ -1,11 +1,12 @@
-import { AnalyticsRangeProcessorService } from './analytics-range-processor.service';
-import type { TypedConfigService } from '../../../config/runtime-config';
+
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Interval } from '@nestjs/schedule';
 import { PrismaService } from '../../../database/prisma.service';
 import { AnalyticsProcessingStatus } from '../../../generated/prisma/client';
 import { PostgresAdvisoryLockService } from '../../../infrastructure/database/postgres-advisory-lock.service';
-import { Injectable, Logger, Inject } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Interval } from '@nestjs/schedule';
+import { AnalyticsRangeProcessorService } from './analytics-range-processor.service';
+import type { TypedConfigService } from '../../../config/runtime-config';
 
 const MAX_RETRY_DELAY_MS = 5 * 60 * 1_000;
 

@@ -1,5 +1,5 @@
-import { RedisService } from '../../infrastructure/redis/redis.service';
 import { Injectable } from '@nestjs/common';
+import { RedisService } from '../../infrastructure/redis/redis.service';
 
 export interface RateLimitResult {
   allowed: boolean;

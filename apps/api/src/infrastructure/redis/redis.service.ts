@@ -1,7 +1,7 @@
-import type { TypedConfigService } from '../../config/runtime-config';
 import { Inject, Injectable, Logger, OnApplicationBootstrap, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
+import type { TypedConfigService } from '../../config/runtime-config';
 
 @Injectable()
 export class RedisService implements OnApplicationBootstrap, OnModuleDestroy {

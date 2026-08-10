@@ -1,6 +1,6 @@
-import type { WorkspaceRequest } from '../interfaces/workspace-request.interface';
-import { WorkspaceMembersService } from '../service/workspace-members.service';
 import { BadRequestException, CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
+import { WorkspaceMembersService } from '../service/workspace-members.service';
+import type { WorkspaceRequest } from '../interfaces/workspace-request.interface';
 
 @Injectable()
 export class WorkspaceAccessGuard implements CanActivate {

@@ -1,12 +1,12 @@
+import { createHash } from 'node:crypto';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { Prisma } from 'src/generated/prisma/client';
+import { AnalyticsAggregateDimension, AnalyticsDeviceType, AnalyticsProcessingStatus, RawAnalyticsEventType } from 'src/generated/prisma/enums';
 import { AnalyticsAggregatePeriod, ReprocessAnalyticsDto } from '../dto/analytics-engine.dto';
 import { calculateSessionMetrics } from '../utils/analytics-metrics';
 import { normalizeAnalyticsPage, normalizeSource, parseUserAgent } from '../utils/analytics-normalization';
 import { getAnalyticsBucket } from '../utils/analytics-time';
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { createHash } from 'node:crypto';
-import { PrismaService } from 'src/database/prisma.service';
-import { Prisma } from 'src/generated/prisma/client';
-import { AnalyticsAggregateDimension, AnalyticsDeviceType, AnalyticsProcessingStatus, RawAnalyticsEventType } from 'src/generated/prisma/enums';
 
 type ProcessingWebsite = {
   id: string;

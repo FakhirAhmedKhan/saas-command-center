@@ -1,10 +1,10 @@
+import { Controller, Get, Param, ParseEnumPipe, ParseUUIDPipe, Query, Res, StreamableFile, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiProduces, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
 import { AnalyticsReportDimension, DimensionReportQueryDto, EventReportQueryDto, PageReportQueryDto } from '../dto/analytics-report-query.dto';
 import { DimensionReportResponseDto, EventReportResponseDto, PageReportResponseDto } from '../dto/analytics-report-response.dto';
 import { AnalyticsReportsService } from '../services/analytics-reports.service';
-import { Controller, Get, Param, ParseEnumPipe, ParseUUIDPipe, Query, Res, StreamableFile, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiProduces, ApiTags } from '@nestjs/swagger';
 import type { Response } from 'express';
 
 @ApiTags('Analytics Reports')

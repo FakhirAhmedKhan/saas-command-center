@@ -1,3 +1,8 @@
+import { Module } from '@nestjs/common';
+import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-members.module';
+import { SharedRateLimitModule } from '../../common/rate-limit/shared-rate-limit.module';
+import { DatabaseModule } from '../../database/database.module';
+import { PostgresAdvisoryLockService } from '../../infrastructure/database/postgres-advisory-lock.service';
 import { WebhooksController } from './controllers/webhooks.controller';
 import { WebhookAccessService } from './services/webhook-access.service';
 import { WebhookCleanupService } from './services/webhook-cleanup.service';
@@ -7,11 +12,6 @@ import { WebhookManagementService } from './services/webhook-management.service'
 import { WebhookOutboundClientService } from './services/webhook-outbound-client.service';
 import { WebhookSecretCryptoService } from './services/webhook-secret-crypto.service';
 import { WebhookSignatureService } from './services/webhook-signature.service';
-import { SharedRateLimitModule } from '../../common/rate-limit/shared-rate-limit.module';
-import { DatabaseModule } from '../../database/database.module';
-import { PostgresAdvisoryLockService } from '../../infrastructure/database/postgres-advisory-lock.service';
-import { Module } from '@nestjs/common';
-import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-members.module';
 
 @Module({
   imports: [WorkspaceMembersModule, DatabaseModule, SharedRateLimitModule],

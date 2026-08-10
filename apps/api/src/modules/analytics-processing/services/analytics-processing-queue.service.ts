@@ -1,9 +1,10 @@
-import type { TypedConfigService } from '../../../config/runtime-config';
+ 
+import { createHash } from 'node:crypto';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../../database/prisma.service';
 import { AnalyticsProcessingStatus, AnalyticsProcessingTrigger, Prisma } from '../../../generated/prisma/client';
-import { BadRequestException, Injectable, NotFoundException, Inject } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { createHash } from 'node:crypto';
+import type { TypedConfigService } from '../../../config/runtime-config';
 
 const MILLISECONDS_PER_DAY = 86_400_000;
 

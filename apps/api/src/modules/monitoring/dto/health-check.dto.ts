@@ -1,7 +1,7 @@
-import { HealthCheckStatus, HealthIncidentStatus, HealthTargetType } from '../../../generated/prisma/client';
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, IsUrl, IsUUID, Max, MaxLength, Min, ValidateIf } from 'class-validator';
+import { HealthCheckStatus, HealthIncidentStatus, HealthTargetType } from '../../../generated/prisma/client';
 
 export class CreateHealthCheckDto {
   @ApiProperty({

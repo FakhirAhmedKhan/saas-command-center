@@ -1,6 +1,6 @@
-import { WEBHOOK_SIGNATURE_VERSION } from '../webhooks.constants';
-import { Injectable } from '@nestjs/common';
 import { createHmac, timingSafeEqual } from 'node:crypto';
+import { Injectable } from '@nestjs/common';
+import { WEBHOOK_SIGNATURE_VERSION } from '../webhooks.constants';
 
 @Injectable()
 export class WebhookSignatureService {

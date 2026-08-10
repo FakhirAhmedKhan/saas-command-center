@@ -1,8 +1,8 @@
-import type { PublicHealthResponseDto, ReadinessResponseDto } from './dto/health-response.dto';
-import { Injectable, ServiceUnavailableException, Inject } from '@nestjs/common';
+import { Inject, Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { TypedConfigService } from 'src/config/runtime-config';
 import { PrismaService } from 'src/database/prisma.service';
+import type { PublicHealthResponseDto, ReadinessResponseDto } from './dto/health-response.dto';
+import type { TypedConfigService } from 'src/config/runtime-config';
 
 @Injectable()
 export class HealthService {

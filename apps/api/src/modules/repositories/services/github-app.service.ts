@@ -1,5 +1,5 @@
-import { BadGatewayException, Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { createSign } from 'node:crypto';
+import { BadGatewayException, Injectable, ServiceUnavailableException } from '@nestjs/common';
 
 interface GithubInstallationResponse {
   id: number;

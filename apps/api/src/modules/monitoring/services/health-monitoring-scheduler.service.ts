@@ -1,10 +1,10 @@
-import { HealthCheckRunnerService } from './health-check-runner.service';
-import type { TypedConfigService } from '../../../config/runtime-config';
-import { PrismaService } from '../../../database/prisma.service';
-import { PostgresAdvisoryLockService } from '../../../infrastructure/database/postgres-advisory-lock.service';
-import { Injectable, Logger, Inject } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron, CronExpression, Interval } from '@nestjs/schedule';
+import { PrismaService } from '../../../database/prisma.service';
+import { PostgresAdvisoryLockService } from '../../../infrastructure/database/postgres-advisory-lock.service';
+import { HealthCheckRunnerService } from './health-check-runner.service';
+import type { TypedConfigService } from '../../../config/runtime-config';
 
 @Injectable()
 export class HealthMonitoringSchedulerService {

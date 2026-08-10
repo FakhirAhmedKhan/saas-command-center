@@ -1,14 +1,14 @@
+import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { WorkspaceRole } from '../../../generated/prisma/client';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
-import type { AuthenticatedUser } from '../../auth/interfaces/authenticated-user.interface';
 import { WorkspaceRoles } from '../decorators/workspace-roles.decorator';
 import { TransferOwnershipDto } from '../dto/transfer-ownership.dto';
 import { UpdateWorkspaceDto } from '../dto/update-workspace.dto';
 import { WorkspaceAccessGuard } from '../guards/workspace-access.guard';
 import { WorkspaceRolesGuard } from '../guards/workspace-roles.guard';
 import { WorkspacesService } from '../service/workspaces.service';
-import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import type { AuthenticatedUser } from '../../auth/interfaces/authenticated-user.interface';
 
 @ApiTags('Workspaces')
 @ApiBearerAuth('access-token')

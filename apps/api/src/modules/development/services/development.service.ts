@@ -1,4 +1,14 @@
-import { ProgressCalculatorService } from './progress-calculator.service';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { Prisma } from 'src/generated/prisma/client';
+import {
+  ActivityActorType,
+  ActivityEntityType,
+  ApplicationActivityType,
+  ApplicationTaskStatus,
+  BlockerStatus,
+  MilestoneStatus,
+} from 'src/generated/prisma/enums';
 import { ActivityWriterService } from '../../activity/services/activity-writer.service';
 import {
   ApplyDevelopmentTemplateDto,
@@ -16,17 +26,7 @@ import {
   UpdateTaskDto,
 } from '../dto/development.dto';
 import { DEVELOPMENT_TEMPLATES } from '../templates/development-templates';
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
-import { Prisma } from 'src/generated/prisma/client';
-import {
-  ActivityActorType,
-  ActivityEntityType,
-  ApplicationActivityType,
-  ApplicationTaskStatus,
-  BlockerStatus,
-  MilestoneStatus,
-} from 'src/generated/prisma/enums';
+import { ProgressCalculatorService } from './progress-calculator.service';
 
 const milestoneInclude = {
   tasks: {
