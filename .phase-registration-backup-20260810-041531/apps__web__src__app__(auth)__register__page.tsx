@@ -34,12 +34,13 @@ export default function RegisterPage() {
 
     try {
       await register({
-        displayName: name.trim() || undefined,
-        email: email.trim(),
+        name,
+        email,
         password,
+        workspaceName: '',
       });
 
-      router.replace('/workspaces/new');
+      router.replace('/dashboard');
     } catch (caughtError) {
       setError(getErrorMessage(caughtError));
     } finally {
@@ -122,7 +123,7 @@ export default function RegisterPage() {
             disabled={submitting}
             className="w-full rounded-lg bg-slate-950 px-4 py-2.5 font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {submitting ? 'Creating accountâ€¦' : 'Create account'}
+            {submitting ? 'Creating account…' : 'Create account'}
           </button>
         </form>
 

@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { Prisma } from 'src/generated/prisma/client';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
 import { WorkspacesService } from 'src/modules/workspace/service/workspaces.service';
 import { LoginDto } from '../dto/login.dto';
 import { RegisterDto } from '../dto/register.dto';
@@ -37,12 +38,16 @@ export class AuthService {
 
   async register(dto: RegisterDto, metadata: AuthRequestMetadata): Promise<AuthResult> {
     const email = dto.email.trim().toLowerCase();
-
     const passwordHash = await this.passwordService.hash(dto.password);
 
     const userId = randomUUID();
+    const workspaceId = randomUUID();
     const sessionId = randomUUID();
     const familyId = randomUUID();
+
+    const workspaceName = dto.workspaceName.trim();
+
+    const workspaceSlug = dto.workspaceSlug ? this.normalizeSlug(dto.workspaceSlug) : `${this.normalizeSlug(workspaceName)}-${randomUUID().slice(0, 6)}`;
 
     const tokens = await this.tokenService.issueTokenPair(userId, sessionId, familyId);
 
@@ -57,8 +62,24 @@ export class AuthService {
             passwordHash,
             displayName: dto.displayName?.trim() || null,
           },
-
           select: publicUserSelect,
+        });
+
+        await transaction.workspace.create({
+          data: {
+            id: workspaceId,
+            name: workspaceName,
+            slug: workspaceSlug,
+            ownerId: userId,
+          },
+        });
+
+        await transaction.workspaceMember.create({
+          data: {
+            workspaceId,
+            userId,
+            role: WorkspaceRole.OWNER,
+          },
         });
 
         await transaction.authSession.create({
@@ -68,9 +89,7 @@ export class AuthService {
             familyId,
             refreshTokenHash,
             expiresAt: tokens.refreshExpiresAt,
-
             userAgent: this.normalizeMetadata(metadata.userAgent),
-
             ipAddress: this.normalizeMetadata(metadata.ipAddress),
           },
         });
@@ -83,12 +102,13 @@ export class AuthService {
       return this.createAuthResult(tokens, user, workspaces);
     } catch (error: unknown) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        throw new ConflictException('Email is already in use');
+        throw new ConflictException('Email or workspace slug is already in use');
       }
 
       throw error;
     }
   }
+
   async login(dto: LoginDto, metadata: AuthRequestMetadata): Promise<AuthResult> {
     const user = await this.usersService.findAuthenticationRecordByEmail(dto.email);
 
@@ -238,6 +258,20 @@ export class AuthService {
       user,
       workspaces,
     };
+  }
+
+  private normalizeSlug(value: string): string {
+    const slug = value
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+    if (slug.length < 2) {
+      throw new ConflictException('Workspace slug is invalid');
+    }
+
+    return slug;
   }
 
   private normalizeMetadata(value?: string | null): string | null {

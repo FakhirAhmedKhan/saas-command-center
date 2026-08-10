@@ -1,4 +1,4 @@
-import { apiRequest } from '../lib/api/api-client';
+﻿import { apiRequest } from '../lib/api/http-client';
 import type { AuthSession, AuthUser, LoginInput, RegisterInput } from './auth.types';
 
 function validateSession(session: AuthSession): AuthSession {

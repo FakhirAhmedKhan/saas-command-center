@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsOptional, IsString, Length, Matches, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsOptional, IsString, Length, MaxLength, MinLength } from 'class-validator';
 
 export class RegisterDto {
   @ApiProperty({
@@ -25,22 +25,4 @@ export class RegisterDto {
   @IsString()
   @Length(2, 120)
   displayName?: string;
-
-  @ApiProperty({
-    example: 'My SaaS Workspace',
-  })
-  @IsString()
-  @Length(2, 120)
-  workspaceName!: string;
-
-  @ApiPropertyOptional({
-    example: 'my-saas-workspace',
-  })
-  @IsOptional()
-  @IsString()
-  @Length(2, 120)
-  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
-    message: 'workspaceSlug can contain lowercase letters, numbers and hyphens only',
-  })
-  workspaceSlug?: string;
 }

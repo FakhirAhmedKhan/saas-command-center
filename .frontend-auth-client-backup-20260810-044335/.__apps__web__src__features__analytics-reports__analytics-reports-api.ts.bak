@@ -1,4 +1,4 @@
-import { apiDownload, apiRequest } from '../lib/api/api-client';
+import { apiDownload, apiRequest } from '../lib/api/http-client';
 import type { AnalyticsDimension, AnalyticsReportRequest, AnalyticsReportResponse } from './analytics-reports.types';
 
 function getReportDimension(request: AnalyticsReportRequest): AnalyticsDimension | null {

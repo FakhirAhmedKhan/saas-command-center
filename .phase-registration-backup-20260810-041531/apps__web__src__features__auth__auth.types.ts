@@ -1,4 +1,4 @@
-import { publicEnv } from 'config/public-env';
+﻿import { publicEnv } from 'config/public-env';
 import { ApiError } from '../lib/api/api-error';
 
 export type WorkspaceRole = 'OWNER' | 'ADMIN' | 'DEVELOPER' | 'VIEWER';
@@ -80,9 +80,12 @@ export interface LoginInput {
 }
 
 export interface RegisterInput {
+  name: string;
   email: string;
   password: string;
   displayName?: string;
+  workspaceName: string;
+  workspaceSlug?: string;
 }
 
 interface RequestOptions extends Omit<RequestInit, 'body'> {
