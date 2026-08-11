@@ -1,16 +1,14 @@
-('use client');
-import type { WorkspaceRole } from '@command-center/shared-types';
-import { Archive, RotateCcw, Trash2 } from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Spinner } from '@/components/ui/spinner';
+﻿'use client';
 import { archiveApplication, getApplication, permanentlyDeleteApplication, restoreApplication } from '@/features/applications/application-api';
 import type { SaasApplication } from '@/features/applications/application-types';
 import { getErrorMessage } from '@/features/applications/application-utils';
 import { ApplicationSubNav } from '@/features/applications/components/application-sub-nav';
 import { apiRequest } from '@/features/lib/api/api-client';
+import type { WorkspaceRole } from '@command-center/shared-types';
+import { Spinner , Card, CardContent, CardHeader , Button } from '@command-center/ui';
+import { Archive, RotateCcw, Trash2 } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 
 interface AuthMeResponse {
   user: {

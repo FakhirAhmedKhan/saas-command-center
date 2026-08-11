@@ -1,5 +1,5 @@
-import { expect, test } from '@playwright/test';
 import { APPLICATION_ID, installMockApi, makeApplication, PRIMARY_WORKSPACE_ID } from './fixtures/mock-api';
+import { expect, test } from '@playwright/test';
 
 test.describe('Batch 10 application flows', () => {
   test('lists active applications with status, priority, and technology', async ({ page }) => {

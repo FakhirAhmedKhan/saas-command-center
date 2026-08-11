@@ -1,5 +1,5 @@
+import { cn } from '../lib/cn';
 import { forwardRef, type InputHTMLAttributes } from 'react';
-import { cn } from '@/features/lib/api/cn';
 
 export interface SwitchProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label?: string;

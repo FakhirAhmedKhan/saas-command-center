@@ -1,1 +1,1 @@
-export * from './team-operations.types';
+export * from './team-operations.types.js';

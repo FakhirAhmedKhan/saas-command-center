@@ -1,5 +1,5 @@
-import { expect, test } from '@playwright/test';
 import { installMockApi, PRIMARY_WORKSPACE_ID } from './fixtures/mock-api';
+import { expect, test } from '@playwright/test';
 
 test.describe('Batch 10 navigation, responsiveness, and accessibility', () => {
   test('restores an authenticated session from the public root', async ({ page }) => {

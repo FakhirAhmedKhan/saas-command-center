@@ -1,5 +1,5 @@
+import { cn } from '../lib/cn';
 import { forwardRef, type ButtonHTMLAttributes } from 'react';
-import { cn } from '@/features/lib/api/cn';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
 

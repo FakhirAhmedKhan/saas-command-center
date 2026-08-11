@@ -1,12 +1,6 @@
 'use client';
 
-import { Archive, Check, Clipboard, KeyRound, Link2, PauseCircle, PlayCircle, RotateCcw, Unlink } from 'lucide-react';
-import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import { PageLoading } from '@/components/states/page-loading';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Select } from '@/components/ui/select';
 import { getApplications } from '@/features/applications/application-api';
 import type { SaasApplication } from '@/features/applications/application-types';
 import { WebsiteSubNav } from '@/features/websites/components/website-sub-nav';
@@ -22,6 +16,10 @@ import {
 } from '@/features/websites/website-api';
 import type { Website } from '@/features/websites/website-types';
 import { getWebsiteError, websiteKeyStorageName } from '@/features/websites/website-utils';
+import { Select , Card, CardContent, CardHeader , Button } from '@command-center/ui';
+import { Archive, Check, Clipboard, KeyRound, Link2, PauseCircle, PlayCircle, RotateCcw, Unlink } from 'lucide-react';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function WebsiteSettingsPage() {
   const params = useParams<{

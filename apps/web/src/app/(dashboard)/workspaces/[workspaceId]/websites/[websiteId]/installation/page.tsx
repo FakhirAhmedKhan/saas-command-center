@@ -1,17 +1,16 @@
 'use client';
 
-import { Check, Clipboard, KeyRound } from 'lucide-react';
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
 import { PageLoading } from '@/components/states/page-loading';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { TrackingStatusPanel } from '@/features/tracking/components/tracking-status-panel';
 import { WebsiteSubNav } from '@/features/websites/components/website-sub-nav';
 import { getWebsite } from '@/features/websites/website-api';
 import type { Website } from '@/features/websites/website-types';
 import { getWebsiteError, websiteKeyStorageName } from '@/features/websites/website-utils';
+import { Card, CardContent, CardHeader , Button } from '@command-center/ui';
+import { Check, Clipboard, KeyRound } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 
 const TRACKER_SCRIPT_URL = process.env.NEXT_PUBLIC_TRACKER_SCRIPT_URL ?? 'http://localhost:3002/tracker.js';
 

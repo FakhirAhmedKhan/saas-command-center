@@ -1,7 +1,7 @@
 'use client';
 
-import { useParams } from 'next/navigation';
 import { CodeExplorer } from '@/features/repositories/code-explorer';
+import { useParams } from 'next/navigation';
 
 type RouteParameters = Record<string, string | string[]> & {
   workspaceId: string;

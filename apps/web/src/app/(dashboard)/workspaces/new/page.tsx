@@ -1,5 +1,5 @@
-﻿import { Suspense } from 'react';
-import NewWorkspaceClient from './new-workspace-client';
+﻿import NewWorkspaceClient from './new-workspace-client';
+import { Suspense } from 'react';
 
 export default function NewWorkspacePage() {
   return (

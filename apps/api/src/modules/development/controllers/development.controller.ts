@@ -1,6 +1,3 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { WorkspaceRole } from 'src/generated/prisma/enums';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { WorkspaceRoles } from '../../workspace/decorators/workspace-roles.decorator';
 import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
@@ -21,7 +18,10 @@ import {
   UpdateTaskDto,
 } from '../dto/development.dto';
 import { DevelopmentService } from '../services/development.service';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
 
 interface AuthenticatedRequest extends Request {
   user: {

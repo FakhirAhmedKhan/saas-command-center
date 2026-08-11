@@ -1,0 +1,189 @@
+﻿=== UI PACKAGE MIGRATION ===
+
+--- PNPM INSTALL ---
+Scope: all 9 workspace projects
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Progress: resolved 1010, reused 0, downloaded 0, added 0
+ΓÇëWARNΓÇë 2 deprecated subdependencies found: glob@7.2.3, inflight@1.0.6
+
+Progress: resolved 1137, reused 42, downloaded 0, added 0
+Progress: resolved 1137, reused 76, downloaded 0, added 0
+Packages: +8 -132
+++++----------------------------------------------------------------------------
+Progress: resolved 1137, reused 106, downloaded 0, added 0
+Progress: resolved 1137, reused 138, downloaded 0, added 8, done
+Done in 9.7s using pnpm v11.0.0
+
+--- PRETTIER UI ---
+
+--- UI ESLINT AUTOFIX ---
+
+--- WEB ESLINT AUTOFIX ---
+
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\analytics-overview\analytics-overview.types.ts
+  1:44  warning  'AnalyticsPreset' is defined but never used  @typescript-eslint/no-unused-vars
+
+Γ£û 1 problem (0 errors, 1 warning)
+
+
+--- OLD IMPORT AUDIT ---
+No old Web UI imports remain.
+
+--- PACKAGE UI STRUCTURE ---
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\src\components\badge.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\src\components\button.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\src\components\card.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\src\components\checkbox.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\src\components\data-table.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\src\components\empty-state.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\src\components\error-state.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\src\components\input.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\src\components\progress.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\src\components\search-input.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\src\components\select.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\src\components\skeleton.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\src\components\spinner.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\src\components\switch.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\src\components\textarea.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\src\index.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\src\lib\cn.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\src\status-badge.tsx
+
+--- UI Typecheck ---
+EXIT CODE: 0
+pnpm.CMD : $ tsc -p tsconfig.json --noEmit
+At line:21 char:5
++     & pnpm.cmd @ArgsList *> $tmp
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ($ tsc -p tsconfig.json --noEmit:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+--- UI Lint ---
+EXIT CODE: 0
+pnpm.CMD : $ eslint src --max-warnings=0
+At line:21 char:5
++     & pnpm.cmd @ArgsList *> $tmp
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ($ eslint src --max-warnings=0:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+--- WEB Typecheck ---
+EXIT CODE: 0
+pnpm.CMD : $ next typegen && tsc --noEmit
+At line:21 char:5
++     & pnpm.cmd @ArgsList *> $tmp
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ($ next typegen && tsc --noEmit:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Generating route types...
+Γ£ô Types generated successfully
+
+--- WEB Lint ---
+EXIT CODE: 0
+pnpm.CMD : $ eslint .
+At line:21 char:5
++     & pnpm.cmd @ArgsList *> $tmp
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ($ eslint .:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\eslint.config.mjs
+  5:1  warning  Assign array to a variable before exporting as module default  import/no-anonymous-default-export
+
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\analytics-overview\analytics-overview.types.ts
+  1:44  warning  'AnalyticsPreset' is defined but never used  @typescript-eslint/no-unused-vars
+
+Γ£û 2 problems (0 errors, 2 warnings)
+
+
+--- WEB Build ---
+EXIT CODE: 0
+pnpm.CMD : $ next build
+At line:21 char:5
++     & pnpm.cmd @ArgsList *> $tmp
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ($ next build:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Γû▓ Next.js 16.2.12 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 6.1s
+  Running TypeScript ...
+  Finished TypeScript in 10.0s ...
+  Collecting page data using 5 workers ...
+  Generating static pages using 5 workers (0/10) ...
+  Generating static pages using 5 workers (2/10) 
+  Generating static pages using 5 workers (4/10) 
+  Generating static pages using 5 workers (7/10) 
+Γ£ô Generating static pages using 5 workers (10/10) in 319ms
+  Finalizing page optimization ...
+
+Route (app)
+Γöî Γùï /
+Γö£ Γùï /_not-found
+Γö£ Γùï /dashboard
+Γö£ Γùï /github/callback
+Γö£ Γùï /github/setup
+Γö£ ╞Æ /invitations/[token]
+Γö£ Γùï /login
+Γö£ Γùï /notifications
+Γö£ Γùï /register
+Γö£ ╞Æ /workspaces/[workspaceId]
+Γö£ ╞Æ /workspaces/[workspaceId]/activities
+Γö£ ╞Æ /workspaces/[workspaceId]/activity
+Γö£ ╞Æ /workspaces/[workspaceId]/applications
+Γö£ ╞Æ /workspaces/[workspaceId]/applications/[applicationId]
+Γö£ ╞Æ /workspaces/[workspaceId]/applications/[applicationId]/development
+Γö£ ╞Æ /workspaces/[workspaceId]/applications/[applicationId]/releases
+Γö£ ╞Æ /workspaces/[workspaceId]/applications/[applicationId]/settings
+Γö£ ╞Æ /workspaces/[workspaceId]/applications/new
+Γö£ ╞Æ /workspaces/[workspaceId]/monitoring
+Γö£ ╞Æ /workspaces/[workspaceId]/repositories
+Γö£ ╞Æ /workspaces/[workspaceId]/repositories/[repositoryId]/code
+Γö£ ╞Æ /workspaces/[workspaceId]/settings
+Γö£ ╞Æ /workspaces/[workspaceId]/settings/integrations
+Γö£ ╞Æ /workspaces/[workspaceId]/settings/members
+Γö£ ╞Æ /workspaces/[workspaceId]/websites
+Γö£ ╞Æ /workspaces/[workspaceId]/websites/[websiteId]
+Γö£ ╞Æ /workspaces/[workspaceId]/websites/[websiteId]/analytics
+Γö£ ╞Æ /workspaces/[workspaceId]/websites/[websiteId]/analytics-engine
+Γö£ ╞Æ /workspaces/[workspaceId]/websites/[websiteId]/analytics/processing
+Γö£ ╞Æ /workspaces/[workspaceId]/websites/[websiteId]/analytics/reports
+Γö£ ╞Æ /workspaces/[workspaceId]/websites/[websiteId]/edit
+Γö£ ╞Æ /workspaces/[workspaceId]/websites/[websiteId]/events
+Γö£ ╞Æ /workspaces/[workspaceId]/websites/[websiteId]/installation
+Γö£ ╞Æ /workspaces/[workspaceId]/websites/[websiteId]/settings
+Γö£ ╞Æ /workspaces/[workspaceId]/websites/new
+Γöö Γùï /workspaces/new
+
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+
+
+=============== UI MIGRATION RESULT ===============
+pnpm install        : PASS
+Old imports removed : PASS
+UI Typecheck        : PASS
+UI Lint             : PASS
+WEB Typecheck       : PASS
+WEB Lint            : PASS
+WEB Build           : PASS
+===================================================
+
+--- GIT DIFF STAT ---
+git : warning: in the working copy of 'reports/ui-package-migration-result.txt', LF will be replaced by CRLF the next time Git touches it
+At line:568 char:1
++ git --no-pager diff --stat *> $tmp
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (warning: in the... Git touches it:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ reports/ui-package-migration-result.txt | 79 +++++++++++++++++++++++++++++++++
+ 1 file changed, 79 insertions(+)

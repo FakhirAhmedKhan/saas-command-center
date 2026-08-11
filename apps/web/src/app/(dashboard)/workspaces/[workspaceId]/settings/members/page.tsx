@@ -1,8 +1,8 @@
 'use client';
 
-import { useParams } from 'next/navigation';
 import { WorkspaceInvitationsPanel } from '@/features/team-operations/workspace-invitations-panel';
 import { WorkspaceSettingsNav } from '@/features/workspaces/components/workspace-settings-nav';
+import { useParams } from 'next/navigation';
 
 export default function WorkspaceMembersSettingsPage() {
   const params = useParams<{

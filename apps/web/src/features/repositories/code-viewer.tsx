@@ -1,8 +1,8 @@
 'use client';
 
+import type { RepositoryCodeFile } from './code-explorer.types';
 import Editor from '@monaco-editor/react';
 import Image from 'next/image';
-import type { RepositoryCodeFile } from './code-explorer.types';
 
 interface CodeViewerProps {
   file: RepositoryCodeFile | null;

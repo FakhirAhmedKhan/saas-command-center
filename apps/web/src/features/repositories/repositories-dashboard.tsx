@@ -1,6 +1,8 @@
 ﻿/* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
+import { beginGithubConnect, disconnectGithubInstallation, listRepositories, syncRepositories, syncRepository } from './repositories-api';
+import type { RepositoryConnection, RepositoryInstallationSummary } from './repository.types';
 import {
   ExternalLink,
   FolderGit2,
@@ -11,8 +13,6 @@ import {
   Unplug,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { beginGithubConnect, disconnectGithubInstallation, listRepositories, syncRepositories, syncRepository } from './repositories-api';
-import type { RepositoryConnection, RepositoryInstallationSummary } from './repository.types';
 
 interface RepositoriesDashboardProps {
   workspaceId: string;

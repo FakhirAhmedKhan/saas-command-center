@@ -1,8 +1,8 @@
-import { AnalyticsDatePreset } from '@command-center/shared-types';
-export { AnalyticsDatePreset };
-import type { AnalyticsOverviewQueryInput, AnalyticsPreset } from '@command-center/shared-types';
+import { AnalyticsDatePreset, type AnalyticsOverviewQueryInput, type AnalyticsPreset } from '@command-center/shared-types';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsOptional, Matches, ValidateIf } from 'class-validator';
+
+export { AnalyticsDatePreset };
 
 const DATE_KEY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 

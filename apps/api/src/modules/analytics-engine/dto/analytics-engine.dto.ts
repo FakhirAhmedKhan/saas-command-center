@@ -1,5 +1,4 @@
-import { AnalyticsAggregatePeriod } from '@command-center/shared-types';
-import type { AnalyticsAggregateQueryInput, AnalyticsReprocessInput } from '@command-center/shared-types';
+import { AnalyticsAggregatePeriod, type AnalyticsAggregateQueryInput, type AnalyticsReprocessInput } from '@command-center/shared-types';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsDateString, IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';

@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
+import { useSession } from '@/features/auth/use-session';
+import { completeGithubCallback } from '@/features/repositories/repositories-api';
 import { CheckCircle2, FolderGit2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { useSession } from '@/features/auth/use-session';
-import { completeGithubCallback } from '@/features/repositories/repositories-api';
 
 export function GithubCallbackClient() {
   const router = useRouter();

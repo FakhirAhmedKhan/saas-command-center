@@ -1,16 +1,12 @@
 'use client';
 
-import { ExternalLink, Pencil, Plus, Trash2, X } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
 import { addApplicationLink, removeApplicationLink, updateApplicationLink } from '../application-api';
 import { LINK_TYPE_LABELS } from '../application-constants';
 import { APPLICATION_LINK_TYPES, type ApplicationLink, type ApplicationLinkType } from '../application-types';
 import { getErrorMessage } from '../application-utils';
+import { Badge , Button , Card, CardContent, CardHeader , Input , Select } from '@command-center/ui';
+import { ExternalLink, Pencil, Plus, Trash2, X } from 'lucide-react';
+import { useState, type FormEvent } from 'react';
 
 interface LinkManagerProps {
   workspaceId: string;

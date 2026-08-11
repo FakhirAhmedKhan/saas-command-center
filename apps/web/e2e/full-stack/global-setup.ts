@@ -1,7 +1,7 @@
-﻿import { mkdirSync, writeFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+﻿import { fullStackStateDirectory, fullStackStatePath, type FullStackState, type SeedUser } from './fixtures/state';
 import { request } from '@playwright/test';
-import { fullStackStateDirectory, fullStackStatePath, type FullStackState, type SeedUser } from './fixtures/state';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 interface AuthResponse {
   accessToken: string;

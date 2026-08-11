@@ -1,6 +1,6 @@
-import { expect, test, type BrowserContext, type Page } from '@playwright/test';
 import { loginThroughUi, uniqueValue } from './fixtures/helpers';
 import { readFullStackState, type FullStackState } from './fixtures/state';
+import { expect, test, type BrowserContext, type Page } from '@playwright/test';
 
 let state: FullStackState;
 

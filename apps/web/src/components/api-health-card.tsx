@@ -1,8 +1,8 @@
 'use client';
 
+import type { HealthResponse } from '@command-center/shared-types';
 import { StatusBadge } from '@command-center/ui';
 import { useEffect, useState } from 'react';
-import type { HealthResponse } from '@command-center/shared-types';
 
 type HealthState = { kind: 'checking' } | { kind: 'connected'; data: HealthResponse } | { kind: 'unavailable'; message: string };
 

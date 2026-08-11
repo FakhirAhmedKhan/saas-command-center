@@ -1,3 +1,7 @@
+import { ACTIVITY_BADGE_VARIANTS, ACTIVITY_TYPE_LABELS, ENTITY_TYPE_LABELS } from '../activity-constants';
+import type { ApplicationActivity, ApplicationActivityType } from '../activity-types';
+import { formatActivityDate, formatRelativeActivityDate, getActivityActorName, getMetadataSummary } from '../activity-utils';
+import { Badge } from '@command-center/ui';
 import {
   Archive,
   ArrowUpDown,
@@ -21,10 +25,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { createElement } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { ACTIVITY_BADGE_VARIANTS, ACTIVITY_TYPE_LABELS, ENTITY_TYPE_LABELS } from '../activity-constants';
-import { formatActivityDate, formatRelativeActivityDate, getActivityActorName, getMetadataSummary } from '../activity-utils';
-import type { ApplicationActivity, ApplicationActivityType } from '../activity-types';
 
 interface ActivityItemProps {
   workspaceId: string;

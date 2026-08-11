@@ -1,5 +1,5 @@
-import { apiRequest } from '@/features/lib/api/api-client';
 import type { ActivityListQuery, ActivityListResponse } from './activity-types';
+import { apiRequest } from '@/features/lib/api/api-client';
 
 function buildActivityQuery(query: ActivityListQuery = {}): string {
   const parameters = new URLSearchParams();

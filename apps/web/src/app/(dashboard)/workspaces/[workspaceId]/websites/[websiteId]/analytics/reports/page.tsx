@@ -1,8 +1,8 @@
 ﻿'use client';
 
-import { useParams } from 'next/navigation';
 import { AnalyticsReportsDashboard } from '@/features/analytics-reports/analytics-reports-dashboard';
 import { WebsiteSubNav } from '@/features/websites/components/website-sub-nav';
+import { useParams } from 'next/navigation';
 
 export default function AnalyticsReportsPage() {
   const params = useParams<{

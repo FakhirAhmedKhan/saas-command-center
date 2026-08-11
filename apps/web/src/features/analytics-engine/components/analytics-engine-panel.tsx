@@ -1,16 +1,11 @@
 'use client';
 
+import { getAnalyticsAggregates, getAnalyticsEngineStatus, processAnalytics, reprocessAnalytics, runAnalyticsRetention } from '../analytics-engine-api';
+import type { AnalyticsAggregateDimension, AnalyticsAggregatePeriod, AnalyticsAggregateResponse, AnalyticsEngineStatus } from '../analytics-engine-types';
+import { calculateBounceRate, formatAnalyticsDate, formatDuration, getAnalyticsEngineError } from '../analytics-engine-utils';
+import { Badge , Button , Card, CardContent, CardHeader , Input , Select , Spinner } from '@command-center/ui';
 import { Activity, CalendarClock, Database, Gauge, Play, RefreshCw, Repeat2, Trash2, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
-import { Spinner } from '@/components/ui/spinner';
-import { getAnalyticsAggregates, getAnalyticsEngineStatus, processAnalytics, reprocessAnalytics, runAnalyticsRetention } from '../analytics-engine-api';
-import { calculateBounceRate, formatAnalyticsDate, formatDuration, getAnalyticsEngineError } from '../analytics-engine-utils';
-import type { AnalyticsAggregateDimension, AnalyticsAggregatePeriod, AnalyticsAggregateResponse, AnalyticsEngineStatus } from '../analytics-engine-types';
 
 interface AnalyticsEnginePanelProps {
   workspaceId: string;

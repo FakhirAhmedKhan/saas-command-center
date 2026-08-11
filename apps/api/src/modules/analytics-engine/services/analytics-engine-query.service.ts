@@ -1,7 +1,7 @@
-﻿import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
+﻿import { AnalyticsAggregateQueryDto } from '../dto/analytics-engine.dto';
 import { AnalyticsAggregatePeriod } from '@command-center/shared-types';
-import { AnalyticsAggregateQueryDto } from '../dto/analytics-engine.dto';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
 
 @Injectable()
 export class AnalyticsEngineQueryService {

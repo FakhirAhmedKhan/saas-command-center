@@ -1,12 +1,12 @@
 'use client';
 
-import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import { getErrorMessage } from '@/features/applications/application-utils';
 import { useSession } from '@/features/auth/use-session';
 import { acceptInvitation, declineInvitation, getInvitationPreview } from '@/features/team-operations/team-operations-api';
 import type { InvitationPreview } from '@/features/team-operations/team-operations.types';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function InvitationPage() {
   const params = useParams<{

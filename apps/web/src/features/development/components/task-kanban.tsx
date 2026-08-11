@@ -1,12 +1,11 @@
 'use client';
 
-import { Check, RotateCcw } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { completeTask, reopenTask, setTaskStatus } from '../development-api';
 import { PRIORITY_LABELS, PRIORITY_VARIANTS } from '../development-constants';
-import { formatDevelopmentDate } from '../development-utils';
 import type { ApplicationMilestone, ApplicationTask, ApplicationTaskStatus } from '../development-types';
+import { formatDevelopmentDate } from '../development-utils';
+import { Badge , Button } from '@command-center/ui';
+import { Check, RotateCcw } from 'lucide-react';
 
 interface TaskKanbanProps {
   workspaceId: string;

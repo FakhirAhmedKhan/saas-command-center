@@ -21,10 +21,12 @@ export abstract class InvitationMailer {
 
 @Injectable()
 export class DisabledInvitationMailer implements InvitationMailer {
-  async send(_input: SendInvitationEmailInput): Promise<InvitationMailResult> {
-    return {
+  send(input: SendInvitationEmailInput): Promise<InvitationMailResult> {
+    void input;
+
+    return Promise.resolve({
       sent: false,
       skipped: true,
-    };
+    });
   }
 }

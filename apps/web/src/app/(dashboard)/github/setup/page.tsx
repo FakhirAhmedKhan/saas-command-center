@@ -1,5 +1,5 @@
-import { Suspense } from 'react';
 import { GithubSetupClient } from './github-setup-client';
+import { Suspense } from 'react';
 
 export default function GithubSetupPage() {
   return (

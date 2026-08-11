@@ -1,5 +1,3 @@
-import { Module } from '@nestjs/common';
-import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-members.module';
 import { SharedRateLimitModule } from '../../common/rate-limit/shared-rate-limit.module';
 import { DatabaseModule } from '../../database/database.module';
 import { PostgresAdvisoryLockService } from '../../infrastructure/database/postgres-advisory-lock.service';
@@ -11,6 +9,8 @@ import { AnalyticsProcessingSchedulerService } from './services/analytics-proces
 import { AnalyticsProcessingStatusService } from './services/analytics-processing-status.service';
 import { AnalyticsProcessingWorkerService } from './services/analytics-processing-worker.service';
 import { AnalyticsRangeProcessorService } from './services/analytics-range-processor.service';
+import { Module } from '@nestjs/common';
+import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-members.module';
 
 @Module({
   imports: [WorkspaceMembersModule, DatabaseModule, AnalyticsEngineModule, SharedRateLimitModule],

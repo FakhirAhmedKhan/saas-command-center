@@ -1,5 +1,5 @@
-import { expect, test } from '@playwright/test';
 import { installMockApi } from './fixtures/mock-api';
+import { expect, test } from '@playwright/test';
 
 test.describe('Batch 10 authentication flows', () => {
   test('redirects the public root to login when the session is missing', async ({ page }) => {

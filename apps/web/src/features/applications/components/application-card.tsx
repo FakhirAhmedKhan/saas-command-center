@@ -1,11 +1,9 @@
+import { CATEGORY_LABELS, PRIORITY_BADGE_VARIANTS, PRIORITY_LABELS, STATUS_BADGE_VARIANTS, STATUS_LABELS } from '../application-constants';
+import type { SaasApplication } from '../application-types';
+import { formatApplicationDate, formatRelativeApplicationDate, getApplicationInitials } from '../application-utils';
+import { Badge , Card , Progress } from '@command-center/ui';
 import { ArrowRight, CalendarDays, Link2 } from 'lucide-react';
 import Link from 'next/link';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { CATEGORY_LABELS, PRIORITY_BADGE_VARIANTS, PRIORITY_LABELS, STATUS_BADGE_VARIANTS, STATUS_LABELS } from '../application-constants';
-import { formatApplicationDate, formatRelativeApplicationDate, getApplicationInitials } from '../application-utils';
-import type { SaasApplication } from '../application-types';
 
 interface ApplicationCardProps {
   workspaceId: string;

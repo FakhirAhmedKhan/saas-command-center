@@ -75,7 +75,7 @@ function sanitizeValue(value: unknown, depth: number): Prisma.InputJsonValue | u
     return result;
   }
 
-  return sanitizeString(String(value));
+  return undefined;
 }
 
 export function sanitizeActivityMetadata(metadata?: Record<string, unknown>): Prisma.InputJsonObject | undefined {

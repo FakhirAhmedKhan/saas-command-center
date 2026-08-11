@@ -1,7 +1,7 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { Prisma } from 'src/generated/prisma/client';
 import { PrismaService } from '../../../database/prisma.service';
 import { ActivityQueryDto } from '../dto/activity-query.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { Prisma } from 'src/generated/prisma/client';
 
 @Injectable()
 export class ActivityQueryService {

@@ -1,0 +1,2903 @@
+﻿=== BATCH 8 VALIDATION AUDIT ===
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\validation\eslint.config.mjs
+==================================================
+import eslint from '@eslint/js';
+import tseslint from 'typescript-eslint';
+
+export default tseslint.config(eslint.configs.recommended, ...tseslint.configs.recommended, {
+  ignores: ['dist/**'],
+});
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\validation\package.json
+==================================================
+{
+  "name": "@command-center/validation",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src --max-warnings=0",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.34.0",
+    "eslint": "^9.34.0",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.41.0"
+  }
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\validation\src\index.ts
+==================================================
+export function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+export function normalizeEmail(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+export function isSafeHttpUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\validation\tsconfig.json
+==================================================
+{
+  "extends": "../tsconfig/base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "declaration": true,
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src/**/*.ts"]
+}
+
+==================================================
+packages\validation\package.json
+==================================================
+{
+  "name": "@command-center/validation",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src --max-warnings=0",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.34.0",
+    "eslint": "^9.34.0",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.41.0"
+  }
+}
+
+==================================================
+packages\shared-types\package.json
+==================================================
+{
+  "name": "@command-center/shared-types",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src --max-warnings=0",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.34.0",
+    "eslint": "^9.34.0",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.41.0"
+  }
+}
+
+==================================================
+apps\api\package.json
+==================================================
+{
+  "name": "@command-center/api",
+  "version": "0.1.0",
+  "private": true,
+  "license": "UNLICENSED",  
+  "scripts": {
+    "prebuild": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "nest build",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:prod": "node dist/main.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch",
+    "prisma:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:seed": "prisma db seed",
+    "db:reset": "prisma migrate reset",
+    "db:studio": "prisma studio",
+    "test:e2e": "jest --config ./test/jest-e2e.config.cjs --runInBand",
+    "test:e2e:watch": "jest --config ./test/jest-e2e.config.cjs --runInBand --watch",
+    "test:e2e:auth": "jest --config ./test/jest-e2e.config.cjs --runInBand auth.e2e-spec.ts",
+    "test:e2e:workspaces": "jest --config ./test/jest-e2e.config.cjs --runInBand workspaces.e2e-spec.ts",
+    "test:e2e:coverage": "jest --config ./test/jest-e2e.config.cjs --runInBand --coverage",
+    "lint:test": "eslint \"test/**/*.ts\" --max-warnings=0",
+    "test:e2e:members": "jest --config ./test/jest-e2e.config.cjs --runInBand workspace-members.e2e-spec.ts",
+    "test:e2e:roles": "jest --config ./test/jest-e2e.config.cjs --runInBand workspace-roles.e2e-spec.ts",
+    "test:e2e:application-roles": "jest --config ./test/jest-e2e.config.cjs --runInBand application-roles.e2e-spec.ts",
+    "test:e2e:applications": "jest --config ./test/jest-e2e.config.cjs --runInBand applications.e2e-spec.ts",
+    "test:e2e:activity": "jest --config ./test/jest-e2e.config.cjs --runInBand activity.e2e-spec.ts",
+    "test:e2e:links": "jest --config ./test/jest-e2e.config.cjs --runInBand application-links.e2e-spec.ts",
+    "test:e2e:technologies": "jest --config ./test/jest-e2e.config.cjs --runInBand application-technologies.e2e-spec.ts",
+    "test:e2e:development-activity": "jest --config ./test/jest-e2e.config.cjs --runInBand development-activity.e2e-spec.ts",
+    "test:e2e:development-roles": "jest --config ./test/jest-e2e.config.cjs --runInBand development-roles.e2e-spec.ts",
+    "test:e2e:development": "jest --config ./test/jest-e2e.config.cjs --runInBand development.e2e-spec.ts",
+    "test:e2e:development-progress": "jest --config ./test/jest-e2e.config.cjs --runInBand development-progress.e2e-spec.ts",
+    "test:e2e:analytics-ingestion": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-ingestion.e2e-spec.ts",
+    "test:e2e:analytics-ingestion-security": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-ingestion-security.e2e-spec.ts",
+    "test:e2e:analytics-ingestion-rate-limit": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-ingestion-rate-limit.e2e-spec.ts",
+    "test:e2e:tracking-admin": "jest --config ./test/jest-e2e.config.cjs --runInBand tracking-admin.e2e-spec.ts",
+    "test:e2e:raw-events": "jest --config ./test/jest-e2e.config.cjs --runInBand raw-events.e2e-spec.ts",
+    "test:e2e:analytics-engine-status": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-engine-status.e2e-spec.ts",
+    "test:e2e:analytics-engine-processing": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-engine-processing.e2e-spec.ts",
+    "test:e2e:analytics-visitors": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-visitors.e2e-spec.ts",
+    "test:e2e:analytics-sessions": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-sessions.e2e-spec.ts",
+    "test:e2e:analytics-pageviews": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-pageviews.e2e-spec.ts",
+    "test:e2e:analytics-aggregates": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-aggregates.e2e-spec.ts",
+    "test:e2e:analytics-timezones": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-timezones.e2e-spec.ts",
+    "test:e2e:analytics-late-events": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-late-events.e2e-spec.ts",
+    "test:e2e:analytics-reprocessing": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-reprocessing.e2e-spec.ts",
+    "test:e2e:analytics-retention": "jest --config ./test/jest-e2e.config.cjs --runInBand analytics-retention.e2e-spec.ts",
+    "test:e2e:phase13": "jest --config ./test/jest-e2e.config.cjs --runInBand phase13-analytics-reports.e2e-spec.ts",
+    "test:e2e:phase14": "jest --config ./test/jest-e2e.config.cjs --runInBand phase14-analytics-processing.e2e-spec.ts",
+    "test:e2e:phase15": "jest --config ./test/jest-e2e.config.cjs --runInBand phase15-monitoring.e2e-spec.ts",
+    "test:e2e:phase16": "jest --config ./test/jest-e2e.config.cjs --runInBand phase16-releases-deployments.e2e-spec.ts",
+    "test:e2e:phase17": "jest --config ./test/jest-e2e.config.cjs --runInBand phase17-team-operations.e2e-spec.ts",
+    "test:e2e:phase18": "jest --config ./test/jest-e2e.config.cjs --runInBand phase18-webhook-integrations.e2e-spec.ts",
+    "test:cover": "jest --coverage",
+    "test:e2e:cover": "jest --config ./test/jest-e2e.config.cjs --runInBand --coverage",
+    "demo:seed": "prisma generate && tsx scripts/demo-data.ts seed",
+    "demo:reset": "prisma generate && tsx scripts/demo-data.ts reset",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@command-center/shared-types": "workspace:*",
+    "@nestjs/common": "^11.1.6",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.1.6",
+    "@nestjs/jwt": "^11.0.2",
+    "@nestjs/passport": "^11.0.5",
+    "@nestjs/platform-express": "^11.1.6",
+    "@nestjs/schedule": "^6.1.3",
+    "@nestjs/swagger": "^11.2.0",
+    "@nestjs/throttler": "^6.5.0",
+    "@prisma/adapter-pg": "^7.9.1",
+    "@prisma/client": "7.9.1",
+    "argon2": "^0.45.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.4.2",
+    "helmet": "^8.1.0",
+    "ioredis": "^6.0.0",
+    "ipaddr.js": "^2.5.0",
+    "luxon": "^3.7.2",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "pg": "^8.22.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "undici": "^8.10.0"
+  },
+  "devDependencies": {
+    "@command-center/eslint-config": "workspace:*",
+    "@eslint/js": "^9.34.0",
+    "@nestjs/cli": "^11.0.10",
+    "@nestjs/schematics": "^11.0.7",
+    "@nestjs/testing": "^11.1.6",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/express": "^5.0.3",
+    "@types/jest": "29.5.14",
+    "@types/luxon": "^3.7.3",
+    "@types/node": "^24.3.0",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/pg": "^8.20.3",
+    "@types/supertest": "^6.0.3",
+    "cross-env": "^10.1.0",
+    "eslint": "^9.34.0",
+    "globals": "^17.9.0",
+    "jest": "29.7.0",
+    "prisma": "7.9.1",
+    "source-map-support": "^0.5.21",
+    "supertest": "^7.1.4",
+    "ts-jest": "29.4.12",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.23.1",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.41.0"
+  }
+}
+
+==================================================
+apps\web\package.json
+==================================================
+{
+  "name": "@command-center/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "node --test",
+    "test:e2e": "playwright test --config=playwright.config.ts",
+    "test:e2e:headed": "playwright test --config=playwright.config.ts --headed",
+    "test:e2e:debug": "playwright test --config=playwright.config.ts --debug",
+    "test:e2e:list": "playwright test --config=playwright.config.ts --list",
+    "test:phase4": "pnpm typecheck && pnpm build",
+    "test:e2e:batch10": "playwright test --config=playwright.config.ts e2e/batch10",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@command-center/shared-types": "workspace:*",
+    "@command-center/ui": "workspace:*",
+    "@monaco-editor/react": "4.8.0-rc.3",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.28.0",
+    "monaco-editor": "^0.56.0",
+    "next": "16.2.12",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tailwind-merge": "^3.6.0"
+  },
+  "devDependencies": {
+    "@command-center/eslint-config": "workspace:*",
+    "@eslint/js": "^9.34.0",
+    "@playwright/test": "^1.62.1",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^24.3.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "eslint": "^9.34.0",
+    "eslint-config-next": "16.2.12",
+    "postcss": "^8.5.25",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.41.0"
+  }
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\activity\dto\activity-query.dto.ts
+==================================================
+import type { ActivityQueryInput } from '@command-center/shared-types';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform, Type } from 'class-transformer';
+import { IsDateString, IsEnum, IsInt, IsOptional, IsString, IsUUID, Max, MaxLength, Min } from 'class-validator';
+import { ActivityActorType, ActivityEntityType, ApplicationActivityType } from 'src/generated/prisma/enums';
+
+function trimString(value: unknown): unknown {
+  return typeof value === 'string' ? value.trim() : value;
+}
+
+export class ActivityQueryDto implements ActivityQueryInput {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  @Transform(({ value }: { value: unknown }) => trimString(value))
+  search?: string;
+
+  @ApiPropertyOptional({
+    enum: ApplicationActivityType,
+  })
+  @IsOptional()
+  @IsEnum(ApplicationActivityType)
+  activityType?: ApplicationActivityType;
+
+  @ApiPropertyOptional({
+    enum: ActivityActorType,
+  })
+  @IsOptional()
+  @IsEnum(ActivityActorType)
+  actorType?: ActivityActorType;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  actorUserId?: string;
+
+  @ApiPropertyOptional({
+    enum: ActivityEntityType,
+  })
+  @IsOptional()
+  @IsEnum(ActivityEntityType)
+  entityType?: ActivityEntityType;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  entityId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  from?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  to?: string;
+
+  @ApiPropertyOptional({
+    default: 1,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page = 1;
+
+  @ApiPropertyOptional({
+    default: 25,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit = 25;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-engine\dto\analytics-engine.dto.ts
+==================================================
+import { AnalyticsAggregatePeriod } from '@command-center/shared-types';
+import type { AnalyticsAggregateQueryInput, AnalyticsReprocessInput } from '@command-center/shared-types';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsDateString, IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
+import { AnalyticsAggregateDimension } from 'src/generated/prisma/enums';
+
+export class ProcessAnalyticsDto {
+  @ApiPropertyOptional({
+    default: 5000,
+    minimum: 1,
+    maximum: 50000,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(50000)
+  maxEvents = 5000;
+}
+
+export class ReprocessAnalyticsDto implements AnalyticsReprocessInput {
+  @ApiProperty({
+    example: '2026-08-01T00:00:00.000Z',
+  })
+  @IsDateString()
+  dateFrom!: string;
+
+  @ApiProperty({
+    example: '2026-08-03T00:00:00.000Z',
+  })
+  @IsDateString()
+  dateTo!: string;
+
+  @ApiPropertyOptional({
+    default: 50000,
+    minimum: 1,
+    maximum: 100000,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100000)
+  maxEvents = 50000;
+}
+
+export class AnalyticsAggregateQueryDto implements AnalyticsAggregateQueryInput {
+  @ApiPropertyOptional({
+    enum: AnalyticsAggregatePeriod,
+    default: AnalyticsAggregatePeriod.DAILY,
+  })
+  @IsOptional()
+  @IsEnum(AnalyticsAggregatePeriod)
+  period: AnalyticsAggregatePeriod = AnalyticsAggregatePeriod.DAILY;
+
+  @ApiPropertyOptional({
+    enum: AnalyticsAggregateDimension,
+    default: AnalyticsAggregateDimension.OVERVIEW,
+  })
+  @IsOptional()
+  @IsEnum(AnalyticsAggregateDimension)
+  dimension = AnalyticsAggregateDimension.OVERVIEW;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  dateFrom?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  dateTo?: string;
+
+  @ApiPropertyOptional({
+    default: 500,
+    maximum: 2000,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(2000)
+  limit = 500;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-ingestion\dto\collect-events.dto.ts
+==================================================
+import { Type } from 'class-transformer';
+import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsArray,
+  IsDateString,
+  IsEnum,
+  IsInt,
+  IsObject,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Matches,
+  Max,
+  MaxLength,
+  Min,
+  ValidateNested,
+} from 'class-validator';
+import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
+
+export class TrackerEventDto {
+  @IsString()
+  @Matches(/^[a-zA-Z0-9_-]{16,80}$/)
+  eventId!: string;
+
+  @IsEnum(RawAnalyticsEventType)
+  type!: RawAnalyticsEventType;
+
+  @IsString()
+  @Matches(/^[a-zA-Z0-9_-]{16,80}$/)
+  visitorId!: string;
+
+  @IsString()
+  @Matches(/^[a-zA-Z0-9_-]{16,80}$/)
+  sessionId!: string;
+
+  @IsDateString()
+  timestamp!: string;
+
+  @IsString()
+  @MaxLength(2048)
+  url!: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(512)
+  title?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(2048)
+  referrer?: string;
+
+  @IsOptional()
+  @IsString()
+  @Matches(/^[a-zA-Z][a-zA-Z0-9_.:-]{1,99}$/)
+  eventName?: string;
+
+  @IsOptional()
+  @IsObject()
+  properties?: Record<string, unknown>;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(100_000)
+  screenWidth?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(100_000)
+  screenHeight?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(100_000)
+  viewportWidth?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(100_000)
+  viewportHeight?: number;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(35)
+  language?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  timeZone?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(300_000)
+  durationMs?: number;
+}
+
+export class CollectEventsDto {
+  @IsUUID()
+  websiteId!: string;
+
+  @IsString()
+  @MaxLength(160)
+  trackingKey!: string;
+
+  @IsString()
+  @MaxLength(32)
+  sdkVersion!: string;
+
+  @IsDateString()
+  sentAt!: string;
+
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(25)
+  @ValidateNested({
+    each: true,
+  })
+  @Type(() => TrackerEventDto)
+  events!: TrackerEventDto[];
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-ingestion\dto\raw-event-query.dto.ts
+==================================================
+import type { RawEventQueryInput } from '@command-center/shared-types';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsDateString, IsEnum, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
+import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
+
+export class RawEventQueryDto implements RawEventQueryInput {
+  @ApiPropertyOptional({
+    enum: RawAnalyticsEventType,
+  })
+  @IsOptional()
+  @IsEnum(RawAnalyticsEventType)
+  type?: RawAnalyticsEventType;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  eventName?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  visitorId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  sessionId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  dateFrom?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  dateTo?: string;
+
+  @ApiPropertyOptional({
+    default: 1,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page = 1;
+
+  @ApiPropertyOptional({
+    default: 50,
+    maximum: 100,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit = 50;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-overview\dto\analytics-overview-query.dto.ts
+==================================================
+import { AnalyticsDatePreset } from '@command-center/shared-types';
+export { AnalyticsDatePreset };
+import type { AnalyticsOverviewQueryInput, AnalyticsPreset } from '@command-center/shared-types';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEnum, IsOptional, Matches, ValidateIf } from 'class-validator';
+
+const DATE_KEY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+export class AnalyticsOverviewQueryDto implements AnalyticsOverviewQueryInput {
+  @ApiPropertyOptional({
+    enum: AnalyticsDatePreset,
+    default: AnalyticsDatePreset.SEVEN_DAYS,
+    description: 'Analytics range calculated in the website timezone.',
+  })
+  @IsOptional()
+  @IsEnum(AnalyticsDatePreset)
+  preset: AnalyticsPreset = AnalyticsDatePreset.SEVEN_DAYS;
+
+  @ApiPropertyOptional({
+    example: '2026-08-01',
+    description: 'Inclusive custom start date using YYYY-MM-DD.',
+  })
+  @ValidateIf((query: AnalyticsOverviewQueryDto) => query.from !== undefined || query.to !== undefined)
+  @Matches(DATE_KEY_PATTERN, {
+    message: 'from must use YYYY-MM-DD format',
+  })
+  from?: string;
+
+  @ApiPropertyOptional({
+    example: '2026-08-07',
+    description: 'Inclusive custom end date using YYYY-MM-DD.',
+  })
+  @ValidateIf((query: AnalyticsOverviewQueryDto) => query.from !== undefined || query.to !== undefined)
+  @Matches(DATE_KEY_PATTERN, {
+    message: 'to must use YYYY-MM-DD format',
+  })
+  to?: string;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-overview\dto\analytics-overview-response.dto.ts
+==================================================
+import type {
+  AnalyticsBreakdownItem,
+  AnalyticsMetric,
+  AnalyticsMetrics,
+  AnalyticsOverviewRange,
+  AnalyticsOverviewResponse,
+  AnalyticsTrendPoint,
+  AnalyticsWebsite,
+} from '@command-center/shared-types';
+import { ApiProperty } from '@nestjs/swagger';
+
+export class AnalyticsWebsiteDto implements AnalyticsWebsite {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  name!: string;
+
+  @ApiProperty()
+  domain!: string;
+
+  @ApiProperty({
+    example: 'Asia/Dubai',
+  })
+  timeZone!: string;
+
+  @ApiProperty({
+    nullable: true,
+  })
+  lastEventAt!: string | null;
+}
+
+export class AnalyticsRangeDto implements AnalyticsOverviewRange {
+  @ApiProperty({
+    example: '7d',
+  })
+  preset!: string;
+
+  @ApiProperty({
+    example: '2026-08-01',
+  })
+  from!: string;
+
+  @ApiProperty({
+    example: '2026-08-07',
+  })
+  to!: string;
+
+  @ApiProperty({
+    example: '2026-07-25',
+  })
+  previousFrom!: string;
+
+  @ApiProperty({
+    example: '2026-07-31',
+  })
+  previousTo!: string;
+
+  @ApiProperty({
+    enum: ['hour', 'day'],
+  })
+  granularity!: 'hour' | 'day';
+
+  @ApiProperty()
+  days!: number;
+}
+
+export class AnalyticsMetricDto implements AnalyticsMetric {
+  @ApiProperty()
+  value!: number;
+
+  @ApiProperty()
+  previousValue!: number;
+
+  @ApiProperty({
+    nullable: true,
+    description: 'Null means the previous period was zero and no meaningful percentage can be calculated.',
+  })
+  changePercent!: number | null;
+}
+
+export class AnalyticsMetricsDto implements AnalyticsMetrics {
+  @ApiProperty({
+    type: AnalyticsMetricDto,
+  })
+  visitors!: AnalyticsMetricDto;
+
+  @ApiProperty({
+    type: AnalyticsMetricDto,
+  })
+  sessions!: AnalyticsMetricDto;
+
+  @ApiProperty({
+    type: AnalyticsMetricDto,
+  })
+  pageViews!: AnalyticsMetricDto;
+
+  @ApiProperty({
+    type: AnalyticsMetricDto,
+  })
+  bounceRate!: AnalyticsMetricDto;
+
+  @ApiProperty({
+    type: AnalyticsMetricDto,
+  })
+  averageDurationSeconds!: AnalyticsMetricDto;
+}
+
+export class AnalyticsTrendPointDto implements AnalyticsTrendPoint {
+  @ApiProperty()
+  bucketStart!: string;
+
+  @ApiProperty()
+  visitors!: number;
+
+  @ApiProperty()
+  sessions!: number;
+
+  @ApiProperty()
+  pageViews!: number;
+}
+
+export class AnalyticsBreakdownItemDto implements AnalyticsBreakdownItem {
+  @ApiProperty()
+  key!: string;
+
+  @ApiProperty()
+  label!: string;
+
+  @ApiProperty()
+  value!: number;
+
+  @ApiProperty()
+  percentage!: number;
+}
+
+export class AnalyticsOverviewResponseDto implements AnalyticsOverviewResponse {
+  @ApiProperty({
+    type: AnalyticsWebsiteDto,
+  })
+  website!: AnalyticsWebsiteDto;
+
+  @ApiProperty({
+    type: AnalyticsRangeDto,
+  })
+  range!: AnalyticsRangeDto;
+
+  @ApiProperty({
+    type: AnalyticsMetricsDto,
+  })
+  metrics!: AnalyticsMetricsDto;
+
+  @ApiProperty({
+    type: [AnalyticsTrendPointDto],
+  })
+  trend!: AnalyticsTrendPointDto[];
+
+  @ApiProperty({
+    type: [AnalyticsBreakdownItemDto],
+  })
+  topPages!: AnalyticsBreakdownItemDto[];
+
+  @ApiProperty({
+    type: [AnalyticsBreakdownItemDto],
+  })
+  topSources!: AnalyticsBreakdownItemDto[];
+
+  @ApiProperty({
+    type: [AnalyticsBreakdownItemDto],
+  })
+  topCountries!: AnalyticsBreakdownItemDto[];
+
+  @ApiProperty({
+    type: [AnalyticsBreakdownItemDto],
+  })
+  topDevices!: AnalyticsBreakdownItemDto[];
+
+  @ApiProperty({
+    type: [AnalyticsBreakdownItemDto],
+  })
+  topBrowsers!: AnalyticsBreakdownItemDto[];
+
+  @ApiProperty({ type: [AnalyticsBreakdownItemDto] })
+  topOperatingSystems!: AnalyticsBreakdownItemDto[];
+
+  @ApiProperty()
+  empty!: boolean;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-processing\dto\analytics-processing-response.dto.ts
+==================================================
+import { ApiProperty } from '@nestjs/swagger';
+
+export class ProcessingRunDto {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  status!: string;
+
+  @ApiProperty()
+  trigger!: string;
+
+  @ApiProperty()
+  rangeStart!: string;
+
+  @ApiProperty()
+  rangeEnd!: string;
+
+  @ApiProperty()
+  retryCount!: number;
+
+  @ApiProperty()
+  maxRetries!: number;
+
+  @ApiProperty()
+  processedEvents!: number;
+
+  @ApiProperty()
+  failedEvents!: number;
+
+  @ApiProperty({
+    nullable: true,
+  })
+  errorMessage!: string | null;
+
+  @ApiProperty({
+    nullable: true,
+  })
+  startedAt!: string | null;
+
+  @ApiProperty({
+    nullable: true,
+  })
+  finishedAt!: string | null;
+
+  @ApiProperty()
+  createdAt!: string;
+}
+
+export class AnalyticsProcessingStatusDto {
+  @ApiProperty()
+  canReprocess!: boolean;
+
+  @ApiProperty()
+  pendingEvents!: number;
+
+  @ApiProperty()
+  unresolvedDeadLetters!: number;
+
+  @ApiProperty({
+    nullable: true,
+    type: ProcessingRunDto,
+  })
+  activeRun!: ProcessingRunDto | null;
+
+  @ApiProperty({
+    nullable: true,
+    type: ProcessingRunDto,
+  })
+  latestRun!: ProcessingRunDto | null;
+
+  @ApiProperty({
+    nullable: true,
+    type: ProcessingRunDto,
+  })
+  lastSuccessfulRun!: ProcessingRunDto | null;
+
+  @ApiProperty({
+    type: [ProcessingRunDto],
+  })
+  recentRuns!: ProcessingRunDto[];
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-processing\dto\reprocess-analytics.dto.ts
+==================================================
+import type { ReprocessAnalyticsInput } from '@command-center/shared-types';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsDateString } from 'class-validator';
+
+export class ReprocessAnalyticsDto implements ReprocessAnalyticsInput {
+  @ApiProperty({
+    example: '2026-08-01T00:00:00.000Z',
+  })
+  @IsDateString()
+  from!: string;
+
+  @ApiProperty({
+    example: '2026-08-08T00:00:00.000Z',
+    description: 'Exclusive range end.',
+  })
+  @IsDateString()
+  to!: string;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-reports\dto\analytics-report-query.dto.ts
+==================================================
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsEnum, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
+import { AnalyticsOverviewQueryDto } from '../../analytics-overview/dto/analytics-overview-query.dto';
+import { ANALYTICS_REPORT_DEFAULT_LIMIT, ANALYTICS_REPORT_MAX_LIMIT, ANALYTICS_SEARCH_MAX_LENGTH } from '../analytics-reports.constants';
+
+export enum AnalyticsSortDirection {
+  ASC = 'asc',
+  DESC = 'desc',
+}
+
+export enum PageReportSortField {
+  VIEWS = 'views',
+  VISITORS = 'visitors',
+  SESSIONS = 'sessions',
+  ENTRANCES = 'entrances',
+  EXITS = 'exits',
+  BOUNCE_RATE = 'bounceRate',
+  AVERAGE_DURATION = 'averageDuration',
+  PATH = 'path',
+}
+
+export enum EventReportSortField {
+  EVENTS = 'events',
+  VISITORS = 'visitors',
+  SESSIONS = 'sessions',
+  NAME = 'name',
+}
+
+export enum DimensionReportSortField {
+  VISITORS = 'visitors',
+  SESSIONS = 'sessions',
+  PAGE_VIEWS = 'pageViews',
+  LABEL = 'label',
+}
+
+export enum AnalyticsReportDimension {
+  SOURCES = 'sources',
+  COUNTRIES = 'countries',
+  DEVICES = 'devices',
+  BROWSERS = 'browsers',
+  OPERATING_SYSTEMS = 'operating-systems',
+}
+
+export class AnalyticsReportQueryDto extends AnalyticsOverviewQueryDto {
+  @ApiPropertyOptional({
+    default: 1,
+    minimum: 1,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page = 1;
+
+  @ApiPropertyOptional({
+    default: ANALYTICS_REPORT_DEFAULT_LIMIT,
+
+    maximum: ANALYTICS_REPORT_MAX_LIMIT,
+
+    minimum: 1,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(ANALYTICS_REPORT_MAX_LIMIT)
+  limit = ANALYTICS_REPORT_DEFAULT_LIMIT;
+
+  @ApiPropertyOptional({
+    maxLength: ANALYTICS_SEARCH_MAX_LENGTH,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(ANALYTICS_SEARCH_MAX_LENGTH)
+  search?: string;
+
+  @ApiPropertyOptional({
+    enum: AnalyticsSortDirection,
+
+    default: AnalyticsSortDirection.DESC,
+  })
+  @IsOptional()
+  @IsEnum(AnalyticsSortDirection)
+  sortDirection = AnalyticsSortDirection.DESC;
+}
+
+export class PageReportQueryDto extends AnalyticsReportQueryDto {
+  @ApiPropertyOptional({
+    enum: PageReportSortField,
+
+    default: PageReportSortField.VIEWS,
+  })
+  @IsOptional()
+  @IsEnum(PageReportSortField)
+  sortBy = PageReportSortField.VIEWS;
+}
+
+export class EventReportQueryDto extends AnalyticsReportQueryDto {
+  @ApiPropertyOptional({
+    enum: EventReportSortField,
+
+    default: EventReportSortField.EVENTS,
+  })
+  @IsOptional()
+  @IsEnum(EventReportSortField)
+  sortBy = EventReportSortField.EVENTS;
+}
+
+export class DimensionReportQueryDto extends AnalyticsReportQueryDto {
+  @ApiPropertyOptional({
+    enum: DimensionReportSortField,
+
+    default: DimensionReportSortField.SESSIONS,
+  })
+  @IsOptional()
+  @IsEnum(DimensionReportSortField)
+  sortBy = DimensionReportSortField.SESSIONS;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-reports\dto\analytics-report-response.dto.ts
+==================================================
+import type {
+  AnalyticsPagination,
+  AnalyticsReportRange,
+  DimensionReportItem,
+  DimensionReportResponse,
+  EventReportItem,
+  EventReportResponse,
+  EventReportSummary,
+  PageReportItem,
+  PageReportResponse,
+} from '@command-center/shared-types';
+import { ApiProperty } from '@nestjs/swagger';
+
+export class AnalyticsPaginationDto implements AnalyticsPagination {
+  @ApiProperty()
+  page!: number;
+
+  @ApiProperty()
+  limit!: number;
+
+  @ApiProperty()
+  total!: number;
+
+  @ApiProperty()
+  totalPages!: number;
+
+  @ApiProperty()
+  hasPreviousPage!: boolean;
+
+  @ApiProperty()
+  hasNextPage!: boolean;
+}
+
+export class AnalyticsReportRangeDto implements AnalyticsReportRange {
+  @ApiProperty()
+  from!: string;
+
+  @ApiProperty()
+  to!: string;
+
+  @ApiProperty()
+  timeZone!: string;
+
+  @ApiProperty()
+  days!: number;
+}
+
+export class PageReportItemDto implements PageReportItem {
+  @ApiProperty()
+  path!: string;
+
+  @ApiProperty()
+  title!: string;
+
+  @ApiProperty()
+  views!: number;
+
+  @ApiProperty()
+  visitors!: number;
+
+  @ApiProperty()
+  sessions!: number;
+
+  @ApiProperty()
+  entrances!: number;
+
+  @ApiProperty()
+  exits!: number;
+
+  @ApiProperty()
+  bounceRate!: number;
+
+  @ApiProperty()
+  averageDurationSeconds!: number;
+}
+
+export class PageReportResponseDto implements PageReportResponse {
+  @ApiProperty({
+    type: [PageReportItemDto],
+  })
+  items!: PageReportItemDto[];
+
+  @ApiProperty({
+    type: AnalyticsPaginationDto,
+  })
+  pagination!: AnalyticsPaginationDto;
+
+  @ApiProperty({
+    type: AnalyticsReportRangeDto,
+  })
+  range!: AnalyticsReportRangeDto;
+}
+
+export class EventReportItemDto implements EventReportItem {
+  @ApiProperty()
+  name!: string;
+
+  @ApiProperty()
+  events!: number;
+
+  @ApiProperty()
+  visitors!: number;
+
+  @ApiProperty()
+  sessions!: number;
+}
+
+export class EventReportSummaryDto implements EventReportSummary {
+  @ApiProperty()
+  totalEvents!: number;
+
+  @ApiProperty()
+  uniqueVisitors!: number;
+
+  @ApiProperty()
+  uniqueSessions!: number;
+}
+
+export class EventReportResponseDto implements EventReportResponse {
+  @ApiProperty({
+    type: [EventReportItemDto],
+  })
+  items!: EventReportItemDto[];
+
+  @ApiProperty({
+    type: EventReportSummaryDto,
+  })
+  summary!: EventReportSummaryDto;
+
+  @ApiProperty({
+    type: AnalyticsPaginationDto,
+  })
+  pagination!: AnalyticsPaginationDto;
+
+  @ApiProperty({
+    type: AnalyticsReportRangeDto,
+  })
+  range!: AnalyticsReportRangeDto;
+}
+
+export class DimensionReportItemDto implements DimensionReportItem {
+  @ApiProperty()
+  key!: string;
+
+  @ApiProperty()
+  label!: string;
+
+  @ApiProperty()
+  visitors!: number;
+
+  @ApiProperty()
+  sessions!: number;
+
+  @ApiProperty()
+  pageViews!: number;
+
+  @ApiProperty()
+  percentage!: number;
+}
+
+export class DimensionReportResponseDto implements DimensionReportResponse {
+  @ApiProperty({
+    type: [DimensionReportItemDto],
+  })
+  items!: DimensionReportItemDto[];
+
+  @ApiProperty({
+    type: AnalyticsPaginationDto,
+  })
+  pagination!: AnalyticsPaginationDto;
+
+  @ApiProperty({
+    type: AnalyticsReportRangeDto,
+  })
+  range!: AnalyticsReportRangeDto;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\applications\dto\application.dto.ts
+==================================================
+import type { ApplicationListQueryInput, CreateApplicationInput } from '@command-center/shared-types';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { Transform, Type } from 'class-transformer';
+import { IsBoolean, IsEnum, IsInt, IsISO8601, IsOptional, IsString, Length, Matches, Max, MaxLength, Min } from 'class-validator';
+import { ApplicationCategory, ApplicationPriority, ApplicationStatus } from 'src/generated/prisma/enums';
+
+export enum ApplicationSortBy {
+  NAME = 'name',
+  STATUS = 'status',
+  PRIORITY = 'priority',
+  CREATED_AT = 'createdAt',
+  UPDATED_AT = 'updatedAt',
+  TARGET_LAUNCH_AT = 'targetLaunchAt',
+}
+
+export enum SortOrder {
+  ASC = 'asc',
+  DESC = 'desc',
+}
+
+export class CreateApplicationDto implements CreateApplicationInput {
+  @ApiProperty({
+    example: 'PriceScout AI',
+  })
+  @IsString()
+  @Length(2, 160)
+  name!: string;
+
+  @ApiPropertyOptional({
+    example: 'pricescout-ai',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(2, 160)
+  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
+    message: 'slug can contain lowercase letters, numbers and hyphens only',
+  })
+  slug?: string;
+
+  @ApiPropertyOptional({
+    example: 'AI-powered UAE product price comparison platform.',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(280)
+  shortDescription?: string | null;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(10_000)
+  longDescription?: string | null;
+
+  @ApiPropertyOptional({
+    enum: ApplicationCategory,
+    default: ApplicationCategory.SAAS,
+  })
+  @IsOptional()
+  @IsEnum(ApplicationCategory)
+  category?: ApplicationCategory;
+
+  @ApiPropertyOptional({
+    enum: ApplicationStatus,
+    default: ApplicationStatus.IDEA,
+  })
+  @IsOptional()
+  @IsEnum(ApplicationStatus)
+  status?: ApplicationStatus;
+
+  @ApiPropertyOptional({
+    enum: ApplicationPriority,
+    default: ApplicationPriority.MEDIUM,
+  })
+  @IsOptional()
+  @IsEnum(ApplicationPriority)
+  priority?: ApplicationPriority;
+
+  @ApiPropertyOptional({
+    example: '2026-08-01T00:00:00.000Z',
+    nullable: true,
+  })
+  @IsOptional()
+  @IsISO8601()
+  startedAt?: string | null;
+
+  @ApiPropertyOptional({
+    example: '2026-10-01T00:00:00.000Z',
+    nullable: true,
+  })
+  @IsOptional()
+  @IsISO8601()
+  targetLaunchAt?: string | null;
+
+  @ApiPropertyOptional({
+    nullable: true,
+  })
+  @IsOptional()
+  @IsISO8601()
+  launchedAt?: string | null;
+}
+
+export class UpdateApplicationDto extends PartialType(CreateApplicationDto) {}
+
+export class ApplicationListQueryDto implements ApplicationListQueryInput {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(160)
+  search?: string;
+
+  @ApiPropertyOptional({
+    enum: ApplicationStatus,
+  })
+  @IsOptional()
+  @IsEnum(ApplicationStatus)
+  status?: ApplicationStatus;
+
+  @ApiPropertyOptional({
+    enum: ApplicationPriority,
+  })
+  @IsOptional()
+  @IsEnum(ApplicationPriority)
+  priority?: ApplicationPriority;
+
+  @ApiPropertyOptional({
+    enum: ApplicationCategory,
+  })
+  @IsOptional()
+  @IsEnum(ApplicationCategory)
+  category?: ApplicationCategory;
+
+  @ApiPropertyOptional({
+    default: false,
+  })
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value === true || value === 'true') {
+      return true;
+    }
+
+    if (value === false || value === 'false') {
+      return false;
+    }
+
+    return value;
+  })
+  @IsBoolean()
+  archived?: boolean;
+
+  @ApiPropertyOptional({
+    enum: ApplicationSortBy,
+    default: ApplicationSortBy.UPDATED_AT,
+  })
+  @IsOptional()
+  @IsEnum(ApplicationSortBy)
+  sortBy?: ApplicationSortBy;
+
+  @ApiPropertyOptional({
+    enum: SortOrder,
+    default: SortOrder.DESC,
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  sortOrder?: SortOrder;
+
+  @ApiPropertyOptional({
+    default: 1,
+    minimum: 1,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page = 1;
+
+  @ApiPropertyOptional({
+    default: 20,
+    minimum: 1,
+    maximum: 100,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit = 20;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\applications\dto\application-link.dto.ts
+==================================================
+import type { CreateApplicationLinkInput } from '@command-center/shared-types';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { IsEnum, IsString, IsUrl, Length } from 'class-validator';
+import { ApplicationLinkType } from 'src/generated/prisma/enums';
+
+export class CreateApplicationLinkDto implements CreateApplicationLinkInput {
+  @ApiProperty({
+    example: 'Production website',
+  })
+  @IsString()
+  @Length(1, 80)
+  label!: string;
+
+  @ApiProperty({
+    enum: ApplicationLinkType,
+  })
+  @IsEnum(ApplicationLinkType)
+  type!: ApplicationLinkType;
+
+  @ApiProperty({
+    example: 'https://example.com',
+  })
+  @IsUrl(
+    {
+      protocols: ['http', 'https'],
+      require_protocol: true,
+      require_tld: false,
+    },
+    {
+      message: 'url must be a valid HTTP or HTTPS URL',
+    },
+  )
+  url!: string;
+}
+
+export class UpdateApplicationLinkDto extends PartialType(CreateApplicationLinkDto) {}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\applications\dto\application-technology.dto.ts
+==================================================
+import type { CreateApplicationTechnologyInput } from '@command-center/shared-types';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { IsEnum, IsOptional, IsString, Length, MaxLength } from 'class-validator';
+import { TechnologyType } from 'src/generated/prisma/enums';
+
+export class CreateApplicationTechnologyDto implements CreateApplicationTechnologyInput {
+  @ApiProperty({
+    example: 'Next.js',
+  })
+  @IsString()
+  @Length(1, 80)
+  name!: string;
+
+  @ApiProperty({
+    enum: TechnologyType,
+  })
+  @IsEnum(TechnologyType)
+  type!: TechnologyType;
+
+  @ApiPropertyOptional({
+    example: '16.2.12',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  version?: string | null;
+}
+
+export class UpdateApplicationTechnologyDto extends PartialType(CreateApplicationTechnologyDto) {}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\auth\dto\login.dto.ts
+==================================================
+import type { LoginInput } from '@command-center/shared-types';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
+
+export class LoginDto implements LoginInput {
+  @ApiProperty({
+    example: 'owner@example.com',
+  })
+  @IsEmail()
+  @MaxLength(320)
+  email!: string;
+
+  @ApiProperty({
+    example: 'StrongPassword123!',
+  })
+  @IsString()
+  @MinLength(1)
+  @MaxLength(128)
+  password!: string;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\auth\dto\refresh-token.dto.ts
+==================================================
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString } from 'class-validator';
+
+export class RefreshTokenDto {
+  @ApiPropertyOptional({
+    description: 'Optional fallback. Normally the refresh token is read from the HTTP-only cookie.',
+  })
+  @IsOptional()
+  @IsString()
+  refreshToken?: string;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\auth\dto\register.dto.ts
+==================================================
+import type { RegisterInput } from '@command-center/shared-types';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEmail, IsOptional, IsString, Length, MaxLength, MinLength } from 'class-validator';
+
+export class RegisterDto implements RegisterInput {
+  @ApiProperty({
+    example: 'owner@example.com',
+  })
+  @IsEmail()
+  @MaxLength(320)
+  email!: string;
+
+  @ApiProperty({
+    minLength: 12,
+    example: 'StrongPassword123!',
+  })
+  @IsString()
+  @MinLength(12)
+  @MaxLength(128)
+  password!: string;
+
+  @ApiPropertyOptional({
+    example: 'John Developer',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(2, 120)
+  displayName?: string;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\dto\development.dto.ts
+==================================================
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { Transform, Type } from 'class-transformer';
+import {
+  ArrayMinSize,
+  ArrayUnique,
+  IsArray,
+  IsBoolean,
+  IsDateString,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Length,
+  Max,
+  MaxLength,
+  Min,
+} from 'class-validator';
+import { BlockerStatus, DevelopmentTemplateType, WorkItemPriority } from 'src/generated/prisma/enums';
+
+export enum ActiveTaskStatus {
+  TODO = 'TODO',
+  IN_PROGRESS = 'IN_PROGRESS',
+  BLOCKED = 'BLOCKED',
+}
+
+export class CreateMilestoneDto {
+  @ApiProperty({ example: 'Backend foundation' })
+  @IsString()
+  @Length(2, 160)
+  title!: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(10_000)
+  description?: string | null;
+
+  @ApiPropertyOptional({
+    default: 1,
+    minimum: 1,
+    maximum: 100,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  weight?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  startsAt?: string | null;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  dueAt?: string | null;
+}
+
+export class UpdateMilestoneDto extends PartialType(CreateMilestoneDto) {}
+
+export class CreateTaskDto {
+  @ApiProperty({ example: 'Create authentication module' })
+  @IsString()
+  @Length(2, 200)
+  title!: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(10_000)
+  description?: string | null;
+
+  @ApiPropertyOptional({
+    enum: WorkItemPriority,
+    default: WorkItemPriority.MEDIUM,
+  })
+  @IsOptional()
+  @IsEnum(WorkItemPriority)
+  priority?: WorkItemPriority;
+
+  @ApiPropertyOptional({
+    default: 1,
+    minimum: 1,
+    maximum: 100,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  weight?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  assigneeUserId?: string | null;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  dueAt?: string | null;
+}
+
+export class UpdateTaskDto extends PartialType(CreateTaskDto) {}
+
+export class ChangeTaskStatusDto {
+  @ApiProperty({ enum: ActiveTaskStatus })
+  @IsEnum(ActiveTaskStatus)
+  status!: ActiveTaskStatus;
+}
+
+export class SkipWorkItemDto {
+  @ApiProperty({
+    example: 'Removed from the current project scope',
+  })
+  @IsString()
+  @Length(3, 500)
+  reason!: string;
+}
+
+export class ReorderItemsDto {
+  @ApiProperty({
+    type: [String],
+  })
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayUnique()
+  @IsUUID(undefined, {
+    each: true,
+  })
+  orderedIds!: string[];
+}
+
+export class MoveTaskDto {
+  @ApiProperty()
+  @IsUUID()
+  targetMilestoneId!: string;
+
+  @ApiPropertyOptional({
+    minimum: 0,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  position?: number;
+}
+
+export class CreateBlockerDto {
+  @ApiProperty({
+    example: 'Waiting for production API credentials',
+  })
+  @IsString()
+  @Length(2, 200)
+  title!: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(10_000)
+  description?: string | null;
+
+  @ApiPropertyOptional({
+    enum: WorkItemPriority,
+    default: WorkItemPriority.HIGH,
+  })
+  @IsOptional()
+  @IsEnum(WorkItemPriority)
+  severity?: WorkItemPriority;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  milestoneId?: string | null;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  taskId?: string | null;
+}
+
+export class UpdateBlockerDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @Length(2, 200)
+  title?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(10_000)
+  description?: string | null;
+
+  @ApiPropertyOptional({
+    enum: WorkItemPriority,
+  })
+  @IsOptional()
+  @IsEnum(WorkItemPriority)
+  severity?: WorkItemPriority;
+}
+
+export class ResolveBlockerDto {
+  @ApiProperty({
+    example: 'Credentials were issued by the provider.',
+  })
+  @IsString()
+  @Length(3, 10_000)
+  resolution!: string;
+}
+
+export class BlockerQueryDto {
+  @ApiPropertyOptional({
+    enum: BlockerStatus,
+  })
+  @IsOptional()
+  @IsEnum(BlockerStatus)
+  status?: BlockerStatus;
+
+  @ApiPropertyOptional({
+    enum: WorkItemPriority,
+  })
+  @IsOptional()
+  @IsEnum(WorkItemPriority)
+  severity?: WorkItemPriority;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(160)
+  search?: string;
+
+  @ApiPropertyOptional({
+    default: 1,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page = 1;
+
+  @ApiPropertyOptional({
+    default: 50,
+    maximum: 100,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit = 50;
+}
+
+export class ApplyDevelopmentTemplateDto {
+  @ApiProperty({
+    enum: DevelopmentTemplateType,
+  })
+  @IsEnum(DevelopmentTemplateType)
+  template!: DevelopmentTemplateType;
+
+  @ApiPropertyOptional({
+    default: false,
+  })
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value === true || value === 'true') {
+      return true;
+    }
+
+    if (value === false || value === 'false') {
+      return false;
+    }
+
+    return value;
+  })
+  @IsBoolean()
+  replaceExisting?: boolean;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\health\dto\health-response.dto.ts
+==================================================
+import { ApiProperty } from '@nestjs/swagger';
+
+export class PublicHealthResponseDto {
+  @ApiProperty({
+    example: 'ok',
+  })
+  status!: 'ok';
+
+  @ApiProperty({
+    example: '2026-08-07T01:18:43.237Z',
+  })
+  timestamp!: string;
+}
+
+export class DatabaseReadinessDto {
+  @ApiProperty({
+    example: 'up',
+  })
+  status!: 'up' | 'down';
+
+  @ApiProperty({
+    example: 73,
+  })
+  responseTimeMs!: number;
+}
+
+export class ReadinessResponseDto {
+  @ApiProperty({
+    example: 'ready',
+  })
+  status!: 'ready';
+
+  @ApiProperty({
+    example: 'command-center-api',
+  })
+  service!: string;
+
+  @ApiProperty({
+    example: '0.1.0',
+  })
+  version!: string;
+
+  @ApiProperty({
+    example: 'development',
+  })
+  environment!: string;
+
+  @ApiProperty({
+    example: '2026-08-07T01:18:43.237Z',
+  })
+  timestamp!: string;
+
+  @ApiProperty({
+    type: DatabaseReadinessDto,
+  })
+  database!: DatabaseReadinessDto;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\monitoring\dto\health-check.dto.ts
+==================================================
+import type { HealthCheckListQueryInput, IncidentListQueryInput, SaveHealthCheckInput, UpdateHealthCheckInput } from '@command-center/shared-types';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, IsUrl, IsUUID, Max, MaxLength, Min, ValidateIf } from 'class-validator';
+import { HealthCheckStatus, HealthIncidentStatus, HealthTargetType } from '../../../generated/prisma/client';
+
+export class CreateHealthCheckDto implements SaveHealthCheckInput {
+  @ApiProperty({
+    enum: HealthTargetType,
+  })
+  @IsEnum(HealthTargetType)
+  targetType!: HealthTargetType;
+
+  @ApiPropertyOptional()
+  @ValidateIf((dto: CreateHealthCheckDto) => dto.targetType === HealthTargetType.APPLICATION)
+  @IsUUID()
+  applicationId?: string;
+
+  @ApiPropertyOptional()
+  @ValidateIf((dto: CreateHealthCheckDto) => dto.targetType === HealthTargetType.WEBSITE)
+  @IsUUID()
+  websiteId?: string;
+
+  @ApiProperty({
+    example: 'Production API',
+  })
+  @IsString()
+  @MaxLength(100)
+  name!: string;
+
+  @ApiProperty({
+    example: 'https://api.example.com/health',
+  })
+  @IsUrl({
+    protocols: ['http', 'https'],
+
+    require_protocol: true,
+  })
+  @MaxLength(2_000)
+  url!: string;
+
+  @ApiProperty({
+    default: 300,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(60)
+  @Max(86_400)
+  intervalSeconds = 300;
+
+  @ApiProperty({
+    default: 10_000,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1_000)
+  @Max(30_000)
+  timeoutMs = 10_000;
+
+  @ApiProperty({
+    default: 200,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(100)
+  @Max(599)
+  expectedStatusMin = 200;
+
+  @ApiProperty({
+    default: 399,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(100)
+  @Max(599)
+  expectedStatusMax = 399;
+
+  @ApiProperty({
+    default: 1_500,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(30_000)
+  degradedAfterMs = 1_500;
+
+  @ApiProperty({
+    default: 3,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(20)
+  failureThreshold = 3;
+
+  @ApiProperty({
+    default: true,
+  })
+  @IsBoolean()
+  enabled = true;
+}
+
+export class UpdateHealthCheckDto extends PartialType(CreateHealthCheckDto) implements UpdateHealthCheckInput {}
+
+export class HealthCheckListQueryDto implements HealthCheckListQueryInput {
+  @ApiPropertyOptional({
+    enum: HealthCheckStatus,
+  })
+  @IsOptional()
+  @IsEnum(HealthCheckStatus)
+  status?: HealthCheckStatus;
+
+  @ApiPropertyOptional({
+    enum: HealthTargetType,
+  })
+  @IsOptional()
+  @IsEnum(HealthTargetType)
+  targetType?: HealthTargetType;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Type(() => Boolean)
+  @IsBoolean()
+  enabled?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  applicationId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  websiteId?: string;
+}
+
+export class IncidentListQueryDto implements IncidentListQueryInput {
+  @ApiPropertyOptional({
+    enum: HealthIncidentStatus,
+  })
+  @IsOptional()
+  @IsEnum(HealthIncidentStatus)
+  status?: HealthIncidentStatus;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\monitoring\dto\monitoring-response.dto.ts
+==================================================
+export type {
+  HealthCheck as HealthCheckDto,
+  HealthCheckHistory as HealthCheckHistoryDto,
+  HealthIncident as HealthIncidentDto,
+  MonitoringSummary as MonitoringSummaryDto,
+  MonitoringTarget as MonitoringTargetDto,
+} from '@command-center/shared-types';
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\releases\dto\release-deployment.dto.ts
+==================================================
+import type {
+  CreateDeploymentInput,
+  CreateReleaseInput,
+  DeploymentListQueryInput,
+  ReleaseListQueryInput,
+  TransitionDeploymentInput,
+  UpdateReleaseInput,
+} from '@command-center/shared-types';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsDateString, IsEnum, IsInt, IsOptional, IsString, IsUrl, IsUUID, Matches, Max, MaxLength, Min, ValidateIf } from 'class-validator';
+import { DeploymentStatus } from '../../../generated/prisma/client';
+
+const VERSION_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9._-]{0,63}$/;
+
+const URL_OPTIONS = {
+  protocols: ['http', 'https'],
+
+  require_protocol: true,
+
+  require_tld: false,
+};
+
+export class CreateReleaseDto implements CreateReleaseInput {
+  @ApiProperty({
+    example: '1.4.0',
+  })
+  @IsString()
+  @Matches(VERSION_PATTERN, {
+    message: 'version may contain letters, numbers, dots, underscores, and hyphens',
+  })
+  version!: string;
+
+  @ApiPropertyOptional({
+    example: 'August release',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  name?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(20_000)
+  notes?: string;
+
+  @ApiPropertyOptional({
+    example: 'a8f21d4',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  commitRef?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUrl(URL_OPTIONS)
+  @MaxLength(2_000)
+  repositoryUrl?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  scheduledAt?: string;
+}
+
+export class UpdateReleaseDto extends PartialType(CreateReleaseDto) implements UpdateReleaseInput {}
+
+export class CreateDeploymentDto implements CreateDeploymentInput {
+  @ApiProperty()
+  @IsUUID()
+  releaseId!: string;
+
+  @ApiProperty()
+  @IsUUID()
+  environmentId!: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  commitRef?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUrl(URL_OPTIONS)
+  @MaxLength(2_000)
+  repositoryUrl?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUrl(URL_OPTIONS)
+  @MaxLength(2_000)
+  ciJobUrl?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUrl(URL_OPTIONS)
+  @MaxLength(2_000)
+  liveUrl?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(20_000)
+  deploymentNotes?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  scheduledAt?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  healthIncidentId?: string;
+}
+
+export class TransitionDeploymentDto implements TransitionDeploymentInput {
+  @ApiProperty({
+    enum: DeploymentStatus,
+  })
+  @IsEnum(DeploymentStatus)
+  status!: DeploymentStatus;
+
+  @ApiPropertyOptional()
+  @ValidateIf((dto: TransitionDeploymentDto) => dto.status === DeploymentStatus.SCHEDULED)
+  @IsDateString()
+  scheduledAt?: string;
+
+  @ApiPropertyOptional()
+  @ValidateIf((dto: TransitionDeploymentDto) => dto.status === DeploymentStatus.FAILED)
+  @IsString()
+  @MaxLength(5_000)
+  failureReason?: string;
+
+  @ApiPropertyOptional()
+  @ValidateIf((dto: TransitionDeploymentDto) => dto.status === DeploymentStatus.ROLLED_BACK)
+  @IsUUID()
+  rollbackToDeploymentId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  healthIncidentId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(2_000)
+  message?: string;
+}
+
+export class DeploymentListQueryDto implements DeploymentListQueryInput {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  environmentId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  releaseId?: string;
+
+  @ApiPropertyOptional({
+    enum: DeploymentStatus,
+  })
+  @IsOptional()
+  @IsEnum(DeploymentStatus)
+  status?: DeploymentStatus;
+
+  @ApiPropertyOptional({
+    default: 1,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page = 1;
+
+  @ApiPropertyOptional({
+    default: 25,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit = 25;
+}
+
+export class ReleaseListQueryDto implements ReleaseListQueryInput {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  search?: string;
+
+  @ApiPropertyOptional({
+    default: 1,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page = 1;
+
+  @ApiPropertyOptional({
+    default: 25,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit = 25;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\dto\code-explorer.dto.ts
+==================================================
+import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+
+export class RepositoryBranchQueryDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  branch?: string;
+}
+
+export class RepositoryFileQueryDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  branch?: string;
+
+  @IsString()
+  @MinLength(1)
+  @MaxLength(2048)
+  path!: string;
+}
+
+export class RepositorySearchQueryDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  branch?: string;
+
+  @IsString()
+  @MinLength(1)
+  @MaxLength(200)
+  query!: string;
+}
+
+export class RepositoryDiffQueryDto {
+  @IsString()
+  @MinLength(1)
+  @MaxLength(255)
+  base!: string;
+
+  @IsString()
+  @MinLength(1)
+  @MaxLength(255)
+  head!: string;
+
+  @IsString()
+  @MinLength(1)
+  @MaxLength(2048)
+  path!: string;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\dto\repository.dto.ts
+==================================================
+import { IsString, IsUUID, Matches, MaxLength } from 'class-validator';
+
+export class CompleteGithubSetupDto {
+  @IsString()
+  @MaxLength(200)
+  installState!: string;
+
+  @IsString()
+  @Matches(/^\d+$/)
+  installationId!: string;
+}
+
+export class CompleteGithubCallbackDto {
+  @IsString()
+  @MaxLength(500)
+  code!: string;
+
+  @IsString()
+  @MaxLength(200)
+  state!: string;
+}
+
+export class LinkRepositoryApplicationDto {
+  @IsUUID()
+  applicationId!: string;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\team-operations\dto\notification.dto.ts
+==================================================
+import type { NotificationListQueryInput } from '@command-center/shared-types';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform, Type } from 'class-transformer';
+import { IsBoolean, IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
+import { NotificationType } from '../../../generated/prisma/client';
+
+function parseBoolean(value: unknown): unknown {
+  if (value === true || value === 'true') {
+    return true;
+  }
+
+  if (value === false || value === 'false') {
+    return false;
+  }
+
+  return value;
+}
+
+export class NotificationListQueryDto implements NotificationListQueryInput {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Transform(({ value }: { value: unknown }) => parseBoolean(value))
+  @IsBoolean()
+  unreadOnly?: boolean;
+
+  @ApiPropertyOptional({
+    enum: NotificationType,
+  })
+  @IsOptional()
+  @IsEnum(NotificationType)
+  type?: NotificationType;
+
+  @ApiPropertyOptional({
+    default: 1,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page = 1;
+
+  @ApiPropertyOptional({
+    default: 20,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit = 20;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\team-operations\dto\workspace-invitation.dto.ts
+==================================================
+import type { CreateWorkspaceInvitationInput, InvitationListQueryInput } from '@command-center/shared-types';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEmail, IsEnum, IsOptional } from 'class-validator';
+import { WorkspaceInvitationStatus, WorkspaceRole } from '../../../generated/prisma/client';
+
+export class CreateWorkspaceInvitationDto implements CreateWorkspaceInvitationInput {
+  @ApiProperty({
+    example: 'developer@example.com',
+  })
+  @IsEmail()
+  email!: string;
+
+  @ApiProperty({
+    enum: WorkspaceRole,
+  })
+  @IsEnum(WorkspaceRole)
+  role!: WorkspaceRole;
+}
+
+export class InvitationListQueryDto implements InvitationListQueryInput {
+  @ApiPropertyOptional({
+    enum: WorkspaceInvitationStatus,
+  })
+  @IsOptional()
+  @IsEnum(WorkspaceInvitationStatus)
+  status?: WorkspaceInvitationStatus;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\webhooks\dto\webhook.dto.ts
+==================================================
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsEnum, IsInt, IsOptional, IsString, IsUrl, Max, MaxLength, Min } from 'class-validator';
+import { WebhookDeliveryStatus, WebhookEventType } from '../../../generated/prisma/client';
+
+export class CreateWebhookEndpointDto {
+  @ApiProperty({
+    example: 'Production automation',
+  })
+  @IsString()
+  @MaxLength(100)
+  name!: string;
+
+  @ApiProperty({
+    example: 'https://automation.example.com/webhooks/command-center',
+  })
+  @IsUrl({
+    protocols: ['http', 'https'],
+
+    require_protocol: true,
+  })
+  @MaxLength(2_000)
+  url!: string;
+
+  @ApiProperty({
+    enum: WebhookEventType,
+
+    isArray: true,
+  })
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(20)
+  @IsEnum(WebhookEventType, {
+    each: true,
+  })
+  eventTypes!: WebhookEventType[];
+
+  @ApiPropertyOptional({
+    default: 10_000,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1_000)
+  @Max(30_000)
+  timeoutMs?: number;
+
+  @ApiPropertyOptional({
+    default: 5,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(8)
+  maxAttempts?: number;
+
+  @ApiPropertyOptional({
+    default: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  enabled?: boolean;
+}
+
+export class UpdateWebhookEndpointDto extends PartialType(CreateWebhookEndpointDto) {}
+
+export class WebhookDeliveryListQueryDto {
+  @ApiPropertyOptional({
+    enum: WebhookDeliveryStatus,
+  })
+  @IsOptional()
+  @IsEnum(WebhookDeliveryStatus)
+  status?: WebhookDeliveryStatus;
+
+  @ApiPropertyOptional({
+    default: 1,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page = 1;
+
+  @ApiPropertyOptional({
+    default: 25,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit = 25;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\websites\dto\website.dto.ts
+==================================================
+import type { ConnectWebsiteInput, CreateWebsiteInput, UpdateWebsiteInput, WebsiteListQueryInput } from '@command-center/shared-types';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { Transform, Type } from 'class-transformer';
+import { ArrayMaxSize, ArrayUnique, IsArray, IsBoolean, IsInt, IsOptional, IsString, IsUUID, Length, Max, MaxLength, Min } from 'class-validator';
+
+function transformBoolean({ value, obj, key }: { value: unknown; obj?: Record<string, unknown>; key?: string }): unknown {
+  const rawValue = obj && key ? obj[key] : value;
+
+  if (rawValue === true || rawValue === 'true') {
+    return true;
+  }
+
+  if (rawValue === false || rawValue === 'false') {
+    return false;
+  }
+
+  return rawValue;
+}
+export class CreateWebsiteDto implements CreateWebsiteInput {
+  @ApiProperty({
+    example: 'SaaS Command Center',
+  })
+  @IsString()
+  @Length(2, 160)
+  name!: string;
+
+  @ApiProperty({
+    example: 'command-center.example.com',
+    description: 'Domain without a path. Protocol is optional.',
+  })
+  @IsString()
+  @Length(1, 253)
+  domain!: string;
+
+  @ApiPropertyOptional({
+    example: 'Asia/Dubai',
+    default: 'UTC',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  timeZone?: string;
+
+  @ApiPropertyOptional({
+    type: [String],
+    example: ['https://command-center.example.com', 'http://localhost:3000'],
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @ArrayMaxSize(20)
+  @IsString({
+    each: true,
+  })
+  allowedOrigins?: string[];
+
+  @ApiPropertyOptional({
+    description: 'Optional SaaS application to connect to.',
+  })
+  @IsOptional()
+  @IsUUID()
+  applicationId?: string | null;
+
+  @ApiPropertyOptional({
+    default: true,
+  })
+  @IsOptional()
+  @Transform(transformBoolean)
+  @IsBoolean()
+  enabled?: boolean;
+}
+
+export class UpdateWebsiteDto extends PartialType(CreateWebsiteDto) implements UpdateWebsiteInput {}
+
+export class ConnectWebsiteDto implements ConnectWebsiteInput {
+  @ApiProperty()
+  @IsUUID()
+  applicationId!: string;
+}
+
+export class WebsiteListQueryDto implements WebsiteListQueryInput {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(160)
+  search?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  applicationId?: string;
+
+  @ApiPropertyOptional({
+    description: 'Filter connected or unconnected websites.',
+  })
+  @IsOptional()
+  @Transform(transformBoolean)
+  @IsBoolean()
+  connected?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Transform(transformBoolean)
+  @IsBoolean()
+  enabled?: boolean;
+
+  @ApiPropertyOptional({
+    default: false,
+  })
+  @IsOptional()
+  @Transform(transformBoolean)
+  @IsBoolean()
+  archived?: boolean;
+
+  @ApiPropertyOptional({
+    default: 1,
+    minimum: 1,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page = 1;
+
+  @ApiPropertyOptional({
+    default: 20,
+    minimum: 1,
+    maximum: 100,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit = 20;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\workspace\dto\add-workspace-member.dto.ts
+==================================================
+import { WorkspaceRole } from '../../../generated/prisma/client';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEmail, IsEnum, IsOptional } from 'class-validator';
+
+export class AddWorkspaceMemberDto {
+  @ApiProperty({
+    example: 'developer@example.com',
+  })
+  @IsEmail()
+  email!: string;
+
+  @ApiPropertyOptional({
+    enum: WorkspaceRole,
+    default: WorkspaceRole.VIEWER,
+  })
+  @IsOptional()
+  @IsEnum(WorkspaceRole)
+  role?: WorkspaceRole;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\workspace\dto\create-workspace.dto.ts
+==================================================
+import type { CreateWorkspaceInput } from '@command-center/shared-types';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString, Length, MaxLength } from 'class-validator';
+
+export class CreateWorkspaceDto implements CreateWorkspaceInput {
+  @ApiProperty({
+    example: 'MadadAI Team',
+    minLength: 2,
+    maxLength: 120,
+  })
+  @IsString()
+  @Length(2, 120)
+  name!: string;
+
+  @ApiPropertyOptional({
+    example: 'madadai-team',
+    description: 'Optional. A slug will be generated from the workspace name when omitted.',
+    maxLength: 120,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  slug?: string;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\workspace\dto\transfer-ownership.dto.ts
+==================================================
+import { ApiProperty } from '@nestjs/swagger';
+import { IsUUID } from 'class-validator';
+
+export class TransferOwnershipDto {
+  @ApiProperty({
+    format: 'uuid',
+  })
+  @IsUUID()
+  newOwnerUserId!: string;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\workspace\dto\update-workspace.dto.ts
+==================================================
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString, Length, Matches } from 'class-validator';
+
+export class UpdateWorkspaceDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @Length(2, 120)
+  name?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @Length(2, 120)
+  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+  slug?: string;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\workspace\dto\update-workspace-member-role.dto.ts
+==================================================
+import { WorkspaceRole } from '../../../generated/prisma/client';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEnum } from 'class-validator';
+
+export class UpdateWorkspaceMemberRoleDto {
+  @ApiProperty({
+    enum: WorkspaceRole,
+  })
+  @IsEnum(WorkspaceRole)
+  role!: WorkspaceRole;
+}
+
+=== WEB VALIDATION USAGES ===
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\settings\page.tsx:284 <p className='mt-3 text-sm text-red-600'>Rotation immediately invalidates the previous key.</p>
+apps\web\src\features\repositories\repositories-api.ts:85 * It validates the installation state and returns
+
+=== VALIDATION DEPENDENCIES ===
+
+apps\api\package.json:80:    "class-transformer": "^0.5.1",
+apps\api\package.json:81:    "class-validator": "^0.14.2",
+
+

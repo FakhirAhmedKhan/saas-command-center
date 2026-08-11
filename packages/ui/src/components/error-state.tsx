@@ -1,6 +1,6 @@
-import { TriangleAlert } from 'lucide-react';
 import { Button } from './button';
 import { Card, CardContent } from './card';
+import { TriangleAlert } from 'lucide-react';
 
 interface ErrorStateProps {
   title?: string;

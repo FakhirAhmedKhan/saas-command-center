@@ -1,11 +1,10 @@
 'use client';
 
+import { createWorkspace } from '@/features/workspaces/workspace-api';
+import { Button , Input } from '@command-center/ui';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useState, type FormEvent } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { createWorkspace } from '@/features/workspaces/workspace-api';
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {

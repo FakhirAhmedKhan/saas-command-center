@@ -1,5 +1,3 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SharedRateLimit } from '../../../common/rate-limit/shared-rate-limit.decorator';
 import { SharedRateLimitGuard } from '../../../common/rate-limit/shared-rate-limit.guard';
 import { WorkspaceRole } from '../../../generated/prisma/client';
@@ -9,6 +7,8 @@ import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.gu
 import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
 import { CreateWorkspaceInvitationDto, InvitationListQueryDto } from '../dto/workspace-invitation.dto';
 import { WorkspaceInvitationService } from '../services/workspace-invitation.service';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
 
 interface AuthenticatedRequest extends Request {

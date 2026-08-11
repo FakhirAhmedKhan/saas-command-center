@@ -56,8 +56,6 @@ const FROM = '2026-08-01';
 const TO = '2026-08-04';
 
 // startOfDateInTimeZone('2026-08-01', 'UTC') .. before startOfDateInTimeZone('2026-08-05', 'UTC')
-const RANGE_START = new Date('2026-08-01T00:00:00.000Z');
-
 // Bucket inside the resolved range. Range is 4 days (Aug 1-4 inclusive) => granularity 'day',
 // so the pages/events report and the dimension report (read from AnalyticsDailyAggregate) must
 // both use bucket/event timestamps within [2026-08-01T00:00:00Z, 2026-08-05T00:00:00Z).
@@ -185,7 +183,7 @@ function parseCsv(csv: string): string[][] {
   const firstCell = firstRow?.[0];
 
   if (firstRow && firstCell !== undefined) {
-    firstRow[0] = firstCell.replace(/^﻿/, '');
+    firstRow[0] = firstCell.replace(/^\uFEFF/, '');
   }
 
   return rows;

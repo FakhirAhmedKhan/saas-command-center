@@ -1,5 +1,5 @@
-import { expect, test } from '@playwright/test';
 import { installMockApi, makeWorkspace, PRIMARY_WORKSPACE_ID, SECONDARY_WORKSPACE_ID } from './fixtures/mock-api';
+import { expect, test } from '@playwright/test';
 
 test.describe('Batch 10 dashboard and workspace flows', () => {
   test('renders account identity, workspace cards, and roles', async ({ page }) => {

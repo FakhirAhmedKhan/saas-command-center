@@ -1,4 +1,3 @@
-import { repositoryRequest } from './repositories-api';
 import type {
   RepositoryBranchesResponse,
   RepositoryCodeFile,
@@ -6,6 +5,7 @@ import type {
   RepositorySearchResponse,
   RepositoryTreeResponse,
 } from './code-explorer.types';
+import { repositoryRequest } from './repositories-api';
 
 function codeBase(workspaceId: string, repositoryId: string): string {
   return `/workspaces/${workspaceId}` + `/repositories/${repositoryId}` + '/code';

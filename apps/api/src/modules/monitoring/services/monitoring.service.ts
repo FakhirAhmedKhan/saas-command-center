@@ -1,14 +1,13 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '../../../database/prisma.service';
-import { HealthCheckStatus, HealthIncidentStatus, HealthTargetType, Prisma } from '../../../generated/prisma/client';
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { MonitoringAccessService } from './monitoring-access.service';
 import { SafeHttpClientService } from './safe-http-client.service';
 import type { TypedConfigService } from '../../../config/runtime-config';
+import { PrismaService } from '../../../database/prisma.service';
+import { HealthCheckStatus, HealthIncidentStatus, HealthTargetType, Prisma } from '../../../generated/prisma/client';
 import type { CreateHealthCheckDto, HealthCheckListQueryDto, IncidentListQueryDto, UpdateHealthCheckDto } from '../dto/health-check.dto';
 import type { HealthCheckDto, HealthCheckHistoryDto, HealthIncidentDto, MonitoringSummaryDto, MonitoringTargetDto } from '../dto/monitoring-response.dto';
-
-
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 type HealthCheckWithTarget = Prisma.HealthCheckGetPayload<{
   include: {
@@ -501,7 +500,7 @@ export class MonitoringService {
         subtitle: null,
       })),
 
-      ...websites.map((website: { id: any; name: any; domain: any }): MonitoringTargetDto => ({
+      ...websites.map((website): MonitoringTargetDto => ({
         id: website.id,
 
         type: HealthTargetType.WEBSITE,

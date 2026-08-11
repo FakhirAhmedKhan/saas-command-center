@@ -1,4 +1,3 @@
-import { apiRequest } from '@/features/lib/api/api-client';
 import type {
   ApplicationBlocker,
   ApplicationMilestone,
@@ -11,6 +10,7 @@ import type {
   DevelopmentTemplate,
   DevelopmentTemplateType,
 } from './development-types';
+import { apiRequest } from '@/features/lib/api/api-client';
 
 function basePath(workspaceId: string, applicationId: string): string {
   return `/workspaces/${workspaceId}/applications/${applicationId}/development`;

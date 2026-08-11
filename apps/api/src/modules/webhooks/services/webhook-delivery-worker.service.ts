@@ -1,6 +1,3 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Interval } from '@nestjs/schedule';
 import { PrismaService } from '../../../database/prisma.service';
 import { WebhookAttemptOutcome, WebhookDeliveryStatus } from '../../../generated/prisma/client';
 import { PostgresAdvisoryLockService } from '../../../infrastructure/database/postgres-advisory-lock.service';
@@ -9,6 +6,9 @@ import { WebhookOutboundClientService } from './webhook-outbound-client.service'
 import { WebhookSecretCryptoService } from './webhook-secret-crypto.service';
 import { WebhookSignatureService } from './webhook-signature.service';
 import type { TypedConfigService } from '../../../config/runtime-config';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Interval } from '@nestjs/schedule';
 
 @Injectable()
 export class WebhookDeliveryWorkerService {

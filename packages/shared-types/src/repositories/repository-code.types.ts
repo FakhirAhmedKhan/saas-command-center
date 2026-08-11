@@ -1,4 +1,4 @@
-import type { CodeTreeNode } from './code-explorer.types';
+import type { CodeTreeNode } from './code-explorer.types.js';
 
 export interface RepositoryBranch {
   name: string;

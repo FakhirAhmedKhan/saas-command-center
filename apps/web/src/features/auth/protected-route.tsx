@@ -1,7 +1,7 @@
 ﻿'use client';
 
-import { Suspense, type ComponentProps } from 'react';
 import { ProtectedRoute as ProtectedRouteContent } from './protected-route-content';
+import { Suspense, type ComponentProps } from 'react';
 
 type ProtectedRouteProps = ComponentProps<typeof ProtectedRouteContent>;
 

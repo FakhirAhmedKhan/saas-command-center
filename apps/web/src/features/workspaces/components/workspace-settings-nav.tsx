@@ -1,8 +1,8 @@
 'use client';
 
+import { cn } from '@command-center/ui';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { cn } from '@/features/lib/api/cn';
 
 interface WorkspaceSettingsNavProps {
   workspaceId: string;

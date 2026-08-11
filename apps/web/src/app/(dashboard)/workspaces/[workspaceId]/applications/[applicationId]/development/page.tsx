@@ -1,8 +1,8 @@
 'use client';
 
-import { useParams } from 'next/navigation';
 import { ApplicationSubNav } from '@/features/applications/components/application-sub-nav';
 import { DevelopmentBoard } from '@/features/development/components/development-board';
+import { useParams } from 'next/navigation';
 
 export default function ApplicationDevelopmentPage() {
   const params = useParams<{

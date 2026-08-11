@@ -1,7 +1,7 @@
-import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
+import type { TypedConfigService } from '../../../config/runtime-config';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { TypedConfigService } from '../../../config/runtime-config';
+import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
 
 export interface EncryptedWebhookSecret {
   ciphertext: string;

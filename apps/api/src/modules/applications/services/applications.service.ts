@@ -1,12 +1,12 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
-import { Prisma } from 'src/generated/prisma/client';
-import { ActivityActorType, ActivityEntityType, ApplicationActivityType } from 'src/generated/prisma/enums';
+import type { ActivityWriteInput } from '../../activity/interfaces/activity-writer.interface';
 import { ActivityWriterService } from '../../activity/services/activity-writer.service';
 import { CreateApplicationLinkDto, UpdateApplicationLinkDto } from '../dto/application-link.dto';
 import { CreateApplicationTechnologyDto, UpdateApplicationTechnologyDto } from '../dto/application-technology.dto';
 import { ApplicationListQueryDto, ApplicationSortBy, CreateApplicationDto, SortOrder, UpdateApplicationDto } from '../dto/application.dto';
-import type { ActivityWriteInput } from '../../activity/interfaces/activity-writer.interface';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { Prisma } from 'src/generated/prisma/client';
+import { ActivityActorType, ActivityEntityType, ApplicationActivityType } from 'src/generated/prisma/enums';
 
 const applicationInclude = {
   technologies: {

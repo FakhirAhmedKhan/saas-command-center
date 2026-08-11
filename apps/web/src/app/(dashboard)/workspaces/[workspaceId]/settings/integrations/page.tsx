@@ -1,8 +1,8 @@
 'use client';
 
-import { useParams } from 'next/navigation';
 import { WebhookIntegrationsDashboard } from '@/features/integrations/webhook-integrations-dashboard';
 import { WorkspaceSettingsNav } from '@/features/workspaces/components/workspace-settings-nav';
+import { useParams } from 'next/navigation';
 
 export default function IntegrationsPage() {
   const params = useParams<{

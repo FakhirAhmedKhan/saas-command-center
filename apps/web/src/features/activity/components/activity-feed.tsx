@@ -1,16 +1,13 @@
 'use client';
 
-import { Activity, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { EmptyState } from '@/components/ui/empty-state';
-import { Spinner } from '@/components/ui/spinner';
 import { getApplicationActivities, getWorkspaceActivities } from '../activity-api';
 import { getActivityErrorMessage } from '../activity-utils';
 import { ActivityFilters, type ActivityFilterValue } from './activity-filters';
 import { ActivityItem } from './activity-item';
 import type { ActivityListQuery, ActivityPagination, ApplicationActivity } from '../activity-types';
+import { Button , Card, CardContent, CardHeader , EmptyState , Spinner } from '@command-center/ui';
+import { Activity, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const DEFAULT_FILTERS: ActivityFilterValue = {
   search: '',

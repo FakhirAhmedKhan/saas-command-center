@@ -1,5 +1,5 @@
-import { apiRequest } from '../lib/api/api-client';
 import type { HealthCheck, HealthCheckHistory, HealthIncident, MonitoringSummary, MonitoringTarget, SaveHealthCheckInput } from './monitoring.types';
+import { apiRequest } from '../lib/api/api-client';
 
 function createBasePath(workspaceId: string): string {
   return `/workspaces/${workspaceId}/monitoring`;

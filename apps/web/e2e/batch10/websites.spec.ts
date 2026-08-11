@@ -1,5 +1,5 @@
-import { expect, test } from '@playwright/test';
 import { APPLICATION_ID, installMockApi, PRIMARY_WORKSPACE_ID, WEBSITE_ID } from './fixtures/mock-api';
+import { expect, test } from '@playwright/test';
 
 test.describe('Batch 10 website and tracker setup flows', () => {
   test('lists websites with connection and tracking information', async ({ page }) => {

@@ -1,4 +1,4 @@
-import type { AnalyticsPreset } from './overview.types';
+import type { AnalyticsPreset } from './overview.types.js';
 
 export type AnalyticsReportTab = 'pages' | 'sources' | 'geography' | 'technology' | 'events';
 

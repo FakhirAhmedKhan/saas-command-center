@@ -142,7 +142,7 @@ export class ApplicationListQueryDto implements ApplicationListQueryInput {
       return false;
     }
 
-    return value;
+    return value as unknown;
   })
   @IsBoolean()
   archived?: boolean;

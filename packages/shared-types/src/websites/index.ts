@@ -1,1 +1,1 @@
-export * from './website.types';
+export * from './website.types.js';

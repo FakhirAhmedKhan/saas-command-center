@@ -1,9 +1,5 @@
 'use client';
 
-import { RotateCcw, Search } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
 import { ACTIVITY_TYPE_LABELS, ACTOR_TYPE_LABELS, ENTITY_TYPE_LABELS } from '../activity-constants';
 import {
   ACTIVITY_ACTOR_TYPES,
@@ -13,6 +9,8 @@ import {
   type ActivityEntityType,
   type ApplicationActivityType,
 } from '../activity-types';
+import { Button , Input , Select } from '@command-center/ui';
+import { RotateCcw, Search } from 'lucide-react';
 import type { FormEvent } from 'react';
 
 export interface ActivityFilterValue {

@@ -1,9 +1,9 @@
-import { Controller, Get, Param, ParseUUIDPipe, Query, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
 import { RawEventQueryDto } from '../dto/raw-event-query.dto';
 import { TrackingAdminService } from '../services/tracking-admin.service';
+import { Controller, Get, Param, ParseUUIDPipe, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Website Tracking')
 @ApiBearerAuth('access-token')

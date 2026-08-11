@@ -1,5 +1,5 @@
-import { BadGatewayException, Injectable } from '@nestjs/common';
 import { GithubAppService } from './github-app.service';
+import { BadGatewayException, Injectable } from '@nestjs/common';
 
 interface GithubBranchResponse {
   name: string;

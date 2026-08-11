@@ -1,8 +1,8 @@
 'use client';
 
-import { X } from 'lucide-react';
 import { CATEGORY_LABELS, PRIORITY_LABELS, STATUS_LABELS } from '../application-constants';
 import type { ApplicationFilterValue } from './application-filters';
+import { X } from 'lucide-react';
 
 interface ActiveFilterChip {
   key: 'search' | 'status' | 'priority' | 'category' | 'archiveView';

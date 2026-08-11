@@ -1,7 +1,6 @@
+import { Button , EmptyState } from '@command-center/ui';
 import { Boxes, FilterX, Plus } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { EmptyState } from '@/components/ui/empty-state';
 
 interface ApplicationsEmptyStateProps {
   workspaceId: string;

@@ -1,16 +1,12 @@
 'use client';
 
-import { Pencil, Plus, Trash2, X } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
 import { addApplicationTechnology, removeApplicationTechnology, updateApplicationTechnology } from '../application-api';
 import { TECHNOLOGY_TYPE_LABELS } from '../application-constants';
 import { TECHNOLOGY_TYPES, type ApplicationTechnology, type TechnologyType } from '../application-types';
 import { getErrorMessage } from '../application-utils';
+import { Badge , Button , Card, CardContent, CardHeader , Input , Select } from '@command-center/ui';
+import { Pencil, Plus, Trash2, X } from 'lucide-react';
+import { useState, type FormEvent } from 'react';
 
 interface TechnologyManagerProps {
   workspaceId: string;

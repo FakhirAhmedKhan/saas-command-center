@@ -1,5 +1,5 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../database/prisma.service';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 
 const WEBHOOK_MANAGEMENT_ROLES = new Set(['OWNER', 'ADMIN', 'DEVELOPER']);
 

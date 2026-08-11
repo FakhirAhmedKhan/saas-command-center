@@ -1,8 +1,8 @@
 'use client';
 
-import { useParams } from 'next/navigation';
 import { AnalyticsEnginePanel } from '@/features/analytics-engine/components/analytics-engine-panel';
 import { WebsiteSubNav } from '@/features/websites/components/website-sub-nav';
+import { useParams } from 'next/navigation';
 
 export default function AnalyticsEnginePage() {
   const params = useParams<{

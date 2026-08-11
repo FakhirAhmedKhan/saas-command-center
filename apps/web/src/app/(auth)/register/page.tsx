@@ -1,12 +1,11 @@
 'use client';
 
+import { useSession } from '@/features/auth/use-session';
+import { getErrorMessage } from '@/features/lib/api/api-error';
+import { Button , Input } from '@command-center/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useSession } from '@/features/auth/use-session';
-import { getErrorMessage } from '@/features/lib/api/api-error';
 
 export default function RegisterPage() {
   const router = useRouter();

@@ -1,8 +1,8 @@
 'use client';
 
-import { useParams } from 'next/navigation';
 import { ApplicationSubNav } from '@/features/applications/components/application-sub-nav';
 import { ReleaseDeploymentDashboard } from '@/features/releases/release-deployment-dashboard';
+import { useParams } from 'next/navigation';
 
 interface RouteParameters extends Record<string, string> {
   workspaceId: string;

@@ -1,13 +1,13 @@
 'use client';
 
+import { WorkspaceSwitcher } from './workspace-switcher';
+import { useAuth } from '@/features/auth/auth-provider';
+import { NotificationBell } from '@/features/team-operations/notification-bell';
+import { cn } from '@command-center/ui';
 import { Activity, Boxes, Building2, GitBranch, Globe2, LayoutDashboard, LogOut, Menu, Radio, Settings, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useAuth } from '@/features/auth/auth-provider';
-import { cn } from '@/features/lib/api/cn';
-import { NotificationBell } from '@/features/team-operations/notification-bell';
-import { WorkspaceSwitcher } from './workspace-switcher';
 
 interface AppShellProps {
   children: React.ReactNode;

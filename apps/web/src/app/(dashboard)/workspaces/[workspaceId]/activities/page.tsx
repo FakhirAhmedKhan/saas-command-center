@@ -1,9 +1,9 @@
 'use client';
 
+import { ActivityFeed } from '@/features/activity/components/activity-feed';
 import { Activity, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { ActivityFeed } from '@/features/activity/components/activity-feed';
 
 export default function WorkspaceActivityPage() {
   const params = useParams<{

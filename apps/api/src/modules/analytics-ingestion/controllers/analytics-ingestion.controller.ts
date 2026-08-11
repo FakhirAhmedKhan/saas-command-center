@@ -1,9 +1,9 @@
-import { Body, Controller, Headers, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
-import { ApiExcludeController } from '@nestjs/swagger';
 import { SharedRateLimit } from '../../../common/rate-limit/shared-rate-limit.decorator';
 import { SharedRateLimitGuard } from '../../../common/rate-limit/shared-rate-limit.guard';
 import { Public } from '../../auth/decorators/public.decorator';
 import { AnalyticsIngestionService } from '../services/analytics-ingestion.service';
+import { Body, Controller, Headers, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
+import { ApiExcludeController } from '@nestjs/swagger';
 import type { Request } from 'express';
 
 @ApiExcludeController()

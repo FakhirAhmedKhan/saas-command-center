@@ -1,6 +1,6 @@
+import { createTrackerHarness, readBeaconPayload } from '../test-support/tracker-harness.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createTrackerHarness, readBeaconPayload } from '../test-support/tracker-harness.mjs';
 
 test('records heartbeat duration while the document is visible', async () => {
   const harness = await createTrackerHarness({

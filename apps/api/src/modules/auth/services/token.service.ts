@@ -1,9 +1,9 @@
-import { createHash, randomUUID } from 'node:crypto';
+import { JWT_AUDIENCE, JWT_ISSUER } from '../auth.constants';
+import type { AccessTokenPayload, RefreshTokenPayload } from '../interfaces/jwt-payload.interface';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { JWT_AUDIENCE, JWT_ISSUER } from '../auth.constants';
-import type { AccessTokenPayload, RefreshTokenPayload } from '../interfaces/jwt-payload.interface';
+import { createHash, randomUUID } from 'node:crypto';
 
 export interface TokenPair {
   accessToken: string;

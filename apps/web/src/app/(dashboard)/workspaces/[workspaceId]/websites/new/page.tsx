@@ -1,16 +1,16 @@
 'use client';
 
-import { ArrowLeft, Globe2 } from 'lucide-react';
-import Link from 'next/link';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
-import { Spinner } from '@/components/ui/spinner';
 import { getApplications } from '@/features/applications/application-api';
 import type { SaasApplication } from '@/features/applications/application-types';
 import { WebsiteForm } from '@/features/websites/components/website-form';
 import { createWebsite } from '@/features/websites/website-api';
 import type { CreateWebsitePayload } from '@/features/websites/website-types';
 import { websiteKeyStorageName } from '@/features/websites/website-utils';
+import { Spinner } from '@command-center/ui';
+import { ArrowLeft, Globe2 } from 'lucide-react';
+import Link from 'next/link';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 
 export default function NewWebsitePage() {
   return (

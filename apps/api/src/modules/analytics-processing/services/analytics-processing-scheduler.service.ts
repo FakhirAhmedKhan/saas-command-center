@@ -1,10 +1,10 @@
+import { AnalyticsProcessingQueueService } from './analytics-processing-queue.service';
+import type { TypedConfigService } from '../../../config/runtime-config';
+import { PrismaService } from '../../../database/prisma.service';
+import { AnalyticsProcessingTrigger } from '../../../generated/prisma/client';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { PrismaService } from '../../../database/prisma.service';
-import { AnalyticsProcessingTrigger } from '../../../generated/prisma/client';
-import { AnalyticsProcessingQueueService } from './analytics-processing-queue.service';
-import type { TypedConfigService } from '../../../config/runtime-config';
 
 interface PendingWebsiteRange {
   workspaceId: string;

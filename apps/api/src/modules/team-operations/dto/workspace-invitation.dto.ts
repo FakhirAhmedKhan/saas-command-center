@@ -1,7 +1,7 @@
+import { WorkspaceInvitationStatus, WorkspaceRole } from '../../../generated/prisma/client';
 import type { CreateWorkspaceInvitationInput, InvitationListQueryInput } from '@command-center/shared-types';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEmail, IsEnum, IsOptional } from 'class-validator';
-import { WorkspaceInvitationStatus, WorkspaceRole } from '../../../generated/prisma/client';
 
 export class CreateWorkspaceInvitationDto implements CreateWorkspaceInvitationInput {
   @ApiProperty({

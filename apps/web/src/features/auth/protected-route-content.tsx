@@ -1,9 +1,9 @@
 'use client';
 
+import { useSession } from './use-session';
+import { PageLoading } from '@/components/states/page-loading';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, type PropsWithChildren } from 'react';
-import { PageLoading } from '@/components/states/page-loading';
-import { useSession } from './use-session';
 
 export function ProtectedRoute({ children }: PropsWithChildren) {
   const router = useRouter();

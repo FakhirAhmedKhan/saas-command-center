@@ -1,1 +1,1 @@
-export * from './activity.types';
+export * from './activity.types.js';

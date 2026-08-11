@@ -272,7 +272,7 @@ export class ApplyDevelopmentTemplateDto {
       return false;
     }
 
-    return value;
+    return value as unknown;
   })
   @IsBoolean()
   replaceExisting?: boolean;

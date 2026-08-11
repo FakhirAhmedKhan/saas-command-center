@@ -1,6 +1,6 @@
+import { createTrackerHarness } from '../test-support/tracker-harness.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createTrackerHarness } from '../test-support/tracker-harness.mjs';
 
 test('includes the expected page-view fields', async () => {
   const harness = await createTrackerHarness({

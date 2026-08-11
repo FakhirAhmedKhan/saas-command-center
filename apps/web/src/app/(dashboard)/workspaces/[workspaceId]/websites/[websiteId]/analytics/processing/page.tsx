@@ -1,8 +1,8 @@
 'use client';
 
-import { useParams } from 'next/navigation';
 import { AnalyticsProcessingPanel } from '@/features/analytics-processing/analytics-processing-panel';
 import { WebsiteSubNav } from '@/features/websites/components/website-sub-nav';
+import { useParams } from 'next/navigation';
 
 interface RouteParameters extends Record<string, string> {
   workspaceId: string;

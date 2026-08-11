@@ -1,5 +1,5 @@
-import { expect, test } from '@playwright/test';
 import { APPLICATION_ID, installMockApi, makeWorkspace, PRIMARY_WORKSPACE_ID } from './fixtures/mock-api';
+import { expect, test } from '@playwright/test';
 
 function viewerWorkspace() {
   return makeWorkspace({

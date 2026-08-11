@@ -2,7 +2,7 @@
   "name": "@command-center/api",
   "version": "0.1.0",
   "private": true,
-  "license": "UNLICENSED",  
+  "license": "UNLICENSED",
   "scripts": {
     "prebuild": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
     "build": "nest build",

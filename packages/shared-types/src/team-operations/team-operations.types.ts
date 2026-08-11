@@ -1,4 +1,4 @@
-import type { WorkspaceRole } from '../common/common.types';
+import type { WorkspaceRole } from '../common/common.types.js';
 
 export type InvitationStatus = 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'REVOKED' | 'EXPIRED';
 

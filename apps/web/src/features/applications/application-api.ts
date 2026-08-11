@@ -1,4 +1,3 @@
-import { apiRequest } from '@/features/lib/api/api-client';
 import type {
   ApplicationLink,
   ApplicationListQuery,
@@ -12,6 +11,7 @@ import type {
   UpdateApplicationPayload,
   UpdateTechnologyPayload,
 } from './application-types';
+import { apiRequest } from '@/features/lib/api/api-client';
 
 function buildQueryString(query: ApplicationListQuery = {}): string {
   const parameters = new URLSearchParams();

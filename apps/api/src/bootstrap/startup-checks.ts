@@ -1,7 +1,7 @@
-import { Logger ,type  INestApplication } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '../database/prisma.service';
 import type { TypedConfigService } from '../config/runtime-config';
+import { PrismaService } from '../database/prisma.service';
+import { Logger, type INestApplication } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 const DATABASE_TIMEOUT_MS = 10_000;
 

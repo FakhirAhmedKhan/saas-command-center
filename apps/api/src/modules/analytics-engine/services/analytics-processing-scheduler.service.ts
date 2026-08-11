@@ -1,6 +1,6 @@
+import { AnalyticsProcessingService } from './analytics-processing.service';
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
-import { AnalyticsProcessingService } from './analytics-processing.service';
 
 const DEFAULT_INTERVAL_MS = 60_000;
 const DEFAULT_MAX_EVENTS = 5_000;

@@ -1,7 +1,7 @@
 'use client';
 
-import { DiffEditor } from '@monaco-editor/react';
 import type { RepositoryDiffResponse } from './code-explorer.types';
+import { DiffEditor } from '@monaco-editor/react';
 
 interface CodeDiffViewerProps {
   diff: RepositoryDiffResponse;

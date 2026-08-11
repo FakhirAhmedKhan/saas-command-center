@@ -1,11 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
-import { ApiError } from 'next/dist/server/api-utils';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { PageError } from '@/components/states/page-error';
-import { EmptyState } from '@/components/ui/empty-state';
-import { getErrorMessage } from '../applications/application-utils';
 import { HealthStatusBadge } from './health-status-badge';
 import {
   createHealthCheck,
@@ -27,6 +22,11 @@ import type {
   MonitoringTarget,
   SaveHealthCheckInput,
 } from './monitoring.types';
+import { getErrorMessage } from '../applications/application-utils';
+import { PageError } from '@/components/states/page-error';
+import { EmptyState } from '@command-center/ui';
+import { ApiError } from 'next/dist/server/api-utils';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface MonitoringDashboardProps {
   workspaceId: string;

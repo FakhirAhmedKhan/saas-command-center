@@ -1,8 +1,4 @@
-﻿import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { validateEnvironment } from './config/env.validation';
+﻿import { validateEnvironment } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
 import { RedisModule } from './infrastructure/redis/redis.module';
 import { ActivityModule } from './modules/activity/activity.module';
@@ -13,18 +9,22 @@ import { AnalyticsProcessingModule } from './modules/analytics-processing/analyt
 import { AnalyticsReportsModule } from './modules/analytics-reports/analytics-reports.module';
 import { ApplicationsModule } from './modules/applications/applications.module';
 import { AuthSessionsModule } from './modules/auth/module/auth-sessions.module';
-import { HealthModule } from './modules/health/health.module';
 import { AuthModule } from './modules/auth/module/auth.module';
-import { MonitoringModule } from './modules/monitoring/monitoring.module';
-import { UsersModule } from './modules/users/users.module';
-import { WorkspaceMembersModule } from './modules/workspace/modules/workspace-members.module';
-import { VersionModule } from './version/version.module';
-import { WorkspaceModule } from './modules/workspace/modules/workspaces.module';
-import { WebsitesModule } from './modules/websites/websites.module';
 import { DevelopmentModule } from './modules/development/development.module';
-import { TeamOperationsModule } from './modules/team-operations/team-operations.module';
-import { WebhooksModule } from './modules/webhooks/webhooks.module';
+import { HealthModule } from './modules/health/health.module';
+import { MonitoringModule } from './modules/monitoring/monitoring.module';
 import { RepositoriesModule } from './modules/repositories/repositories.module';
+import { TeamOperationsModule } from './modules/team-operations/team-operations.module';
+import { UsersModule } from './modules/users/users.module';
+import { WebhooksModule } from './modules/webhooks/webhooks.module';
+import { WebsitesModule } from './modules/websites/websites.module';
+import { WorkspaceMembersModule } from './modules/workspace/modules/workspace-members.module';
+import { WorkspaceModule } from './modules/workspace/modules/workspaces.module';
+import { VersionModule } from './version/version.module';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [

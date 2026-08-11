@@ -1,6 +1,6 @@
+import { Input } from './input';
 import { Search } from 'lucide-react';
 import { forwardRef, type InputHTMLAttributes } from 'react';
-import { Input } from './input';
 
 export interface SearchInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label?: string;

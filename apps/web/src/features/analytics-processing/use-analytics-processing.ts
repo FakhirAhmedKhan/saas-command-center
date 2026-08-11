@@ -1,8 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
 import { getAnalyticsProcessingStatus } from './analytics-processing-api';
 import type { AnalyticsProcessingStatus } from './analytics-processing.types';
+import { useCallback, useEffect, useState } from 'react';
 
 interface ProcessingState {
   data: AnalyticsProcessingStatus | null;

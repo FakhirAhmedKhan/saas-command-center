@@ -1,17 +1,21 @@
+import { SHARED_RATE_LIMIT_KEY, type SharedRateLimitOptions } from './shared-rate-limit.decorator';
+import { SharedRateLimitService } from './shared-rate-limit.service';
 import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { SHARED_RATE_LIMIT_KEY ,type  SharedRateLimitOptions } from './shared-rate-limit.decorator';
-import { SharedRateLimitService } from './shared-rate-limit.service';
 import type { Request, Response } from 'express';
 
 function getIdentity(request: Request): string {
   const trackingKey = request.header('x-tracking-key');
 
-  if (trackingKey) {return trackingKey;}
+  if (trackingKey) {
+    return trackingKey;
+  }
 
   const apiKey = request.header('x-api-key');
 
-  if (apiKey) {return apiKey;}
+  if (apiKey) {
+    return apiKey;
+  }
 
   return request.ip || request.socket.remoteAddress || 'unknown';
 }
@@ -26,7 +30,9 @@ export class SharedRateLimitGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const options = this.reflector.getAllAndOverride<SharedRateLimitOptions>(SHARED_RATE_LIMIT_KEY, [context.getHandler(), context.getClass()]);
 
-    if (!options) { return true;}
+    if (!options) {
+      return true;
+    }
 
     const httpContext = context.switchToHttp();
     const request = httpContext.getRequest<Request>();

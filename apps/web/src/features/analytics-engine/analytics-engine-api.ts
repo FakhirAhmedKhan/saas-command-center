@@ -1,4 +1,3 @@
-import { apiRequest } from '@/features/lib/api/api-client';
 import type {
   AnalyticsAggregateDimension,
   AnalyticsAggregatePeriod,
@@ -8,6 +7,7 @@ import type {
   AnalyticsRetentionResult,
   ReprocessAnalyticsPayload,
 } from './analytics-engine-types';
+import { apiRequest } from '@/features/lib/api/api-client';
 
 function basePath(workspaceId: string, websiteId: string): string {
   return `/workspaces/${workspaceId}/websites/${websiteId}/analytics-engine`;

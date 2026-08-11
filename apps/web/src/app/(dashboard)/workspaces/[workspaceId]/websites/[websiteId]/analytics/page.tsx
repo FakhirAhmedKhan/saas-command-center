@@ -1,8 +1,8 @@
 'use client';
 
-import { useParams } from 'next/navigation';
 import { AnalyticsOverviewDashboard } from '@/features/analytics-overview/analytics-overview-dashboard';
 import { WebsiteSubNav } from '@/features/websites/components/website-sub-nav';
+import { useParams } from 'next/navigation';
 
 type AnalyticsRouteParams = {
   workspaceId: string;

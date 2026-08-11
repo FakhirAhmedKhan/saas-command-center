@@ -1,5 +1,5 @@
-import { apiRequest } from '../lib/api/api-client';
 import type { AnalyticsOverviewResponse, GetAnalyticsOverviewInput } from './analytics-overview.types';
+import { apiRequest } from '../lib/api/api-client';
 
 export async function getAnalyticsOverview({
   workspaceId,

@@ -1,9 +1,8 @@
+import type { Website } from '../website-types';
+import { formatWebsiteDate } from '../website-utils';
+import { Badge , Card } from '@command-center/ui';
 import { ArrowRight, Clock3, Globe2, KeyRound, Link2 } from 'lucide-react';
 import Link from 'next/link';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
-import { formatWebsiteDate } from '../website-utils';
-import type { Website } from '../website-types';
 
 interface WebsiteCardProps {
   workspaceId: string;

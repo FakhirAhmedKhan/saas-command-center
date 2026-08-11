@@ -39,10 +39,7 @@ function formatBytes(bytes) {
   }
 
   const units = ['B', 'KB', 'MB', 'GB'];
-  const index = Math.min(
-    Math.floor(Math.log(bytes) / Math.log(1024)),
-    units.length - 1,
-  );
+  const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
 
   const value = bytes / 1024 ** index;
 
@@ -122,9 +119,7 @@ function printTarget(target) {
   console.log('');
   console.log('  Largest files:');
 
-  const largestFiles = [...files]
-    .sort((a, b) => b.size - a.size)
-    .slice(0, 10);
+  const largestFiles = [...files].sort((a, b) => b.size - a.size).slice(0, 10);
 
   for (const file of largestFiles) {
     const relativePath = path.relative(ROOT, file.path);

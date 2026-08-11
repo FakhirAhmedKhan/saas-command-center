@@ -1,15 +1,12 @@
 'use client';
 
+import { getTrackingStatus } from '../tracking-api';
+import type { TrackingStatus } from '../tracking-types';
+import { formatTrackingDate, getTrackingError } from '../tracking-utils';
+import { Badge , Button , Card, CardContent, CardHeader , Spinner } from '@command-center/ui';
 import { Activity, CheckCircle2, Clock3, MousePointerClick, Radio, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Spinner } from '@/components/ui/spinner';
-import { getTrackingStatus } from '../tracking-api';
-import { formatTrackingDate, getTrackingError } from '../tracking-utils';
-import type { TrackingStatus } from '../tracking-types';
 
 interface TrackingStatusPanelProps {
   workspaceId: string;

@@ -1,15 +1,15 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
-import { GitBranch, RefreshCw, Search, X } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CodeDiffViewer } from './code-diff-viewer';
 import { getRepositoryBranches, getRepositoryCodeFile, getRepositoryFileDiff, getRepositoryTree, searchRepositoryFiles } from './code-explorer-api';
+import type { CodeTreeNode, RepositoryBranch, RepositoryCodeFile, RepositoryDiffResponse, RepositorySearchMatch } from './code-explorer.types';
 import { CodeTree } from './code-tree';
 import { CodeViewer } from './code-viewer';
 import { getRepository } from './repositories-api';
-import type { CodeTreeNode, RepositoryBranch, RepositoryCodeFile, RepositoryDiffResponse, RepositorySearchMatch } from './code-explorer.types';
 import type { RepositoryConnection } from './repository.types';
+import { GitBranch, RefreshCw, Search, X } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface CodeExplorerProps {
   workspaceId: string;

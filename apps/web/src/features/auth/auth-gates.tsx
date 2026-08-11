@@ -1,7 +1,7 @@
 'use client';
+import { useAuth } from '@/features/auth/auth-provider';
 import { useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
-import { useAuth } from '@/features/auth/auth-provider';
 
 interface GateProps {
   children: ReactNode;

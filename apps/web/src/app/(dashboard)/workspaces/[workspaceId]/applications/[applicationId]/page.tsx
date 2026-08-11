@@ -1,14 +1,6 @@
 'use client';
 
-import { ArrowLeft, Globe2, Pencil } from 'lucide-react';
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import { PageLoading } from '@/components/states/page-loading';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { ErrorState } from '@/components/ui/error-state';
-import { Progress } from '@/components/ui/progress';
 import { ActivityFeed } from '@/features/activity/components/activity-feed';
 import { getApplication } from '@/features/applications/application-api';
 import { CATEGORY_LABELS, PRIORITY_BADGE_VARIANTS, PRIORITY_LABELS, STATUS_BADGE_VARIANTS, STATUS_LABELS } from '@/features/applications/application-constants';
@@ -17,6 +9,11 @@ import { formatApplicationDate, getApplicationInitials, getErrorMessage } from '
 import { ApplicationSubNav } from '@/features/applications/components/application-sub-nav';
 import { LinkManager } from '@/features/applications/components/link-manager';
 import { TechnologyManager } from '@/features/applications/components/technology-manager';
+import { Progress , ErrorState , Card, CardContent, CardHeader , Badge } from '@command-center/ui';
+import { ArrowLeft, Globe2, Pencil } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function ApplicationDetailsPage() {
   const params = useParams<{

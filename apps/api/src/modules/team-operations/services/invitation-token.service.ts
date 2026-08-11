@@ -1,7 +1,7 @@
-import { createHmac, randomBytes } from 'node:crypto';
+import type { TypedConfigService } from '../../../config/runtime-config';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { TypedConfigService } from '../../../config/runtime-config';
+import { createHmac, randomBytes } from 'node:crypto';
 
 export interface GeneratedInvitationToken {
   rawToken: string;

@@ -1,15 +1,11 @@
 'use client';
 
+import { getWorkspaceActivities, type WorkspaceActivity } from '@/features/activity/workspace-activity-api';
+import { getErrorMessage } from '@/features/applications/application-utils';
+import { EmptyState , ErrorState , Input , Select , Skeleton } from '@command-center/ui';
 import { Activity as ActivityIcon } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { EmptyState } from '@/components/ui/empty-state';
-import { ErrorState } from '@/components/ui/error-state';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
-import { getWorkspaceActivities, type WorkspaceActivity } from '@/features/activity/workspace-activity-api';
-import { getErrorMessage } from '@/features/applications/application-utils';
 
 function humanize(value: string): string {
   return value

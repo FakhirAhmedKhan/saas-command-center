@@ -1,9 +1,9 @@
 'use client';
 
+import { useAuth } from '@/features/auth/auth-provider';
+import { EmptyState } from '@command-center/ui';
 import { ArrowRight, Building2, Plus } from 'lucide-react';
 import Link from 'next/link';
-import { EmptyState } from '@/components/ui/empty-state';
-import { useAuth } from '@/features/auth/auth-provider';
 
 function getGreeting(): string {
   const hour = new Date().getHours();

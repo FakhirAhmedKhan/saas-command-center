@@ -1,5 +1,5 @@
-﻿import { DateTime } from 'luxon';
-import { AnalyticsAggregatePeriod } from '@command-center/shared-types';
+﻿import { AnalyticsAggregatePeriod } from '@command-center/shared-types';
+import { DateTime } from 'luxon';
 
 export interface AnalyticsBucket {
   start: Date;

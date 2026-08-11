@@ -1,8 +1,8 @@
 'use client';
 
+import { getUnreadNotificationCount } from './team-operations-api';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { getUnreadNotificationCount } from './team-operations-api';
 
 export function NotificationBell() {
   const [count, setCount] = useState(0);

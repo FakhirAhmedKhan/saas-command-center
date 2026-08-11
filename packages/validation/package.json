@@ -22,5 +22,9 @@
     "eslint": "^9.34.0",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.41.0"
+  },
+  "dependencies": {
+    "@command-center/shared-types": "workspace:*",
+    "zod": "^4.4.3"
   }
 }

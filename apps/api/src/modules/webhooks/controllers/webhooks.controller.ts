@@ -1,6 +1,3 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthenticatedUser } from 'src/modules/auth/interfaces/authenticated-user.interface';
 import { SharedRateLimit } from '../../../common/rate-limit/shared-rate-limit.decorator';
 import { SharedRateLimitGuard } from '../../../common/rate-limit/shared-rate-limit.guard';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
@@ -8,6 +5,9 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
 import { CreateWebhookEndpointDto, UpdateWebhookEndpointDto, WebhookDeliveryListQueryDto } from '../dto/webhook.dto';
 import { WebhookManagementService } from '../services/webhook-management.service';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AuthenticatedUser } from 'src/modules/auth/interfaces/authenticated-user.interface';
 
 @ApiTags('Webhook Integrations')
 @ApiBearerAuth('access-token')

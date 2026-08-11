@@ -1,6 +1,6 @@
+import { context } from 'esbuild';
 import { readFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
-import { context } from 'esbuild';
 
 const port = Number(process.env.TRACKER_PORT) || 3002;
 

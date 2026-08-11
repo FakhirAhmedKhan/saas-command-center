@@ -33,26 +33,13 @@ function format(bytes) {
 
 const files = getFiles(serverDir);
 
-const runtimeJs = files.filter(
-  (file) =>
-    file.path.endsWith('.js') &&
-    !file.path.endsWith('.js.map'),
-);
+const runtimeJs = files.filter((file) => file.path.endsWith('.js') && !file.path.endsWith('.js.map'));
 
-const sourceMaps = files.filter((file) =>
-  file.path.endsWith('.map'),
-);
+const sourceMaps = files.filter((file) => file.path.endsWith('.map'));
 
-const json = files.filter((file) =>
-  file.path.endsWith('.json'),
-);
+const json = files.filter((file) => file.path.endsWith('.json'));
 
-const other = files.filter(
-  (file) =>
-    !file.path.endsWith('.js') &&
-    !file.path.endsWith('.map') &&
-    !file.path.endsWith('.json'),
-);
+const other = files.filter((file) => !file.path.endsWith('.js') && !file.path.endsWith('.map') && !file.path.endsWith('.json'));
 
 function total(list) {
   return list.reduce((sum, file) => sum + file.size, 0);
@@ -75,9 +62,7 @@ runtimeJs
   .sort((a, b) => b.size - a.size)
   .slice(0, 15)
   .forEach((file) => {
-    console.log(
-      `${format(file.size).padStart(10)}  ${path.relative(root, file.path)}`,
-    );
+    console.log(`${format(file.size).padStart(10)}  ${path.relative(root, file.path)}`);
   });
 
 console.log('');

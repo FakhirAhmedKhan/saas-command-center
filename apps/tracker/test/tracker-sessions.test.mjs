@@ -1,6 +1,6 @@
+import { createTrackerHarness } from '../test-support/tracker-harness.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createTrackerHarness } from '../test-support/tracker-harness.mjs';
 
 test('persists the visitor ID across tracker reloads for the same website', async () => {
   const first = await createTrackerHarness({ online: false });

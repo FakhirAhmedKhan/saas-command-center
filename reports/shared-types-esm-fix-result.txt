@@ -1,0 +1,148 @@
+﻿=== SHARED TYPES ESM FIX ===
+
+--- FORMAT SHARED TYPES ---
+
+--- VERIFY SOURCE SPECIFIERS ---
+All shared-types relative module specifiers are ESM-safe.
+
+--- SHARED TYPES BUILD ---
+pnpm.CMD : $ tsc -p tsconfig.json
+At line:18 char:5
++     & pnpm.cmd @ArgsList *> $tmp
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ($ tsc -p tsconfig.json:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+--- VALIDATION BUILD ---
+pnpm.CMD : $ tsc -p tsconfig.json
+At line:18 char:5
++     & pnpm.cmd @ArgsList *> $tmp
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ($ tsc -p tsconfig.json:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+--- VALIDATION LINT ---
+pnpm.CMD : $ eslint src --max-warnings=0
+At line:18 char:5
++     & pnpm.cmd @ArgsList *> $tmp
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ($ eslint src --max-warnings=0:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+--- SHARED TYPES NATIVE ESM TEST ---
+Shared Types Native ESM PASS
+
+--- VALIDATION RUNTIME TEST ---
+node : node:internal/modules/esm/resolve:275
+At line:186 char:5
++     node --input-type=module -e "import('./packages/validation/dist/i ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (node:internal/modules/esm/resolve:275:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 
+'C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\validation\dist\common' imported from 
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\validation\dist\webhooks.js
+    at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    at moduleResolve (node:internal/modules/esm/resolve:866:10)
+    at defaultResolve (node:internal/modules/esm/resolve:992:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:719:20)
+    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:736:38)
+    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:765:52)
+    at #resolve (node:internal/modules/esm/loader:701:17)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:621:35)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:160:33)
+    at ModuleJob.link (node:internal/modules/esm/module_job:245:17) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/Users/Dell/OneDrive/Desktop/Programs/saas-command-center/packages/validation/dist/common'
+}
+
+Node.js v24.13.1
+
+--- API TYPECHECK ---
+pnpm.CMD : $ tsc -p tsconfig.json --noEmit
+At line:18 char:5
++     & pnpm.cmd @ArgsList *> $tmp
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ($ tsc -p tsconfig.json --noEmit:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+--- WEB TYPECHECK ---
+pnpm.CMD : $ next typegen && tsc --noEmit
+At line:18 char:5
++     & pnpm.cmd @ArgsList *> $tmp
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ($ next typegen && tsc --noEmit:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Generating route types...
+Γ£ô Types generated successfully
+
+=============== FINAL RESULT ===============
+Shared Types Build   : PASS
+Shared Types Runtime : PASS
+Validation Build     : PASS
+Validation Lint      : PASS
+Validation Runtime   : FAIL
+API Typecheck        : PASS
+WEB Typecheck        : PASS
+============================================
+
+--- GIT DIFF SUMMARY ---
+git : warning: in the working copy of 'apps/web/next-env.d.ts', LF will be replaced by CRLF the next time Git touches it
+At line:227 char:1
++ git --no-pager diff --stat *> $tmp
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (warning: in the... Git touches it:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+warning: in the working copy of 'packages/shared-types/src/activity/index.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'packages/shared-types/src/analytics/index.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'packages/shared-types/src/analytics/reports.types.ts', LF will be replaced by CRLF the next time Git 
+touches it
+warning: in the working copy of 'packages/shared-types/src/applications/index.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'packages/shared-types/src/auth/index.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'packages/shared-types/src/common/index.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'packages/shared-types/src/development/index.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'packages/shared-types/src/index.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'packages/shared-types/src/integrations/index.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'packages/shared-types/src/monitoring/index.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'packages/shared-types/src/releases/index.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'packages/shared-types/src/repositories/index.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'packages/shared-types/src/repositories/repository-code.types.ts', LF will be replaced by CRLF the next 
+time Git touches it
+warning: in the working copy of 'packages/shared-types/src/team-operations/index.ts', LF will be replaced by CRLF the next time Git 
+touches it
+warning: in the working copy of 'packages/shared-types/src/team-operations/team-operations.types.ts', LF will be replaced by CRLF the next 
+time Git touches it
+warning: in the working copy of 'packages/shared-types/src/tracking/index.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'packages/shared-types/src/websites/index.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'packages/shared-types/src/workspaces/index.ts', LF will be replaced by CRLF the next time Git touches it
+ apps/web/next-env.d.ts                             |  2 +-
+ apps/web/tsconfig.tsbuildinfo                      |  2 +-
+ packages/shared-types/src/activity/index.ts        |  2 +-
+ packages/shared-types/src/analytics/index.ts       |  8 +++----
+ .../shared-types/src/analytics/reports.types.ts    |  2 +-
+ packages/shared-types/src/applications/index.ts    |  2 +-
+ packages/shared-types/src/auth/index.ts            |  2 +-
+ packages/shared-types/src/common/index.ts          |  2 +-
+ packages/shared-types/src/development/index.ts     |  2 +-
+ packages/shared-types/src/index.ts                 | 28 +++++++++++-----------
+ packages/shared-types/src/integrations/index.ts    |  2 +-
+ packages/shared-types/src/monitoring/index.ts      |  2 +-
+ packages/shared-types/src/releases/index.ts        |  2 +-
+ packages/shared-types/src/repositories/index.ts    |  6 ++---
+ .../src/repositories/repository-code.types.ts      |  2 +-
+ packages/shared-types/src/team-operations/index.ts |  2 +-
+ .../src/team-operations/team-operations.types.ts   |  2 +-
+ packages/shared-types/src/tracking/index.ts        |  2 +-
+ packages/shared-types/src/websites/index.ts        |  2 +-
+ packages/shared-types/src/workspaces/index.ts      |  2 +-
+ 20 files changed, 38 insertions(+), 38 deletions(-)

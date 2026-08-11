@@ -1,4 +1,4 @@
-import { Card } from '@/components/ui/card';
+import { Card } from '@command-center/ui';
 
 const SKELETON_CARD_COUNT = 3;
 

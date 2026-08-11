@@ -1,1 +1,1 @@
-export * from './release.types';
+export * from './release.types.js';

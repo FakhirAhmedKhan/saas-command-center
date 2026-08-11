@@ -1,5 +1,5 @@
-import { apiRequest } from '@/features/lib/api/api-client';
 import type { RawEventQuery, RawEventsResponse, TrackingStatus } from './tracking-types';
+import { apiRequest } from '@/features/lib/api/api-client';
 
 function basePath(workspaceId: string, websiteId: string): string {
   return `/workspaces/${workspaceId}/websites/${websiteId}/tracking`;

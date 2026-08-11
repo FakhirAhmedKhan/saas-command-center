@@ -1,6 +1,5 @@
+import { Button , Card, CardContent } from '@command-center/ui';
 import { TriangleAlert } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 
 interface ApplicationsErrorStateProps {
   message: string;

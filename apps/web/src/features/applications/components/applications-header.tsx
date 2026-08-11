@@ -1,6 +1,6 @@
+import { Button } from '@command-center/ui';
 import { Plus, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 
 interface ApplicationsHeaderProps {
   workspaceId: string;

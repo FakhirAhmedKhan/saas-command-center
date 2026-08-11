@@ -1,8 +1,8 @@
 'use client';
 
+import type { CodeTreeNode } from './code-explorer.types';
 import { ChevronDown, ChevronRight, File, Folder } from 'lucide-react';
 import { useState } from 'react';
-import type { CodeTreeNode } from './code-explorer.types';
 
 interface CodeTreeProps {
   nodes: CodeTreeNode[];

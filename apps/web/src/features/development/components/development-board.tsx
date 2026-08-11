@@ -1,13 +1,5 @@
 'use client';
 
-import { AlertTriangle, CalendarClock, CheckCircle2, Flag, ListChecks, Plus, Sparkles } from 'lucide-react';
-import { useEffect, useState, type FormEvent } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
-import { Spinner } from '@/components/ui/spinner';
 import { applyDevelopmentTemplate, createMilestone, getDevelopmentSummary, getDevelopmentTemplates, reorderMilestones } from '../development-api';
 import { TEMPLATE_LABELS } from '../development-constants';
 import { getDevelopmentError, toApiDate } from '../development-utils';
@@ -16,6 +8,9 @@ import { DevelopmentTimeline } from './development-timeline';
 import { MilestoneCard } from './milestone-card';
 import { TaskKanban } from './task-kanban';
 import type { DevelopmentSummary, DevelopmentTemplate, DevelopmentTemplateType } from '../development-types';
+import { Badge , Button , Card, CardContent, CardHeader , Input , Select , Spinner } from '@command-center/ui';
+import { AlertTriangle, CalendarClock, CheckCircle2, Flag, ListChecks, Plus, Sparkles } from 'lucide-react';
+import { useEffect, useState, type FormEvent } from 'react';
 
 interface DevelopmentBoardProps {
   workspaceId: string;

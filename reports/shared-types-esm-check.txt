@@ -1,0 +1,240 @@
+﻿=== SHARED TYPES ESM AUDIT ===
+
+=== SOURCE FILES ===
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\activity\activity.types.ts
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\activity\index.ts
+1: export * from './activity.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\analytics\analytics.types.ts
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\analytics\index.ts
+1: export * from './analytics.types';
+2: export * from './overview.types';
+3: export * from './processing.types';
+4: export * from './reports.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\analytics\overview.types.ts
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\analytics\processing.types.ts
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\analytics\reports.types.ts
+1: import type { AnalyticsPreset } from './overview.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\applications\application.types.ts
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\applications\index.ts
+1: export * from './application.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\auth\auth.types.ts
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\auth\index.ts
+1: export * from './auth.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\common\common.types.ts
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\common\index.ts
+1: export * from './common.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\development\development.types.ts
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\development\index.ts
+1: export * from './development.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\index.ts
+22: export * from './analytics';
+23: export * from './repositories';
+24: export * from './common';
+25: export * from './auth';
+26: export * from './workspaces';
+27: export * from './applications';
+28: export * from './websites';
+29: export * from './activity';
+30: export * from './development';
+31: export * from './monitoring';
+32: export * from './releases';
+33: export * from './integrations';
+34: export * from './team-operations';
+35: export * from './tracking';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\integrations\index.ts
+1: export * from './webhook.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\integrations\webhook.types.ts
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\monitoring\index.ts
+1: export * from './monitoring.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\monitoring\monitoring.types.ts
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\releases\index.ts
+1: export * from './release.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\releases\release.types.ts
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\repositories\code-explorer.types.ts
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\repositories\index.ts
+1: export * from './code-explorer.types';
+2: export * from './repository-code.types';
+3: export * from './repository.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\repositories\repository.types.ts
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\repositories\repository-code.types.ts
+1: import type { CodeTreeNode } from './code-explorer.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\team-operations\index.ts
+1: export * from './team-operations.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\team-operations\team-operations.types.ts
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\tracking\index.ts
+1: export * from './tracking.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\tracking\tracking.types.ts
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\websites\index.ts
+1: export * from './website.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\websites\website.types.ts
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\workspaces\index.ts
+1: export * from './workspace.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\workspaces\workspace.types.ts
+
+=== ROOT INDEX ===
+export interface ApiErrorResponse {
+  statusCode: number;
+  code: string;
+  message: string;
+  path: string;
+  requestId: string;
+  timestamp: string;
+  details?: unknown;
+}
+
+export interface HealthResponse {
+  status: 'ok' | 'error';
+  service: string;
+  version: string;
+  environment: string;
+  timestamp: string;
+  database: {
+    status: 'up' | 'down';
+    responseTimeMs: number;
+  };
+}
+export * from './analytics';
+export * from './repositories';
+export * from './common';
+export * from './auth';
+export * from './workspaces';
+export * from './applications';
+export * from './websites';
+export * from './activity';
+export * from './development';
+export * from './monitoring';
+export * from './releases';
+export * from './integrations';
+export * from './team-operations';
+export * from './tracking';
+
+=== SUBDIRECTORY INDEX FILES ===
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\activity\index.ts
+export * from './activity.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\analytics\index.ts
+export * from './analytics.types';
+export * from './overview.types';
+export * from './processing.types';
+export * from './reports.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\applications\index.ts
+export * from './application.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\auth\index.ts
+export * from './auth.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\common\index.ts
+export * from './common.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\development\index.ts
+export * from './development.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\integrations\index.ts
+export * from './webhook.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\monitoring\index.ts
+export * from './monitoring.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\releases\index.ts
+export * from './release.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\repositories\index.ts
+export * from './code-explorer.types';
+export * from './repository-code.types';
+export * from './repository.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\team-operations\index.ts
+export * from './team-operations.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\tracking\index.ts
+export * from './tracking.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\websites\index.ts
+export * from './website.types';
+
+----------------------------------------
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\workspaces\index.ts
+export * from './workspace.types';

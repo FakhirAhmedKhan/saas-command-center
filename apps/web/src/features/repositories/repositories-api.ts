@@ -1,5 +1,5 @@
-import { getAccessToken } from '@/features/lib/api/api-client';
 import type { GithubCallbackResult, GithubConnectStart, GithubSetupResult, RepositoryConnection, RepositoryListResponse } from './repository.types';
+import { getAccessToken } from '@/features/lib/api/api-client';
 
 interface ApiErrorBody {
   message?: string | string[];

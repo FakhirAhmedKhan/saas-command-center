@@ -1,3 +1,3 @@
-﻿export * from './code-explorer.types';
-export * from './repository-code.types';
-export * from './repository.types';
+﻿export * from './code-explorer.types.js';
+export * from './repository-code.types.js';
+export * from './repository.types.js';

@@ -1,13 +1,13 @@
-﻿import { createHash } from 'node:crypto';
+﻿import { getAnalyticsBucket } from '../utils/analytics-time';
+import { AnalyticsAggregatePeriod } from '@command-center/shared-types';
 import { Injectable } from '@nestjs/common';
 import { DefaultArgs } from '@prisma/client/runtime/client';
+import { createHash } from 'node:crypto';
 import { PrismaService } from 'src/database/prisma.service';
 import { AnalyticsAggregateDimension, AnalyticsDeviceType, RawAnalyticsEventType } from 'src/generated/prisma/enums';
 import { PrismaClient } from 'src/generated/prisma/internal/class';
 import { GlobalOmitConfig } from 'src/generated/prisma/internal/prismaNamespace';
 import { ProcessAnalyticsRangeInput } from 'src/modules/analytics-processing/services/analytics-range-processor.service';
-import { AnalyticsAggregatePeriod } from '@command-center/shared-types';
-import { getAnalyticsBucket } from '../utils/analytics-time';
 
 export interface AnalyticsAggregationWebsite {
   id: string;

@@ -1,15 +1,15 @@
 'use client';
 
-import { ArrowRight } from 'lucide-react';
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import { PageError } from '@/components/states/page-error';
 import { PageLoading } from '@/components/states/page-loading';
 import { getApplications } from '@/features/applications/application-api';
 import type { Workspace } from '@/features/auth/auth.types';
 import { apiRequest } from '@/features/lib/api/api-client';
 import { getErrorMessage } from '@/features/lib/api/api-error';
+import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function WorkspacePage() {
   const params = useParams<{

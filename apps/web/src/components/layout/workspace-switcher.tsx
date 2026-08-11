@@ -1,11 +1,11 @@
 'use client';
 
+import { useAuth } from '@/features/auth/auth-provider';
+import { cn } from '@command-center/ui';
 import { Check, ChevronsUpDown, Plus, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { useAuth } from '@/features/auth/auth-provider';
-import { cn } from '@/features/lib/api/cn';
 
 interface WorkspaceSwitcherProps {
   workspaceId: string;

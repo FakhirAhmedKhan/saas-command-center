@@ -1,7 +1,7 @@
 import type { ApplicationProgressExplanation, MilestoneProgressExplanation } from '@command-center/shared-types';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ApplicationTaskStatus, MilestoneStatus } from 'src/generated/prisma/enums';
 import type { Prisma } from 'src/generated/prisma/client';
+import { ApplicationTaskStatus, MilestoneStatus } from 'src/generated/prisma/enums';
 
 interface ProgressTask {
   id: string;

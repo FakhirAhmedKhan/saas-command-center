@@ -1,9 +1,5 @@
 'use client';
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { getApplications } from '@/features/applications/application-api';
 import type { ApplicationListQuery, ApplicationPagination, SaasApplication } from '@/features/applications/application-types';
 import { getErrorMessage } from '@/features/applications/application-utils';
@@ -15,6 +11,10 @@ import { ApplicationsGrid } from '@/features/applications/components/application
 import { ApplicationsHeader } from '@/features/applications/components/applications-header';
 import { ApplicationsResultSummary } from '@/features/applications/components/applications-result-summary';
 import { ApplicationsSkeleton } from '@/features/applications/components/applications-skeleton';
+import { Button } from '@command-center/ui';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 const DEFAULT_FILTERS: ApplicationFilterValue = {
   search: '',

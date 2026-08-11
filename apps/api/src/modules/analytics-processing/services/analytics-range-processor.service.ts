@@ -1,4 +1,5 @@
-
+import type { TypedConfigService } from '../../../config/runtime-config';
+import { PrismaService } from '../../../database/prisma.service';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AnalyticsAggregationService } from 'src/modules/analytics-engine/services/analytics-aggregation.service';
@@ -6,8 +7,6 @@ import { PageViewRebuilderService } from 'src/modules/analytics-engine/services/
 import { RawEventProcessingService } from 'src/modules/analytics-engine/services/raw-event-processing.service';
 import { SessionRebuilderService } from 'src/modules/analytics-engine/services/session-rebuilder.service';
 import { VisitorRebuilderService } from 'src/modules/analytics-engine/services/visitor-rebuilder.service';
-import { PrismaService } from '../../../database/prisma.service';
-import type { TypedConfigService } from '../../../config/runtime-config';
 
 export interface ProcessAnalyticsRangeInput {
   workspaceId: string;

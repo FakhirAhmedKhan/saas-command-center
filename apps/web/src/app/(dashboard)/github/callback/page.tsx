@@ -1,5 +1,5 @@
-import { Suspense } from 'react';
 import { GithubCallbackClient } from './github-callback-client';
+import { Suspense } from 'react';
 
 export default function GithubCallbackPage() {
   return (

@@ -1,15 +1,14 @@
 'use client';
 
-import { useParams } from 'next/navigation';
-import { useEffect, useState, type FormEvent } from 'react';
 import { PageLoading } from '@/components/states/page-loading';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useAuth } from '@/features/auth/auth-provider';
 import type { Workspace } from '@/features/auth/auth.types';
 import { apiRequest } from '@/features/lib/api/api-client';
 import { getErrorMessage } from '@/features/lib/api/api-error';
 import { WorkspaceSettingsNav } from '@/features/workspaces/components/workspace-settings-nav';
+import { Input , Button } from '@command-center/ui';
+import { useParams } from 'next/navigation';
+import { useEffect, useState, type FormEvent } from 'react';
 
 export default function WorkspaceSettingsPage() {
   const params = useParams<{

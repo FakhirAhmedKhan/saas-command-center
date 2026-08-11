@@ -1,5 +1,3 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { Public } from '../decorators/public.decorator';
 import { LoginDto } from '../dto/login.dto';
@@ -7,6 +5,8 @@ import { RegisterDto } from '../dto/register.dto';
 import { AuthenticatedUser } from '../interfaces/authenticated-user.interface';
 import { AuthCookieService } from '../services/auth-cookie.service';
 import { AuthService } from '../services/auth.service';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 
 type AuthSessionResult = Awaited<ReturnType<AuthService['login']>>;
