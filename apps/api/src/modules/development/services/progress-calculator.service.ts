@@ -1,3 +1,4 @@
+import type { ApplicationProgressExplanation, MilestoneProgressExplanation } from '@command-center/shared-types';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ApplicationTaskStatus, MilestoneStatus } from 'src/generated/prisma/enums';
 import type { Prisma } from 'src/generated/prisma/client';
@@ -15,28 +16,6 @@ interface ProgressMilestone {
   weight: number;
   progressPercent: number;
   tasks: ProgressTask[];
-}
-
-export interface MilestoneProgressExplanation {
-  milestoneId: string;
-  title: string;
-  included: boolean;
-  weight: number;
-  progressPercent: number;
-  applicableTaskWeight: number;
-  completedTaskWeight: number;
-  excludedTaskCount: number;
-  derivedStatus: MilestoneStatus;
-}
-
-export interface ApplicationProgressExplanation {
-  percentage: number;
-  totalMilestoneWeight: number;
-  weightedProgressPoints: number;
-  includedMilestones: number;
-  excludedMilestones: number;
-  formula: string;
-  milestones: MilestoneProgressExplanation[];
 }
 
 @Injectable()
@@ -58,7 +37,7 @@ export class ProgressCalculatorService {
       weightedProgressPoints,
       includedMilestones: included.length,
       excludedMilestones: milestoneResults.length - included.length,
-      formula: 'sum(milestone progress × milestone weight) ÷ sum(applicable milestone weights)',
+      formula: 'sum(milestone progress Ã— milestone weight) Ã· sum(applicable milestone weights)',
       milestones: milestoneResults,
     };
   }

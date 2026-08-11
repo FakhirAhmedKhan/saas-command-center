@@ -1,8 +1,9 @@
-﻿import { ApiProperty, PartialType } from '@nestjs/swagger';
+import type { CreateApplicationLinkInput } from '@command-center/shared-types';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsEnum, IsString, IsUrl, Length } from 'class-validator';
 import { ApplicationLinkType } from 'src/generated/prisma/enums';
 
-export class CreateApplicationLinkDto {
+export class CreateApplicationLinkDto implements CreateApplicationLinkInput {
   @ApiProperty({
     example: 'Production website',
   })

@@ -1,9 +1,10 @@
+import type { RawEventQueryInput } from '@command-center/shared-types';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsDateString, IsEnum, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
 
-export class RawEventQueryDto {
+export class RawEventQueryDto implements RawEventQueryInput {
   @ApiPropertyOptional({
     enum: RawAnalyticsEventType,
   })

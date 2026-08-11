@@ -1,8 +1,9 @@
+import type { CreateApplicationTechnologyInput } from '@command-center/shared-types';
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString, Length, MaxLength } from 'class-validator';
 import { TechnologyType } from 'src/generated/prisma/enums';
 
-export class CreateApplicationTechnologyDto {
+export class CreateApplicationTechnologyDto implements CreateApplicationTechnologyInput {
   @ApiProperty({
     example: 'Next.js',
   })

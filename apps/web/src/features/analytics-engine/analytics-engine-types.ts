@@ -1,11 +1,12 @@
-export type AnalyticsDeviceType = 'DESKTOP' | 'MOBILE' | 'TABLET' | 'BOT' | 'OTHER';
+import type { AnalyticsAggregateDimension, AnalyticsAggregatePeriod, AnalyticsDeviceType, AnalyticsSourceType } from '@command-center/shared-types';
 
-export type AnalyticsSourceType = 'DIRECT' | 'INTERNAL' | 'SEARCH' | 'SOCIAL' | 'REFERRAL' | 'UNKNOWN';
-
-export type AnalyticsAggregateDimension = 'OVERVIEW' | 'PAGE' | 'SOURCE' | 'COUNTRY' | 'DEVICE' | 'BROWSER' | 'OPERATING_SYSTEM' | 'CUSTOM_EVENT';
-
-export type AnalyticsAggregatePeriod = 'HOURLY' | 'DAILY';
-
+export type {
+  AnalyticsAggregateDimension,
+  AnalyticsAggregatePeriod,
+  AnalyticsDeviceType,
+  AnalyticsReprocessInput as ReprocessAnalyticsPayload,
+  AnalyticsSourceType,
+} from '@command-center/shared-types';
 export type AnalyticsProcessingStatus = 'RUNNING' | 'COMPLETED' | 'FAILED';
 
 export interface AnalyticsProcessingState {
@@ -119,12 +120,6 @@ export interface AnalyticsAggregateResponse {
   dimension: AnalyticsAggregateDimension;
 
   data: AnalyticsAggregate[];
-}
-
-export interface ReprocessAnalyticsPayload {
-  dateFrom: string;
-  dateTo: string;
-  maxEvents?: number;
 }
 
 export interface AnalyticsRetentionResult {

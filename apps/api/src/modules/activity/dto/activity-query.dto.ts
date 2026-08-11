@@ -1,3 +1,4 @@
+import type { ActivityQueryInput } from '@command-center/shared-types';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { IsDateString, IsEnum, IsInt, IsOptional, IsString, IsUUID, Max, MaxLength, Min } from 'class-validator';
@@ -7,7 +8,7 @@ function trimString(value: unknown): unknown {
   return typeof value === 'string' ? value.trim() : value;
 }
 
-export class ActivityQueryDto {
+export class ActivityQueryDto implements ActivityQueryInput {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()

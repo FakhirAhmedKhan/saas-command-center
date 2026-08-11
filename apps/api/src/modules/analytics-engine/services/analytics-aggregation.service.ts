@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto';
+﻿import { createHash } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import { DefaultArgs } from '@prisma/client/runtime/client';
 import { PrismaService } from 'src/database/prisma.service';
@@ -6,7 +6,7 @@ import { AnalyticsAggregateDimension, AnalyticsDeviceType, RawAnalyticsEventType
 import { PrismaClient } from 'src/generated/prisma/internal/class';
 import { GlobalOmitConfig } from 'src/generated/prisma/internal/prismaNamespace';
 import { ProcessAnalyticsRangeInput } from 'src/modules/analytics-processing/services/analytics-range-processor.service';
-import { AnalyticsAggregatePeriod } from '../dto/analytics-engine.dto';
+import { AnalyticsAggregatePeriod } from '@command-center/shared-types';
 import { getAnalyticsBucket } from '../utils/analytics-time';
 
 export interface AnalyticsAggregationWebsite {
@@ -216,37 +216,19 @@ export class AnalyticsAggregationService {
 
       this.addSessionDimension(
         aggregates,
-
         AnalyticsAggregateDimension.DEVICE,
-
         session.deviceType ?? AnalyticsDeviceType.OTHER,
-
         session.deviceType ?? AnalyticsDeviceType.OTHER,
-
         session,
       );
 
-      this.addSessionDimension(
-        aggregates,
-
-        AnalyticsAggregateDimension.BROWSER,
-
-        session.browserName || 'Unknown',
-
-        session.browserName || 'Unknown',
-
-        session,
-      );
+      this.addSessionDimension(aggregates, AnalyticsAggregateDimension.BROWSER, session.browserName || 'Unknown', session.browserName || 'Unknown', session);
 
       this.addSessionDimension(
         aggregates,
-
         AnalyticsAggregateDimension.OPERATING_SYSTEM,
-
         session.operatingSystem || 'Unknown',
-
         session.operatingSystem || 'Unknown',
-
         session,
       );
     }
@@ -255,35 +237,20 @@ export class AnalyticsAggregationService {
 
     const data = [...aggregates.values()].map((item) => ({
       websiteId: website.id,
-
       bucketStart: bucket.start,
-
       bucketEnd: bucket.end,
-
       timeZone: website.timeZone,
-
       dimension: item.dimension,
-
       dimensionKey: this.createDimensionKey(item.dimension, item.value),
-
       dimensionValue: item.value.slice(0, 2048),
-
       dimensionLabel: item.label.slice(0, 256),
-
       visitors: item.visitors.size,
-
       sessions: item.sessions.size,
-
       pageViews: item.pageViews,
-
       events: item.events,
-
       customEvents: item.customEvents,
-
       bounces: item.bounces,
-
       totalDurationMs: item.totalDurationMs,
-
       generatedAt,
     }));
 
@@ -292,15 +259,12 @@ export class AnalyticsAggregationService {
         await transaction.analyticsHourlyAggregate.deleteMany({
           where: {
             websiteId: website.id,
-
             bucketStart: bucket.start,
           },
         });
 
         if (data.length > 0) {
-          await transaction.analyticsHourlyAggregate.createMany({
-            data,
-          });
+          await transaction.analyticsHourlyAggregate.createMany({ data });
         }
       });
 
@@ -311,7 +275,6 @@ export class AnalyticsAggregationService {
       await transaction.analyticsDailyAggregate.deleteMany({
         where: {
           websiteId: website.id,
-
           bucketStart: bucket.start,
         },
       });

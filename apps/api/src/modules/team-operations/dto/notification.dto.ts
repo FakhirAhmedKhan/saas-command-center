@@ -1,3 +1,4 @@
+import type { NotificationListQueryInput } from '@command-center/shared-types';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
@@ -15,7 +16,7 @@ function parseBoolean(value: unknown): unknown {
   return value;
 }
 
-export class NotificationListQueryDto {
+export class NotificationListQueryDto implements NotificationListQueryInput {
   @ApiPropertyOptional()
   @IsOptional()
   @Transform(({ value }: { value: unknown }) => parseBoolean(value))

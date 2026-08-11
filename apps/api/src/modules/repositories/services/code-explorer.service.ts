@@ -1,42 +1,11 @@
+﻿import type { CodeTreeNode, RepositoryCodeFile } from '@command-center/shared-types';
 import { BadRequestException, Injectable, NotFoundException, PayloadTooLargeException } from '@nestjs/common';
 import { GithubCodeService, GithubRepositoryContent, GithubTreeEntry } from './github-code.service';
 import { RepositoriesService } from './repositories.service';
 
 const MAX_CODE_FILE_SIZE = 1_000_000;
 
-export interface CodeTreeNode {
-  name: string;
-  path: string;
-
-  type: 'file' | 'directory' | 'submodule';
-
-  sha: string | null;
-
-  size: number | null;
-
-  children?: CodeTreeNode[];
-}
-
-export interface CodeFile {
-  name: string;
-  path: string;
-
-  branch: string;
-
-  sha: string;
-
-  size: number;
-
-  kind: 'text' | 'image' | 'binary';
-
-  language: string;
-
-  mimeType: string | null;
-
-  content: string | null;
-
-  encoding: 'utf8' | 'base64' | null;
-}
+export type CodeFile = RepositoryCodeFile;
 
 @Injectable()
 export class CodeExplorerService {

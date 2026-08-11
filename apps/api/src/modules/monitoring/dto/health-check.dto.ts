@@ -1,9 +1,10 @@
+import type { HealthCheckListQueryInput, IncidentListQueryInput, SaveHealthCheckInput, UpdateHealthCheckInput } from '@command-center/shared-types';
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, IsUrl, IsUUID, Max, MaxLength, Min, ValidateIf } from 'class-validator';
 import { HealthCheckStatus, HealthIncidentStatus, HealthTargetType } from '../../../generated/prisma/client';
 
-export class CreateHealthCheckDto {
+export class CreateHealthCheckDto implements SaveHealthCheckInput {
   @ApiProperty({
     enum: HealthTargetType,
   })
@@ -99,9 +100,9 @@ export class CreateHealthCheckDto {
   enabled = true;
 }
 
-export class UpdateHealthCheckDto extends PartialType(CreateHealthCheckDto) {}
+export class UpdateHealthCheckDto extends PartialType(CreateHealthCheckDto) implements UpdateHealthCheckInput {}
 
-export class HealthCheckListQueryDto {
+export class HealthCheckListQueryDto implements HealthCheckListQueryInput {
   @ApiPropertyOptional({
     enum: HealthCheckStatus,
   })
@@ -133,7 +134,7 @@ export class HealthCheckListQueryDto {
   websiteId?: string;
 }
 
-export class IncidentListQueryDto {
+export class IncidentListQueryDto implements IncidentListQueryInput {
   @ApiPropertyOptional({
     enum: HealthIncidentStatus,
   })

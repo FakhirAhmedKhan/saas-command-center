@@ -1,7 +1,7 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+﻿import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from 'src/generated/prisma/client';
 import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
-import { AnalyticsAggregatePeriod } from '../dto/analytics-engine.dto';
+import { AnalyticsAggregatePeriod } from '@command-center/shared-types';
 import { normalizeAnalyticsPage, normalizeSource, parseUserAgent } from '../utils/analytics-normalization';
 import { getAnalyticsBucket } from '../utils/analytics-time';
 

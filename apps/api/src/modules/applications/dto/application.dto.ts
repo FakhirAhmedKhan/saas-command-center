@@ -1,3 +1,4 @@
+import type { ApplicationListQueryInput, CreateApplicationInput } from '@command-center/shared-types';
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsEnum, IsInt, IsISO8601, IsOptional, IsString, Length, Matches, Max, MaxLength, Min } from 'class-validator';
@@ -17,7 +18,7 @@ export enum SortOrder {
   DESC = 'desc',
 }
 
-export class CreateApplicationDto {
+export class CreateApplicationDto implements CreateApplicationInput {
   @ApiProperty({
     example: 'PriceScout AI',
   })
@@ -100,7 +101,7 @@ export class CreateApplicationDto {
 
 export class UpdateApplicationDto extends PartialType(CreateApplicationDto) {}
 
-export class ApplicationListQueryDto {
+export class ApplicationListQueryDto implements ApplicationListQueryInput {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()

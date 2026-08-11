@@ -1,10 +1,6 @@
-export type WorkspaceRole = 'OWNER' | 'ADMIN' | 'DEVELOPER' | 'VIEWER';
+import type { WorkspaceRole } from '@command-center/shared-types';
 
-export interface CreateWorkspacePayload {
-  name: string;
-  slug?: string;
-}
-
+export type { CreateWorkspaceInput as CreateWorkspacePayload, WorkspaceRole } from '@command-center/shared-types';
 export interface CreatedWorkspace {
   id: string;
   name: string;

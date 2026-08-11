@@ -1,5 +1,6 @@
-export type WorkspaceRole = 'OWNER' | 'ADMIN' | 'DEVELOPER' | 'VIEWER';
+import type { WorkspaceRole } from '@command-center/shared-types';
 
+export type { LoginInput, RegisterInput, WorkspaceRole } from '@command-center/shared-types';
 export interface User {
   id: string;
   email: string;
@@ -80,18 +81,4 @@ export interface AuthSession {
   expiresIn: number;
 
   user: AuthUser;
-}
-
-export interface LoginInput {
-  email: string;
-
-  password: string;
-}
-
-export interface RegisterInput {
-  email: string;
-
-  password: string;
-
-  displayName?: string;
 }

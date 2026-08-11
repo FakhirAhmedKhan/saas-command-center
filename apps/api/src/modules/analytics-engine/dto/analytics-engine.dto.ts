@@ -1,12 +1,9 @@
+import { AnalyticsAggregatePeriod } from '@command-center/shared-types';
+import type { AnalyticsAggregateQueryInput, AnalyticsReprocessInput } from '@command-center/shared-types';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsDateString, IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
 import { AnalyticsAggregateDimension } from 'src/generated/prisma/enums';
-
-export enum AnalyticsAggregatePeriod {
-  HOURLY = 'HOURLY',
-  DAILY = 'DAILY',
-}
 
 export class ProcessAnalyticsDto {
   @ApiPropertyOptional({
@@ -22,7 +19,7 @@ export class ProcessAnalyticsDto {
   maxEvents = 5000;
 }
 
-export class ReprocessAnalyticsDto {
+export class ReprocessAnalyticsDto implements AnalyticsReprocessInput {
   @ApiProperty({
     example: '2026-08-01T00:00:00.000Z',
   })
@@ -48,14 +45,14 @@ export class ReprocessAnalyticsDto {
   maxEvents = 50000;
 }
 
-export class AnalyticsAggregateQueryDto {
+export class AnalyticsAggregateQueryDto implements AnalyticsAggregateQueryInput {
   @ApiPropertyOptional({
     enum: AnalyticsAggregatePeriod,
     default: AnalyticsAggregatePeriod.DAILY,
   })
   @IsOptional()
   @IsEnum(AnalyticsAggregatePeriod)
-  period = AnalyticsAggregatePeriod.DAILY;
+  period: AnalyticsAggregatePeriod = AnalyticsAggregatePeriod.DAILY;
 
   @ApiPropertyOptional({
     enum: AnalyticsAggregateDimension,

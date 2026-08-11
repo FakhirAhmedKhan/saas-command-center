@@ -1,7 +1,8 @@
+import type { CreateWorkspaceInput } from '@command-center/shared-types';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, Length, MaxLength } from 'class-validator';
 
-export class CreateWorkspaceDto {
+export class CreateWorkspaceDto implements CreateWorkspaceInput {
   @ApiProperty({
     example: 'MadadAI Team',
     minLength: 2,

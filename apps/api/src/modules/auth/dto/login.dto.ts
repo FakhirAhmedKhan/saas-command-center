@@ -1,7 +1,8 @@
+import type { LoginInput } from '@command-center/shared-types';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
 
-export class LoginDto {
+export class LoginDto implements LoginInput {
   @ApiProperty({
     example: 'owner@example.com',
   })

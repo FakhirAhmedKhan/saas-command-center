@@ -1,6 +1,15 @@
+import type {
+  AnalyticsBreakdownItem,
+  AnalyticsMetric,
+  AnalyticsMetrics,
+  AnalyticsOverviewRange,
+  AnalyticsOverviewResponse,
+  AnalyticsTrendPoint,
+  AnalyticsWebsite,
+} from '@command-center/shared-types';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class AnalyticsWebsiteDto {
+export class AnalyticsWebsiteDto implements AnalyticsWebsite {
   @ApiProperty()
   id!: string;
 
@@ -21,7 +30,7 @@ export class AnalyticsWebsiteDto {
   lastEventAt!: string | null;
 }
 
-export class AnalyticsRangeDto {
+export class AnalyticsRangeDto implements AnalyticsOverviewRange {
   @ApiProperty({
     example: '7d',
   })
@@ -56,7 +65,7 @@ export class AnalyticsRangeDto {
   days!: number;
 }
 
-export class AnalyticsMetricDto {
+export class AnalyticsMetricDto implements AnalyticsMetric {
   @ApiProperty()
   value!: number;
 
@@ -70,7 +79,7 @@ export class AnalyticsMetricDto {
   changePercent!: number | null;
 }
 
-export class AnalyticsMetricsDto {
+export class AnalyticsMetricsDto implements AnalyticsMetrics {
   @ApiProperty({
     type: AnalyticsMetricDto,
   })
@@ -97,7 +106,7 @@ export class AnalyticsMetricsDto {
   averageDurationSeconds!: AnalyticsMetricDto;
 }
 
-export class AnalyticsTrendPointDto {
+export class AnalyticsTrendPointDto implements AnalyticsTrendPoint {
   @ApiProperty()
   bucketStart!: string;
 
@@ -111,7 +120,7 @@ export class AnalyticsTrendPointDto {
   pageViews!: number;
 }
 
-export class AnalyticsBreakdownItemDto {
+export class AnalyticsBreakdownItemDto implements AnalyticsBreakdownItem {
   @ApiProperty()
   key!: string;
 
@@ -125,7 +134,7 @@ export class AnalyticsBreakdownItemDto {
   percentage!: number;
 }
 
-export class AnalyticsOverviewResponseDto {
+export class AnalyticsOverviewResponseDto implements AnalyticsOverviewResponse {
   @ApiProperty({
     type: AnalyticsWebsiteDto,
   })

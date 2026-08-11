@@ -1,3 +1,11 @@
+import type {
+  CreateDeploymentInput,
+  CreateReleaseInput,
+  DeploymentListQueryInput,
+  ReleaseListQueryInput,
+  TransitionDeploymentInput,
+  UpdateReleaseInput,
+} from '@command-center/shared-types';
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsDateString, IsEnum, IsInt, IsOptional, IsString, IsUrl, IsUUID, Matches, Max, MaxLength, Min, ValidateIf } from 'class-validator';
@@ -13,7 +21,7 @@ const URL_OPTIONS = {
   require_tld: false,
 };
 
-export class CreateReleaseDto {
+export class CreateReleaseDto implements CreateReleaseInput {
   @ApiProperty({
     example: '1.4.0',
   })
@@ -57,9 +65,9 @@ export class CreateReleaseDto {
   scheduledAt?: string;
 }
 
-export class UpdateReleaseDto extends PartialType(CreateReleaseDto) {}
+export class UpdateReleaseDto extends PartialType(CreateReleaseDto) implements UpdateReleaseInput {}
 
-export class CreateDeploymentDto {
+export class CreateDeploymentDto implements CreateDeploymentInput {
   @ApiProperty()
   @IsUUID()
   releaseId!: string;
@@ -109,7 +117,7 @@ export class CreateDeploymentDto {
   healthIncidentId?: string;
 }
 
-export class TransitionDeploymentDto {
+export class TransitionDeploymentDto implements TransitionDeploymentInput {
   @ApiProperty({
     enum: DeploymentStatus,
   })
@@ -144,7 +152,7 @@ export class TransitionDeploymentDto {
   message?: string;
 }
 
-export class DeploymentListQueryDto {
+export class DeploymentListQueryDto implements DeploymentListQueryInput {
   @ApiPropertyOptional()
   @IsOptional()
   @IsUUID()
@@ -182,7 +190,7 @@ export class DeploymentListQueryDto {
   limit = 25;
 }
 
-export class ReleaseListQueryDto {
+export class ReleaseListQueryDto implements ReleaseListQueryInput {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()

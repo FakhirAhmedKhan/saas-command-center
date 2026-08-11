@@ -1,7 +1,8 @@
+import type { ReprocessAnalyticsInput } from '@command-center/shared-types';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString } from 'class-validator';
 
-export class ReprocessAnalyticsDto {
+export class ReprocessAnalyticsDto implements ReprocessAnalyticsInput {
   @ApiProperty({
     example: '2026-08-01T00:00:00.000Z',
   })

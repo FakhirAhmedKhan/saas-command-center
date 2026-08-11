@@ -1,7 +1,7 @@
+import type { ConnectWebsiteInput, CreateWebsiteInput, UpdateWebsiteInput, WebsiteListQueryInput } from '@command-center/shared-types';
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { ArrayMaxSize, ArrayUnique, IsArray, IsBoolean, IsInt, IsOptional, IsString, IsUUID, Length, Max, MaxLength, Min } from 'class-validator';
-
 
 function transformBoolean({ value, obj, key }: { value: unknown; obj?: Record<string, unknown>; key?: string }): unknown {
   const rawValue = obj && key ? obj[key] : value;
@@ -16,7 +16,7 @@ function transformBoolean({ value, obj, key }: { value: unknown; obj?: Record<st
 
   return rawValue;
 }
-export class CreateWebsiteDto {
+export class CreateWebsiteDto implements CreateWebsiteInput {
   @ApiProperty({
     example: 'SaaS Command Center',
   })
@@ -70,15 +70,15 @@ export class CreateWebsiteDto {
   enabled?: boolean;
 }
 
-export class UpdateWebsiteDto extends PartialType(CreateWebsiteDto) {}
+export class UpdateWebsiteDto extends PartialType(CreateWebsiteDto) implements UpdateWebsiteInput {}
 
-export class ConnectWebsiteDto {
+export class ConnectWebsiteDto implements ConnectWebsiteInput {
   @ApiProperty()
   @IsUUID()
   applicationId!: string;
 }
 
-export class WebsiteListQueryDto {
+export class WebsiteListQueryDto implements WebsiteListQueryInput {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()

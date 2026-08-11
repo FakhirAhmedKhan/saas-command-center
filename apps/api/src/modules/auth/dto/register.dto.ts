@@ -1,7 +1,8 @@
+import type { RegisterInput } from '@command-center/shared-types';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEmail, IsOptional, IsString, Length, MaxLength, MinLength } from 'class-validator';
 
-export class RegisterDto {
+export class RegisterDto implements RegisterInput {
   @ApiProperty({
     example: 'owner@example.com',
   })

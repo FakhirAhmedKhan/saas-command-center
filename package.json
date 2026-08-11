@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build:packages": "pnpm --filter @command-center/shared-types build && pnpm --filter @command-center/validation build",
-    "build": "pnpm build:packages && pnpm -r --if-present build",
+    "build": "pnpm build:packages && pnpm -r --if-present build && pnpm size",
     "lint": "pnpm -r --if-present lint",
     "typecheck": "pnpm build:packages && pnpm -r --if-present typecheck",
     "test": "pnpm build:packages && pnpm -r --if-present test",
@@ -31,7 +31,9 @@
     "test:cover": "pnpm --filter @command-center/api test:cover && pnpm --filter @command-center/web test:cover",
     "test:e2e": "pnpm --filter @command-center/api test:e2e",
     "lint:fix": "pnpm -r --if-present lint:fix",
-    "style:fix": "pnpm lint:fix && pnpm format"
+    "style:fix": "pnpm lint:fix && pnpm format",
+    "size": "node scripts/build-size-report.mjs",
+    "analyze:web": "pnpm --filter @command-center/web exec next experimental-analyze"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",

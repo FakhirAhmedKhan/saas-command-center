@@ -1,6 +1,17 @@
+import type {
+  AnalyticsPagination,
+  AnalyticsReportRange,
+  DimensionReportItem,
+  DimensionReportResponse,
+  EventReportItem,
+  EventReportResponse,
+  EventReportSummary,
+  PageReportItem,
+  PageReportResponse,
+} from '@command-center/shared-types';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class AnalyticsPaginationDto {
+export class AnalyticsPaginationDto implements AnalyticsPagination {
   @ApiProperty()
   page!: number;
 
@@ -20,7 +31,7 @@ export class AnalyticsPaginationDto {
   hasNextPage!: boolean;
 }
 
-export class AnalyticsReportRangeDto {
+export class AnalyticsReportRangeDto implements AnalyticsReportRange {
   @ApiProperty()
   from!: string;
 
@@ -34,7 +45,7 @@ export class AnalyticsReportRangeDto {
   days!: number;
 }
 
-export class PageReportItemDto {
+export class PageReportItemDto implements PageReportItem {
   @ApiProperty()
   path!: string;
 
@@ -63,7 +74,7 @@ export class PageReportItemDto {
   averageDurationSeconds!: number;
 }
 
-export class PageReportResponseDto {
+export class PageReportResponseDto implements PageReportResponse {
   @ApiProperty({
     type: [PageReportItemDto],
   })
@@ -80,7 +91,7 @@ export class PageReportResponseDto {
   range!: AnalyticsReportRangeDto;
 }
 
-export class EventReportItemDto {
+export class EventReportItemDto implements EventReportItem {
   @ApiProperty()
   name!: string;
 
@@ -94,7 +105,7 @@ export class EventReportItemDto {
   sessions!: number;
 }
 
-export class EventReportSummaryDto {
+export class EventReportSummaryDto implements EventReportSummary {
   @ApiProperty()
   totalEvents!: number;
 
@@ -105,7 +116,7 @@ export class EventReportSummaryDto {
   uniqueSessions!: number;
 }
 
-export class EventReportResponseDto {
+export class EventReportResponseDto implements EventReportResponse {
   @ApiProperty({
     type: [EventReportItemDto],
   })
@@ -127,7 +138,7 @@ export class EventReportResponseDto {
   range!: AnalyticsReportRangeDto;
 }
 
-export class DimensionReportItemDto {
+export class DimensionReportItemDto implements DimensionReportItem {
   @ApiProperty()
   key!: string;
 
@@ -147,7 +158,7 @@ export class DimensionReportItemDto {
   percentage!: number;
 }
 
-export class DimensionReportResponseDto {
+export class DimensionReportResponseDto implements DimensionReportResponse {
   @ApiProperty({
     type: [DimensionReportItemDto],
   })

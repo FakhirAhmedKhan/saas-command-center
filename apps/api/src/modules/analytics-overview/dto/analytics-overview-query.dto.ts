@@ -1,16 +1,12 @@
+import { AnalyticsDatePreset } from '@command-center/shared-types';
+export { AnalyticsDatePreset };
+import type { AnalyticsOverviewQueryInput, AnalyticsPreset } from '@command-center/shared-types';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsOptional, Matches, ValidateIf } from 'class-validator';
 
-export enum AnalyticsDatePreset {
-  TODAY = 'today',
-  SEVEN_DAYS = '7d',
-  THIRTY_DAYS = '30d',
-  NINETY_DAYS = '90d',
-}
-
 const DATE_KEY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
-export class AnalyticsOverviewQueryDto {
+export class AnalyticsOverviewQueryDto implements AnalyticsOverviewQueryInput {
   @ApiPropertyOptional({
     enum: AnalyticsDatePreset,
     default: AnalyticsDatePreset.SEVEN_DAYS,
@@ -18,7 +14,7 @@ export class AnalyticsOverviewQueryDto {
   })
   @IsOptional()
   @IsEnum(AnalyticsDatePreset)
-  preset: AnalyticsDatePreset = AnalyticsDatePreset.SEVEN_DAYS;
+  preset: AnalyticsPreset = AnalyticsDatePreset.SEVEN_DAYS;
 
   @ApiPropertyOptional({
     example: '2026-08-01',
