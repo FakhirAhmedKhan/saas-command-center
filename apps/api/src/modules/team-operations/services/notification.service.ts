@@ -34,6 +34,8 @@ export interface ListNotificationsInput {
 
   unreadOnly?: boolean;
 
+  type?: NotificationType;
+
   limit?: number;
 
   cursor?: string;
@@ -150,6 +152,8 @@ export class NotificationService {
         userId: input.userId,
 
         workspaceId: input.workspaceId,
+
+        type: input.type,
 
         readAt: input.unreadOnly ? null : undefined,
 

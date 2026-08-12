@@ -1,4 +1,4 @@
-import { AnalyticsProcessingTrigger } from '../../../generated/prisma/client';
+﻿import { AnalyticsProcessingTrigger } from '../../../generated/prisma/client';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
@@ -89,6 +89,9 @@ export class AnalyticsProcessingController {
     @Param('workspaceId', ParseUUIDPipe)
     workspaceId: string,
 
+    @Param('websiteId', ParseUUIDPipe)
+    websiteId: string,
+
     @Param('runId', ParseUUIDPipe)
     runId: string,
 
@@ -97,6 +100,6 @@ export class AnalyticsProcessingController {
   ) {
     await this.access.assertCanReprocess(workspaceId, user.id);
 
-    return this.queue.retryDeadLetter(runId, user.id);
+    return this.queue.retryDeadLetter(workspaceId, websiteId, runId, user.id);
   }
 }

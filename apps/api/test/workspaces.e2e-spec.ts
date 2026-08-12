@@ -50,7 +50,7 @@ describe('Workspaces E2E', () => {
     expect(readResourceId(response)).toEqual(expect.any(String));
   });
 
-  it('lists the initial and newly created workspaces', async () => {
+  it('lists multiple explicitly created workspaces', async () => {
     const agent = createAgent(app);
 
     const user = createTestUser({
@@ -63,9 +63,13 @@ describe('Workspaces E2E', () => {
 
     const accessToken = readAccessToken(registerResponse);
 
-    const createResponse = await agent.post(TEST_ROUTES.workspaces.root).set(withBearer(accessToken)).send(buildWorkspacePayload('Additional Workspace'));
+    const firstCreateResponse = await agent.post(TEST_ROUTES.workspaces.root).set(withBearer(accessToken)).send(buildWorkspacePayload('Initial Workspace'));
 
-    expectSuccessfulStatus(createResponse);
+    expectSuccessfulStatus(firstCreateResponse);
+
+    const secondCreateResponse = await agent.post(TEST_ROUTES.workspaces.root).set(withBearer(accessToken)).send(buildWorkspacePayload('Additional Workspace'));
+
+    expectSuccessfulStatus(secondCreateResponse);
 
     const listResponse = await agent.get(TEST_ROUTES.workspaces.root).set(withBearer(accessToken));
 
@@ -77,7 +81,6 @@ describe('Workspaces E2E', () => {
 
     expect(names).toEqual(expect.arrayContaining(['Initial Workspace', 'Additional Workspace']));
   });
-
   it('rejects anonymous workspace creation', async () => {
     const response = await request(app.getHttpServer()).post(TEST_ROUTES.workspaces.root).send(buildWorkspacePayload('Anonymous Workspace'));
 

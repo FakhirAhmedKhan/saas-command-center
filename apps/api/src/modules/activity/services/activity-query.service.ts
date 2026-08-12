@@ -1,6 +1,6 @@
-import { PrismaService } from '../../../database/prisma.service';
+﻿import { PrismaService } from '../../../database/prisma.service';
 import { ActivityQueryDto } from '../dto/activity-query.dto';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from 'src/generated/prisma/client';
 
 @Injectable()
@@ -24,6 +24,21 @@ export class ActivityQueryService {
 
     query: ActivityQueryDto,
   ) {
+    const application = await this.prisma.saasApplication.findFirst({
+      where: {
+        id: applicationId,
+        workspaceId,
+      },
+
+      select: {
+        id: true,
+      },
+    });
+
+    if (!application) {
+      throw new NotFoundException('Application not found');
+    }
+
     const where = this.buildWhere(workspaceId, applicationId, query);
 
     return this.list(where, query);

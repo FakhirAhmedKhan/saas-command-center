@@ -1,0 +1,16 @@
+PASS test/websites.e2e-spec.ts (11.029 s)
+  Websites E2E
+    √ creates a website and normalizes its domain (1425 ms)
+    √ creates a website using only required fields and applies defaults (600 ms)
+    √ rejects invalid domains and invalid DTO fields (882 ms)
+    √ rejects duplicate domains within a workspace but allows them across workspaces (845 ms)
+    √ updates website configuration (811 ms)
+    √ supports search, enabled filtering, and pagination (1110 ms)
+    √ prevents cross-workspace website access (858 ms)
+    √ rejects malformed and unknown website IDs (654 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        11.463 s
+Ran all test suites within paths "test/websites.e2e-spec.ts".

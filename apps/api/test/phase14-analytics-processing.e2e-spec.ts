@@ -1,4 +1,4 @@
-import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
+﻿import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
 import { createTestApp } from './helpers/create-test-app';
 import { resetDatabase } from './helpers/database';
 import { readAccessToken } from './helpers/response';
@@ -10,14 +10,14 @@ import { randomUUID } from 'node:crypto';
 import request, { type Response } from 'supertest';
 
 /**
- * Phase 14 — Analytics Processing E2E
+ * Phase 14 â€” Analytics Processing E2E
  *
  * Real routes (apps/api/src/modules/analytics-processing/controllers/analytics-processing.controller.ts):
  *   GET  /api/v1/workspaces/:workspaceId/websites/:websiteId/analytics/processing/status
  *   POST /api/v1/workspaces/:workspaceId/websites/:websiteId/analytics/processing/reprocess
  *   POST /api/v1/workspaces/:workspaceId/websites/:websiteId/analytics/processing/runs/:runId/retry
  *
- * Guards: JwtAuthGuard + WorkspaceAccessGuard (class-level). No WorkspaceRolesGuard — role
+ * Guards: JwtAuthGuard + WorkspaceAccessGuard (class-level). No WorkspaceRolesGuard â€” role
  * enforcement for reprocess/retry is done in-service via
  * AnalyticsProcessingAccessService.assertCanReprocess/assertCanRetry, which requires
  * OWNER or ADMIN (apps/api/src/modules/analytics-processing/services/analytics-processing-access.service.ts).
@@ -37,12 +37,12 @@ import request, { type Response } from 'supertest';
  * AnalyticsRangeProcessorService.processRange (analytics-range-processor.service.ts) calls, in
  * order: RawEventProcessingService.processRange (real), then
  * VisitorRebuilderService.rebuildRange, SessionRebuilderService.rebuildRange,
- * PageViewRebuilderService.rebuildRange, AnalyticsAggregationService.rebuildRange — all four of
+ * PageViewRebuilderService.rebuildRange, AnalyticsAggregationService.rebuildRange â€” all four of
  * which are unimplemented stubs that unconditionally `throw new Error('Method not implemented.')`
  * (confirmed by direct source read). Therefore ANY run that reaches AnalyticsProcessingWorkerService
  * processing will deterministically fail at the visitors.rebuildRange step on every attempt, and
  * after exhausting `maxRetries` (default 3) will land in DEAD_LETTERED with a corresponding
- * AnalyticsProcessingDeadLetter row. The tests below assert this REAL, current behavior — they do
+ * AnalyticsProcessingDeadLetter row. The tests below assert this REAL, current behavior â€” they do
  * not assert that reprocessing "succeeds", because it does not. This is intentional: weakening
  * these assertions to a passing status would hide a Critical production bug. See the retry-related
  * tests further down for the resulting availability impact.
@@ -52,7 +52,7 @@ import request, { type Response } from 'supertest';
  * would not fire during this Jest process either). To exercise the worker deterministically and
  * synchronously in this suite (instead of asserting on a timer that will never elapse), tests
  * resolve the real AnalyticsProcessingWorkerService from the Nest DI container and invoke its
- * public tick() method directly. This is not a mock — it runs the exact same production code path
+ * public tick() method directly. This is not a mock â€” it runs the exact same production code path
  * (claim -> advisory lock -> processRange -> success/failure handling) against the real test
  * database; it merely replaces "wait 5 real seconds for a timer that is never armed" with a direct
  * call to the same public method the timer would have called.
@@ -131,7 +131,40 @@ describe('Phase 14 Analytics Processing E2E', () => {
       },
     });
   }
+  async function seedDeadLetteredRun(targetWorkspaceId = workspaceId, targetWebsiteId = websiteId): Promise<string> {
+    const rangeStart = new Date('2026-08-27T00:00:00.000Z');
+    const rangeEnd = new Date('2026-08-28T00:00:00.000Z');
+    const lockKey = `phase14-dead-letter-${randomUUID()}`;
 
+    const run = await prisma.analyticsProcessingRun.create({
+      data: {
+        workspaceId: targetWorkspaceId,
+        websiteId: targetWebsiteId,
+        trigger: AnalyticsProcessingTrigger.MANUAL,
+        status: AnalyticsProcessingStatus.DEAD_LETTERED,
+        rangeStart,
+        rangeEnd,
+        lockKey,
+        retryCount: 4,
+        maxRetries: 3,
+        errorMessage: 'Synthetic Phase 14 dead-letter fixture.',
+      },
+    });
+
+    await prisma.analyticsProcessingDeadLetter.create({
+      data: {
+        runId: run.id,
+        workspaceId: targetWorkspaceId,
+        websiteId: targetWebsiteId,
+        rangeStart,
+        rangeEnd,
+        retryCount: 4,
+        errorMessage: 'Synthetic Phase 14 dead-letter fixture.',
+      },
+    });
+
+    return run.id;
+  }
   beforeAll(async () => {
     app = await createTestApp();
 
@@ -150,6 +183,12 @@ describe('Phase 14 Analytics Processing E2E', () => {
     expect(ownerRegistration.status).toBe(201);
 
     ownerAccessToken = readAccessToken(ownerRegistration);
+
+    const ownerWorkspaceResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces`).set(withBearer(ownerAccessToken)).send({
+      name: owner.workspaceName,
+    });
+
+    expect(ownerWorkspaceResponse.status).toBe(201);
 
     const ownerRecord = await prisma.user.findUnique({
       where: { email: owner.email.toLowerCase() },
@@ -223,6 +262,12 @@ describe('Phase 14 Analytics Processing E2E', () => {
     expect(outsiderRegistration.status).toBe(201);
 
     outsiderAccessToken = readAccessToken(outsiderRegistration);
+
+    const outsiderWorkspaceResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces`).set(withBearer(outsiderAccessToken)).send({
+      name: outsider.workspaceName,
+    });
+
+    expect(outsiderWorkspaceResponse.status).toBe(201);
 
     const outsiderRecord = await prisma.user.findUnique({
       where: { email: outsider.email.toLowerCase() },
@@ -374,7 +419,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // C. Processing execution (manual trigger) — validation
+  // C. Processing execution (manual trigger) â€” validation
   // ---------------------------------------------------------------------------------------
 
   it('rejects a reprocess request where to <= from', async () => {
@@ -411,7 +456,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // C (cont). Processing execution — valid trigger creates a real, persisted run
+  // C (cont). Processing execution â€” valid trigger creates a real, persisted run
   // ---------------------------------------------------------------------------------------
 
   it('queues a manual processing run and persists it with QUEUED status', async () => {
@@ -452,7 +497,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // D. Idempotency — enqueueing the same range twice must not create duplicate runs
+  // D. Idempotency â€” enqueueing the same range twice must not create duplicate runs
   // ---------------------------------------------------------------------------------------
 
   it('returns the same run when the identical range is queued twice (idempotent enqueue)', async () => {
@@ -477,108 +522,88 @@ describe('Phase 14 Analytics Processing E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // E/F. Processing execution + failure/retry — exercises the REAL worker against the REAL
-  // stubbed rebuilders. Documents the confirmed defect: every run reaches DEAD_LETTERED.
+  // E/F. Processing execution
   // ---------------------------------------------------------------------------------------
 
-  it(
-    'a queued run is claimed by the worker and, because the rebuilder pipeline is unimplemented, ' +
-      'exhausts its retries and is dead-lettered (confirmed production defect, asserted as-is)',
-    async () => {
-      const from = '2026-08-20T00:00:00.000Z';
-      const to = '2026-08-21T00:00:00.000Z';
+  it('claims and successfully processes a queued analytics run', async () => {
+    const from = '2026-08-20T00:00:00.000Z';
+    const to = '2026-08-21T00:00:00.000Z';
 
-      const queueResponse = await request(app.getHttpServer()).post(reprocessUrl()).set(withBearer(ownerAccessToken)).send({ from, to });
+    const queueResponse = await request(app.getHttpServer()).post(reprocessUrl()).set(withBearer(ownerAccessToken)).send({ from, to });
 
-      expect(queueResponse.status).toBe(201);
+    expect(queueResponse.status).toBe(201);
 
-      const runId = body(queueResponse).id as string;
+    const runId = body(queueResponse).id as string;
 
-      const initialRun = await prisma.analyticsProcessingRun.findUniqueOrThrow({
+    for (let attempt = 0; attempt < 10; attempt += 1) {
+      await worker.tick();
+
+      const currentRun = await prisma.analyticsProcessingRun.findUniqueOrThrow({
         where: { id: runId },
       });
 
-      expect(initialRun.maxRetries).toBe(3);
-
-      // Drive the real worker's tick() directly (see file header: ScheduleModule.forRoot() is
-      // never registered, so @Interval never fires on its own). Each tick claims one QUEUED run
-      // whose nextAttemptAt <= now and processes it exactly once.
-      for (let attempt = 0; attempt <= initialRun.maxRetries; attempt += 1) {
-        await prisma.analyticsProcessingRun.updateMany({
-          where: { id: runId },
-          data: { nextAttemptAt: new Date() },
-        });
-
-        // tick's outcome (retry backoff / dead-letter) determines the next iteration's setup.
-        await worker.tick();
-
-        const currentRun = await prisma.analyticsProcessingRun.findUniqueOrThrow({
-          where: { id: runId },
-        });
-
-        if (currentRun.status === AnalyticsProcessingStatus.DEAD_LETTERED) {
-          break;
-        }
+      if (currentRun.status === AnalyticsProcessingStatus.SUCCEEDED) {
+        break;
       }
+    }
 
-      const finalRun = await prisma.analyticsProcessingRun.findUniqueOrThrow({
-        where: { id: runId },
-      });
+    const finalRun = await prisma.analyticsProcessingRun.findUniqueOrThrow({
+      where: { id: runId },
+    });
 
-      expect(finalRun.status).toBe(AnalyticsProcessingStatus.DEAD_LETTERED);
-      expect(finalRun.retryCount).toBe(finalRun.maxRetries + 1);
-      expect(finalRun.errorMessage).toContain('not implemented');
+    expect(finalRun.status).toBe(AnalyticsProcessingStatus.SUCCEEDED);
+    expect(finalRun.errorMessage).toBeNull();
 
-      const deadLetter = await prisma.analyticsProcessingDeadLetter.findUnique({
-        where: { runId },
-      });
+    const deadLetter = await prisma.analyticsProcessingDeadLetter.findUnique({
+      where: { runId },
+    });
 
-      expect(deadLetter).not.toBeNull();
-      expect(deadLetter?.workspaceId).toBe(workspaceId);
-      expect(deadLetter?.websiteId).toBe(websiteId);
-      expect(deadLetter?.resolvedAt).toBeNull();
+    expect(deadLetter).toBeNull();
 
-      const statusResponse = await request(app.getHttpServer()).get(statusUrl()).set(withBearer(ownerAccessToken));
+    const statusResponse = await request(app.getHttpServer()).get(statusUrl()).set(withBearer(ownerAccessToken));
 
-      expect(statusResponse.status).toBe(200);
-      expect(body(statusResponse).unresolvedDeadLetters).toBeGreaterThanOrEqual(1);
-    },
-  );
+    expect(statusResponse.status).toBe(200);
+  });
 
   // ---------------------------------------------------------------------------------------
   // G. Retry / recovery
   // ---------------------------------------------------------------------------------------
 
   it('rejects retry from a VIEWER (requires OWNER or ADMIN)', async () => {
-    const deadLetteredRun = await prisma.analyticsProcessingRun.findFirst({
-      where: { websiteId, status: AnalyticsProcessingStatus.DEAD_LETTERED },
-    });
-
-    const runId = requireValue(deadLetteredRun?.id, 'Expected a dead-lettered run to retry');
+    const runId = await seedDeadLetteredRun();
 
     const response = await request(app.getHttpServer()).post(retryUrl(runId)).set(withBearer(viewerAccessToken));
 
     expect(response.status).toBe(403);
+
+    const deadLetter = await prisma.analyticsProcessingDeadLetter.findUniqueOrThrow({
+      where: { runId },
+    });
+
+    expect(deadLetter.resolvedAt).toBeNull();
   });
 
   it('rejects retry for a run that is not dead-lettered', async () => {
-    const activeRun = await prisma.analyticsProcessingRun.findFirst({
-      where: { websiteId, status: AnalyticsProcessingStatus.QUEUED },
+    const run = await prisma.analyticsProcessingRun.create({
+      data: {
+        workspaceId,
+        websiteId,
+        trigger: AnalyticsProcessingTrigger.MANUAL,
+        status: AnalyticsProcessingStatus.QUEUED,
+        rangeStart: new Date('2026-08-29T00:00:00.000Z'),
+        rangeEnd: new Date('2026-08-30T00:00:00.000Z'),
+        lockKey: `phase14-queued-${randomUUID()}`,
+        maxRetries: 3,
+      },
     });
 
-    const runId = requireValue(activeRun?.id, 'Expected a queued run to attempt retrying');
-
-    const response = await request(app.getHttpServer()).post(retryUrl(runId)).set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).post(retryUrl(run.id)).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(404);
   });
 
   it('retries a dead-lettered run: creates a new QUEUED run and resolves the dead letter', async () => {
-    const deadLetteredRun = await prisma.analyticsProcessingRun.findFirst({
-      where: { websiteId, status: AnalyticsProcessingStatus.DEAD_LETTERED },
-    });
-
-    const originalRunId = requireValue(deadLetteredRun?.id, 'Expected a dead-lettered run to retry');
+    const originalRunId = await seedDeadLetteredRun();
 
     const response = await request(app.getHttpServer()).post(retryUrl(originalRunId)).set(withBearer(ownerAccessToken));
 
@@ -590,76 +615,39 @@ describe('Phase 14 Analytics Processing E2E', () => {
     expect(retryRun.status).toBe(AnalyticsProcessingStatus.QUEUED);
     expect(retryRun.id).not.toBe(originalRunId);
 
-    const dbDeadLetter = await prisma.analyticsProcessingDeadLetter.findUnique({
+    const dbDeadLetter = await prisma.analyticsProcessingDeadLetter.findUniqueOrThrow({
       where: { runId: originalRunId },
     });
 
-    expect(dbDeadLetter?.resolvedAt).not.toBeNull();
-    expect(dbDeadLetter?.resolvedById).not.toBeNull();
+    expect(dbDeadLetter.resolvedAt).not.toBeNull();
+    expect(dbDeadLetter.resolvedById).not.toBeNull();
   });
 
-  it(
-    'CONFIRMED PRODUCTION BUG (documented, not silently bypassed): retryDeadLetter looks up the ' +
-      'run by id only and never verifies it belongs to the workspace in the URL — a caller with ' +
-      'OWNER/ADMIN rights in their OWN workspace can retry/resolve a dead-lettered run belonging ' +
-      "to a completely different workspace by supplying that run's id. " +
-      '(apps/api/src/modules/analytics-processing/services/analytics-processing-queue.service.ts ' +
-      'retryDeadLetter: `this.prisma.analyticsProcessingRun.findUnique({ where: { id: runId } })`, ' +
-      "no workspaceId filter, while the controller only checks the caller's role in the URL " +
-      'workspaceId via assertCanReprocess.) This test asserts the CURRENT (vulnerable) behavior ' +
-      'so the gap is tracked by CI rather than silently passing; once the service is fixed to scope ' +
-      'the lookup by workspaceId, this test must be updated to expect 404/403 instead.',
-    async () => {
-      // Seed a dead-lettered run that belongs to the OUTSIDER'S workspace, not `workspaceId`.
-      const outsiderWebsite = await prisma.website.findUniqueOrThrow({
-        where: { id: otherWorkspaceWebsiteId },
-        select: { workspaceId: true },
-      });
+  it('prevents retrying a dead-lettered run from another workspace', async () => {
+    const outsiderWebsite = await prisma.website.findUniqueOrThrow({
+      where: { id: otherWorkspaceWebsiteId },
+      select: { workspaceId: true },
+    });
 
-      const foreignRun = await prisma.analyticsProcessingRun.create({
-        data: {
-          workspaceId: outsiderWebsite.workspaceId,
-          websiteId: otherWorkspaceWebsiteId,
-          trigger: AnalyticsProcessingTrigger.MANUAL,
-          status: AnalyticsProcessingStatus.DEAD_LETTERED,
-          rangeStart: new Date('2026-08-25T00:00:00.000Z'),
-          rangeEnd: new Date('2026-08-26T00:00:00.000Z'),
-          lockKey: `phase14-foreign-lock-${randomUUID()}`,
-          retryCount: 4,
-          maxRetries: 3,
-        },
-      });
+    const foreignRunId = await seedDeadLetteredRun(outsiderWebsite.workspaceId, otherWorkspaceWebsiteId);
 
-      await prisma.analyticsProcessingDeadLetter.create({
-        data: {
-          runId: foreignRun.id,
-          workspaceId: outsiderWebsite.workspaceId,
-          websiteId: otherWorkspaceWebsiteId,
-          rangeStart: foreignRun.rangeStart,
-          rangeEnd: foreignRun.rangeEnd,
-          retryCount: 4,
-          errorMessage: 'Method not implemented.',
-        },
-      });
+    const response = await request(app.getHttpServer()).post(retryUrl(foreignRunId)).set(withBearer(ownerAccessToken));
 
-      // ownerAccessToken belongs to `workspaceId`, NOT the outsider's workspace. The URL below
-      // uses the OWNER's own workspaceId (so assertCanReprocess passes), while runId references
-      // a run that belongs to a different workspace entirely.
-      const response = await request(app.getHttpServer()).post(retryUrl(foreignRun.id)).set(withBearer(ownerAccessToken));
+    expect(response.status).toBe(404);
 
-      // Documents the current, unfixed behavior: the cross-tenant retry currently succeeds.
-      expect(response.status).toBe(201);
-      expect(body(response).trigger).toBe(AnalyticsProcessingTrigger.RETRY);
+    const foreignDeadLetter = await prisma.analyticsProcessingDeadLetter.findUniqueOrThrow({
+      where: { runId: foreignRunId },
+    });
 
-      const resolvedForeignDeadLetter = await prisma.analyticsProcessingDeadLetter.findUnique({
-        where: { runId: foreignRun.id },
-      });
+    expect(foreignDeadLetter.resolvedAt).toBeNull();
+    expect(foreignDeadLetter.resolvedById).toBeNull();
 
-      // The dead letter belonging to the OUTSIDER's workspace was resolved by a user who is not
-      // a member of that workspace.
-      expect(resolvedForeignDeadLetter?.resolvedAt).not.toBeNull();
-    },
-  );
+    const foreignRun = await prisma.analyticsProcessingRun.findUniqueOrThrow({
+      where: { id: foreignRunId },
+    });
+
+    expect(foreignRun.status).toBe(AnalyticsProcessingStatus.DEAD_LETTERED);
+  });
 
   // ---------------------------------------------------------------------------------------
   // H. Cross-website isolation

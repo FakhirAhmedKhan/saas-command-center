@@ -1,30 +1,57 @@
-import { AppModule } from '../../src/app.module';
-import { configureApplication } from '../../src/bootstrap/configure-application';
-import type { INestApplication } from '@nestjs/common';
-import { Test, type TestingModule } from '@nestjs/testing';
+﻿import { HealthController } from './health.controller';
+import type { HealthService } from './health.service';
+import { HttpStatus } from '@nestjs/common';
+import type { Response } from 'express';
 
-export interface TestApplication {
-  app: INestApplication;
-  moduleRef: TestingModule;
-}
+describe('HealthController', () => {
+  let controller: HealthController;
+  let healthService: jest.Mocked<Pick<HealthService, 'getHealth'>>;
+  let response: Pick<Response, 'status'>;
 
-export async function createTestApplication(): Promise<TestApplication> {
-  const moduleRef = await Test.createTestingModule({
-    imports: [AppModule],
-  }).compile();
+  beforeEach(() => {
+    healthService = {
+      getHealth: jest.fn(),
+    };
 
-  const app = moduleRef.createNestApplication({
-    bodyParser: false,
+    response = {
+      status: jest.fn().mockReturnThis(),
+    };
+
+    controller = new HealthController(healthService as HealthService);
   });
 
-  configureApplication(app, {
-    enableSwagger: false,
+  it('returns healthy response without changing the HTTP status', async () => {
+    const health = {
+      status: 'ok' as const,
+      timestamp: '2026-08-12T00:00:00.000Z',
+      database: {
+        status: 'ok' as const,
+      },
+    };
+
+    healthService.getHealth.mockResolvedValue(health);
+
+    const result = await controller.getHealth(response as Response);
+
+    expect(result).toEqual(health);
+    expect(response.status).not.toHaveBeenCalled();
   });
 
-  await app.init();
+  it('returns 503 when health status is error', async () => {
+    const health = {
+      status: 'error' as const,
+      timestamp: '2026-08-12T00:00:00.000Z',
+      database: {
+        status: 'error' as const,
+      },
+    };
 
-  return {
-    app,
-    moduleRef,
-  };
-}
+    healthService.getHealth.mockResolvedValue(health);
+
+    const result = await controller.getHealth(response as Response);
+
+    expect(result).toEqual(health);
+    expect(response.status).toHaveBeenCalledWith(HttpStatus.SERVICE_UNAVAILABLE);
+    expect(response.status).toHaveBeenCalledTimes(1);
+  });
+});

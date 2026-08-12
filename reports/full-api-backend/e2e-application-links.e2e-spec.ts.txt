@@ -1,0 +1,13 @@
+PASS test/application-links.e2e-spec.ts (8.48 s)
+  Application Links E2E
+    √ adds, updates, and removes a link (1887 ms)
+    √ rejects invalid and unsafe URLs (838 ms)
+    √ rejects invalid link type and empty label (657 ms)
+    √ rejects link ID from another application (844 ms)
+    √ rejects link changes on archived application (787 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        8.877 s, estimated 9 s
+Ran all test suites within paths "test/application-links.e2e-spec.ts".

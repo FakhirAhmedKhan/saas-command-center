@@ -1,4 +1,4 @@
-import {
+﻿import {
   addLink,
   addTechnology,
   applicationRoutes,
@@ -176,9 +176,9 @@ describe('Application Activity E2E', () => {
     if (createdAt) {
       const time = new Date(createdAt).getTime();
 
-      query.dateFrom = new Date(time - 60_000).toISOString();
+      query.from = new Date(time - 60_000).toISOString();
 
-      query.dateTo = new Date(time + 60_000).toISOString();
+      query.to = new Date(time + 60_000).toISOString();
     }
 
     const filteredResponse = await listApplicationActivity(owner, application.id, query);

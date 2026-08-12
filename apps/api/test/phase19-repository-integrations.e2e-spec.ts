@@ -253,23 +253,30 @@ async function registerIdentity(app: INestApplication, prisma: PrismaService, la
     throw new Error(`Registered user ${userInput.email} was not persisted.`);
   }
 
-  const workspace = await prisma.workspace.findFirst({
+  const workspaceResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces`).set(withBearer(token)).send({
+    name: userInput.workspaceName,
+  });
+
+  expect(workspaceResponse.status).toBe(201);
+
+  const ownerMembership = await prisma.workspaceMember.findFirst({
     where: {
-      ownerId: user.id,
+      userId: user.id,
+      role: WorkspaceRole.OWNER,
     },
     select: {
-      id: true,
+      workspaceId: true,
     },
   });
 
-  if (!workspace) {
-    throw new Error(`Initial workspace for ${userInput.email} was not persisted.`);
+  if (!ownerMembership) {
+    throw new Error(`Explicit workspace for ${userInput.email} was not persisted.`);
   }
 
   return {
     token,
     userId: user.id,
-    workspaceId: workspace.id,
+    workspaceId: ownerMembership.workspaceId,
     email: userInput.email,
   };
 }
@@ -329,7 +336,7 @@ async function beginGithubConnect(app: INestApplication, identity: Identity, wor
 
 async function completeGithubSetup(app: INestApplication, identity: Identity, installationState: string, installationId: string): Promise<string> {
   const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/setup`).set(withBearer(identity.token)).send({
-    state: installationState,
+    installState: installationState,
     installationId,
   });
 
@@ -488,7 +495,7 @@ describe('Phase 19 - Repository Integrations E2E', () => {
   describe('GitHub setup and OAuth callback', () => {
     it('rejects setup without authentication', async () => {
       const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/setup`).send({
-        state: 'missing-authentication-state-value-1234567890',
+        installState: 'missing-authentication-state-value-1234567890',
         installationId: DEFAULT_GITHUB_FIXTURE.installationId,
       });
 
@@ -499,7 +506,7 @@ describe('Phase 19 - Repository Integrations E2E', () => {
       const owner = await registerIdentity(app, prisma, 'Unknown State Owner');
 
       const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/setup`).set(withBearer(owner.token)).send({
-        state: 'unknown-installation-state-value-1234567890',
+        installState: 'unknown-installation-state-value-1234567890',
         installationId: DEFAULT_GITHUB_FIXTURE.installationId,
       });
 
@@ -512,7 +519,7 @@ describe('Phase 19 - Repository Integrations E2E', () => {
       const installationState = await beginGithubConnect(app, owner, owner.workspaceId);
 
       const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/setup`).set(withBearer(attacker.token)).send({
-        state: installationState,
+        installState: installationState,
         installationId: DEFAULT_GITHUB_FIXTURE.installationId,
       });
 

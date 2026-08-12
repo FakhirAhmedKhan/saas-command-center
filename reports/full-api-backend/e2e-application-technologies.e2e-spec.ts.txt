@@ -1,0 +1,13 @@
+PASS test/application-technologies.e2e-spec.ts (8.319 s)
+  Application Technologies E2E
+    √ adds, updates, and removes a technology (1702 ms)
+    √ rejects invalid technology payloads (744 ms)
+    √ rejects technology ID from another application (878 ms)
+    √ rejects technology changes on archived application (838 ms)
+    √ rejects malformed technology UUID (664 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        8.784 s
+Ran all test suites within paths "test/application-technologies.e2e-spec.ts".

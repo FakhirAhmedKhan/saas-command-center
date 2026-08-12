@@ -1,0 +1,16 @@
+PASS src/modules/analytics-overview/utils/analytics-date-range.spec.ts
+PASS src/modules/team-operations/services/invitation-token.service.spec.ts
+PASS src/modules/webhooks/services/webhook-secret-crypto.service.spec.ts
+PASS src/modules/webhooks/services/webhook-outbound-client.service.spec.ts
+PASS src/modules/releases/services/deployment-transition.service.spec.ts
+PASS src/health/health.controller.spec.ts
+PASS src/modules/analytics-processing/services/safe-http-client.service.spec.ts
+PASS src/modules/webhooks/services/webhook-signature.service.spec.ts
+PASS src/modules/analytics-engine/utils/analytics-metrics.spec.ts
+PASS src/modules/analytics-reports/utils/analytics-csv.spec.ts
+
+Test Suites: 10 passed, 10 total
+Tests:       49 passed, 49 total
+Snapshots:   0 total
+Time:        5.524 s, estimated 15 s
+Ran all test suites.

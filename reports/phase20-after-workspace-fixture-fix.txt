@@ -1,0 +1,492 @@
+FAIL test/phase20-code-explorer.e2e-spec.ts (16.731 s)
+  Phase 20 - Code Explorer E2E
+    authorization and tenant isolation
+      × rejects anonymous code access (921 ms)
+      × rejects an outsider who is not a workspace member (606 ms)
+      × returns 404 for a repository ID from another workspace (623 ms)
+      × allows VIEWER to use read-only Code Explorer endpoints (577 ms)
+      √ rejects a malformed repository UUID (435 ms)
+    branches and tree
+      × returns repository branches (546 ms)
+      × loads the recursive tree using the repository default branch (446 ms)
+      × forwards an explicit branch to GitHub (449 ms)
+      × preserves GitHub truncated-tree state (362 ms)
+      × rejects a blank branch after normalization (497 ms)
+    repository search
+      × searches repository paths case-insensitively (382 ms)
+      × caps search results at 100 entries (444 ms)
+      × rejects a blank search query (453 ms)
+    file viewing and file safety
+      × decodes a UTF-8 text file from GitHub base64 content (488 ms)
+      × returns image files as base64 image content (440 ms)
+      × does not decode an arbitrary binary file as text (376 ms)
+      × returns 404 when GitHub reports that a file does not exist (396 ms)
+      × rejects files larger than the Code Explorer limit (491 ms)
+      × rejects parent-directory traversal (436 ms)
+      × rejects absolute repository paths (454 ms)
+      × uses repository owner and name from the database instead of client input (434 ms)
+    diff viewer
+      × returns decoded text for both sides of a text diff (415 ms)
+      × supports a file that exists only on the base side (507 ms)
+      × returns 404 when the file is absent from both refs (420 ms)
+      × marks a binary comparison as non-text instead of decoding it (457 ms)
+      × rejects traversal paths before making either GitHub file request (367 ms)
+
+  ● Phase 20 - Code Explorer E2E › authorization and tenant isolation › rejects anonymous code access
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:518:28)
+
+  ● Phase 20 - Code Explorer E2E › authorization and tenant isolation › rejects an outsider who is not a workspace member
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:528:28)
+
+  ● Phase 20 - Code Explorer E2E › authorization and tenant isolation › returns 404 for a repository ID from another workspace
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:547:27)
+
+  ● Phase 20 - Code Explorer E2E › authorization and tenant isolation › allows VIEWER to use read-only Code Explorer endpoints
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:560:28)
+
+  ● Phase 20 - Code Explorer E2E › branches and tree › returns repository branches
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:583:28)
+
+  ● Phase 20 - Code Explorer E2E › branches and tree › loads the recursive tree using the repository default branch
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:603:28)
+
+  ● Phase 20 - Code Explorer E2E › branches and tree › forwards an explicit branch to GitHub
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:624:28)
+
+  ● Phase 20 - Code Explorer E2E › branches and tree › preserves GitHub truncated-tree state
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:644:28)
+
+  ● Phase 20 - Code Explorer E2E › branches and tree › rejects a blank branch after normalization
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:662:28)
+
+  ● Phase 20 - Code Explorer E2E › repository search › searches repository paths case-insensitively
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:679:28)
+
+  ● Phase 20 - Code Explorer E2E › repository search › caps search results at 100 entries
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:706:28)
+
+  ● Phase 20 - Code Explorer E2E › repository search › rejects a blank search query
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:732:28)
+
+  ● Phase 20 - Code Explorer E2E › file viewing and file safety › decodes a UTF-8 text file from GitHub base64 content
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:748:28)
+
+  ● Phase 20 - Code Explorer E2E › file viewing and file safety › returns image files as base64 image content
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:775:28)
+
+  ● Phase 20 - Code Explorer E2E › file viewing and file safety › does not decode an arbitrary binary file as text
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:803:28)
+
+  ● Phase 20 - Code Explorer E2E › file viewing and file safety › returns 404 when GitHub reports that a file does not exist
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:830:28)
+
+  ● Phase 20 - Code Explorer E2E › file viewing and file safety › rejects files larger than the Code Explorer limit
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:845:28)
+
+  ● Phase 20 - Code Explorer E2E › file viewing and file safety › rejects parent-directory traversal
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:869:28)
+
+  ● Phase 20 - Code Explorer E2E › file viewing and file safety › rejects absolute repository paths
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:884:28)
+
+  ● Phase 20 - Code Explorer E2E › file viewing and file safety › uses repository owner and name from the database instead of client input
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:899:28)
+
+  ● Phase 20 - Code Explorer E2E › diff viewer › returns decoded text for both sides of a text diff
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:937:28)
+
+  ● Phase 20 - Code Explorer E2E › diff viewer › supports a file that exists only on the base side
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:977:28)
+
+  ● Phase 20 - Code Explorer E2E › diff viewer › returns 404 when the file is absent from both refs
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:1006:28)
+
+  ● Phase 20 - Code Explorer E2E › diff viewer › marks a binary comparison as non-text instead of decoding it
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:1023:28)
+
+  ● Phase 20 - Code Explorer E2E › diff viewer › rejects traversal paths before making either GitHub file request
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 410 |[39m   })[33m;[39m
+     [90m 411 |[39m
+    [31m[1m>[22m[39m[90m 412 |[39m   expect(setupResponse[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 413 |[39m
+     [90m 414 |[39m   [36mconst[39m oauthState [33m=[39m queryParameter(requireString(responseRecord(setupResponse)[33m,[39m [32m'authorizationUrl'[39m)[33m,[39m [32m'state'[39m)[33m;[39m
+     [90m 415 |[39m[0m
+
+      at connectRepository (test/phase20-code-explorer.e2e-spec.ts:412:32)
+      at Object.<anonymous> (test/phase20-code-explorer.e2e-spec.ts:1061:28)
+
+Test Suites: 1 failed, 1 total
+Tests:       25 failed, 1 passed, 26 total
+Snapshots:   0 total
+Time:        17.133 s
+Ran all test suites within paths "test/phase20-code-explorer.e2e-spec.ts".
+undefined
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api:
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command failed with exit code 1: jest --config ./test/jest-e2e.config.cjs --runInBand --runTestsByPath test/phase20-code-explorer.e2e-spec.ts

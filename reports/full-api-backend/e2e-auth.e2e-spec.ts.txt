@@ -1,0 +1,38 @@
+PASS test/auth.e2e-spec.ts (16.287 s)
+  Phase 11 - Foundation & Authentication E2E
+    registration
+      √ registers a new user and creates an authenticated session (1286 ms)
+      √ registers the user without automatically creating a workspace (678 ms)
+      √ does not expose a refresh token or password hash in the registration body (481 ms)
+      √ rejects duplicate email registration with 409 conflict (661 ms)
+      √ rejects invalid registration input (465 ms)
+    login and protected-route authorization
+      √ logs in using valid credentials (676 ms)
+      √ rejects an invalid password without exposing account internals (567 ms)
+      √ rejects an unknown email with the same generic authentication failure (512 ms)
+      √ rejects access to protected routes without an access token (306 ms)
+      √ rejects a tampered access token (476 ms)
+      √ rejects a refresh token when it is presented as a Bearer access token (476 ms)
+    refresh cookie security
+      √ sets HttpOnly, SameSite, and Path attributes on the refresh cookie (463 ms)
+      √ stores only the SHA-256 hash of the refresh token (493 ms)
+      √ rejects refresh when the refresh cookie is missing (444 ms)
+      √ rejects a tampered refresh token (508 ms)
+    refresh rotation and replay protection
+      √ rotates the refresh session and returns a new access token (688 ms)
+      √ rejects old refresh-token reuse and revokes the whole refresh-token family (697 ms)
+      √ rejects an expired refresh session and records EXPIRED revocation (511 ms)
+    logout
+      √ revokes the current refresh session and clears the refresh cookie (541 ms)
+      √ keeps logout idempotent when no refresh cookie exists (383 ms)
+    logout-all
+      √ rejects logout-all without a valid access token (389 ms)
+      √ revokes every active refresh session for the authenticated user (852 ms)
+    public health
+      √ returns minimal public health without authentication or secret leakage (382 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       23 passed, 23 total
+Snapshots:   0 total
+Time:        16.705 s, estimated 20 s
+Ran all test suites within paths "test/auth.e2e-spec.ts".

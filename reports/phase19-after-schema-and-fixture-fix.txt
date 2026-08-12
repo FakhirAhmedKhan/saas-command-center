@@ -1,0 +1,340 @@
+FAIL test/phase19-repository-integrations.e2e-spec.ts (17.058 s)
+  Phase 19 - Repository Integrations E2E
+    GitHub connection authorization
+      √ rejects anonymous GitHub connection attempts (782 ms)
+      √ rejects a malformed workspace identifier (394 ms)
+      √ allows OWNER to start a GitHub App installation and stores only hashed state (440 ms)
+      √ allows ADMIN to start a GitHub connection (569 ms)
+      √ prevents DEVELOPER from starting a GitHub connection (565 ms)
+      √ prevents VIEWER from starting a GitHub connection (595 ms)
+    GitHub setup and OAuth callback
+      √ rejects setup without authentication (186 ms)
+      × rejects an unknown installation state (390 ms)
+      × does not allow another user to consume an installation state (604 ms)
+      × creates OAuth authorization state without storing the raw state (443 ms)
+      × rejects callback when the authenticated GitHub user cannot access the installation (404 ms)
+      × persists the installation and repositories after a valid callback (483 ms)
+      × prevents OAuth callback replay after the intent has been consumed (434 ms)
+    Repository read, tenant isolation, linking, and sync
+      × lists only repositories in the requested workspace (423 ms)
+      × allows VIEWER to read repository metadata (511 ms)
+      × prevents an outsider from reading repository metadata (615 ms)
+      × returns 404 when a repository belongs to a different workspace (620 ms)
+      × links a repository to an application in the same workspace (451 ms)
+      × rejects linking a repository to an application from another workspace (586 ms)
+      × unlinks an application from a repository (428 ms)
+      × allows DEVELOPER to synchronize an already-connected repository (642 ms)
+    Disconnect authorization and cascade behavior
+      × prevents DEVELOPER from disconnecting a GitHub installation (637 ms)
+      × allows OWNER to disconnect an installation and removes its repositories (409 ms)
+    GitHub webhook security and idempotency
+      √ rejects a webhook when GitHub delivery headers are missing (196 ms)
+      √ rejects a webhook with an invalid signature (225 ms)
+      √ accepts a correctly signed webhook and records the delivery (227 ms)
+      √ treats duplicate GitHub delivery IDs idempotently (221 ms)
+
+  ● Phase 19 - Repository Integrations E2E › GitHub setup and OAuth callback › rejects an unknown installation state
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 401
+    Received: 400
+
+    [0m [90m 511 |[39m       })[33m;[39m
+     [90m 512 |[39m
+    [31m[1m>[22m[39m[90m 513 |[39m       expect(response[33m.[39mstatus)[33m.[39mtoBe([35m401[39m)[33m;[39m
+     [90m     |[39m                               [31m[1m^[22m[39m
+     [90m 514 |[39m     })[33m;[39m
+     [90m 515 |[39m
+     [90m 516 |[39m     it([32m'does not allow another user to consume an installation state'[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (test/phase19-repository-integrations.e2e-spec.ts:513:31)
+
+  ● Phase 19 - Repository Integrations E2E › GitHub setup and OAuth callback › does not allow another user to consume an installation state
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 401
+    Received: 400
+
+    [0m [90m 524 |[39m       })[33m;[39m
+     [90m 525 |[39m
+    [31m[1m>[22m[39m[90m 526 |[39m       expect(response[33m.[39mstatus)[33m.[39mtoBe([35m401[39m)[33m;[39m
+     [90m     |[39m                               [31m[1m^[22m[39m
+     [90m 527 |[39m     })[33m;[39m
+     [90m 528 |[39m
+     [90m 529 |[39m     it([32m'creates OAuth authorization state without storing the raw state'[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (test/phase19-repository-integrations.e2e-spec.ts:526:31)
+
+  ● Phase 19 - Repository Integrations E2E › GitHub setup and OAuth callback › creates OAuth authorization state without storing the raw state
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 341 |[39m   })[33m;[39m
+     [90m 342 |[39m
+    [31m[1m>[22m[39m[90m 343 |[39m   expect(response[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 344 |[39m
+     [90m 345 |[39m   [36mconst[39m authorizationUrl [33m=[39m requireString(responseRecord(response)[33m,[39m [32m'authorizationUrl'[39m)[33m;[39m
+     [90m 346 |[39m   [36mreturn[39m queryParameter(authorizationUrl[33m,[39m [32m'state'[39m)[33m;[39m[0m
+
+      at completeGithubSetup (test/phase19-repository-integrations.e2e-spec.ts:343:27)
+      at Object.<anonymous> (test/phase19-repository-integrations.e2e-spec.ts:532:26)
+
+  ● Phase 19 - Repository Integrations E2E › GitHub setup and OAuth callback › rejects callback when the authenticated GitHub user cannot access the installation
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 341 |[39m   })[33m;[39m
+     [90m 342 |[39m
+    [31m[1m>[22m[39m[90m 343 |[39m   expect(response[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 344 |[39m
+     [90m 345 |[39m   [36mconst[39m authorizationUrl [33m=[39m requireString(responseRecord(response)[33m,[39m [32m'authorizationUrl'[39m)[33m;[39m
+     [90m 346 |[39m   [36mreturn[39m queryParameter(authorizationUrl[33m,[39m [32m'state'[39m)[33m;[39m[0m
+
+      at completeGithubSetup (test/phase19-repository-integrations.e2e-spec.ts:343:27)
+      at Object.<anonymous> (test/phase19-repository-integrations.e2e-spec.ts:551:26)
+
+  ● Phase 19 - Repository Integrations E2E › GitHub setup and OAuth callback › persists the installation and repositories after a valid callback
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 341 |[39m   })[33m;[39m
+     [90m 342 |[39m
+    [31m[1m>[22m[39m[90m 343 |[39m   expect(response[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 344 |[39m
+     [90m 345 |[39m   [36mconst[39m authorizationUrl [33m=[39m requireString(responseRecord(response)[33m,[39m [32m'authorizationUrl'[39m)[33m;[39m
+     [90m 346 |[39m   [36mreturn[39m queryParameter(authorizationUrl[33m,[39m [32m'state'[39m)[33m;[39m[0m
+
+      at completeGithubSetup (test/phase19-repository-integrations.e2e-spec.ts:343:27)
+      at connectRepository (test/phase19-repository-integrations.e2e-spec.ts:369:22)
+      at Object.<anonymous> (test/phase19-repository-integrations.e2e-spec.ts:576:7)
+
+  ● Phase 19 - Repository Integrations E2E › GitHub setup and OAuth callback › prevents OAuth callback replay after the intent has been consumed
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 341 |[39m   })[33m;[39m
+     [90m 342 |[39m
+    [31m[1m>[22m[39m[90m 343 |[39m   expect(response[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 344 |[39m
+     [90m 345 |[39m   [36mconst[39m authorizationUrl [33m=[39m requireString(responseRecord(response)[33m,[39m [32m'authorizationUrl'[39m)[33m;[39m
+     [90m 346 |[39m   [36mreturn[39m queryParameter(authorizationUrl[33m,[39m [32m'state'[39m)[33m;[39m[0m
+
+      at completeGithubSetup (test/phase19-repository-integrations.e2e-spec.ts:343:27)
+      at Object.<anonymous> (test/phase19-repository-integrations.e2e-spec.ts:602:26)
+
+  ● Phase 19 - Repository Integrations E2E › Repository read, tenant isolation, linking, and sync › lists only repositories in the requested workspace
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 341 |[39m   })[33m;[39m
+     [90m 342 |[39m
+    [31m[1m>[22m[39m[90m 343 |[39m   expect(response[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 344 |[39m
+     [90m 345 |[39m   [36mconst[39m authorizationUrl [33m=[39m requireString(responseRecord(response)[33m,[39m [32m'authorizationUrl'[39m)[33m;[39m
+     [90m 346 |[39m   [36mreturn[39m queryParameter(authorizationUrl[33m,[39m [32m'state'[39m)[33m;[39m[0m
+
+      at completeGithubSetup (test/phase19-repository-integrations.e2e-spec.ts:343:27)
+      at connectRepository (test/phase19-repository-integrations.e2e-spec.ts:369:22)
+      at Object.<anonymous> (test/phase19-repository-integrations.e2e-spec.ts:615:25)
+
+  ● Phase 19 - Repository Integrations E2E › Repository read, tenant isolation, linking, and sync › allows VIEWER to read repository metadata
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 341 |[39m   })[33m;[39m
+     [90m 342 |[39m
+    [31m[1m>[22m[39m[90m 343 |[39m   expect(response[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 344 |[39m
+     [90m 345 |[39m   [36mconst[39m authorizationUrl [33m=[39m requireString(responseRecord(response)[33m,[39m [32m'authorizationUrl'[39m)[33m;[39m
+     [90m 346 |[39m   [36mreturn[39m queryParameter(authorizationUrl[33m,[39m [32m'state'[39m)[33m;[39m[0m
+
+      at completeGithubSetup (test/phase19-repository-integrations.e2e-spec.ts:343:27)
+      at connectRepository (test/phase19-repository-integrations.e2e-spec.ts:369:22)
+      at Object.<anonymous> (test/phase19-repository-integrations.e2e-spec.ts:631:7)
+
+  ● Phase 19 - Repository Integrations E2E › Repository read, tenant isolation, linking, and sync › prevents an outsider from reading repository metadata
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 341 |[39m   })[33m;[39m
+     [90m 342 |[39m
+    [31m[1m>[22m[39m[90m 343 |[39m   expect(response[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 344 |[39m
+     [90m 345 |[39m   [36mconst[39m authorizationUrl [33m=[39m requireString(responseRecord(response)[33m,[39m [32m'authorizationUrl'[39m)[33m;[39m
+     [90m 346 |[39m   [36mreturn[39m queryParameter(authorizationUrl[33m,[39m [32m'state'[39m)[33m;[39m[0m
+
+      at completeGithubSetup (test/phase19-repository-integrations.e2e-spec.ts:343:27)
+      at connectRepository (test/phase19-repository-integrations.e2e-spec.ts:369:22)
+      at Object.<anonymous> (test/phase19-repository-integrations.e2e-spec.ts:642:7)
+
+  ● Phase 19 - Repository Integrations E2E › Repository read, tenant isolation, linking, and sync › returns 404 when a repository belongs to a different workspace
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 341 |[39m   })[33m;[39m
+     [90m 342 |[39m
+    [31m[1m>[22m[39m[90m 343 |[39m   expect(response[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 344 |[39m
+     [90m 345 |[39m   [36mconst[39m authorizationUrl [33m=[39m requireString(responseRecord(response)[33m,[39m [32m'authorizationUrl'[39m)[33m;[39m
+     [90m 346 |[39m   [36mreturn[39m queryParameter(authorizationUrl[33m,[39m [32m'state'[39m)[33m;[39m[0m
+
+      at completeGithubSetup (test/phase19-repository-integrations.e2e-spec.ts:343:27)
+      at connectRepository (test/phase19-repository-integrations.e2e-spec.ts:369:22)
+      at Object.<anonymous> (test/phase19-repository-integrations.e2e-spec.ts:661:27)
+
+  ● Phase 19 - Repository Integrations E2E › Repository read, tenant isolation, linking, and sync › links a repository to an application in the same workspace
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 341 |[39m   })[33m;[39m
+     [90m 342 |[39m
+    [31m[1m>[22m[39m[90m 343 |[39m   expect(response[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 344 |[39m
+     [90m 345 |[39m   [36mconst[39m authorizationUrl [33m=[39m requireString(responseRecord(response)[33m,[39m [32m'authorizationUrl'[39m)[33m;[39m
+     [90m 346 |[39m   [36mreturn[39m queryParameter(authorizationUrl[33m,[39m [32m'state'[39m)[33m;[39m[0m
+
+      at completeGithubSetup (test/phase19-repository-integrations.e2e-spec.ts:343:27)
+      at connectRepository (test/phase19-repository-integrations.e2e-spec.ts:369:22)
+      at Object.<anonymous> (test/phase19-repository-integrations.e2e-spec.ts:672:25)
+
+  ● Phase 19 - Repository Integrations E2E › Repository read, tenant isolation, linking, and sync › rejects linking a repository to an application from another workspace
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 341 |[39m   })[33m;[39m
+     [90m 342 |[39m
+    [31m[1m>[22m[39m[90m 343 |[39m   expect(response[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 344 |[39m
+     [90m 345 |[39m   [36mconst[39m authorizationUrl [33m=[39m requireString(responseRecord(response)[33m,[39m [32m'authorizationUrl'[39m)[33m;[39m
+     [90m 346 |[39m   [36mreturn[39m queryParameter(authorizationUrl[33m,[39m [32m'state'[39m)[33m;[39m[0m
+
+      at completeGithubSetup (test/phase19-repository-integrations.e2e-spec.ts:343:27)
+      at connectRepository (test/phase19-repository-integrations.e2e-spec.ts:369:22)
+      at Object.<anonymous> (test/phase19-repository-integrations.e2e-spec.ts:709:25)
+
+  ● Phase 19 - Repository Integrations E2E › Repository read, tenant isolation, linking, and sync › unlinks an application from a repository
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 341 |[39m   })[33m;[39m
+     [90m 342 |[39m
+    [31m[1m>[22m[39m[90m 343 |[39m   expect(response[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 344 |[39m
+     [90m 345 |[39m   [36mconst[39m authorizationUrl [33m=[39m requireString(responseRecord(response)[33m,[39m [32m'authorizationUrl'[39m)[33m;[39m
+     [90m 346 |[39m   [36mreturn[39m queryParameter(authorizationUrl[33m,[39m [32m'state'[39m)[33m;[39m[0m
+
+      at completeGithubSetup (test/phase19-repository-integrations.e2e-spec.ts:343:27)
+      at connectRepository (test/phase19-repository-integrations.e2e-spec.ts:369:22)
+      at Object.<anonymous> (test/phase19-repository-integrations.e2e-spec.ts:734:25)
+
+  ● Phase 19 - Repository Integrations E2E › Repository read, tenant isolation, linking, and sync › allows DEVELOPER to synchronize an already-connected repository
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 341 |[39m   })[33m;[39m
+     [90m 342 |[39m
+    [31m[1m>[22m[39m[90m 343 |[39m   expect(response[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 344 |[39m
+     [90m 345 |[39m   [36mconst[39m authorizationUrl [33m=[39m requireString(responseRecord(response)[33m,[39m [32m'authorizationUrl'[39m)[33m;[39m
+     [90m 346 |[39m   [36mreturn[39m queryParameter(authorizationUrl[33m,[39m [32m'state'[39m)[33m;[39m[0m
+
+      at completeGithubSetup (test/phase19-repository-integrations.e2e-spec.ts:343:27)
+      at connectRepository (test/phase19-repository-integrations.e2e-spec.ts:369:22)
+      at Object.<anonymous> (test/phase19-repository-integrations.e2e-spec.ts:777:25)
+
+  ● Phase 19 - Repository Integrations E2E › Disconnect authorization and cascade behavior › prevents DEVELOPER from disconnecting a GitHub installation
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 341 |[39m   })[33m;[39m
+     [90m 342 |[39m
+    [31m[1m>[22m[39m[90m 343 |[39m   expect(response[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 344 |[39m
+     [90m 345 |[39m   [36mconst[39m authorizationUrl [33m=[39m requireString(responseRecord(response)[33m,[39m [32m'authorizationUrl'[39m)[33m;[39m
+     [90m 346 |[39m   [36mreturn[39m queryParameter(authorizationUrl[33m,[39m [32m'state'[39m)[33m;[39m[0m
+
+      at completeGithubSetup (test/phase19-repository-integrations.e2e-spec.ts:343:27)
+      at connectRepository (test/phase19-repository-integrations.e2e-spec.ts:369:22)
+      at Object.<anonymous> (test/phase19-repository-integrations.e2e-spec.ts:803:25)
+
+  ● Phase 19 - Repository Integrations E2E › Disconnect authorization and cascade behavior › allows OWNER to disconnect an installation and removes its repositories
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 400
+
+    [0m [90m 341 |[39m   })[33m;[39m
+     [90m 342 |[39m
+    [31m[1m>[22m[39m[90m 343 |[39m   expect(response[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 344 |[39m
+     [90m 345 |[39m   [36mconst[39m authorizationUrl [33m=[39m requireString(responseRecord(response)[33m,[39m [32m'authorizationUrl'[39m)[33m;[39m
+     [90m 346 |[39m   [36mreturn[39m queryParameter(authorizationUrl[33m,[39m [32m'state'[39m)[33m;[39m[0m
+
+      at completeGithubSetup (test/phase19-repository-integrations.e2e-spec.ts:343:27)
+      at connectRepository (test/phase19-repository-integrations.e2e-spec.ts:369:22)
+      at Object.<anonymous> (test/phase19-repository-integrations.e2e-spec.ts:814:25)
+
+Test Suites: 1 failed, 1 total
+Tests:       16 failed, 11 passed, 27 total
+Snapshots:   0 total
+Time:        17.51 s, estimated 18 s
+Ran all test suites within paths "test/phase19-repository-integrations.e2e-spec.ts".
+undefined
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api:
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command failed with exit code 1: jest --config ./test/jest-e2e.config.cjs --runInBand --runTestsByPath test/phase19-repository-integrations.e2e-spec.ts

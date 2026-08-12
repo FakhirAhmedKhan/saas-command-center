@@ -1,4 +1,4 @@
-import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
+﻿import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
 import { createTestApp } from './helpers/create-test-app';
 import { resetDatabase } from './helpers/database';
 import { readAccessToken } from './helpers/response';
@@ -9,7 +9,7 @@ import { randomUUID } from 'node:crypto';
 import request, { type Response } from 'supertest';
 
 /**
- * Phase 16 â€” Releases & Deployments E2E
+ * Phase 16 Ã¢â‚¬â€ Releases & Deployments E2E
  *
  * No prior e2e coverage exists for this module (confirmed: no *release* or *deployment* named
  * spec file under apps/api/test before this one).
@@ -50,7 +50,7 @@ import request, { type Response } from 'supertest';
  * scheduledAt/healthIncidentId. A new deployment always starts at DeploymentStatus.DRAFT with an
  * auto-incremented `attempt` number scoped to (releaseId, environmentId).
  *
- * Deployment state machine (deployment-transition.service.ts, TRANSITIONS map â€” this is the
+ * Deployment state machine (deployment-transition.service.ts, TRANSITIONS map Ã¢â‚¬â€ this is the
  * authoritative, real contract; DO NOT assume any other pairs are valid):
  *   DRAFT       -> SCHEDULED | IN_PROGRESS
  *   SCHEDULED   -> DRAFT | IN_PROGRESS
@@ -167,6 +167,12 @@ describe('Phase 16 Releases & Deployments E2E', () => {
 
     ownerAccessToken = readAccessToken(ownerRegistration);
 
+    const ownerWorkspaceResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces`).set(withBearer(ownerAccessToken)).send({
+      name: owner.workspaceName,
+    });
+
+    expect(ownerWorkspaceResponse.status).toBe(201);
+
     const ownerRecord = await prisma.user.findUnique({
       where: { email: owner.email.toLowerCase() },
       select: { id: true },
@@ -248,7 +254,6 @@ describe('Phase 16 Releases & Deployments E2E', () => {
         category: 'SAAS',
         status: 'LIVE',
         priority: 'MEDIUM',
-        createdById: ownerId,
       },
       select: { id: true },
     });
@@ -405,7 +410,6 @@ describe('Phase 16 Releases & Deployments E2E', () => {
         category: 'SAAS',
         status: 'LIVE',
         priority: 'MEDIUM',
-        createdById: ownerId,
       },
       select: { id: true },
     });
@@ -457,7 +461,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // C. Deployment CRUD/state â€” belongs to release/environment/application
+  // C. Deployment CRUD/state Ã¢â‚¬â€ belongs to release/environment/application
   // ---------------------------------------------------------------------------------------
 
   it('creates a deployment in DRAFT status with attempt=1, and records a CREATED activity entry', async () => {
@@ -514,7 +518,6 @@ describe('Phase 16 Releases & Deployments E2E', () => {
         category: 'SAAS',
         status: 'LIVE',
         priority: 'MEDIUM',
-        createdById: ownerId,
       },
       select: { id: true },
     });
@@ -545,7 +548,6 @@ describe('Phase 16 Releases & Deployments E2E', () => {
         category: 'SAAS',
         status: 'LIVE',
         priority: 'MEDIUM',
-        createdById: ownerId,
       },
       select: { id: true },
     });
@@ -851,7 +853,6 @@ describe('Phase 16 Releases & Deployments E2E', () => {
         category: 'SAAS',
         status: 'LIVE',
         priority: 'MEDIUM',
-        createdById: ownerId,
       },
       select: { id: true },
     });
@@ -1014,7 +1015,7 @@ describe('Phase 16 Releases & Deployments E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // H. Data integrity â€” optimistic concurrency
+  // H. Data integrity Ã¢â‚¬â€ optimistic concurrency
   // ---------------------------------------------------------------------------------------
 
   it('rejects a transition whose precondition status no longer matches (optimistic concurrency)', async () => {

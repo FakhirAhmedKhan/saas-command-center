@@ -1,4 +1,4 @@
-import { createAgent, createTestUser, registerUser, withBearer } from './auth';
+﻿import { createAgent, createTestUser, registerUser, withBearer } from './auth';
 import type { TestUserInput } from './contracts';
 import { expectSuccessfulStatus, readAccessToken, readResponseArray } from './response';
 import type { INestApplication } from '@nestjs/common';
@@ -54,6 +54,12 @@ export async function registerWorkspaceTestUser(
   expectSuccessfulStatus(registrationResponse);
 
   const accessToken = readAccessToken(registrationResponse);
+
+  const workspaceResponse = await agent.post(workspaceRoutes.root).set(withBearer(accessToken)).send({
+    name: input.workspaceName,
+  });
+
+  expectSuccessfulStatus(workspaceResponse);
 
   const databaseUser = await prisma.user.findUnique({
     where: {

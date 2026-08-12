@@ -1,4 +1,4 @@
-import { resolveAnalyticsDateRange } from './analytics-date-range';
+﻿import { resolveAnalyticsDateRange } from './analytics-date-range';
 import { AnalyticsDatePreset } from '../dto/analytics-overview-query.dto';
 
 describe('resolveAnalyticsDateRange', () => {
@@ -47,7 +47,6 @@ describe('resolveAnalyticsDateRange', () => {
       resolveAnalyticsDateRange(
         {
           from: '2026-08-01',
-          to: '2026-08-07',
           preset: AnalyticsDatePreset.TODAY,
         },
 

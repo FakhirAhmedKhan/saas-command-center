@@ -1,4 +1,4 @@
-import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
+﻿import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
 import { createTestApp } from './helpers/create-test-app';
 import { resetDatabase } from './helpers/database';
 import { readAccessToken } from './helpers/response';
@@ -9,7 +9,7 @@ import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import request, { type Response } from 'supertest';
 
 /**
- * Phase 13 — Analytics Reports E2E
+ * Phase 13 â€” Analytics Reports E2E
  *
  * Real routes (apps/api/src/modules/analytics-reports/controllers/analytics-reports.controller.ts):
  *   GET /api/v1/workspaces/:workspaceId/websites/:websiteId/analytics/reports/pages
@@ -51,7 +51,7 @@ import request, { type Response } from 'supertest';
 
 const API_PREFIX = '/api/v1';
 
-// Date keys (YYYY-MM-DD) — the only format the DTO accepts for from/to.
+// Date keys (YYYY-MM-DD) â€” the only format the DTO accepts for from/to.
 const FROM = '2026-08-01';
 const TO = '2026-08-04';
 
@@ -686,6 +686,12 @@ describe('Phase 13 Analytics Reports E2E', () => {
 
     ownerAccessToken = readAccessToken(ownerRegistration);
 
+    const ownerWorkspaceResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces`).set(withBearer(ownerAccessToken)).send({
+      name: owner.workspaceName,
+    });
+
+    expect(ownerWorkspaceResponse.status).toBe(201);
+
     const ownerRecord = await prisma.user.findUnique({
       where: { email: owner.email.toLowerCase() },
       select: { id: true },
@@ -984,7 +990,7 @@ describe('Phase 13 Analytics Reports E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // E. Dimensions report — every implemented AnalyticsReportDimension enum value
+  // E. Dimensions report â€” every implemented AnalyticsReportDimension enum value
   // ---------------------------------------------------------------------------------------
 
   it('returns the sources dimension report reconciling total page views to 40', async () => {
@@ -1299,10 +1305,10 @@ describe('Phase 13 Analytics Reports E2E', () => {
   });
 
   it('bounds the CSV export at ANALYTICS_EXPORT_MAX_ROWS regardless of requested limit', async () => {
-    // The export routes reuse PageReportQueryDto, whose `limit` caps at 100 via @Max —
+    // The export routes reuse PageReportQueryDto, whose `limit` caps at 100 via @Max â€”
     // the export path itself always internally requests ANALYTICS_EXPORT_MAX_ROWS (5000)
     // rows via loadPagesReport(..., 1, ANALYTICS_EXPORT_MAX_ROWS), ignoring any client-supplied
-    // limit. Only 4 distinct paths exist in the fixture, so the export can never exceed 4 rows —
+    // limit. Only 4 distinct paths exist in the fixture, so the export can never exceed 4 rows â€”
     // verifying the export ignores/ is not bypassable via an oversized `limit` query value.
     const response = await get(exportPagesUrl(), ownerAccessToken, {
       from: FROM,

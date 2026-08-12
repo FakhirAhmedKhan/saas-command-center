@@ -1,4 +1,4 @@
-import { createAgent, createTestUser, loginUser, registerUser, withBearer } from './helpers/auth';
+﻿import { createAgent, createTestUser, loginUser, registerUser, withBearer } from './helpers/auth';
 import { TEST_ROUTES } from './helpers/contracts';
 import { buildCookieWithValue, readCookiePair, readCookieValue, readFirstSetCookie } from './helpers/cookie';
 import { createTestApp } from './helpers/create-test-app';
@@ -85,7 +85,7 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
       expect(readResponseEmail(meResponse)).toBe(user.email);
     });
 
-    it('creates the registered user as OWNER of the initial workspace', async () => {
+    it('registers the user without automatically creating a workspace', async () => {
       const user = createTestUser();
 
       const response = await registerUser(createAgent(app), user);
@@ -108,31 +108,16 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
       }
 
       expect(databaseUser.email).toBe(user.email);
-
       expect(databaseUser.displayName).toBe(user.name);
 
       const membership = await prisma.workspaceMember.findFirst({
         where: {
           userId: databaseUser.id,
         },
-        select: {
-          role: true,
-          workspace: {
-            select: {
-              name: true,
-            },
-          },
-        },
       });
 
-      expect(membership).toEqual({
-        role: 'OWNER',
-        workspace: {
-          name: user.workspaceName,
-        },
-      });
+      expect(membership).toBeNull();
     });
-
     it('does not expose a refresh token or password hash in the registration body', async () => {
       const response = await registerUser(createAgent(app), createTestUser());
 

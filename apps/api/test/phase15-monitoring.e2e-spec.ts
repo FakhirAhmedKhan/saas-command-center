@@ -1,33 +1,40 @@
-import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
+﻿import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
 import { createTestApp } from './helpers/create-test-app';
 import { resetDatabase } from './helpers/database';
-import { readAccessToken } from './helpers/response';
+import { readAccessToken, readResourceId } from './helpers/response';
 import { PrismaService } from '../src/database/prisma.service';
-import { HealthCheckStatus, HealthIncidentStatus, HealthTargetType, WorkspaceRole } from '../src/generated/prisma/enums';
+import {
+  ApplicationCategory,
+  ApplicationStatus,
+  HealthCheckStatus,
+  HealthIncidentStatus,
+  HealthTargetType,
+  WorkspaceRole,
+} from '../src/generated/prisma/enums';
 import { HealthCheckRunnerService } from '../src/modules/monitoring/services/health-check-runner.service';
 import type { INestApplication } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import request, { type Response } from 'supertest';
 
 /**
- * Phase 15 — Monitoring E2E
+ * Phase 15 â€” Monitoring E2E
  *
  * NOTE: apps/api/test/monitoring.e2e-spec.ts already exists but references undefined variables
  * (workspaceId, adminAccessToken, applicationId, anotherWorkspaceId, viewerAccessToken are never
- * declared anywhere in that file — its fixture-setup block at lines 15-19 is only a comment).
+ * declared anywhere in that file â€” its fixture-setup block at lines 15-19 is only a comment).
  * That file cannot compile/run as written; it is a pre-existing test-file (fixture) bug, not
  * something introduced here. This Phase 15 suite is written standalone against the real
  * implementation, is fully self-contained, and does not depend on or duplicate that broken file.
  *
  * Real routes (apps/api/src/modules/monitoring/controllers/monitoring.controller.ts), all
  * mounted under /api/v1/workspaces/:workspaceId/monitoring, guarded by
- * JwtAuthGuard + WorkspaceAccessGuard (class-level; no WorkspaceRolesGuard — write operations
+ * JwtAuthGuard + WorkspaceAccessGuard (class-level; no WorkspaceRolesGuard â€” write operations
  * are guarded in-service via MonitoringAccessService.assertCanManage, which requires
- * OWNER, ADMIN, or DEVELOPER — monitoring-access.service.ts MANAGEMENT_ROLES):
+ * OWNER, ADMIN, or DEVELOPER â€” monitoring-access.service.ts MANAGEMENT_ROLES):
  *   GET   /monitoring/summary
  *   GET   /monitoring/targets
  *   GET   /monitoring/checks                      (HealthCheckListQueryDto: status, targetType,
- *                                                   enabled, applicationId, websiteId — no page/
+ *                                                   enabled, applicationId, websiteId â€” no page/
  *                                                   limit; service caps at take: 200)
  *   POST  /monitoring/checks                       (CreateHealthCheckDto)
  *   GET   /monitoring/checks/:checkId
@@ -37,7 +44,7 @@ import request, { type Response } from 'supertest';
  *   GET   /monitoring/incidents                     (IncidentListQueryDto: status)
  *   GET   /monitoring/applications/:applicationId/summary
  *
- * There is NO delete/archive endpoint for health checks in this implementation — only enable/
+ * There is NO delete/archive endpoint for health checks in this implementation â€” only enable/
  * disable via PATCH { enabled: false }, which additionally auto-resolves any open incident
  * (MonitoringService.update -> resolveOpenIncident when merged.enabled === false).
  *
@@ -72,7 +79,7 @@ import request, { type Response } from 'supertest';
  * assumed reachable in CI; instead this suite drives HealthCheckHistory/HealthCheck/HealthIncident
  * state directly via Prisma to assert the CONTRACT (list/detail/history/incident endpoints,
  * privacy, tenant isolation, pagination-equivalent behavior), and separately exercises the REAL
- * runner (HealthCheckRunnerService.run, resolved from the Nest DI container — not a mock) against
+ * runner (HealthCheckRunnerService.run, resolved from the Nest DI container â€” not a mock) against
  * a URL that is guaranteed to fail DNS resolution (an RFC 2606 reserved, non-resolvable domain),
  * which deterministically produces a DOWN result without depending on any real external service
  * being up. This still exercises the true runner code path end-to-end (HTTP attempt -> failure
@@ -82,7 +89,7 @@ import request, { type Response } from 'supertest';
 
 const API_PREFIX = '/api/v1';
 
-// RFC 2606 reserved TLD guaranteed to never resolve — used to deterministically exercise the
+// RFC 2606 reserved TLD guaranteed to never resolve â€” used to deterministically exercise the
 // REAL HealthCheckRunnerService failure path without depending on any external network service.
 const UNRESOLVABLE_URL = 'https://phase15-guaranteed-unresolvable.invalid/health';
 
@@ -177,10 +184,58 @@ describe('Phase 15 Monitoring E2E', () => {
   }
 
   async function createCheck(token: string, overrides: Partial<Record<string, unknown>> = {}): Promise<Response> {
-    return request(app.getHttpServer())
+    const requestedUrl = overrides.url;
+
+    /*
+     * UNRESOLVABLE_URL is used only for runner-failure tests.
+     *
+     * Production correctly validates DNS when a check is created, so an
+     * already-unresolvable hostname cannot legitimately be configured
+     * through the API.
+     *
+     * To test the real runner failure path deterministically, create the
+     * check with a valid public URL first and then simulate the hostname
+     * becoming unavailable after configuration by changing only the stored
+     * URL directly in the test database.
+     */
+    const simulateDnsFailureAfterCreation = requestedUrl === UNRESOLVABLE_URL;
+
+    const response = await request(app.getHttpServer())
       .post(checksUrl())
       .set(withBearer(token))
-      .send(validCreatePayload({ applicationId, ...overrides }));
+      .send(
+        validCreatePayload({
+          applicationId,
+          ...overrides,
+          ...(simulateDnsFailureAfterCreation
+            ? {
+                url: 'https://example.com/health',
+              }
+            : {}),
+        }),
+      );
+
+    if (simulateDnsFailureAfterCreation && response.status === 201) {
+      const checkId = body(response).id;
+
+      if (typeof checkId !== 'string') {
+        throw new Error('Expected created health check id.');
+      }
+
+      await prisma.healthCheck.update({
+        where: {
+          id: checkId,
+        },
+        data: {
+          url: UNRESOLVABLE_URL,
+        },
+      });
+
+      const responseBody = response.body as JsonRecord;
+      responseBody.url = UNRESOLVABLE_URL;
+    }
+
+    return response;
   }
 
   beforeAll(async () => {
@@ -201,6 +256,12 @@ describe('Phase 15 Monitoring E2E', () => {
     expect(ownerRegistration.status).toBe(201);
 
     ownerAccessToken = readAccessToken(ownerRegistration);
+
+    const ownerWorkspaceResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces`).set(withBearer(ownerAccessToken)).send({
+      name: owner.workspaceName,
+    });
+
+    expect(ownerWorkspaceResponse.status).toBe(201);
 
     const ownerRecord = await prisma.user.findUnique({
       where: { email: owner.email.toLowerCase() },
@@ -280,10 +341,9 @@ describe('Phase 15 Monitoring E2E', () => {
         workspaceId,
         name: 'Phase 15 Application',
         slug: `phase15-application-${randomUUID()}`,
-        category: 'WEB_APP',
-        status: 'ACTIVE',
+        category: ApplicationCategory.SAAS,
+        status: ApplicationStatus.LIVE,
         priority: 'MEDIUM',
-        createdById: ownerId,
       },
       select: { id: true },
     });
@@ -419,7 +479,7 @@ describe('Phase 15 Monitoring E2E', () => {
     const checkId = body(createResponse).id as string;
 
     // Directly seed an OPEN incident to verify the disable path resolves it (no delete endpoint
-    // exists in this implementation — disabling is the closest analogue to "archive").
+    // exists in this implementation â€” disabling is the closest analogue to "archive").
     await prisma.healthIncident.create({
       data: {
         healthCheckId: checkId,
@@ -529,28 +589,28 @@ describe('Phase 15 Monitoring E2E', () => {
   });
 
   it('rejects a check referencing an application from a different workspace', async () => {
+    const foreignWorkspaceName = `Phase 15 Foreign Workspace ${randomUUID()}`;
+
+    const workspaceResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces`).set(withBearer(outsiderAccessToken)).send({
+      name: foreignWorkspaceName,
+    });
+
+    expect(workspaceResponse.status).toBe(201);
+
+    const outsiderWorkspaceId = readResourceId(workspaceResponse);
+
     const outsiderApplication = await prisma.saasApplication.create({
       data: {
-        workspaceId: requireValue(
-          (
-            await prisma.workspaceMember.findFirst({
-              where: {
-                userId: requireValue((await prisma.user.findFirst({ where: { name: 'Phase 15 Outsider' } }))?.id, 'Outsider user missing'),
-                role: WorkspaceRole.OWNER,
-              },
-              select: { workspaceId: true },
-            })
-          )?.workspaceId,
-          'Outsider workspace missing',
-        ),
+        workspaceId: outsiderWorkspaceId,
         name: 'Foreign Application',
         slug: `phase15-foreign-application-${randomUUID()}`,
-        category: 'WEB_APP',
-        status: 'ACTIVE',
+        category: ApplicationCategory.SAAS,
+        status: ApplicationStatus.LIVE,
         priority: 'MEDIUM',
-        createdById: requireValue((await prisma.user.findFirst({ where: { name: 'Phase 15 Outsider' } }))?.id, 'Outsider user missing'),
       },
-      select: { id: true },
+      select: {
+        id: true,
+      },
     });
 
     const response = await createCheck(ownerAccessToken, {
@@ -686,7 +746,7 @@ describe('Phase 15 Monitoring E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // E. Health history — exercising the REAL runner against a guaranteed-unresolvable host
+  // E. Health history â€” exercising the REAL runner against a guaranteed-unresolvable host
   // ---------------------------------------------------------------------------------------
 
   it('recording a failed health-check run: writes history, updates the check, and increments consecutiveFailures', async () => {
@@ -809,7 +869,7 @@ describe('Phase 15 Monitoring E2E', () => {
 
     // Simulate recovery directly through the runner's own resolution logic without requiring a
     // live external HTTP success (the "success" branch of HealthCheckRunnerService.run resolves
-    // any OPEN incident for that check unconditionally when isFailure is false — reproduced here
+    // any OPEN incident for that check unconditionally when isFailure is false â€” reproduced here
     // via the same production update the runner performs, to assert the incident-resolution
     // contract deterministically).
     await prisma.$transaction(async (transaction) => {
@@ -914,7 +974,7 @@ describe('Phase 15 Monitoring E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // H. Pagination/filtering/sorting (per real DTO — no page/limit; filter fields only)
+  // H. Pagination/filtering/sorting (per real DTO â€” no page/limit; filter fields only)
   // ---------------------------------------------------------------------------------------
 
   it('filters checks by targetType', async () => {

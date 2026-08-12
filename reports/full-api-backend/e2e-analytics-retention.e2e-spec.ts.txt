@@ -1,0 +1,14 @@
+PASS test/analytics-retention.e2e-spec.ts (11.037 s)
+  Analytics Retention E2E
+    √ deletes only processed raw events older than the raw cutoff (2001 ms)
+    √ deletes expired sessions and removes only orphaned visitors (1159 ms)
+    √ deletes expired hourly and daily aggregates while preserving recent buckets (714 ms)
+    √ limits retention changes to the requested website (746 ms)
+    √ allows OWNER and ADMIN but denies DEVELOPER and VIEWER (1506 ms)
+    √ requires authentication and hides foreign websites (963 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       6 passed, 6 total
+Snapshots:   0 total
+Time:        11.497 s
+Ran all test suites within paths "test/analytics-retention.e2e-spec.ts".

@@ -48,7 +48,7 @@ export function buildRegisterPayload(user: TestUserInput) {
     displayName: user.name,
     email: user.email.trim().toLowerCase(),
     password: user.password,
-    workspaceName: user.workspaceName,
+    // workspaceName: user.workspaceName,
   };
 }
 

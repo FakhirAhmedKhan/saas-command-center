@@ -1,0 +1,18 @@
+PASS test/workspace-roles.e2e-spec.ts (13.294 s)
+  Workspace Roles and Ownership E2E
+    √ allows OWNER and ADMIN to update a workspace (1732 ms)
+    √ prevents DEVELOPER and VIEWER from updating a workspace (1104 ms)
+    √ prevents DEVELOPER and VIEWER from adding members (1214 ms)
+    √ allows ADMIN to manage non-owner members but not create another OWNER (1019 ms)
+    √ prevents ADMIN from changing or removing the workspace OWNER (852 ms)
+    √ allows OWNER to transfer ownership to an existing member (814 ms)
+    √ prevents ADMIN from transferring workspace ownership (873 ms)
+    √ rejects ownership transfer to a user who is not a workspace member (898 ms)
+    √ prevents the only OWNER from being demoted or removed (654 ms)
+    √ prevents members from managing a foreign workspace (725 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       10 passed, 10 total
+Snapshots:   0 total
+Time:        13.715 s
+Ran all test suites within paths "test/workspace-roles.e2e-spec.ts".

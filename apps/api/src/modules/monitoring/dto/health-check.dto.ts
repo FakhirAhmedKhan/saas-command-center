@@ -1,7 +1,7 @@
-import { HealthCheckStatus, HealthIncidentStatus, HealthTargetType } from '../../../generated/prisma/client';
+﻿import { HealthCheckStatus, HealthIncidentStatus, HealthTargetType } from '../../../generated/prisma/client';
 import type { HealthCheckListQueryInput, IncidentListQueryInput, SaveHealthCheckInput, UpdateHealthCheckInput } from '@command-center/shared-types';
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, IsUrl, IsUUID, Max, MaxLength, Min, ValidateIf } from 'class-validator';
 
 export class CreateHealthCheckDto implements SaveHealthCheckInput {
@@ -119,7 +119,19 @@ export class HealthCheckListQueryDto implements HealthCheckListQueryInput {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(({ obj }) => {
+    const rawValue: unknown = (obj as Record<string, unknown>).enabled;
+
+    if (rawValue === 'true' || rawValue === true) {
+      return true;
+    }
+
+    if (rawValue === 'false' || rawValue === false) {
+      return false;
+    }
+
+    return rawValue;
+  })
   @IsBoolean()
   enabled?: boolean;
 

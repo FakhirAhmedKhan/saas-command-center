@@ -1,0 +1,704 @@
+[31m[Nest] 24208  - [39m08/12/2026, 5:45:44 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPrismaClientKnownRequestError: 
+Invalid `transaction.user.create()` invocation in
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\auth\services\auth.service.ts:53:52
+
+  50 
+  51 try {
+  52   const user = await this.prisma.$transaction(async (transaction) => {
+→ 53     const createdUser = await transaction.user.create(
+The table `public.users` does not exist in the current database.
+    at Jr.handleRequestError (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\[4m@prisma\client[24m\src\runtime\RequestHandler.ts:237:13)
+    at Jr.handleAndLogRequestError (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\[4m@prisma\client[24m\src\runtime\RequestHandler.ts:183:12)
+    at Jr.request (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\[4m@prisma\client[24m\src\runtime\RequestHandler.ts:152:12)
+[90m    at processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at a (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\[4m@prisma\client[24m\src\runtime\getPrismaClient.ts:1014:24)
+    at [90mC:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\[39msrc\modules\auth\services\auth.service.ts:53:29
+    at Proxy._transactionWithCallback (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\[4m@prisma\client[24m\src\runtime\getPrismaClient.ts:861:18)
+    at AuthService.register [90m(C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\[39msrc\modules\auth\services\auth.service.ts:52:20[90m)[39m
+    at AuthController.register [90m(C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\[39msrc\modules\auth\controllers\auth.controller.ts:59:20[90m)[39m
+    at C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\[4m@nestjs\core[24m\router\router-execution-context.js:47:62
+    at C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\[4m@nestjs\core[24m\router\router-proxy.js:9:17 {
+  code: [32m'P2021'[39m,
+  meta: {
+    modelName: [32m'User'[39m,
+    driverAdapterError: DriverAdapterError: TableDoesNotExist
+        at PgTransaction.onError (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\[4m@prisma\adapter-pg[24m\dist\index.js:675:11)
+        at PgTransaction.performIO (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\[4m@prisma\adapter-pg[24m\dist\index.js:670:12)
+    [90m    at processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+        at PgTransaction.queryRaw (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\[4m@prisma\adapter-pg[24m\dist\index.js:604:30)
+        at e.interpretNode (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\[4m@prisma\client-engine-runtime[24m\src\interpreter\query-interpreter.ts:186:26)
+        at e.interpretNode (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\[4m@prisma\client-engine-runtime[24m\src\interpreter\query-interpreter.ts:213:41)
+        at e.interpretNode (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\[4m@prisma\client-engine-runtime[24m\src\interpreter\query-interpreter.ts:272:41)
+        at e.run (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\[4m@prisma\client-engine-runtime[24m\src\interpreter\query-interpreter.ts:94:23)
+        at execute (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\[4m@prisma\client[24m\src\runtime\core\engines\client\LocalExecutor.ts:81:12)
+        at Ut.request (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\[4m@prisma\client[24m\src\runtime\core\engines\client\ClientEngine.ts:510:22)
+        at Object.singleLoader (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\[4m@prisma\client[24m\src\runtime\RequestHandler.ts:112:26) {
+      cause: {
+        originalCode: [32m'42P01'[39m,
+        originalMessage: [32m'relation "public.users" does not exist'[39m,
+        kind: [32m'TableDoesNotExist'[39m,
+        table: [32m'public.users'[39m
+      }
+    }
+  },
+  clientVersion: [32m'7.9.1'[39m
+}
+FAIL test/phase17-team-operations.e2e-spec.ts (5.745 s)
+  Phase 17 Team Operations E2E
+    × rejects anonymous access to list invitations (2 ms)
+    × allows an OWNER to create an invitation (1 ms)
+    × allows an ADMIN to create an invitation
+    × rejects a DEVELOPER creating an invitation (only OWNER/ADMIN may manage invitations)
+    × rejects a DEVELOPER listing invitations (no read access for lower roles on this controller) (1 ms)
+    × rejects an invalid email
+    × rejects an invalid workspace role
+    × rejects inviting an email that already belongs to a workspace member (409)
+    × allows inviting an email belonging to an existing platform user who is not yet a member
+    × lists invitations scoped to the workspace, filterable by status
+    × rejects an invalid status filter
+    × resends a pending invitation, rotating the token and incrementing sendCount
+    × rejects resending an already-revoked invitation
+    × returns 404 when revoking an invitation that is not pending
+    × returns 404 for a nonexistent invitation id
+    × rejects an invitation-management call scoped to a workspace the invitation does not belong to
+    × allows anonymous preview of a pending invitation by token
+    × returns 404 for an unknown/garbage token
+    × requires authentication to accept an invitation
+    × rejects accepting an invitation whose email does not match the authenticated user
+    × accepts a matching invitation: creates the workspace membership with the invited role
+    × rejects accepting the same invitation a second time (already consumed) (1 ms)
+    × accepting an invitation when already a member does not duplicate membership or change role
+    × requires authentication to decline an invitation
+    × declines a matching invitation without creating a workspace membership
+    × lazily expires a PENDING invitation once past expiresAt, surfacing EXPIRED on preview (1 ms)
+    × rejects accepting an expired invitation with a 409
+    × enforces the invitation resend rate limit of 5 per 15 minutes
+    × rejects anonymous access to notifications
+    × lists only the authenticated user own notifications
+    × reports an accurate unread count and reduces it after marking all as read
+    × marks a single notification as read and persists readAt
+    × rejects marking as read a notification that does not belong to the caller
+    × returns 400 for a malformed notification id
+    × filters notifications by type
+    × rejects an invalid notification type filter (1 ms)
+
+  ● Phase 17 Team Operations E2E › rejects anonymous access to list invitations
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › allows an OWNER to create an invitation
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › allows an ADMIN to create an invitation
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › rejects a DEVELOPER creating an invitation (only OWNER/ADMIN may manage invitations)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › rejects a DEVELOPER listing invitations (no read access for lower roles on this controller)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › rejects an invalid email
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › rejects an invalid workspace role
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › rejects inviting an email that already belongs to a workspace member (409)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › allows inviting an email belonging to an existing platform user who is not yet a member
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › lists invitations scoped to the workspace, filterable by status
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › rejects an invalid status filter
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › resends a pending invitation, rotating the token and incrementing sendCount
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › rejects resending an already-revoked invitation
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › returns 404 when revoking an invitation that is not pending
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › returns 404 for a nonexistent invitation id
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › rejects an invitation-management call scoped to a workspace the invitation does not belong to
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › allows anonymous preview of a pending invitation by token
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › returns 404 for an unknown/garbage token
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › requires authentication to accept an invitation
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › rejects accepting an invitation whose email does not match the authenticated user
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › accepts a matching invitation: creates the workspace membership with the invited role
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › rejects accepting the same invitation a second time (already consumed)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › accepting an invitation when already a member does not duplicate membership or change role
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › requires authentication to decline an invitation
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › declines a matching invitation without creating a workspace membership
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › lazily expires a PENDING invitation once past expiresAt, surfacing EXPIRED on preview
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › rejects accepting an expired invitation with a 409
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › enforces the invitation resend rate limit of 5 per 15 minutes
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › rejects anonymous access to notifications
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › lists only the authenticated user own notifications
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › reports an accurate unread count and reduces it after marking all as read
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › marks a single notification as read and persists readAt
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › rejects marking as read a notification that does not belong to the caller
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › returns 400 for a malformed notification id
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › filters notifications by type
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+  ● Phase 17 Team Operations E2E › rejects an invalid notification type filter
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+    [0m [90m 189 |[39m     [36mconst[39m ownerRegistration [33m=[39m [36mawait[39m registerUser(createAgent(app)[33m,[39m owner)[33m;[39m
+     [90m 190 |[39m
+    [31m[1m>[22m[39m[90m 191 |[39m     expect(ownerRegistration[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 192 |[39m
+     [90m 193 |[39m     ownerAccessToken [33m=[39m readAccessToken(ownerRegistration)[33m;[39m
+     [90m 194 |[39m[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:191:38)
+
+Test Suites: 1 failed, 1 total
+Tests:       36 failed, 36 total
+Snapshots:   0 total
+Time:        6.226 s, estimated 7 s
+Ran all test suites within paths "test/phase17-team-operations.e2e-spec.ts".
+undefined
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api:
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command failed with exit code 1: jest --config ./test/jest-e2e.config.cjs --runInBand --runTestsByPath test/phase17-team-operations.e2e-spec.ts

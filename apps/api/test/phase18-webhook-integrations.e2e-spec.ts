@@ -1,9 +1,11 @@
 import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
 import { createTestApp } from './helpers/create-test-app';
 import { resetDatabase } from './helpers/database';
+import { resetTestRedis } from './helpers/redis';
 import { readAccessToken } from './helpers/response';
 import { PrismaService } from '../src/database/prisma.service';
 import { WebhookAttemptOutcome, WebhookDeliveryStatus, WebhookEventType, WorkspaceRole } from '../src/generated/prisma/enums';
+import { RedisService } from '../src/infrastructure/redis/redis.service';
 import { WebhookSecretCryptoService } from '../src/modules/webhooks/services/webhook-secret-crypto.service';
 import { WebhookSignatureService } from '../src/modules/webhooks/services/webhook-signature.service';
 import type { INestApplication } from '@nestjs/common';
@@ -11,14 +13,14 @@ import { randomUUID } from 'node:crypto';
 import request, { type Response } from 'supertest';
 
 /**
- * Phase 18 — Webhook Integrations E2E
+ * Phase 18 â€” Webhook Integrations E2E
  *
  * NOTE: apps/api/test/webhooks.e2e-spec.ts already exists but, like monitoring.e2e-spec.ts,
  * references undefined variables (workspaceId, ownerToken, publicWebhookUrl, viewerToken,
- * otherWorkspaceId are never declared — the fixture-setup block is only a comment) and cannot
+ * otherWorkspaceId are never declared â€” the fixture-setup block is only a comment) and cannot
  * compile/run as written. This is a pre-existing test-file bug, not introduced here. This Phase 18
  * suite is fully self-contained and does not depend on that broken file. It also has no delete
- * endpoint to test — the real implementation only supports create/update/disable (soft), matching
+ * endpoint to test â€” the real implementation only supports create/update/disable (soft), matching
  * that file's own implicit assumption.
  *
  * Real routes (webhooks.controller.ts), mounted under
@@ -30,7 +32,7 @@ import request, { type Response } from 'supertest';
  *   GET  /                          list endpoints + event catalog + canManage flag
  *   POST /                          create (rate limited 20/hour, scope 'webhook-create')
  *   PATCH /:endpointId               update
- *   POST /:endpointId/disable        soft-disable (PATCH enabled:false under the hood) — there is
+ *   POST /:endpointId/disable        soft-disable (PATCH enabled:false under the hood) â€” there is
  *                                     NO delete/archive/hard-remove endpoint in this implementation
  *   POST /:endpointId/rotate-secret  rotate signing secret (rate limited 5/hour, scope
  *                                     'webhook-secret-rotation')
@@ -40,7 +42,7 @@ import request, { type Response } from 'supertest';
  *                                     status, page, limit)
  *
  * CreateWebhookEndpointDto: name (string, max 100), url (http(s), max 2000), eventTypes
- * (WebhookEventType[], 1-20 items, no duplicates, WEBHOOK_TEST cannot be subscribed to manually —
+ * (WebhookEventType[], 1-20 items, no duplicates, WEBHOOK_TEST cannot be subscribed to manually â€”
  * it is reserved for the test-delivery endpoint), timeoutMs (optional, 1000-30000, default via
  * WEBHOOK_DEFAULT_TIMEOUT_MS=10000), maxAttempts (optional, 1-8, default via
  * WEBHOOK_DEFAULT_MAX_ATTEMPTS=5), enabled (optional, default true).
@@ -54,18 +56,18 @@ import request, { type Response } from 'supertest';
  * on update whenever `url` is supplied.
  *
  * Secrets: WebhookSecretCryptoService.generateSecret() returns 32 random bytes (base64url); the
- * RAW secret is returned ONLY in the create() and rotateSecret() response bodies — it is NEVER
+ * RAW secret is returned ONLY in the create() and rotateSecret() response bodies â€” it is NEVER
  * persisted in plaintext (only AES-256-GCM ciphertext + iv + authTag + keyVersion), and
  * mapEndpoint() (used by list()/update()/disable()) exposes only `secretConfigured: true`, never
  * the ciphertext fields or the raw secret. WebhookSignatureService signs
  * `${timestamp}.${rawBody}` with HMAC-SHA256 keyed on the raw (decrypted) secret, formatted as
- * `v1=<hex>`; verify() rejects mismatched lengths outright and otherwise uses timingSafeEqual —
+ * `v1=<hex>`; verify() rejects mismatched lengths outright and otherwise uses timingSafeEqual â€”
  * both the sign and verify paths are exercised directly here (resolved from the Nest DI
  * container) since there is no real external HTTP endpoint in this test environment to receive an
  * actual outbound delivery and its signature header.
  *
  * Idempotency: WebhookEvent -> WebhookDelivery fan-out uses `webhookDelivery.createMany({...,
- * skipDuplicates: true})` guarded by a DB @@unique([endpointId, eventId]) constraint — publishing
+ * skipDuplicates: true})` guarded by a DB @@unique([endpointId, eventId]) constraint â€” publishing
  * the same logical event twice for the same endpoint can never create two delivery rows.
  *
  * There is no real delivery worker exercised over live HTTP in this suite (no external server is
@@ -141,8 +143,12 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     return `${endpointUrl(endpointId)}/deliveries`;
   }
 
-  async function createEndpoint(token: string, overrides: Record<string, unknown> = {}): Promise<Response> {
-    return request(app.getHttpServer()).post(webhooksUrl()).set(withBearer(token)).send(validCreatePayload(overrides));
+  async function createEndpoint(
+    token: string,
+    overrides: Record<string, unknown> = {},
+    rateLimitIdentity = `phase18-create-${randomUUID()}`,
+  ): Promise<Response> {
+    return request(app.getHttpServer()).post(webhooksUrl()).set(withBearer(token)).set('x-tracking-key', rateLimitIdentity).send(validCreatePayload(overrides));
   }
 
   beforeAll(async () => {
@@ -152,6 +158,9 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     signatureService = app.get(WebhookSignatureService);
     cryptoService = app.get(WebhookSecretCryptoService);
 
+    const redis = app.get(RedisService);
+
+    await resetTestRedis(redis);
     await resetDatabase(prisma);
 
     const owner = createTestUser({
@@ -164,6 +173,12 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     expect(ownerRegistration.status).toBe(201);
 
     ownerAccessToken = readAccessToken(ownerRegistration);
+
+    const ownerWorkspaceResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces`).set(withBearer(ownerAccessToken)).send({
+      name: owner.workspaceName,
+    });
+
+    expect(ownerWorkspaceResponse.status).toBe(201);
 
     const ownerRecord = await prisma.user.findUnique({
       where: { email: owner.email.toLowerCase() },
@@ -558,7 +573,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // D. Signature — exercised directly via the real WebhookSignatureService (DI-resolved, not
+  // D. Signature â€” exercised directly via the real WebhookSignatureService (DI-resolved, not
   // mocked), since no external HTTP receiver exists in this test environment.
   // ---------------------------------------------------------------------------------------
 
@@ -804,7 +819,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // G. Idempotency — same logical event never creates duplicate deliveries for one endpoint
+  // G. Idempotency â€” same logical event never creates duplicate deliveries for one endpoint
   // ---------------------------------------------------------------------------------------
 
   it('never creates two delivery rows for the same (endpoint, event) pair', async () => {
@@ -936,7 +951,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
   it('rejects more than 20 event-type subscriptions', async () => {
     // Only 8 real event types exist in the catalog, so this exercises the ArrayMaxSize(20) bound
     // using a repeated/invalid-shaped payload solely to trip DTO-level length validation before
-    // any enum check — still asserts the real constraint, not a fabricated one.
+    // any enum check â€” still asserts the real constraint, not a fabricated one.
     const response = await createEndpoint(ownerAccessToken, {
       eventTypes: Array.from({ length: 21 }, () => WebhookEventType.DEPLOYMENT_FAILED),
     });
@@ -949,17 +964,25 @@ describe('Phase 18 Webhook Integrations E2E', () => {
   // ---------------------------------------------------------------------------------------
 
   it('enforces the webhook secret rotation rate limit of 5 per hour', async () => {
+    const rateLimitIdentity = `phase18-rotation-${randomUUID()}`;
+
     const createResponse = await createEndpoint(ownerAccessToken, {
       name: 'Phase 18 Rate Limit Target',
     });
+
+    expect(createResponse.status).toBe(201);
 
     const endpointId = (body(createResponse).endpoint as JsonRecord).id as string;
 
     let lastStatus = 0;
 
     for (let attempt = 0; attempt < 6; attempt += 1) {
-      // bucket; parallelizing would make the assertion racy.
-      const response = await request(app.getHttpServer()).post(rotateUrl(endpointId)).set(withBearer(ownerAccessToken));
+      // All attempts intentionally share one identity so the real
+      // five-per-hour production rate limit is exercised deterministically.
+      const response = await request(app.getHttpServer())
+        .post(rotateUrl(endpointId))
+        .set(withBearer(ownerAccessToken))
+        .set('x-tracking-key', rateLimitIdentity);
 
       lastStatus = response.status;
     }

@@ -42,6 +42,33 @@ if (!safeTestDatabase) {
  * the isolated test database.
  */
 process.env.DATABASE_URL = testDatabaseUrl;
+const testRedisUrl = process.env.TEST_REDIS_URL;
+
+if (!testRedisUrl) {
+  throw new Error('TEST_REDIS_URL is required for E2E tests');
+}
+
+let parsedRedisUrl: URL;
+
+try {
+  parsedRedisUrl = new URL(testRedisUrl);
+} catch {
+  throw new Error('TEST_REDIS_URL must be a valid Redis URL');
+}
+
+const redisDatabaseRaw = parsedRedisUrl.pathname.replace(/^\//, '');
+const redisDatabase = redisDatabaseRaw ? Number(redisDatabaseRaw) : 0;
+
+if (!Number.isInteger(redisDatabase) || redisDatabase <= 0) {
+  throw new Error(
+    ['E2E tests refused to start.', 'TEST_REDIS_URL must use a dedicated non-zero Redis database.', `Redis database: ${redisDatabase}`].join(' '),
+  );
+}
+
+/*
+ * Never allow E2E tests to use the normal development Redis DB.
+ */
+process.env.REDIS_URL = testRedisUrl;
 
 /*
  * Disable background processing during

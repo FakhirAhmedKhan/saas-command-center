@@ -1,49 +1,51 @@
 import { createAgent, createTestUser, registerUser, withBearer } from './helpers/auth';
 import { createTestApp } from './helpers/create-test-app';
 import { resetDatabase } from './helpers/database';
+import { resetTestRedis } from './helpers/redis';
 import { readAccessToken } from './helpers/response';
 import { PrismaService } from '../src/database/prisma.service';
 import { NotificationType, WorkspaceInvitationStatus, WorkspaceRole } from '../src/generated/prisma/enums';
+import { RedisService } from '../src/infrastructure/redis/redis.service';
 import type { INestApplication } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import request, { type Response } from 'supertest';
 
 /**
- * Phase 17 — Team Operations E2E
+ * Phase 17 â€” Team Operations E2E
  *
  * SCOPE NOTE: the "development" surface referenced generically in the Phase 17 brief (milestones/
- * tasks/blockers) already has thorough, existing e2e coverage — apps/api/test/development.e2e-spec.ts,
+ * tasks/blockers) already has thorough, existing e2e coverage â€” apps/api/test/development.e2e-spec.ts,
  * development-activity.e2e-spec.ts, development-progress.e2e-spec.ts, development-roles.e2e-spec.ts
  * (27 test cases total, confirmed by inspection). Workspace member listing/roles are likewise
  * already covered by apps/api/test/workspace-members.e2e-spec.ts and workspace-roles.e2e-spec.ts.
- * The genuinely UNTESTED real implementation under apps/api/src/modules/team-operations/ — workspace
- * invitations (create/list/resend/revoke/preview/accept/decline) and user notifications — is what
+ * The genuinely UNTESTED real implementation under apps/api/src/modules/team-operations/ â€” workspace
+ * invitations (create/list/resend/revoke/preview/accept/decline) and user notifications â€” is what
  * this Phase 17 suite covers, to avoid duplicating existing, working coverage.
  *
  * Real routes:
  *   Invitations (workspace-invitations.controller.ts), mounted under
  *   /api/v1/workspaces/:workspaceId/invitations, guarded by JwtAuthGuard + WorkspaceAccessGuard +
  *   WorkspaceRolesGuard + SharedRateLimitGuard. EVERY route requires @WorkspaceRoles(OWNER, ADMIN)
- *   — there is no read access for DEVELOPER/VIEWER on this controller at all (unlike monitoring/
+ *   â€” there is no read access for DEVELOPER/VIEWER on this controller at all (unlike monitoring/
  *   releases, which allow read-only access to lower roles):
  *     GET  /                       (InvitationListQueryDto: status)
- *     POST /                       (CreateWorkspaceInvitationDto: email, role) — rate limited
+ *     POST /                       (CreateWorkspaceInvitationDto: email, role) â€” rate limited
  *                                    20/hour (SharedRateLimit scope 'workspace-invitation-create')
- *     POST /:invitationId/resend   — rate limited 5/15min (scope 'workspace-invitation-resend')
+ *     POST /:invitationId/resend   â€” rate limited 5/15min (scope 'workspace-invitation-resend')
  *     POST /:invitationId/revoke
  *
  *   Invitation response (invitation-response.controller.ts), mounted under /api/v1/invitations,
  *   token-based (NOT workspace-param-based) trust model:
- *     GET  /:token          @Public() — preview, no auth required
+ *     GET  /:token          @Public() â€” preview, no auth required
  *     POST /:token/accept   requires JwtAuthGuard (any authenticated user; email match enforced
  *                            in-service)
  *     POST /:token/decline  requires JwtAuthGuard
  *
  *   Notifications (notifications.controller.ts), mounted under /api/v1/notifications, guarded
- *   only by JwtAuthGuard — NOT workspace-scoped in the URL at all; every method filters by the
+ *   only by JwtAuthGuard â€” NOT workspace-scoped in the URL at all; every method filters by the
  *   authenticated user's id in NotificationService:
  *     GET  /                  (NotificationListQueryDto: unreadOnly, type; `page` is defined on
- *                              the DTO but NOT read by NotificationService.list — pagination is
+ *                              the DTO but NOT read by NotificationService.list â€” pagination is
  *                              cursor-only via a `cursor` field the DTO doesn't even expose
  *                              through the controller's query object; only `limit` and `cursor`,
  *                              if manually appended as raw query params, are honored)
@@ -61,7 +63,7 @@ import request, { type Response } from 'supertest';
  *     expiresAt), increments sendCount, resets deliveryStatus to NOT_REQUESTED.
  *   - revoke(): atomic `updateMany({where: {id, workspaceId, status: PENDING}})`; 404 if no row
  *     matched (already accepted/declined/revoked/expired, or wrong workspace).
- *   - preview()/accept()/decline(): resolve status lazily — a PENDING invitation whose expiresAt
+ *   - preview()/accept()/decline(): resolve status lazily â€” a PENDING invitation whose expiresAt
  *     has passed is transitioned to EXPIRED in the SAME call that reads it (self-healing lazy
  *     expiry), then a 409 ConflictException("Invitation has expired.") is thrown.
  *   - accept()/decline(): 403 ForbiddenException if the authenticated user's email does not
@@ -74,9 +76,9 @@ import request, { type Response } from 'supertest';
  *     WORKSPACE_INVITATION_ACCEPTED notification for the ORIGINAL inviter.
  *   - findByToken(): tokens shorter than 20 chars are rejected as 404 without a DB lookup
  *     (defensive short-circuit); tokens are looked up by SHA-256-HMAC hash (tokenHash), never by
- *     raw value — raw tokens are never persisted anywhere.
+ *     raw value â€” raw tokens are never persisted anywhere.
  *
- * Notifications: markRead/markAllRead/list/getUnreadCount all scope by `userId` from the JWT —
+ * Notifications: markRead/markAllRead/list/getUnreadCount all scope by `userId` from the JWT â€”
  * confirmed no workspaceId or notificationId-only lookup path exists that could leak another
  * user's notifications. dedupeKey (used internally by invitation flows) prevents duplicate
  * notification rows for the same logical event.
@@ -174,6 +176,9 @@ describe('Phase 17 Team Operations E2E', () => {
 
     prisma = app.get(PrismaService);
 
+    const redis = app.get(RedisService);
+
+    await resetTestRedis(redis);
     await resetDatabase(prisma);
 
     const owner = createTestUser({
@@ -186,6 +191,12 @@ describe('Phase 17 Team Operations E2E', () => {
     expect(ownerRegistration.status).toBe(201);
 
     ownerAccessToken = readAccessToken(ownerRegistration);
+
+    const ownerWorkspaceResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces`).set(withBearer(ownerAccessToken)).send({
+      name: owner.workspaceName,
+    });
+
+    expect(ownerWorkspaceResponse.status).toBe(201);
 
     const ownerRecord = await prisma.user.findUnique({
       where: { email: owner.email.toLowerCase() },
@@ -255,7 +266,7 @@ describe('Phase 17 Team Operations E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // A. Role enforcement — invitations require OWNER or ADMIN for EVERY route, including reads
+  // A. Role enforcement â€” invitations require OWNER or ADMIN for EVERY route, including reads
   // ---------------------------------------------------------------------------------------
 
   it('rejects anonymous access to list invitations', async () => {
@@ -309,7 +320,7 @@ describe('Phase 17 Team Operations E2E', () => {
   // ---------------------------------------------------------------------------------------
 
   it('rejects inviting an email that already belongs to a workspace member (409)', async () => {
-    const admin = await prisma.user.findFirstOrThrow({ where: { name: 'Phase 17 Admin' } });
+    const admin = await prisma.user.findFirstOrThrow({ where: { displayName: 'Phase 17 Admin' } });
 
     const response = await createInvitation(ownerAccessToken, { email: admin.email });
 
@@ -449,26 +460,19 @@ describe('Phase 17 Team Operations E2E', () => {
 
     const secondOwnerAccessToken = readAccessToken(secondOwnerRegistration);
 
-    const secondOwnerRecord = await prisma.user.findUniqueOrThrow({
-      where: { email: secondOwner.email.toLowerCase() },
-      select: { id: true },
+    const secondWorkspaceResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces`).set(withBearer(secondOwnerAccessToken)).send({
+      name: secondOwner.workspaceName,
     });
 
-    const secondWorkspaceId = requireValue(
-      (
-        await prisma.workspaceMember.findFirst({
-          where: { userId: secondOwnerRecord.id, role: WorkspaceRole.OWNER },
-          select: { workspaceId: true },
-        })
-      )?.workspaceId,
-      'Second owner workspace missing',
-    );
+    expect(secondWorkspaceResponse.status).toBe(201);
+
+    const secondWorkspaceId = requireValue(body(secondWorkspaceResponse).id as string | undefined, 'Second owner workspace missing');
 
     const response = await request(app.getHttpServer())
       .post(`${API_PREFIX}/workspaces/${secondWorkspaceId}/invitations/${invitationId}/revoke`)
       .set(withBearer(secondOwnerAccessToken));
 
-    // The caller IS an OWNER, just of a different workspace than the invitation belongs to —
+    // The caller IS an OWNER, just of a different workspace than the invitation belongs to â€”
     // revoke's atomic updateMany requires BOTH id and workspaceId to match, so this must 404,
     // not succeed against another workspace's invitation.
     expect(response.status).toBe(404);
@@ -601,7 +605,7 @@ describe('Phase 17 Team Operations E2E', () => {
 
   it('accepting an invitation when already a member does not duplicate membership or change role', async () => {
     // The owner is already OWNER of `workspaceId`; invite them again at a different role and
-    // accept — the existing OWNER role must be preserved, not overwritten to the invited role.
+    // accept â€” the existing OWNER role must be preserved, not overwritten to the invited role.
     const createResponse = await createInvitation(ownerAccessToken, {
       email: (await prisma.user.findUniqueOrThrow({ where: { id: ownerId } })).email,
       role: WorkspaceRole.VIEWER,
@@ -741,17 +745,30 @@ describe('Phase 17 Team Operations E2E', () => {
   // ---------------------------------------------------------------------------------------
 
   it('enforces the invitation resend rate limit of 5 per 15 minutes', async () => {
-    const createResponse = await createInvitation(ownerAccessToken, {
-      email: `resend-rate-limit-${randomUUID()}@example.test`,
-    });
+    const rateLimitIdentity = `phase17-resend-${randomUUID()}`;
+
+    const createResponse = await request(app.getHttpServer())
+      .post(invitationsUrl())
+      .set(withBearer(ownerAccessToken))
+      .set('x-tracking-key', rateLimitIdentity)
+      .send({
+        email: `resend-rate-limit-${randomUUID()}@example.test`,
+        role: WorkspaceRole.DEVELOPER,
+      });
+
+    expect(createResponse.status).toBe(201);
 
     const invitationId = (body(createResponse).invitation as JsonRecord).id as string;
 
     let lastStatus = 0;
 
     for (let attempt = 0; attempt < 6; attempt += 1) {
-      // rate-limit bucket keyed by identity; parallelizing would make the assertion racy.
-      const response = await request(app.getHttpServer()).post(resendUrl(invitationId)).set(withBearer(ownerAccessToken));
+      // All resend attempts intentionally use the same identity so the
+      // real shared 5-per-15-minute rate limit is exercised deterministically.
+      const response = await request(app.getHttpServer())
+        .post(resendUrl(invitationId))
+        .set(withBearer(ownerAccessToken))
+        .set('x-tracking-key', rateLimitIdentity);
 
       lastStatus = response.status;
     }
@@ -760,7 +777,7 @@ describe('Phase 17 Team Operations E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // F. Notifications — scoped strictly to the authenticated user
+  // F. Notifications â€” scoped strictly to the authenticated user
   // ---------------------------------------------------------------------------------------
 
   it('rejects anonymous access to notifications', async () => {
@@ -834,7 +851,7 @@ describe('Phase 17 Team Operations E2E', () => {
     const foreignNotification = await prisma.notification.create({
       data: {
         workspaceId,
-        userId: requireValue((await prisma.user.findFirst({ where: { name: 'Phase 17 Admin' } }))?.id, 'Admin user missing'),
+        userId: requireValue((await prisma.user.findFirst({ where: { displayName: 'Phase 17 Admin' } }))?.id, 'Admin user missing'),
         type: NotificationType.SYSTEM,
         title: 'Phase 17 foreign notification',
         message: 'Should not be readable by the owner',

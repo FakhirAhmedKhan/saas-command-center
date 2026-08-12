@@ -1,0 +1,618 @@
+﻿
+==================================================
+FILE: apps\api\test\activity.e2e-spec.ts
+==================================================
+import {
+  addLink,
+  addTechnology,
+  applicationRoutes,
+  archiveApplication,
+  createApplication,
+  readApiItems,
+  recordString,
+  restoreApplication,
+  updateApplication,
+} from './helpers/application';
+import { withBearer } from './helpers/auth';
+import { createTestApp } from './helpers/create-test-app';
+import { resetDatabase } from './helpers/database';
+import { expectAccessDenied, registerWorkspaceTestUser, type WorkspaceTestUser } from './helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+
+describe('Application Activity E2E', () => {
+  let app: INestApplication;
+
+  let prisma: PrismaService;
+
+  beforeEach(async () => {
+    app = await createTestApp();
+
+    prisma = app.get(PrismaService);
+
+    await resetDatabase(prisma);
+  });
+
+  afterEach(async () => {
+    await app.close();
+  });
+
+  async function listApplicationActivity(actor: WorkspaceTestUser, applicationId: string, query: Record<string, string | number> = {}) {
+    return actor.agent.get(applicationRoutes.applicationActivities(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken)).query(query);
+  }
+
+  async function listWorkspaceActivity(actor: WorkspaceTestUser, query: Record<string, string | number> = {}) {
+    return actor.agent.get(applicationRoutes.workspaceActivities(actor.workspaceId)).set(withBearer(actor.accessToken)).query(query);
+  }
+
+  it('writes application create and update activities', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
+
+    const application = await createApplication(owner, {
+      name: 'Activity Test Application',
+    });
+
+    const createActivityResponse = await listApplicationActivity(owner, application.id);
+
+    expect(createActivityResponse.status).toBe(200);
+
+    const beforeUpdate = readApiItems(createActivityResponse, ['activities']);
+
+    expect(beforeUpdate.length).toBeGreaterThanOrEqual(1);
+
+    expect(
+      (
+        await updateApplication(owner, application.id, {
+          name: 'Updated Activity Application',
+        })
+      ).status,
+    ).toBe(200);
+
+    const updateActivityResponse = await listApplicationActivity(owner, application.id);
+
+    const afterUpdate = readApiItems(updateActivityResponse, ['activities']);
+
+    expect(afterUpdate.length).toBeGreaterThan(beforeUpdate.length);
+
+    expect(JSON.stringify(afterUpdate)).toContain(application.id);
+  });
+
+  it('writes technology, link, archive, and restore activities', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
+
+    const application = await createApplication(owner);
+
+    const initialResponse = await listApplicationActivity(owner, application.id);
+
+    const initialCount = readApiItems(initialResponse, ['activities']).length;
+
+    expect([200, 201]).toContain((await addTechnology(owner, application.id)).status);
+
+    expect([200, 201]).toContain((await addLink(owner, application.id)).status);
+
+    expect((await archiveApplication(owner, application.id)).status).toBe(200);
+
+    expect((await restoreApplication(owner, application.id)).status).toBe(200);
+
+    const finalResponse = await listApplicationActivity(owner, application.id);
+
+    const finalItems = readApiItems(finalResponse, ['activities']);
+
+    expect(finalItems.length).toBeGreaterThanOrEqual(initialCount + 4);
+  });
+
+  it('does not create activity for rejected operation', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
+
+    const application = await createApplication(owner);
+
+    const beforeResponse = await listApplicationActivity(owner, application.id);
+
+    const beforeCount = readApiItems(beforeResponse, ['activities']).length;
+
+    const invalidResponse = await updateApplication(owner, application.id, {
+      name: '',
+    });
+
+    expect(invalidResponse.status).toBe(400);
+
+    const afterResponse = await listApplicationActivity(owner, application.id);
+
+    const afterCount = readApiItems(afterResponse, ['activities']).length;
+
+    expect(afterCount).toBe(beforeCount);
+  });
+
+  it('supports filters and pagination', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
+
+    const application = await createApplication(owner);
+
+    expect(
+      (
+        await updateApplication(owner, application.id, {
+          shortDescription: 'Activity filter update',
+        })
+      ).status,
+    ).toBe(200);
+
+    const allResponse = await listApplicationActivity(owner, application.id, {
+      limit: 100,
+    });
+
+    const allItems = readApiItems(allResponse, ['activities']);
+
+    expect(allItems.length).toBeGreaterThanOrEqual(2);
+
+    const first = allItems[0];
+
+    const query: Record<string, string | number> = {
+      page: 1,
+      limit: 1,
+    };
+
+    const activityType = recordString(first, 'activityType', 'type');
+
+    const actorType = recordString(first, 'actorType');
+
+    const entityType = recordString(first, 'entityType');
+
+    const actorUserId = recordString(first, 'actorUserId');
+
+    const createdAt = recordString(first, 'createdAt');
+
+    if (activityType) {
+      query.activityType = activityType;
+    }
+
+    if (actorType) {
+      query.actorType = actorType;
+    }
+
+    if (entityType) {
+      query.entityType = entityType;
+    }
+
+    if (actorUserId) {
+      query.actorUserId = actorUserId;
+    }
+
+    if (createdAt) {
+      const time = new Date(createdAt).getTime();
+
+      query.dateFrom = new Date(time - 60_000).toISOString();
+
+      query.dateTo = new Date(time + 60_000).toISOString();
+    }
+
+    const filteredResponse = await listApplicationActivity(owner, application.id, query);
+
+    expect(filteredResponse.status).toBe(200);
+
+    expect(readApiItems(filteredResponse, ['activities'])).toHaveLength(1);
+
+    expect(
+      (
+        await listApplicationActivity(owner, application.id, {
+          page: 0,
+        })
+      ).status,
+    ).toBe(400);
+
+    expect(
+      (
+        await listApplicationActivity(owner, application.id, {
+          activityType: 'INVALID_ACTIVITY',
+        })
+      ).status,
+    ).toBe(400);
+  });
+
+  it('keeps workspace activity isolated', async () => {
+    const alphaOwner = await registerWorkspaceTestUser(app, prisma);
+
+    const betaOwner = await registerWorkspaceTestUser(app, prisma);
+
+    const alphaApp = await createApplication(alphaOwner);
+
+    const betaApp = await createApplication(betaOwner);
+
+    const alphaActivityResponse = await listWorkspaceActivity(alphaOwner);
+
+    const alphaActivities = readApiItems(alphaActivityResponse, ['activities']);
+
+    const serialized = JSON.stringify(alphaActivities);
+
+    expect(serialized).toContain(alphaApp.id);
+
+    expect(serialized).not.toContain(betaApp.id);
+
+    const foreignResponse = await betaOwner.agent.get(applicationRoutes.workspaceActivities(alphaOwner.workspaceId)).set(withBearer(betaOwner.accessToken));
+
+    expectAccessDenied(foreignResponse);
+
+    const wrongApplicationResponse = await alphaOwner.agent
+      .get(applicationRoutes.applicationActivities(alphaOwner.workspaceId, betaApp.id))
+      .set(withBearer(alphaOwner.accessToken));
+
+    expect(wrongApplicationResponse.status).toBe(404);
+  });
+
+  it('does not expose authentication secrets', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
+
+    const application = await createApplication(owner);
+
+    const response = await listApplicationActivity(owner, application.id);
+
+    expect(response.status).toBe(200);
+
+    const serialized = JSON.stringify(response.body).toLowerCase();
+
+    expect(serialized).not.toContain(owner.input.password.toLowerCase());
+
+    expect(serialized).not.toContain(owner.accessToken.toLowerCase());
+
+    expect(serialized).not.toContain('refreshtoken');
+
+    expect(serialized).not.toContain('passwordhash');
+  });
+});
+
+==================================================
+FILE: apps\api\src\modules\activity\dto\activity-query.dto.ts
+==================================================
+import type { ActivityQueryInput } from '@command-center/shared-types';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform, Type } from 'class-transformer';
+import { IsDateString, IsEnum, IsInt, IsOptional, IsString, IsUUID, Max, MaxLength, Min } from 'class-validator';
+import { ActivityActorType, ActivityEntityType, ApplicationActivityType } from 'src/generated/prisma/enums';
+
+function trimString(value: unknown): unknown {
+  return typeof value === 'string' ? value.trim() : value;
+}
+
+export class ActivityQueryDto implements ActivityQueryInput {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  @Transform(({ value }: { value: unknown }) => trimString(value))
+  search?: string;
+
+  @ApiPropertyOptional({
+    enum: ApplicationActivityType,
+  })
+  @IsOptional()
+  @IsEnum(ApplicationActivityType)
+  activityType?: ApplicationActivityType;
+
+  @ApiPropertyOptional({
+    enum: ActivityActorType,
+  })
+  @IsOptional()
+  @IsEnum(ActivityActorType)
+  actorType?: ActivityActorType;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  actorUserId?: string;
+
+  @ApiPropertyOptional({
+    enum: ActivityEntityType,
+  })
+  @IsOptional()
+  @IsEnum(ActivityEntityType)
+  entityType?: ActivityEntityType;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  entityId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  from?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  to?: string;
+
+  @ApiPropertyOptional({
+    default: 1,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page = 1;
+
+  @ApiPropertyOptional({
+    default: 25,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit = 25;
+}
+
+==================================================
+FILE: apps\api\src\modules\activity\controllers\activity.controller.ts
+==================================================
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
+import { ActivityQueryDto } from '../dto/activity-query.dto';
+import { ActivityQueryService } from '../services/activity-query.service';
+import { Controller, Get, Param, ParseUUIDPipe, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+
+@ApiTags('Workspace Activity')
+@ApiBearerAuth('access-token')
+@Controller('workspaces/:workspaceId/activities')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard)
+export class WorkspaceActivityController {
+  constructor(private readonly activityQueryService: ActivityQueryService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'List workspace activity history' })
+  list(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Query()
+    query: ActivityQueryDto,
+  ) {
+    return this.activityQueryService.listWorkspaceActivities(workspaceId, query);
+  }
+}
+
+@ApiTags('Application Activity')
+@ApiBearerAuth('access-token')
+@Controller('workspaces/:workspaceId/applications/:applicationId/activities')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard)
+export class ApplicationActivityController {
+  constructor(private readonly activityQueryService: ActivityQueryService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'List application activity history' })
+  list(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+
+    @Query()
+    query: ActivityQueryDto,
+  ) {
+    return this.activityQueryService.listApplicationActivities(workspaceId, applicationId, query);
+  }
+}
+
+==================================================
+FILE: apps\api\src\modules\activity\services\activity-query.service.ts
+==================================================
+import { PrismaService } from '../../../database/prisma.service';
+import { ActivityQueryDto } from '../dto/activity-query.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { Prisma } from 'src/generated/prisma/client';
+
+@Injectable()
+export class ActivityQueryService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async listWorkspaceActivities(
+    workspaceId: string,
+
+    query: ActivityQueryDto,
+  ) {
+    const where = this.buildWhere(workspaceId, undefined, query);
+
+    return this.list(where, query);
+  }
+
+  async listApplicationActivities(
+    workspaceId: string,
+
+    applicationId: string,
+
+    query: ActivityQueryDto,
+  ) {
+    const where = this.buildWhere(workspaceId, applicationId, query);
+
+    return this.list(where, query);
+  }
+
+  private async list(
+    where: Prisma.ApplicationActivityWhereInput,
+
+    query: ActivityQueryDto,
+  ) {
+    const [total, items] = await Promise.all([
+      this.prisma.applicationActivity.count({
+        where,
+      }),
+
+      this.prisma.applicationActivity.findMany({
+        where,
+
+        include: {
+          actor: {
+            select: {
+              id: true,
+              displayName: true,
+              email: true,
+            },
+          },
+
+          application: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+
+        orderBy: [
+          {
+            createdAt: 'desc',
+          },
+
+          {
+            id: 'desc',
+          },
+        ],
+
+        skip: (query.page - 1) * query.limit,
+
+        take: query.limit,
+      }),
+    ]);
+
+    return {
+      items: items.map((item) => ({
+        ...item,
+
+        createdAt: item.createdAt.toISOString(),
+      })),
+
+      pagination: {
+        page: query.page,
+
+        limit: query.limit,
+
+        total,
+
+        totalPages: Math.max(1, Math.ceil(total / query.limit)),
+      },
+    };
+  }
+
+  private buildWhere(
+    workspaceId: string,
+
+    applicationId: string | undefined,
+
+    query: ActivityQueryDto,
+  ): Prisma.ApplicationActivityWhereInput {
+    const from = query.from ? new Date(query.from) : undefined;
+
+    const to = query.to ? new Date(query.to) : undefined;
+
+    if (from && to && to < from) {
+      throw new BadRequestException('to must be on or after from.');
+    }
+
+    return {
+      workspaceId,
+
+      applicationId,
+
+      activityType: query.activityType,
+
+      actorType: query.actorType,
+
+      actorUserId: query.actorUserId,
+
+      entityType: query.entityType,
+
+      entityId: query.entityId,
+
+      createdAt:
+        from || to
+          ? {
+              gte: from,
+              lte: to,
+            }
+          : undefined,
+
+      OR: query.search
+        ? [
+            {
+              description: {
+                contains: query.search,
+
+                mode: 'insensitive',
+              },
+            },
+
+            {
+              actor: {
+                displayName: {
+                  contains: query.search,
+
+                  mode: 'insensitive',
+                },
+              },
+            },
+
+            {
+              actor: {
+                email: {
+                  contains: query.search,
+
+                  mode: 'insensitive',
+                },
+              },
+            },
+
+            {
+              application: {
+                name: {
+                  contains: query.search,
+
+                  mode: 'insensitive',
+                },
+              },
+            },
+          ]
+        : undefined,
+    };
+  }
+}
+
+==================================================
+FILE: apps\api\src\modules\workspace\guards\workspace-access.guard.ts
+==================================================
+import type { WorkspaceRequest } from '../interfaces/workspace-request.interface';
+import { WorkspaceMembersService } from '../service/workspace-members.service';
+import { BadRequestException, CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
+
+@Injectable()
+export class WorkspaceAccessGuard implements CanActivate {
+  constructor(private readonly workspaceMembersService: WorkspaceMembersService) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest<WorkspaceRequest>();
+
+    const rawWorkspaceId = request.params?.workspaceId;
+
+    const workspaceId = Array.isArray(rawWorkspaceId) ? rawWorkspaceId.at(0) : rawWorkspaceId;
+
+    if (typeof workspaceId !== 'string' || workspaceId.trim().length === 0) {
+      throw new ForbiddenException('Workspace ID is required');
+    }
+
+    if (!request.user?.id) {
+      throw new ForbiddenException('Authenticated user is required');
+    }
+    if (typeof workspaceId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(workspaceId)) {
+      throw new BadRequestException('Invalid workspace ID');
+    }
+
+    const membership = await this.workspaceMembersService.findMembership(workspaceId.trim(), request.user.id);
+
+    if (!membership) {
+      throw new ForbiddenException('You do not have access to this workspace');
+    }
+
+    request.workspaceMember = membership;
+
+    return true;
+  }
+}

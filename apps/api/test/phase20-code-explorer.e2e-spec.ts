@@ -350,23 +350,30 @@ async function registerIdentity(app: INestApplication, prisma: PrismaService, la
     throw new Error(`Registered user ${userInput.email} was not persisted.`);
   }
 
-  const workspace = await prisma.workspace.findFirst({
+  const workspaceResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces`).set(withBearer(token)).send({
+    name: userInput.workspaceName,
+  });
+
+  expect(workspaceResponse.status).toBe(201);
+
+  const ownerMembership = await prisma.workspaceMember.findFirst({
     where: {
-      ownerId: user.id,
+      userId: user.id,
+      role: WorkspaceRole.OWNER,
     },
     select: {
-      id: true,
+      workspaceId: true,
     },
   });
 
-  if (!workspace) {
-    throw new Error(`Workspace for ${userInput.email} was not persisted.`);
+  if (!ownerMembership) {
+    throw new Error(`Explicit workspace for ${userInput.email} was not persisted.`);
   }
 
   return {
     token,
     userId: user.id,
-    workspaceId: workspace.id,
+    workspaceId: ownerMembership.workspaceId,
   };
 }
 
@@ -398,7 +405,7 @@ async function connectRepository(
   const installationState = queryParameter(requireString(responseRecord(beginResponse), 'installationUrl'), 'state');
 
   const setupResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/setup`).set(withBearer(identity.token)).send({
-    state: installationState,
+    installState: installationState,
     installationId: fixture.installationId,
   });
 
@@ -689,7 +696,7 @@ describe('Phase 20 - Code Explorer E2E', () => {
         .set(withBearer(owner.token));
 
       expect(response.status).toBe(200);
-      const results = readArray(response, ['results', 'data', 'items']);
+      const results = readArray(response, ['matches']);
       expect(results).toHaveLength(1);
       expect(JSON.stringify(results[0])).toContain('AuthService.ts');
     });
@@ -717,7 +724,7 @@ describe('Phase 20 - Code Explorer E2E', () => {
         .set(withBearer(owner.token));
 
       expect(response.status).toBe(200);
-      expect(readArray(response, ['results', 'data', 'items'])).toHaveLength(100);
+      expect(readArray(response, ['matches'])).toHaveLength(100);
     });
 
     it('rejects a blank search query', async () => {

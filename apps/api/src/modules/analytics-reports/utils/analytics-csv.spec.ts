@@ -1,4 +1,4 @@
-import { createCsv } from './analytics-csv';
+﻿import { createCsv } from './analytics-csv';
 
 describe('createCsv', () => {
   it('escapes quotes and commas', () => {
@@ -6,11 +6,9 @@ describe('createCsv', () => {
       [
         {
           header: 'Name',
-
           value: (row: { name: string }) => row.name,
         },
       ],
-
       [
         {
           name: 'Hello, "World"',
@@ -26,11 +24,9 @@ describe('createCsv', () => {
       [
         {
           header: 'Value',
-
           value: (row: { value: string }) => row.value,
         },
       ],
-
       [
         {
           value: dangerousValue,
@@ -38,10 +34,6 @@ describe('createCsv', () => {
       ],
     );
 
-    expect(result).toContain(
-      `"'\${
-                        dangerousValue
-                    }"`.replace('\\$', '$'),
-    );
+    expect(result).toContain(`"'${dangerousValue}"`);
   });
 });

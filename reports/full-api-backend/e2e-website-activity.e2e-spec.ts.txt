@@ -1,0 +1,13 @@
+PASS test/website-activity.e2e-spec.ts (9.249 s)
+  Website Activity E2E
+    √ writes activity for website creation and update (1924 ms)
+    √ writes activity for state, connection, and key-management actions (1564 ms)
+    √ does not write activity for rejected validation (686 ms)
+    √ keeps website activity isolated across workspaces (959 ms)
+    √ does not expose raw tracking keys or authentication secrets in activity (721 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        9.81 s
+Ran all test suites within paths "test/website-activity.e2e-spec.ts".

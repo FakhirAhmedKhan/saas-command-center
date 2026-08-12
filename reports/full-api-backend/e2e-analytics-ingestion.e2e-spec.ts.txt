@@ -1,0 +1,13 @@
+PASS test/analytics-ingestion.e2e-spec.ts (8.266 s)
+  Analytics Ingestion E2E
+    √ accepts page-view, heartbeat, and custom events in one batch (1480 ms)
+    √ deduplicates repeated event IDs per website (694 ms)
+    √ allows the same event ID on different websites (844 ms)
+    √ updates website lastEventAt and tracking status after collection (944 ms)
+    √ stores request metadata and optional event dimensions (633 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        8.768 s
+Ran all test suites within paths "test/analytics-ingestion.e2e-spec.ts".

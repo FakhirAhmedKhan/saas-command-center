@@ -1,4 +1,4 @@
-import { resolveAnalyticsDateRange } from '../../analytics-overview/utils/analytics-date-range';
+﻿import { resolveAnalyticsDateRange } from '../../analytics-overview/utils/analytics-date-range';
 import { roundMetric, toSafeNumber } from '../../analytics-overview/utils/analytics-overview-metrics';
 import { ANALYTICS_EXPORT_MAX_DAYS, ANALYTICS_EXPORT_MAX_ROWS } from '../analytics-reports.constants';
 import {
@@ -355,7 +355,7 @@ export class AnalyticsReportsService {
       Prisma.sql`
                         WITH page_report AS (
                             SELECT
-                                pv.path AS path,
+                                pv.normalized_path AS path,
 
                                 COALESCE(
                                     NULLIF(
@@ -364,7 +364,7 @@ export class AnalyticsReportsService {
                                         ),
                                         ''
                                     ),
-                                    pv.path
+                                    pv.normalized_path
                                 ) AS title,
 
                                 COUNT(*)::bigint
@@ -387,7 +387,7 @@ export class AnalyticsReportsService {
                                     pv.session_id
                                 ) FILTER (
                                     WHERE
-                                        pv.is_entrance =
+                                        pv.is_entry =
                                             TRUE
                                 )::bigint
                                     AS entrances,
@@ -407,7 +407,7 @@ export class AnalyticsReportsService {
                                     pv.session_id
                                 ) FILTER (
                                     WHERE
-                                        pv.is_entrance =
+                                        pv.is_entry =
                                             TRUE
                                         AND
                                         analytics_session
@@ -418,7 +418,7 @@ export class AnalyticsReportsService {
 
                                 COALESCE(
                                     SUM(
-                                        pv.duration_ms
+                                        analytics_event.duration_ms
                                     ),
                                     0
                                 )::bigint
@@ -438,6 +438,17 @@ export class AnalyticsReportsService {
                                     analytics_session.website_id =
                                         pv.website_id
 
+                            LEFT JOIN
+                                analytics_events
+                                    AS analytics_event
+                                ON
+                                    analytics_event.id =
+                                        pv.analytics_event_id
+                                    AND
+                                    analytics_event.website_id =
+                                        pv.website_id
+
+
                             WHERE
                                 pv.website_id =
                                     ${context.websiteId}::uuid
@@ -451,7 +462,7 @@ export class AnalyticsReportsService {
                                     ${context.range.current.end}
 
                             GROUP BY
-                                pv.path
+                                pv.normalized_path
                         ),
 
                         filtered_report AS (

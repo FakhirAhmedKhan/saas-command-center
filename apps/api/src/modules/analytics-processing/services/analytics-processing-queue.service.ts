@@ -1,4 +1,4 @@
-import type { TypedConfigService } from '../../../config/runtime-config';
+﻿import type { TypedConfigService } from '../../../config/runtime-config';
 import { PrismaService } from '../../../database/prisma.service';
 import { AnalyticsProcessingStatus, AnalyticsProcessingTrigger, Prisma } from '../../../generated/prisma/client';
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
@@ -98,14 +98,17 @@ export class AnalyticsProcessingQueueService {
     }
   }
 
-  async retryDeadLetter(runId: string, userId: string) {
-    const run = await this.prisma.analyticsProcessingRun.findUnique({
+  async retryDeadLetter(workspaceId: string, websiteId: string, runId: string, userId: string) {
+    const run = await this.prisma.analyticsProcessingRun.findFirst({
       where: {
         id: runId,
+        workspaceId,
+        websiteId,
+        status: AnalyticsProcessingStatus.DEAD_LETTERED,
       },
     });
 
-    if (!run || run.status !== AnalyticsProcessingStatus.DEAD_LETTERED) {
+    if (!run) {
       throw new NotFoundException('Dead-lettered processing run not found.');
     }
 
