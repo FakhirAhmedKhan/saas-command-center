@@ -2,10 +2,6 @@
 import globals from 'globals';
 
 export default [
-  {
-    ignores: ['dist/**', 'dist-coverage/**', 'coverage/**', 'node_modules/**'],
-  },
-
   ...baseConfig,
 
   // Node.js build/dev/server/test scripts

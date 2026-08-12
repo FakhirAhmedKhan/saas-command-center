@@ -9,6 +9,7 @@
     "start": "node scripts/server.mjs",
     "typecheck": "tsc --noEmit",
     "test": "pnpm build && node scripts/test.mjs",
+    "test:cover": "node scripts/build-coverage.mjs && node scripts/test.mjs --coverage",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },

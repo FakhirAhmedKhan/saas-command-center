@@ -1,7 +1,12 @@
 import { readFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 
-const bundleUrl = new URL('../dist/tracker.js', import.meta.url);
+// Coverage runs point this at an unminified build so the v8 report maps back
+// to readable source instead of a single minified line.
+const bundleUrl = process.env.TRACKER_BUNDLE
+  ? new URL(process.env.TRACKER_BUNDLE, import.meta.url)
+  : new URL('../dist/tracker.js', import.meta.url);
 let cachedBundle;
 
 async function readBundle() {
@@ -329,7 +334,8 @@ export async function createTrackerHarness(options = {}) {
 
   function executeBundle() {
     vm.runInContext(bundle, context, {
-      filename: 'tracker.js',
+      // Absolute path so v8 coverage can attribute the executed script.
+      filename: fileURLToPath(bundleUrl),
     });
   }
 

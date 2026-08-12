@@ -1,10 +1,7 @@
 import { PageViewRebuilderService } from './page-view-rebuilder.service';
 import { calculateSessionMetrics } from '../utils/analytics-metrics';
 import { Injectable } from '@nestjs/common';
-import { DefaultArgs } from '@prisma/client/runtime/client';
 import { Prisma } from 'src/generated/prisma/client';
-import { PrismaClient } from 'src/generated/prisma/internal/class';
-import { ProcessAnalyticsRangeInput } from 'src/modules/analytics-processing/services/analytics-range-processor.service';
 
 type AnalyticsSessionRecord = Prisma.AnalyticsSessionGetPayload<Record<string, never>>;
 
@@ -15,12 +12,6 @@ export interface RebuiltSessionResult {
 
 @Injectable()
 export class SessionRebuilderService {
-  rebuildRange(
-    transaction: Omit<PrismaClient<never, Prisma.GlobalOmitConfig | undefined, DefaultArgs>, '$connect' | '$disconnect' | '$on' | '$use' | '$extends'>,
-    input: ProcessAnalyticsRangeInput,
-  ) {
-    throw new Error('Method not implemented.');
-  }
   constructor(private readonly pageViews: PageViewRebuilderService) {}
 
   async rebuild(transaction: Prisma.TransactionClient, sessionId: string): Promise<RebuiltSessionResult> {

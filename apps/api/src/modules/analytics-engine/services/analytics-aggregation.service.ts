@@ -1,13 +1,10 @@
 ﻿import { getAnalyticsBucket } from '../utils/analytics-time';
 import { AnalyticsAggregatePeriod } from '@command-center/shared-types';
 import { Injectable } from '@nestjs/common';
-import { DefaultArgs } from '@prisma/client/runtime/client';
 import { createHash } from 'node:crypto';
 import { PrismaService } from 'src/database/prisma.service';
+import { Prisma } from 'src/generated/prisma/client';
 import { AnalyticsAggregateDimension, AnalyticsDeviceType, RawAnalyticsEventType } from 'src/generated/prisma/enums';
-import { PrismaClient } from 'src/generated/prisma/internal/class';
-import { GlobalOmitConfig } from 'src/generated/prisma/internal/prismaNamespace';
-import { ProcessAnalyticsRangeInput } from 'src/modules/analytics-processing/services/analytics-range-processor.service';
 
 export interface AnalyticsAggregationWebsite {
   id: string;
@@ -29,100 +26,94 @@ interface MutableAggregate {
 
 @Injectable()
 export class AnalyticsAggregationService {
-  rebuildRange(
-    D: Omit<PrismaClient<never, GlobalOmitConfig | undefined, DefaultArgs>, '$connect' | '$disconnect' | '$on' | '$use' | '$extends'>,
-    input: ProcessAnalyticsRangeInput,
-  ) {
-    throw new Error('Method not implemented.');
-  }
   constructor(private readonly prisma: PrismaService) {}
 
   async rebuildBucket(website: AnalyticsAggregationWebsite, period: AnalyticsAggregatePeriod, bucketStart: Date): Promise<void> {
+    await this.prisma.$transaction(async (transaction) => {
+      await this.rebuildBucketInTransaction(transaction, website, period, bucketStart);
+    });
+  }
+
+  async rebuildBucketsInTransaction(
+    transaction: Prisma.TransactionClient,
+    website: AnalyticsAggregationWebsite,
+    period: AnalyticsAggregatePeriod,
+    bucketStarts: readonly Date[],
+  ): Promise<void> {
+    for (const bucketStart of bucketStarts) {
+      await this.rebuildBucketInTransaction(transaction, website, period, bucketStart);
+    }
+  }
+
+  private async rebuildBucketInTransaction(
+    transaction: Prisma.TransactionClient,
+    website: AnalyticsAggregationWebsite,
+    period: AnalyticsAggregatePeriod,
+    bucketStart: Date,
+  ): Promise<void> {
     const bucket = getAnalyticsBucket(bucketStart, website.timeZone, period);
 
-    const [events, pageViews, sessions] = await this.prisma.$transaction([
-      this.prisma.analyticsEvent.findMany({
-        where: {
-          websiteId: website.id,
+    const events = await transaction.analyticsEvent.findMany({
+      where: {
+        websiteId: website.id,
 
-          occurredAt: {
-            gte: bucket.start,
-
-            lt: bucket.end,
-          },
+        occurredAt: {
+          gte: bucket.start,
+          lt: bucket.end,
         },
+      },
 
-        select: {
-          visitorId: true,
+      select: {
+        visitorId: true,
+        sessionId: true,
+        type: true,
+        eventName: true,
+      },
+    });
 
-          sessionId: true,
+    const pageViews = await transaction.analyticsPageView.findMany({
+      where: {
+        websiteId: website.id,
 
-          type: true,
-
-          eventName: true,
+        occurredAt: {
+          gte: bucket.start,
+          lt: bucket.end,
         },
-      }),
+      },
 
-      this.prisma.analyticsPageView.findMany({
-        where: {
-          websiteId: website.id,
+      select: {
+        visitorId: true,
+        sessionId: true,
+        normalizedPath: true,
+        title: true,
+      },
+    });
 
-          occurredAt: {
-            gte: bucket.start,
+    const sessions = await transaction.analyticsSession.findMany({
+      where: {
+        websiteId: website.id,
 
-            lt: bucket.end,
-          },
+        startedAt: {
+          gte: bucket.start,
+          lt: bucket.end,
         },
+      },
 
-        select: {
-          visitorId: true,
-
-          sessionId: true,
-
-          normalizedPath: true,
-
-          title: true,
-        },
-      }),
-
-      this.prisma.analyticsSession.findMany({
-        where: {
-          websiteId: website.id,
-
-          startedAt: {
-            gte: bucket.start,
-
-            lt: bucket.end,
-          },
-        },
-
-        select: {
-          id: true,
-
-          visitorId: true,
-
-          sourceName: true,
-
-          countryCode: true,
-
-          deviceType: true,
-
-          browserName: true,
-
-          operatingSystem: true,
-
-          pageViewCount: true,
-
-          eventCount: true,
-
-          customEventCount: true,
-
-          bounced: true,
-
-          durationMs: true,
-        },
-      }),
-    ]);
+      select: {
+        id: true,
+        visitorId: true,
+        sourceName: true,
+        countryCode: true,
+        deviceType: true,
+        browserName: true,
+        operatingSystem: true,
+        pageViewCount: true,
+        eventCount: true,
+        customEventCount: true,
+        bounced: true,
+        durationMs: true,
+      },
+    });
 
     const aggregates = new Map<string, MutableAggregate>();
 
@@ -255,24 +246,7 @@ export class AnalyticsAggregationService {
     }));
 
     if (period === AnalyticsAggregatePeriod.HOURLY) {
-      await this.prisma.$transaction(async (transaction) => {
-        await transaction.analyticsHourlyAggregate.deleteMany({
-          where: {
-            websiteId: website.id,
-            bucketStart: bucket.start,
-          },
-        });
-
-        if (data.length > 0) {
-          await transaction.analyticsHourlyAggregate.createMany({ data });
-        }
-      });
-
-      return;
-    }
-
-    await this.prisma.$transaction(async (transaction) => {
-      await transaction.analyticsDailyAggregate.deleteMany({
+      await transaction.analyticsHourlyAggregate.deleteMany({
         where: {
           websiteId: website.id,
           bucketStart: bucket.start,
@@ -280,11 +254,26 @@ export class AnalyticsAggregationService {
       });
 
       if (data.length > 0) {
-        await transaction.analyticsDailyAggregate.createMany({
+        await transaction.analyticsHourlyAggregate.createMany({
           data,
         });
       }
+
+      return;
+    }
+
+    await transaction.analyticsDailyAggregate.deleteMany({
+      where: {
+        websiteId: website.id,
+        bucketStart: bucket.start,
+      },
     });
+
+    if (data.length > 0) {
+      await transaction.analyticsDailyAggregate.createMany({
+        data,
+      });
+    }
   }
 
   async rebuild(website: AnalyticsAggregationWebsite, period: AnalyticsAggregatePeriod, bucketStart: Date): Promise<void> {

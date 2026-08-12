@@ -1,17 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { DefaultArgs } from '@prisma/client/runtime/client';
 import { Prisma } from 'src/generated/prisma/client';
-import { PrismaClient } from 'src/generated/prisma/internal/class';
-import { ProcessAnalyticsRangeInput } from 'src/modules/analytics-processing/services/analytics-range-processor.service';
 
 @Injectable()
 export class VisitorRebuilderService {
-  rebuildRange(
-    transaction: Omit<PrismaClient<never, Prisma.GlobalOmitConfig | undefined, DefaultArgs>, '$connect' | '$disconnect' | '$on' | '$use' | '$extends'>,
-    input: ProcessAnalyticsRangeInput,
-  ) {
-    throw new Error('Method not implemented.');
-  }
   async rebuild(transaction: Prisma.TransactionClient, visitorId: string): Promise<void> {
     /*
      * Keep these operations sequential.

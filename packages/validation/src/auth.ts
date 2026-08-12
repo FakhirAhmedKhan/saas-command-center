@@ -11,3 +11,4 @@ export const registerSchema: z.ZodType<RegisterInput> = z.object({
   password: z.string().min(12).max(128),
   displayName: z.string().min(2).max(120).optional(),
 });
+

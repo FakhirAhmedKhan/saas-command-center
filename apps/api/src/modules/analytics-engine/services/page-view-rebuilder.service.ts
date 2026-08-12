@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DefaultArgs } from '@prisma/client/runtime/client';
 import { Prisma } from 'src/generated/prisma/client';
-import { PrismaClient } from 'src/generated/prisma/internal/class';
-import { ProcessAnalyticsRangeInput } from 'src/modules/analytics-processing/services/analytics-range-processor.service';
 
 export type AnalyticsPageViewRecord = Prisma.AnalyticsPageViewGetPayload<Record<string, never>>;
 
@@ -14,12 +11,6 @@ export interface RebuiltPageViews {
 
 @Injectable()
 export class PageViewRebuilderService {
-  rebuildRange(
-    transaction: Omit<PrismaClient<never, Prisma.GlobalOmitConfig | undefined, DefaultArgs>, '$connect' | '$disconnect' | '$on' | '$use' | '$extends'>,
-    input: ProcessAnalyticsRangeInput,
-  ) {
-    throw new Error('Method not implemented.');
-  }
   async rebuildForSession(transaction: Prisma.TransactionClient, sessionId: string): Promise<RebuiltPageViews> {
     const pageViews = await transaction.analyticsPageView.findMany({
       where: {
