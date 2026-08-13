@@ -65,16 +65,13 @@ describe('apiRequest url building', () => {
     expect(fetchMock().mock.calls[0]?.[0]).toBe(`${BASE_URL}/health`);
   });
 
-  it.each([['http://other.test/thing'], ['https://other.test/thing']])(
-    'leaves the absolute url %s untouched',
-    async (url) => {
-      fetchMock().mockResolvedValue(jsonResponse({ ok: true }));
+  it.each([['http://other.test/thing'], ['https://other.test/thing']])('leaves the absolute url %s untouched', async (url) => {
+    fetchMock().mockResolvedValue(jsonResponse({ ok: true }));
 
-      await apiRequest(url);
+    await apiRequest(url);
 
-      expect(fetchMock().mock.calls[0]?.[0]).toBe(url);
-    },
-  );
+    expect(fetchMock().mock.calls[0]?.[0]).toBe(url);
+  });
 });
 
 describe('apiRequest headers and body', () => {
@@ -156,17 +153,13 @@ describe('apiRequest response parsing', () => {
   });
 
   it('returns raw text when the response is not JSON', async () => {
-    fetchMock().mockResolvedValue(
-      new Response('pong', { status: 200, headers: { 'content-type': 'text/plain' } }),
-    );
+    fetchMock().mockResolvedValue(new Response('pong', { status: 200, headers: { 'content-type': 'text/plain' } }));
 
     await expect(apiRequest('/ping')).resolves.toBe('pong');
   });
 
   it('returns undefined for an empty non-JSON body', async () => {
-    fetchMock().mockResolvedValue(
-      new Response('', { status: 200, headers: { 'content-type': 'text/plain' } }),
-    );
+    fetchMock().mockResolvedValue(new Response('', { status: 200, headers: { 'content-type': 'text/plain' } }));
 
     await expect(apiRequest('/ping')).resolves.toBeUndefined();
   });
@@ -185,9 +178,7 @@ describe('apiRequest error handling', () => {
   });
 
   it('joins an array of validation messages', async () => {
-    fetchMock().mockResolvedValue(
-      jsonResponse({ message: ['name must be set', 'slug is invalid'] }, { status: 400 }),
-    );
+    fetchMock().mockResolvedValue(jsonResponse({ message: ['name must be set', 'slug is invalid'] }, { status: 400 }));
 
     await expect(apiRequest('/apps')).rejects.toThrow('name must be set, slug is invalid');
   });
@@ -290,11 +281,7 @@ describe('apiRequest 401 refresh flow', () => {
         return Promise.resolve(jsonResponse({ accessToken: 'fresh-token' }));
       }
 
-      return Promise.resolve(
-        getAccessToken() === 'fresh-token'
-          ? jsonResponse({ ok: true })
-          : jsonResponse({ message: 'Unauthorized' }, { status: 401 }),
-      );
+      return Promise.resolve(getAccessToken() === 'fresh-token' ? jsonResponse({ ok: true }) : jsonResponse({ message: 'Unauthorized' }, { status: 401 }));
     });
 
     await Promise.all([apiRequest('/a'), apiRequest('/b'), apiRequest('/c')]);

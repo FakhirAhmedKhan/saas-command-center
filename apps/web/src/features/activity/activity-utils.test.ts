@@ -1,11 +1,5 @@
 import type { ApplicationActivity } from './activity-types';
-import {
-  formatActivityDate,
-  formatRelativeActivityDate,
-  getActivityActorName,
-  getActivityErrorMessage,
-  getMetadataSummary,
-} from './activity-utils';
+import { formatActivityDate, formatRelativeActivityDate, getActivityActorName, getActivityErrorMessage, getMetadataSummary } from './activity-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 function buildActivity(overrides: Partial<ApplicationActivity> = {}): ApplicationActivity {

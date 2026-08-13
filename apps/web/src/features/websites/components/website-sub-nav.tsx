@@ -26,7 +26,7 @@ export function WebsiteSubNav({ workspaceId, websiteId }: WebsiteSubNavProps) {
   return (
     <nav aria-label='Website sections' className='flex gap-1 overflow-x-auto border-b border-slate-200'>
       {tabs.map((tab) => {
-        const isActive = tab.href === baseHref ? pathname === baseHref : pathname.startsWith(tab.href);
+        const isActive = tab.href === baseHref ? pathname === baseHref : pathname === tab.href || pathname.startsWith(`${tab.href}/`);
 
         return (
           <Link

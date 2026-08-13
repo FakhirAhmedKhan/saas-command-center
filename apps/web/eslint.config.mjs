@@ -11,6 +11,6 @@ export default [
   },
 
   {
-    ignores: ['.next/**', 'out/**', 'build/**', 'coverage/**', 'playwright-report/**', 'test-results/**', 'next-env.d.ts'],
+    ignores: ['.next/**', 'out/**', 'build/**', 'coverage/**', 'playwright-report/**', 'playwright-report-fullstack/**', 'test-results/**', 'next-env.d.ts'],
   },
 ];

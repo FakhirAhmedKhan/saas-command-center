@@ -88,7 +88,7 @@ function formatMetricChange(changePercent: number | null): {
 
   if (changePercent > 0) {
     return {
-      label: `â†‘ ${Math.abs(changePercent)}%`,
+      label: `↑ ${Math.abs(changePercent)}%`,
 
       className: 'text-emerald-700 bg-emerald-50',
     };
@@ -96,7 +96,7 @@ function formatMetricChange(changePercent: number | null): {
 
   if (changePercent < 0) {
     return {
-      label: `â†“ ${Math.abs(changePercent)}%`,
+      label: `↓ ${Math.abs(changePercent)}%`,
 
       className: 'text-red-700 bg-red-50',
     };

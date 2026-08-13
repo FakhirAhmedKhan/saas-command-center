@@ -49,10 +49,7 @@ describe('getErrorMessage', () => {
     expect(getErrorMessage(new Error('Network down'))).toBe('Network down');
   });
 
-  it.each([['a string'], [null], [undefined], [42], [{ message: 'nope' }]])(
-    'falls back for non-Error value %s',
-    (value) => {
-      expect(getErrorMessage(value)).toBe('Something went wrong. Please try again.');
-    },
-  );
+  it.each([['a string'], [null], [undefined], [42], [{ message: 'nope' }]])('falls back for non-Error value %s', (value) => {
+    expect(getErrorMessage(value)).toBe('Something went wrong. Please try again.');
+  });
 });

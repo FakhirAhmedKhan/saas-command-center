@@ -1,10 +1,4 @@
-import {
-  formatWebsiteDate,
-  getWebsiteError,
-  originsToText,
-  textToOrigins,
-  websiteKeyStorageName,
-} from './website-utils';
+import { formatWebsiteDate, getWebsiteError, originsToText, textToOrigins, websiteKeyStorageName } from './website-utils';
 import { describe, expect, it } from 'vitest';
 
 describe('getWebsiteError', () => {

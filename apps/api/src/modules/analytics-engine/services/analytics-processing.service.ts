@@ -1,4 +1,4 @@
-﻿import { ReprocessAnalyticsDto } from '../dto/analytics-engine.dto';
+import { ReprocessAnalyticsDto } from '../dto/analytics-engine.dto';
 import { calculateSessionMetrics } from '../utils/analytics-metrics';
 import { normalizeAnalyticsPage, normalizeSource, parseUserAgent } from '../utils/analytics-normalization';
 import { getAnalyticsBucket } from '../utils/analytics-time';
@@ -619,6 +619,27 @@ export class AnalyticsProcessingService {
 
     for (const visitorId of affectedVisitors) {
       await this.rebuildVisitor(transaction, visitorId);
+    }
+
+    /*
+     * RawAnalyticsEvent.processedAt is the canonical processing-completion
+     * marker used by the newer range processor. Keep the legacy/manual
+     * processor consistent with that contract as well.
+     *
+     * This update runs inside the same transaction as normalization and
+     * session/visitor rebuilding, so a later failure rolls everything back.
+     */
+    if (rawEvents.length > 0) {
+      await transaction.rawAnalyticsEvent.updateMany({
+        where: {
+          id: {
+            in: rawEvents.map((event) => event.id),
+          },
+        },
+        data: {
+          processedAt: new Date(),
+        },
+      });
     }
 
     return {

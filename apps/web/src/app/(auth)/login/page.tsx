@@ -2,7 +2,7 @@
 
 import { useSession } from '@/features/auth/use-session';
 import { getErrorMessage } from '@/features/lib/api/api-error';
-import { Button , Input } from '@command-center/ui';
+import { Button, Input } from '@command-center/ui';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
@@ -36,7 +36,7 @@ export default function LoginPage() {
 
       const nextPath = searchParams.get('next');
 
-      router.replace(nextPath && nextPath.startsWith('/') ? nextPath : '/dashboard');
+      router.replace(nextPath && nextPath.startsWith('/') && !nextPath.startsWith('//') ? nextPath : '/dashboard');
     } catch (caughtError) {
       setError(getErrorMessage(caughtError));
     } finally {

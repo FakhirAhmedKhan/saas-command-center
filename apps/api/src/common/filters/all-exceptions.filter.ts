@@ -23,6 +23,28 @@ function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === 'string');
 }
 
+/*
+ * Express middleware (body-parser, CORS) rejects requests with a plain Error
+ * carrying an HTTP status rather than a Nest HttpException — an oversized body
+ * arrives as `{ status: 413, type: 'entity.too.large' }`. Without this, those
+ * client errors would be reported as 500s.
+ */
+function getExpressErrorStatus(exception: unknown): number | undefined {
+  if (typeof exception !== 'object' || exception === null) {
+    return undefined;
+  }
+
+  const candidate = exception as { status?: unknown; statusCode?: unknown };
+
+  const status = typeof candidate.status === 'number' ? candidate.status : candidate.statusCode;
+
+  if (typeof status !== 'number' || !Number.isInteger(status)) {
+    return undefined;
+  }
+
+  return status >= 400 && status <= 599 ? status : undefined;
+}
+
 function normalizeHttpException(exception: HttpException): NormalizedException {
   const exceptionResponse = exception.getResponse();
 
@@ -65,16 +87,22 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     const isHttpException = exception instanceof HttpException;
 
-    const statusCode = isHttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
+    const expressErrorStatus = isHttpException ? undefined : getExpressErrorStatus(exception);
+
+    const statusCode = isHttpException ? exception.getStatus() : (expressErrorStatus ?? HttpStatus.INTERNAL_SERVER_ERROR);
 
     const normalizedException = isHttpException
       ? normalizeHttpException(exception)
-      : {
-          message: 'Internal server error',
-          error: 'Internal Server Error',
-        };
+      : expressErrorStatus !== undefined
+        ? {
+            message: exception instanceof Error ? exception.message : 'Request rejected',
+          }
+        : {
+            message: 'Internal server error',
+            error: 'Internal Server Error',
+          };
 
-    if (!isHttpException) {
+    if (!isHttpException && expressErrorStatus === undefined) {
       const stack = exception instanceof Error ? exception.stack : String(exception);
 
       this.logger.error(

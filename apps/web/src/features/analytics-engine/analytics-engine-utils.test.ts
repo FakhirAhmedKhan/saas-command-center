@@ -1,9 +1,4 @@
-import {
-  calculateBounceRate,
-  formatAnalyticsDate,
-  formatDuration,
-  getAnalyticsEngineError,
-} from './analytics-engine-utils';
+import { calculateBounceRate, formatAnalyticsDate, formatDuration, getAnalyticsEngineError } from './analytics-engine-utils';
 import { describe, expect, it } from 'vitest';
 
 describe('formatAnalyticsDate', () => {

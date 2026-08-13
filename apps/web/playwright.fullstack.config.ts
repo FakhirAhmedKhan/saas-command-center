@@ -31,6 +31,7 @@ export default defineConfig({
 
   use: {
     baseURL: webUrl,
+    permissions: ['local-network-access'],
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -45,8 +46,10 @@ export default defineConfig({
       env: {
         ...process.env,
         NODE_ENV: 'test',
-        API_PORT: '4100',
+        PORT: '4100',
         WEB_URL: webUrl,
+        FRONTEND_URL: webUrl,
+        CORS_ORIGINS: webUrl,
         DATABASE_URL: databaseUrl,
         TEST_DATABASE_URL: databaseUrl,
         JWT_ACCESS_SECRET: 'batch11-access-secret-0123456789-abcdefghijklmnopqrstuvwxyz',
@@ -65,8 +68,19 @@ export default defineConfig({
       env: {
         ...process.env,
         NEXT_PUBLIC_API_URL: apiUrl,
+        NEXT_PUBLIC_API_BASE_URL: apiUrl,
         NEXT_PUBLIC_INGESTION_URL: `${apiUrl}/collect`,
         NEXT_PUBLIC_TRACKER_SCRIPT_URL: 'http://127.0.0.1:3102/tracker.js',
+      },
+    },
+    {
+      command: 'pnpm --dir ../tracker build && pnpm --dir ../tracker start',
+      url: 'http://127.0.0.1:3102/tracker.js',
+      reuseExistingServer: false,
+      timeout: 120_000,
+      env: {
+        ...process.env,
+        TRACKER_PORT: '3102',
       },
     },
   ],

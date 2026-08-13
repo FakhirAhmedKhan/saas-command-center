@@ -1,0 +1,10 @@
+{
+  "name": "@command-center/api-tests",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test:unit": "jest --config jest.config.cjs --runInBand",
+    "test:e2e": "pnpm --dir ../../../apps/api exec jest --config ../../packages/test-code/api/jest-e2e.config.cjs --runInBand",
+    "test": "pnpm run test:unit \u0026\u0026 pnpm run test:e2e"
+  }
+}

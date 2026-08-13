@@ -10,7 +10,11 @@ export default defineConfig({
     },
   },
   test: {
+    // Pure-logic tests (.test.ts) run on the faster node environment.
+    // Component tests (.test.tsx) opt into jsdom via a
+    // `// @vitest-environment jsdom` docblock at the top of the file.
     environment: 'node',
+    setupFiles: ['./vitest.setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
     // Playwright specs live in e2e/ and use their own runner.
     exclude: ['e2e/**', 'node_modules/**', '.next/**'],
@@ -18,10 +22,10 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
       reportsDirectory: './coverage',
-      // Only the pure-logic modules that unit tests actually target. Widening
-      // this to all of src/ would bury the real numbers under untested UI.
-      include: ['src/features/**/*-utils.ts', 'src/features/lib/api/**/*.ts'],
-      exclude: ['**/*.test.ts', '**/*.types.ts', '**/*-types.ts'],
+      // Full production source tree, so the report reflects real coverage
+      // instead of only the handful of files that already have tests.
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: ['**/*.test.{ts,tsx}', '**/*.types.ts', '**/*-types.ts', 'src/**/*.d.ts'],
     },
   },
 });

@@ -31,10 +31,13 @@ beforeEach(() => {
 
   createObjectUrl = vi.fn(() => 'blob:mock-url');
   revokeObjectUrl = vi.fn();
-  vi.stubGlobal('URL', Object.assign(globalThis.URL, {
-    createObjectURL: createObjectUrl,
-    revokeObjectURL: revokeObjectUrl,
-  }));
+  vi.stubGlobal(
+    'URL',
+    Object.assign(globalThis.URL, {
+      createObjectURL: createObjectUrl,
+      revokeObjectURL: revokeObjectUrl,
+    }),
+  );
 
   setAccessToken(null);
   setUnauthorizedHandler(null);
