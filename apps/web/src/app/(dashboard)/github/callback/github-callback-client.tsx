@@ -3,6 +3,8 @@
 
 import { useSession } from '@/features/auth/use-session';
 import { completeGithubCallback } from '@/features/repositories/repositories-api';
+import { completePersonalGithubCallback } from '@/features/workspaces/github-import/github-import-api';
+import { clearGithubImportFlow, githubImportReturnPath, isGithubImportFlow } from '@/features/workspaces/github-import/github-import-flow-marker';
 import { CheckCircle2, FolderGit2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -50,6 +52,28 @@ export function GithubCallbackClient() {
     }
 
     started.current = true;
+
+    if (isGithubImportFlow()) {
+      void completePersonalGithubCallback(code, state)
+        .then(() => {
+          setConnected(true);
+
+          const returnTo = githubImportReturnPath();
+
+          clearGithubImportFlow();
+
+          window.setTimeout(() => {
+            router.replace(returnTo);
+          }, 900);
+        })
+        .catch((caughtError: unknown) => {
+          started.current = false;
+
+          setError(caughtError instanceof Error ? caughtError.message : 'Unable to complete GitHub authorization.');
+        });
+
+      return;
+    }
 
     void completeGithubCallback(code, state)
       .then((result: { workspaceId: string; repositoryCount: number }) => {

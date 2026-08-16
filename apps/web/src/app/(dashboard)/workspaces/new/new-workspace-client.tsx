@@ -1,123 +1,32 @@
 'use client';
 
-import { createWorkspace } from '@/features/workspaces/workspace-api';
-import { Button , Input } from '@command-center/ui';
-import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
-import { useState, type FormEvent } from 'react';
+import { ManualWorkspaceForm } from '@/features/workspaces/components/manual-workspace-form';
+import { WorkspaceCreationMethod } from '@/features/workspaces/components/workspace-creation-method';
+import { GithubImportWizard } from '@/features/workspaces/github-import/github-import-wizard';
+import { useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return 'Unable to create workspace';
-}
-
-function generateSlugPreview(value: string): string {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 120);
-}
+type CreationMethod = 'select' | 'manual' | 'github';
 
 export default function NewWorkspacePage() {
-  const [name, setName] = useState('');
+  const searchParams = useSearchParams();
 
-  const [slug, setSlug] = useState('');
+  const [method, setMethod] = useState<CreationMethod>(() => (searchParams.get('method') === 'github' ? 'github' : 'select'));
 
-  const [submitting, setSubmitting] = useState(false);
-
-  const [error, setError] = useState<string | null>(null);
-
-  const slugPreview = slug.trim() || generateSlugPreview(name);
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
-    event.preventDefault();
-
-    const normalizedName = name.trim();
-
-    if (normalizedName.length < 2) {
-      setError('Workspace name must contain at least two characters.');
-
-      return;
-    }
-
-    setSubmitting(true);
-    setError(null);
-
-    try {
-      const workspace = await createWorkspace({
-        name: normalizedName,
-        slug: slug.trim() || undefined,
-      });
-
-      /*
-       * A full navigation refreshes the auth
-       * provider, so the new workspace appears
-       * immediately on the dashboard.
-       */
-      window.location.assign(`/workspaces/${workspace.id}/applications`);
-    } catch (submitError: unknown) {
-      setError(getErrorMessage(submitError));
-
-      setSubmitting(false);
-    }
+  if (method === 'manual') {
+    return <ManualWorkspaceForm onBack={() => setMethod('select')} />;
   }
 
-  return (
-    <div className='mx-auto w-full max-w-md p-4 pt-16 sm:p-6 sm:pt-24'>
-      <Link href='/dashboard' className='inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-500 transition hover:text-slate-800'>
-        <ArrowLeft className='size-3.5' aria-hidden='true' />
-        Back to dashboard
-      </Link>
+  if (method === 'github') {
+    return (
+      <GithubImportWizard
+        onCancel={() => setMethod('select')}
+        onImported={(workspaceId) => {
+          window.location.assign(`/workspaces/${workspaceId}/applications`);
+        }}
+      />
+    );
+  }
 
-      <h1 className='mt-5 text-2xl font-semibold tracking-tight text-slate-950'>Create your workspace</h1>
-
-      <p className='mt-1.5 text-sm leading-6 text-slate-500'>A workspace contains your applications, websites, analytics, repositories and team.</p>
-
-      <form onSubmit={handleSubmit} className='mt-6 space-y-4'>
-        {error ? (
-          <div role='alert' className='rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800'>
-            {error}
-          </div>
-        ) : null}
-
-        <Input
-          name='workspaceName'
-          label='Workspace name'
-          placeholder='Demo Command Center'
-          value={name}
-          required
-          minLength={2}
-          maxLength={120}
-          disabled={submitting}
-          onChange={(event) => setName(event.target.value)}
-        />
-
-        <Input
-          name='workspaceSlug'
-          label='Workspace URL'
-          placeholder='demo-command-center'
-          value={slug}
-          maxLength={120}
-          disabled={submitting}
-          hint={slugPreview ? `command-center.app/${slugPreview}` : 'Leave blank to generate it from the workspace name.'}
-          onChange={(event) => setSlug(event.target.value)}
-        />
-
-        <div className='flex items-center gap-3 pt-1'>
-          <Button type='submit' loading={submitting}>
-            Create workspace
-          </Button>
-
-          <Link href='/dashboard' className='text-sm font-medium text-slate-500 transition hover:text-slate-800'>
-            Cancel
-          </Link>
-        </div>
-      </form>
-    </div>
-  );
+  return <WorkspaceCreationMethod onSelectManual={() => setMethod('manual')} onSelectGithub={() => setMethod('github')} />;
 }

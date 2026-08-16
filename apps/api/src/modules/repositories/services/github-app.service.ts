@@ -23,14 +23,22 @@ interface GithubRepositoryResponse {
   html_url: string;
   default_branch: string;
   archived: boolean;
+  description: string | null;
+  updated_at: string;
 
   owner: {
     login: string;
+    avatar_url: string;
   };
 }
 
 interface GithubRepositoriesResponse {
   repositories: GithubRepositoryResponse[];
+  total_count: number;
+}
+
+interface GithubUserInstallationsResponse {
+  installations: GithubInstallationResponse[];
   total_count: number;
 }
 
@@ -56,6 +64,22 @@ export interface GithubInstallation {
   id: string;
   accountLogin: string;
   accountType: string;
+}
+
+export interface GithubImportableRepository {
+  id: number;
+  name: string;
+  fullName: string;
+  description: string | null;
+  isPrivate: boolean;
+  defaultBranch: string;
+  htmlUrl: string;
+  updatedAt: string;
+
+  owner: {
+    login: string;
+    avatarUrl: string;
+  };
 }
 
 @Injectable()
@@ -152,6 +176,72 @@ export class GithubAppService {
     }
 
     return true;
+  }
+
+  async listUserInstallations(userAccessToken: string): Promise<GithubInstallation[]> {
+    const installations: GithubInstallation[] = [];
+
+    for (let page = 1; ; page += 1) {
+      const data = await this.tokenJson<GithubUserInstallationsResponse>(userAccessToken, `/user/installations?per_page=100&page=${page}`, {
+        method: 'GET',
+      });
+
+      for (const installation of data.installations) {
+        const accountLogin = installation.account?.login?.trim();
+
+        if (!accountLogin) {
+          continue;
+        }
+
+        installations.push({
+          id: String(installation.id),
+          accountLogin,
+          accountType: installation.account?.type?.trim() ?? 'Unknown',
+        });
+      }
+
+      if (data.installations.length < 100) {
+        break;
+      }
+    }
+
+    return installations;
+  }
+
+  async listImportableInstallationRepositories(installationId: string): Promise<GithubImportableRepository[]> {
+    const token = await this.createInstallationAccessToken(installationId);
+
+    const repositories: GithubImportableRepository[] = [];
+
+    for (let page = 1; ; page += 1) {
+      const data = await this.tokenJson<GithubRepositoriesResponse>(token, `/installation/repositories?per_page=100&page=${page}`, {
+        method: 'GET',
+      });
+
+      for (const repository of data.repositories) {
+        repositories.push({
+          id: repository.id,
+          name: repository.name,
+          fullName: repository.full_name,
+          description: repository.description,
+          isPrivate: repository.private,
+          defaultBranch: repository.default_branch,
+          htmlUrl: repository.html_url,
+          updatedAt: repository.updated_at,
+
+          owner: {
+            login: repository.owner.login,
+            avatarUrl: repository.owner.avatar_url,
+          },
+        });
+      }
+
+      if (data.repositories.length < 100) {
+        break;
+      }
+    }
+
+    return repositories;
   }
 
   async listInstallationRepositories(installationId: string): Promise<GithubRepository[]> {

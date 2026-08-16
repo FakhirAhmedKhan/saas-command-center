@@ -3,7 +3,7 @@
 import { getErrorMessage } from '@/features/applications/application-utils';
 import { getNotifications, markAllNotificationsRead, markNotificationRead } from '@/features/team-operations/team-operations-api';
 import type { UserNotification } from '@/features/team-operations/team-operations.types';
-import { Skeleton , EmptyState } from '@command-center/ui';
+import { Skeleton, EmptyState } from '@command-center/ui';
 import { Bell } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';

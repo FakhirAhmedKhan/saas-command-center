@@ -24,3 +24,23 @@ export class LinkRepositoryApplicationDto {
   @IsUUID()
   applicationId!: string;
 }
+
+export class CompletePersonalGithubSetupDto {
+  @IsString()
+  @MaxLength(200)
+  installState!: string;
+
+  @IsString()
+  @Matches(/^\d+$/)
+  installationId!: string;
+}
+
+export class CompletePersonalGithubCallbackDto {
+  @IsString()
+  @MaxLength(500)
+  code!: string;
+
+  @IsString()
+  @MaxLength(200)
+  state!: string;
+}

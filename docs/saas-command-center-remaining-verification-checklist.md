@@ -6,23 +6,23 @@ This checklist compares the old monorepo audit with the work completed since the
 
 ## ✅ Completed / Verified
 
-| Area | Change | Status |
-|---|---|---|
-| API E2E | 45 suites / 543 tests | ✅ PASS |
-| API Unit | 14 suites / 96 tests | ✅ PASS |
-| Production bootstrap | E2E now uses real `configureApplication()` | ✅ VERIFIED |
-| Exception handling | `AllExceptionsFilter` covered and oversized body `500 -> 413` bug fixed | ✅ VERIFIED |
-| Request ID | Middleware generation/propagation covered | ✅ VERIFIED |
-| Runtime config | Unit coverage | ✅ 100% |
-| Startup checks | Unit coverage | ✅ 100% |
-| CORS / Helmet / body limits | Production-like infrastructure E2E | ✅ VERIFIED |
-| Dead-letter retry IDOR | Workspace isolation bug fixed | ✅ VERIFIED |
-| Analytics processing | Previously broken processing/rebuilder paths fixed | ✅ VERIFIED |
-| Tracker VM tests | 63 / 63 | ✅ PASS |
-| Tracker real Chrome E2E | 5 / 5 | ✅ PASS |
-| Tracker DB persistence | Direct PostgreSQL verification | ✅ VERIFIED |
-| Tracker `sendBeacon` | Real-browser coverage | ✅ VERIFIED |
-| Tracker invalid key/origin | Negative tests | ✅ VERIFIED |
+| Area                        | Change                                                                  | Status      |
+| --------------------------- | ----------------------------------------------------------------------- | ----------- |
+| API E2E                     | 45 suites / 543 tests                                                   | ✅ PASS     |
+| API Unit                    | 14 suites / 96 tests                                                    | ✅ PASS     |
+| Production bootstrap        | E2E now uses real `configureApplication()`                              | ✅ VERIFIED |
+| Exception handling          | `AllExceptionsFilter` covered and oversized body `500 -> 413` bug fixed | ✅ VERIFIED |
+| Request ID                  | Middleware generation/propagation covered                               | ✅ VERIFIED |
+| Runtime config              | Unit coverage                                                           | ✅ 100%     |
+| Startup checks              | Unit coverage                                                           | ✅ 100%     |
+| CORS / Helmet / body limits | Production-like infrastructure E2E                                      | ✅ VERIFIED |
+| Dead-letter retry IDOR      | Workspace isolation bug fixed                                           | ✅ VERIFIED |
+| Analytics processing        | Previously broken processing/rebuilder paths fixed                      | ✅ VERIFIED |
+| Tracker VM tests            | 63 / 63                                                                 | ✅ PASS     |
+| Tracker real Chrome E2E     | 5 / 5                                                                   | ✅ PASS     |
+| Tracker DB persistence      | Direct PostgreSQL verification                                          | ✅ VERIFIED |
+| Tracker `sendBeacon`        | Real-browser coverage                                                   | ✅ VERIFIED |
+| Tracker invalid key/origin  | Negative tests                                                          | ✅ VERIFIED |
 
 ## 🔎 Must Verify Against Current Code
 
@@ -102,12 +102,12 @@ First measure the current frontend baseline before fixing anything.
 
 ### Frontend coverage targets
 
-| Metric | Target |
-|---|---:|
-| Statements | ≥ 90% |
-| Lines | ≥ 90% |
-| Functions | ≥ 90% |
-| Branches | ≥ 85% |
+| Metric                       |                      Target |
+| ---------------------------- | --------------------------: |
+| Statements                   |                       ≥ 90% |
+| Lines                        |                       ≥ 90% |
+| Functions                    |                       ≥ 90% |
+| Branches                     |                       ≥ 85% |
 | Critical auth/security flows | 95–100% meaningful coverage |
 
 ## 🟡 Architecture / Performance Work Still Worth Reviewing

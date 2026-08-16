@@ -15,7 +15,7 @@ function assertTestDatabase(): void {
 
   const databaseName = parsed.pathname.replace(/^\//, '').toLowerCase();
 
-  const safe = databaseName.includes('test') || parsed.port === '5434';
+  const safe = databaseName.includes('test');
 
   if (!safe) {
     throw new Error(`Refusing to reset non-test database "${databaseName}"`);

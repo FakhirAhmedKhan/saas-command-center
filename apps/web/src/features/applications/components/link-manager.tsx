@@ -4,7 +4,7 @@ import { addApplicationLink, removeApplicationLink, updateApplicationLink } from
 import { LINK_TYPE_LABELS } from '../application-constants';
 import { APPLICATION_LINK_TYPES, type ApplicationLink, type ApplicationLinkType } from '../application-types';
 import { getErrorMessage } from '../application-utils';
-import { Badge , Button , Card, CardContent, CardHeader , Input , Select } from '@command-center/ui';
+import { Badge, Button, Card, CardContent, CardHeader, Input, Select } from '@command-center/ui';
 import { ExternalLink, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 

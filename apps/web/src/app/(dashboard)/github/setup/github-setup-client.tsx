@@ -3,6 +3,8 @@
 
 import { useSession } from '@/features/auth/use-session';
 import { completeGithubSetup } from '@/features/repositories/repositories-api';
+import { completePersonalGithubSetup } from '@/features/workspaces/github-import/github-import-api';
+import { isGithubImportFlow } from '@/features/workspaces/github-import/github-import-flow-marker';
 import { FolderGit2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -49,7 +51,9 @@ export function GithubSetupClient() {
 
     started.current = true;
 
-    void completeGithubSetup(installState, installationId)
+    const completeSetup = isGithubImportFlow() ? completePersonalGithubSetup(installState, installationId) : completeGithubSetup(installState, installationId);
+
+    void completeSetup
       .then((result: { authorizationUrl: string | URL }) => {
         window.location.replace(result.authorizationUrl);
       })

@@ -18,7 +18,7 @@
     "test:tracker": "pnpm --filter @command-center/tracker-tests test",
     "test:web": "pnpm --filter @command-center/web-tests test",
     "test:web:fullstack": "pnpm --filter @command-center/web-tests test:fullstack",
-    "test:all": "pnpm -r --no-bail --workspace-concurrency=1 --filter @command-center/api-tests --filter @command-center/tracker-tests --filter @command-center/web-tests run test",
+    "test:all": "node -e \"const{spawnSync}=require('node:child_process');const steps=[['API','test:api'],['Tracker','test:tracker'],['Web','test:web']];const results=[];for(const[label,script]of steps){console.log();console.log('====================================');console.log(label.toUpperCase()+' TESTS');console.log('====================================');console.log();const r=spawnSync('pnpm',['run',script],{stdio:'inherit',shell:true});const pass=(r.status===0);results.push([label,pass]);console.log();console.log(label+': '+(pass?'PASS':'FAIL'));}console.log();console.log('====================================');console.log('FINAL TEST SUMMARY');console.log('====================================');for(const[label,pass]of results){console.log(label.padEnd(9)+(pass?'PASS':'FAIL'));}const overallPass=results.every(function(x){return x[1]});console.log();console.log('Overall: '+(overallPass?'PASS':'FAIL'));process.exit(overallPass?0:1);\"",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:up": "docker compose -f infrastructure/docker-compose.yml up -d",

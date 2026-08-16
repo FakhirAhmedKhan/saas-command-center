@@ -6,7 +6,7 @@ import { WebsiteSubNav } from '@/features/websites/components/website-sub-nav';
 import { getWebsite } from '@/features/websites/website-api';
 import type { Website } from '@/features/websites/website-types';
 import { getWebsiteError, websiteKeyStorageName } from '@/features/websites/website-utils';
-import { Card, CardContent, CardHeader , Button } from '@command-center/ui';
+import { Card, CardContent, CardHeader, Button } from '@command-center/ui';
 import { Check, Clipboard, KeyRound } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';

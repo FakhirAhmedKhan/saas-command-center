@@ -1,4 +1,4 @@
-import { Button , Card, CardContent } from '@command-center/ui';
+import { Button, Card, CardContent } from '@command-center/ui';
 import { TriangleAlert } from 'lucide-react';
 
 interface ApplicationsErrorStateProps {

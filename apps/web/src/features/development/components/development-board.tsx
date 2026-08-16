@@ -8,7 +8,7 @@ import { DevelopmentTimeline } from './development-timeline';
 import { MilestoneCard } from './milestone-card';
 import { TaskKanban } from './task-kanban';
 import type { DevelopmentSummary, DevelopmentTemplate, DevelopmentTemplateType } from '../development-types';
-import { Badge , Button , Card, CardContent, CardHeader , Input , Select , Spinner } from '@command-center/ui';
+import { Badge, Button, Card, CardContent, CardHeader, Input, Select, Spinner } from '@command-center/ui';
 import { AlertTriangle, CalendarClock, CheckCircle2, Flag, ListChecks, Plus, Sparkles } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 

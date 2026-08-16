@@ -1,4 +1,3 @@
- 
 import { MonitoringAccessService } from './monitoring-access.service';
 import { SafeHttpClientService } from './safe-http-client.service';
 import type { TypedConfigService } from '../../../config/runtime-config';

@@ -16,7 +16,7 @@ import {
 } from '@/features/websites/website-api';
 import type { Website } from '@/features/websites/website-types';
 import { getWebsiteError, websiteKeyStorageName } from '@/features/websites/website-utils';
-import { Select , Card, CardContent, CardHeader , Button } from '@command-center/ui';
+import { Select, Card, CardContent, CardHeader, Button } from '@command-center/ui';
 import { Archive, Check, Clipboard, KeyRound, Link2, PauseCircle, PlayCircle, RotateCcw, Unlink } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';

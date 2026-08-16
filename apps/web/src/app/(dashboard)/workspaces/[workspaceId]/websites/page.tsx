@@ -4,7 +4,7 @@ import { WebsiteCard } from '@/features/websites/components/website-card';
 import { getWebsites } from '@/features/websites/website-api';
 import type { Website, WebsiteListQuery, WebsitePagination } from '@/features/websites/website-types';
 import { getWebsiteError } from '@/features/websites/website-utils';
-import { Button , Card , EmptyState , ErrorState , SearchInput , Select , Skeleton } from '@command-center/ui';
+import { Button, Card, EmptyState, ErrorState, SearchInput, Select, Skeleton } from '@command-center/ui';
 import { ChevronLeft, ChevronRight, Globe2, Plus, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';

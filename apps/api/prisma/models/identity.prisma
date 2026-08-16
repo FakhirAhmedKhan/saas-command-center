@@ -41,6 +41,8 @@ model User {
   createdWebhookEndpoints WebhookEndpoint[] @relation("WebhookEndpointCreatedBy")
   updatedWebhookEndpoints WebhookEndpoint[] @relation("WebhookEndpointUpdatedBy")
 
+  personalGithubConnectIntents PersonalGithubConnectIntent[]
+
   @@index([deletedAt])
   @@index([isActive])
   @@map("users")

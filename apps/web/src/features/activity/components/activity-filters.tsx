@@ -9,7 +9,7 @@ import {
   type ActivityEntityType,
   type ApplicationActivityType,
 } from '../activity-types';
-import { Button , Input , Select } from '@command-center/ui';
+import { Button, Input, Select } from '@command-center/ui';
 import { RotateCcw, Search } from 'lucide-react';
 import type { FormEvent } from 'react';
 

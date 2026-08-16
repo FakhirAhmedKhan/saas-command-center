@@ -6,7 +6,7 @@ import type { Workspace } from '@/features/auth/auth.types';
 import { apiRequest } from '@/features/lib/api/api-client';
 import { getErrorMessage } from '@/features/lib/api/api-error';
 import { WorkspaceSettingsNav } from '@/features/workspaces/components/workspace-settings-nav';
-import { Input , Button } from '@command-center/ui';
+import { Input, Button } from '@command-center/ui';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, type FormEvent } from 'react';
 
@@ -128,9 +128,18 @@ export default function WorkspaceSettingsPage() {
             </div>
           ) : null}
 
-          <Input label='Workspace name' disabled={!canEdit} value={name} onChange={(event) => setName(event.target.value)} minLength={2} required />
+          <Input
+            id='workspaceName'
+            label='Workspace name'
+            disabled={!canEdit}
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            minLength={2}
+            required
+          />
 
           <Input
+            id='workspaceSlug'
             label='Workspace slug'
             disabled={!canEdit}
             value={slug}

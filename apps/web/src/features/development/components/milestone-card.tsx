@@ -26,7 +26,7 @@ import {
 } from '../development-constants';
 import type { ApplicationMilestone, WorkItemPriority } from '../development-types';
 import { formatDevelopmentDate, getDevelopmentError, toApiDate } from '../development-utils';
-import { Badge , Button , Card, CardContent, CardHeader , Input , Select } from '@command-center/ui';
+import { Badge, Button, Card, CardContent, CardHeader, Input, Select } from '@command-center/ui';
 import { ArrowDown, ArrowUp, Check, Pencil, Plus, RotateCcw, SkipForward, Trash2 } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 

@@ -5,7 +5,7 @@ import { getErrorMessage } from '@/features/applications/application-utils';
 import { ApplicationSubNav } from '@/features/applications/components/application-sub-nav';
 import { apiRequest } from '@/features/lib/api/api-client';
 import type { WorkspaceRole } from '@command-center/shared-types';
-import { Spinner , Card, CardContent, CardHeader , Button } from '@command-center/ui';
+import { Spinner, Card, CardContent, CardHeader, Button } from '@command-center/ui';
 import { Archive, RotateCcw, Trash2 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';

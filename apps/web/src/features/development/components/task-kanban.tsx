@@ -4,7 +4,7 @@ import { completeTask, reopenTask, setTaskStatus } from '../development-api';
 import { PRIORITY_LABELS, PRIORITY_VARIANTS } from '../development-constants';
 import type { ApplicationMilestone, ApplicationTask, ApplicationTaskStatus } from '../development-types';
 import { formatDevelopmentDate } from '../development-utils';
-import { Badge , Button } from '@command-center/ui';
+import { Badge, Button } from '@command-center/ui';
 import { Check, RotateCcw } from 'lucide-react';
 
 interface TaskKanbanProps {

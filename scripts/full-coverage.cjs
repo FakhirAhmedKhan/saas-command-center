@@ -1,4 +1,3 @@
-
 const { createCoverageMap } = require('istanbul-lib-coverage');
 const libReport = require('istanbul-lib-report');
 const reports = require('istanbul-reports');

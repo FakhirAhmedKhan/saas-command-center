@@ -1,14 +1,55 @@
 import { expect, test } from '@playwright/test';
 
+async function registerAccount(
+  page: import('@playwright/test').Page,
+  options: { name: string; email: string; password: string },
+): Promise<void> {
+  await page.goto('/register');
+
+  await page.getByLabel('Name').fill(options.name);
+
+  await page.getByLabel('Email').fill(options.email);
+
+  await page.getByLabel('Password').fill(options.password);
+
+  await page
+    .getByRole('button', {
+      name: 'Create account',
+    })
+    .click();
+
+  await expect(page).toHaveURL(/\/dashboard$/);
+}
+
+async function createWorkspace(page: import('@playwright/test').Page, workspaceName: string): Promise<void> {
+  await page
+    .getByRole('link', {
+      name: 'Create workspace',
+    })
+    .click();
+
+  await expect(page).toHaveURL(/\/workspaces\/new$/);
+
+  await page.getByLabel('Workspace name').fill(workspaceName);
+
+  await page
+    .getByRole('button', {
+      name: 'Create workspace',
+    })
+    .click();
+
+  await expect(page).toHaveURL(/\/workspaces\/[^/]+\/applications$/);
+}
+
 test.describe('Phase 4 frontend', () => {
   test('redirects unauthenticated dashboard access to login', async ({ page }) => {
     await page.goto('/dashboard');
 
-    await expect(page).toHaveURL(/\/login$/);
+    await expect(page).toHaveURL(/\/login\?next=%2Fdashboard$/);
 
     await expect(
       page.getByRole('heading', {
-        name: 'Sign in to continue',
+        name: 'Welcome back',
       }),
     ).toBeVisible();
   });
@@ -22,29 +63,15 @@ test.describe('Phase 4 frontend', () => {
 
     const workspaceName = `Frontend Workspace ${uniqueId}`;
 
-    await page.goto('/register');
+    await registerAccount(page, {
+      name: 'Frontend Test User',
+      email,
+      password,
+    });
 
-    await page.getByLabel('Your name').fill('Frontend Test User');
+    await createWorkspace(page, workspaceName);
 
-    await page.getByLabel('Email address').fill(email);
-
-    await page.getByLabel('Password').fill(password);
-
-    await page.getByLabel('Workspace name').fill(workspaceName);
-
-    await page
-      .getByRole('button', {
-        name: 'Create account',
-      })
-      .click();
-
-    await expect(page).toHaveURL(/\/dashboard$/);
-
-    await expect(
-      page.getByRole('heading', {
-        name: /Welcome back/,
-      }),
-    ).toBeVisible();
+    await page.goto('/dashboard');
 
     await expect(page.getByText(workspaceName)).toBeVisible();
 
@@ -56,7 +83,7 @@ test.describe('Phase 4 frontend', () => {
 
     await expect(page).toHaveURL(/\/login$/);
 
-    await page.getByLabel('Email address').fill(email);
+    await page.getByLabel('Email').fill(email);
 
     await page.getByLabel('Password').fill(password);
 
@@ -76,29 +103,29 @@ test.describe('Phase 4 frontend', () => {
 
     const email = `workspace-settings-${uniqueId}@example.com`;
 
-    await page.goto('/register');
+    const workspaceName = `Workspace ${uniqueId}`;
 
-    await page.getByLabel('Your name').fill('Workspace Owner');
+    await registerAccount(page, {
+      name: 'Workspace Owner',
+      email,
+      password: 'StrongPassword123!',
+    });
 
-    await page.getByLabel('Email address').fill(email);
+    await createWorkspace(page, workspaceName);
 
-    await page.getByLabel('Password').fill('StrongPassword123!');
-
-    await page.getByLabel('Workspace name').fill(`Workspace ${uniqueId}`);
+    await expect(page).toHaveURL(/\/workspaces\/[^/]+\/applications$/);
 
     await page
       .getByRole('button', {
-        name: 'Create account',
+        name: workspaceName,
       })
       .click();
 
-    await expect(page).toHaveURL(/\/dashboard$/);
-
-    await page.getByText(`Workspace ${uniqueId}`).click();
-
-    await expect(page).toHaveURL(/\/workspaces\/[^/]+$/);
-
-    await page.getByText('Workspace settings').click();
+    await page
+      .getByRole('link', {
+        name: 'Workspace settings',
+      })
+      .click();
 
     await expect(page).toHaveURL(/\/settings$/);
 

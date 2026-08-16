@@ -1,4 +1,4 @@
-import { Button , EmptyState } from '@command-center/ui';
+import { Button, EmptyState } from '@command-center/ui';
 import { Boxes, FilterX, Plus } from 'lucide-react';
 import Link from 'next/link';
 

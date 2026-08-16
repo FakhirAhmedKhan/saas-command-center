@@ -2,7 +2,7 @@
 
 import { getWorkspaceActivities, type WorkspaceActivity } from '@/features/activity/workspace-activity-api';
 import { getErrorMessage } from '@/features/applications/application-utils';
-import { EmptyState , ErrorState , Input , Select , Skeleton } from '@command-center/ui';
+import { EmptyState, ErrorState, Input, Select, Skeleton } from '@command-center/ui';
 import { Activity as ActivityIcon } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';

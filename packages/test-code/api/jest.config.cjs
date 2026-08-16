@@ -9,14 +9,9 @@ module.exports = {
 
   testEnvironment: 'node',
 
-  roots: [
-    path.join(testRoot, 'unit'),
-    path.join(apiRoot, 'src'),
-  ],
+  roots: [path.join(testRoot, 'unit'), path.join(apiRoot, 'src')],
 
-  testMatch: [
-    '<rootDir>/packages/test-code/api/unit/**/*.spec.ts',
-  ],
+  testMatch: ['<rootDir>/packages/test-code/api/unit/**/*.spec.ts'],
 
   transform: {
     '^.+\\.ts$': [
@@ -31,11 +26,7 @@ module.exports = {
     '^src/(.*)$': '<rootDir>/apps/api/src/$1',
   },
 
-  moduleFileExtensions: [
-    'ts',
-    'js',
-    'json',
-  ],
+  moduleFileExtensions: ['ts', 'js', 'json'],
 
   clearMocks: true,
 

@@ -3,7 +3,7 @@
 import { getTrackingStatus } from '../tracking-api';
 import type { TrackingStatus } from '../tracking-types';
 import { formatTrackingDate, getTrackingError } from '../tracking-utils';
-import { Badge , Button , Card, CardContent, CardHeader , Spinner } from '@command-center/ui';
+import { Badge, Button, Card, CardContent, CardHeader, Spinner } from '@command-center/ui';
 import { Activity, CheckCircle2, Clock3, MousePointerClick, Radio, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';

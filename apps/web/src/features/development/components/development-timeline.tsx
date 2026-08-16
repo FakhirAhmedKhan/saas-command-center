@@ -1,7 +1,7 @@
 import { TASK_STATUS_LABELS, TASK_STATUS_VARIANTS } from '../development-constants';
 import type { ApplicationMilestone } from '../development-types';
 import { formatDevelopmentDate } from '../development-utils';
-import { Badge , Card, CardContent, CardHeader } from '@command-center/ui';
+import { Badge, Card, CardContent, CardHeader } from '@command-center/ui';
 import { CalendarClock } from 'lucide-react';
 
 interface DevelopmentTimelineProps {

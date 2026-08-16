@@ -15,3 +15,11 @@ coverage/
 .vscode/
 apps/api/src/generated/prisma/
 .pnpm-lock.yaml
+
+# Playwright / test run artifacts
+playwright-report/
+playwright-report-*/
+blob-report/
+test-results/
+.state/
+.last-run.json

@@ -39,8 +39,10 @@ export class WorkspacesController {
   @ApiOperation({
     summary: 'Update workspace',
   })
-  update(@Param('workspaceId') workspaceId: string, @Body() dto: UpdateWorkspaceDto) {
-    return this.workspacesService.update(workspaceId, dto);
+  async update(@Param('workspaceId') workspaceId: string, @Body() dto: UpdateWorkspaceDto, @CurrentUser() user: AuthenticatedUser) {
+    await this.workspacesService.update(workspaceId, dto);
+
+    return this.workspacesService.findForUser(workspaceId, user.id);
   }
 
   @Post(':workspaceId/transfer-ownership')

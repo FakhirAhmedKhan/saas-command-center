@@ -9,7 +9,7 @@ import { formatApplicationDate, getApplicationInitials, getErrorMessage } from '
 import { ApplicationSubNav } from '@/features/applications/components/application-sub-nav';
 import { LinkManager } from '@/features/applications/components/link-manager';
 import { TechnologyManager } from '@/features/applications/components/technology-manager';
-import { Progress , ErrorState , Card, CardContent, CardHeader , Badge } from '@command-center/ui';
+import { Progress, ErrorState, Card, CardContent, CardHeader, Badge } from '@command-center/ui';
 import { ArrowLeft, Globe2, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';

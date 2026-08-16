@@ -5,7 +5,7 @@ import { getActivityErrorMessage } from '../activity-utils';
 import { ActivityFilters, type ActivityFilterValue } from './activity-filters';
 import { ActivityItem } from './activity-item';
 import type { ActivityListQuery, ActivityPagination, ApplicationActivity } from '../activity-types';
-import { Button , Card, CardContent, CardHeader , EmptyState , Spinner } from '@command-center/ui';
+import { Button, Card, CardContent, CardHeader, EmptyState, Spinner } from '@command-center/ui';
 import { Activity, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 import { useEffect, useState } from 'react';
 

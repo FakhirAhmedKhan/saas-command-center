@@ -2,7 +2,6 @@ import { createTrackerHarness } from '../test-support/tracker-harness.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-
 const WEBSITE_ID = '11111111-1111-4111-8111-111111111111';
 
 test('uses crypto.getRandomValues when randomUUID is unavailable', async () => {

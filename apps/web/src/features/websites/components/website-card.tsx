@@ -1,6 +1,6 @@
 import type { Website } from '../website-types';
 import { formatWebsiteDate } from '../website-utils';
-import { Badge , Card } from '@command-center/ui';
+import { Badge, Card } from '@command-center/ui';
 import { ArrowRight, Clock3, Globe2, KeyRound, Link2 } from 'lucide-react';
 import Link from 'next/link';
 
