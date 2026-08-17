@@ -13,13 +13,13 @@ interface RequestOptions extends Omit<RequestInit, 'body'> {
   skipRefresh?: boolean;
 }
 
-interface RefreshResponse {
-  accessToken: string;
+interface RefreshPayload {
+  accessToken?: unknown;
 }
 
 let accessToken: string | null = null;
 
-let refreshPromise: Promise<string | null> | null = null;
+let refreshPromise: Promise<RefreshPayload | null> | null = null;
 
 let unauthorizedHandler: (() => void) | null = null;
 
@@ -111,7 +111,18 @@ function resolveErrorMessage(body: unknown, fallback: string): string {
   return fallback;
 }
 
-async function refreshAccessToken(): Promise<string | null> {
+/**
+ * Calls POST /auth/refresh at most once for any set of overlapping callers.
+ *
+ * The refresh-token cookie is single-use and rotated server-side on every
+ * call; a second concurrent call with the same (already-consumed) cookie is
+ * indistinguishable from token replay and gets the whole session family
+ * revoked. Sharing one in-flight promise is what keeps concurrent callers
+ * (an apiRequest() 401 retry racing AuthProvider's mount-time restore, or
+ * React Strict Mode's double effect invocation in development) from ever
+ * sending two requests for the same refresh cycle.
+ */
+function performRefresh(): Promise<RefreshPayload | null> {
   if (refreshPromise) {
     return refreshPromise;
   }
@@ -136,7 +147,7 @@ async function refreshAccessToken(): Promise<string | null> {
         return null;
       }
 
-      const payload = (await response.json()) as RefreshResponse;
+      const payload = (await response.json()) as RefreshPayload;
 
       if (typeof payload.accessToken !== 'string' || payload.accessToken.length === 0) {
         setAccessToken(null);
@@ -148,7 +159,7 @@ async function refreshAccessToken(): Promise<string | null> {
 
       setAccessToken(payload.accessToken);
 
-      return payload.accessToken;
+      return payload;
     } catch {
       setAccessToken(null);
 
@@ -161,6 +172,25 @@ async function refreshAccessToken(): Promise<string | null> {
   })();
 
   return refreshPromise;
+}
+
+async function refreshAccessToken(): Promise<string | null> {
+  const payload = await performRefresh();
+
+  return typeof payload?.accessToken === 'string' ? payload.accessToken : null;
+}
+
+/**
+ * Restores a session from the HTTP-only refresh cookie and returns the full
+ * response body (access token plus user/workspaces), not just the token.
+ * Used by AuthProvider to repopulate session state on mount -- routed
+ * through the same single-flight performRefresh() as the automatic 401
+ * retry above so the two never race each other's rotation.
+ */
+export async function refreshSession<T extends RefreshPayload>(): Promise<T | null> {
+  const payload = await performRefresh();
+
+  return payload as T | null;
 }
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {

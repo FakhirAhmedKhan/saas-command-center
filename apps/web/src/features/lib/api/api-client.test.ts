@@ -1,4 +1,4 @@
-import { apiRequest, getAccessToken, setAccessToken, setUnauthorizedHandler } from './api-client';
+import { apiRequest, getAccessToken, refreshSession, setAccessToken, setUnauthorizedHandler } from './api-client';
 import { ApiError } from './api-error';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -289,5 +289,64 @@ describe('apiRequest 401 refresh flow', () => {
     const refreshCalls = fetchMock().mock.calls.filter(([input]) => String(input).endsWith('/auth/refresh'));
 
     expect(refreshCalls).toHaveLength(1);
+  });
+});
+
+describe('refreshSession', () => {
+  it('returns the full refresh payload and stores the access token', async () => {
+    fetchMock().mockResolvedValue(jsonResponse({ accessToken: 'fresh-token', user: { id: 'user-1' }, workspaces: [] }));
+
+    await expect(refreshSession()).resolves.toEqual({ accessToken: 'fresh-token', user: { id: 'user-1' }, workspaces: [] });
+
+    expect(getAccessToken()).toBe('fresh-token');
+    expect(fetchMock().mock.calls[0]?.[0]).toBe(`${BASE_URL}/auth/refresh`);
+    expect(callInit(0).credentials).toBe('include');
+  });
+
+  it('returns null and notifies the unauthorized handler when the refresh response is not ok', async () => {
+    const onUnauthorized = vi.fn();
+    setUnauthorizedHandler(onUnauthorized);
+
+    fetchMock().mockResolvedValue(jsonResponse({ message: 'Unauthorized' }, { status: 401 }));
+
+    await expect(refreshSession()).resolves.toBeNull();
+
+    expect(onUnauthorized).toHaveBeenCalledTimes(1);
+    expect(getAccessToken()).toBeNull();
+  });
+
+  it('de-duplicates concurrent refreshSession() calls into a single request', async () => {
+    // Regression test: the refresh-token cookie is single-use, so two
+    // independent calls (e.g. React Strict Mode double-invoking a mount
+    // effect) would otherwise send two requests, and the second would be
+    // rejected as token replay.
+    fetchMock().mockResolvedValue(jsonResponse({ accessToken: 'fresh-token' }));
+
+    const [first, second, third] = await Promise.all([refreshSession(), refreshSession(), refreshSession()]);
+
+    expect(fetchMock()).toHaveBeenCalledTimes(1);
+    expect(first).toEqual(second);
+    expect(second).toEqual(third);
+  });
+
+  it('shares its in-flight request with a concurrent apiRequest() 401 retry', async () => {
+    let refreshCallCount = 0;
+
+    fetchMock().mockImplementation((input: RequestInfo | URL) => {
+      const url = String(input);
+
+      if (url.endsWith('/auth/refresh')) {
+        refreshCallCount += 1;
+
+        return Promise.resolve(jsonResponse({ accessToken: 'fresh-token' }));
+      }
+
+      return Promise.resolve(getAccessToken() === 'fresh-token' ? jsonResponse({ ok: true }) : jsonResponse({ message: 'Unauthorized' }, { status: 401 }));
+    });
+
+    const [restoreResult] = await Promise.all([refreshSession(), apiRequest('/me')]);
+
+    expect(refreshCallCount).toBe(1);
+    expect(restoreResult).toEqual({ accessToken: 'fresh-token' });
   });
 });

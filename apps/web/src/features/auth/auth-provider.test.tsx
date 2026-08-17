@@ -5,14 +5,16 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import { useEffect } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { apiRequestMock, setAccessTokenMock, setUnauthorizedHandlerMock } = vi.hoisted(() => ({
+const { apiRequestMock, refreshSessionMock, setAccessTokenMock, setUnauthorizedHandlerMock } = vi.hoisted(() => ({
   apiRequestMock: vi.fn(),
+  refreshSessionMock: vi.fn(),
   setAccessTokenMock: vi.fn(),
   setUnauthorizedHandlerMock: vi.fn(),
 }));
 
 vi.mock('../lib/api/api-client', () => ({
   apiRequest: apiRequestMock,
+  refreshSession: refreshSessionMock,
   setAccessToken: setAccessTokenMock,
   setUnauthorizedHandler: setUnauthorizedHandlerMock,
 }));
@@ -88,6 +90,7 @@ function getAuth() {
 
 beforeEach(() => {
   apiRequestMock.mockReset();
+  refreshSessionMock.mockReset();
   setAccessTokenMock.mockReset();
   setUnauthorizedHandlerMock.mockReset();
 });
@@ -99,7 +102,7 @@ afterEach(() => {
 
 describe('AuthProvider status state machine', () => {
   it('transitions from loading to authenticated after a successful refresh on mount', async () => {
-    apiRequestMock.mockResolvedValueOnce(makeAuthResponse());
+    refreshSessionMock.mockResolvedValueOnce(makeAuthResponse());
 
     renderAuth();
 
@@ -108,16 +111,15 @@ describe('AuthProvider status state machine', () => {
     await waitFor(() => expect(screen.getByTestId('status').textContent).toBe('authenticated'));
 
     expect(screen.getByTestId('user-email').textContent).toBe('user@example.com');
-    expect(apiRequestMock).toHaveBeenCalledWith('/auth/refresh', {
-      method: 'POST',
-      skipAuthentication: true,
-      skipRefresh: true,
-    });
+    expect(refreshSessionMock).toHaveBeenCalledWith();
     expect(setAccessTokenMock).toHaveBeenCalledWith('access-token-1');
   });
 
   it('transitions from loading to unauthenticated after a failed refresh on mount', async () => {
-    apiRequestMock.mockRejectedValueOnce(new Error('no session'));
+    // The api-client never rejects on a failed refresh (a non-ok response,
+    // a missing token, or a network error all resolve to null) -- AuthProvider
+    // is what turns a null result into a rejected refresh() promise.
+    refreshSessionMock.mockResolvedValueOnce(null);
 
     renderAuth();
 
@@ -130,7 +132,7 @@ describe('AuthProvider status state machine', () => {
   });
 
   it('registers an unauthorized handler on mount and clears it on unmount', async () => {
-    apiRequestMock.mockRejectedValueOnce(new Error('no session'));
+    refreshSessionMock.mockResolvedValueOnce(null);
 
     const { unmount } = renderAuth();
 
@@ -142,11 +144,29 @@ describe('AuthProvider status state machine', () => {
 
     expect(setUnauthorizedHandlerMock).toHaveBeenLastCalledWith(null);
   });
+
+  it('restores the session through the shared refreshSession() helper, not a direct apiRequest() call', async () => {
+    // refresh() must go through api-client's single-flight refreshSession()
+    // rather than calling apiRequest('/auth/refresh', ...) directly, so that
+    // a concurrent caller (an apiRequest() 401 retry, or this same mount
+    // effect running twice under React Strict Mode) shares one in-flight
+    // request instead of sending two. The de-duplication itself is exercised
+    // directly, without mocking it away, in auth-provider-refresh-integration.test.tsx
+    // and in api-client.test.ts.
+    refreshSessionMock.mockResolvedValueOnce(makeAuthResponse());
+
+    renderAuth();
+
+    await waitFor(() => expect(screen.getByTestId('status').textContent).toBe('authenticated'));
+
+    expect(refreshSessionMock).toHaveBeenCalledTimes(1);
+    expect(apiRequestMock).not.toHaveBeenCalledWith('/auth/refresh', expect.anything());
+  });
 });
 
 describe('AuthProvider login/register/logout/logoutAll', () => {
   it('login calls apiRequest with the correct method/path/body and applies the response', async () => {
-    apiRequestMock.mockRejectedValueOnce(new Error('no session'));
+    refreshSessionMock.mockResolvedValueOnce(null);
 
     renderAuth();
 
@@ -169,7 +189,7 @@ describe('AuthProvider login/register/logout/logoutAll', () => {
   });
 
   it('login rejects and leaves status unauthenticated when the API call fails', async () => {
-    apiRequestMock.mockRejectedValueOnce(new Error('no session'));
+    refreshSessionMock.mockResolvedValueOnce(null);
 
     renderAuth();
 
@@ -185,7 +205,7 @@ describe('AuthProvider login/register/logout/logoutAll', () => {
   });
 
   it('register calls apiRequest with the correct method/path/body and applies the response', async () => {
-    apiRequestMock.mockRejectedValueOnce(new Error('no session'));
+    refreshSessionMock.mockResolvedValueOnce(null);
 
     renderAuth();
 
@@ -211,7 +231,7 @@ describe('AuthProvider login/register/logout/logoutAll', () => {
   });
 
   it('logout calls apiRequest with the correct method/path and clears the session', async () => {
-    apiRequestMock.mockResolvedValueOnce(makeAuthResponse());
+    refreshSessionMock.mockResolvedValueOnce(makeAuthResponse());
 
     renderAuth();
 
@@ -233,7 +253,7 @@ describe('AuthProvider login/register/logout/logoutAll', () => {
   });
 
   it('logout clears the session even when the API call fails', async () => {
-    apiRequestMock.mockResolvedValueOnce(makeAuthResponse());
+    refreshSessionMock.mockResolvedValueOnce(makeAuthResponse());
 
     renderAuth();
 
@@ -249,7 +269,7 @@ describe('AuthProvider login/register/logout/logoutAll', () => {
   });
 
   it('logoutAll calls apiRequest with the correct method/path and clears the session', async () => {
-    apiRequestMock.mockResolvedValueOnce(makeAuthResponse());
+    refreshSessionMock.mockResolvedValueOnce(makeAuthResponse());
 
     renderAuth();
 
@@ -269,7 +289,7 @@ describe('AuthProvider login/register/logout/logoutAll', () => {
   });
 
   it('refreshCurrentUser calls apiRequest with GET /auth/me and updates user/workspaces without changing status', async () => {
-    apiRequestMock.mockResolvedValueOnce(makeAuthResponse());
+    refreshSessionMock.mockResolvedValueOnce(makeAuthResponse());
 
     renderAuth();
 
@@ -294,7 +314,7 @@ describe('AuthProvider login/register/logout/logoutAll', () => {
 
 describe('AuthProvider updateWorkspaceInState', () => {
   it('adds a new workspace when it does not already exist in state', async () => {
-    apiRequestMock.mockResolvedValueOnce(makeAuthResponse({ workspaces: [makeWorkspace({ id: 'workspace-1', name: 'First' })] }));
+    refreshSessionMock.mockResolvedValueOnce(makeAuthResponse({ workspaces: [makeWorkspace({ id: 'workspace-1', name: 'First' })] }));
 
     renderAuth();
 
@@ -311,7 +331,7 @@ describe('AuthProvider updateWorkspaceInState', () => {
   });
 
   it('merges an update into an existing workspace instead of duplicating it', async () => {
-    apiRequestMock.mockResolvedValueOnce(makeAuthResponse({ workspaces: [makeWorkspace({ id: 'workspace-1', name: 'Original Name', slug: 'original' })] }));
+    refreshSessionMock.mockResolvedValueOnce(makeAuthResponse({ workspaces: [makeWorkspace({ id: 'workspace-1', name: 'Original Name', slug: 'original' })] }));
 
     renderAuth();
 

@@ -2,7 +2,7 @@
 'use client';
 
 import type { AuthResponse, CurrentUserResponse, LoginInput, RegisterInput, User, Workspace } from './auth.types';
-import { apiRequest, setAccessToken, setUnauthorizedHandler } from '../lib/api/api-client';
+import { apiRequest, refreshSession, setAccessToken, setUnauthorizedHandler } from '../lib/api/api-client';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type PropsWithChildren } from 'react';
 
 export type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
@@ -69,13 +69,21 @@ function AuthProviderRoot({ children }: PropsWithChildren) {
   }, []);
 
   const refresh = useCallback(async () => {
-    const response = await apiRequest<AuthResponse>('/auth/refresh', {
-      method: 'POST',
+    /*
+     * Goes through the api-client's single-flight refreshSession() rather
+     * than a plain apiRequest() call. The refresh-token cookie is single-use
+     * and rotated on every call, so if this effect ever runs twice
+     * concurrently (React Strict Mode double-invokes mount effects in
+     * development), a second independent request would reuse an
+     * already-consumed cookie and get the whole session revoked as
+     * suspected token replay. Sharing one in-flight request keeps that from
+     * happening.
+     */
+    const response = await refreshSession<AuthResponse>();
 
-      skipAuthentication: true,
-
-      skipRefresh: true,
-    });
+    if (!response) {
+      throw new Error('Unable to restore session.');
+    }
 
     applyAuthResponse(response);
   }, [applyAuthResponse]);
