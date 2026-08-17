@@ -3,6 +3,12 @@ export type NodeEnvironment = 'development' | 'test' | 'production';
 export type CookieSameSite = 'lax' | 'strict' | 'none';
 
 export interface EnvironmentVariables {
+  GITHUB_APP_CALLBACK_URL?: string;
+  GITHUB_APP_CLIENT_ID?: string;
+  GITHUB_APP_CLIENT_SECRET?: string;
+  GITHUB_APP_PRIVATE_KEY_BASE64?: string;
+  GITHUB_APP_SLUG?: string;
+  GITHUB_APP_WEBHOOK_SECRET?: string;
   REDIS_URL: string;
 
   ANALYTICS_WORKER_ENABLED: boolean;
@@ -282,6 +288,13 @@ export function validateEnvironment(config: Record<string, unknown>): Environmen
   }
 
   return {
+    GITHUB_APP_CALLBACK_URL: getOptionalString(config, 'GITHUB_APP_CALLBACK_URL'),
+    GITHUB_APP_CLIENT_ID: getOptionalString(config, 'GITHUB_APP_CLIENT_ID'),
+    GITHUB_APP_CLIENT_SECRET: getOptionalString(config, 'GITHUB_APP_CLIENT_SECRET'),
+    GITHUB_APP_PRIVATE_KEY_BASE64: getOptionalString(config, 'GITHUB_APP_PRIVATE_KEY_BASE64'),
+    GITHUB_APP_SLUG: getOptionalString(config, 'GITHUB_APP_SLUG'),
+    GITHUB_APP_WEBHOOK_SECRET: getOptionalString(config, 'GITHUB_APP_WEBHOOK_SECRET'),
+
     WEBHOOK_ENCRYPTION_KEY: webhookEncryptionKey,
 
     WEBHOOK_WORKER_ENABLED: getBoolean(config, 'WEBHOOK_WORKER_ENABLED', true),

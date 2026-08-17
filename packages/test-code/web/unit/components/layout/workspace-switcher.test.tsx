@@ -61,7 +61,7 @@ describe('WorkspaceSwitcher', () => {
 
     render(<WorkspaceSwitcher workspaceId='workspace-1' />);
 
-    await user.click(screen.getByRole('button', { name: /Acme Corp/ }));
+    await user.click(screen.getByRole('button', { name: 'Select workspace' }));
 
     const options = screen.getAllByRole('option');
 
@@ -80,7 +80,7 @@ describe('WorkspaceSwitcher', () => {
     render(<WorkspaceSwitcher workspaceId='workspace-does-not-belong-to-member' />);
 
     // Renders the member's own workspace, not the unrecognised id from the URL.
-    expect(screen.getByRole('button', { name: /Acme Corp/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Select workspace' })).toHaveTextContent('Acme Corp');
   });
 
   it('marks the active workspace as selected and navigates to a different one on click', async () => {
@@ -93,7 +93,7 @@ describe('WorkspaceSwitcher', () => {
 
     render(<WorkspaceSwitcher workspaceId='workspace-1' />);
 
-    await user.click(screen.getByRole('button', { name: /Acme Corp/ }));
+    await user.click(screen.getByRole('button', { name: 'Select workspace' }));
 
     const activeOption = screen.getByRole('option', { name: /Acme Corp/ });
     const inactiveOption = screen.getByRole('option', { name: /Globex Inc/ });
@@ -116,7 +116,7 @@ describe('WorkspaceSwitcher', () => {
 
     render(<WorkspaceSwitcher workspaceId='workspace-1' />);
 
-    await user.click(screen.getByRole('button', { name: /Acme Corp/ }));
+    await user.click(screen.getByRole('button', { name: 'Select workspace' }));
     await user.click(screen.getByRole('option', { name: /Acme Corp/ }));
 
     expect(push).not.toHaveBeenCalled();

@@ -222,7 +222,7 @@ test.describe('Phase 13 analytics reports', () => {
 
     await expect(
       page.getByRole('button', {
-        name: 'Retry',
+        name: 'Try again',
       }),
     ).toBeVisible();
   });
@@ -288,6 +288,7 @@ test.describe('Phase 13 analytics reports', () => {
     await page
       .getByRole('button', {
         name: 'Next',
+        exact: true,
       })
       .click();
 
@@ -302,6 +303,7 @@ test.describe('Phase 13 analytics reports', () => {
     await expect(
       page.getByRole('button', {
         name: 'Next',
+        exact: true,
       }),
     ).toBeDisabled();
   });

@@ -1,5 +1,6 @@
 'use client';
 
+import { useAuth } from '@/features/auth/auth-provider';
 import { WebsiteCard } from '@/features/websites/components/website-card';
 import { getWebsites } from '@/features/websites/website-api';
 import type { Website, WebsiteListQuery, WebsitePagination } from '@/features/websites/website-types';
@@ -25,6 +26,12 @@ export default function WebsitesPage() {
   }>();
 
   const workspaceId = params.workspaceId;
+
+  const { workspaces } = useAuth();
+
+  const role = workspaces.find((workspace) => workspace.id === workspaceId)?.members?.[0]?.role ?? 'VIEWER';
+
+  const canCreate = role !== 'VIEWER';
 
   const [search, setSearch] = useState('');
 
@@ -147,13 +154,15 @@ export default function WebsitesPage() {
             Refresh
           </Button>
 
-          <Link
-            href={`/workspaces/${workspaceId}/websites/new`}
-            className='inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700'
-          >
-            <Plus className='size-4' />
-            New website
-          </Link>
+          {canCreate ? (
+            <Link
+              href={`/workspaces/${workspaceId}/websites/new`}
+              className='inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700'
+            >
+              <Plus className='size-4' />
+              New website
+            </Link>
+          ) : null}
         </div>
       </header>
 

@@ -67,6 +67,7 @@ export function WorkspaceSwitcher({ workspaceId }: WorkspaceSwitcherProps) {
         onClick={() => setOpen((value) => !value)}
         aria-haspopup='listbox'
         aria-expanded={open}
+        aria-label='Select workspace'
         className='flex w-full items-center gap-2 rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-left transition hover:bg-slate-50'
       >
         <span className='flex size-6 shrink-0 items-center justify-center rounded-md bg-brand-600 text-[10px] font-bold text-white'>

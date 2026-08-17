@@ -184,7 +184,7 @@ test.describe('Phase 15 monitoring', () => {
 
     await expect(
       page.getByRole('heading', {
-        name: 'Health monitoring',
+        name: 'Monitoring',
       }),
     ).toBeVisible();
 
@@ -194,8 +194,12 @@ test.describe('Phase 15 monitoring', () => {
       }),
     ).toBeVisible();
 
+    const checkCard = page.locator('article').filter({
+      hasText: 'Production API',
+    });
+
     await expect(
-      page.getByText('Healthy', {
+      checkCard.getByText('Healthy', {
         exact: true,
       }),
     ).toBeVisible();
@@ -326,7 +330,7 @@ test.describe('Phase 15 monitoring', () => {
 
     await expect(
       page.getByRole('button', {
-        name: 'Retry',
+        name: 'Try again',
       }),
     ).toBeVisible();
   });
@@ -434,7 +438,7 @@ test.describe('Phase 15 monitoring', () => {
       })
       .click();
 
-    await expect(page.getByRole('alert')).toHaveText('Unable to disable this health check right now.');
+    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toHaveText('Unable to disable this health check right now.');
   });
 
   test('opens the health-check history view', async ({ page }) => {

@@ -6,10 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "next typegen \u0026\u0026 tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "verify": "pnpm typecheck \u0026\u0026 pnpm build"
+    "verify": "pnpm typecheck && pnpm build"
   },
   "dependencies": {
     "@command-center/shared-types": "workspace:*",
@@ -18,7 +18,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^1.28.0",
     "monaco-editor": "^0.56.0",
-    "next": "16.2.12",
+    "next": "16.3.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwind-merge": "^3.6.0"
@@ -39,13 +39,13 @@
     "@vitejs/plugin-react": "^6.0.5",
     "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^9.34.0",
-    "eslint-config-next": "16.2.12",
+    "eslint-config-next": "16.3.1",
     "jsdom": "^30.0.1",
     "pg": "^8.22.0",
-    "postcss": "^8.5.25",
+    "postcss": "^8.5.26",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.2",
-    "typescript-eslint": "^8.41.0",
+    "typescript-eslint": "^8.67.0",
     "vitest": "^4.1.10"
   }
 }

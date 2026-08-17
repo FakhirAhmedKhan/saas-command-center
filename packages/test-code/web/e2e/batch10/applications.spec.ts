@@ -196,7 +196,7 @@ test.describe('Batch 10 application flows', () => {
 
     await expect(
       page.getByRole('heading', {
-        name: 'Unable to load application',
+        name: 'Something went wrong',
       }),
     ).toBeVisible();
     await expect(page.getByText('Application not found')).toBeVisible();

@@ -12,7 +12,7 @@ test.describe('Batch 10 authentication flows', () => {
     await expect(page).toHaveURL(/\/login$/);
     await expect(
       page.getByRole('heading', {
-        name: 'Sign in to continue',
+        name: 'Welcome back',
       }),
     ).toBeVisible();
   });
@@ -24,7 +24,7 @@ test.describe('Batch 10 authentication flows', () => {
 
     await page.goto('/dashboard');
 
-    await expect(page).toHaveURL(/\/login$/);
+    await expect(page).toHaveURL(/\/login\?next=%2Fdashboard$/);
   });
 
   test('logs in and opens the dashboard', async ({ page }) => {
@@ -33,7 +33,7 @@ test.describe('Batch 10 authentication flows', () => {
     });
 
     await page.goto('/login');
-    await page.getByLabel('Email address').fill('owner@example.com');
+    await page.getByLabel('Email').fill('owner@example.com');
     await page.getByLabel('Password').fill('StrongPassword123!');
     await page
       .getByRole('button', {
@@ -44,7 +44,7 @@ test.describe('Batch 10 authentication flows', () => {
     await expect(page).toHaveURL(/\/dashboard$/);
     await expect(
       page.getByRole('heading', {
-        name: 'Welcome back, Frontend Owner',
+        name: /Good (morning|afternoon|evening), Frontend Owner/,
       }),
     ).toBeVisible();
 
@@ -68,7 +68,7 @@ test.describe('Batch 10 authentication flows', () => {
     });
 
     await page.goto('/login');
-    await page.getByLabel('Email address').fill('wrong@example.com');
+    await page.getByLabel('Email').fill('wrong@example.com');
     await page.getByLabel('Password').fill('WrongPassword123!');
     await page
       .getByRole('button', {
@@ -86,10 +86,9 @@ test.describe('Batch 10 authentication flows', () => {
     });
 
     await page.goto('/register');
-    await page.getByLabel('Your name').fill('  New Owner  ');
-    await page.getByLabel('Email address').fill('new-owner@example.com');
+    await page.getByLabel('Name').fill('  New Owner  ');
+    await page.getByLabel('Email').fill('new-owner@example.com');
     await page.getByLabel('Password').fill('StrongPassword123!');
-    await page.getByLabel('Workspace name').fill('New SaaS Team');
     await page
       .getByRole('button', {
         name: 'Create account',
@@ -104,7 +103,6 @@ test.describe('Batch 10 authentication flows', () => {
       displayName: 'New Owner',
       email: 'new-owner@example.com',
       password: 'StrongPassword123!',
-      workspaceName: 'New SaaS Team',
     });
   });
 
@@ -114,9 +112,8 @@ test.describe('Batch 10 authentication flows', () => {
     });
 
     await page.goto('/register');
-    await page.getByLabel('Email address').fill('new-owner@example.com');
-    await page.getByLabel('Password').fill('too-short');
-    await page.getByLabel('Workspace name').fill('New Team');
+    await page.getByLabel('Email').fill('new-owner@example.com');
+    await page.getByLabel('Password').fill('short1');
     await page
       .getByRole('button', {
         name: 'Create account',
@@ -148,7 +145,7 @@ test.describe('Batch 10 authentication flows', () => {
       })
       .click();
 
-    await expect(page).toHaveURL(/\/login$/);
+    await expect(page).toHaveURL(/\/login\?next=%2Fdashboard$/);
     expect(state.requests.some((request) => request.method === 'POST' && request.path === '/auth/logout')).toBe(true);
   });
 });

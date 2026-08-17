@@ -14,3 +14,8 @@ allowBuilds:
 
 nodeLinker: hoisted
 sharedWorkspaceLockfile: true
+
+
+overrides:
+  "js-yaml@>=5.0.0 <=5.2.1": "5.2.3"
+  "dompurify@<=3.4.12": "3.4.13"

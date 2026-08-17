@@ -30,6 +30,12 @@ async function createWorkspace(page: import('@playwright/test').Page, workspaceN
 
   await expect(page).toHaveURL(/\/workspaces\/new$/);
 
+  await page
+    .getByRole('button', {
+      name: 'Create Manually',
+    })
+    .click();
+
   await page.getByLabel('Workspace name').fill(workspaceName);
 
   await page
@@ -72,6 +78,7 @@ test.describe('Phase 4 frontend', () => {
     await createWorkspace(page, workspaceName);
 
     await page.goto('/dashboard');
+    await page.waitForLoadState('networkidle');
 
     await expect(page.getByText(workspaceName)).toBeVisible();
 
@@ -81,7 +88,7 @@ test.describe('Phase 4 frontend', () => {
       })
       .click();
 
-    await expect(page).toHaveURL(/\/login$/);
+    await expect(page).toHaveURL(/\/login/);
 
     await page.getByLabel('Email').fill(email);
 
@@ -114,10 +121,11 @@ test.describe('Phase 4 frontend', () => {
     await createWorkspace(page, workspaceName);
 
     await expect(page).toHaveURL(/\/workspaces\/[^/]+\/applications$/);
+    await page.waitForLoadState('networkidle');
 
     await page
       .getByRole('button', {
-        name: workspaceName,
+        name: 'Select workspace',
       })
       .click();
 

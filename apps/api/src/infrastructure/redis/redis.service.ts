@@ -52,6 +52,14 @@ export class RedisService implements OnApplicationBootstrap, OnModuleDestroy {
   }
 
   async onModuleDestroy(): Promise<void> {
-    await this.client.quit();
+    if (this.client.status === 'ready') {
+      await this.client.quit();
+      return;
+    }
+
+    if (this.client.status !== 'end') {
+      this.client.disconnect();
+    }
   }
 }
+

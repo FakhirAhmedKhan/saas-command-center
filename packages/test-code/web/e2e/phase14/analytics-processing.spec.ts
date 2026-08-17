@@ -212,7 +212,7 @@ test.describe('Phase 14 analytics processing', () => {
 
     await expect(
       page.getByRole('button', {
-        name: 'Retry',
+        name: 'Try again',
       }),
     ).toBeVisible();
   });
@@ -324,7 +324,7 @@ test.describe('Phase 14 analytics processing', () => {
       })
       .click();
 
-    await expect(page.getByRole('alert')).toHaveText('Reprocessing cannot exceed 31 days.');
+    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toHaveText('Reprocessing cannot exceed 31 days.');
   });
 
   test('shows a dead-lettered run with a Retry action and its error message', async ({ page }) => {

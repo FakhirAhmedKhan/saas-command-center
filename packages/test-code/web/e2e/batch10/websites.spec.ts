@@ -54,7 +54,7 @@ test.describe('Batch 10 website and tracker setup flows', () => {
     await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}/websites`);
 
     await page.getByPlaceholder('Search websites...').fill('command-center');
-    await page.locator('select').nth(1).selectOption('enabled');
+    await page.getByLabel('Status').selectOption('enabled');
     await page
       .getByRole('button', {
         name: 'Apply',
@@ -85,7 +85,7 @@ test.describe('Batch 10 website and tracker setup flows', () => {
     await expect(page).toHaveURL(/\/websites\/88888888-8888-4888-8888-888888888888\/installation$/);
     await expect(
       page.getByRole('heading', {
-        name: 'Tracker installation',
+        name: 'Install tracking',
       }),
     ).toBeVisible();
     await expect(page.getByText(state.trackingKey).first()).toBeVisible();

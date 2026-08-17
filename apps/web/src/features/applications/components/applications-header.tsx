@@ -6,9 +6,10 @@ interface ApplicationsHeaderProps {
   workspaceId: string;
   onRefresh: () => void;
   refreshing?: boolean;
+  canCreate?: boolean;
 }
 
-export function ApplicationsHeader({ workspaceId, onRefresh, refreshing = false }: ApplicationsHeaderProps) {
+export function ApplicationsHeader({ workspaceId, onRefresh, refreshing = false, canCreate = true }: ApplicationsHeaderProps) {
   return (
     <header className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
       <div>
@@ -27,13 +28,15 @@ export function ApplicationsHeader({ workspaceId, onRefresh, refreshing = false 
           Refresh
         </Button>
 
-        <Link
-          href={`/workspaces/${workspaceId}/applications/new`}
-          className='inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700'
-        >
-          <Plus className='size-4' />
-          New application
-        </Link>
+        {canCreate ? (
+          <Link
+            href={`/workspaces/${workspaceId}/applications/new`}
+            className='inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700'
+          >
+            <Plus className='size-4' />
+            New application
+          </Link>
+        ) : null}
       </div>
     </header>
   );

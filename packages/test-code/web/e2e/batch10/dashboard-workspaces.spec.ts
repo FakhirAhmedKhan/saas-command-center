@@ -55,7 +55,16 @@ test.describe('Batch 10 dashboard and workspace flows', () => {
 
     await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}`);
 
-    await page.getByLabel('Select workspace').selectOption(SECONDARY_WORKSPACE_ID);
+    await page
+      .getByRole('button', {
+        name: 'Select workspace',
+      })
+      .click();
+    await page
+      .getByRole('option', {
+        name: 'MadadAI Team',
+      })
+      .click();
 
     await expect(page).toHaveURL(new RegExp(`/workspaces/${SECONDARY_WORKSPACE_ID}$`));
     await expect(
@@ -69,17 +78,27 @@ test.describe('Batch 10 dashboard and workspace flows', () => {
     await installMockApi(page);
 
     await page.goto('/workspaces/new');
+    await page
+      .getByRole('button', {
+        name: 'Create Manually',
+      })
+      .click();
     await page.getByLabel('Workspace name').fill('My New SaaS Portfolio');
 
-    await expect(page.getByText('Workspace URL identifier: my-new-saas-portfolio')).toBeVisible();
+    await expect(page.getByText('command-center.app/my-new-saas-portfolio')).toBeVisible();
   });
 
   test('creates a workspace and opens its applications page', async ({ page }) => {
     const state = await installMockApi(page);
 
     await page.goto('/workspaces/new');
+    await page
+      .getByRole('button', {
+        name: 'Create Manually',
+      })
+      .click();
     await page.getByLabel('Workspace name').fill('Analytics Team');
-    await page.getByLabel('Workspace slug').fill('analytics-team');
+    await page.getByLabel('Workspace URL').fill('analytics-team');
     await page
       .getByRole('button', {
         name: 'Create workspace',
@@ -107,8 +126,13 @@ test.describe('Batch 10 dashboard and workspace flows', () => {
     });
 
     await page.goto('/workspaces/new');
+    await page
+      .getByRole('button', {
+        name: 'Create Manually',
+      })
+      .click();
     await page.getByLabel('Workspace name').fill('Duplicate Team');
-    await page.getByLabel('Workspace slug').fill('duplicate-team');
+    await page.getByLabel('Workspace URL').fill('duplicate-team');
     await page
       .getByRole('button', {
         name: 'Create workspace',

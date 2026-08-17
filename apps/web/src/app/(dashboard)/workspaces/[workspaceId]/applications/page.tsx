@@ -11,6 +11,7 @@ import { ApplicationsGrid } from '@/features/applications/components/application
 import { ApplicationsHeader } from '@/features/applications/components/applications-header';
 import { ApplicationsResultSummary } from '@/features/applications/components/applications-result-summary';
 import { ApplicationsSkeleton } from '@/features/applications/components/applications-skeleton';
+import { useAuth } from '@/features/auth/auth-provider';
 import { Button } from '@command-center/ui';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useParams } from 'next/navigation';
@@ -59,6 +60,12 @@ export default function ApplicationsPage() {
   }>();
 
   const workspaceId = params.workspaceId;
+
+  const { workspaces } = useAuth();
+
+  const role = workspaces.find((workspace) => workspace.id === workspaceId)?.members?.[0]?.role ?? 'VIEWER';
+
+  const canCreate = role !== 'VIEWER';
 
   const [filterDraft, setFilterDraft] = useState<ApplicationFilterValue>(DEFAULT_FILTERS);
 
@@ -139,7 +146,7 @@ export default function ApplicationsPage() {
 
   return (
     <div className='mx-auto w-full max-w-[1600px] space-y-6 p-4 sm:p-6 lg:p-8'>
-      <ApplicationsHeader workspaceId={workspaceId} onRefresh={refresh} refreshing={loading} />
+      <ApplicationsHeader workspaceId={workspaceId} onRefresh={refresh} refreshing={loading} canCreate={canCreate} />
 
       <div className='space-y-3'>
         <ApplicationFilters value={filterDraft} onChange={setFilterDraft} onApply={() => applyFilters()} onReset={resetFilters} />

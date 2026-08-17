@@ -10,7 +10,7 @@ test.describe('Batch 10 navigation, responsiveness, and accessibility', () => {
     await expect(page).toHaveURL(/\/dashboard$/);
     await expect(
       page.getByRole('heading', {
-        name: 'Welcome back, Frontend Owner',
+        name: /Good (morning|afternoon|evening), Frontend Owner/,
       }),
     ).toBeVisible();
   });
@@ -18,20 +18,26 @@ test.describe('Batch 10 navigation, responsiveness, and accessibility', () => {
   test('exposes meaningful navigation landmarks and links', async ({ page }) => {
     await installMockApi(page);
 
-    await page.goto('/dashboard');
+    await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}/applications`);
 
-    await expect(page.getByRole('navigation')).toBeVisible();
+    const nav = page.getByRole('navigation');
+
+    await expect(nav).toBeVisible();
     await expect(
-      page.getByRole('link', {
-        name: 'Overview',
+      nav.getByRole('link', {
+        name: 'Applications',
       }),
     ).toBeVisible();
     await expect(
-      page.getByRole('link', {
-        name: 'Command Center Team',
+      nav.getByRole('link', {
+        name: 'Websites',
       }),
     ).toBeVisible();
-    await expect(page.getByLabel('Select workspace')).toBeVisible();
+    await expect(
+      page.getByRole('button', {
+        name: 'Select workspace',
+      }),
+    ).toContainText('Command Center Team');
   });
 
   test('keeps the dashboard inside the mobile viewport', async ({ page }) => {
@@ -41,13 +47,22 @@ test.describe('Batch 10 navigation, responsiveness, and accessibility', () => {
     });
     await installMockApi(page);
 
-    await page.goto('/dashboard');
+    await page.goto(`/workspaces/${PRIMARY_WORKSPACE_ID}/applications`);
 
     const hasHorizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
 
     expect(hasHorizontalOverflow).toBe(false);
-    await expect(page.getByLabel('Select workspace')).toBeVisible();
-    await expect(page.locator('.sidebar-nav')).toBeHidden();
+    await expect(page.locator('aside')).toBeHidden();
+
+    await page
+      .getByRole('button', {
+        name: 'Open navigation',
+      })
+      .click();
+
+    const mobileDrawer = page.getByRole('button', { name: 'Close navigation' }).last().locator('..');
+
+    await expect(mobileDrawer.getByLabel('Select workspace')).toBeVisible();
   });
 
   test('provides accessible names for authentication controls', async ({ page }) => {
@@ -57,7 +72,7 @@ test.describe('Batch 10 navigation, responsiveness, and accessibility', () => {
 
     await page.goto('/login');
 
-    await expect(page.getByLabel('Email address')).toHaveAttribute('type', 'email');
+    await expect(page.getByLabel('Email')).toHaveAttribute('type', 'email');
     await expect(page.getByLabel('Password')).toHaveAttribute('type', 'password');
     await expect(
       page.getByRole('button', {
@@ -66,7 +81,7 @@ test.describe('Batch 10 navigation, responsiveness, and accessibility', () => {
     ).toBeEnabled();
     await expect(
       page.getByRole('link', {
-        name: 'Create an account',
+        name: 'Create one',
       }),
     ).toBeVisible();
   });
