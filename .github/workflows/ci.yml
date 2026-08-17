@@ -1,43 +1,161 @@
 name: CI
 
 on:
-  pull_request:
   push:
-    branches: [main]
+    branches:
+      - devlopment
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   quality:
+    name: Quality & Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: command_center
+          POSTGRES_PASSWORD: command_center_ci
+          POSTGRES_DB: command_center_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U command_center -d command_center_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      NODE_ENV: development
+
+      DATABASE_URL: postgresql://command_center:command_center_ci@localhost:5432/command_center_test?schema=public
+      TEST_DATABASE_URL: postgresql://command_center:command_center_ci@localhost:5432/command_center_test?schema=public
+
+      REDIS_URL: redis://localhost:6379
+      TEST_REDIS_URL: redis://localhost:6379/1
+
+      JWT_ACCESS_SECRET: ci-access-secret-at-least-32-characters-long
+      JWT_REFRESH_SECRET: ci-refresh-secret-at-least-32-characters-long
+
+      FRONTEND_URL: http://localhost:3000
+      CORS_ORIGINS: http://localhost:3000
+
+      INVITATION_TOKEN_PEPPER: ci-invitation-pepper-at-least-32-characters
+
+      WEBHOOK_ENCRYPTION_KEY: x+nJDMsbP6mMzpkd3iZYgPP7GdoE2K1kp9m/jafq6Uo=
+
+      COOKIE_NAME: command_center_refresh_token
+      COOKIE_SECURE: 'false'
+      COOKIE_SAME_SITE: lax
+
+      ANALYTICS_SCHEDULER_ENABLED: 'false'
+      ANALYTICS_WORKER_ENABLED: 'false'
+      HEALTH_MONITOR_ENABLED: 'false'
+      WEBHOOK_WORKER_ENABLED: 'false'
+      WEBHOOK_CLEANUP_ENABLED: 'false'
+      NOTIFICATION_CLEANUP_ENABLED: 'false'
+
     steps:
-      - name: Checkout
+      # --------------------------------------------------
+      # 1. CHECKOUT
+      # --------------------------------------------------
+      - name: Checkout repository
         uses: actions/checkout@v4
 
+      # --------------------------------------------------
+      # 2. PNPM
+      # --------------------------------------------------
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 11.0.0
           run_install: false
 
+      # --------------------------------------------------
+      # 3. NODE
+      # --------------------------------------------------
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
 
+      # --------------------------------------------------
+      # 4. INSTALL
+      # --------------------------------------------------
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
+      # --------------------------------------------------
+      # 5. PRISMA CLIENT
+      # --------------------------------------------------
+      - name: Generate Prisma Client
+        run: pnpm --filter @command-center/api exec prisma generate
+
+      # --------------------------------------------------
+      # 6. PRETTIER
+      # --------------------------------------------------
       - name: Check formatting
         run: pnpm format:check
 
+      # -mame: formmatting code
+      #  run: pnpm 
+
+      # --------------------------------------------------
+      # 7. LINT
+      # --------------------------------------------------
       - name: Lint
         run: pnpm lint
 
+      # --------------------------------------------------
+      # 8. TYPECHECK
+      # --------------------------------------------------
       - name: Type-check
         run: pnpm typecheck
 
-      - name: Test
-        run: pnpm test
+      # --------------------------------------------------
+      # 9. DATABASE MIGRATIONS
+      # --------------------------------------------------
+      - name: Run database migrations
+        run: pnpm --filter @command-center/api exec prisma migrate deploy
 
+      # --------------------------------------------------
+      # 10. BUILD
+      # --------------------------------------------------
       - name: Build
         run: pnpm build
+
+      # --------------------------------------------------
+      # 11. PLAYWRIGHT
+      # --------------------------------------------------
+      - name: Install Playwright Chrome
+        run: pnpm --filter @command-center/web-tests exec playwright install --with-deps chrome
+
+      # --------------------------------------------------
+      # 12. FULL TEST SUITE - LAST GATE
+      # --------------------------------------------------
+      - name: Run all tests
+        run: pnpm test:all
