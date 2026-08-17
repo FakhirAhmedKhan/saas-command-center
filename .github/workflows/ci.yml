@@ -17,21 +17,192 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  NODE_ENV: development
+
+  DATABASE_URL: postgresql://command_center:command_center_ci@localhost:5432/command_center_test?schema=public
+  TEST_DATABASE_URL: postgresql://command_center:command_center_ci@localhost:5432/command_center_test?schema=public
+
+  REDIS_URL: redis://localhost:6379
+  TEST_REDIS_URL: redis://localhost:6379/1
+
+  JWT_ACCESS_SECRET: ci-access-secret-at-least-32-characters-long
+  JWT_REFRESH_SECRET: ci-refresh-secret-at-least-32-characters-long
+
+  FRONTEND_URL: http://localhost:3000
+  CORS_ORIGINS: http://localhost:3000
+
+  INVITATION_TOKEN_PEPPER: ci-invitation-pepper-at-least-32-characters
+
+  WEBHOOK_ENCRYPTION_KEY: x+nJDMsbP6mMzpkd3iZYgPP7GdoE2K1kp9m/jafq6Uo=
+
+  COOKIE_NAME: command_center_refresh_token
+  COOKIE_SECURE: 'false'
+  COOKIE_SAME_SITE: lax
+
+  ANALYTICS_SCHEDULER_ENABLED: 'false'
+  ANALYTICS_WORKER_ENABLED: 'false'
+  HEALTH_MONITOR_ENABLED: 'false'
+  WEBHOOK_WORKER_ENABLED: 'false'
+  WEBHOOK_CLEANUP_ENABLED: 'false'
+  NOTIFICATION_CLEANUP_ENABLED: 'false'
+
 jobs:
-  quality:
-    name: Quality & Tests
+
+  # ======================================================
+  # FORMAT
+  # ======================================================
+
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.0.0
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check formatting
+        run: pnpm format:check
+
+
+  # ======================================================
+  # LINT
+  # ======================================================
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.0.0
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm --filter @command-center/api exec prisma generate
+
+      - name: Lint
+        run: pnpm lint
+
+
+  # ======================================================
+  # TYPECHECK
+  # ======================================================
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.0.0
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm --filter @command-center/api exec prisma generate
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+
+  # ======================================================
+  # BUILD
+  # ======================================================
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.0.0
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm --filter @command-center/api exec prisma generate
+
+      - name: Build
+        run: pnpm build
+
+
+  # ======================================================
+  # FULL TEST SUITE
+  # ======================================================
+
+  tests:
+    name: Full Tests
     runs-on: ubuntu-latest
     timeout-minutes: 90
 
     services:
       postgres:
         image: postgres:17-alpine
+
         env:
           POSTGRES_USER: command_center
           POSTGRES_PASSWORD: command_center_ci
           POSTGRES_DB: command_center_test
+
         ports:
           - 5432:5432
+
         options: >-
           --health-cmd "pg_isready -U command_center -d command_center_test"
           --health-interval 5s
@@ -40,122 +211,91 @@ jobs:
 
       redis:
         image: redis:7-alpine
+
         ports:
           - 6379:6379
+
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
 
-    env:
-      NODE_ENV: development
-
-      DATABASE_URL: postgresql://command_center:command_center_ci@localhost:5432/command_center_test?schema=public
-      TEST_DATABASE_URL: postgresql://command_center:command_center_ci@localhost:5432/command_center_test?schema=public
-
-      REDIS_URL: redis://localhost:6379
-      TEST_REDIS_URL: redis://localhost:6379/1
-
-      JWT_ACCESS_SECRET: ci-access-secret-at-least-32-characters-long
-      JWT_REFRESH_SECRET: ci-refresh-secret-at-least-32-characters-long
-
-      FRONTEND_URL: http://localhost:3000
-      CORS_ORIGINS: http://localhost:3000
-
-      INVITATION_TOKEN_PEPPER: ci-invitation-pepper-at-least-32-characters
-
-      WEBHOOK_ENCRYPTION_KEY: x+nJDMsbP6mMzpkd3iZYgPP7GdoE2K1kp9m/jafq6Uo=
-
-      COOKIE_NAME: command_center_refresh_token
-      COOKIE_SECURE: 'false'
-      COOKIE_SAME_SITE: lax
-
-      ANALYTICS_SCHEDULER_ENABLED: 'false'
-      ANALYTICS_WORKER_ENABLED: 'false'
-      HEALTH_MONITOR_ENABLED: 'false'
-      WEBHOOK_WORKER_ENABLED: 'false'
-      WEBHOOK_CLEANUP_ENABLED: 'false'
-      NOTIFICATION_CLEANUP_ENABLED: 'false'
-
     steps:
-      # --------------------------------------------------
-      # 1. CHECKOUT
-      # --------------------------------------------------
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # --------------------------------------------------
-      # 2. PNPM
-      # --------------------------------------------------
-      - name: Set up pnpm
+      - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 11.0.0
           run_install: false
 
-      # --------------------------------------------------
-      # 3. NODE
-      # --------------------------------------------------
-      - name: Set up Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
 
-      # --------------------------------------------------
-      # 4. INSTALL
-      # --------------------------------------------------
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # --------------------------------------------------
-      # 5. PRISMA CLIENT
-      # --------------------------------------------------
       - name: Generate Prisma Client
         run: pnpm --filter @command-center/api exec prisma generate
 
-      # --------------------------------------------------
-      # 6. PRETTIER
-      # --------------------------------------------------
-      - name: Check formatting
-        run: pnpm format:check
-
-      # -mame: formmatting code
-      #  run: pnpm 
-
-      # --------------------------------------------------
-      # 7. LINT
-      # --------------------------------------------------
-      - name: Lint
-        run: pnpm lint
-
-      # --------------------------------------------------
-      # 8. TYPECHECK
-      # --------------------------------------------------
-      - name: Type-check
-        run: pnpm typecheck
-
-      # --------------------------------------------------
-      # 9. DATABASE MIGRATIONS
-      # --------------------------------------------------
       - name: Run database migrations
         run: pnpm --filter @command-center/api exec prisma migrate deploy
 
-      # --------------------------------------------------
-      # 10. BUILD
-      # --------------------------------------------------
-      - name: Build
-        run: pnpm build
-
-      # --------------------------------------------------
-      # 11. PLAYWRIGHT
-      # --------------------------------------------------
       - name: Install Playwright Chrome
         run: pnpm --filter @command-center/web-tests exec playwright install --with-deps chrome
 
-      # --------------------------------------------------
-      # 12. FULL TEST SUITE - LAST GATE
-      # --------------------------------------------------
-      - name: Run all tests
+      - name: Run complete monorepo test suite
         run: pnpm test:all
+
+
+  # ======================================================
+  # REQUIRED MAIN-BRANCH GATE
+  # ======================================================
+
+  quality:
+    name: Quality & Tests
+    runs-on: ubuntu-latest
+
+    needs:
+      - format
+      - lint
+      - typecheck
+      - build
+      - tests
+
+    if: always()
+
+    steps:
+      - name: Verify all CI jobs passed
+        run: |
+          if [[ "${{ needs.format.result }}" != "success" ]]; then
+            echo "Format failed"
+            exit 1
+          fi
+
+          if [[ "${{ needs.lint.result }}" != "success" ]]; then
+            echo "Lint failed"
+            exit 1
+          fi
+
+          if [[ "${{ needs.typecheck.result }}" != "success" ]]; then
+            echo "Typecheck failed"
+            exit 1
+          fi
+
+          if [[ "${{ needs.build.result }}" != "success" ]]; then
+            echo "Build failed"
+            exit 1
+          fi
+
+          if [[ "${{ needs.tests.result }}" != "success" ]]; then
+            echo "Tests failed"
+            exit 1
+          fi
+
+          echo "All CI checks passed"

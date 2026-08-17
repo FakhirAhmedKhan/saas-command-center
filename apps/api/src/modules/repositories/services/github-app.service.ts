@@ -1,5 +1,5 @@
 import { BadGatewayException, Injectable, ServiceUnavailableException } from '@nestjs/common';
-import { createSign } from 'node:crypto';
+import { createPrivateKey, createSign } from 'node:crypto';
 
 interface GithubInstallationResponse {
   id: number;
@@ -90,8 +90,7 @@ export class GithubAppService {
   private readonly apiVersion = '2026-03-10';
 
   buildInstallationUrl(state: string): string {
-    // const slug = this.required('GITHUB_APP_SLUG' );
-    const slug = 'saas-command-center-dev';
+    const slug = this.required('GITHUB_APP_SLUG');
 
     return `https://github.com/apps/${encodeURIComponent(slug)}` + `/installations/new?state=${encodeURIComponent(state)}`;
   }
@@ -383,7 +382,21 @@ export class GithubAppService {
 
     const key = Buffer.from(encoded, 'base64').toString('utf8');
 
-    if (!key.includes('PRIVATE KEY')) {
+    if (!key.includes('BEGIN') || !key.includes('PRIVATE KEY')) {
+      throw new ServiceUnavailableException('GitHub App private key configuration is invalid.');
+    }
+
+    /*
+     * Buffer.from(..., 'base64') never throws on malformed input -- it just
+     * decodes whatever bytes it can. The only reliable way to confirm the
+     * result is a usable RSA private key is to have Node's crypto module
+     * actually parse it, which throws a catchable error for a truncated or
+     * corrupted PEM instead of failing deep inside signer.sign() later with
+     * a raw OpenSSL error.
+     */
+    try {
+      createPrivateKey(key);
+    } catch {
       throw new ServiceUnavailableException('GitHub App private key configuration is invalid.');
     }
 

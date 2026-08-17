@@ -36,14 +36,14 @@ describe('ConnectGithubStep', () => {
   });
 
   it('redirects to the installation URL on successful connect', async () => {
-    mockedBegin.mockResolvedValue({ installationUrl: 'https://github.test/apps/command-center/installations/new?state=abc' });
+    mockedBegin.mockResolvedValue({ installationUrl: 'https://github.com/apps/command-center/installations/new?state=abc' });
 
     render(<ConnectGithubStep checking={false} />);
 
     await userEvent.click(screen.getByRole('button', { name: /Connect GitHub/ }));
 
     await waitFor(() => {
-      expect(window.location.assign).toHaveBeenCalledWith('https://github.test/apps/command-center/installations/new?state=abc');
+      expect(window.location.assign).toHaveBeenCalledWith('https://github.com/apps/command-center/installations/new?state=abc');
     });
   });
 
@@ -55,5 +55,16 @@ describe('ConnectGithubStep', () => {
     await userEvent.click(screen.getByRole('button', { name: /Connect GitHub/ }));
 
     expect(await screen.findByText('GitHub App is not configured.')).toBeInTheDocument();
+  });
+
+  it('refuses to navigate to a non-GitHub installation URL and shows an error', async () => {
+    mockedBegin.mockResolvedValue({ installationUrl: 'https://attacker.example.com/phish' });
+
+    render(<ConnectGithubStep checking={false} />);
+
+    await userEvent.click(screen.getByRole('button', { name: /Connect GitHub/ }));
+
+    expect(await screen.findByText(/did not return a valid authorization URL/)).toBeInTheDocument();
+    expect(window.location.assign).not.toHaveBeenCalled();
   });
 });

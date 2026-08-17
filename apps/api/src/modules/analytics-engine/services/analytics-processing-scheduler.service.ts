@@ -27,6 +27,27 @@ export class AnalyticsProcessingSchedulerService implements OnModuleInit, OnModu
       return;
     }
 
+    /*
+     * The analytics-processing module's scheduler/worker is the canonical
+     * pipeline (it owns the product-facing status/reprocess UI and the
+     * queue/retry/dead-letter machinery). Both pipelines mark completion
+     * on the same RawAnalyticsEvent.processedAt column, so running this
+     * legacy timer at the same time as the canonical scheduler would
+     * process the same raw events twice. Refuse to start rather than
+     * risk that, instead of silently racing.
+     */
+    if (process.env.ANALYTICS_SCHEDULER_ENABLED !== 'false') {
+      this.logger.error(
+        'Legacy analytics-engine scheduler was requested (ANALYTICS_PROCESSING_SCHEDULER_ENABLED=true) while the ' +
+          'canonical analytics-processing scheduler is also enabled (ANALYTICS_SCHEDULER_ENABLED is not "false"). ' +
+          'Refusing to start the legacy timer to avoid double-processing the same RawAnalyticsEvent rows. ' +
+          'Set ANALYTICS_SCHEDULER_ENABLED=false to run the legacy pipeline instead, or unset ' +
+          'ANALYTICS_PROCESSING_SCHEDULER_ENABLED to use the canonical pipeline.',
+      );
+
+      return;
+    }
+
     const intervalMs = this.readPositiveInteger(process.env.ANALYTICS_PROCESSING_INTERVAL_MS, DEFAULT_INTERVAL_MS);
 
     this.timer = setInterval(() => {

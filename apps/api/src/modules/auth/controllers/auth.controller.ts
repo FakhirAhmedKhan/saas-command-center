@@ -7,7 +7,48 @@ import { AuthCookieService } from '../services/auth-cookie.service';
 import { AuthService } from '../services/auth.service';
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
+
+/*
+ * These endpoints share the app-wide 100 req/min/IP throttle by default,
+ * which is far too generous for credential-guessing/brute-force resistance.
+ * Override with tighter, endpoint-specific limits (SEC-01).
+ *
+ * Resolved via a function (not a static value) so it's read fresh per
+ * request rather than once at module load — matching the same
+ * env-var-driven, per-request-resolved pattern already used by
+ * IngestionRateLimitService for the analytics collector. This is what lets
+ * environment overrides (e.g. a relaxed test-only limit in .env.test) apply
+ * correctly for a freshly-booted test app without weakening the production
+ * default declared here.
+ */
+function readPositiveInteger(value: string | undefined, fallback: number): number {
+  const parsed = Number(value);
+
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+const REGISTER_THROTTLE = {
+  default: {
+    limit: () => readPositiveInteger(process.env.AUTH_REGISTER_RATE_LIMIT, 5),
+    ttl: () => readPositiveInteger(process.env.AUTH_REGISTER_RATE_WINDOW_MS, 60_000),
+  },
+};
+
+const LOGIN_THROTTLE = {
+  default: {
+    limit: () => readPositiveInteger(process.env.AUTH_LOGIN_RATE_LIMIT, 5),
+    ttl: () => readPositiveInteger(process.env.AUTH_LOGIN_RATE_WINDOW_MS, 60_000),
+  },
+};
+
+const REFRESH_THROTTLE = {
+  default: {
+    limit: () => readPositiveInteger(process.env.AUTH_REFRESH_RATE_LIMIT, 10),
+    ttl: () => readPositiveInteger(process.env.AUTH_REFRESH_RATE_WINDOW_MS, 60_000),
+  },
+};
 
 type AuthSessionResult = Awaited<ReturnType<AuthService['login']>>;
 
@@ -40,6 +81,7 @@ export class AuthController {
   ) {}
 
   @Public()
+  @Throttle(REGISTER_THROTTLE)
   @Post('register')
   @ApiOperation({
     summary: 'Register and create a user session',
@@ -64,6 +106,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle(LOGIN_THROTTLE)
   @Post('login')
   @ApiOperation({
     summary: 'Authenticate and create a user session',
@@ -88,6 +131,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle(REFRESH_THROTTLE)
   @Post('refresh')
   @ApiOperation({
     summary: 'Rotate the current refresh session',

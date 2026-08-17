@@ -3,6 +3,7 @@
 import { beginPersonalGithubConnect } from '../github-import-api';
 import { markGithubImportFlow } from '../github-import-flow-marker';
 import { getErrorMessage } from '@/features/lib/api/api-error';
+import { assertTrustedGithubUrl } from '@/features/lib/github/github-url';
 import { Button, Card, CardContent } from '@command-center/ui';
 import { FolderGit2 } from 'lucide-react';
 import { useState } from 'react';
@@ -23,9 +24,11 @@ export function ConnectGithubStep({ checking }: ConnectGithubStepProps) {
     try {
       const result = await beginPersonalGithubConnect();
 
+      const installationUrl = assertTrustedGithubUrl(result.installationUrl);
+
       markGithubImportFlow(`${window.location.pathname}?method=github`);
 
-      window.location.assign(result.installationUrl);
+      window.location.assign(installationUrl);
     } catch (caughtError: unknown) {
       setError(getErrorMessage(caughtError));
 

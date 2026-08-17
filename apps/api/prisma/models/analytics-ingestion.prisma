@@ -33,6 +33,7 @@ model RawAnalyticsEvent {
   @@unique([websiteId, eventId])
   @@index([websiteId, receivedAt])
   @@index([websiteId, occurredAt])
+  @@index([websiteId, processedAt, occurredAt])
   @@index([websiteId, type, occurredAt])
   @@index([websiteId, visitorId, occurredAt])
   @@index([websiteId, sessionId, occurredAt])

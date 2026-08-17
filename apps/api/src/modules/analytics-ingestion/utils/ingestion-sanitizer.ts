@@ -1,5 +1,15 @@
 import { BadRequestException } from '@nestjs/common';
+import { createHash } from 'node:crypto';
 import { Prisma } from 'src/generated/prisma/client';
+
+/**
+ * Deterministically hashes a visitor IP with the configured salt so the same
+ * salt+IP pair always produces the same hash (required for de-duplication)
+ * while the raw IP is never persisted.
+ */
+export function hashIpAddressWithSalt(salt: string, ipAddress: string): string {
+  return createHash('sha256').update(`${salt}:${ipAddress}`).digest('hex');
+}
 
 const SENSITIVE_QUERY_PARAMETER =
   /^(access_?token|refresh_?token|token|password|pass|secret|authorization|auth|api_?key|session|session_?id|jwt|email|code|otp)$/i;

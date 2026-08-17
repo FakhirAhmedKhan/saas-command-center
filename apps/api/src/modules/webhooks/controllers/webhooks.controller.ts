@@ -9,6 +9,19 @@ import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Query, UseGua
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthenticatedUser } from 'src/modules/auth/interfaces/authenticated-user.interface';
 
+/*
+ * Configurable so a real e2e suite creating many legitimate endpoints across
+ * one workspace within a single test run can be tuned independently of the
+ * production default (still 20/hour unless overridden). This limit is now
+ * genuinely enforced per workspace since SEC-02 fixed the identity it was
+ * keyed on (previously bypassable by rotating X-Tracking-Key).
+ */
+function readPositiveInteger(value: string | undefined, fallback: number): number {
+  const parsed = Number(value);
+
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+}
+
 @ApiTags('Webhook Integrations')
 @ApiBearerAuth('access-token')
 @Controller('workspaces/:workspaceId/integrations/webhooks')
@@ -31,7 +44,7 @@ export class WebhooksController {
   @SharedRateLimit({
     scope: 'webhook-create',
 
-    limit: 20,
+    limit: readPositiveInteger(process.env.WEBHOOK_CREATE_RATE_LIMIT, 20),
 
     windowSeconds: 60 * 60,
   })

@@ -21,6 +21,7 @@ export interface EnvironmentVariables {
 
   ANALYTICS_INGESTION_LIMIT: number;
   ANALYTICS_INGESTION_WINDOW_SECONDS: number;
+  ANALYTICS_IP_HASH_SALT: string;
   NODE_ENV: NodeEnvironment;
   PORT: number;
 
@@ -175,9 +176,39 @@ function validateSecret(key: string, value: string, environment: NodeEnvironment
     throw new Error(`${key} must contain at least 32 characters.`);
   }
 
-  if (environment === 'production' && /change-me|replace-me|default|secret123|password123/i.test(value)) {
+  if (environment === 'production' && /change-me|change-this|replace-me|replace-with|default|secret123|password123/i.test(value)) {
     throw new Error(`${key} contains an unsafe production placeholder.`);
   }
+}
+
+/*
+ * Only ever used when NODE_ENV is not "production" and no explicit salt was
+ * configured. Deliberately unusable as a real secret (short, obviously
+ * labeled) so it cannot be mistaken for a production-safe value and cannot
+ * satisfy validateSecret's own length check if someone copies it forward.
+ */
+const DEV_ONLY_ANALYTICS_IP_HASH_SALT = 'dev-only-analytics-ip-hash-salt';
+
+function resolveAnalyticsIpHashSalt(config: Record<string, unknown>, environment: NodeEnvironment): string {
+  const configuredValue = getOptionalString(config, 'ANALYTICS_IP_HASH_SALT');
+
+  if (environment === 'production') {
+    if (!configuredValue) {
+      throw new Error('Environment variable ANALYTICS_IP_HASH_SALT is required in production.');
+    }
+
+    validateSecret('ANALYTICS_IP_HASH_SALT', configuredValue, environment);
+
+    return configuredValue;
+  }
+
+  if (configuredValue) {
+    validateSecret('ANALYTICS_IP_HASH_SALT', configuredValue, environment);
+
+    return configuredValue;
+  }
+
+  return DEV_ONLY_ANALYTICS_IP_HASH_SALT;
 }
 
 function validateCorsOrigins(value: string): void {
@@ -359,6 +390,8 @@ export function validateEnvironment(config: Record<string, unknown>): Environmen
     ANALYTICS_INGESTION_LIMIT: getPositiveInteger(config, 'ANALYTICS_INGESTION_LIMIT', 120),
 
     ANALYTICS_INGESTION_WINDOW_SECONDS: getPositiveInteger(config, 'ANALYTICS_INGESTION_WINDOW_SECONDS', 60),
+
+    ANALYTICS_IP_HASH_SALT: resolveAnalyticsIpHashSalt(config, nodeEnvironment),
     NODE_ENV: nodeEnvironment,
 
     PORT: getPositiveInteger(config, 'PORT', 4000),

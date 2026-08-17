@@ -3,6 +3,7 @@
 
 import { beginGithubConnect, disconnectGithubInstallation, listRepositories, syncRepositories, syncRepository } from './repositories-api';
 import type { RepositoryConnection, RepositoryInstallationSummary } from './repository.types';
+import { assertTrustedGithubUrl } from '@/features/lib/github/github-url';
 import {
   ExternalLink,
   FolderGit2,
@@ -87,7 +88,7 @@ export function RepositoriesDashboard({ workspaceId }: RepositoriesDashboardProp
     try {
       const result = await beginGithubConnect(workspaceId);
 
-      window.location.assign(result.installationUrl);
+      window.location.assign(assertTrustedGithubUrl(result.installationUrl));
     } catch (caughtError: unknown) {
       setError(caughtError instanceof Error ? caughtError.message : 'Unable to start the GitHub connection.');
 

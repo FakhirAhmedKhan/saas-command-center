@@ -2,6 +2,7 @@
 'use client';
 
 import { useSession } from '@/features/auth/use-session';
+import { assertTrustedGithubUrl } from '@/features/lib/github/github-url';
 import { completeGithubSetup } from '@/features/repositories/repositories-api';
 import { completePersonalGithubSetup } from '@/features/workspaces/github-import/github-import-api';
 import { isGithubImportFlow } from '@/features/workspaces/github-import/github-import-flow-marker';
@@ -54,8 +55,8 @@ export function GithubSetupClient() {
     const completeSetup = isGithubImportFlow() ? completePersonalGithubSetup(installState, installationId) : completeGithubSetup(installState, installationId);
 
     void completeSetup
-      .then((result: { authorizationUrl: string | URL }) => {
-        window.location.replace(result.authorizationUrl);
+      .then((result: { authorizationUrl: string }) => {
+        window.location.replace(assertTrustedGithubUrl(result.authorizationUrl));
       })
       .catch((caughtError: unknown) => {
         started.current = false;

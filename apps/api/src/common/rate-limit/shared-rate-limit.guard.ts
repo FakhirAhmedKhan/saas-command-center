@@ -4,20 +4,48 @@ import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable } 
 import { Reflector } from '@nestjs/core';
 import type { Request, Response } from 'express';
 
-function getIdentity(request: Request): string {
+interface RequestWithOptionalUser extends Request {
+  user?: {
+    id?: string;
+  };
+}
+
+/**
+ * Resolves the identity a rate-limit bucket is keyed on.
+ *
+ * `JwtAuthGuard` runs before this guard on every non-`@Public()` route (both
+ * as the global `APP_GUARD` and, redundantly, on controllers that also list
+ * it explicitly), so `request.user` is already server-verified by the time
+ * this executes. For those routes we key on that verified identity — plus
+ * the workspace the route operates on, when present — so a caller cannot
+ * reset their bucket by rotating a request header (SEC-02).
+ *
+ * Only requests with no verified user (i.e. genuinely `@Public()` routes,
+ * such as the analytics ingestion collector) fall back to a caller-supplied
+ * tracking/API key, which is the only identity available for them.
+ */
+export function getIdentity(request: Request): string {
+  const userId = (request as RequestWithOptionalUser).user?.id;
+
+  if (userId) {
+    const workspaceId = request.params?.workspaceId;
+
+    return workspaceId ? `user:${userId}:workspace:${workspaceId}` : `user:${userId}`;
+  }
+
   const trackingKey = request.header('x-tracking-key');
 
   if (trackingKey) {
-    return trackingKey;
+    return `tracking:${trackingKey}`;
   }
 
   const apiKey = request.header('x-api-key');
 
   if (apiKey) {
-    return apiKey;
+    return `apikey:${apiKey}`;
   }
 
-  return request.ip || request.socket.remoteAddress || 'unknown';
+  return `ip:${request.ip || request.socket.remoteAddress || 'unknown'}`;
 }
 
 @Injectable()

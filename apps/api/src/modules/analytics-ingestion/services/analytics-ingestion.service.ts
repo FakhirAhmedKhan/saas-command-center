@@ -1,6 +1,6 @@
 import { IngestionRateLimitService } from './ingestion-rate-limit.service';
 import { CollectEventsDto } from '../dto/collect-events.dto';
-import { normalizeRequestOrigin, sanitizeEventProperties, sanitizeReferrerUrl, sanitizeTrackedUrl } from '../utils/ingestion-sanitizer';
+import { hashIpAddressWithSalt, normalizeRequestOrigin, sanitizeEventProperties, sanitizeReferrerUrl, sanitizeTrackedUrl } from '../utils/ingestion-sanitizer';
 import { BadRequestException, ForbiddenException, Injectable, PayloadTooLargeException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { plainToInstance } from 'class-transformer';
@@ -54,7 +54,14 @@ export class AnalyticsIngestionService {
 
     this.allowOriginless = this.isEnabled(process.env.ANALYTICS_ALLOW_ORIGINLESS ?? this.configService.get<string>('ANALYTICS_ALLOW_ORIGINLESS'));
 
-    this.ipHashSalt = this.configService.get<string>('ANALYTICS_IP_HASH_SALT')?.trim() || 'local-development-change-this';
+    /*
+     * validateEnvironment() already guarantees this is a valid, non-empty
+     * value (required + validated in production, explicit dev-only fallback
+     * otherwise) — see SEC-03. getOrThrow keeps that guarantee loud: if this
+     * ever regresses, startup fails clearly instead of silently reusing an
+     * insecure fallback. The value itself is never logged.
+     */
+    this.ipHashSalt = this.configService.getOrThrow<string>('ANALYTICS_IP_HASH_SALT');
   }
 
   async collect(rawBody: unknown, context: CollectionContext): Promise<CollectEventsResult> {
@@ -417,7 +424,7 @@ export class AnalyticsIngestionService {
   }
 
   private hashIpAddress(ipAddress: string): string {
-    return createHash('sha256').update(`${this.ipHashSalt}:${ipAddress}`).digest('hex');
+    return hashIpAddressWithSalt(this.ipHashSalt, ipAddress);
   }
 
   private normalizeOptionalString(value: string | undefined, maximumLength: number): string | null {

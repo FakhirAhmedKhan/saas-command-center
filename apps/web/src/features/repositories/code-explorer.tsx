@@ -9,7 +9,7 @@ import { CodeViewer } from './code-viewer';
 import { getRepository } from './repositories-api';
 import type { RepositoryConnection } from './repository.types';
 import { GitBranch, RefreshCw, Search, X } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface CodeExplorerProps {
   workspaceId: string;
@@ -52,11 +52,38 @@ export function CodeExplorer({ workspaceId, repositoryId }: CodeExplorerProps) {
 
   const [diffMode, setDiffMode] = useState(false);
 
+  /*
+   * getRepositoryTree/getRepositoryCodeFile/etc. run in response to user
+   * actions (branch switch, file click) that can fire again -- or the
+   * component can unmount -- before an earlier request resolves. Without
+   * these guards a stale response could overwrite fresher state, or update
+   * state after unmount.
+   */
+  const mountedRef = useRef(true);
+
+  const treeRequestIdRef = useRef(0);
+
+  useEffect(() => {
+    mountedRef.current = true;
+
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
   const activeFile = useMemo(() => tabs.find((tab) => tab.path === activePath)?.file ?? null, [tabs, activePath]);
 
   const loadTree = useCallback(
     async (selectedBranch: string) => {
+      const requestId = treeRequestIdRef.current + 1;
+
+      treeRequestIdRef.current = requestId;
+
       const tree = await getRepositoryTree(workspaceId, repositoryId, selectedBranch);
+
+      if (!mountedRef.current || treeRequestIdRef.current !== requestId) {
+        return;
+      }
 
       setNodes(tree.nodes);
 
@@ -73,6 +100,10 @@ export function CodeExplorer({ workspaceId, repositoryId }: CodeExplorerProps) {
     try {
       const [repositoryResult, branchResult] = await Promise.all([getRepository(workspaceId, repositoryId), getRepositoryBranches(workspaceId, repositoryId)]);
 
+      if (!mountedRef.current) {
+        return;
+      }
+
       setRepository(repositoryResult);
 
       setBranches(branchResult.branches);
@@ -81,9 +112,13 @@ export function CodeExplorer({ workspaceId, repositoryId }: CodeExplorerProps) {
 
       await loadTree(branchResult.defaultBranch);
     } catch (caughtError: unknown) {
-      setError(caughtError instanceof Error ? caughtError.message : 'Unable to load the repository.');
+      if (mountedRef.current) {
+        setError(caughtError instanceof Error ? caughtError.message : 'Unable to load the repository.');
+      }
     } finally {
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+      }
     }
   }, [workspaceId, repositoryId, loadTree]);
 
@@ -109,6 +144,10 @@ export function CodeExplorer({ workspaceId, repositoryId }: CodeExplorerProps) {
     try {
       const file = await getRepositoryCodeFile(workspaceId, repositoryId, branch, path);
 
+      if (!mountedRef.current) {
+        return;
+      }
+
       setTabs((current) => [
         ...current,
         {
@@ -121,9 +160,13 @@ export function CodeExplorer({ workspaceId, repositoryId }: CodeExplorerProps) {
 
       setDiffMode(false);
     } catch (caughtError: unknown) {
-      setError(caughtError instanceof Error ? caughtError.message : 'Unable to open the file.');
+      if (mountedRef.current) {
+        setError(caughtError instanceof Error ? caughtError.message : 'Unable to open the file.');
+      }
     } finally {
-      setFileLoading(false);
+      if (mountedRef.current) {
+        setFileLoading(false);
+      }
     }
   }
 
@@ -171,9 +214,13 @@ export function CodeExplorer({ workspaceId, repositoryId }: CodeExplorerProps) {
     try {
       await loadTree(nextBranch);
     } catch (caughtError: unknown) {
-      setError(caughtError instanceof Error ? caughtError.message : 'Unable to switch branch.');
+      if (mountedRef.current) {
+        setError(caughtError instanceof Error ? caughtError.message : 'Unable to switch branch.');
+      }
     } finally {
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+      }
     }
   }
 
@@ -191,9 +238,13 @@ export function CodeExplorer({ workspaceId, repositoryId }: CodeExplorerProps) {
     try {
       const result = await searchRepositoryFiles(workspaceId, repositoryId, branch, query);
 
-      setSearchResults(result.matches);
+      if (mountedRef.current) {
+        setSearchResults(result.matches);
+      }
     } catch (caughtError: unknown) {
-      setError(caughtError instanceof Error ? caughtError.message : 'Search failed.');
+      if (mountedRef.current) {
+        setError(caughtError instanceof Error ? caughtError.message : 'Search failed.');
+      }
     }
   }
 
@@ -209,13 +260,21 @@ export function CodeExplorer({ workspaceId, repositoryId }: CodeExplorerProps) {
     try {
       const result = await getRepositoryFileDiff(workspaceId, repositoryId, repository.defaultBranch, branch, activePath);
 
+      if (!mountedRef.current) {
+        return;
+      }
+
       setDiff(result);
 
       setDiffMode(true);
     } catch (caughtError: unknown) {
-      setError(caughtError instanceof Error ? caughtError.message : 'Unable to compare the file.');
+      if (mountedRef.current) {
+        setError(caughtError instanceof Error ? caughtError.message : 'Unable to compare the file.');
+      }
     } finally {
-      setFileLoading(false);
+      if (mountedRef.current) {
+        setFileLoading(false);
+      }
     }
   }
 

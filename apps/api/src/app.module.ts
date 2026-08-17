@@ -25,6 +25,7 @@ import { VersionModule } from './version/version.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
@@ -42,6 +43,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
         limit: 100,
       },
     ]),
+    ScheduleModule.forRoot(),
     RepositoriesModule,
     ReleasesModule,
     ApplicationsModule,
