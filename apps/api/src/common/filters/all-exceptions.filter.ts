@@ -123,9 +123,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     const expressErrorStatus = isHttpException || isPrismaKnownError ? undefined : getExpressErrorStatus(exception);
 
-    const statusCode = isHttpException
-      ? exception.getStatus()
-      : (prismaResponse?.status ?? expressErrorStatus ?? HttpStatus.INTERNAL_SERVER_ERROR);
+    const statusCode = isHttpException ? exception.getStatus() : (prismaResponse?.status ?? expressErrorStatus ?? HttpStatus.INTERNAL_SERVER_ERROR);
 
     const normalizedException = isHttpException
       ? normalizeHttpException(exception)

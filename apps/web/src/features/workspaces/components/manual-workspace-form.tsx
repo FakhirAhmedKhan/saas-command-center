@@ -72,7 +72,11 @@ export function ManualWorkspaceForm({ onBack }: ManualWorkspaceFormProps) {
 
   return (
     <div className='mx-auto w-full max-w-md p-4 pt-16 sm:p-6 sm:pt-24'>
-      <button type='button' onClick={onBack} className='inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-500 transition hover:text-slate-800'>
+      <button
+        type='button'
+        onClick={onBack}
+        className='inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-500 transition hover:text-slate-800'
+      >
         <ArrowLeft className='size-3.5' aria-hidden='true' />
         Back
       </button>

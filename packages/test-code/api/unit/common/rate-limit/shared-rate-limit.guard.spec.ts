@@ -1,12 +1,7 @@
 import { getIdentity } from 'src/common/rate-limit/shared-rate-limit.guard';
 import type { Request } from 'express';
 
-function buildRequest(overrides: {
-  userId?: string;
-  workspaceId?: string;
-  headers?: Record<string, string>;
-  ip?: string;
-}): Request {
+function buildRequest(overrides: { userId?: string; workspaceId?: string; headers?: Record<string, string>; ip?: string }): Request {
   const headers = overrides.headers ?? {};
 
   return {

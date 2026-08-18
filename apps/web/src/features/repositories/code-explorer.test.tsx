@@ -5,14 +5,15 @@ import type { RepositoryConnection } from './repository.types';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { getRepositoryMock, getRepositoryBranchesMock, getRepositoryTreeMock, getRepositoryCodeFileMock, searchRepositoryFilesMock, getRepositoryFileDiffMock } = vi.hoisted(() => ({
-  getRepositoryMock: vi.fn(),
-  getRepositoryBranchesMock: vi.fn(),
-  getRepositoryTreeMock: vi.fn(),
-  getRepositoryCodeFileMock: vi.fn(),
-  searchRepositoryFilesMock: vi.fn(),
-  getRepositoryFileDiffMock: vi.fn(),
-}));
+const { getRepositoryMock, getRepositoryBranchesMock, getRepositoryTreeMock, getRepositoryCodeFileMock, searchRepositoryFilesMock, getRepositoryFileDiffMock } =
+  vi.hoisted(() => ({
+    getRepositoryMock: vi.fn(),
+    getRepositoryBranchesMock: vi.fn(),
+    getRepositoryTreeMock: vi.fn(),
+    getRepositoryCodeFileMock: vi.fn(),
+    searchRepositoryFilesMock: vi.fn(),
+    getRepositoryFileDiffMock: vi.fn(),
+  }));
 
 vi.mock('./repositories-api', () => ({
   getRepository: getRepositoryMock,

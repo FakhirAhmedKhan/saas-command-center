@@ -735,8 +735,7 @@ export class AnalyticsReportsService {
      * date-range granularity, so Prisma.raw here does not open a SQL
      * injection path.
      */
-    const aggregateTable =
-      context.range.granularity === 'hour' ? Prisma.raw('analytics_hourly_aggregates') : Prisma.raw('analytics_daily_aggregates');
+    const aggregateTable = context.range.granularity === 'hour' ? Prisma.raw('analytics_hourly_aggregates') : Prisma.raw('analytics_daily_aggregates');
 
     const rows = await this.prisma.$queryRaw<DimensionDatabaseRow[]>(
       Prisma.sql`

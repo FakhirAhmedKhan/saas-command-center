@@ -1,4 +1,9 @@
-import { directoryFileNamesFromTree, directoryOf, findPackageJsonPaths, rootFileNamesFromTree } from 'src/modules/repositories/services/analyzer/repository-tree-analyzer';
+import {
+  directoryFileNamesFromTree,
+  directoryOf,
+  findPackageJsonPaths,
+  rootFileNamesFromTree,
+} from 'src/modules/repositories/services/analyzer/repository-tree-analyzer';
 import type { GithubTreeEntry } from 'src/modules/repositories/services/github-code.service';
 
 function file(path: string): GithubTreeEntry {

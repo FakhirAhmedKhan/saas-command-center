@@ -62,4 +62,3 @@ export class RedisService implements OnApplicationBootstrap, OnModuleDestroy {
     }
   }
 }
-

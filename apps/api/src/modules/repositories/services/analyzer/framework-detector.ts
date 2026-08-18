@@ -43,7 +43,10 @@ const FRAMEWORK_RULES: FrameworkRule[] = [
   },
 ];
 
-export function detectFramework(packageJson: ParsedPackageJson, hasTypescriptConfig: boolean): {
+export function detectFramework(
+  packageJson: ParsedPackageJson,
+  hasTypescriptConfig: boolean,
+): {
   framework: string | null;
   language: string | null;
 } {

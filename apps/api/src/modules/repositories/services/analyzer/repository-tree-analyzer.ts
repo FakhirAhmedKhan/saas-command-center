@@ -10,7 +10,13 @@ const MAX_PATH_DEPTH = 4;
  * reads. Root package.json (depth 0) is always included when present.
  */
 export function findPackageJsonPaths(entries: readonly GithubTreeEntry[]): string[] {
-  const matches = entries.filter((entry) => entry.type === 'file' && entry.path.split('/').pop() === 'package.json' && !isInsideIgnoredDirectory(entry.path) && pathDepth(entry.path) <= MAX_PATH_DEPTH);
+  const matches = entries.filter(
+    (entry) =>
+      entry.type === 'file' &&
+      entry.path.split('/').pop() === 'package.json' &&
+      !isInsideIgnoredDirectory(entry.path) &&
+      pathDepth(entry.path) <= MAX_PATH_DEPTH,
+  );
 
   matches.sort((left, right) => pathDepth(left.path) - pathDepth(right.path) || left.path.localeCompare(right.path));
 
@@ -62,5 +68,7 @@ function pathDepth(path: string): number {
 function isInsideIgnoredDirectory(path: string): boolean {
   const segments = path.split('/');
 
-  return segments.some((segment) => segment === 'node_modules' || segment === '.git' || segment === 'dist' || segment === 'build' || segment === '.next' || segment === '.turbo');
+  return segments.some(
+    (segment) => segment === 'node_modules' || segment === '.git' || segment === 'dist' || segment === 'build' || segment === '.next' || segment === '.turbo',
+  );
 }

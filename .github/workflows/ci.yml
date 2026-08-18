@@ -48,7 +48,6 @@ env:
   NOTIFICATION_CLEANUP_ENABLED: 'false'
 
 jobs:
-
   # ======================================================
   # FORMAT
   # ======================================================
@@ -77,7 +76,6 @@ jobs:
 
       - name: Check formatting
         run: pnpm format:check
-
 
   # ======================================================
   # LINT
@@ -111,7 +109,6 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-
   # ======================================================
   # TYPECHECK
   # ======================================================
@@ -144,7 +141,6 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-
   # ======================================================
   # BUILD
   # ======================================================
@@ -176,7 +172,6 @@ jobs:
 
       - name: Build
         run: pnpm build
-
 
   # ======================================================
   # FULL TEST SUITE
@@ -247,7 +242,6 @@ jobs:
       - name: Run complete monorepo test suite
         run: pnpm test:all
 
-
   # ======================================================
   # FULL-STACK PLAYWRIGHT SUITE
   # ======================================================
@@ -317,7 +311,6 @@ jobs:
           name: playwright-report-fullstack
           path: packages/test-code/web/playwright-report-fullstack
           retention-days: 7
-
 
   # ======================================================
   # REQUIRED MAIN-BRANCH GATE

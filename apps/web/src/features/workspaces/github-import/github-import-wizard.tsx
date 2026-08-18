@@ -101,7 +101,9 @@ export function GithubImportWizard({ onCancel, onImported }: GithubImportWizardP
 
       <h1 className='mt-5 text-2xl font-semibold tracking-tight text-slate-950'>Import from GitHub</h1>
 
-      <p className='mt-1.5 text-sm leading-6 text-slate-500'>Connect a repository and we&apos;ll suggest a workspace and application configuration for you to review.</p>
+      <p className='mt-1.5 text-sm leading-6 text-slate-500'>
+        Connect a repository and we&apos;ll suggest a workspace and application configuration for you to review.
+      </p>
 
       <div className='mt-8'>
         {step === 'connect' ? <ConnectGithubStep checking={checkingConnection} /> : null}

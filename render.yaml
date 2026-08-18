@@ -1,4 +1,3 @@
-\
 # Render Blueprint for the SaaS Command Center API.
 #
 # This deploys apps/api as a native Node web service — no Dockerfile is used.
@@ -142,10 +141,11 @@ services:
 
     envVars:
       - key: NODE_ENV
-        value: production # intentionally "production" mode (not "development") so
-                           # staging exercises the same validation/security posture
-                           # as prod; it is a separate Render service/DB/Redis, not
-                           # a lighter-weight environment.
+        value:
+          production # intentionally "production" mode (not "development") so
+          # staging exercises the same validation/security posture
+          # as prod; it is a separate Render service/DB/Redis, not
+          # a lighter-weight environment.
       - key: PORT
         value: 4000
       - key: TRUST_PROXY

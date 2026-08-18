@@ -71,21 +71,22 @@ NestJS builds to plain JS with `nest build`; there's no native binary, OS-level 
 
 ### Configuration (from `render.yaml`)
 
-| Field | Value |
-|---|---|
-| Runtime | Node (native, no Docker) |
-| Build command | `pnpm install --frozen-lockfile && pnpm build:packages && pnpm --filter @command-center/api exec prisma generate && pnpm --filter @command-center/api build` |
-| Start command | `node apps/api/dist/main.js` — **not** `pnpm dev`/`start:dev` |
-| Health check path | `/api/v1/health` |
-| Port | Reads `process.env.PORT`; `main.ts` calls `app.listen(port, '0.0.0.0')` — already correct for Render, no code change needed |
+| Field             | Value                                                                                                                                                        |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Runtime           | Node (native, no Docker)                                                                                                                                     |
+| Build command     | `pnpm install --frozen-lockfile && pnpm build:packages && pnpm --filter @command-center/api exec prisma generate && pnpm --filter @command-center/api build` |
+| Start command     | `node apps/api/dist/main.js` — **not** `pnpm dev`/`start:dev`                                                                                                |
+| Health check path | `/api/v1/health`                                                                                                                                             |
+| Port              | Reads `process.env.PORT`; `main.ts` calls `app.listen(port, '0.0.0.0')` — already correct for Render, no code change needed                                  |
 
 ### Health check — verified, with a real constraint
 
 Two endpoints exist:
+
 - `GET /api/v1/health` — **public** (`@Public()`), returns `{status:'ok', timestamp}` only. No DB/Redis check. Cheap — safe for Render's polling frequency.
 - `GET /api/v1/health/readiness` — **requires a Bearer access token** (no `@Public()` decorator, so the global `JwtAuthGuard` applies), checks `SELECT 1` against Postgres.
 
-**Render's health-check prober cannot authenticate**, so `/api/v1/health/readiness` cannot be used as the Render health-check path even though it's the more meaningful check. Use `/api/v1/health` (liveness only). This means Render's health check will report the service "up" even if the database is unreachable — the app still degrades that scenario safely (it fails closed on affected requests, and `assertStartupRequirements`/`RedisService.onApplicationBootstrap` both already refuse to finish booting at all if DB/Redis aren't reachable at startup), but a DB outage *after* a successful boot won't flip Render's health check. If deeper external monitoring is wanted later, that's a product decision (exposing readiness publicly, or adding a separate metrics/monitoring integration) — not something changed in this pass.
+**Render's health-check prober cannot authenticate**, so `/api/v1/health/readiness` cannot be used as the Render health-check path even though it's the more meaningful check. Use `/api/v1/health` (liveness only). This means Render's health check will report the service "up" even if the database is unreachable — the app still degrades that scenario safely (it fails closed on affected requests, and `assertStartupRequirements`/`RedisService.onApplicationBootstrap` both already refuse to finish booting at all if DB/Redis aren't reachable at startup), but a DB outage _after_ a successful boot won't flip Render's health check. If deeper external monitoring is wanted later, that's a product decision (exposing readiness publicly, or adding a separate metrics/monitoring integration) — not something changed in this pass.
 
 ### Migrations — explicit, not automatic
 
@@ -127,21 +128,22 @@ This is Vercel's own documented pattern for pnpm-workspace monorepos: `cd ../..`
 
 ### Environment variables (set per Vercel Environment: Production / Preview / Staging)
 
-| Variable | Staging example | Production example |
-|---|---|---|
-| `NEXT_PUBLIC_API_URL` | `https://command-center-api-staging.onrender.com/api/v1` | `https://api.<yourdomain>/api/v1` |
-| `NEXT_PUBLIC_INGESTION_URL` | `https://command-center-api-staging.onrender.com/api/v1/collect` | `https://api.<yourdomain>/api/v1/collect` |
-| `NEXT_PUBLIC_TRACKER_SCRIPT_URL` | wherever the staging tracker build is hosted | wherever the production tracker build is hosted |
+| Variable                         | Staging example                                                  | Production example                              |
+| -------------------------------- | ---------------------------------------------------------------- | ----------------------------------------------- |
+| `NEXT_PUBLIC_API_URL`            | `https://command-center-api-staging.onrender.com/api/v1`         | `https://api.<yourdomain>/api/v1`               |
+| `NEXT_PUBLIC_INGESTION_URL`      | `https://command-center-api-staging.onrender.com/api/v1/collect` | `https://api.<yourdomain>/api/v1/collect`       |
+| `NEXT_PUBLIC_TRACKER_SCRIPT_URL` | wherever the staging tracker build is hosted                     | wherever the production tracker build is hosted |
 
 **All three fall back to a `localhost` default if left unset** (`apps/web/src/components/api-health-card.tsx`, the installation-snippet page, and `features/lib/api/api-client.ts` all use `?? 'http://localhost:...'`). A missing Vercel env var therefore fails silently in the browser (network error calling `localhost` from a deployed site) rather than failing the build — **set all three explicitly in every Vercel environment**, don't rely on the fallback ever being reached.
 
-**Note found in code:** `features/lib/api/api-client.ts` checks `NEXT_PUBLIC_API_BASE_URL` *before* `NEXT_PUBLIC_API_URL`. Nothing else in the app reads `NEXT_PUBLIC_API_BASE_URL`, and it isn't in `.env.example`. Leave it unset (so `NEXT_PUBLIC_API_URL` is what actually takes effect everywhere) unless a future change deliberately consolidates on one name — not changed in this pass since it's not a deployment blocker, just worth knowing it exists.
+**Note found in code:** `features/lib/api/api-client.ts` checks `NEXT_PUBLIC_API_BASE_URL` _before_ `NEXT_PUBLIC_API_URL`. Nothing else in the app reads `NEXT_PUBLIC_API_BASE_URL`, and it isn't in `.env.example`. Leave it unset (so `NEXT_PUBLIC_API_URL` is what actually takes effect everywhere) unless a future change deliberately consolidates on one name — not changed in this pass since it's not a deployment blocker, just worth knowing it exists.
 
 ---
 
 ## 7. Redis (production)
 
 `RedisService` (`apps/api/src/infrastructure/redis/redis.service.ts`) already:
+
 - connects lazily and `PING`s on `onApplicationBootstrap`, **throwing (and refusing to finish startup) if the ping fails** — the app will not silently run without Redis;
 - retries with backoff (`Math.min(attempt * 250, 5000)` ms);
 - logs connection errors (message + stack only — the `REDIS_URL` value itself is never logged, verified);
@@ -159,13 +161,13 @@ Redis is used for: `SharedRateLimitService` (webhook/invitation/analytics-ingest
 
 Actual routes, read directly from the controllers (not assumed):
 
-| Purpose | Method + path | Which domain |
-|---|---|---|
-| GitHub App "Callback URL" | Frontend page `GET /github/callback` → that page then calls backend `POST /api/v1/repositories/github/callback` (Bearer-authenticated, from the browser) | **Vercel** frontend domain |
-| GitHub App "Setup URL" | Frontend page `GET /github/setup` → calls backend `POST /api/v1/repositories/github/setup` | **Vercel** frontend domain |
-| GitHub App "Webhook URL" | `POST /api/v1/repositories/github/webhook` — hit directly by GitHub's servers, HMAC-signature verified | **Render** backend domain |
-| Personal (pre-workspace) connect flow | `POST /api/v1/repositories/github/personal/{connect,setup,callback,analyze}`, `GET /api/v1/repositories/github/personal` | Render backend, called from the same frontend pages |
-| Import-as-new-workspace | `POST /api/v1/workspaces/import/github` | Render backend |
+| Purpose                               | Method + path                                                                                                                                            | Which domain                                        |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| GitHub App "Callback URL"             | Frontend page `GET /github/callback` → that page then calls backend `POST /api/v1/repositories/github/callback` (Bearer-authenticated, from the browser) | **Vercel** frontend domain                          |
+| GitHub App "Setup URL"                | Frontend page `GET /github/setup` → calls backend `POST /api/v1/repositories/github/setup`                                                               | **Vercel** frontend domain                          |
+| GitHub App "Webhook URL"              | `POST /api/v1/repositories/github/webhook` — hit directly by GitHub's servers, HMAC-signature verified                                                   | **Render** backend domain                           |
+| Personal (pre-workspace) connect flow | `POST /api/v1/repositories/github/personal/{connect,setup,callback,analyze}`, `GET /api/v1/repositories/github/personal`                                 | Render backend, called from the same frontend pages |
+| Import-as-new-workspace               | `POST /api/v1/workspaces/import/github`                                                                                                                  | Render backend                                      |
 
 Example, filling in real domains:
 
@@ -226,19 +228,19 @@ _No values are reproduced here — keys and purpose only._
 
 ### API — required in every environment
 
-| Variable | Notes |
-|---|---|
-| `DATABASE_URL` | Neon pooled connection string |
-| `REDIS_URL` | Managed Redis provider URL |
-| `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | ≥32 chars, validated at startup, rejects placeholder patterns in production |
-| `INVITATION_TOKEN_PEPPER` | Same validation as JWT secrets |
-| `WEBHOOK_ENCRYPTION_KEY` | Must be base64, decodes to exactly 32 bytes |
-| `ANALYTICS_IP_HASH_SALT` | Required in production since Phase 3 (previously had a silent insecure fallback) |
-| `FRONTEND_URL`, `CORS_ORIGINS` | Exact origin(s), comma-separated if multiple — no wildcard |
-| `COOKIE_SECURE`, `COOKIE_SAME_SITE` | `true` / `none` for this cross-site topology (§9) |
-| `TRUST_PROXY` | `1` on Render (§10) |
-| `GITHUB_APP_SLUG`, `GITHUB_APP_CLIENT_ID`, `GITHUB_APP_CLIENT_SECRET`, `GITHUB_APP_CALLBACK_URL`, `GITHUB_APP_WEBHOOK_SECRET`, `GITHUB_APP_PRIVATE_KEY_BASE64` | Separate values per environment (§8) |
-| `PORT` | Render supplies/reads this automatically; `4000` locally |
+| Variable                                                                                                                                                       | Notes                                                                            |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `DATABASE_URL`                                                                                                                                                 | Neon pooled connection string                                                    |
+| `REDIS_URL`                                                                                                                                                    | Managed Redis provider URL                                                       |
+| `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`                                                                                                                      | ≥32 chars, validated at startup, rejects placeholder patterns in production      |
+| `INVITATION_TOKEN_PEPPER`                                                                                                                                      | Same validation as JWT secrets                                                   |
+| `WEBHOOK_ENCRYPTION_KEY`                                                                                                                                       | Must be base64, decodes to exactly 32 bytes                                      |
+| `ANALYTICS_IP_HASH_SALT`                                                                                                                                       | Required in production since Phase 3 (previously had a silent insecure fallback) |
+| `FRONTEND_URL`, `CORS_ORIGINS`                                                                                                                                 | Exact origin(s), comma-separated if multiple — no wildcard                       |
+| `COOKIE_SECURE`, `COOKIE_SAME_SITE`                                                                                                                            | `true` / `none` for this cross-site topology (§9)                                |
+| `TRUST_PROXY`                                                                                                                                                  | `1` on Render (§10)                                                              |
+| `GITHUB_APP_SLUG`, `GITHUB_APP_CLIENT_ID`, `GITHUB_APP_CLIENT_SECRET`, `GITHUB_APP_CALLBACK_URL`, `GITHUB_APP_WEBHOOK_SECRET`, `GITHUB_APP_PRIVATE_KEY_BASE64` | Separate values per environment (§8)                                             |
+| `PORT`                                                                                                                                                         | Render supplies/reads this automatically; `4000` locally                         |
 
 ### API — optional (sensible code defaults, override only with a reason)
 
@@ -347,11 +349,11 @@ Manual walkthrough (automate later if desired — a truncating/reset-based E2E r
 
 ## 17. Rollback plan
 
-**Backend (Render):** Render retains prior successful deploys — use "Rollback to this deploy" on the previous build from the service's Deploys tab. Safe as long as the rolled-back code version is compatible with the *current* database schema — see the migration-compatibility note below.
+**Backend (Render):** Render retains prior successful deploys — use "Rollback to this deploy" on the previous build from the service's Deploys tab. Safe as long as the rolled-back code version is compatible with the _current_ database schema — see the migration-compatibility note below.
 
 **Frontend (Vercel):** Vercel keeps every deployment as an immutable, individually-addressable build — use "Promote to Production" on the previous deployment from the Deployments tab. No build step is re-run; it's an instant traffic switch.
 
-**Database:** Migrations are the hard part of a rollback — code can roll back instantly, but a schema change generally cannot. Prefer an **expand/contract** approach for any migration that removes a column/table/constraint: (1) deploy a migration that *adds* the new shape while the old shape still works, (2) deploy code that uses the new shape, (3) only once that's confirmed stable, deploy a later migration that removes the old shape. This keeps every individual deploy backward-compatible with the *previous* deploy's expected schema, so a code rollback never lands on a schema that's missing something it needs. Never rely on `prisma migrate reset` as a rollback mechanism — it's destructive and inappropriate for any environment with real data.
+**Database:** Migrations are the hard part of a rollback — code can roll back instantly, but a schema change generally cannot. Prefer an **expand/contract** approach for any migration that removes a column/table/constraint: (1) deploy a migration that _adds_ the new shape while the old shape still works, (2) deploy code that uses the new shape, (3) only once that's confirmed stable, deploy a later migration that removes the old shape. This keeps every individual deploy backward-compatible with the _previous_ deploy's expected schema, so a code rollback never lands on a schema that's missing something it needs. Never rely on `prisma migrate reset` as a rollback mechanism — it's destructive and inappropriate for any environment with real data.
 
 ---
 

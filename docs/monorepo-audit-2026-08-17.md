@@ -8,20 +8,20 @@ _This is the third audit pass on this repository, following `monorepo-audit-2026
 
 ## Executive Summary
 
-| | |
-|---|---|
-| **Overall health** | Fundamentally sound design, incomplete follow-through |
-| **Critical issues (P0)** | 3 |
-| **High issues (P1)** | 6 |
-| **Medium issues (P2)** | 11 |
-| **Low issues (P3)** | 14 |
-| **Fixed since 08-09** | 12 |
-| **Security posture** | Strong crypto/session fundamentals; auth endpoints unthrottled |
-| **Architecture quality** | Clean module boundaries; two P0s dormant since 08-09 |
-| **Testing quality** | Substantial suites; CI likely cannot run them right now |
-| **Deployment readiness** | Not configured for any target |
-| **Overall score** | 58 / 100 |
-| **Production readiness** | Not Ready |
+|                          |                                                                |
+| ------------------------ | -------------------------------------------------------------- |
+| **Overall health**       | Fundamentally sound design, incomplete follow-through          |
+| **Critical issues (P0)** | 3                                                              |
+| **High issues (P1)**     | 6                                                              |
+| **Medium issues (P2)**   | 11                                                             |
+| **Low issues (P3)**      | 14                                                             |
+| **Fixed since 08-09**    | 12                                                             |
+| **Security posture**     | Strong crypto/session fundamentals; auth endpoints unthrottled |
+| **Architecture quality** | Clean module boundaries; two P0s dormant since 08-09           |
+| **Testing quality**      | Substantial suites; CI likely cannot run them right now        |
+| **Deployment readiness** | Not configured for any target                                  |
+| **Overall score**        | 58 / 100                                                       |
+| **Production readiness** | Not Ready                                                      |
 
 ### What actually changed since Aug 13
 
@@ -29,7 +29,7 @@ Two previously-Critical bugs are genuinely fixed: the cross-tenant IDOR in the a
 
 Set against that: the two issues both prior audits called the #1 priority — the missing `ScheduleModule.forRoot()` (which leaves every background job dead) and the duplicated analytics-processing pipeline — are **still exactly as broken as they were on Aug 9**, eight days and two "must verify" checklists later. A new GitHub repository-import feature landed with solid authorization and input-safety fundamentals, but shipped with a hardcoded dev-only App slug that breaks the feature outside the developer's own machine, and reintroduced the second-HTTP-client problem the team had just finished fixing elsewhere. Most seriously: the test suite was restructured into a new `packages/test-code` workspace, but `.github/workflows/ci.yml` was never updated to match — `pnpm test` in CI now very likely fails outright for want of Postgres/Redis/Chrome, rather than the previous, subtler problem of silently skipping e2e coverage.
 
-> **Read this first:** confirm whether CI is currently green. If it is, that's worth understanding *why* before trusting it — see [Testing → CI status](#ci-status--read-this-section-fully-before-trusting-any-green-checkmark).
+> **Read this first:** confirm whether CI is currently green. If it is, that's worth understanding _why_ before trusting it — see [Testing → CI status](#ci-status--read-this-section-fully-before-trusting-any-green-checkmark).
 
 ---
 
@@ -37,17 +37,17 @@ Set against that: the two issues both prior audits called the #1 priority — th
 
 Plain pnpm workspace (no Turbo/Nx — appropriate at this size), 3 apps + 6 packages, no orchestrator-level build cache.
 
-| Package | Purpose | Framework | Depends on | Used by |
-|---|---|---|---|---|
-| `apps/api` | REST API, `/api/v1` | NestJS 11 · Prisma 7 (pg adapter) | shared-types | web, tracker (via HTTP) |
-| `apps/web` | Dashboard SPA-in-App-Router | Next.js 15 · React 19 | shared-types, ui | browser |
-| `apps/tracker` | Browser analytics beacon SDK | vanilla TS, esbuild | — | customer sites → api |
-| `packages/shared-types` | Cross-app enum/type source of truth | hand-written TS | — | api, web (~65 files, up from 4) |
-| `packages/ui` | 14 shared components | React | clsx, tailwind-merge | web (51 files, up from 1) |
-| `packages/validation` | Zod schemas, 12 domain files | Zod 4 | shared-types | **nobody — 0 consumers** |
-| `packages/eslint-config` | Shared flat ESLint config | — | — | api, web, tracker (fixed since 08-09) |
-| `packages/tsconfig` | base/node/react tsconfig bases | — | — | api, web (tracker still doesn't extend it) |
-| `packages/test-code/{api,web,tracker}` | Relocated test suites (new since 08-13) | Jest, Vitest, Playwright | hoisted deps from apps | root `pnpm test` |
+| Package                                | Purpose                                 | Framework                         | Depends on             | Used by                                    |
+| -------------------------------------- | --------------------------------------- | --------------------------------- | ---------------------- | ------------------------------------------ |
+| `apps/api`                             | REST API, `/api/v1`                     | NestJS 11 · Prisma 7 (pg adapter) | shared-types           | web, tracker (via HTTP)                    |
+| `apps/web`                             | Dashboard SPA-in-App-Router             | Next.js 15 · React 19             | shared-types, ui       | browser                                    |
+| `apps/tracker`                         | Browser analytics beacon SDK            | vanilla TS, esbuild               | —                      | customer sites → api                       |
+| `packages/shared-types`                | Cross-app enum/type source of truth     | hand-written TS                   | —                      | api, web (~65 files, up from 4)            |
+| `packages/ui`                          | 14 shared components                    | React                             | clsx, tailwind-merge   | web (51 files, up from 1)                  |
+| `packages/validation`                  | Zod schemas, 12 domain files            | Zod 4                             | shared-types           | **nobody — 0 consumers**                   |
+| `packages/eslint-config`               | Shared flat ESLint config               | —                                 | —                      | api, web, tracker (fixed since 08-09)      |
+| `packages/tsconfig`                    | base/node/react tsconfig bases          | —                                 | —                      | api, web (tracker still doesn't extend it) |
+| `packages/test-code/{api,web,tracker}` | Relocated test suites (new since 08-13) | Jest, Vitest, Playwright          | hoisted deps from apps | root `pnpm test`                           |
 
 **Request flow:** Browser (client components, all 34 routes) → one consolidated `apiRequest` HTTP client → NestJS `/api/v1/*` → `JwtAuthGuard` (global) → `WorkspaceAccessGuard` → `WorkspaceRolesGuard` → thin controllers → services → `PrismaService` (pg adapter) → PostgreSQL. Background work (analytics aggregation, webhook delivery, health checks, cleanup) is designed as claim-pattern + Postgres-advisory-lock `@Cron` services — architecturally sound, still completely inert (see ARCH-01).
 
@@ -95,6 +95,7 @@ Every headline finding from the 08-09 and 08-13 docs, re-verified against source
 All three are continuations or compounding of issues flagged in the first audit eight days ago — none are newly introduced, but none have been fixed either.
 
 ### ARCH-01 — Background job scheduler is never bootstrapped
+
 **Severity:** P0 · **Confidence:** CONFIRMED
 
 `apps/api/src/app.module.ts` imports no `ScheduleModule` (repo-wide grep for the symbol: zero matches). NestJS's `@Cron`/`@Interval` decorators are inert unless `ScheduleModule.forRoot()` is registered somewhere in the module tree.
@@ -106,6 +107,7 @@ All three are continuations or compounding of issues flagged in the first audit 
 **Related:** `apps/api/src/app.module.ts` · `webhook-delivery-worker.service.ts:43` · `health-monitoring-scheduler.service.ts:32` · `analytics-processing-scheduler.service.ts:37`
 
 ### ARCH-02 — Two independent analytics-processing pipelines both registered
+
 **Severity:** P0 · **Confidence:** CONFIRMED
 
 `app.module.ts` imports both `AnalyticsEngineModule` and `AnalyticsProcessingModule`. The legacy pipeline (`analytics-engine`) self-starts via `onModuleInit()` + `setInterval`, gated by `ANALYTICS_PROCESSING_SCHEDULER_ENABLED` (unset in `.env.example` → off by default). The newer queue/worker/dead-letter pipeline (`analytics-processing`) uses `@Cron(EVERY_MINUTE)`, gated by `ANALYTICS_SCHEDULER_ENABLED=true` (set by default) — but is fully inert today because of ARCH-01.
@@ -117,9 +119,10 @@ All three are continuations or compounding of issues flagged in the first audit 
 **Related:** `apps/api/src/app.module.ts` · `modules/analytics-engine/services/analytics-processing-scheduler.service.ts` · `modules/analytics-processing/services/analytics-processing-scheduler.service.ts`
 
 ### CI-01 — CI is very likely failing outright right now
+
 **Severity:** P0 · **Confidence:** CONFIRMED
 
-`.github/workflows/ci.yml` was last touched Aug 3 and still runs `pnpm install --no-frozen-lockfile`, no `prisma generate` step, and a bare `pnpm test`. But the test suite was restructured after Aug 13 into `packages/test-code/{api,web,tracker}`, and root `pnpm test` now runs `test:all` → the full 46-suite API E2E regression (needs `TEST_DATABASE_URL`/`TEST_REDIS_URL`, enforced by an explicit startup check) *and* the full Playwright suite (needs a real installed Chrome — `channel: 'chrome'`, no Playwright browser-install step exists anywhere).
+`.github/workflows/ci.yml` was last touched Aug 3 and still runs `pnpm install --no-frozen-lockfile`, no `prisma generate` step, and a bare `pnpm test`. But the test suite was restructured after Aug 13 into `packages/test-code/{api,web,tracker}`, and root `pnpm test` now runs `test:all` → the full 46-suite API E2E regression (needs `TEST_DATABASE_URL`/`TEST_REDIS_URL`, enforced by an explicit startup check) _and_ the full Playwright suite (needs a real installed Chrome — `channel: 'chrome'`, no Playwright browser-install step exists anywhere).
 
 **Impact:** CI provisions none of this — no Postgres/Redis service container, no `prisma generate`, no browser install. What used to be a coverage gap (e2e tests silently never ran) is now very likely an outright pipeline failure on every PR and push to main, which is a stronger merge-blocker than before but also means CI currently gives no usable signal at all until someone confirms and fixes this.
 
@@ -132,6 +135,7 @@ All three are continuations or compounding of issues flagged in the first audit 
 ## High Priority Findings (P1)
 
 ### SEC-01 — No dedicated rate limiting on login, register, or refresh
+
 **Confidence:** CONFIRMED
 
 Only the generous global `ThrottlerModule` tier (100 req/min/IP) applies — zero `@Throttle()` overrides exist on any of the three most sensitive public endpoints in the app.
@@ -141,6 +145,7 @@ Only the generous global `ThrottlerModule` tier (100 req/min/IP) applies — zer
 **File:** `apps/api/src/modules/auth/controllers/auth.controller.ts:43,67,91`
 
 ### FE-01 — Zero error boundaries across all 34 routes
+
 **Confidence:** CONFIRMED
 
 No `error.tsx` or `global-error.tsx` exists anywhere in `apps/web/src/app` — confirmed by exhaustive search, unchanged since 08-13 despite 3 new routes being added since (the GitHub callback/setup pages, repositories list). Every unhandled render exception falls through to Next's default, unbranded error screen instead of the app's own `PageError` component.
@@ -148,6 +153,7 @@ No `error.tsx` or `global-error.tsx` exists anywhere in `apps/web/src/app` — c
 **Fix:** add a root `app/global-error.tsx` and route-group-level `error.tsx` for `(dashboard)`/`(auth)`, reusing the existing `PageError` component.
 
 ### FE-02 — New repositories feature reintroduced a second, weaker HTTP client
+
 **Confidence:** CONFIRMED
 
 `features/repositories/repositories-api.ts:11-59` defines its own `repositoryRequest()` fetch wrapper — sharing the token store with `api-client.ts`, but with **no 401 → refresh → retry logic**, unlike the consolidated client every other feature uses. Every call in the repositories/code-explorer feature (list, connect, sync, link/unlink, branches, tree, file, search, diff) goes through it. No test exercises a 401 response.
@@ -159,6 +165,7 @@ No `error.tsx` or `global-error.tsx` exists anywhere in `apps/web/src/app` — c
 **File:** `apps/web/src/features/repositories/repositories-api.ts:11-59` · `code-explorer-api.ts`
 
 ### BE-01 — GitHub App installation URL is hardcoded to a dev-only slug
+
 **Confidence:** CONFIRMED — flagged independently by two agents
 
 `github-app.service.ts:92-97`: the config-driven read is commented out and replaced with a literal:
@@ -175,6 +182,7 @@ const slug = 'saas-command-center-dev';
 **File:** `apps/api/src/modules/repositories/services/github-app.service.ts:92-97`
 
 ### CI-02 — No deployment configuration exists for any target
+
 **Severity:** P1 (dormant) · **Confidence:** HIGH CONFIDENCE
 
 No `vercel.json`, no `render.yaml`, no `Dockerfile` anywhere in the repo. If this repo is connected to Vercel with Root Directory = `apps/web` and default install/build commands (the natural first thing an operator would try), the build would fail: `apps/web` depends on `@command-center/shared-types`'s built `dist/` output, which is only produced by the root `pnpm build:packages` script — not invoked by `apps/web`'s own `next build`, and not checked into git.
@@ -182,6 +190,7 @@ No `vercel.json`, no `render.yaml`, no `Dockerfile` anywhere in the repo. If thi
 **Fix:** add a `vercel.json` (or platform-equivalent) that runs the install/build from the monorepo root, or add an explicit `prebuild` step in `apps/web/package.json` that builds its workspace dependencies first.
 
 ### FE-03 — Frontend test coverage remains far below target on the components that matter most
+
 **Confidence:** CONFIRMED
 
 As measured 08-13: statements/branches/functions/lines all ~41-42%, against a ≥90%/85% target. Re-checked now: test-file count grew 66 → 72, but the specific large stateful dashboards already called out — `monitoring-dashboard.tsx` (950 lines), `release-deployment-dashboard.tsx` (884 lines), `webhook-integrations-dashboard.tsx` (761 lines) — still have **zero** test files, and the new `repositories-dashboard.tsx`/`code-explorer.tsx` joined that list rather than avoiding it. New test investment since 08-13 went into API-layer/leaf-component files, not into closing the flagged gap.
@@ -261,6 +270,7 @@ This remains the strongest layer of the codebase, and the pass found nothing to 
 - **SEC-03 [P3, CONFIRMED] Weak hardcoded fallback for an analytics salt.** `analytics-ingestion.service.ts:57` falls back to `'local-development-change-this'` if `ANALYTICS_IP_HASH_SALT` is unset.
 
 **Checked and confirmed clean:**
+
 - **CORS:** exact-match origin allowlist via a `Set`, no wildcard/regex, validated at startup. The one carve-out (public `/collect` tracker endpoint) is deliberate and documented in code.
 - **Secrets:** full repo-wide scan for API-key-shaped strings, PEM headers, and common secret patterns — zero real credentials found in tracked files. All `.env.example` templates use obvious placeholders.
 - **GitHub App credentials:** private key never logged, webhook HMAC comparison uses `timingSafeEqual` with a length guard, OAuth access tokens are never persisted at all (by explicit design).
@@ -276,6 +286,7 @@ This is the layer with the most visible progress since 08-09 — and one new reg
 - **PKG-02 [P2, CONFIRMED] `apps/tracker`'s tsconfig has no `extends` — and now has real drift, not just duplication.** The base sets `noUncheckedIndexedAccess`, `forceConsistentCasingInFileNames`, `esModuleInterop`, `resolveJsonModule`, and `isolatedModules` — none of which are present in `apps/tracker/tsconfig.json`. `noUncheckedIndexedAccess` in particular is a real strictness reduction for a file that does a lot of array/object indexing on untrusted page data. **Fix:** add `"extends": "../../packages/tsconfig/base.json"` and reconcile resulting type errors.
 
 **Fixed since 08-09:**
+
 - `packages/eslint-config`: 0 → 3 consumers (all three apps).
 - `packages/shared-types`: ~4 files/2 exports → ~65 files, with the previously-drifted `TaskStatus` enum now confirmed matching Prisma exactly.
 - `packages/ui`: 1 component/1 file → 14 components/51 files.
@@ -342,16 +353,16 @@ No deployment has apparently been configured yet for any target. See CI-02 for t
 
 ### Definitely unused — confirmed zero references
 
-| File | Evidence |
-|---|---|
-| `analytics-engine/services/analytics-processing.service.fixed.ts` | 0 bytes, zero imports anywhere |
-| `apps/api/src/health/*` (4 files) | Orphaned duplicate — `app.module.ts` only wires the real `modules/health/*` |
-| `analytics-engine/controllers/analytics-ingestion.controller.ts` | Not in `AnalyticsEngineModule`'s `controllers` array |
-| `apps/web/src/providers/app-providers.tsx` | Zero references anywhere |
-| `common/filters/http-exception.filter.ts` | Unreferenced outside itself (see BE-03) |
-| `apps/tracker/src/index.ts` | Build entry point is `tracker.ts` directly; unbuilt leftover stub |
-| `activity-feed.tsx.backup-20260810-054631` / `…-054800` | Two stale pre-migration snapshots, zero references |
-| `pnpm-workspace.yaml.backup` (repo root) | Predates the `test-code` workspace-glob addition, zero references |
+| File                                                              | Evidence                                                                    |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `analytics-engine/services/analytics-processing.service.fixed.ts` | 0 bytes, zero imports anywhere                                              |
+| `apps/api/src/health/*` (4 files)                                 | Orphaned duplicate — `app.module.ts` only wires the real `modules/health/*` |
+| `analytics-engine/controllers/analytics-ingestion.controller.ts`  | Not in `AnalyticsEngineModule`'s `controllers` array                        |
+| `apps/web/src/providers/app-providers.tsx`                        | Zero references anywhere                                                    |
+| `common/filters/http-exception.filter.ts`                         | Unreferenced outside itself (see BE-03)                                     |
+| `apps/tracker/src/index.ts`                                       | Build entry point is `tracker.ts` directly; unbuilt leftover stub           |
+| `activity-feed.tsx.backup-20260810-054631` / `…-054800`           | Two stale pre-migration snapshots, zero references                          |
+| `pnpm-workspace.yaml.backup` (repo root)                          | Predates the `test-code` workspace-glob addition, zero references           |
 
 ### Likely unused — new since this pass
 
@@ -374,15 +385,15 @@ No deployment has apparently been configured yet for any target. See CI-02 for t
 
 ## Configuration Findings
 
-| Variable | Used by | Required | Risk if misconfigured |
-|---|---|---|---|
-| `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | api | Yes (prod) | Validated ≥32 chars, rejects placeholder patterns — low risk |
-| `TRUST_PROXY` | api | No, defaults `false` | Operator must set correctly (numeric hop count) for the real proxy topology — undocumented beyond the default |
-| `CORS_ORIGINS` | api | Yes | Strict exact-match, validated at startup — low risk |
-| `ANALYTICS_SCHEDULER_ENABLED` / `ANALYTICS_PROCESSING_SCHEDULER_ENABLED` | api | No | Both moot until ARCH-01 ships; misconfiguration risk becomes real double-processing at that point (ARCH-02) |
-| `GITHUB_APP_SLUG` | api (intended, currently unused) | — | Not read at all right now — see BE-01 |
-| `ANALYTICS_IP_HASH_SALT` | api | No, weak fallback | See SEC-03 |
-| `TEST_DATABASE_URL` / `TEST_REDIS_URL` | packages/test-code/api | Yes for e2e | Double-guarded against pointing at a non-test database — low risk |
+| Variable                                                                 | Used by                          | Required             | Risk if misconfigured                                                                                         |
+| ------------------------------------------------------------------------ | -------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET`                               | api                              | Yes (prod)           | Validated ≥32 chars, rejects placeholder patterns — low risk                                                  |
+| `TRUST_PROXY`                                                            | api                              | No, defaults `false` | Operator must set correctly (numeric hop count) for the real proxy topology — undocumented beyond the default |
+| `CORS_ORIGINS`                                                           | api                              | Yes                  | Strict exact-match, validated at startup — low risk                                                           |
+| `ANALYTICS_SCHEDULER_ENABLED` / `ANALYTICS_PROCESSING_SCHEDULER_ENABLED` | api                              | No                   | Both moot until ARCH-01 ships; misconfiguration risk becomes real double-processing at that point (ARCH-02)   |
+| `GITHUB_APP_SLUG`                                                        | api (intended, currently unused) | —                    | Not read at all right now — see BE-01                                                                         |
+| `ANALYTICS_IP_HASH_SALT`                                                 | api                              | No, weak fallback    | See SEC-03                                                                                                    |
+| `TEST_DATABASE_URL` / `TEST_REDIS_URL`                                   | packages/test-code/api           | Yes for e2e          | Double-guarded against pointing at a non-test database — low risk                                             |
 
 No secret values are reproduced above or elsewhere in this report. The one committed inconsistency found: `apps/api/.env.example`'s documented `DATABASE_URL` port (5433) doesn't match `infrastructure/docker-compose.yml`'s exposed port (55432).
 
@@ -396,28 +407,28 @@ Request-ID generation/propagation middleware exists and is test-covered. Structu
 
 ## Top 20 Bugs / Risks
 
-| Rank | ID | Sev | Area | Problem | Confidence |
-|---|---|---|---|---|---|
-| 1 | ARCH-01 | P0 | Backend | Scheduler never bootstrapped — all background jobs dead | CONFIRMED |
-| 2 | ARCH-02 | P0 | Backend | Two analytics pipelines both registered, would double-process if naively fixed | CONFIRMED |
-| 3 | CI-01 | P0 | CI/Testing | CI likely fails outright — test suite needs infra CI doesn't provision | CONFIRMED |
-| 4 | SEC-01 | P1 | Security | No rate limiting on login/register/refresh | CONFIRMED |
-| 5 | FE-01 | P1 | Frontend | Zero error boundaries across 34 routes | CONFIRMED |
-| 6 | FE-02 | P1 | Frontend | Second HTTP client reintroduced, no 401-retry logic | CONFIRMED |
-| 7 | BE-01 | P1 | Backend | GitHub App slug hardcoded to dev value — breaks feature outside dev | CONFIRMED (2 agents) |
-| 8 | CI-02 | P1 | Deployment | No deployment config; default Vercel path would break the build | HIGH CONFIDENCE |
-| 9 | FE-03 | P1 | Frontend | Test coverage ~41%, large dashboards still ~0% | CONFIRMED |
-| 10 | SEC-02 | P2 | Security | Rate-limit identity trusts caller-supplied headers | CONFIRMED |
-| 11 | DB-01 | P2 | Database | Missing index on the scheduler's primary filter column | CONFIRMED |
-| 12 | FE-04 | P2 | Frontend | Dead abort-cleanup pattern, now in 4 dashboards | CONFIRMED |
-| 13 | DB-02 | P2 | Database | Unbounded in-memory pagination on analytics reports | CONFIRMED |
-| 14 | PKG-01 | P2 | Monorepo | 12-file validation library with zero consumers | CONFIRMED |
-| 15 | BE-02 | P2 | Backend | No centralized Prisma error translation, 10 duplicated instances | CONFIRMED |
-| 16 | DB-03 | P2 | Database | Owner/membership invariant unenforced, actively relied upon | CONFIRMED |
-| 17 | CI-03 | P2 | Testing | Per-test app boot makes e2e suite architecturally slow | CONFIRMED |
-| 18 | CI-04 | P2 | Testing | Full-stack Playwright has no DB teardown between runs | CONFIRMED |
-| 19 | FE-06 | P2 | Frontend | Code explorer has no stale-response/unmount guards | HIGH CONFIDENCE |
-| 20 | PKG-02 | P2 | Monorepo | Tracker tsconfig drift — 5 strictness flags silently missing | CONFIRMED |
+| Rank | ID      | Sev | Area       | Problem                                                                        | Confidence           |
+| ---- | ------- | --- | ---------- | ------------------------------------------------------------------------------ | -------------------- |
+| 1    | ARCH-01 | P0  | Backend    | Scheduler never bootstrapped — all background jobs dead                        | CONFIRMED            |
+| 2    | ARCH-02 | P0  | Backend    | Two analytics pipelines both registered, would double-process if naively fixed | CONFIRMED            |
+| 3    | CI-01   | P0  | CI/Testing | CI likely fails outright — test suite needs infra CI doesn't provision         | CONFIRMED            |
+| 4    | SEC-01  | P1  | Security   | No rate limiting on login/register/refresh                                     | CONFIRMED            |
+| 5    | FE-01   | P1  | Frontend   | Zero error boundaries across 34 routes                                         | CONFIRMED            |
+| 6    | FE-02   | P1  | Frontend   | Second HTTP client reintroduced, no 401-retry logic                            | CONFIRMED            |
+| 7    | BE-01   | P1  | Backend    | GitHub App slug hardcoded to dev value — breaks feature outside dev            | CONFIRMED (2 agents) |
+| 8    | CI-02   | P1  | Deployment | No deployment config; default Vercel path would break the build                | HIGH CONFIDENCE      |
+| 9    | FE-03   | P1  | Frontend   | Test coverage ~41%, large dashboards still ~0%                                 | CONFIRMED            |
+| 10   | SEC-02  | P2  | Security   | Rate-limit identity trusts caller-supplied headers                             | CONFIRMED            |
+| 11   | DB-01   | P2  | Database   | Missing index on the scheduler's primary filter column                         | CONFIRMED            |
+| 12   | FE-04   | P2  | Frontend   | Dead abort-cleanup pattern, now in 4 dashboards                                | CONFIRMED            |
+| 13   | DB-02   | P2  | Database   | Unbounded in-memory pagination on analytics reports                            | CONFIRMED            |
+| 14   | PKG-01  | P2  | Monorepo   | 12-file validation library with zero consumers                                 | CONFIRMED            |
+| 15   | BE-02   | P2  | Backend    | No centralized Prisma error translation, 10 duplicated instances               | CONFIRMED            |
+| 16   | DB-03   | P2  | Database   | Owner/membership invariant unenforced, actively relied upon                    | CONFIRMED            |
+| 17   | CI-03   | P2  | Testing    | Per-test app boot makes e2e suite architecturally slow                         | CONFIRMED            |
+| 18   | CI-04   | P2  | Testing    | Full-stack Playwright has no DB teardown between runs                          | CONFIRMED            |
+| 19   | FE-06   | P2  | Frontend   | Code explorer has no stale-response/unmount guards                             | HIGH CONFIDENCE      |
+| 20   | PKG-02  | P2  | Monorepo   | Tracker tsconfig drift — 5 strictness flags silently missing                   | CONFIRMED            |
 
 ---
 
@@ -426,7 +437,7 @@ Request-ID generation/propagation middleware exists and is test-covered. Structu
 ### Immediate — before anything else ships
 
 - Confirm current CI status and fix the Postgres/Redis/Chrome/`prisma generate`/`--frozen-lockfile` gaps (CI-01) — nothing else matters if CI can't verify it.
-- Register `ScheduleModule.forRoot()` *and* resolve which analytics pipeline is canonical in the same change (ARCH-01 + ARCH-02) — fixing one without the other creates a worse bug than either alone.
+- Register `ScheduleModule.forRoot()` _and_ resolve which analytics pipeline is canonical in the same change (ARCH-01 + ARCH-02) — fixing one without the other creates a worse bug than either alone.
 - Restore the `GITHUB_APP_SLUG` env read (BE-01) — the repository-import feature is non-functional outside the developer's machine as shipped.
 - Delete `repositoryRequest` and route the repositories feature through the shared `apiRequest` (FE-02).
 
@@ -458,53 +469,56 @@ Request-ID generation/propagation middleware exists and is test-covered. Structu
 
 ## Technical Debt Matrix
 
-| Area | Current Problem | Risk | Difficulty | Priority |
-|---|---|---:|---:|---:|
-| Background jobs | Scheduler dormant, dual pipelines registered | High | Low | P0 |
-| CI pipeline | Untouched since test-suite relocation; likely broken | High | Low | P0 |
-| Repositories module | Hardcoded dev slug, zero tests, second HTTP client | High | Low–Med | P1 |
-| Frontend error handling | No error boundaries anywhere | Medium | Low | P1 |
-| Frontend test coverage | Large dashboards near-zero coverage | Medium | High | P1 |
-| Deployment | No config for any target; build-order gap | Medium (dormant) | Low | P1 |
-| Auth endpoint hardening | No dedicated throttling | Medium | Low | P2 |
-| Analytics query performance | Missing index, unbounded in-memory pagination | Medium | Low | P2 |
-| E2E suite architecture | Per-test app boot, no parallelism | Low (DX only) | Medium | P2 |
-| Shared validation package | 12-file library, zero adoption | Low | Medium (decision) | P2 |
-| Development service size | 1753-line god service | Low | Medium | P3 |
-| Dead/orphaned files | 8 confirmed-dead + 14 orphaned specs | Low | Low | P3 |
+| Area                        | Current Problem                                      |             Risk |        Difficulty | Priority |
+| --------------------------- | ---------------------------------------------------- | ---------------: | ----------------: | -------: |
+| Background jobs             | Scheduler dormant, dual pipelines registered         |             High |               Low |       P0 |
+| CI pipeline                 | Untouched since test-suite relocation; likely broken |             High |               Low |       P0 |
+| Repositories module         | Hardcoded dev slug, zero tests, second HTTP client   |             High |           Low–Med |       P1 |
+| Frontend error handling     | No error boundaries anywhere                         |           Medium |               Low |       P1 |
+| Frontend test coverage      | Large dashboards near-zero coverage                  |           Medium |              High |       P1 |
+| Deployment                  | No config for any target; build-order gap            | Medium (dormant) |               Low |       P1 |
+| Auth endpoint hardening     | No dedicated throttling                              |           Medium |               Low |       P2 |
+| Analytics query performance | Missing index, unbounded in-memory pagination        |           Medium |               Low |       P2 |
+| E2E suite architecture      | Per-test app boot, no parallelism                    |    Low (DX only) |            Medium |       P2 |
+| Shared validation package   | 12-file library, zero adoption                       |              Low | Medium (decision) |       P2 |
+| Development service size    | 1753-line god service                                |              Low |            Medium |       P3 |
+| Dead/orphaned files         | 8 confirmed-dead + 14 orphaned specs                 |              Low |               Low |       P3 |
 
 ---
 
 ## Testing Gap Matrix
 
-| Feature | Existing Coverage | Missing Coverage | Risk |
-|---|---|---|---|
-| Auth (login/register/refresh) | Strong — unit + e2e + frontend tests | Auth-endpoint rate-limit behavior itself | Low |
-| Analytics processing pipeline | Good unit/e2e coverage of the logic | No test asserts the scheduler actually fires (can't, until ARCH-01) | High — the untested path is exactly the dead one |
-| Repositories / GitHub import (backend) | None | OAuth/PKCE flow, webhook HMAC verification, analyzer edge cases | Medium-High — newest, least-verified surface |
-| Repositories / code explorer (frontend) | Leaf components only (tree, diff, viewer) | Orchestrating components: repositories-dashboard, code-explorer, github-callback/setup clients | Medium — race conditions in FE-06 are exactly here |
-| Large dashboards (monitoring, releases, integrations) | Small sub-component tests only | The dashboards themselves — 700-950 line files at ~0% | Medium |
-| Redis reconnect / advisory-lock contention | None | Simulated connection drop, concurrent lock acquisition, release-on-error | Medium |
-| Webhook retry/backoff/dead-letter | Partial | Full retry-count and backoff-timing assertions | Medium |
-| Tracker real-browser edge cases | Core flows covered (5 real-Chrome tests) | Offline-network retry, real DNT enforcement, real consent UI, multi-session/timeout | Low — already flagged as known/optional |
+| Feature                                               | Existing Coverage                         | Missing Coverage                                                                               | Risk                                               |
+| ----------------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| Auth (login/register/refresh)                         | Strong — unit + e2e + frontend tests      | Auth-endpoint rate-limit behavior itself                                                       | Low                                                |
+| Analytics processing pipeline                         | Good unit/e2e coverage of the logic       | No test asserts the scheduler actually fires (can't, until ARCH-01)                            | High — the untested path is exactly the dead one   |
+| Repositories / GitHub import (backend)                | None                                      | OAuth/PKCE flow, webhook HMAC verification, analyzer edge cases                                | Medium-High — newest, least-verified surface       |
+| Repositories / code explorer (frontend)               | Leaf components only (tree, diff, viewer) | Orchestrating components: repositories-dashboard, code-explorer, github-callback/setup clients | Medium — race conditions in FE-06 are exactly here |
+| Large dashboards (monitoring, releases, integrations) | Small sub-component tests only            | The dashboards themselves — 700-950 line files at ~0%                                          | Medium                                             |
+| Redis reconnect / advisory-lock contention            | None                                      | Simulated connection drop, concurrent lock acquisition, release-on-error                       | Medium                                             |
+| Webhook retry/backoff/dead-letter                     | Partial                                   | Full retry-count and backoff-timing assertions                                                 | Medium                                             |
+| Tracker real-browser edge cases                       | Core flows covered (5 real-Chrome tests)  | Offline-network retry, real DNT enforcement, real consent UI, multi-session/timeout            | Low — already flagged as known/optional            |
 
 ---
 
 ## Architecture Improvement Plan
 
 **1. Background processing**
+
 - Current state: fully designed (claim-pattern + Postgres advisory locks, dead-letter handling, status tracking) but never bootstrapped, and exists twice.
 - Recommended state: one registered scheduler, the queue/worker/dead-letter pipeline as canonical, legacy pipeline's provider registration removed entirely (not just disabled).
 - Benefit: restores the entire background-processing layer with zero new logic needed.
 - Migration difficulty: Low for registration; Medium for confidently retiring the legacy pipeline.
 
 **2. Frontend HTTP client**
+
 - Current state: two implementations exist again (the consolidated one, plus the new repositories-only one).
 - Recommended state: one client, used everywhere, with a lint rule or code-review checklist item that catches a new fetch wrapper being introduced.
 - Benefit: prevents this exact regression from recurring a third time.
 - Migration difficulty: Low for the code; the harder part is process.
 
 **3. CI ↔ test-suite alignment**
+
 - Current state: CI configuration and the test-suite's actual shape have drifted apart.
 - Recommended state: CI provisions exactly what `pnpm test` needs (Postgres, Redis, Chrome), split into fast (unit) and slow (e2e/Playwright) jobs.
 - Benefit: CI becomes trustworthy again.
@@ -526,13 +540,13 @@ Request-ID generation/propagation middleware exists and is test-covered. Structu
 
 ## Security Remediation Plan
 
-| Finding | Severity | Attack Scenario | Fix |
-|---|---|---|---|
-| SEC-01 | P1 | Credential-stuffing / brute-force against login with only a shared 100/min/IP budget | Add `@Throttle` override on login/register/refresh |
-| SEC-02 | P2 | Authenticated caller rotates `X-Tracking-Key` per request to bypass webhook/invitation rate limits | Key the throttle on authenticated `userId`/`workspaceId`, not client-supplied headers |
-| BE-01 | P1 | Not an attack — a functional break, but security-adjacent: users are silently redirected to install the wrong GitHub App | Restore `GITHUB_APP_SLUG` env read |
-| FE-05 | P2 | Would require a compromised backend response to redirect a user off-domain on page load | Allowlist `authorizationUrl`'s host before navigating |
-| SEC-03 | P3 | Guessable IP-hash salt if never set, weakening visitor-IP anonymization | Require `ANALYTICS_IP_HASH_SALT` explicitly in production |
+| Finding | Severity | Attack Scenario                                                                                                          | Fix                                                                                   |
+| ------- | -------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| SEC-01  | P1       | Credential-stuffing / brute-force against login with only a shared 100/min/IP budget                                     | Add `@Throttle` override on login/register/refresh                                    |
+| SEC-02  | P2       | Authenticated caller rotates `X-Tracking-Key` per request to bypass webhook/invitation rate limits                       | Key the throttle on authenticated `userId`/`workspaceId`, not client-supplied headers |
+| BE-01   | P1       | Not an attack — a functional break, but security-adjacent: users are silently redirected to install the wrong GitHub App | Restore `GITHUB_APP_SLUG` env read                                                    |
+| FE-05   | P2       | Would require a compromised backend response to redirect a user off-domain on page load                                  | Allowlist `authorizationUrl`'s host before navigating                                 |
+| SEC-03  | P3       | Guessable IP-hash salt if never set, weakening visitor-IP anonymization                                                  | Require `ANALYTICS_IP_HASH_SALT` explicitly in production                             |
 
 ---
 
@@ -540,25 +554,26 @@ Request-ID generation/propagation middleware exists and is test-covered. Structu
 
 _Nothing below was removed as part of this audit._
 
-| File / Symbol | Reason | Confidence |
-|---|---|---|
-| `analytics-processing.service.fixed.ts` | 0 bytes, zero references | Definite |
-| `apps/api/src/health/*` | Orphaned duplicate of the real health module | Definite |
-| `analytics-engine/controllers/analytics-ingestion.controller.ts` | Not wired into its module's controller list | Definite |
-| `apps/web/src/providers/app-providers.tsx` | Zero references | Definite |
-| `common/filters/http-exception.filter.ts` | Unreferenced, superseded by `AllExceptionsFilter` | Definite (after confirming the error-shape decision in BE-03) |
-| `apps/tracker/src/index.ts` | Unbuilt, unimported stub | Definite |
-| 2× `activity-feed.tsx.backup-*` | Stale pre-migration snapshots | Definite |
-| `pnpm-workspace.yaml.backup` | Predates current workspace glob | Definite |
-| 14 duplicate `.spec.ts` under `apps/api/src/**` | Superseded by `packages/test-code/api/unit/`, never executed | High — verify the new copies are complete replacements first |
-| `apps/api/jest.config.cjs` | Orphaned — no script references it anymore | High |
-| `packages/validation` (whole package) | Zero consumers despite 12-file investment | Needs a decision, not just confirmation — see PKG-01 |
+| File / Symbol                                                    | Reason                                                       | Confidence                                                    |
+| ---------------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------- |
+| `analytics-processing.service.fixed.ts`                          | 0 bytes, zero references                                     | Definite                                                      |
+| `apps/api/src/health/*`                                          | Orphaned duplicate of the real health module                 | Definite                                                      |
+| `analytics-engine/controllers/analytics-ingestion.controller.ts` | Not wired into its module's controller list                  | Definite                                                      |
+| `apps/web/src/providers/app-providers.tsx`                       | Zero references                                              | Definite                                                      |
+| `common/filters/http-exception.filter.ts`                        | Unreferenced, superseded by `AllExceptionsFilter`            | Definite (after confirming the error-shape decision in BE-03) |
+| `apps/tracker/src/index.ts`                                      | Unbuilt, unimported stub                                     | Definite                                                      |
+| 2× `activity-feed.tsx.backup-*`                                  | Stale pre-migration snapshots                                | Definite                                                      |
+| `pnpm-workspace.yaml.backup`                                     | Predates current workspace glob                              | Definite                                                      |
+| 14 duplicate `.spec.ts` under `apps/api/src/**`                  | Superseded by `packages/test-code/api/unit/`, never executed | High — verify the new copies are complete replacements first  |
+| `apps/api/jest.config.cjs`                                       | Orphaned — no script references it anymore                   | High                                                          |
+| `packages/validation` (whole package)                            | Zero consumers despite 12-file investment                    | Needs a decision, not just confirmation — see PKG-01          |
 
 ---
 
 ## Final Prioritized Roadmap
 
 ### Phase 1 — Critical Stability & CI Trust
+
 ```text
 [ ] Confirm actual current CI pass/fail status
 [ ] Fix CI: Postgres/Redis service containers, prisma generate, --frozen-lockfile, Chrome install for Playwright
@@ -567,6 +582,7 @@ _Nothing below was removed as part of this audit._
 ```
 
 ### Phase 2 — Backend Correctness
+
 ```text
 [ ] Add auth-endpoint rate limiting; fix the header-trust rate-limit bypass
 [ ] Add the processedAt index before the scheduler goes live
@@ -574,6 +590,7 @@ _Nothing below was removed as part of this audit._
 ```
 
 ### Phase 3 — Frontend Correctness
+
 ```text
 [ ] Delete repositoryRequest, route repositories/code-explorer through the shared client
 [ ] Add error.tsx/global-error.tsx boundaries
@@ -582,6 +599,7 @@ _Nothing below was removed as part of this audit._
 ```
 
 ### Phase 4 — Database Reliability
+
 ```text
 [ ] Add a CHECK/trigger or integration test for the owner/membership invariant
 [ ] SQL-paginate loadDimensionReport
@@ -589,6 +607,7 @@ _Nothing below was removed as part of this audit._
 ```
 
 ### Phase 5 — Testing
+
 ```text
 [ ] Convert 40 beforeEach-boot e2e files to beforeAll
 [ ] Write tests for the repositories backend module and the new GitHub frontend components
@@ -597,6 +616,7 @@ _Nothing below was removed as part of this audit._
 ```
 
 ### Phase 6 — Performance
+
 ```text
 [ ] Batch per-raw-event processing once the scheduler is live
 [ ] Parallelize the per-installation GitHub API loop
@@ -604,6 +624,7 @@ _Nothing below was removed as part of this audit._
 ```
 
 ### Phase 7 — Architecture & Cleanup
+
 ```text
 [ ] Split DevelopmentService
 [ ] Decide the fate of packages/validation
@@ -616,20 +637,20 @@ _Nothing below was removed as part of this audit._
 
 ## Final Scorecard
 
-| Category | Score | Reason |
-|---|---:|---|
-| Architecture | 7/10 | Clean module boundaries; two P0s dormant since 08-09 |
-| Backend | 6.5/10 | Strong auth/authz fundamentals; core scheduler/pipeline bugs unfixed |
-| Frontend | 5.5/10 | Real consolidation progress, offset by a fresh regression (FE-02) and persistent gaps |
-| Database | 8/10 | Excellent schema discipline maintained through new feature work, no new tenant-isolation gaps |
-| Security | 6.5/10 | Strong crypto/session/CORS/secrets hygiene; auth rate limiting still missing |
-| Type Safety | 7/10 | Shared-types adoption fixed real drift; one tsconfig drift regression in tracker |
-| Error Handling | 5/10 | Two competing filters unresolved; no centralized Prisma error translation |
-| Testing | 5/10 | Substantial, passing suites; CI likely cannot execute them right now |
-| Performance | 6/10 | Mostly efficient; documented hotspots unchanged |
-| Maintainability | 6/10 | Oversized service persists; shared-package adoption genuinely improved this |
-| Observability | 5/10 | Request IDs and structured exceptions exist; no signal for silently-dead background jobs |
-| Deployment Readiness | 2/10 | No configuration exists for any target; a build-order gap would break a naive first attempt |
+| Category             |  Score | Reason                                                                                        |
+| -------------------- | -----: | --------------------------------------------------------------------------------------------- |
+| Architecture         |   7/10 | Clean module boundaries; two P0s dormant since 08-09                                          |
+| Backend              | 6.5/10 | Strong auth/authz fundamentals; core scheduler/pipeline bugs unfixed                          |
+| Frontend             | 5.5/10 | Real consolidation progress, offset by a fresh regression (FE-02) and persistent gaps         |
+| Database             |   8/10 | Excellent schema discipline maintained through new feature work, no new tenant-isolation gaps |
+| Security             | 6.5/10 | Strong crypto/session/CORS/secrets hygiene; auth rate limiting still missing                  |
+| Type Safety          |   7/10 | Shared-types adoption fixed real drift; one tsconfig drift regression in tracker              |
+| Error Handling       |   5/10 | Two competing filters unresolved; no centralized Prisma error translation                     |
+| Testing              |   5/10 | Substantial, passing suites; CI likely cannot execute them right now                          |
+| Performance          |   6/10 | Mostly efficient; documented hotspots unchanged                                               |
+| Maintainability      |   6/10 | Oversized service persists; shared-package adoption genuinely improved this                   |
+| Observability        |   5/10 | Request IDs and structured exceptions exist; no signal for silently-dead background jobs      |
+| Deployment Readiness |   2/10 | No configuration exists for any target; a build-order gap would break a naive first attempt   |
 
 **Overall Score: 58 / 100**
 **Production Readiness: Not Ready**

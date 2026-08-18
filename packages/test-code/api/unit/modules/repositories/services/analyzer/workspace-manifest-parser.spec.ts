@@ -2,7 +2,7 @@ import { parsePackageJsonWorkspaceGlobs, parsePnpmWorkspaceGlobs } from 'src/mod
 
 describe('parsePnpmWorkspaceGlobs', () => {
   it('extracts quoted globs from a standard pnpm-workspace.yaml', () => {
-    const yaml = ["packages:", "  - 'apps/*'", "  - 'packages/*'", '', 'nodeLinker: hoisted'].join('\n');
+    const yaml = ['packages:', "  - 'apps/*'", "  - 'packages/*'", '', 'nodeLinker: hoisted'].join('\n');
 
     expect(parsePnpmWorkspaceGlobs(yaml)).toEqual(['apps/*', 'packages/*']);
   });

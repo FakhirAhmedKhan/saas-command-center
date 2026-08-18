@@ -1,9 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-async function registerAccount(
-  page: import('@playwright/test').Page,
-  options: { name: string; email: string; password: string },
-): Promise<void> {
+async function registerAccount(page: import('@playwright/test').Page, options: { name: string; email: string; password: string }): Promise<void> {
   await page.goto('/register');
 
   await page.getByLabel('Name').fill(options.name);

@@ -1,7 +1,14 @@
 import { GithubAppService } from 'src/modules/repositories/services/github-app.service';
 import { generateKeyPairSync } from 'node:crypto';
 
-const GITHUB_ENV_KEYS = ['GITHUB_APP_SLUG', 'GITHUB_APP_CLIENT_ID', 'GITHUB_APP_CLIENT_SECRET', 'GITHUB_APP_CALLBACK_URL', 'GITHUB_APP_WEBHOOK_SECRET', 'GITHUB_APP_PRIVATE_KEY_BASE64'] as const;
+const GITHUB_ENV_KEYS = [
+  'GITHUB_APP_SLUG',
+  'GITHUB_APP_CLIENT_ID',
+  'GITHUB_APP_CLIENT_SECRET',
+  'GITHUB_APP_CALLBACK_URL',
+  'GITHUB_APP_WEBHOOK_SECRET',
+  'GITHUB_APP_PRIVATE_KEY_BASE64',
+] as const;
 
 function validPrivateKeyBase64(): string {
   const { privateKey } = generateKeyPairSync('rsa', {
@@ -62,7 +69,9 @@ describe(GithubAppService.name, () => {
     it('throws a clear ServiceUnavailableException when GITHUB_APP_CLIENT_ID is missing', () => {
       process.env.GITHUB_APP_CALLBACK_URL = 'http://localhost:3000/github/callback';
 
-      expect(() => service.buildUserAuthorizationUrl('state-1', 'challenge-1')).toThrow('GitHub integration is not configured: GITHUB_APP_CLIENT_ID is missing.');
+      expect(() => service.buildUserAuthorizationUrl('state-1', 'challenge-1')).toThrow(
+        'GitHub integration is not configured: GITHUB_APP_CLIENT_ID is missing.',
+      );
     });
 
     it('throws before making any network call', async () => {
@@ -179,12 +188,11 @@ describe(GithubAppService.name, () => {
     it('accepts a well-formed RSA private key and proceeds to call the GitHub API', async () => {
       process.env.GITHUB_APP_PRIVATE_KEY_BASE64 = validPrivateKeyBase64();
 
-      fetchMock
-        .mockResolvedValueOnce({
-          ok: true,
-          status: 200,
-          text: async () => JSON.stringify({ id: 123, account: { login: 'octocat', type: 'User' } }),
-        });
+      fetchMock.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ id: 123, account: { login: 'octocat', type: 'User' } }),
+      });
 
       const installation = await service.getInstallation('123');
 

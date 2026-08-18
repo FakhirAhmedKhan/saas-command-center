@@ -50,7 +50,11 @@ export function AnalysisProgress({ repository }: AnalysisProgressProps) {
               <li key={label} className='flex items-center gap-2.5 text-sm'>
                 <span
                   className={`flex size-5 shrink-0 items-center justify-center rounded-full border transition ${
-                    isComplete ? 'border-emerald-500 bg-emerald-500 text-white' : isActive ? 'border-brand-500 text-brand-600' : 'border-slate-200 text-transparent'
+                    isComplete
+                      ? 'border-emerald-500 bg-emerald-500 text-white'
+                      : isActive
+                        ? 'border-brand-500 text-brand-600'
+                        : 'border-slate-200 text-transparent'
                   }`}
                 >
                   {isComplete ? (

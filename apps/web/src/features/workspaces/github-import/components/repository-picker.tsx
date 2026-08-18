@@ -61,7 +61,9 @@ export function RepositoryPicker({ error, onSelect, onReconnect }: RepositoryPic
       return repositories;
     }
 
-    return repositories.filter((repository) => repository.fullName.toLowerCase().includes(query) || (repository.description ?? '').toLowerCase().includes(query));
+    return repositories.filter(
+      (repository) => repository.fullName.toLowerCase().includes(query) || (repository.description ?? '').toLowerCase().includes(query),
+    );
   }, [repositories, search]);
 
   if (loading) {

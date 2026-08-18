@@ -197,14 +197,8 @@ async function registerIdentity(app: INestApplication, label: string): Promise<I
   return { token, userId: user.id, email: userInput.email };
 }
 
-async function connectPersonalGithub(
-  app: INestApplication,
-  identity: Identity,
-  installationId: string = DEFAULT_INSTALLATION_ID,
-): Promise<void> {
-  const beginResponse = await request(app.getHttpServer())
-    .post(`${API_PREFIX}/repositories/github/personal/connect`)
-    .set(withBearer(identity.token));
+async function connectPersonalGithub(app: INestApplication, identity: Identity, installationId: string = DEFAULT_INSTALLATION_ID): Promise<void> {
+  const beginResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/connect`).set(withBearer(identity.token));
 
   expect(beginResponse.status).toBe(201);
 
@@ -270,9 +264,7 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
     it('allows any authenticated user to begin a personal connect without an existing workspace', async () => {
       const identity = await registerIdentity(app, 'Personal Connect');
 
-      const response = await request(app.getHttpServer())
-        .post(`${API_PREFIX}/repositories/github/personal/connect`)
-        .set(withBearer(identity.token));
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/connect`).set(withBearer(identity.token));
 
       expect(response.status).toBe(201);
 
@@ -286,9 +278,7 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
     it('rejects the callback when the GitHub user cannot access the installation', async () => {
       const identity = await registerIdentity(app, 'Denied Personal Connect');
 
-      const beginResponse = await request(app.getHttpServer())
-        .post(`${API_PREFIX}/repositories/github/personal/connect`)
-        .set(withBearer(identity.token));
+      const beginResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/connect`).set(withBearer(identity.token));
 
       const installState = queryParameter(requireString(responseRecord(beginResponse), 'installationUrl'), 'state');
 
@@ -326,9 +316,7 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
     it('rejects listing repositories before GitHub is connected', async () => {
       const identity = await registerIdentity(app, 'No Repos Yet');
 
-      const response = await request(app.getHttpServer())
-        .get(`${API_PREFIX}/repositories/github/personal`)
-        .set(withBearer(identity.token));
+      const response = await request(app.getHttpServer()).get(`${API_PREFIX}/repositories/github/personal`).set(withBearer(identity.token));
 
       expect(response.status).toBe(200);
       expect(responseRecord(response)).toEqual({
@@ -342,9 +330,7 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
 
       await connectPersonalGithub(app, identity);
 
-      const response = await request(app.getHttpServer())
-        .get(`${API_PREFIX}/repositories/github/personal`)
-        .set(withBearer(identity.token));
+      const response = await request(app.getHttpServer()).get(`${API_PREFIX}/repositories/github/personal`).set(withBearer(identity.token));
 
       expect(response.status).toBe(200);
 
@@ -693,17 +679,11 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
         applications: [{ name: 'Duplicate App', rootDirectory: '.' }],
       };
 
-      const first = await request(app.getHttpServer())
-        .post(`${API_PREFIX}/workspaces/import/github`)
-        .set(withBearer(identity.token))
-        .send(importPayload);
+      const first = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces/import/github`).set(withBearer(identity.token)).send(importPayload);
 
       expect(first.status).toBe(201);
 
-      const second = await request(app.getHttpServer())
-        .post(`${API_PREFIX}/workspaces/import/github`)
-        .set(withBearer(identity.token))
-        .send(importPayload);
+      const second = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces/import/github`).set(withBearer(identity.token)).send(importPayload);
 
       expect(second.status).toBe(201);
 

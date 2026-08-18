@@ -5,16 +5,23 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { getReleaseOptionsMock, getReleasesMock, getDeploymentsMock, getCurrentVersionsMock, createReleaseMock, createDeploymentMock, transitionDeploymentMock } =
-  vi.hoisted(() => ({
-    getReleaseOptionsMock: vi.fn(),
-    getReleasesMock: vi.fn(),
-    getDeploymentsMock: vi.fn(),
-    getCurrentVersionsMock: vi.fn(),
-    createReleaseMock: vi.fn(),
-    createDeploymentMock: vi.fn(),
-    transitionDeploymentMock: vi.fn(),
-  }));
+const {
+  getReleaseOptionsMock,
+  getReleasesMock,
+  getDeploymentsMock,
+  getCurrentVersionsMock,
+  createReleaseMock,
+  createDeploymentMock,
+  transitionDeploymentMock,
+} = vi.hoisted(() => ({
+  getReleaseOptionsMock: vi.fn(),
+  getReleasesMock: vi.fn(),
+  getDeploymentsMock: vi.fn(),
+  getCurrentVersionsMock: vi.fn(),
+  createReleaseMock: vi.fn(),
+  createDeploymentMock: vi.fn(),
+  transitionDeploymentMock: vi.fn(),
+}));
 
 vi.mock('@/features/releases/release-management-api', () => ({
   getReleaseOptions: getReleaseOptionsMock,

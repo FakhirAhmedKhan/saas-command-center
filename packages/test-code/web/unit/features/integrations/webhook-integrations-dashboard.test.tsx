@@ -5,15 +5,21 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { getWebhookEndpointsMock, disableWebhookEndpointMock, updateWebhookEndpointMock, createWebhookEndpointMock, rotateWebhookSecretMock, sendWebhookTestMock } =
-  vi.hoisted(() => ({
-    getWebhookEndpointsMock: vi.fn(),
-    disableWebhookEndpointMock: vi.fn(),
-    updateWebhookEndpointMock: vi.fn(),
-    createWebhookEndpointMock: vi.fn(),
-    rotateWebhookSecretMock: vi.fn(),
-    sendWebhookTestMock: vi.fn(),
-  }));
+const {
+  getWebhookEndpointsMock,
+  disableWebhookEndpointMock,
+  updateWebhookEndpointMock,
+  createWebhookEndpointMock,
+  rotateWebhookSecretMock,
+  sendWebhookTestMock,
+} = vi.hoisted(() => ({
+  getWebhookEndpointsMock: vi.fn(),
+  disableWebhookEndpointMock: vi.fn(),
+  updateWebhookEndpointMock: vi.fn(),
+  createWebhookEndpointMock: vi.fn(),
+  rotateWebhookSecretMock: vi.fn(),
+  sendWebhookTestMock: vi.fn(),
+}));
 
 vi.mock('@/features/integrations/integrations-api', () => ({
   getWebhookEndpoints: getWebhookEndpointsMock,
