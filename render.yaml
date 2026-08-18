@@ -1,0 +1,206 @@
+\
+# Render Blueprint for the SaaS Command Center API.
+#
+# This deploys apps/api as a native Node web service — no Dockerfile is used.
+# NestJS builds to plain JS (`nest build` -> apps/api/dist/main.js) and has no
+# native-binary/OS-level dependency that would require a container, so a
+# Dockerfile would only add build-time overhead without a corresponding
+# benefit here.
+#
+# Secrets are intentionally NOT set to real values in this file (sync: false
+# means "set this in the Render dashboard, not in git"). See docs/DEPLOYMENT.md
+# for the full environment-variable inventory and where each value comes from.
+#
+# Two services are declared: production and staging. Create the staging one
+# first and do not promote to production until Phase 8's staging checklist
+# passes (see docs/DEPLOYMENT.md).
+
+services:
+  - type: web
+    name: command-center-api
+    runtime: node
+    plan: starter
+    region: oregon
+    branch: main
+
+    buildCommand: >-
+      pnpm install --frozen-lockfile &&
+      pnpm build:packages &&
+      pnpm --filter @command-center/api exec prisma generate &&
+      pnpm --filter @command-center/api build
+
+    startCommand: node apps/api/dist/main.js
+
+    healthCheckPath: /api/v1/health
+
+    autoDeploy: true
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+
+      # Trust exactly Render's own front door — Render terminates TLS and
+      # proxies through one hop, so req.ip should reflect the first
+      # X-Forwarded-For entry. Do not set this to `true` (would trust an
+      # attacker-supplied header if Render's topology ever changes).
+      - key: TRUST_PROXY
+        value: '1'
+
+      - key: SWAGGER_ENABLED
+        value: 'false'
+
+      # --- Database (Neon) ---
+      - key: DATABASE_URL
+        sync: false
+
+      # --- Redis (managed provider) ---
+      - key: REDIS_URL
+        sync: false
+
+      # --- Auth secrets — generate fresh values per environment, never reuse
+      #     a value that has ever appeared in a commit, chat log, or screenshot ---
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: INVITATION_TOKEN_PEPPER
+        sync: false
+      - key: WEBHOOK_ENCRYPTION_KEY
+        sync: false
+      - key: ANALYTICS_IP_HASH_SALT
+        sync: false
+
+      # --- Cookies ---
+      - key: COOKIE_NAME
+        value: command_center_refresh_token
+      - key: COOKIE_SECURE
+        value: 'true'
+      # Frontend (Vercel) and backend (Render) are different sites, so the
+      # refresh cookie must be sent cross-site. This REQUIRES SameSite=None,
+      # which in turn requires Secure=true (already set above) — see
+      # docs/DEPLOYMENT.md "Cookies" section for why `lax` would break login.
+      - key: COOKIE_SAME_SITE
+        value: none
+      # Left unset intentionally: Vercel and Render domains share no parent
+      # domain, so a COOKIE_DOMAIN value would make the cookie unroutable.
+      # Host-only (unset) is correct here.
+
+      # --- CORS / frontend origin ---
+      - key: FRONTEND_URL
+        sync: false # e.g. https://app.example.com (staging: https://staging.example.com)
+      - key: CORS_ORIGINS
+        sync: false # same value(s) as FRONTEND_URL, comma-separated if more than one
+
+      # --- GitHub App (production/staging must use separate GitHub Apps) ---
+      - key: GITHUB_APP_SLUG
+        sync: false
+      - key: GITHUB_APP_CLIENT_ID
+        sync: false
+      - key: GITHUB_APP_CLIENT_SECRET
+        sync: false
+      - key: GITHUB_APP_CALLBACK_URL
+        sync: false # frontend route: https://<web-domain>/github/callback
+      - key: GITHUB_APP_WEBHOOK_SECRET
+        sync: false
+      - key: GITHUB_APP_PRIVATE_KEY_BASE64
+        sync: false
+
+      # --- Background workers / scheduler ---
+      # These stay on their code defaults (see apps/api/src/config/env.validation.ts)
+      # unless there's a specific reason to override per environment.
+      - key: ANALYTICS_SCHEDULER_ENABLED
+        value: 'true'
+      - key: HEALTH_MONITOR_ENABLED
+        value: 'true'
+      - key: WEBHOOK_WORKER_ENABLED
+        value: 'true'
+      - key: WEBHOOK_CLEANUP_ENABLED
+        value: 'true'
+      - key: NOTIFICATION_CLEANUP_ENABLED
+        value: 'true'
+
+  - type: web
+    name: command-center-api-staging
+    runtime: node
+    plan: starter
+    region: oregon
+    branch: devlopment
+
+    buildCommand: >-
+      pnpm install --frozen-lockfile &&
+      pnpm build:packages &&
+      pnpm --filter @command-center/api exec prisma generate &&
+      pnpm --filter @command-center/api build
+
+    startCommand: node apps/api/dist/main.js
+
+    healthCheckPath: /api/v1/health
+
+    autoDeploy: true
+
+    envVars:
+      - key: NODE_ENV
+        value: production # intentionally "production" mode (not "development") so
+                           # staging exercises the same validation/security posture
+                           # as prod; it is a separate Render service/DB/Redis, not
+                           # a lighter-weight environment.
+      - key: PORT
+        value: 4000
+      - key: TRUST_PROXY
+        value: '1'
+      - key: SWAGGER_ENABLED
+        value: 'true' # fine to leave on in staging for manual API exploration
+
+      - key: DATABASE_URL
+        sync: false # a SEPARATE Neon database/branch from production — see docs/DEPLOYMENT.md
+      - key: REDIS_URL
+        sync: false # a SEPARATE Redis instance/database index from production
+
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: INVITATION_TOKEN_PEPPER
+        sync: false
+      - key: WEBHOOK_ENCRYPTION_KEY
+        sync: false
+      - key: ANALYTICS_IP_HASH_SALT
+        sync: false
+
+      - key: COOKIE_NAME
+        value: command_center_refresh_token
+      - key: COOKIE_SECURE
+        value: 'true'
+      - key: COOKIE_SAME_SITE
+        value: none
+
+      - key: FRONTEND_URL
+        sync: false # e.g. https://command-center-staging.vercel.app
+      - key: CORS_ORIGINS
+        sync: false
+
+      - key: GITHUB_APP_SLUG
+        sync: false # a SEPARATE staging GitHub App — never reuse the production App
+      - key: GITHUB_APP_CLIENT_ID
+        sync: false
+      - key: GITHUB_APP_CLIENT_SECRET
+        sync: false
+      - key: GITHUB_APP_CALLBACK_URL
+        sync: false
+      - key: GITHUB_APP_WEBHOOK_SECRET
+        sync: false
+      - key: GITHUB_APP_PRIVATE_KEY_BASE64
+        sync: false
+
+      - key: ANALYTICS_SCHEDULER_ENABLED
+        value: 'true'
+      - key: HEALTH_MONITOR_ENABLED
+        value: 'true'
+      - key: WEBHOOK_WORKER_ENABLED
+        value: 'true'
+      - key: WEBHOOK_CLEANUP_ENABLED
+        value: 'true'
+      - key: NOTIFICATION_CLEANUP_ENABLED
+        value: 'true'

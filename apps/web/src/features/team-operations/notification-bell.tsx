@@ -1,13 +1,20 @@
 'use client';
 
 import { getUnreadNotificationCount } from './team-operations-api';
+import { usePageVisibility } from '@/hooks/use-page-visibility';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 export function NotificationBell() {
   const [count, setCount] = useState(0);
 
+  const visible = usePageVisibility();
+
   useEffect(() => {
+    if (!visible) {
+      return;
+    }
+
     let active = true;
 
     async function load(): Promise<void> {
@@ -39,7 +46,7 @@ export function NotificationBell() {
 
       window.clearInterval(timer);
     };
-  }, []);
+  }, [visible]);
 
   return (
     <Link

@@ -23,11 +23,13 @@ describe('Infrastructure E2E', () => {
 
   let accessToken: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     app = await createTestApp();
 
     prisma = app.get(PrismaService);
+  });
 
+  beforeEach(async () => {
     await resetDatabase(prisma);
 
     const agent = createAgent(app);
@@ -37,7 +39,7 @@ describe('Infrastructure E2E', () => {
     accessToken = readAccessToken(await registerUser(agent, user));
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await app.close();
   });
 

@@ -17,6 +17,7 @@ export default defineConfig({
   testDir: './e2e/full-stack',
 
   globalSetup: './e2e/full-stack/global-setup.ts',
+  globalTeardown: './e2e/full-stack/global-teardown.ts',
 
   fullyParallel: false,
   workers: 1,

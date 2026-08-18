@@ -81,6 +81,8 @@ export interface EnvironmentVariables {
 
   WEBHOOK_RETENTION_DAYS: number;
   WEBHOOK_CLEANUP_ENABLED: boolean;
+
+  GITHUB_CONNECT_INTENT_CLEANUP_ENABLED: boolean;
 }
 function getOptionalString(config: Record<string, unknown>, key: string): string | undefined {
   const value = config[key];
@@ -347,6 +349,8 @@ export function validateEnvironment(config: Record<string, unknown>): Environmen
     WEBHOOK_RETENTION_DAYS: getPositiveInteger(config, 'WEBHOOK_RETENTION_DAYS', 90),
 
     WEBHOOK_CLEANUP_ENABLED: getBoolean(config, 'WEBHOOK_CLEANUP_ENABLED', true),
+
+    GITHUB_CONNECT_INTENT_CLEANUP_ENABLED: getBoolean(config, 'GITHUB_CONNECT_INTENT_CLEANUP_ENABLED', true),
     INVITATION_TOKEN_PEPPER: invitationTokenPepper,
 
     INVITATION_TTL_HOURS: getPositiveInteger(config, 'INVITATION_TTL_HOURS', 72),

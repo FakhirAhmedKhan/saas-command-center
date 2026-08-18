@@ -36,15 +36,17 @@ describe('Development E2E', () => {
 
   let prisma: PrismaService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     app = await createTestApp();
 
     prisma = app.get(PrismaService);
+  });
 
+  beforeEach(async () => {
     await resetDatabase(prisma);
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await app.close();
   });
 
@@ -310,6 +312,124 @@ describe('Development E2E', () => {
     const taskResponse = await updateTask(owner, secondApplication.id, firstTask.id, {
       title: 'Wrong Application Task',
     });
+
+    expectBusinessRuleRejected(taskResponse);
+  });
+
+  it('creates a blocker referencing a valid milestone and task combination (DB-05)', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
+
+    const application = await createApplication(owner);
+
+    const milestone = await createMilestone(owner, application.id);
+
+    const task = await createTask(owner, application.id, milestone.id);
+
+    const blocker = await createBlocker(owner, application.id, {
+      title: 'Valid combination blocker',
+      milestoneId: milestone.id,
+      taskId: task.id,
+    });
+
+    expect(blocker.record.milestoneId).toBe(milestone.id);
+    expect(blocker.record.taskId).toBe(task.id);
+  });
+
+  it('rejects a blocker referencing a milestone from another application (DB-05)', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
+
+    const firstApplication = await createApplication(owner);
+
+    const secondApplication = await createApplication(owner);
+
+    const foreignMilestone = await createMilestone(owner, secondApplication.id);
+
+    const response = await owner.agent
+      .post(developmentRoutes.blockers(owner.workspaceId, firstApplication.id))
+      .set('Authorization', `Bearer ${owner.accessToken}`)
+      .send({
+        title: 'Blocker with mismatched milestone',
+        milestoneId: foreignMilestone.id,
+      });
+
+    expectBusinessRuleRejected(response);
+  });
+
+  it('rejects a blocker referencing a task from another application (DB-05)', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
+
+    const firstApplication = await createApplication(owner);
+
+    const secondApplication = await createApplication(owner);
+
+    const foreignMilestone = await createMilestone(owner, secondApplication.id);
+
+    const foreignTask = await createTask(owner, secondApplication.id, foreignMilestone.id);
+
+    const response = await owner.agent
+      .post(developmentRoutes.blockers(owner.workspaceId, firstApplication.id))
+      .set('Authorization', `Bearer ${owner.accessToken}`)
+      .send({
+        title: 'Blocker with mismatched task',
+        taskId: foreignTask.id,
+      });
+
+    expectBusinessRuleRejected(response);
+  });
+
+  it('rejects a blocker whose task does not belong to the supplied milestone (DB-05)', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
+
+    const application = await createApplication(owner);
+
+    const firstMilestone = await createMilestone(owner, application.id);
+
+    const secondMilestone = await createMilestone(owner, application.id);
+
+    const taskUnderFirstMilestone = await createTask(owner, application.id, firstMilestone.id);
+
+    const response = await owner.agent
+      .post(developmentRoutes.blockers(owner.workspaceId, application.id))
+      .set('Authorization', `Bearer ${owner.accessToken}`)
+      .send({
+        title: 'Blocker with milestone/task mismatch',
+        milestoneId: secondMilestone.id,
+        taskId: taskUnderFirstMilestone.id,
+      });
+
+    expectBusinessRuleRejected(response);
+  });
+
+  it('rejects a blocker referencing milestone/task IDs from a foreign workspace (DB-05)', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
+
+    const outsider = await registerWorkspaceTestUser(app, prisma);
+
+    const application = await createApplication(owner);
+
+    const outsiderApplication = await createApplication(outsider);
+
+    const outsiderMilestone = await createMilestone(outsider, outsiderApplication.id);
+
+    const outsiderTask = await createTask(outsider, outsiderApplication.id, outsiderMilestone.id);
+
+    const milestoneResponse = await owner.agent
+      .post(developmentRoutes.blockers(owner.workspaceId, application.id))
+      .set('Authorization', `Bearer ${owner.accessToken}`)
+      .send({
+        title: 'Blocker with foreign-workspace milestone',
+        milestoneId: outsiderMilestone.id,
+      });
+
+    expectBusinessRuleRejected(milestoneResponse);
+
+    const taskResponse = await owner.agent
+      .post(developmentRoutes.blockers(owner.workspaceId, application.id))
+      .set('Authorization', `Bearer ${owner.accessToken}`)
+      .send({
+        title: 'Blocker with foreign-workspace task',
+        taskId: outsiderTask.id,
+      });
 
     expectBusinessRuleRejected(taskResponse);
   });

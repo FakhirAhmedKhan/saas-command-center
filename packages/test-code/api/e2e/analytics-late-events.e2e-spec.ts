@@ -15,17 +15,19 @@ describe('Analytics Late Events E2E', () => {
 
   let processingService: AnalyticsProcessingService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     app = await createTestApp();
 
     prisma = app.get(PrismaService);
 
     processingService = app.get(AnalyticsProcessingService);
+  });
 
+  beforeEach(async () => {
     await resetDatabase(prisma);
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await app.close();
   });
 

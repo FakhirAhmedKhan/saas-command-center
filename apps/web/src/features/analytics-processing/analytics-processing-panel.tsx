@@ -5,7 +5,7 @@ import type { ProcessingRun } from './analytics-processing.types';
 import { useAnalyticsProcessing } from './use-analytics-processing';
 import { getErrorMessage } from '../applications/application-utils';
 import { PageError } from '@/components/states/page-error';
-import { ApiError } from 'next/dist/server/api-utils';
+import { ApiError } from '@/features/lib/api/api-error';
 import { useMemo, useState } from 'react';
 
 interface AnalyticsProcessingPanelProps {
@@ -211,7 +211,7 @@ export function AnalyticsProcessingPanel({ workspaceId, websiteId }: AnalyticsPr
       <PageError
         title='Processing status unavailable'
         message={getErrorMessage(error)}
-        requestId={error instanceof ApiError ? ('requestId' in error && typeof error.requestId === 'string' ? error.requestId : undefined) : undefined}
+        requestId={error instanceof ApiError ? error.requestId : undefined}
         onRetry={reload}
       />
     );

@@ -24,9 +24,10 @@ import type {
 } from './monitoring.types';
 import { getErrorMessage } from '../applications/application-utils';
 import { PageError } from '@/components/states/page-error';
+import { ApiError } from '@/features/lib/api/api-error';
+import { usePageVisibility } from '@/hooks/use-page-visibility';
 import { EmptyState } from '@command-center/ui';
-import { ApiError } from 'next/dist/server/api-utils';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface MonitoringDashboardProps {
   workspaceId: string;
@@ -473,8 +474,16 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
 
   const [actionError, setActionError] = useState<string | null>(null);
 
+  const controllerRef = useRef<AbortController | null>(null);
+
+  const visible = usePageVisibility();
+
   const load = useCallback(async () => {
+    controllerRef.current?.abort();
+
     const controller = new AbortController();
+
+    controllerRef.current = controller;
 
     setLoading(true);
 
@@ -491,6 +500,10 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
         getMonitoringTargets(workspaceId, controller.signal),
       ]);
 
+      if (controller.signal.aborted) {
+        return;
+      }
+
       setData({
         summary,
         checks,
@@ -498,18 +511,30 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
         targets,
       });
     } catch (caughtError) {
+      if (controller.signal.aborted) {
+        return;
+      }
+
       setError(caughtError);
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) {
+        setLoading(false);
+      }
     }
-
-    return () => {
-      controller.abort();
-    };
   }, [workspaceId]);
 
   useEffect(() => {
     void load();
+
+    return () => {
+      controllerRef.current?.abort();
+    };
+  }, [load]);
+
+  useEffect(() => {
+    if (!visible) {
+      return;
+    }
 
     const timer = window.setInterval(() => {
       void load();
@@ -518,7 +543,7 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
     return () => {
       window.clearInterval(timer);
     };
-  }, [load]);
+  }, [load, visible]);
 
   const filteredChecks = useMemo(
     () =>
@@ -609,7 +634,7 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
       <PageError
         title='Monitoring unavailable'
         message={getErrorMessage(error)}
-        requestId={error instanceof ApiError ? ('requestId' in error && typeof error.requestId === 'string' ? error.requestId : undefined) : undefined}
+        requestId={error instanceof ApiError ? error.requestId : undefined}
         onRetry={() => {
           void load();
         }}

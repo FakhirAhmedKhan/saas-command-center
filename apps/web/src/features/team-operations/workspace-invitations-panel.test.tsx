@@ -158,3 +158,52 @@ describe('WorkspaceInvitationsPanel empty and loading states', () => {
     expect(screen.getByText('No workspace invitations have been created.')).toBeInTheDocument();
   });
 });
+
+describe('WorkspaceInvitationsPanel request lifecycle', () => {
+  it('does not throw or leak a state update when the in-flight request is aborted by unmount', async () => {
+    let rejectInvitations: (reason: unknown) => void = () => {};
+
+    getWorkspaceInvitationsMock.mockImplementation(
+      () =>
+        new Promise((_resolve, reject) => {
+          rejectInvitations = reject;
+        }),
+    );
+
+    const { unmount } = render(<WorkspaceInvitationsPanel workspaceId='workspace-1' canManageMembers />);
+
+    unmount();
+
+    expect(() => {
+      rejectInvitations(new DOMException('Aborted', 'AbortError'));
+    }).not.toThrow();
+
+    await Promise.resolve();
+  });
+
+  it('does not let a stale in-flight request overwrite the latest data when workspaceId changes', async () => {
+    let resolveFirst: (value: WorkspaceInvitation[]) => void = () => {};
+
+    getWorkspaceInvitationsMock.mockImplementationOnce(
+      () =>
+        new Promise<WorkspaceInvitation[]>((resolve) => {
+          resolveFirst = resolve;
+        }),
+    );
+
+    const { rerender } = render(<WorkspaceInvitationsPanel workspaceId='workspace-1' canManageMembers />);
+
+    getWorkspaceInvitationsMock.mockResolvedValueOnce([invitation({ id: 'invitation-2', email: 'second-workspace@example.com' })]);
+
+    rerender(<WorkspaceInvitationsPanel workspaceId='workspace-2' canManageMembers />);
+
+    await screen.findByText('second-workspace@example.com');
+
+    resolveFirst([invitation({ id: 'invitation-1', email: 'stale-workspace@example.com' })]);
+
+    await Promise.resolve();
+
+    expect(screen.queryByText('stale-workspace@example.com')).not.toBeInTheDocument();
+    expect(screen.getByText('second-workspace@example.com')).toBeInTheDocument();
+  });
+});

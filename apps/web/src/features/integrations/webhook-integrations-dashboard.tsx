@@ -13,9 +13,9 @@ import {
 import type { SaveWebhookInput, WebhookDelivery, WebhookEndpoint, WebhookEventCatalogItem, WebhookEventType, WebhookListResponse } from './integrations.types';
 import { getErrorMessage } from '../applications/application-utils';
 import { PageError } from '@/components/states/page-error';
+import { ApiError } from '@/features/lib/api/api-error';
 import { EmptyState } from '@command-center/ui';
-import { ApiError } from 'next/dist/server/api-utils';
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 
 interface WebhookIntegrationsDashboardProps {
   workspaceId: string;
@@ -310,30 +310,46 @@ export function WebhookIntegrationsDashboard({ workspaceId }: WebhookIntegration
 
   const [deliveriesLoading, setDeliveriesLoading] = useState(false);
 
+  const controllerRef = useRef<AbortController | null>(null);
+
   const load = useCallback(async () => {
+    controllerRef.current?.abort();
+
     const controller = new AbortController();
+
+    controllerRef.current = controller;
 
     setLoading(true);
 
     try {
       const response = await getWebhookEndpoints(workspaceId, controller.signal);
 
+      if (controller.signal.aborted) {
+        return;
+      }
+
       setData(response);
 
       setError(null);
     } catch (caughtError) {
+      if (controller.signal.aborted) {
+        return;
+      }
+
       setError(caughtError);
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) {
+        setLoading(false);
+      }
     }
-
-    return () => {
-      controller.abort();
-    };
   }, [workspaceId]);
 
   useEffect(() => {
     void load();
+
+    return () => {
+      controllerRef.current?.abort();
+    };
   }, [load]);
 
   async function loadDeliveries(endpoint: WebhookEndpoint): Promise<void> {
@@ -445,7 +461,7 @@ export function WebhookIntegrationsDashboard({ workspaceId }: WebhookIntegration
       <PageError
         title='Integrations unavailable'
         message={getErrorMessage(error)}
-        requestId={error instanceof ApiError ? ('requestId' in error && typeof error.requestId === 'string' ? error.requestId : undefined) : undefined}
+        requestId={error instanceof ApiError ? error.requestId : undefined}
         onRetry={() => {
           void load();
         }}

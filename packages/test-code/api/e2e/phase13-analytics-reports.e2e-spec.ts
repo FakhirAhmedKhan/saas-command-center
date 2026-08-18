@@ -1070,6 +1070,101 @@ describe('Phase 13 Analytics Reports E2E', () => {
     expect(sessions).toEqual([...sessions].sort((left, right) => right - left));
   });
 
+  it('paginates the sources dimension report without duplicate or skipped rows (DB-02)', async () => {
+    const common = { from: FROM, to: TO, sortBy: 'sessions', sortDirection: 'desc', limit: 2 };
+
+    const firstResponse = await get(dimensionUrl('sources'), ownerAccessToken, { ...common, page: 1 });
+    const secondResponse = await get(dimensionUrl('sources'), ownerAccessToken, { ...common, page: 2 });
+
+    expect(firstResponse.status).toBe(200);
+    expect(secondResponse.status).toBe(200);
+
+    const firstRows = items(firstResponse);
+    const secondRows = items(secondResponse);
+
+    expect(firstRows).toHaveLength(2);
+    expect(secondRows).toHaveLength(1);
+
+    const combinedKeys = [...firstRows, ...secondRows].map((row) => row.key);
+
+    expect(new Set(combinedKeys).size).toBe(3);
+    expect(new Set(combinedKeys)).toEqual(new Set(['Direct', 'Google', 'Newsletter']));
+
+    expect(body(firstResponse).pagination).toMatchObject({
+      page: 1,
+      limit: 2,
+      total: 3,
+      totalPages: 2,
+      hasPreviousPage: false,
+      hasNextPage: true,
+    });
+
+    expect(body(secondResponse).pagination).toMatchObject({
+      page: 2,
+      limit: 2,
+      total: 3,
+      totalPages: 2,
+      hasPreviousPage: true,
+      hasNextPage: false,
+    });
+  });
+
+  it('reports the same total sessions percentage baseline across dimension report pages (DB-02)', async () => {
+    const common = { from: FROM, to: TO, sortBy: 'sessions', sortDirection: 'desc', limit: 2 };
+
+    const firstResponse = await get(dimensionUrl('sources'), ownerAccessToken, { ...common, page: 1 });
+    const secondResponse = await get(dimensionUrl('sources'), ownerAccessToken, { ...common, page: 2 });
+
+    const percentages = [...items(firstResponse), ...items(secondResponse)].map((row) => Number(row.percentage));
+
+    // 7 + 5 + 3 = 15 total sessions across all three sources; percentages reconcile to 100.
+    expect(percentages.reduce((sum, value) => sum + value, 0)).toBeCloseTo(100, 0);
+  });
+
+  it('filters the sources dimension report by search text (DB-02)', async () => {
+    const response = await get(dimensionUrl('sources'), ownerAccessToken, { from: FROM, to: TO, search: 'news' });
+
+    expect(response.status).toBe(200);
+
+    const rows = items(response);
+
+    expect(rows.map((row) => row.key)).toEqual(['Newsletter']);
+    expect(body(response).pagination).toMatchObject({ total: 1 });
+
+    // Percentage is relative to the filtered subset, not the full dimension set.
+    expect(Number(rows[0]?.percentage)).toBe(100);
+  });
+
+  it('returns an empty dimension report page for a search term matching nothing (DB-02)', async () => {
+    const response = await get(dimensionUrl('sources'), ownerAccessToken, { from: FROM, to: TO, search: 'no-such-source' });
+
+    expect(response.status).toBe(200);
+
+    expect(items(response)).toHaveLength(0);
+
+    expect(body(response).pagination).toMatchObject({
+      total: 0,
+      totalPages: 1,
+      hasPreviousPage: false,
+      hasNextPage: false,
+    });
+  });
+
+  it('sorts the sources dimension report by sessions ascending as well as descending (DB-02)', async () => {
+    const response = await get(dimensionUrl('sources'), ownerAccessToken, {
+      from: FROM,
+      to: TO,
+      sortBy: 'sessions',
+      sortDirection: 'asc',
+    });
+
+    expect(response.status).toBe(200);
+
+    const sessions = items(response).map((row) => Number(row.sessions));
+
+    expect(sessions).toEqual([...sessions].sort((left, right) => left - right));
+  });
+
   // ---------------------------------------------------------------------------------------
   // F. Validation
   // ---------------------------------------------------------------------------------------

@@ -79,16 +79,20 @@ interface EventSummaryDatabaseRow {
   unique_sessions: bigint | number | string;
 }
 
-interface AggregateDimensionRow {
-  dimensionValue: string;
+interface DimensionDatabaseRow {
+  key: string;
 
-  dimensionLabel: string;
+  label: string;
 
-  visitors: number;
+  visitors: bigint | number | string;
 
-  sessions: number;
+  sessions: bigint | number | string;
 
-  pageViews: number;
+  page_views: bigint | number | string;
+
+  total_count: bigint | number | string;
+
+  total_sessions: bigint | number | string;
 }
 
 export interface CsvExportResult {
@@ -715,114 +719,129 @@ export class AnalyticsReportsService {
   ): Promise<DimensionReportResponseDto> {
     const aggregateDimension = this.mapDimension(dimension);
 
-    const where = {
-      websiteId: context.websiteId,
-
-      dimension: aggregateDimension,
-
-      bucketStart: {
-        gte: context.range.current.start,
-
-        lt: context.range.current.end,
-      },
-    };
-
-    const select = {
-      dimensionValue: true,
-
-      dimensionLabel: true,
-
-      visitors: true,
-
-      sessions: true,
-
-      pageViews: true,
-    } as const;
-
-    const rows: AggregateDimensionRow[] =
-      context.range.granularity === 'hour'
-        ? await this.prisma.analyticsHourlyAggregate.findMany({
-            where,
-            select,
-          })
-        : await this.prisma.analyticsDailyAggregate.findMany({
-            where,
-            select,
-          });
-
-    const grouped = new Map<
-      string,
-      {
-        label: string;
-        visitors: number;
-        sessions: number;
-        pageViews: number;
-      }
-    >();
-
-    for (const row of rows) {
-      const key = row.dimensionValue.trim() || 'unknown';
-
-      const label = row.dimensionLabel.trim() || 'Unknown';
-
-      const current = grouped.get(key);
-
-      if (current) {
-        current.visitors += row.visitors;
-
-        current.sessions += row.sessions;
-
-        current.pageViews += row.pageViews;
-      } else {
-        grouped.set(key, {
-          label,
-
-          visitors: row.visitors,
-
-          sessions: row.sessions,
-
-          pageViews: row.pageViews,
-        });
-      }
-    }
-
-    const search = query.search?.trim().toLowerCase() ?? '';
-
-    const filtered = Array.from(grouped.entries())
-      .map(([key, value]) => ({
-        key,
-
-        ...value,
-      }))
-      .filter((item) => search === '' || item.key.toLowerCase().includes(search) || item.label.toLowerCase().includes(search));
-
-    const totalSessions = filtered.reduce(
-      (total, item) => total + item.sessions,
-
-      0,
-    );
-
-    const items = filtered.map((item): DimensionReportItemDto => ({
-      ...item,
-
-      percentage:
-        totalSessions === 0
-          ? 0
-          : roundMetric(
-              (item.sessions / totalSessions) * 100,
-
-              1,
-            ),
-    }));
-
-    this.sortDimensionItems(items, query.sortBy, query.sortDirection);
-
-    const total = items.length;
-
     const offset = (page - 1) * limit;
 
+    const search = query.search?.trim() ?? '';
+
+    const searchPattern = `%${search}%`;
+
+    const sortColumn = this.getDimensionSortColumn(query.sortBy);
+
+    const sortDirection = query.sortDirection === AnalyticsSortDirection.ASC ? Prisma.sql`ASC` : Prisma.sql`DESC`;
+
+    /*
+     * The aggregate table name can't be a bind parameter, but it is never
+     * derived from user input -- it's chosen solely from the server-computed
+     * date-range granularity, so Prisma.raw here does not open a SQL
+     * injection path.
+     */
+    const aggregateTable =
+      context.range.granularity === 'hour' ? Prisma.raw('analytics_hourly_aggregates') : Prisma.raw('analytics_daily_aggregates');
+
+    const rows = await this.prisma.$queryRaw<DimensionDatabaseRow[]>(
+      Prisma.sql`
+                        WITH dimension_agg AS (
+                            SELECT
+                                COALESCE(NULLIF(TRIM(dimension_value), ''), 'unknown') AS key,
+
+                                COALESCE(NULLIF(TRIM(MAX(dimension_label)), ''), 'Unknown') AS label,
+
+                                SUM(visitors)::bigint AS visitors,
+
+                                SUM(sessions)::bigint AS sessions,
+
+                                SUM(page_views)::bigint AS page_views
+
+                            FROM
+                                ${aggregateTable}
+
+                            WHERE
+                                website_id =
+                                    ${context.websiteId}::uuid
+
+                                AND
+                                dimension =
+                                    ${aggregateDimension}::"AnalyticsAggregateDimension"
+
+                                AND
+                                bucket_start >=
+                                    ${context.range.current.start}
+
+                                AND
+                                bucket_start <
+                                    ${context.range.current.end}
+
+                            GROUP BY
+                                COALESCE(NULLIF(TRIM(dimension_value), ''), 'unknown')
+                        ),
+
+                        filtered_report AS (
+                            SELECT
+                                *,
+
+                                COUNT(*) OVER()::bigint
+                                    AS total_count,
+
+                                COALESCE(SUM(sessions) OVER(), 0)::bigint
+                                    AS total_sessions
+
+                            FROM
+                                dimension_agg
+
+                            WHERE
+                                ${search} = ''
+                                OR
+                                key ILIKE
+                                    ${searchPattern}
+                                OR
+                                label ILIKE
+                                    ${searchPattern}
+                        )
+
+                        SELECT
+                            *
+
+                        FROM
+                            filtered_report
+
+                        ORDER BY
+                            ${sortColumn}
+                            ${sortDirection},
+
+                            label ASC
+
+                        LIMIT
+                            ${limit}
+
+                        OFFSET
+                            ${offset}
+                    `,
+    );
+
+    const total = toSafeNumber(rows[0]?.total_count);
+
+    const totalSessions = toSafeNumber(rows[0]?.total_sessions);
+
+    const items: DimensionReportItemDto[] = rows.map((row) => {
+      const sessions = toSafeNumber(row.sessions);
+
+      return {
+        key: row.key,
+
+        label: row.label,
+
+        visitors: toSafeNumber(row.visitors),
+
+        sessions,
+
+        pageViews: toSafeNumber(row.page_views),
+
+        percentage: totalSessions === 0 ? 0 : roundMetric((sessions / totalSessions) * 100, 1),
+      };
+    });
+
     return {
-      items: items.slice(offset, offset + limit),
+      items,
 
       pagination: this.createPagination(page, limit, total),
 
@@ -955,32 +974,21 @@ export class AnalyticsReportsService {
     }
   }
 
-  private sortDimensionItems(
-    items: DimensionReportItemDto[],
+  private getDimensionSortColumn(field: DimensionReportSortField): Prisma.Sql {
+    switch (field) {
+      case DimensionReportSortField.VISITORS:
+        return Prisma.sql`visitors`;
 
-    field: DimensionReportSortField,
+      case DimensionReportSortField.PAGE_VIEWS:
+        return Prisma.sql`page_views`;
 
-    direction: AnalyticsSortDirection,
-  ): void {
-    const multiplier = direction === AnalyticsSortDirection.ASC ? 1 : -1;
+      case DimensionReportSortField.LABEL:
+        return Prisma.sql`label`;
 
-    items.sort((first, second) => {
-      if (field === DimensionReportSortField.LABEL) {
-        return first.label.localeCompare(second.label) * multiplier;
-      }
-
-      const firstValue =
-        field === DimensionReportSortField.VISITORS ? first.visitors : field === DimensionReportSortField.PAGE_VIEWS ? first.pageViews : first.sessions;
-
-      const secondValue =
-        field === DimensionReportSortField.VISITORS ? second.visitors : field === DimensionReportSortField.PAGE_VIEWS ? second.pageViews : second.sessions;
-
-      if (firstValue === secondValue) {
-        return first.label.localeCompare(second.label);
-      }
-
-      return (firstValue - secondValue) * multiplier;
-    });
+      case DimensionReportSortField.SESSIONS:
+      default:
+        return Prisma.sql`sessions`;
+    }
   }
 
   private createPagination(page: number, limit: number, total: number): AnalyticsPaginationDto {

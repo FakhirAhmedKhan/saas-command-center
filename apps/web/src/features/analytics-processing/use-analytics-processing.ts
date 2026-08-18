@@ -2,6 +2,7 @@
 
 import { getAnalyticsProcessingStatus } from './analytics-processing-api';
 import type { AnalyticsProcessingStatus } from './analytics-processing.types';
+import { usePageVisibility } from '@/hooks/use-page-visibility';
 import { useCallback, useEffect, useState } from 'react';
 
 interface ProcessingState {
@@ -31,7 +32,13 @@ export function useAnalyticsProcessing(
     setReloadKey((current) => current + 1);
   }, []);
 
+  const visible = usePageVisibility();
+
   useEffect(() => {
+    if (!visible) {
+      return;
+    }
+
     const controller = new AbortController();
 
     let timer: number | undefined;
@@ -90,7 +97,7 @@ export function useAnalyticsProcessing(
         window.clearTimeout(timer);
       }
     };
-  }, [workspaceId, websiteId, reloadKey]);
+  }, [workspaceId, websiteId, reloadKey, visible]);
 
   return {
     ...state,

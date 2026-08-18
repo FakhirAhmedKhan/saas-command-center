@@ -14,9 +14,9 @@ import {
 import type { CurrentEnvironmentVersion, Deployment, DeploymentOptions, DeploymentStatus, Release } from './release-management.types';
 import { getErrorMessage } from '../applications/application-utils';
 import { PageError } from '@/components/states/page-error';
+import { ApiError } from '@/features/lib/api/api-error';
 import { EmptyState } from '@command-center/ui';
-import { ApiError } from 'next/dist/server/api-utils';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface DashboardProps {
   workspaceId: string;
@@ -407,8 +407,14 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
 
   const [actionError, setActionError] = useState<string | null>(null);
 
+  const controllerRef = useRef<AbortController | null>(null);
+
   const load = useCallback(async () => {
+    controllerRef.current?.abort();
+
     const controller = new AbortController();
+
+    controllerRef.current = controller;
 
     setLoading(true);
 
@@ -435,6 +441,10 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
         getCurrentVersions(workspaceId, applicationId, controller.signal),
       ]);
 
+      if (controller.signal.aborted) {
+        return;
+      }
+
       setData({
         options,
 
@@ -445,18 +455,24 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
         currentVersions,
       });
     } catch (caughtError) {
+      if (controller.signal.aborted) {
+        return;
+      }
+
       setError(caughtError);
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) {
+        setLoading(false);
+      }
     }
-
-    return () => {
-      controller.abort();
-    };
   }, [workspaceId, applicationId, environmentFilter, statusFilter]);
 
   useEffect(() => {
     void load();
+
+    return () => {
+      controllerRef.current?.abort();
+    };
   }, [load]);
 
   const successfulDeployments = useMemo(() => (data?.deployments ?? []).filter((deployment) => deployment.status === 'SUCCESSFUL'), [data]);
@@ -590,7 +606,7 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
       <PageError
         title='Release tracking unavailable'
         message={getErrorMessage(error)}
-        requestId={error instanceof ApiError ? ('requestId' in error && typeof error.requestId === 'string' ? error.requestId : undefined) : undefined}
+        requestId={error instanceof ApiError ? error.requestId : undefined}
         onRetry={() => {
           void load();
         }}

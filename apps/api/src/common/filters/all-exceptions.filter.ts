@@ -4,6 +4,7 @@ import type {
   //   Request,
   Response,
 } from 'express';
+import { Prisma } from 'src/generated/prisma/client';
 
 interface ErrorResponse {
   statusCode: number;
@@ -44,6 +45,35 @@ function getExpressErrorStatus(exception: unknown): number | undefined {
 
   return status >= 400 && status <= 599 ? status : undefined;
 }
+
+interface PrismaKnownErrorResponse {
+  status: number;
+  message: string;
+  error: string;
+}
+
+/*
+ * Safety net only: most services translate P2002 (and similar) into a
+ * domain-specific ConflictException themselves so callers get a useful
+ * message ("Email is already in use", "Workspace slug already exists",
+ * etc). This map exists for the Prisma errors that slip past every
+ * service-level catch -- it converts them into a safe, generic 4xx
+ * instead of an opaque 500, without ever exposing raw Prisma error text,
+ * table/column names, or the `meta` field to the client.
+ */
+const PRISMA_KNOWN_ERROR_RESPONSES: Partial<Record<string, PrismaKnownErrorResponse>> = {
+  P2002: {
+    status: HttpStatus.CONFLICT,
+    message: 'A record with this value already exists.',
+    error: 'Conflict',
+  },
+
+  P2025: {
+    status: HttpStatus.NOT_FOUND,
+    message: 'The requested resource was not found.',
+    error: 'Not Found',
+  },
+};
 
 function normalizeHttpException(exception: HttpException): NormalizedException {
   const exceptionResponse = exception.getResponse();
@@ -87,22 +117,48 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     const isHttpException = exception instanceof HttpException;
 
-    const expressErrorStatus = isHttpException ? undefined : getExpressErrorStatus(exception);
+    const isPrismaKnownError = !isHttpException && exception instanceof Prisma.PrismaClientKnownRequestError;
 
-    const statusCode = isHttpException ? exception.getStatus() : (expressErrorStatus ?? HttpStatus.INTERNAL_SERVER_ERROR);
+    const prismaResponse = isPrismaKnownError ? PRISMA_KNOWN_ERROR_RESPONSES[exception.code] : undefined;
+
+    const expressErrorStatus = isHttpException || isPrismaKnownError ? undefined : getExpressErrorStatus(exception);
+
+    const statusCode = isHttpException
+      ? exception.getStatus()
+      : (prismaResponse?.status ?? expressErrorStatus ?? HttpStatus.INTERNAL_SERVER_ERROR);
 
     const normalizedException = isHttpException
       ? normalizeHttpException(exception)
-      : expressErrorStatus !== undefined
+      : prismaResponse
         ? {
-            message: exception instanceof Error ? exception.message : 'Request rejected',
+            message: prismaResponse.message,
+            error: prismaResponse.error,
           }
-        : {
-            message: 'Internal server error',
-            error: 'Internal Server Error',
-          };
+        : expressErrorStatus !== undefined
+          ? {
+              message: exception instanceof Error ? exception.message : 'Request rejected',
+            }
+          : {
+              message: 'Internal server error',
+              error: 'Internal Server Error',
+            };
 
-    if (!isHttpException && expressErrorStatus === undefined) {
+    if (isPrismaKnownError && prismaResponse) {
+      /*
+       * Handled gracefully, but a service should ideally have caught this
+       * itself with a more specific message -- worth knowing about without
+       * treating it as a genuine 500-level failure.
+       */
+      this.logger.warn(
+        [
+          `${request.method} ${request.originalUrl}`,
+          request.requestId ? `requestId=${request.requestId}` : undefined,
+          `Unhandled Prisma ${exception.code} reached the global filter; consider a service-level catch.`,
+        ]
+          .filter(Boolean)
+          .join(' | '),
+      );
+    } else if (!isHttpException && expressErrorStatus === undefined) {
       const stack = exception instanceof Error ? exception.stack : String(exception);
 
       this.logger.error(

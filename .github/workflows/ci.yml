@@ -59,16 +59,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 11.0.0
           run_install: false
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: pnpm
@@ -90,7 +89,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -98,7 +97,7 @@ jobs:
           run_install: false
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: pnpm
@@ -123,16 +122,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 11.0.0
           run_install: false
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: pnpm
@@ -157,16 +155,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 11.0.0
           run_install: false
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: pnpm
@@ -222,16 +219,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 11.0.0
           run_install: false
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: pnpm
@@ -253,6 +249,77 @@ jobs:
 
 
   # ======================================================
+  # FULL-STACK PLAYWRIGHT SUITE
+  # ======================================================
+  # Real API + Next.js + tracker servers, seeded via
+  # e2e/full-stack/global-setup.ts, against a dedicated database. Not part
+  # of `pnpm test:all` and previously never ran in CI at all.
+
+  tests-fullstack:
+    name: Full-Stack E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres-fullstack:
+        image: postgres:17-alpine
+
+        env:
+          POSTGRES_USER: command_center_full_e2e
+          POSTGRES_PASSWORD: command_center_full_e2e
+          POSTGRES_DB: command_center_full_e2e
+
+        ports:
+          - 5435:5432
+
+        options: >-
+          --health-cmd "pg_isready -U command_center_full_e2e -d command_center_full_e2e"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm --filter @command-center/api exec prisma generate
+
+      - name: Run database migrations (full-stack DB)
+        run: pnpm --filter @command-center/api exec prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://command_center_full_e2e:command_center_full_e2e@localhost:5435/command_center_full_e2e?schema=public
+
+      - name: Install Playwright Chrome
+        run: pnpm --filter @command-center/web-tests exec playwright install --with-deps chrome
+
+      - name: Run full-stack Playwright suite
+        run: pnpm test:web:fullstack
+
+      - name: Upload full-stack Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-fullstack
+          path: packages/test-code/web/playwright-report-fullstack
+          retention-days: 7
+
+
+  # ======================================================
   # REQUIRED MAIN-BRANCH GATE
   # ======================================================
 
@@ -266,34 +333,48 @@ jobs:
       - typecheck
       - build
       - tests
+      - tests-fullstack
 
     if: always()
 
     steps:
+      - name: Write job summary
+        run: |
+          {
+            echo "## CI Summary"
+            echo
+            echo "| Job | Result |"
+            echo "|---|---|"
+            echo "| Format | ${{ needs.format.result == 'success' && '✅ pass' || needs.format.result == 'skipped' && '⏭️ skipped' || '❌ fail' }} |"
+            echo "| Lint | ${{ needs.lint.result == 'success' && '✅ pass' || needs.lint.result == 'skipped' && '⏭️ skipped' || '❌ fail' }} |"
+            echo "| Typecheck | ${{ needs.typecheck.result == 'success' && '✅ pass' || needs.typecheck.result == 'skipped' && '⏭️ skipped' || '❌ fail' }} |"
+            echo "| Build | ${{ needs.build.result == 'success' && '✅ pass' || needs.build.result == 'skipped' && '⏭️ skipped' || '❌ fail' }} |"
+            echo "| Full Tests (API + Web + Tracker) | ${{ needs.tests.result == 'success' && '✅ pass' || needs.tests.result == 'skipped' && '⏭️ skipped' || '❌ fail' }} |"
+            echo "| Full-Stack E2E | ${{ needs.tests-fullstack.result == 'success' && '✅ pass' || needs.tests-fullstack.result == 'skipped' && '⏭️ skipped' || '❌ fail' }} |"
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Verify all CI jobs passed
         run: |
-          if [[ "${{ needs.format.result }}" != "success" ]]; then
-            echo "Format failed"
-            exit 1
-          fi
+          failed=0
 
-          if [[ "${{ needs.lint.result }}" != "success" ]]; then
-            echo "Lint failed"
-            exit 1
-          fi
+          declare -A results=(
+            [Format]="${{ needs.format.result }}"
+            [Lint]="${{ needs.lint.result }}"
+            [Typecheck]="${{ needs.typecheck.result }}"
+            [Build]="${{ needs.build.result }}"
+            [Tests]="${{ needs.tests.result }}"
+            ["Full-Stack E2E"]="${{ needs.tests-fullstack.result }}"
+          )
 
-          if [[ "${{ needs.typecheck.result }}" != "success" ]]; then
-            echo "Typecheck failed"
-            exit 1
-          fi
+          for name in "${!results[@]}"; do
+            if [[ "${results[$name]}" != "success" ]]; then
+              echo "$name failed (${results[$name]})"
+              failed=1
+            fi
+          done
 
-          if [[ "${{ needs.build.result }}" != "success" ]]; then
-            echo "Build failed"
-            exit 1
-          fi
-
-          if [[ "${{ needs.tests.result }}" != "success" ]]; then
-            echo "Tests failed"
+          if [[ "$failed" -eq 1 ]]; then
             exit 1
           fi
 

@@ -96,7 +96,6 @@ pnpm dev
 - `@command-center/web`
 - `@command-center/tracker`
 - `@command-center/shared-types`
-- `@command-center/validation`
 - `@command-center/ui`
 - `@command-center/tsconfig`
 - `@command-center/eslint-config`
@@ -105,7 +104,13 @@ These names must remain unique so `pnpm --filter` commands resolve correctly.
 
 ## Current boundary
 
-This foundation intentionally does not implement:
+> This section describes the original Phase 0–2 foundation and predates
+> Prisma models, authentication, analytics, GitHub integration, and
+> monitoring, all of which are now implemented. It is kept for historical
+> context only; see `docs/product-blueprint.md` and the module-level source
+> under `apps/api/src/modules/**` for the current feature set.
+
+This foundation originally did not implement:
 
 - Prisma models or migrations
 - Authentication
@@ -114,5 +119,3 @@ This foundation intentionally does not implement:
 - GitHub integration
 - Deployment monitoring
 - AI features
-
-The next implementation phase is the database foundation: Prisma, development/test database wiring, and the initial `User`, `Workspace`, `WorkspaceMember`, and `AuthSession` models.

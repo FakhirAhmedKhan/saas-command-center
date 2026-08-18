@@ -5,6 +5,7 @@ import { RepositoriesController } from './controllers/repositories.controller';
 import { RepositoryImportController } from './controllers/repository-import.controller';
 import { CodeExplorerService } from './services/code-explorer.service';
 import { GithubAppService } from './services/github-app.service';
+import { GithubConnectIntentCleanupService } from './services/github-connect-intent-cleanup.service';
 import { GithubCodeService } from './services/github-code.service';
 import { GithubWebhookService } from './services/github-webhook.service';
 import { PersonalGithubConnectService } from './services/personal-github-connect.service';
@@ -34,6 +35,7 @@ import { Module } from '@nestjs/common';
     PersonalRepositoriesService,
     RepositoryAnalyzerService,
     RepositoryImportService,
+    GithubConnectIntentCleanupService,
   ],
 
   exports: [GithubAppService, GithubCodeService, RepositoriesService, CodeExplorerService],

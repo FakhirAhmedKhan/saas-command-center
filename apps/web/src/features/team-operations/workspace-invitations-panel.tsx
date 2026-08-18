@@ -3,7 +3,7 @@
 import { createWorkspaceInvitation, getWorkspaceInvitations, resendWorkspaceInvitation, revokeWorkspaceInvitation } from './team-operations-api';
 import type { WorkspaceInvitation, WorkspaceRole } from './team-operations.types';
 import { getErrorMessage } from '../applications/application-utils';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface WorkspaceInvitationsPanelProps {
   workspaceId: string;
@@ -34,29 +34,47 @@ export function WorkspaceInvitationsPanel({ workspaceId, canManageMembers }: Wor
 
   const [invitationUrl, setInvitationUrl] = useState<string | null>(null);
 
+  const controllerRef = useRef<AbortController | null>(null);
+
   const load = useCallback(async () => {
+    controllerRef.current?.abort();
+
     const controller = new AbortController();
+
+    controllerRef.current = controller;
 
     setLoading(true);
 
     try {
-      setInvitations(await getWorkspaceInvitations(workspaceId, controller.signal));
+      const result = await getWorkspaceInvitations(workspaceId, controller.signal);
+
+      if (controller.signal.aborted) {
+        return;
+      }
+
+      setInvitations(result);
 
       setError(null);
     } catch (caughtError) {
+      if (controller.signal.aborted) {
+        return;
+      }
+
       setError(getErrorMessage(caughtError));
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) {
+        setLoading(false);
+      }
     }
-
-    return () => {
-      controller.abort();
-    };
   }, [workspaceId]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void load();
+
+    return () => {
+      controllerRef.current?.abort();
+    };
   }, [load]);
 
   async function invite(): Promise<void> {

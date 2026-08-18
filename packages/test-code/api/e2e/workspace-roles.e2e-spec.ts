@@ -313,4 +313,74 @@ describe('Workspace Roles and Ownership E2E', () => {
 
     expectAccessDenied(response);
   });
+
+  it('creates exactly one OWNER membership matching workspace.ownerId on workspace creation (DB-03)', async () => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
+
+    const workspace = await prisma.workspace.findUnique({
+      where: {
+        id: owner.workspaceId,
+      },
+
+      select: {
+        ownerId: true,
+      },
+    });
+
+    expect(workspace?.ownerId).toBe(owner.userId);
+
+    const memberships = await prisma.workspaceMember.findMany({
+      where: {
+        workspaceId: owner.workspaceId,
+        role: WorkspaceRole.OWNER,
+      },
+    });
+
+    expect(memberships).toHaveLength(1);
+
+    expect(memberships[0]?.userId).toBe(owner.userId);
+  });
+
+  it('keeps ownership transfer isolated to the target workspace (DB-03)', async () => {
+    const alphaOwner = await registerWorkspaceTestUser(app, prisma, {
+      workspaceName: 'Alpha Isolation Workspace',
+    });
+
+    const alphaSuccessor = await registerWorkspaceTestUser(app, prisma);
+
+    const betaOwner = await registerWorkspaceTestUser(app, prisma, {
+      workspaceName: 'Beta Isolation Workspace',
+    });
+
+    expect([200, 201]).toContain((await addWorkspaceMember(alphaOwner, alphaSuccessor, WorkspaceRole.ADMIN)).status);
+
+    const transferResponse = await alphaOwner.agent
+      .post(workspaceRoutes.transferOwnership(alphaOwner.workspaceId))
+      .set(withBearer(alphaOwner.accessToken))
+      .send({
+        newOwnerUserId: alphaSuccessor.userId,
+      });
+
+    expect([200, 201]).toContain(transferResponse.status);
+
+    const betaWorkspace = await prisma.workspace.findUnique({
+      where: {
+        id: betaOwner.workspaceId,
+      },
+
+      select: {
+        ownerId: true,
+      },
+    });
+
+    expect(betaWorkspace?.ownerId).toBe(betaOwner.userId);
+
+    const betaOwnerMembership = await getWorkspaceMembership(prisma, betaOwner.workspaceId, betaOwner.userId);
+
+    expect(betaOwnerMembership?.role).toBe(WorkspaceRole.OWNER);
+
+    const alphaMembershipInBeta = await getWorkspaceMembership(prisma, betaOwner.workspaceId, alphaSuccessor.userId);
+
+    expect(alphaMembershipInBeta).toBeNull();
+  });
 });

@@ -3,6 +3,7 @@
 import { getTrackingStatus } from '../tracking-api';
 import type { TrackingStatus } from '../tracking-types';
 import { formatTrackingDate, getTrackingError } from '../tracking-utils';
+import { usePageVisibility } from '@/hooks/use-page-visibility';
 import { Badge, Button, Card, CardContent, CardHeader, Spinner } from '@command-center/ui';
 import { Activity, CheckCircle2, Clock3, MousePointerClick, Radio, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
@@ -23,7 +24,13 @@ export function TrackingStatusPanel({ workspaceId, websiteId, autoRefresh = true
 
   const [error, setError] = useState<string | null>(null);
 
+  const visible = usePageVisibility();
+
   useEffect(() => {
+    if (!visible) {
+      return;
+    }
+
     let cancelled = false;
 
     async function load(): Promise<void> {
@@ -63,7 +70,7 @@ export function TrackingStatusPanel({ workspaceId, websiteId, autoRefresh = true
 
       window.clearInterval(timer);
     };
-  }, [workspaceId, websiteId, autoRefresh]);
+  }, [workspaceId, websiteId, autoRefresh, visible]);
 
   async function refresh(): Promise<void> {
     setRefreshing(true);

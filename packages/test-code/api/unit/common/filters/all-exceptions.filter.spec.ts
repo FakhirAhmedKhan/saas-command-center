@@ -1,5 +1,17 @@
 import { AllExceptionsFilter } from 'src/common/filters/all-exceptions.filter';
 import { ArgumentsHost, BadRequestException, HttpException, HttpStatus, Logger, NotFoundException } from '@nestjs/common';
+import { Prisma } from 'src/generated/prisma/client';
+
+function prismaKnownError(code: string, message = 'Prisma raw internal error text'): Prisma.PrismaClientKnownRequestError {
+  return new Prisma.PrismaClientKnownRequestError(message, {
+    code,
+    clientVersion: '7.9.1',
+    meta: {
+      target: ['email'],
+      modelName: 'User',
+    },
+  });
+}
 
 interface CapturedResponse {
   status: jest.Mock<CapturedResponse, [number]>;
@@ -225,6 +237,84 @@ describe('AllExceptionsFilter', () => {
       filter.catch(new NotFoundException('Missing'), host);
 
       expect(bodyFrom(response).requestId).toBeUndefined();
+    });
+  });
+
+  describe('Prisma error translation (BE-02 safety net)', () => {
+    it('translates an uncaught P2002 into a 409 Conflict without leaking Prisma internals', () => {
+      const { host, response } = createHost();
+
+      filter.catch(prismaKnownError('P2002', 'Unique constraint failed on the fields: (`email`)'), host);
+
+      expect(response.status).toHaveBeenCalledWith(409);
+
+      expect(bodyFrom(response)).toMatchObject({
+        statusCode: 409,
+        message: 'A record with this value already exists.',
+        error: 'Conflict',
+        requestId: 'req-123',
+      });
+
+      expect(JSON.stringify(bodyFrom(response))).not.toContain('Unique constraint failed');
+      expect(JSON.stringify(bodyFrom(response))).not.toContain('email');
+    });
+
+    it('translates an uncaught P2025 into a 404 Not Found without leaking Prisma internals', () => {
+      const { host, response } = createHost();
+
+      filter.catch(prismaKnownError('P2025', 'An operation failed because it depends on one or more records that were required but not found.'), host);
+
+      expect(response.status).toHaveBeenCalledWith(404);
+
+      expect(bodyFrom(response)).toMatchObject({
+        statusCode: 404,
+        message: 'The requested resource was not found.',
+        error: 'Not Found',
+      });
+
+      expect(JSON.stringify(bodyFrom(response))).not.toContain('records that were required');
+    });
+
+    it('preserves requestId on a translated Prisma error', () => {
+      const { host, response } = createHost({ requestId: 'req-prisma-1' });
+
+      filter.catch(prismaKnownError('P2002'), host);
+
+      expect(bodyFrom(response).requestId).toBe('req-prisma-1');
+    });
+
+    it('logs a warning (not an error) for a P2002/P2025 that reaches the filter unhandled', () => {
+      const { host } = createHost();
+
+      filter.catch(prismaKnownError('P2002'), host);
+
+      expect(errorLogger).not.toHaveBeenCalled();
+    });
+
+    it('falls back to a safe 500 for a Prisma error code with no explicit mapping, and still logs it', () => {
+      const { host, response } = createHost();
+
+      filter.catch(prismaKnownError('P2003', 'Foreign key constraint failed on the field: `workspaceId`'), host);
+
+      expect(response.status).toHaveBeenCalledWith(500);
+
+      expect(bodyFrom(response)).toMatchObject({
+        statusCode: 500,
+        message: 'Internal server error',
+        error: 'Internal Server Error',
+      });
+
+      expect(JSON.stringify(bodyFrom(response))).not.toContain('Foreign key constraint');
+      expect(JSON.stringify(bodyFrom(response))).not.toContain('workspaceId');
+      expect(errorLogger).toHaveBeenCalledTimes(1);
+    });
+
+    it('never includes the Prisma error meta field in the response body', () => {
+      const { host, response } = createHost();
+
+      filter.catch(prismaKnownError('P2002'), host);
+
+      expect(bodyFrom(response)).not.toHaveProperty('meta');
     });
   });
 });

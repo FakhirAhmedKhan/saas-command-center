@@ -104,4 +104,47 @@ describe('NotificationBell', () => {
     expect(getUnreadNotificationCountMock).toHaveBeenCalledTimes(2);
     expect(screen.getByText('2')).toBeInTheDocument();
   });
+
+  it('pauses polling while the tab is hidden and refreshes immediately once it becomes visible again', async () => {
+    vi.useFakeTimers();
+
+    getUnreadNotificationCountMock.mockResolvedValue({ count: 1 });
+
+    await act(async () => {
+      render(<NotificationBell />);
+    });
+
+    expect(getUnreadNotificationCountMock).toHaveBeenCalledTimes(1);
+
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      get: () => 'hidden',
+    });
+
+    await act(async () => {
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+
+    getUnreadNotificationCountMock.mockClear();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(60_000);
+    });
+
+    expect(getUnreadNotificationCountMock).not.toHaveBeenCalled();
+
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      get: () => 'visible',
+    });
+
+    getUnreadNotificationCountMock.mockResolvedValue({ count: 3 });
+
+    await act(async () => {
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+
+    expect(getUnreadNotificationCountMock).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('3')).toBeInTheDocument();
+  });
 });

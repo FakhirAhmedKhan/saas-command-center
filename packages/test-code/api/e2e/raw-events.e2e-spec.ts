@@ -21,15 +21,17 @@ describe('Raw Events E2E', () => {
 
   let prisma: PrismaService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     app = await createTestApp();
 
     prisma = app.get(PrismaService);
+  });
 
+  beforeEach(async () => {
     await resetDatabase(prisma);
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await app.close();
   });
 
