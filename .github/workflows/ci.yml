@@ -1,4 +1,4 @@
-name: CI
+﻿name: CI
 
 on:
   push:
@@ -18,8 +18,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_ENV: development
-
   DATABASE_URL: postgresql://command_center:command_center_ci@localhost:5432/command_center_test?schema=public
   TEST_DATABASE_URL: postgresql://command_center:command_center_ci@localhost:5432/command_center_test?schema=public
 
@@ -338,12 +336,12 @@ jobs:
             echo
             echo "| Job | Result |"
             echo "|---|---|"
-            echo "| Format | ${{ needs.format.result == 'success' && '✅ pass' || needs.format.result == 'skipped' && '⏭️ skipped' || '❌ fail' }} |"
-            echo "| Lint | ${{ needs.lint.result == 'success' && '✅ pass' || needs.lint.result == 'skipped' && '⏭️ skipped' || '❌ fail' }} |"
-            echo "| Typecheck | ${{ needs.typecheck.result == 'success' && '✅ pass' || needs.typecheck.result == 'skipped' && '⏭️ skipped' || '❌ fail' }} |"
-            echo "| Build | ${{ needs.build.result == 'success' && '✅ pass' || needs.build.result == 'skipped' && '⏭️ skipped' || '❌ fail' }} |"
-            echo "| Full Tests (API + Web + Tracker) | ${{ needs.tests.result == 'success' && '✅ pass' || needs.tests.result == 'skipped' && '⏭️ skipped' || '❌ fail' }} |"
-            echo "| Full-Stack E2E | ${{ needs.tests-fullstack.result == 'success' && '✅ pass' || needs.tests-fullstack.result == 'skipped' && '⏭️ skipped' || '❌ fail' }} |"
+            echo "| Format | ${{ needs.format.result == 'success' && 'âœ… pass' || needs.format.result == 'skipped' && 'â­ï¸ skipped' || 'âŒ fail' }} |"
+            echo "| Lint | ${{ needs.lint.result == 'success' && 'âœ… pass' || needs.lint.result == 'skipped' && 'â­ï¸ skipped' || 'âŒ fail' }} |"
+            echo "| Typecheck | ${{ needs.typecheck.result == 'success' && 'âœ… pass' || needs.typecheck.result == 'skipped' && 'â­ï¸ skipped' || 'âŒ fail' }} |"
+            echo "| Build | ${{ needs.build.result == 'success' && 'âœ… pass' || needs.build.result == 'skipped' && 'â­ï¸ skipped' || 'âŒ fail' }} |"
+            echo "| Full Tests (API + Web + Tracker) | ${{ needs.tests.result == 'success' && 'âœ… pass' || needs.tests.result == 'skipped' && 'â­ï¸ skipped' || 'âŒ fail' }} |"
+            echo "| Full-Stack E2E | ${{ needs.tests-fullstack.result == 'success' && 'âœ… pass' || needs.tests-fullstack.result == 'skipped' && 'â­ï¸ skipped' || 'âŒ fail' }} |"
             echo
           } >> "$GITHUB_STEP_SUMMARY"
 
