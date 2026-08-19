@@ -1,3 +1,5 @@
+import { createPrivateKey } from 'node:crypto';
+
 export type NodeEnvironment = 'development' | 'test' | 'production';
 
 export type CookieSameSite = 'lax' | 'strict' | 'none';
@@ -213,6 +215,49 @@ function resolveAnalyticsIpHashSalt(config: Record<string, unknown>, environment
   return DEV_ONLY_ANALYTICS_IP_HASH_SALT;
 }
 
+function validateProductionGithubConfiguration(config: Record<string, unknown>, environment: NodeEnvironment, frontendUrl: string): void {
+  if (environment !== 'production') {
+    return;
+  }
+
+  const githubAppSlug = getRequiredString(config, 'GITHUB_APP_SLUG');
+  const githubClientId = getRequiredString(config, 'GITHUB_APP_CLIENT_ID');
+  const githubClientSecret = getRequiredString(config, 'GITHUB_APP_CLIENT_SECRET');
+  const githubCallbackUrl = getRequiredString(config, 'GITHUB_APP_CALLBACK_URL');
+  const githubWebhookSecret = getRequiredString(config, 'GITHUB_APP_WEBHOOK_SECRET');
+  const githubPrivateKeyBase64 = getRequiredString(config, 'GITHUB_APP_PRIVATE_KEY_BASE64');
+
+  // Keep these reads explicit so missing/blank values always fail startup.
+  void githubAppSlug;
+  void githubClientId;
+
+  validateSecret('GITHUB_APP_CLIENT_SECRET', githubClientSecret, environment);
+  validateSecret('GITHUB_APP_WEBHOOK_SECRET', githubWebhookSecret, environment);
+
+  validateUrl('GITHUB_APP_CALLBACK_URL', githubCallbackUrl, ['https:']);
+
+  const frontend = new URL(frontendUrl);
+  const callback = new URL(githubCallbackUrl);
+
+  if (frontend.origin !== callback.origin) {
+    throw new Error('GITHUB_APP_CALLBACK_URL must use the same origin as FRONTEND_URL in production.');
+  }
+
+  let privateKey: string;
+
+  try {
+    privateKey = Buffer.from(githubPrivateKeyBase64, 'base64').toString('utf8');
+
+    if (!privateKey.includes('BEGIN') || !privateKey.includes('PRIVATE KEY')) {
+      throw new Error('Invalid private key.');
+    }
+
+    createPrivateKey(privateKey);
+  } catch {
+    throw new Error('GITHUB_APP_PRIVATE_KEY_BASE64 must contain a valid Base64-encoded private key in production.');
+  }
+}
+
 function validateCorsOrigins(value: string): void {
   const origins = value
     .split(',')
@@ -301,6 +346,8 @@ export function validateEnvironment(config: Record<string, unknown>): Environmen
   }
 
   validateUrl('FRONTEND_URL', frontendUrl, ['http:', 'https:']);
+
+  validateProductionGithubConfiguration(config, nodeEnvironment, frontendUrl);
 
   validateCorsOrigins(corsOrigins);
 

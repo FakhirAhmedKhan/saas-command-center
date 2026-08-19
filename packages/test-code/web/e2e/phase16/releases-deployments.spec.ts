@@ -141,6 +141,66 @@ test.describe('Phase 16 releases and deployments', () => {
         body: JSON.stringify({
           items: [
             {
+              id: 'deployment-0',
+
+              releaseId: 'release-0',
+
+              environmentId: '44444444-4444-4444-8444-444444444444',
+
+              attempt: 1,
+
+              status: 'SUCCESSFUL',
+
+              commitRef: 'previous123',
+
+              repositoryUrl: null,
+
+              ciJobUrl: null,
+
+              liveUrl: 'https://previous.example.com',
+
+              deploymentNotes: null,
+
+              failureReason: null,
+
+              scheduledAt: null,
+
+              startedAt: '2026-08-05T09:55:00.000Z',
+
+              finishedAt: '2026-08-05T10:00:00.000Z',
+
+              durationMs: 300000,
+
+              statusChangedAt: '2026-08-05T10:00:00.000Z',
+
+              createdAt: '2026-08-05T09:50:00.000Z',
+
+              release: {
+                id: 'release-0',
+
+                version: '1.2.0',
+
+                notes: 'Previous stable release.',
+              },
+
+              environment: {
+                id: '44444444-4444-4444-8444-444444444444',
+
+                name: 'Production',
+              },
+
+              deployedBy: null,
+
+              healthIncident: null,
+
+              rollbackTo: null,
+
+              activities: [],
+
+              allowedTransitions: [],
+            },
+
+            {
               id: 'deployment-1',
 
               releaseId: 'release-1',
@@ -206,7 +266,7 @@ test.describe('Phase 16 releases and deployments', () => {
 
             limit: 100,
 
-            total: 1,
+            total: 2,
 
             totalPages: 1,
 
@@ -228,7 +288,7 @@ test.describe('Phase 16 releases and deployments', () => {
       }),
     ).toBeVisible();
 
-    await expect(page.getByText('Production')).toBeVisible();
+    await expect(page.getByText('Production', { exact: true }).first()).toBeVisible();
 
     await expect(
       page
@@ -336,7 +396,7 @@ test.describe('Phase 16 releases and deployments', () => {
 
     await expect(
       page.getByRole('button', {
-        name: 'Retry',
+        name: 'Try again',
       }),
     ).toBeVisible();
   });
@@ -427,8 +487,15 @@ test.describe('Phase 16 releases and deployments', () => {
       });
     });
 
-    page.once('dialog', (dialog) => {
-      void dialog.accept();
+    page.on('dialog', (dialog) => {
+      if (dialog.type() === 'prompt') {
+        void dialog.accept('1');
+        return;
+      }
+
+      if (dialog.type() === 'confirm') {
+        void dialog.accept();
+      }
     });
 
     await page.goto(`/workspaces/${workspaceId}/applications/${applicationId}/releases`);
@@ -457,8 +524,15 @@ test.describe('Phase 16 releases and deployments', () => {
       });
     });
 
-    page.once('dialog', (dialog) => {
-      void dialog.dismiss();
+    page.on('dialog', (dialog) => {
+      if (dialog.type() === 'prompt') {
+        void dialog.accept('1');
+        return;
+      }
+
+      if (dialog.type() === 'confirm') {
+        void dialog.dismiss();
+      }
     });
 
     await page.goto(`/workspaces/${workspaceId}/applications/${applicationId}/releases`);
@@ -487,8 +561,15 @@ test.describe('Phase 16 releases and deployments', () => {
       });
     });
 
-    page.once('dialog', (dialog) => {
-      void dialog.accept();
+    page.on('dialog', (dialog) => {
+      if (dialog.type() === 'prompt') {
+        void dialog.accept('1');
+        return;
+      }
+
+      if (dialog.type() === 'confirm') {
+        void dialog.accept();
+      }
     });
 
     await page.goto(`/workspaces/${workspaceId}/applications/${applicationId}/releases`);
@@ -499,7 +580,7 @@ test.describe('Phase 16 releases and deployments', () => {
       })
       .click();
 
-    await expect(page.getByRole('alert')).toHaveText('Rollback target must be a successful deployment.');
+    await expect(page.getByText('Rollback target must be a successful deployment.', { exact: true })).toBeVisible();
   });
 
   test('filters deployments by status', async ({ page }) => {

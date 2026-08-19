@@ -22,11 +22,16 @@ export default defineConfig({
   },
 
   webServer: {
-    command: 'pnpm dev',
+    command: `pnpm build && node -e "const fs=require('node:fs'); const root='.next/standalone/apps/web'; if(fs.existsSync('public')) fs.cpSync('public', root + '/public', { recursive: true }); fs.mkdirSync(root + '/.next', { recursive: true }); fs.cpSync('.next/static', root + '/.next/static', { recursive: true });" && node .next/standalone/apps/web/server.js`,
     cwd: webRoot,
     url: 'http://localhost:3000',
-    reuseExistingServer: true,
-    timeout: 120_000,
+    reuseExistingServer: false,
+    timeout: 180_000,
+    env: {
+      ...process.env,
+      PORT: '3000',
+      HOSTNAME: '127.0.0.1',
+    },
   },
 
   projects: [

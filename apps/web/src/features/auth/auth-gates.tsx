@@ -1,6 +1,6 @@
 'use client';
 import { useAuth } from '@/features/auth/auth-provider';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
 
 interface GateProps {
@@ -9,13 +9,19 @@ interface GateProps {
 
 export function GuestOnly({ children }: GateProps) {
   const router = useRouter();
-  const { status } = useAuth();
+  const pathname = usePathname();
+  const { status, workspaces } = useAuth();
+
+  const authenticatedRedirect =
+    pathname === '/register' && workspaces.length === 0
+      ? '/workspaces/new'
+      : '/dashboard';
 
   useEffect(() => {
     if (status === 'authenticated') {
-      router.replace('/dashboard');
+      router.replace(authenticatedRedirect);
     }
-  }, [router, status]);
+  }, [authenticatedRedirect, router, status]);
 
   if (status === 'loading') {
     return <FullPageLoader />;

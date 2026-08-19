@@ -62,7 +62,7 @@ export async function authorizedApiRequest(
  * span also avoids colliding with headings that reuse the same text (the
  * installation page has a "Custom events" <h2>).
  */
-export async function expectMetric(page: Page, label: string, value: string | number): Promise<void> {
+export async function expectMetric(page: Page, label: string, value: string | number, timeout = 10_000): Promise<void> {
   const labelElement = page.locator('span', {
     hasText: new RegExp(`^${escapeForRegExp(label)}$`),
   });
@@ -73,7 +73,7 @@ export async function expectMetric(page: Page, label: string, value: string | nu
 
   const valueElement = labelElement.locator('xpath=../following-sibling::p[1]');
 
-  await expect(valueElement).toHaveText(String(value));
+  await expect(valueElement).toHaveText(String(value), { timeout });
 }
 
 function escapeForRegExp(value: string): string {

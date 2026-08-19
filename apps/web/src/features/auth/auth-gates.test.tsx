@@ -3,9 +3,10 @@ import { AuthenticatedOnly, GuestOnly } from './auth-gates';
 import { render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { useAuthMock, replaceMock } = vi.hoisted(() => ({
+const { useAuthMock, replaceMock, usePathnameMock } = vi.hoisted(() => ({
   useAuthMock: vi.fn(),
   replaceMock: vi.fn(),
+  usePathnameMock: vi.fn(),
 }));
 
 vi.mock('@/features/auth/auth-provider', () => ({
@@ -14,11 +15,14 @@ vi.mock('@/features/auth/auth-provider', () => ({
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace: replaceMock }),
+  usePathname: usePathnameMock,
 }));
 
 beforeEach(() => {
   useAuthMock.mockReset();
   replaceMock.mockReset();
+  usePathnameMock.mockReset();
+  usePathnameMock.mockReturnValue('/login');
 });
 
 afterEach(() => {
@@ -27,7 +31,7 @@ afterEach(() => {
 
 describe('GuestOnly', () => {
   it('renders a loader and does not redirect while loading', () => {
-    useAuthMock.mockReturnValue({ status: 'loading' });
+    useAuthMock.mockReturnValue({ status: 'loading', workspaces: [] });
 
     render(
       <GuestOnly>
@@ -41,7 +45,7 @@ describe('GuestOnly', () => {
   });
 
   it('renders children when unauthenticated and does not redirect', () => {
-    useAuthMock.mockReturnValue({ status: 'unauthenticated' });
+    useAuthMock.mockReturnValue({ status: 'unauthenticated', workspaces: [] });
 
     render(
       <GuestOnly>
@@ -53,8 +57,22 @@ describe('GuestOnly', () => {
     expect(replaceMock).not.toHaveBeenCalled();
   });
 
+  it('redirects a newly registered authenticated user to workspace onboarding', () => {
+    usePathnameMock.mockReturnValue('/register');
+    useAuthMock.mockReturnValue({ status: 'authenticated', workspaces: [] });
+
+    render(
+      <GuestOnly>
+        <div>guest content</div>
+      </GuestOnly>,
+    );
+
+    expect(screen.queryByText('guest content')).not.toBeInTheDocument();
+    expect(replaceMock).toHaveBeenCalledExactlyOnceWith('/workspaces/new');
+  });
+
   it('redirects to /dashboard and renders a loader when authenticated', () => {
-    useAuthMock.mockReturnValue({ status: 'authenticated' });
+    useAuthMock.mockReturnValue({ status: 'authenticated', workspaces: [] });
 
     render(
       <GuestOnly>
@@ -70,7 +88,7 @@ describe('GuestOnly', () => {
 
 describe('AuthenticatedOnly', () => {
   it('renders a loader and does not redirect while loading', () => {
-    useAuthMock.mockReturnValue({ status: 'loading' });
+    useAuthMock.mockReturnValue({ status: 'loading', workspaces: [] });
 
     render(
       <AuthenticatedOnly>
@@ -84,7 +102,7 @@ describe('AuthenticatedOnly', () => {
   });
 
   it('renders children only when authenticated', () => {
-    useAuthMock.mockReturnValue({ status: 'authenticated' });
+    useAuthMock.mockReturnValue({ status: 'authenticated', workspaces: [] });
 
     render(
       <AuthenticatedOnly>
@@ -97,7 +115,7 @@ describe('AuthenticatedOnly', () => {
   });
 
   it('redirects to /login and renders a loader when unauthenticated', () => {
-    useAuthMock.mockReturnValue({ status: 'unauthenticated' });
+    useAuthMock.mockReturnValue({ status: 'unauthenticated', workspaces: [] });
 
     render(
       <AuthenticatedOnly>

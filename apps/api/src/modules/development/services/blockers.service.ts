@@ -1,8 +1,8 @@
-import { BlockerQueryDto, CreateBlockerDto, ResolveBlockerDto, UpdateBlockerDto } from '../dto/development.dto';
 import { DevelopmentSharedService } from './development-shared.service';
 import { MilestonesService } from './milestones.service';
 import { ProgressCalculatorService } from './progress-calculator.service';
 import { TasksService } from './tasks.service';
+import { BlockerQueryDto, CreateBlockerDto, ResolveBlockerDto, UpdateBlockerDto } from '../dto/development.dto';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { Prisma } from 'src/generated/prisma/client';

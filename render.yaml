@@ -1,6 +1,6 @@
-# Render Blueprint for the SaaS Command Center API.
+﻿# Render Blueprint for the SaaS Command Center API.
 #
-# This deploys apps/api as a native Node web service — no Dockerfile is used.
+# This deploys apps/api as a native Node web service Ã¢â‚¬â€ no Dockerfile is used.
 # NestJS builds to plain JS (`nest build` -> apps/api/dist/main.js) and has no
 # native-binary/OS-level dependency that would require a container, so a
 # Dockerfile would only add build-time overhead without a corresponding
@@ -28,6 +28,8 @@ services:
       pnpm --filter @command-center/api exec prisma generate &&
       pnpm --filter @command-center/api build
 
+    preDeployCommand: pnpm --filter @command-center/api exec prisma migrate deploy
+
     startCommand: node apps/api/dist/main.js
 
     healthCheckPath: /api/v1/health
@@ -40,7 +42,7 @@ services:
       - key: PORT
         value: 4000
 
-      # Trust exactly Render's own front door — Render terminates TLS and
+      # Trust exactly Render's own front door Ã¢â‚¬â€ Render terminates TLS and
       # proxies through one hop, so req.ip should reflect the first
       # X-Forwarded-For entry. Do not set this to `true` (would trust an
       # attacker-supplied header if Render's topology ever changes).
@@ -53,12 +55,14 @@ services:
       # --- Database (Neon) ---
       - key: DATABASE_URL
         sync: false
+      - key: DIRECT_URL
+        sync: false
 
       # --- Redis (managed provider) ---
       - key: REDIS_URL
         sync: false
 
-      # --- Auth secrets — generate fresh values per environment, never reuse
+      # --- Auth secrets Ã¢â‚¬â€ generate fresh values per environment, never reuse
       #     a value that has ever appeared in a commit, chat log, or screenshot ---
       - key: JWT_ACCESS_SECRET
         sync: false
@@ -78,7 +82,7 @@ services:
         value: 'true'
       # Frontend (Vercel) and backend (Render) are different sites, so the
       # refresh cookie must be sent cross-site. This REQUIRES SameSite=None,
-      # which in turn requires Secure=true (already set above) — see
+      # which in turn requires Secure=true (already set above) Ã¢â‚¬â€ see
       # docs/DEPLOYMENT.md "Cookies" section for why `lax` would break login.
       - key: COOKIE_SAME_SITE
         value: none
@@ -133,6 +137,8 @@ services:
       pnpm --filter @command-center/api exec prisma generate &&
       pnpm --filter @command-center/api build
 
+    preDeployCommand: pnpm --filter @command-center/api exec prisma migrate deploy
+
     startCommand: node apps/api/dist/main.js
 
     healthCheckPath: /api/v1/health
@@ -142,6 +148,7 @@ services:
     envVars:
       - key: NODE_ENV
         value:
+          production
           production # intentionally "production" mode (not "development") so
           # staging exercises the same validation/security posture
           # as prod; it is a separate Render service/DB/Redis, not
@@ -154,7 +161,9 @@ services:
         value: 'true' # fine to leave on in staging for manual API exploration
 
       - key: DATABASE_URL
-        sync: false # a SEPARATE Neon database/branch from production — see docs/DEPLOYMENT.md
+        sync: false # a SEPARATE Neon database/branch from production
+      - key: DIRECT_URL
+        sync: false
       - key: REDIS_URL
         sync: false # a SEPARATE Redis instance/database index from production
 
@@ -182,7 +191,7 @@ services:
         sync: false
 
       - key: GITHUB_APP_SLUG
-        sync: false # a SEPARATE staging GitHub App — never reuse the production App
+        sync: false # a SEPARATE staging GitHub App Ã¢â‚¬â€ never reuse the production App
       - key: GITHUB_APP_CLIENT_ID
         sync: false
       - key: GITHUB_APP_CLIENT_SECRET

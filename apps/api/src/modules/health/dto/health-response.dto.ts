@@ -24,6 +24,18 @@ export class DatabaseReadinessDto {
   responseTimeMs!: number;
 }
 
+export class RedisReadinessDto {
+  @ApiProperty({
+    example: 'up',
+  })
+  status!: 'up' | 'down';
+
+  @ApiProperty({
+    example: 12,
+  })
+  responseTimeMs!: number;
+}
+
 export class ReadinessResponseDto {
   @ApiProperty({
     example: 'ready',
@@ -54,4 +66,9 @@ export class ReadinessResponseDto {
     type: DatabaseReadinessDto,
   })
   database!: DatabaseReadinessDto;
+
+  @ApiProperty({
+    type: RedisReadinessDto,
+  })
+  redis!: RedisReadinessDto;
 }

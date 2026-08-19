@@ -28,7 +28,8 @@ export function getIdentity(request: Request): string {
   const userId = (request as RequestWithOptionalUser).user?.id;
 
   if (userId) {
-    const workspaceId = request.params?.workspaceId;
+    const rawWorkspaceId = request.params?.workspaceId;
+    const workspaceId = typeof rawWorkspaceId === 'string' ? rawWorkspaceId : undefined;
 
     return workspaceId ? `user:${userId}:workspace:${workspaceId}` : `user:${userId}`;
   }

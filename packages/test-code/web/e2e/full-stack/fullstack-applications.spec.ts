@@ -84,7 +84,7 @@ test.describe('Batch 11 real application flows', () => {
     ).toBeVisible();
   });
 
-  test('returns a real conflict for a duplicate application slug', async () => {
+  test('generates a unique slug when the requested application slug is already in use', async () => {
     await page.goto(`/workspaces/${state.owner.workspaceId}/applications/new`);
 
     await page.getByLabel('Application name').fill('Batch 11 Duplicate App');
@@ -97,6 +97,12 @@ test.describe('Batch 11 real application flows', () => {
       })
       .click();
 
-    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toContainText(/slug|already|use/i);
+    await expect(page).toHaveURL(/\/applications\/[0-9a-f-]+$/);
+
+    await expect(
+      page.getByText(`${applicationSlug}-2`, {
+        exact: true,
+      }),
+    ).toBeVisible();
   });
 });

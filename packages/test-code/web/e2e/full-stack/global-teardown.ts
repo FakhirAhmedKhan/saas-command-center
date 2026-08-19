@@ -41,13 +41,22 @@ async function globalTeardown(): Promise<void> {
   try {
     await client.connect();
 
-    // Workspace.ownerId -> User has onDelete: Restrict, so the workspace
-    // (and its cascading members/applications/websites) must go first.
-    await client.query('DELETE FROM workspaces WHERE id = $1', [state.owner.workspaceId]);
+    // Every seeded/test user contains this runId in its email. Remove every
+    // workspace owned by those users first because Workspace.ownerId uses
+    // ON DELETE RESTRICT. Workspace dependants cascade from there.
+    const runEmailPattern = `%${state.runId}%`;
 
-    const userIds = [state.owner.id, state.admin.id, state.developer.id, state.viewer.id];
+    await client.query(
+      `DELETE FROM workspaces
+       WHERE owner_id IN (
+         SELECT id
+         FROM users
+         WHERE email LIKE $1
+       )`,
+      [runEmailPattern],
+    );
 
-    await client.query('DELETE FROM users WHERE id = ANY($1::uuid[])', [userIds]);
+    await client.query('DELETE FROM users WHERE email LIKE $1', [runEmailPattern]);
 
     console.log(`[full-stack teardown] Removed seed data for run ${state.runId}`);
   } catch (error) {

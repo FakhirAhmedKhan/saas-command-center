@@ -62,6 +62,7 @@ export function ManualWorkspaceForm({ onBack }: ManualWorkspaceFormProps) {
        * provider, so the new workspace appears
        * immediately on the dashboard.
        */
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
       window.location.assign(`/workspaces/${workspace.id}/applications`);
     } catch (submitError: unknown) {
       setError(getErrorMessage(submitError));

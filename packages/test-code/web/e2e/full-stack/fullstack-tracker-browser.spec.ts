@@ -530,21 +530,34 @@ test.describe('Real Chrome Tracker SDK E2E', () => {
 
     await page.goto(`/workspaces/${state.owner.workspaceId}/websites/${websiteId}/analytics-engine`);
 
-    await expectMetric(page, 'Pending', 5);
+    // The real background processor may already have processed some events.
+    // Read the current pending value instead of assuming all 5 are still pending.
+    const pendingLabel = page.locator('span', {
+      hasText: /^Pending$/,
+    });
 
-    const processingResponse = page.waitForResponse(
-      (response) => response.url().endsWith('/analytics-engine/process') && response.request().method() === 'POST',
-    );
+    const pendingValue = pendingLabel.locator('xpath=../following-sibling::p[1]');
 
-    await page
-      .getByRole('button', {
-        name: 'Process pending events',
-      })
-      .click();
+    const pendingBefore = Number((await pendingValue.textContent())?.trim() ?? '0');
 
-    expect((await processingResponse).status()).toBe(201);
+    expect(pendingBefore).toBeGreaterThanOrEqual(0);
+    expect(pendingBefore).toBeLessThanOrEqual(5);
 
-    await expectMetric(page, 'Pending', 0);
+    if (pendingBefore > 0) {
+      const processingResponse = page.waitForResponse(
+        (response) => response.url().endsWith('/analytics-engine/process') && response.request().method() === 'POST',
+      );
+
+      await page
+        .getByRole('button', {
+          name: 'Process pending events',
+        })
+        .click();
+
+      expect((await processingResponse).status()).toBe(201);
+    }
+
+    await expectMetric(page, 'Pending', 0, 30_000);
     await expectMetric(page, 'Visitors', 1);
     await expectMetric(page, 'Sessions', 1);
     await expectMetric(page, 'Page views', 3);

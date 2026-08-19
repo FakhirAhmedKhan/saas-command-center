@@ -65,6 +65,12 @@ export default defineConfig({
 
         NODE_ENV: 'test',
 
+        WEBHOOK_ENCRYPTION_KEY: 'MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=',
+
+        AUTH_REGISTER_RATE_LIMIT: '10000',
+        AUTH_LOGIN_RATE_LIMIT: '10000',
+        AUTH_REFRESH_RATE_LIMIT: '10000',
+
         PORT: '4100',
 
         WEB_URL: webUrl,
@@ -88,17 +94,21 @@ export default defineConfig({
     },
 
     {
-      command: 'pnpm exec next dev -p 3100',
+      command: `pnpm build && node -e "const fs=require('node:fs'); const root='.next/standalone/apps/web'; if(fs.existsSync('public')) fs.cpSync('public', root + '/public', { recursive: true }); fs.mkdirSync(root + '/.next', { recursive: true }); fs.cpSync('.next/static', root + '/.next/static', { recursive: true });" && node .next/standalone/apps/web/server.js`,
 
       cwd: webRoot,
 
       url: webUrl,
 
       reuseExistingServer: false,
-      timeout: 120_000,
+      timeout: 180_000,
 
       env: {
         ...process.env,
+
+        NODE_ENV: 'production',
+        PORT: '3100',
+        HOSTNAME: '127.0.0.1',
 
         NEXT_PUBLIC_API_URL: apiUrl,
 

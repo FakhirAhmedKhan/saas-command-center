@@ -125,6 +125,7 @@ test.describe('Phase 18 webhook integrations', () => {
       .click();
 
     await page
+      .locator('form')
       .getByRole('button', {
         name: 'Create webhook',
       })
@@ -226,7 +227,7 @@ test.describe('Phase 18 webhook integrations', () => {
 
     await expect(
       page.getByRole('button', {
-        name: 'Retry',
+        name: 'Try again',
       }),
     ).toBeVisible();
   });
@@ -321,6 +322,7 @@ test.describe('Phase 18 webhook integrations', () => {
       .click();
 
     await page
+      .locator('form')
       .getByRole('button', {
         name: 'Create webhook',
       })

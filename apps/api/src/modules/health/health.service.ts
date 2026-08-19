@@ -3,11 +3,13 @@ import { Inject, Injectable, ServiceUnavailableException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config';
 import type { TypedConfigService } from 'src/config/runtime-config';
 import { PrismaService } from 'src/database/prisma.service';
+import { RedisService } from 'src/infrastructure/redis/redis.service';
 
 @Injectable()
 export class HealthService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly redis: RedisService,
 
     @Inject(ConfigService)
     private readonly config: TypedConfigService,
@@ -21,21 +23,34 @@ export class HealthService {
   }
 
   async getReadiness(): Promise<ReadinessResponseDto> {
-    const startedAt = performance.now();
+    const databaseStartedAt = performance.now();
 
     try {
       await this.prisma.$queryRaw`
-          SELECT 1
-        `;
+        SELECT 1
+      `;
     } catch {
       throw new ServiceUnavailableException('Database is unavailable.');
     }
 
-    const responseTimeMs = Math.max(0, Math.round(performance.now() - startedAt));
+    const databaseResponseTimeMs = Math.max(0, Math.round(performance.now() - databaseStartedAt));
+
+    const redisStartedAt = performance.now();
+
+    try {
+      const result = await this.redis.getClient().ping();
+
+      if (result !== 'PONG') {
+        throw new Error('Unexpected Redis response.');
+      }
+    } catch {
+      throw new ServiceUnavailableException('Redis is unavailable.');
+    }
+
+    const redisResponseTimeMs = Math.max(0, Math.round(performance.now() - redisStartedAt));
 
     return {
       status: 'ready',
-
       service: 'command-center-api',
 
       version: this.config.get('APP_VERSION', {
@@ -50,7 +65,12 @@ export class HealthService {
 
       database: {
         status: 'up',
-        responseTimeMs,
+        responseTimeMs: databaseResponseTimeMs,
+      },
+
+      redis: {
+        status: 'up',
+        responseTimeMs: redisResponseTimeMs,
       },
     };
   }

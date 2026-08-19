@@ -57,7 +57,7 @@ test.describe('Batch 11 real website flows', () => {
 
     await expect(
       page.getByRole('heading', {
-        name: 'Tracker installation',
+        name: 'Install tracking',
       }),
     ).toBeVisible();
 

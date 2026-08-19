@@ -631,7 +631,12 @@ test.describe('Phase 17 team operations', () => {
 
     expect(lastUnreadOnlyParam).not.toBe('true');
 
-    await page.getByText('Unread only').click();
+    await page
+      .getByRole('button', {
+        name: 'Unread',
+        exact: true,
+      })
+      .click();
 
     await expect.poll(() => lastUnreadOnlyParam).toBe('true');
   });

@@ -2,6 +2,7 @@
 import type { RepositoryCodeFile } from './code-explorer.types';
 import { CodeViewer } from './code-viewer';
 import { render, screen } from '@testing-library/react';
+import Image from 'next/image';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@monaco-editor/react', () => ({
@@ -14,7 +15,7 @@ vi.mock('@monaco-editor/react', () => ({
 
 vi.mock('next/image', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  default: (props: any) => <img alt={props.alt} src={props.src} />,
+  default: (props: any) => <Image alt={props.alt} src={props.src} width={props.width} height={props.height} />,
 }));
 
 function textFile(overrides: Partial<RepositoryCodeFile> = {}): RepositoryCodeFile {

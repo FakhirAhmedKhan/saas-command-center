@@ -1,4 +1,4 @@
-import type { AnalyticsOverviewQueryInput, AnalyticsPreset } from '@command-center/shared-types';
+import type { AnalyticsOverviewQueryInput } from '@command-center/shared-types';
 
 export type { AnalyticsBreakdownItem, AnalyticsMetric, AnalyticsOverviewResponse, AnalyticsPreset, AnalyticsTrendPoint } from '@command-center/shared-types';
 

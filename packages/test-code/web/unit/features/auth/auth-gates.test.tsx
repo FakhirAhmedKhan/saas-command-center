@@ -13,6 +13,7 @@ vi.mock('@/features/auth/auth-provider', () => ({
 }));
 
 vi.mock('next/navigation', () => ({
+  usePathname: vi.fn(() => '/login'),
   useRouter: () => ({ replace: replaceMock }),
 }));
 

@@ -1,4 +1,14 @@
 import { validateEnvironment } from 'src/config/env.validation';
+import { generateKeyPairSync } from 'node:crypto';
+
+const TEST_GITHUB_PRIVATE_KEY_BASE64 = Buffer.from(
+  generateKeyPairSync('rsa', {
+    modulusLength: 2048,
+  }).privateKey.export({
+    type: 'pkcs8',
+    format: 'pem',
+  }),
+).toString('base64');
 
 function baseConfig(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
@@ -14,19 +24,32 @@ function baseConfig(overrides: Record<string, unknown> = {}): Record<string, unk
   };
 }
 
-describe('validateEnvironment — ANALYTICS_IP_HASH_SALT (SEC-03)', () => {
+function productionConfig(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return baseConfig({
+    NODE_ENV: 'production',
+    COOKIE_SECURE: 'true',
+    FRONTEND_URL: 'https://app.example.com',
+
+    GITHUB_APP_CALLBACK_URL: 'https://app.example.com/github/callback',
+    GITHUB_APP_CLIENT_ID: 'Iv1.production-test-client',
+    GITHUB_APP_CLIENT_SECRET: 'g'.repeat(40),
+    GITHUB_APP_PRIVATE_KEY_BASE64: TEST_GITHUB_PRIVATE_KEY_BASE64,
+    GITHUB_APP_SLUG: 'command-center-production-test',
+    GITHUB_APP_WEBHOOK_SECRET: 'h'.repeat(40),
+
+    ...overrides,
+  });
+}
+
+describe('validateEnvironment ? ANALYTICS_IP_HASH_SALT (SEC-03)', () => {
   it('fails startup clearly when missing in production', () => {
-    expect(() => validateEnvironment(baseConfig({ NODE_ENV: 'production', COOKIE_SECURE: 'true' }))).toThrow(
-      /ANALYTICS_IP_HASH_SALT is required in production/,
-    );
+    expect(() => validateEnvironment(productionConfig())).toThrow(/ANALYTICS_IP_HASH_SALT is required in production/);
   });
 
   it('fails startup when the configured production value is a placeholder', () => {
     expect(() =>
       validateEnvironment(
-        baseConfig({
-          NODE_ENV: 'production',
-          COOKIE_SECURE: 'true',
+        productionConfig({
           ANALYTICS_IP_HASH_SALT: `replace-with-a-random-secret-${'x'.repeat(10)}`,
         }),
       ),
@@ -36,9 +59,7 @@ describe('validateEnvironment — ANALYTICS_IP_HASH_SALT (SEC-03)', () => {
   it('fails startup when the configured production value is too short', () => {
     expect(() =>
       validateEnvironment(
-        baseConfig({
-          NODE_ENV: 'production',
-          COOKIE_SECURE: 'true',
+        productionConfig({
           ANALYTICS_IP_HASH_SALT: 'too-short',
         }),
       ),
@@ -49,9 +70,7 @@ describe('validateEnvironment — ANALYTICS_IP_HASH_SALT (SEC-03)', () => {
     const salt = 'z'.repeat(40);
 
     const result = validateEnvironment(
-      baseConfig({
-        NODE_ENV: 'production',
-        COOKIE_SECURE: 'true',
+      productionConfig({
         ANALYTICS_IP_HASH_SALT: salt,
       }),
     );
@@ -63,36 +82,42 @@ describe('validateEnvironment — ANALYTICS_IP_HASH_SALT (SEC-03)', () => {
     const result = validateEnvironment(baseConfig({ NODE_ENV: 'development' }));
 
     expect(result.ANALYTICS_IP_HASH_SALT).toEqual(expect.any(String));
-
     expect(result.ANALYTICS_IP_HASH_SALT.length).toBeGreaterThan(0);
-
     expect(result.ANALYTICS_IP_HASH_SALT).toContain('dev-only');
   });
 
   it('honors an explicitly configured value outside production instead of the fallback', () => {
     const salt = 'y'.repeat(40);
 
-    const result = validateEnvironment(baseConfig({ NODE_ENV: 'development', ANALYTICS_IP_HASH_SALT: salt }));
+    const result = validateEnvironment(
+      baseConfig({
+        NODE_ENV: 'development',
+        ANALYTICS_IP_HASH_SALT: salt,
+      }),
+    );
 
     expect(result.ANALYTICS_IP_HASH_SALT).toBe(salt);
   });
 
-  it('is deterministic — resolving the same config twice yields the same value', () => {
-    const first = validateEnvironment(baseConfig({ NODE_ENV: 'test', TEST_DATABASE_URL: 'postgresql://user:pass@localhost:5432/db_test' }));
+  it('is deterministic ? resolving the same config twice yields the same value', () => {
+    const config = baseConfig({
+      NODE_ENV: 'test',
+      TEST_DATABASE_URL: 'postgresql://user:pass@localhost:5432/db_test',
+    });
 
-    const second = validateEnvironment(baseConfig({ NODE_ENV: 'test', TEST_DATABASE_URL: 'postgresql://user:pass@localhost:5432/db_test' }));
+    const first = validateEnvironment(config);
+    const second = validateEnvironment(config);
 
     expect(first.ANALYTICS_IP_HASH_SALT).toBe(second.ANALYTICS_IP_HASH_SALT);
   });
 });
 
-describe('validateEnvironment — production placeholder detection (widened for SEC-03)', () => {
+describe('validateEnvironment ? production placeholder detection (widened for SEC-03)', () => {
   it('rejects the exact "replace-with-..." placeholder pattern used throughout .env.example', () => {
     expect(() =>
       validateEnvironment(
-        baseConfig({
-          NODE_ENV: 'production',
-          COOKIE_SECURE: 'true',
+        productionConfig({
+          ANALYTICS_IP_HASH_SALT: 'z'.repeat(40),
           JWT_ACCESS_SECRET: `replace-with-a-random-access-secret-${'x'.repeat(10)}`,
         }),
       ),
@@ -100,8 +125,8 @@ describe('validateEnvironment — production placeholder detection (widened for 
   });
 });
 
-describe('validateEnvironment — GitHub App configuration', () => {
-  it('is optional: startup succeeds with no GITHUB_APP_* variables set', () => {
+describe('validateEnvironment ? GitHub App configuration', () => {
+  it('remains optional outside production', () => {
     const result = validateEnvironment(baseConfig());
 
     expect(result.GITHUB_APP_CALLBACK_URL).toBeUndefined();
@@ -112,7 +137,65 @@ describe('validateEnvironment — GitHub App configuration', () => {
     expect(result.GITHUB_APP_WEBHOOK_SECRET).toBeUndefined();
   });
 
-  it('passes every GITHUB_APP_* variable through to the resolved config unchanged', () => {
+  it('requires GitHub App configuration in production', () => {
+    expect(() =>
+      validateEnvironment(
+        baseConfig({
+          NODE_ENV: 'production',
+          COOKIE_SECURE: 'true',
+          FRONTEND_URL: 'https://app.example.com',
+          ANALYTICS_IP_HASH_SALT: 'z'.repeat(40),
+        }),
+      ),
+    ).toThrow(/GITHUB_APP_SLUG is required/);
+  });
+
+  it('accepts complete GitHub App configuration in production', () => {
+    const result = validateEnvironment(
+      productionConfig({
+        ANALYTICS_IP_HASH_SALT: 'z'.repeat(40),
+      }),
+    );
+
+    expect(result.GITHUB_APP_SLUG).toBe('command-center-production-test');
+    expect(result.GITHUB_APP_CLIENT_ID).toBe('Iv1.production-test-client');
+    expect(result.GITHUB_APP_CALLBACK_URL).toBe('https://app.example.com/github/callback');
+  });
+
+  it('requires an HTTPS GitHub callback in production', () => {
+    expect(() =>
+      validateEnvironment(
+        productionConfig({
+          ANALYTICS_IP_HASH_SALT: 'z'.repeat(40),
+          GITHUB_APP_CALLBACK_URL: 'http://app.example.com/github/callback',
+        }),
+      ),
+    ).toThrow(/GITHUB_APP_CALLBACK_URL must use https:/);
+  });
+
+  it('requires the GitHub callback to use the frontend origin in production', () => {
+    expect(() =>
+      validateEnvironment(
+        productionConfig({
+          ANALYTICS_IP_HASH_SALT: 'z'.repeat(40),
+          GITHUB_APP_CALLBACK_URL: 'https://other.example.com/github/callback',
+        }),
+      ),
+    ).toThrow(/same origin as FRONTEND_URL/);
+  });
+
+  it('rejects an invalid GitHub private key in production', () => {
+    expect(() =>
+      validateEnvironment(
+        productionConfig({
+          ANALYTICS_IP_HASH_SALT: 'z'.repeat(40),
+          GITHUB_APP_PRIVATE_KEY_BASE64: Buffer.from('not-a-private-key').toString('base64'),
+        }),
+      ),
+    ).toThrow(/valid Base64-encoded private key/);
+  });
+
+  it('passes every GITHUB_APP_* variable through unchanged outside production', () => {
     const result = validateEnvironment(
       baseConfig({
         GITHUB_APP_CALLBACK_URL: 'http://localhost:3000/github/callback',
@@ -132,21 +215,25 @@ describe('validateEnvironment — GitHub App configuration', () => {
     expect(result.GITHUB_APP_WEBHOOK_SECRET).toBe('example-webhook-secret');
   });
 
-  it('treats a blank GITHUB_APP_* value the same as unset', () => {
-    const result = validateEnvironment(baseConfig({ GITHUB_APP_SLUG: '   ' }));
+  it('treats a blank GITHUB_APP_* value as unset outside production', () => {
+    const result = validateEnvironment(
+      baseConfig({
+        GITHUB_APP_SLUG: '   ',
+      }),
+    );
 
     expect(result.GITHUB_APP_SLUG).toBeUndefined();
   });
 
-  it('never appears in any thrown validation error message, even when other secrets are being validated', () => {
+  it('never leaks GitHub secrets in another validation error', () => {
+    const githubSecret = 'super-secret-github-value-should-not-leak';
+
     try {
       validateEnvironment(
-        baseConfig({
-          NODE_ENV: 'production',
-          COOKIE_SECURE: 'true',
+        productionConfig({
+          ANALYTICS_IP_HASH_SALT: 'z'.repeat(40),
           JWT_ACCESS_SECRET: 'too-short',
-          GITHUB_APP_CLIENT_SECRET: 'super-secret-github-value-should-not-leak',
-          GITHUB_APP_PRIVATE_KEY_BASE64: 'super-secret-private-key-should-not-leak',
+          GITHUB_APP_CLIENT_SECRET: githubSecret,
         }),
       );
 
@@ -154,8 +241,9 @@ describe('validateEnvironment — GitHub App configuration', () => {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
 
-      expect(message).not.toContain('super-secret-github-value-should-not-leak');
-      expect(message).not.toContain('super-secret-private-key-should-not-leak');
+      expect(message).toMatch(/JWT_ACCESS_SECRET/);
+      expect(message).not.toContain(githubSecret);
+      expect(message).not.toContain(TEST_GITHUB_PRIVATE_KEY_BASE64);
     }
   });
 });

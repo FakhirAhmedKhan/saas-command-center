@@ -40,18 +40,16 @@ test.describe('Batch 11 real authentication', () => {
     await expect(page.getByText('Invalid email or password')).toBeVisible();
   });
 
-  test('registers a fifth real account and workspace', async ({ page }) => {
+  test('registers a fifth real account and opens workspace onboarding', async ({ page }) => {
     const email = `batch11-new-${state.runId}@example.test`;
 
     await page.goto('/register');
 
-    await page.getByLabel('Your name').fill('Batch 11 New Owner');
+    await page.getByLabel('Name').fill('Batch 11 New Owner');
 
     await page.getByLabel('Email').fill(email);
 
     await page.getByLabel('Password').fill('StrongBatch11Password123!');
-
-    await page.getByLabel('Workspace name').fill('Batch 11 Registered Workspace');
 
     await page
       .getByRole('button', {
@@ -59,9 +57,11 @@ test.describe('Batch 11 real authentication', () => {
       })
       .click();
 
-    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page).toHaveURL(/\/workspaces\/new$/);
 
-    await expect(page.getByText(email)).toBeVisible();
+    await page.reload();
+
+    await expect(page).toHaveURL(/\/workspaces\/new$/);
   });
 
   test('restores the browser session from the real refresh-token cookie', async ({ browser }) => {
@@ -89,7 +89,12 @@ test.describe('Batch 11 real authentication', () => {
       })
       .click();
 
-    await expect(page).toHaveURL(/\/login$/);
+    await expect(page).toHaveURL(/\/login\?/);
+
+    const logoutUrl = new URL(page.url());
+
+    expect(logoutUrl.pathname).toBe('/login');
+    expect(logoutUrl.searchParams.get('next')).toBe('/dashboard');
 
     await page.goto('/dashboard');
 

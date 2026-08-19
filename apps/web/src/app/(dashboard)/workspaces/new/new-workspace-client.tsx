@@ -22,6 +22,7 @@ export default function NewWorkspacePage() {
       <GithubImportWizard
         onCancel={() => setMethod('select')}
         onImported={(workspaceId) => {
+          // eslint-disable-next-line @next/next/no-location-assign-relative-destination
           window.location.assign(`/workspaces/${workspaceId}/applications`);
         }}
       />
