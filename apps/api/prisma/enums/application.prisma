@@ -1,0 +1,54 @@
+enum ApplicationStatus {
+  IDEA
+  PLANNING
+  IN_DEVELOPMENT
+  TESTING
+  LIVE
+  MAINTENANCE
+  PAUSED
+}
+
+enum ApplicationPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ApplicationCategory {
+  SAAS
+  AI
+  MOBILE
+  ECOMMERCE
+  API
+  INTERNAL_TOOL
+  OTHER
+}
+
+enum TechnologyType {
+  FRONTEND
+  BACKEND
+  DATABASE
+  MOBILE
+  AI
+  INFRASTRUCTURE
+  OTHER
+}
+
+enum ApplicationLinkType {
+  PRODUCTION
+  STAGING
+  REPOSITORY
+  DOCUMENTATION
+  DESIGN
+  API
+  OTHER
+}
+
+enum DevelopmentTemplateType {
+  STANDARD_SAAS
+  AI_SAAS
+  MOBILE
+  API
+  ECOMMERCE
+}

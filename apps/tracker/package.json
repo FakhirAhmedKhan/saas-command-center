@@ -1,17 +1,22 @@
 {
   "name": "@command-center/tracker",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "eslint src --max-warnings=0",
-    "test": "node --test"
+    "dev": "node scripts/dev.mjs",
+    "build": "node scripts/build.mjs",
+    "start": "node scripts/server.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "pnpm build && node scripts/test.mjs",
+    "test:cover": "node scripts/build-coverage.mjs && node scripts/test.mjs --coverage",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
-    "@eslint/js": "^9.34.0",
-    "eslint": "^9.34.0",
-    "typescript": "^5.9.2",
-    "typescript-eslint": "^8.41.0"
+    "@command-center/eslint-config": "workspace:*",
+    "esbuild": "^0.25.12",
+    "globals": "^17.11.0",
+    "typescript": "^5.9.2"
   }
 }

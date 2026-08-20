@@ -1,0 +1,14 @@
+PASS test/website-roles.e2e-spec.ts (43.978 s)
+  Website Roles E2E
+    √ allows OWNER, ADMIN, and DEVELOPER to create and update websites (6714 ms)
+    √ allows OWNER, ADMIN, and DEVELOPER to connect and disconnect websites (2496 ms)
+    √ allows VIEWER to read but prevents website mutations (2079 ms)
+    √ allows OWNER and ADMIN to archive, restore, and rotate keys (1882 ms)
+    √ prevents DEVELOPER from archive, restore, and key rotation (1483 ms)
+    √ prevents outsider and anonymous access (1767 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       6 passed, 6 total
+Snapshots:   0 total
+Time:        45.211 s
+Ran all test suites within paths "test/website-roles.e2e-spec.ts".

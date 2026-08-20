@@ -1,0 +1,12 @@
+PASS test/analytics-visitors.e2e-spec.ts (8.582 s)
+  Analytics Visitors E2E
+    √ creates one visitor per website and external visitor ID (1896 ms)
+    √ isolates the same external visitor ID between websites (1288 ms)
+    √ rebuilds firstSeenAt and lastSeenAt from out-of-order events (931 ms)
+    √ keeps visitor counts idempotent across repeated processing runs (998 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       4 passed, 4 total
+Snapshots:   0 total
+Time:        9.02 s
+Ran all test suites within paths "test/analytics-visitors.e2e-spec.ts".

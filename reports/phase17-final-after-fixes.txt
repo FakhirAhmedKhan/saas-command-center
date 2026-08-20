@@ -1,0 +1,66 @@
+(node:23104) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+FAIL test/phase17-team-operations.e2e-spec.ts (10.878 s)
+  Phase 17 Team Operations E2E
+    √ rejects anonymous access to list invitations (19 ms)
+    √ allows an OWNER to create an invitation (180 ms)
+    √ allows an ADMIN to create an invitation (100 ms)
+    √ rejects a DEVELOPER creating an invitation (only OWNER/ADMIN may manage invitations) (37 ms)
+    √ rejects a DEVELOPER listing invitations (no read access for lower roles on this controller) (32 ms)
+    √ rejects an invalid email (56 ms)
+    √ rejects an invalid workspace role (44 ms)
+    √ rejects inviting an email that already belongs to a workspace member (409) (59 ms)
+    √ allows inviting an email belonging to an existing platform user who is not yet a member (280 ms)
+    √ lists invitations scoped to the workspace, filterable by status (62 ms)
+    √ rejects an invalid status filter (35 ms)
+    √ resends a pending invitation, rotating the token and incrementing sendCount (312 ms)
+    √ rejects resending an already-revoked invitation (194 ms)
+    √ returns 404 when revoking an invitation that is not pending (175 ms)
+    √ returns 404 for a nonexistent invitation id (41 ms)
+    √ rejects an invitation-management call scoped to a workspace the invitation does not belong to (359 ms)
+    √ allows anonymous preview of a pending invitation by token (122 ms)
+    √ returns 404 for an unknown/garbage token (23 ms)
+    √ requires authentication to accept an invitation (109 ms)
+    √ rejects accepting an invitation whose email does not match the authenticated user (123 ms)
+    √ accepts a matching invitation: creates the workspace membership with the invited role (351 ms)
+    √ rejects accepting the same invitation a second time (already consumed) (354 ms)
+    √ accepting an invitation when already a member does not duplicate membership or change role (103 ms)
+    √ requires authentication to decline an invitation (110 ms)
+    √ declines a matching invitation without creating a workspace membership (325 ms)
+    √ lazily expires a PENDING invitation once past expiresAt, surfacing EXPIRED on preview (139 ms)
+    √ rejects accepting an expired invitation with a 409 (303 ms)
+    √ enforces the invitation resend rate limit of 5 per 15 minutes (502 ms)
+    √ rejects anonymous access to notifications (11 ms)
+    √ lists only the authenticated user own notifications (40 ms)
+    √ reports an accurate unread count and reduces it after marking all as read (88 ms)
+    √ marks a single notification as read and persists readAt (45 ms)
+    √ rejects marking as read a notification that does not belong to the caller (47 ms)
+    √ returns 400 for a malformed notification id (18 ms)
+    × filters notifications by type (31 ms)
+    √ rejects an invalid notification type filter (20 ms)
+
+  ● Phase 17 Team Operations E2E › filters notifications by type
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+    [0m [90m 883 |[39m     [36mconst[39m items [33m=[39m body(response)[33m.[39mitems [36mas[39m [33mJsonRecord[39m[][33m;[39m
+     [90m 884 |[39m
+    [31m[1m>[22m[39m[90m 885 |[39m     expect(items[33m.[39mevery((item) [33m=>[39m item[33m.[39mtype [33m===[39m [33mNotificationType[39m[33m.[39m[33mSYSTEM[39m))[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+     [90m     |[39m                                                                          [31m[1m^[22m[39m
+     [90m 886 |[39m   })[33m;[39m
+     [90m 887 |[39m
+     [90m 888 |[39m   it([32m'rejects an invalid notification type filter'[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (test/phase17-team-operations.e2e-spec.ts:885:74)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 35 passed, 36 total
+Snapshots:   0 total
+Time:        11.442 s
+Ran all test suites within paths "test/phase17-team-operations.e2e-spec.ts".
+undefined
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api:
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command failed with exit code 1: jest --config ./test/jest-e2e.config.cjs --runInBand --runTestsByPath test/phase17-team-operations.e2e-spec.ts

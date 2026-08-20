@@ -4,10 +4,7 @@ import type { HealthResponse } from '@command-center/shared-types';
 import { StatusBadge } from '@command-center/ui';
 import { useEffect, useState } from 'react';
 
-type HealthState =
-  | { kind: 'checking' }
-  | { kind: 'connected'; data: HealthResponse }
-  | { kind: 'unavailable'; message: string };
+type HealthState = { kind: 'checking' } | { kind: 'connected'; data: HealthResponse } | { kind: 'unavailable'; message: string };
 
 export function ApiHealthCard() {
   const [state, setState] = useState<HealthState>({ kind: 'checking' });
@@ -43,22 +40,20 @@ export function ApiHealthCard() {
   }, [apiUrl]);
 
   return (
-    <section className="health-card" aria-live="polite">
+    <section className='health-card' aria-live='polite'>
       <div>
-        <p className="eyebrow">API FOUNDATION</p>
+        <p className='eyebrow'>API FOUNDATION</p>
         <h2>Backend connection</h2>
       </div>
 
       {state.kind === 'checking' && <StatusBadge>Checking</StatusBadge>}
-      {state.kind === 'connected' && <StatusBadge tone="success">Connected</StatusBadge>}
-      {state.kind === 'unavailable' && <StatusBadge tone="danger">Unavailable</StatusBadge>}
+      {state.kind === 'connected' && <StatusBadge tone='success'>Connected</StatusBadge>}
+      {state.kind === 'unavailable' && <StatusBadge tone='danger'>Unavailable</StatusBadge>}
 
-      <p className="health-copy">
+      <p className='health-copy'>
         {state.kind === 'checking' && 'Checking the NestJS health endpoint…'}
-        {state.kind === 'connected' &&
-          `${state.data.service} is healthy in ${state.data.environment}.`}
-        {state.kind === 'unavailable' &&
-          `Start the API on port 4000. ${state.message}`}
+        {state.kind === 'connected' && `${state.data.service} is healthy in ${state.data.environment}.`}
+        {state.kind === 'unavailable' && `Start the API on port 4000. ${state.message}`}
       </p>
     </section>
   );

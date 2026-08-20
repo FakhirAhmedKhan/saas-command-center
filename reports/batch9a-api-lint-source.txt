@@ -1,0 +1,981 @@
+﻿
+==================================================
+FILE: apps\api\src\bootstrap\configure-application.ts
+==================================================
+    1: import { AllExceptionsFilter } from '../common/filters/all-exceptions.filter';
+    2: import { requestIdMiddleware } from '../common/middleware/request-id.middleware';
+    3: import { getAllowedOrigins, parseTrustProxy, type TypedConfigService } from '../config/runtime-config';
+    4: import { Logger, ValidationPipe, type INestApplication } from '@nestjs/common';
+    5: import { ConfigService } from '@nestjs/config';
+    6: import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+    7: import cookieParser from 'cookie-parser';
+    8: import { json, raw, urlencoded, type Express } from 'express';
+    9: import helmet from 'helmet';
+   10: 
+   11: export interface ConfigureApplicationOptions {
+   12:   enableSwagger?: boolean;
+   13: }
+   14: 
+   15: function configureCors(app: INestApplication, config: TypedConfigService): void {
+   16:   const allowedOrigins = getAllowedOrigins(config);
+   17: 
+   18:   app.enableCors({
+   19:     credentials: true,
+   20: 
+   21:     methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+   22: 
+   23:     allowedHeaders: ['Authorization', 'Content-Type', 'X-Request-Id', 'X-Workspace-Id'],
+   24: 
+   25:     exposedHeaders: ['X-Request-Id'],
+   26: 
+   27:     origin(origin: string, callback: (arg0: Error | null, arg1: boolean) => void) {
+   28:       if (!origin) {
+   29:         callback(null, true);
+   30: 
+   31:         return;
+   32:       }
+   33: 
+   34:       if (allowedOrigins.has(origin)) {
+   35:         callback(null, true);
+   36: 
+   37:         return;
+   38:       }
+   39: 
+   40:       callback(new Error(`Origin ${origin} is not allowed by CORS.`), false);
+   41:     },
+   42:   });
+   43: }
+   44: 
+   45: function configureSwagger(app: INestApplication): void {
+   46:   const swaggerConfig = new DocumentBuilder()
+   47:     .setTitle('SaaS Command Center API')
+   48:     .setDescription('Backend API for SaaS Command Center.')
+   49:     .setVersion('0.1.0')
+   50:     .addBearerAuth()
+   51:     .addCookieAuth('command_center_refresh_token')
+   52:     .build();
+   53: 
+   54:   const document = SwaggerModule.createDocument(app, swaggerConfig);
+   55: 
+   56:   SwaggerModule.setup('api/v1/docs', app, document, {
+   57:     swaggerOptions: {
+   58:       persistAuthorization: true,
+   59:     },
+   60:   });
+   61: }
+   62: 
+   63: export function configureApplication(app: INestApplication, options: ConfigureApplicationOptions = {}): void {
+   64:   const logger = new Logger('ApplicationBootstrap');
+   65: 
+   66:   const config = app.get<TypedConfigService>(ConfigService);
+   67: 
+   68:   const expressApplication = app.getHttpAdapter().getInstance() as Express;
+   69: 
+   70:   expressApplication.set(
+   71:     'trust proxy',
+   72:     parseTrustProxy(
+   73:       config.get('TRUST_PROXY', {
+   74:         infer: true,
+   75:       }),
+   76:     ),
+   77:   );
+   78: 
+   79:   app.use(requestIdMiddleware);
+   80: 
+   81:   app.use(
+   82:     helmet({
+   83:       contentSecurityPolicy:
+   84:         config.get('NODE_ENV', {
+   85:           infer: true,
+   86:         }) === 'production',
+   87: 
+   88:       crossOriginResourcePolicy: {
+   89:         policy: 'cross-origin',
+   90:       },
+   91:     }),
+   92:   );
+   93: 
+   94:   app.use(cookieParser());
+   95: 
+   96:   const bodyLimit = config.get('BODY_LIMIT', {
+   97:     infer: true,
+   98:   });
+   99: 
+  100:   app.use(
+  101:     json({
+  102:       limit: bodyLimit,
+  103:     }),
+  104:   );
+  105: 
+  106:   app.use(
+  107:     urlencoded({
+  108:       extended: true,
+  109:       limit: bodyLimit,
+  110:     }),
+  111:   );
+  112: 
+  113:   configureCors(app, config);
+  114: 
+  115:   app.setGlobalPrefix('api/v1');
+  116: 
+  117:   app.useGlobalPipes(
+  118:     new ValidationPipe({
+  119:       transform: true,
+  120:       whitelist: true,
+
+==================================================
+FILE: apps\api\src\modules\activity\utils\activity-metadata-sanitizer.ts
+==================================================
+   50:       .slice(0, MAX_ARRAY_ITEMS)
+   51:       .map((item) => sanitizeValue(item, depth + 1))
+   52:       .filter((item): item is Prisma.InputJsonValue => item !== undefined);
+   53:   }
+   54: 
+   55:   if (typeof value === 'object') {
+   56:     const source = value as Record<string, unknown>;
+   57: 
+   58:     const result: Record<string, Prisma.InputJsonValue> = {};
+   59: 
+   60:     const entries = Object.entries(source).slice(0, MAX_OBJECT_KEYS);
+   61: 
+   62:     for (const [key, item] of entries) {
+   63:       if (SECRET_KEY_PATTERN.test(normalizeKey(key))) {
+   64:         result[key] = '[REDACTED]';
+   65:         continue;
+   66:       }
+   67: 
+   68:       const sanitized = sanitizeValue(item, depth + 1);
+   69: 
+   70:       if (sanitized !== undefined) {
+   71:         result[key] = sanitized;
+   72:       }
+   73:     }
+   74: 
+   75:     return result;
+   76:   }
+   77: 
+   78:   return sanitizeString(String(value));
+   79: }
+   80: 
+   81: export function sanitizeActivityMetadata(metadata?: Record<string, unknown>): Prisma.InputJsonObject | undefined {
+   82:   if (!metadata) {
+   83:     return undefined;
+   84:   }
+   85: 
+   86:   const sanitized = sanitizeValue(metadata, 0);
+   87: 
+   88:   if (!sanitized || Array.isArray(sanitized) || typeof sanitized !== 'object') {
+   89:     return undefined;
+   90:   }
+   91: 
+   92:   return sanitized as Prisma.InputJsonObject;
+   93: }
+
+==================================================
+FILE: apps\api\src\modules\analytics-engine\services\analytics-aggregation.service.ts
+==================================================
+    1: import { getAnalyticsBucket } from '../utils/analytics-time';
+    2: import { AnalyticsAggregatePeriod } from '@command-center/shared-types';
+    3: import { Injectable } from '@nestjs/common';
+    4: import { DefaultArgs } from '@prisma/client/runtime/client';
+    5: import { createHash } from 'node:crypto';
+    6: import { PrismaService } from 'src/database/prisma.service';
+    7: import { AnalyticsAggregateDimension, AnalyticsDeviceType, RawAnalyticsEventType } from 'src/generated/prisma/enums';
+    8: import { PrismaClient } from 'src/generated/prisma/internal/class';
+    9: import { GlobalOmitConfig } from 'src/generated/prisma/internal/prismaNamespace';
+   10: import { ProcessAnalyticsRangeInput } from 'src/modules/analytics-processing/services/analytics-range-processor.service';
+   11: 
+   12: export interface AnalyticsAggregationWebsite {
+   13:   id: string;
+   14:   timeZone: string;
+   15: }
+   16: 
+   17: interface MutableAggregate {
+   18:   dimension: AnalyticsAggregateDimension;
+   19:   value: string;
+   20:   label: string;
+   21:   visitors: Set<string>;
+   22:   sessions: Set<string>;
+   23:   pageViews: number;
+   24:   events: number;
+   25:   customEvents: number;
+   26:   bounces: number;
+   27:   totalDurationMs: bigint;
+   28: }
+   29: 
+   30: @Injectable()
+   31: export class AnalyticsAggregationService {
+   32:   rebuildRange(
+   33:     D: Omit<PrismaClient<never, GlobalOmitConfig | undefined, DefaultArgs>, '$connect' | '$disconnect' | '$on' | '$use' | '$extends'>,
+   34:     input: ProcessAnalyticsRangeInput,
+   35:   ) {
+   36:     throw new Error('Method not implemented.');
+   37:   }
+   38:   constructor(private readonly prisma: PrismaService) {}
+   39: 
+   40:   async rebuildBucket(website: AnalyticsAggregationWebsite, period: AnalyticsAggregatePeriod, bucketStart: Date): Promise<void> {
+   41:     const bucket = getAnalyticsBucket(bucketStart, website.timeZone, period);
+   42: 
+   43:     const [events, pageViews, sessions] = await this.prisma.$transaction([
+   44:       this.prisma.analyticsEvent.findMany({
+   45:         where: {
+   46:           websiteId: website.id,
+   47: 
+   48:           occurredAt: {
+   49:             gte: bucket.start,
+   50: 
+   51:             lt: bucket.end,
+   52:           },
+   53:         },
+   54: 
+   55:         select: {
+   56:           visitorId: true,
+   57: 
+   58:           sessionId: true,
+   59: 
+   60:           type: true,
+   61: 
+   62:           eventName: true,
+   63:         },
+   64:       }),
+   65: 
+   66:       this.prisma.analyticsPageView.findMany({
+   67:         where: {
+   68:           websiteId: website.id,
+   69: 
+   70:           occurredAt: {
+   71:             gte: bucket.start,
+   72: 
+   73:             lt: bucket.end,
+   74:           },
+   75:         },
+   76: 
+   77:         select: {
+   78:           visitorId: true,
+   79: 
+   80:           sessionId: true,
+   81: 
+   82:           normalizedPath: true,
+   83: 
+   84:           title: true,
+   85:         },
+   86:       }),
+   87: 
+   88:       this.prisma.analyticsSession.findMany({
+   89:         where: {
+   90:           websiteId: website.id,
+
+==================================================
+FILE: apps\api\src\modules\analytics-engine\services\page-view-rebuilder.service.ts
+==================================================
+    1: import { Injectable } from '@nestjs/common';
+    2: import { DefaultArgs } from '@prisma/client/runtime/client';
+    3: import { Prisma } from 'src/generated/prisma/client';
+    4: import { PrismaClient } from 'src/generated/prisma/internal/class';
+    5: import { ProcessAnalyticsRangeInput } from 'src/modules/analytics-processing/services/analytics-range-processor.service';
+    6: 
+    7: export type AnalyticsPageViewRecord = Prisma.AnalyticsPageViewGetPayload<Record<string, never>>;
+    8: 
+    9: export interface RebuiltPageViews {
+   10:   pageViews: AnalyticsPageViewRecord[];
+   11:   firstPage: AnalyticsPageViewRecord | null;
+   12:   lastPage: AnalyticsPageViewRecord | null;
+   13: }
+   14: 
+   15: @Injectable()
+   16: export class PageViewRebuilderService {
+   17:   rebuildRange(
+   18:     transaction: Omit<PrismaClient<never, Prisma.GlobalOmitConfig | undefined, DefaultArgs>, '$connect' | '$disconnect' | '$on' | '$use' | '$extends'>,
+   19:     input: ProcessAnalyticsRangeInput,
+   20:   ) {
+   21:     throw new Error('Method not implemented.');
+   22:   }
+   23:   async rebuildForSession(transaction: Prisma.TransactionClient, sessionId: string): Promise<RebuiltPageViews> {
+   24:     const pageViews = await transaction.analyticsPageView.findMany({
+   25:       where: {
+   26:         sessionId,
+   27:       },
+   28: 
+   29:       orderBy: [
+   30:         {
+   31:           occurredAt: 'asc',
+   32:         },
+   33:         {
+   34:           id: 'asc',
+   35:         },
+   36:       ],
+   37:     });
+   38: 
+   39:     const firstPage = pageViews[0] ?? null;
+   40: 
+   41:     const lastPage = pageViews.at(-1) ?? null;
+   42: 
+   43:     await transaction.analyticsPageView.updateMany({
+   44:       where: {
+   45:         sessionId,
+   46:       },
+   47: 
+   48:       data: {
+   49:         isEntry: false,
+   50: 
+   51:         isExit: false,
+   52:       },
+   53:     });
+   54: 
+   55:     if (firstPage && lastPage && firstPage.id === lastPage.id) {
+   56:       await transaction.analyticsPageView.update({
+   57:         where: {
+   58:           id: firstPage.id,
+   59:         },
+   60: 
+   61:         data: {
+   62:           isEntry: true,
+   63: 
+   64:           isExit: true,
+   65:         },
+   66:       });
+   67:     } else {
+   68:       if (firstPage) {
+   69:         await transaction.analyticsPageView.update({
+   70:           where: {
+   71:             id: firstPage.id,
+   72:           },
+   73: 
+   74:           data: {
+   75:             isEntry: true,
+   76:           },
+   77:         });
+   78:       }
+   79: 
+   80:       if (lastPage) {
+   81:         await transaction.analyticsPageView.update({
+   82:           where: {
+   83:             id: lastPage.id,
+   84:           },
+   85: 
+   86:           data: {
+   87:             isExit: true,
+   88:           },
+   89:         });
+   90:       }
+
+==================================================
+FILE: apps\api\src\modules\analytics-engine\services\session-rebuilder.service.ts
+==================================================
+    1: import { PageViewRebuilderService } from './page-view-rebuilder.service';
+    2: import { calculateSessionMetrics } from '../utils/analytics-metrics';
+    3: import { Injectable } from '@nestjs/common';
+    4: import { DefaultArgs } from '@prisma/client/runtime/client';
+    5: import { Prisma } from 'src/generated/prisma/client';
+    6: import { PrismaClient } from 'src/generated/prisma/internal/class';
+    7: import { ProcessAnalyticsRangeInput } from 'src/modules/analytics-processing/services/analytics-range-processor.service';
+    8: 
+    9: type AnalyticsSessionRecord = Prisma.AnalyticsSessionGetPayload<Record<string, never>>;
+   10: 
+   11: export interface RebuiltSessionResult {
+   12:   previousStartedAt: Date;
+   13:   session: AnalyticsSessionRecord;
+   14: }
+   15: 
+   16: @Injectable()
+   17: export class SessionRebuilderService {
+   18:   rebuildRange(
+   19:     transaction: Omit<PrismaClient<never, Prisma.GlobalOmitConfig | undefined, DefaultArgs>, '$connect' | '$disconnect' | '$on' | '$use' | '$extends'>,
+   20:     input: ProcessAnalyticsRangeInput,
+   21:   ) {
+   22:     throw new Error('Method not implemented.');
+   23:   }
+   24:   constructor(private readonly pageViews: PageViewRebuilderService) {}
+   25: 
+   26:   async rebuild(transaction: Prisma.TransactionClient, sessionId: string): Promise<RebuiltSessionResult> {
+   27:     const existingSession = await transaction.analyticsSession.findUniqueOrThrow({
+   28:       where: {
+   29:         id: sessionId,
+   30:       },
+   31:     });
+   32: 
+   33:     const events = await transaction.analyticsEvent.findMany({
+   34:       where: {
+   35:         sessionId,
+   36:       },
+   37: 
+   38:       orderBy: [
+   39:         {
+   40:           occurredAt: 'asc',
+   41:         },
+   42:         {
+   43:           id: 'asc',
+   44:         },
+   45:       ],
+   46:     });
+   47: 
+   48:     const { pageViews, firstPage, lastPage } = await this.pageViews.rebuildForSession(transaction, sessionId);
+   49: 
+   50:     const firstEvent = events[0];
+   51: 
+   52:     if (!firstEvent) {
+   53:       return {
+   54:         previousStartedAt: existingSession.startedAt,
+   55: 
+   56:         session: existingSession,
+   57:       };
+   58:     }
+   59: 
+   60:     const metrics = calculateSessionMetrics(events, pageViews);
+   61: 
+   62:     const lastEvent = events.at(-1) ?? firstEvent;
+   63: 
+   64:     const updatedSession = await transaction.analyticsSession.update({
+   65:       where: {
+   66:         id: sessionId,
+   67:       },
+   68: 
+   69:       data: {
+   70:         startedAt: metrics.startedAt,
+   71: 
+   72:         endedAt: metrics.endedAt,
+   73: 
+   74:         lastEventAt: lastEvent.occurredAt,
+   75: 
+   76:         durationMs: metrics.durationMs,
+   77: 
+   78:         engagedDurationMs: metrics.engagedDurationMs,
+   79: 
+   80:         eventCount: metrics.eventCount,
+   81: 
+   82:         pageViewCount: metrics.pageViewCount,
+   83: 
+   84:         customEventCount: metrics.customEventCount,
+   85: 
+   86:         bounced: metrics.bounced,
+   87: 
+   88:         entryPath: firstPage?.normalizedPath ?? null,
+   89: 
+   90:         exitPath: lastPage?.normalizedPath ?? null,
+   91: 
+   92:         entryTitle: firstPage?.title ?? null,
+   93: 
+   94:         exitTitle: lastPage?.title ?? null,
+   95: 
+   96:         referrerUrl: firstPage?.referrerUrl ?? firstEvent.referrerUrl,
+   97: 
+   98:         sourceType: firstPage?.sourceType ?? firstEvent.sourceType,
+   99: 
+  100:         sourceName: firstPage?.sourceName ?? firstEvent.sourceName,
+
+==================================================
+FILE: apps\api\src\modules\analytics-engine\services\visitor-rebuilder.service.ts
+==================================================
+    1: import { Injectable } from '@nestjs/common';
+    2: import { DefaultArgs } from '@prisma/client/runtime/client';
+    3: import { Prisma } from 'src/generated/prisma/client';
+    4: import { PrismaClient } from 'src/generated/prisma/internal/class';
+    5: import { ProcessAnalyticsRangeInput } from 'src/modules/analytics-processing/services/analytics-range-processor.service';
+    6: 
+    7: @Injectable()
+    8: export class VisitorRebuilderService {
+    9:   rebuildRange(
+   10:     transaction: Omit<PrismaClient<never, Prisma.GlobalOmitConfig | undefined, DefaultArgs>, '$connect' | '$disconnect' | '$on' | '$use' | '$extends'>,
+   11:     input: ProcessAnalyticsRangeInput,
+   12:   ) {
+   13:     throw new Error('Method not implemented.');
+   14:   }
+   15:   async rebuild(transaction: Prisma.TransactionClient, visitorId: string): Promise<void> {
+   16:     /*
+   17:      * Keep these operations sequential.
+   18:      *
+   19:      * Earlier E2E runs exposed the pg warning caused by
+   20:      * concurrent queries on one interactive-transaction
+   21:      * client. Sequential execution avoids that problem.
+   22:      */
+   23:     const eventStats = await transaction.analyticsEvent.aggregate({
+   24:       where: {
+   25:         visitorId,
+   26:       },
+   27: 
+   28:       _min: {
+   29:         occurredAt: true,
+   30:       },
+   31: 
+   32:       _max: {
+   33:         occurredAt: true,
+   34:       },
+   35:     });
+   36: 
+   37:     const sessionCount = await transaction.analyticsSession.count({
+   38:       where: {
+   39:         visitorId,
+   40:       },
+   41:     });
+   42: 
+   43:     const pageViewCount = await transaction.analyticsPageView.count({
+   44:       where: {
+   45:         visitorId,
+   46:       },
+   47:     });
+   48: 
+   49:     const eventCount = await transaction.analyticsEvent.count({
+   50:       where: {
+   51:         visitorId,
+   52:       },
+   53:     });
+   54: 
+   55:     const firstSeenAt = eventStats._min.occurredAt;
+   56: 
+   57:     const lastSeenAt = eventStats._max.occurredAt;
+   58: 
+   59:     if (!firstSeenAt || !lastSeenAt) {
+   60:       return;
+   61:     }
+   62: 
+   63:     await transaction.analyticsVisitor.update({
+   64:       where: {
+   65:         id: visitorId,
+   66:       },
+   67: 
+   68:       data: {
+   69:         firstSeenAt,
+   70:         lastSeenAt,
+   71:         sessionCount,
+   72:         pageViewCount,
+   73:         eventCount,
+   74:       },
+   75:     });
+   76:   }
+   77: 
+   78:   async rebuildVisitor(transaction: Prisma.TransactionClient, visitorId: string): Promise<void> {
+   79:     await this.rebuild(transaction, visitorId);
+   80:   }
+
+==================================================
+FILE: apps\api\src\modules\analytics-processing\services\analytics-range-processor.service.ts
+==================================================
+   40:     private readonly aggregates: AnalyticsAggregationService,
+   41: 
+   42:     @Inject(ConfigService)
+   43:     private readonly config: TypedConfigService,
+   44:   ) {}
+   45: 
+   46:   async processRange(input: ProcessAnalyticsRangeInput): Promise<ProcessAnalyticsRangeResult> {
+   47:     const timeout = this.config.get('ANALYTICS_PROCESSING_TIMEOUT_MS', {
+   48:       infer: true,
+   49:     });
+   50: 
+   51:     return this.prisma.$transaction(
+   52:       async (transaction) => {
+   53:         const pendingEventsAtStart = await transaction.rawAnalyticsEvent.count({
+   54:           where: {
+   55:             websiteId: input.websiteId,
+   56: 
+   57:             occurredAt: {
+   58:               gte: input.from,
+   59: 
+   60:               lt: input.to,
+   61:             },
+   62: 
+   63:             processedAt: null,
+   64:           },
+   65:         });
+   66: 
+   67:         /*
+   68:          * Run sequentially.
+   69:          *
+   70:          * Do not use Promise.all() with a transaction client.
+   71:          * Each step must await completion before the next step.
+   72:          */
+   73: 
+   74:         const rawResult = await this.rawEvents.processRange(transaction, input);
+   75: 
+   76:         await this.visitors.rebuildRange(transaction, input);
+   77: 
+   78:         await this.sessions.rebuildRange(transaction, input);
+   79: 
+   80:         await this.pageViews.rebuildRange(transaction, input);
+   81: 
+   82:         await this.aggregates.rebuildRange(transaction, input);
+   83: 
+   84:         return {
+   85:           pendingEventsAtStart,
+   86: 
+   87:           processedEvents: rawResult.processedEvents,
+   88: 
+   89:           failedEvents: rawResult.failedEvents,
+   90:         };
+   91:       },
+   92:       {
+   93:         isolationLevel: 'Serializable',
+   94: 
+   95:         maxWait: 10_000,
+   96: 
+   97:         timeout,
+   98:       },
+   99:     );
+  100:   }
+  101: }
+
+==================================================
+FILE: apps\api\src\modules\applications\dto\application.dto.ts
+==================================================
+  120:   })
+  121:   @IsOptional()
+  122:   @IsEnum(ApplicationPriority)
+  123:   priority?: ApplicationPriority;
+  124: 
+  125:   @ApiPropertyOptional({
+  126:     enum: ApplicationCategory,
+  127:   })
+  128:   @IsOptional()
+  129:   @IsEnum(ApplicationCategory)
+  130:   category?: ApplicationCategory;
+  131: 
+  132:   @ApiPropertyOptional({
+  133:     default: false,
+  134:   })
+  135:   @IsOptional()
+  136:   @Transform(({ value }) => {
+  137:     if (value === true || value === 'true') {
+  138:       return true;
+  139:     }
+  140: 
+  141:     if (value === false || value === 'false') {
+  142:       return false;
+  143:     }
+  144: 
+  145:     return value;
+  146:   })
+  147:   @IsBoolean()
+  148:   archived?: boolean;
+  149: 
+  150:   @ApiPropertyOptional({
+  151:     enum: ApplicationSortBy,
+  152:     default: ApplicationSortBy.UPDATED_AT,
+  153:   })
+  154:   @IsOptional()
+  155:   @IsEnum(ApplicationSortBy)
+  156:   sortBy?: ApplicationSortBy;
+  157: 
+  158:   @ApiPropertyOptional({
+  159:     enum: SortOrder,
+  160:     default: SortOrder.DESC,
+  161:   })
+  162:   @IsOptional()
+  163:   @IsEnum(SortOrder)
+  164:   sortOrder?: SortOrder;
+  165: 
+
+==================================================
+FILE: apps\api\src\modules\development\dto\development.dto.ts
+==================================================
+  250:   @Min(1)
+  251:   @Max(100)
+  252:   limit = 50;
+  253: }
+  254: 
+  255: export class ApplyDevelopmentTemplateDto {
+  256:   @ApiProperty({
+  257:     enum: DevelopmentTemplateType,
+  258:   })
+  259:   @IsEnum(DevelopmentTemplateType)
+  260:   template!: DevelopmentTemplateType;
+  261: 
+  262:   @ApiPropertyOptional({
+  263:     default: false,
+  264:   })
+  265:   @IsOptional()
+  266:   @Transform(({ value }) => {
+  267:     if (value === true || value === 'true') {
+  268:       return true;
+  269:     }
+  270: 
+  271:     if (value === false || value === 'false') {
+  272:       return false;
+  273:     }
+  274: 
+  275:     return value;
+  276:   })
+  277:   @IsBoolean()
+  278:   replaceExisting?: boolean;
+  279: }
+
+==================================================
+FILE: apps\api\src\modules\monitoring\controllers\monitoring.controller.ts
+==================================================
+    1: import { CurrentUser } from '../../auth/decorators/current-user.decorator';
+    2: import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+    3: import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
+    4: import { CreateHealthCheckDto, HealthCheckListQueryDto, IncidentListQueryDto, UpdateHealthCheckDto } from '../dto/health-check.dto';
+    5: import { HealthCheckRunnerService } from '../services/health-check-runner.service';
+    6: import { MonitoringAccessService } from '../services/monitoring-access.service';
+    7: import { MonitoringService } from '../services/monitoring.service';
+    8: import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
+    9: import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+   10: import { AuthenticatedUser } from 'src/modules/auth/interfaces/authenticated-user.interface';
+   11: 
+   12: @ApiTags('Monitoring')
+   13: @ApiBearerAuth('access-token')
+   14: @Controller('workspaces/:workspaceId/monitoring')
+   15: @UseGuards(JwtAuthGuard, WorkspaceAccessGuard)
+   16: export class MonitoringController {
+   17:   constructor(
+   18:     private readonly monitoring: MonitoringService,
+   19: 
+   20:     private readonly access: MonitoringAccessService,
+   21: 
+   22:     private readonly runner: HealthCheckRunnerService,
+   23:   ) {}
+   24: 
+   25:   @Get('summary')
+   26:   @ApiOperation({
+   27:     summary: 'Get workspace monitoring summary',
+   28:   })
+   29:   getSummary(
+   30:     @Param('workspaceId', ParseUUIDPipe)
+   31:     workspaceId: string,
+   32: 
+   33:     @CurrentUser()
+   34:     user: AuthenticatedUser,
+   35:   ) {
+   36:     return this.monitoring.getSummary(workspaceId, user.id);
+   37:   }
+   38: 
+   39:   @Get('targets')
+   40:   @ApiOperation({
+   41:     summary: 'List available monitoring targets',
+   42:   })
+   43:   getTargets(
+   44:     @Param('workspaceId', ParseUUIDPipe)
+   45:     workspaceId: string,
+   46:   ) {
+   47:     return this.monitoring.getTargets(workspaceId);
+   48:   }
+   49: 
+   50:   @Get('checks')
+   51:   @ApiOperation({
+   52:     summary: 'List workspace health checks',
+   53:   })
+   54:   listChecks(
+   55:     @Param('workspaceId', ParseUUIDPipe)
+   56:     workspaceId: string,
+   57: 
+   58:     @Query()
+   59:     query: HealthCheckListQueryDto,
+   60:   ) {
+   61:     return this.monitoring.list(workspaceId, query);
+   62:   }
+   63: 
+   64:   @Post('checks')
+   65:   @ApiCreatedResponse()
+   66:   @ApiOperation({
+   67:     summary: 'Create a health check',
+   68:   })
+   69:   createCheck(
+   70:     @Param('workspaceId', ParseUUIDPipe)
+   71:     workspaceId: string,
+   72: 
+   73:     @CurrentUser()
+   74:     user: AuthenticatedUser,
+   75: 
+   76:     @Body()
+   77:     body: CreateHealthCheckDto,
+   78:   ) {
+   79:     return this.monitoring.create(workspaceId, user.id, body);
+   80:   }
+
+==================================================
+FILE: apps\api\src\modules\monitoring\services\monitoring.service.ts
+==================================================
+  460:         select: {
+  461:           id: true,
+  462: 
+  463:           name: true,
+  464:         },
+  465: 
+  466:         orderBy: {
+  467:           name: 'asc',
+  468:         },
+  469:       }),
+  470: 
+  471:       this.prisma.website.findMany({
+  472:         where: {
+  473:           workspaceId,
+  474: 
+  475:           archivedAt: null,
+  476:         },
+  477: 
+  478:         select: {
+  479:           id: true,
+  480: 
+  481:           name: true,
+  482: 
+  483:           domain: true,
+  484:         },
+  485: 
+  486:         orderBy: {
+  487:           name: 'asc',
+  488:         },
+  489:       }),
+  490:     ]);
+  491: 
+  492:     return [
+  493:       ...applications.map((application): MonitoringTargetDto => ({
+  494:         id: application.id,
+  495: 
+  496:         type: HealthTargetType.APPLICATION,
+  497: 
+  498:         name: application.name,
+  499: 
+  500:         subtitle: null,
+  501:       })),
+  502: 
+  503:       ...websites.map((website: { id: any; name: any; domain: any }): MonitoringTargetDto => ({
+  504:         id: website.id,
+  505: 
+  506:         type: HealthTargetType.WEBSITE,
+  507: 
+  508:         name: website.name,
+  509: 
+  510:         subtitle: website.domain,
+  511:       })),
+  512:     ];
+  513:   }
+  514: 
+  515:   private validateConfiguration(input: {
+  516:     targetType: HealthTargetType;
+  517: 
+  518:     applicationId?: string;
+  519: 
+  520:     websiteId?: string;
+  521: 
+  522:     intervalSeconds: number;
+  523: 
+  524:     timeoutMs: number;
+  525: 
+  526:     expectedStatusMin: number;
+  527: 
+  528:     expectedStatusMax: number;
+  529: 
+  530:     degradedAfterMs: number;
+  531: 
+  532:     failureThreshold: number;
+  533:   }): void {
+  534:     if (input.targetType === HealthTargetType.APPLICATION && !input.applicationId) {
+  535:       throw new BadRequestException('applicationId is required for an application health check.');
+  536:     }
+  537: 
+  538:     if (input.targetType === HealthTargetType.WEBSITE && !input.websiteId) {
+  539:       throw new BadRequestException('websiteId is required for a website health check.');
+  540:     }
+
+==================================================
+FILE: apps\api\src\modules\team-operations\services\invitation-mailer.service.ts
+==================================================
+    1: import { Injectable } from '@nestjs/common';
+    2: 
+    3: export interface SendInvitationEmailInput {
+    4:   email: string;
+    5:   workspaceName: string;
+    6:   inviterName: string;
+    7:   role: string;
+    8:   invitationUrl: string;
+    9:   expiresAt: Date;
+   10: }
+   11: 
+   12: export interface InvitationMailResult {
+   13:   sent: boolean;
+   14:   skipped: boolean;
+   15:   error?: string;
+   16: }
+   17: 
+   18: export abstract class InvitationMailer {
+   19:   abstract send(input: SendInvitationEmailInput): Promise<InvitationMailResult>;
+   20: }
+   21: 
+   22: @Injectable()
+   23: export class DisabledInvitationMailer implements InvitationMailer {
+   24:   async send(_input: SendInvitationEmailInput): Promise<InvitationMailResult> {
+   25:     return {
+   26:       sent: false,
+   27:       skipped: true,
+   28:     };
+   29:   }
+   30: }
+
+==================================================
+FILE: apps\api\test\phase13-analytics-reports.e2e-spec.ts
+==================================================
+   40:  *   'sources' | 'countries' | 'devices' | 'browsers' | 'operating-systems'
+   41:  * (mapped internally to Prisma AnalyticsAggregateDimension SOURCE/COUNTRY/DEVICE/BROWSER/OPERATING_SYSTEM)
+   42:  *
+   43:  * Dimension reports are read from pre-computed AnalyticsDailyAggregate / AnalyticsHourlyAggregate
+   44:  * rows (granularity is 'hour' when the resolved range is <= 2 days, else 'day'); pages/events
+   45:  * reports are computed live via parameterized raw SQL against analytics_page_views /
+   46:  * analytics_events.
+   47:  *
+   48:  * CSV export limits (analytics-reports.constants.ts):
+   49:  *   ANALYTICS_EXPORT_MAX_ROWS = 5000, ANALYTICS_EXPORT_MAX_DAYS = 90
+   50:  */
+   51: 
+   52: const API_PREFIX = '/api/v1';
+   53: 
+   54: // Date keys (YYYY-MM-DD) â€” the only format the DTO accepts for from/to.
+   55: const FROM = '2026-08-01';
+   56: const TO = '2026-08-04';
+   57: 
+   58: // startOfDateInTimeZone('2026-08-01', 'UTC') .. before startOfDateInTimeZone('2026-08-05', 'UTC')
+   59: const RANGE_START = new Date('2026-08-01T00:00:00.000Z');
+   60: 
+   61: // Bucket inside the resolved range. Range is 4 days (Aug 1-4 inclusive) => granularity 'day',
+   62: // so the pages/events report and the dimension report (read from AnalyticsDailyAggregate) must
+   63: // both use bucket/event timestamps within [2026-08-01T00:00:00Z, 2026-08-05T00:00:00Z).
+   64: const BUCKET_START = new Date('2026-08-02T00:00:00.000Z');
+   65: const DAILY_BUCKET_END = new Date('2026-08-03T00:00:00.000Z');
+   66: const HOURLY_BUCKET_END = new Date('2026-08-02T01:00:00.000Z');
+   67: 
+   68: const SENSITIVE_IP_HASH = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+   69: 
+   70: const PRIVATE_PROPERTY_VALUE = 'phase13-private-event-property-must-never-be-exported';
+   71: 
+   72: const DANGEROUS_CSV_PATH = '=SUM(A1:A2)';
+   73: 
+   74: type JsonRecord = Record<string, unknown>;
+   75: 
+
+==================================================
+FILE: apps\api\test\phase13-analytics-reports.e2e-spec.ts
+==================================================
+  170:       continue;
+  171:     }
+  172: 
+  173:     field += character;
+  174:   }
+  175: 
+  176:   if (field.length > 0 || row.length > 0) {
+  177:     row.push(field);
+  178: 
+  179:     if (row.some((value) => value.length > 0)) {
+  180:       rows.push(row);
+  181:     }
+  182:   }
+  183: 
+  184:   const firstRow = rows[0];
+  185:   const firstCell = firstRow?.[0];
+  186: 
+  187:   if (firstRow && firstCell !== undefined) {
+  188:     firstRow[0] = firstCell.replace(/^ï»¿/, '');
+  189:   }
+  190: 
+  191:   return rows;
+  192: }
+  193: 
+  194: interface AggregateSeed {
+  195:   dimension: AnalyticsAggregateDimension;
+  196:   value: string;
+  197:   label: string;
+  198:   visitors: number;
+  199:   sessions: number;
+  200:   pageViews: number;
+  201:   events: number;
+  202:   customEvents: number;
+  203:   bounces: number;
+  204:   totalDurationMs: bigint;
+  205: }

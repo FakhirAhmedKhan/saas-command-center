@@ -1,0 +1,15 @@
+PASS test/raw-events.e2e-spec.ts (11.015 s)
+  Raw Events E2E
+    √ lists raw events with pagination metadata (1739 ms)
+    √ filters by type and case-insensitive custom event name (901 ms)
+    √ filters by visitor and session identifiers (778 ms)
+    √ filters by occurred-at date range (721 ms)
+    √ keeps raw events isolated between websites and workspaces (1155 ms)
+    √ rejects invalid raw-event query parameters (805 ms)
+    √ does not expose IP hashes, country codes, or user agents through the admin API (895 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       7 passed, 7 total
+Snapshots:   0 total
+Time:        11.527 s
+Ran all test suites within paths "test/raw-events.e2e-spec.ts".

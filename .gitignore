@@ -2,6 +2,8 @@ node_modules/
 .pnpm-store/
 .next/
 dist/
+dist-cjs/
+dist-coverage/
 coverage/
 *.log
 .env
@@ -11,3 +13,13 @@ coverage/
 .DS_Store
 .idea/
 .vscode/
+apps/api/src/generated/prisma/
+.pnpm-lock.yaml
+
+# Playwright / test run artifacts
+playwright-report/
+playwright-report-*/
+blob-report/
+test-results/
+.state/
+.last-run.json

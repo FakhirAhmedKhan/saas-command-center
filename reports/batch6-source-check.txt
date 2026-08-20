@@ -1,0 +1,5543 @@
+﻿BATCH 6 SOURCE CHECK
+Analytics Overview + Reports + Processing + Tracking
+
+==================================================
+apps\web\src\features\analytics-overview\analytics-overview.types.ts
+==================================================
+export type AnalyticsPreset = 'today' | '7d' | '30d' | '90d';
+
+export interface AnalyticsMetric {
+  value: number;
+
+  previousValue: number;
+
+  changePercent: number | null;
+}
+
+export interface AnalyticsBreakdownItem {
+  key: string;
+
+  label: string;
+
+  value: number;
+
+  percentage: number;
+}
+
+export interface AnalyticsTrendPoint {
+  bucketStart: string;
+
+  visitors: number;
+
+  sessions: number;
+
+  pageViews: number;
+}
+
+export interface AnalyticsOverviewResponse {
+  website: {
+    id: string;
+
+    name: string;
+
+    domain: string;
+
+    timeZone: string;
+
+    lastEventAt: string | null;
+  };
+
+  range: {
+    preset: string;
+
+    from: string;
+
+    to: string;
+
+    previousFrom: string;
+
+    previousTo: string;
+
+    granularity: 'hour' | 'day';
+
+    days: number;
+  };
+
+  metrics: {
+    visitors: AnalyticsMetric;
+
+    sessions: AnalyticsMetric;
+
+    pageViews: AnalyticsMetric;
+
+    bounceRate: AnalyticsMetric;
+
+    averageDurationSeconds: AnalyticsMetric;
+  };
+
+  trend: AnalyticsTrendPoint[];
+
+  topPages: AnalyticsBreakdownItem[];
+
+  topSources: AnalyticsBreakdownItem[];
+
+  topCountries: AnalyticsBreakdownItem[];
+
+  topDevices: AnalyticsBreakdownItem[];
+
+  topBrowsers: AnalyticsBreakdownItem[];
+
+  topOperatingSystems: AnalyticsBreakdownItem[];
+
+  empty: boolean;
+}
+
+export interface GetAnalyticsOverviewInput {
+  workspaceId: string;
+
+  websiteId: string;
+
+  preset?: AnalyticsPreset;
+
+  from?: string;
+
+  to?: string;
+
+  signal?: AbortSignal;
+}
+
+==================================================
+apps\web\src\features\analytics-processing\analytics-processing.types.ts
+==================================================
+export type ProcessingRunStatus = 'QUEUED' | 'RUNNING' | 'SUCCEEDED' | 'DEAD_LETTERED' | 'CANCELLED';
+
+export interface ProcessingRun {
+  id: string;
+
+  status: ProcessingRunStatus;
+
+  trigger: 'SCHEDULED' | 'MANUAL' | 'RETRY';
+
+  rangeStart: string;
+
+  rangeEnd: string;
+
+  retryCount: number;
+
+  maxRetries: number;
+
+  processedEvents: number;
+
+  failedEvents: number;
+
+  errorMessage: string | null;
+
+  startedAt: string | null;
+
+  finishedAt: string | null;
+
+  createdAt: string;
+}
+
+export interface AnalyticsProcessingStatus {
+  canReprocess: boolean;
+
+  pendingEvents: number;
+
+  unresolvedDeadLetters: number;
+
+  activeRun: ProcessingRun | null;
+
+  latestRun: ProcessingRun | null;
+
+  lastSuccessfulRun: ProcessingRun | null;
+
+  recentRuns: ProcessingRun[];
+}
+
+export interface ReprocessAnalyticsInput {
+  from: string;
+
+  to: string;
+}
+
+==================================================
+apps\web\src\features\analytics-reports\analytics-reports.types.ts
+==================================================
+export type AnalyticsPreset = 'today' | '7d' | '30d' | '90d';
+
+export type AnalyticsReportTab = 'pages' | 'sources' | 'geography' | 'technology' | 'events';
+
+export type TechnologyDimension = 'devices' | 'browsers' | 'operating-systems';
+
+export type AnalyticsDimension = 'sources' | 'countries' | TechnologyDimension;
+
+export type SortDirection = 'asc' | 'desc';
+
+export interface Pagination {
+  page: number;
+
+  limit: number;
+
+  total: number;
+
+  totalPages: number;
+
+  hasPreviousPage: boolean;
+
+  hasNextPage: boolean;
+}
+
+export interface ReportRange {
+  from: string;
+
+  to: string;
+
+  timeZone: string;
+
+  days: number;
+}
+
+export interface PageReportItem {
+  path: string;
+
+  title: string;
+
+  views: number;
+
+  visitors: number;
+
+  sessions: number;
+
+  entrances: number;
+
+  exits: number;
+
+  bounceRate: number;
+
+  averageDurationSeconds: number;
+}
+
+export interface PageReportResponse {
+  items: PageReportItem[];
+
+  pagination: Pagination;
+
+  range: ReportRange;
+}
+
+export interface EventReportItem {
+  name: string;
+
+  events: number;
+
+  visitors: number;
+
+  sessions: number;
+}
+
+export interface EventReportResponse {
+  items: EventReportItem[];
+
+  summary: {
+    totalEvents: number;
+
+    uniqueVisitors: number;
+
+    uniqueSessions: number;
+  };
+
+  pagination: Pagination;
+
+  range: ReportRange;
+}
+
+export interface DimensionReportItem {
+  key: string;
+
+  label: string;
+
+  visitors: number;
+
+  sessions: number;
+
+  pageViews: number;
+
+  percentage: number;
+}
+
+export interface DimensionReportResponse {
+  items: DimensionReportItem[];
+
+  pagination: Pagination;
+
+  range: ReportRange;
+}
+
+export interface AnalyticsReportRequest {
+  workspaceId: string;
+
+  websiteId: string;
+
+  tab: AnalyticsReportTab;
+
+  dimension: TechnologyDimension;
+
+  preset: AnalyticsPreset;
+
+  search: string;
+
+  page: number;
+
+  limit: number;
+
+  sortBy: string;
+
+  sortDirection: SortDirection;
+
+  signal?: AbortSignal;
+}
+
+export type AnalyticsReportResponse = PageReportResponse | EventReportResponse | DimensionReportResponse;
+
+==================================================
+apps\web\src\features\tracking\tracking-types.ts
+==================================================
+export type RawEventType = 'PAGE_VIEW' | 'HEARTBEAT' | 'CUSTOM';
+
+export interface RawTrackingEvent {
+  id: string;
+  websiteId: string;
+  eventId: string;
+  type: RawEventType;
+  visitorId: string;
+  sessionId: string;
+  occurredAt: string;
+  receivedAt: string;
+  pageUrl: string;
+  pagePath: string;
+  pageTitle: string | null;
+  referrerUrl: string | null;
+  eventName: string | null;
+  properties: Record<string, unknown> | null;
+  screenWidth: number | null;
+  screenHeight: number | null;
+  viewportWidth: number | null;
+  viewportHeight: number | null;
+  language: string | null;
+  clientTimeZone: string | null;
+  durationMs: number | null;
+  origin: string;
+  sdkVersion: string;
+}
+
+export interface TrackingStatus {
+  website: {
+    id: string;
+    name: string;
+    domain: string;
+    enabled: boolean;
+    archivedAt: string | null;
+    lastEventAt: string | null;
+    trackingKeyPrefix: string;
+  };
+
+  connected: boolean;
+
+  totalEvents: number;
+
+  counts: {
+    PAGE_VIEW: number;
+    HEARTBEAT: number;
+    CUSTOM: number;
+  };
+
+  recentEvents: RawTrackingEvent[];
+}
+
+export interface RawEventsResponse {
+  data: RawTrackingEvent[];
+
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+}
+
+export interface RawEventQuery {
+  type?: RawEventType;
+  eventName?: string;
+  visitorId?: string;
+  sessionId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  page?: number;
+  limit?: number;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-overview\dto\analytics-overview-query.dto.ts
+==================================================
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEnum, IsOptional, Matches, ValidateIf } from 'class-validator';
+
+export enum AnalyticsDatePreset {
+  TODAY = 'today',
+  SEVEN_DAYS = '7d',
+  THIRTY_DAYS = '30d',
+  NINETY_DAYS = '90d',
+}
+
+const DATE_KEY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+export class AnalyticsOverviewQueryDto {
+  @ApiPropertyOptional({
+    enum: AnalyticsDatePreset,
+    default: AnalyticsDatePreset.SEVEN_DAYS,
+    description: 'Analytics range calculated in the website timezone.',
+  })
+  @IsOptional()
+  @IsEnum(AnalyticsDatePreset)
+  preset: AnalyticsDatePreset = AnalyticsDatePreset.SEVEN_DAYS;
+
+  @ApiPropertyOptional({
+    example: '2026-08-01',
+    description: 'Inclusive custom start date using YYYY-MM-DD.',
+  })
+  @ValidateIf((query: AnalyticsOverviewQueryDto) => query.from !== undefined || query.to !== undefined)
+  @Matches(DATE_KEY_PATTERN, {
+    message: 'from must use YYYY-MM-DD format',
+  })
+  from?: string;
+
+  @ApiPropertyOptional({
+    example: '2026-08-07',
+    description: 'Inclusive custom end date using YYYY-MM-DD.',
+  })
+  @ValidateIf((query: AnalyticsOverviewQueryDto) => query.from !== undefined || query.to !== undefined)
+  @Matches(DATE_KEY_PATTERN, {
+    message: 'to must use YYYY-MM-DD format',
+  })
+  to?: string;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-overview\dto\analytics-overview-response.dto.ts
+==================================================
+import { ApiProperty } from '@nestjs/swagger';
+
+export class AnalyticsWebsiteDto {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  name!: string;
+
+  @ApiProperty()
+  domain!: string;
+
+  @ApiProperty({
+    example: 'Asia/Dubai',
+  })
+  timeZone!: string;
+
+  @ApiProperty({
+    nullable: true,
+  })
+  lastEventAt!: string | null;
+}
+
+export class AnalyticsRangeDto {
+  @ApiProperty({
+    example: '7d',
+  })
+  preset!: string;
+
+  @ApiProperty({
+    example: '2026-08-01',
+  })
+  from!: string;
+
+  @ApiProperty({
+    example: '2026-08-07',
+  })
+  to!: string;
+
+  @ApiProperty({
+    example: '2026-07-25',
+  })
+  previousFrom!: string;
+
+  @ApiProperty({
+    example: '2026-07-31',
+  })
+  previousTo!: string;
+
+  @ApiProperty({
+    enum: ['hour', 'day'],
+  })
+  granularity!: 'hour' | 'day';
+
+  @ApiProperty()
+  days!: number;
+}
+
+export class AnalyticsMetricDto {
+  @ApiProperty()
+  value!: number;
+
+  @ApiProperty()
+  previousValue!: number;
+
+  @ApiProperty({
+    nullable: true,
+    description: 'Null means the previous period was zero and no meaningful percentage can be calculated.',
+  })
+  changePercent!: number | null;
+}
+
+export class AnalyticsMetricsDto {
+  @ApiProperty({
+    type: AnalyticsMetricDto,
+  })
+  visitors!: AnalyticsMetricDto;
+
+  @ApiProperty({
+    type: AnalyticsMetricDto,
+  })
+  sessions!: AnalyticsMetricDto;
+
+  @ApiProperty({
+    type: AnalyticsMetricDto,
+  })
+  pageViews!: AnalyticsMetricDto;
+
+  @ApiProperty({
+    type: AnalyticsMetricDto,
+  })
+  bounceRate!: AnalyticsMetricDto;
+
+  @ApiProperty({
+    type: AnalyticsMetricDto,
+  })
+  averageDurationSeconds!: AnalyticsMetricDto;
+}
+
+export class AnalyticsTrendPointDto {
+  @ApiProperty()
+  bucketStart!: string;
+
+  @ApiProperty()
+  visitors!: number;
+
+  @ApiProperty()
+  sessions!: number;
+
+  @ApiProperty()
+  pageViews!: number;
+}
+
+export class AnalyticsBreakdownItemDto {
+  @ApiProperty()
+  key!: string;
+
+  @ApiProperty()
+  label!: string;
+
+  @ApiProperty()
+  value!: number;
+
+  @ApiProperty()
+  percentage!: number;
+}
+
+export class AnalyticsOverviewResponseDto {
+  @ApiProperty({
+    type: AnalyticsWebsiteDto,
+  })
+  website!: AnalyticsWebsiteDto;
+
+  @ApiProperty({
+    type: AnalyticsRangeDto,
+  })
+  range!: AnalyticsRangeDto;
+
+  @ApiProperty({
+    type: AnalyticsMetricsDto,
+  })
+  metrics!: AnalyticsMetricsDto;
+
+  @ApiProperty({
+    type: [AnalyticsTrendPointDto],
+  })
+  trend!: AnalyticsTrendPointDto[];
+
+  @ApiProperty({
+    type: [AnalyticsBreakdownItemDto],
+  })
+  topPages!: AnalyticsBreakdownItemDto[];
+
+  @ApiProperty({
+    type: [AnalyticsBreakdownItemDto],
+  })
+  topSources!: AnalyticsBreakdownItemDto[];
+
+  @ApiProperty({
+    type: [AnalyticsBreakdownItemDto],
+  })
+  topCountries!: AnalyticsBreakdownItemDto[];
+
+  @ApiProperty({
+    type: [AnalyticsBreakdownItemDto],
+  })
+  topDevices!: AnalyticsBreakdownItemDto[];
+
+  @ApiProperty({
+    type: [AnalyticsBreakdownItemDto],
+  })
+  topBrowsers!: AnalyticsBreakdownItemDto[];
+
+  @ApiProperty({ type: [AnalyticsBreakdownItemDto] })
+  topOperatingSystems!: AnalyticsBreakdownItemDto[];
+
+  @ApiProperty()
+  empty!: boolean;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-overview\services\analytics-overview.service.ts
+==================================================
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { Prisma } from 'src/generated/prisma/client';
+import { AnalyticsAggregateDimension } from 'src/generated/prisma/enums';
+import { AnalyticsOverviewQueryDto } from '../dto/analytics-overview-query.dto';
+import { resolveAnalyticsDateRange } from '../utils/analytics-date-range';
+import { createMetricComparison, roundMetric, toSafeNumber } from '../utils/analytics-overview-metrics';
+import type { AnalyticsBreakdownItemDto, AnalyticsOverviewResponseDto, AnalyticsTrendPointDto } from '../dto/analytics-overview-response.dto';
+
+interface MetricsDatabaseRow {
+  visitors: bigint | number | string;
+
+  sessions: bigint | number | string;
+
+  page_views: bigint | number | string;
+
+  bounced_sessions: bigint | number | string;
+
+  measured_sessions: bigint | number | string;
+
+  total_duration_ms: bigint | number | string;
+}
+
+interface PeriodMetrics {
+  visitors: number;
+  sessions: number;
+  pageViews: number;
+  bounceRate: number;
+  averageDurationSeconds: number;
+}
+
+interface OverviewAggregateRow {
+  bucketStart: Date;
+  visitors: number;
+  sessions: number;
+  pageViews: number;
+}
+
+interface BreakdownAggregateRow {
+  dimensionValue: string;
+  dimensionLabel: string;
+  sessions: number;
+  pageViews: number;
+}
+
+@Injectable()
+export class AnalyticsOverviewService {
+  private readonly breakdownLimit = 8;
+
+  constructor(private readonly prisma: PrismaService) {}
+
+  async getOverview(workspaceId: string, websiteId: string, query: AnalyticsOverviewQueryDto): Promise<AnalyticsOverviewResponseDto> {
+    const website = await this.requireWebsite(workspaceId, websiteId);
+
+    const range = resolveAnalyticsDateRange(query, website.timeZone);
+
+    const [currentMetrics, previousMetrics, trendRows, pageRows, sourceRows, countryRows, deviceRows, browserRows, operatingSystemRows] = await Promise.all([
+      this.loadPeriodMetrics(website.id, range.current.start, range.current.end),
+
+      this.loadPeriodMetrics(website.id, range.previous.start, range.previous.end),
+
+      this.loadOverviewTrend(website.id, range.current.start, range.current.end, range.granularity),
+
+      this.loadBreakdownRows(website.id, range.current.start, range.current.end, range.granularity, AnalyticsAggregateDimension.PAGE),
+
+      this.loadBreakdownRows(website.id, range.current.start, range.current.end, range.granularity, AnalyticsAggregateDimension.SOURCE),
+
+      this.loadBreakdownRows(website.id, range.current.start, range.current.end, range.granularity, AnalyticsAggregateDimension.COUNTRY),
+
+      this.loadBreakdownRows(website.id, range.current.start, range.current.end, range.granularity, AnalyticsAggregateDimension.DEVICE),
+
+      this.loadBreakdownRows(website.id, range.current.start, range.current.end, range.granularity, AnalyticsAggregateDimension.BROWSER),
+
+      this.loadBreakdownRows(website.id, range.current.start, range.current.end, range.granularity, AnalyticsAggregateDimension.OPERATING_SYSTEM),
+    ]);
+
+    return {
+      website: {
+        id: website.id,
+
+        name: website.name,
+
+        domain: website.domain,
+
+        timeZone: website.timeZone,
+
+        lastEventAt: website.lastEventAt?.toISOString() ?? null,
+      },
+
+      range: {
+        preset: range.preset,
+
+        from: range.current.from,
+
+        to: range.current.to,
+
+        previousFrom: range.previous.from,
+
+        previousTo: range.previous.to,
+
+        granularity: range.granularity,
+
+        days: range.days,
+      },
+
+      metrics: {
+        visitors: createMetricComparison(
+          currentMetrics.visitors,
+
+          previousMetrics.visitors,
+        ),
+
+        sessions: createMetricComparison(
+          currentMetrics.sessions,
+
+          previousMetrics.sessions,
+        ),
+
+        pageViews: createMetricComparison(
+          currentMetrics.pageViews,
+
+          previousMetrics.pageViews,
+        ),
+
+        bounceRate: createMetricComparison(
+          currentMetrics.bounceRate,
+
+          previousMetrics.bounceRate,
+        ),
+
+        averageDurationSeconds: createMetricComparison(
+          currentMetrics.averageDurationSeconds,
+
+          previousMetrics.averageDurationSeconds,
+        ),
+      },
+
+      trend: this.mapTrendRows(trendRows),
+
+      topPages: this.buildBreakdown(pageRows, 'pageViews'),
+
+      topSources: this.buildBreakdown(sourceRows, 'sessions'),
+
+      topCountries: this.buildBreakdown(countryRows, 'sessions'),
+
+      topDevices: this.buildBreakdown(deviceRows, 'sessions'),
+
+      topBrowsers: this.buildBreakdown(browserRows, 'sessions'),
+
+      topOperatingSystems: this.buildBreakdown(operatingSystemRows, 'sessions'),
+
+      empty: currentMetrics.sessions === 0 && currentMetrics.pageViews === 0,
+    };
+  }
+
+  private async requireWebsite(workspaceId: string, websiteId: string) {
+    const website = await this.prisma.website.findFirst({
+      where: {
+        id: websiteId,
+
+        workspaceId,
+
+        archivedAt: null,
+      },
+
+      select: {
+        id: true,
+
+        name: true,
+
+        domain: true,
+
+        timeZone: true,
+
+        lastEventAt: true,
+      },
+    });
+
+    if (!website) {
+      throw new NotFoundException('Website not found');
+    }
+
+    return website;
+  }
+
+  private async loadPeriodMetrics(websiteId: string, start: Date, end: Date): Promise<PeriodMetrics> {
+    const rows = await this.prisma.$queryRaw<MetricsDatabaseRow[]>(
+      Prisma.sql`
+                        SELECT
+                            (
+                                SELECT
+                                    COUNT(
+                                        DISTINCT visitor_id
+                                    )::bigint
+                                FROM
+                                    analytics_events
+                                WHERE
+                                    website_id =
+                                        ${websiteId}::uuid
+                                    AND occurred_at >=
+                                        ${start}
+                                    AND occurred_at <
+                                        ${end}
+                            ) AS visitors,
+
+                            (
+                                SELECT
+                                    COUNT(
+                                        DISTINCT session_id
+                                    )::bigint
+                                FROM
+                                    analytics_events
+                                WHERE
+                                    website_id =
+                                        ${websiteId}::uuid
+                                    AND occurred_at >=
+                                        ${start}
+                                    AND occurred_at <
+                                        ${end}
+                            ) AS sessions,
+
+                            (
+                                SELECT
+                                    COUNT(*)::bigint
+                                FROM
+                                    analytics_page_views
+                                WHERE
+                                    website_id =
+                                        ${websiteId}::uuid
+                                    AND occurred_at >=
+                                        ${start}
+                                    AND occurred_at <
+                                        ${end}
+                            ) AS page_views,
+
+                            (
+                                SELECT
+                                    COUNT(*)::bigint
+                                FROM
+                                    analytics_sessions
+                                WHERE
+                                    website_id =
+                                        ${websiteId}::uuid
+                                    AND started_at >=
+                                        ${start}
+                                    AND started_at <
+                                        ${end}
+                                    AND bounced = TRUE
+                            ) AS bounced_sessions,
+
+                            (
+                                SELECT
+                                    COUNT(*)::bigint
+                                FROM
+                                    analytics_sessions
+                                WHERE
+                                    website_id =
+                                        ${websiteId}::uuid
+                                    AND started_at >=
+                                        ${start}
+                                    AND started_at <
+                                        ${end}
+                            ) AS measured_sessions,
+
+                            (
+                                SELECT
+                                    COALESCE(
+                                        SUM(duration_ms),
+                                        0
+                                    )::bigint
+                                FROM
+                                    analytics_sessions
+                                WHERE
+                                    website_id =
+                                        ${websiteId}::uuid
+                                    AND started_at >=
+                                        ${start}
+                                    AND started_at <
+                                        ${end}
+                            ) AS total_duration_ms
+                    `,
+    );
+
+    const row = rows[0];
+
+    const visitors = toSafeNumber(row?.visitors);
+
+    const sessions = toSafeNumber(row?.sessions);
+
+    const pageViews = toSafeNumber(row?.page_views);
+
+    const bouncedSessions = toSafeNumber(row?.bounced_sessions);
+
+    const measuredSessions = toSafeNumber(row?.measured_sessions);
+
+    const totalDurationMs = toSafeNumber(row?.total_duration_ms);
+
+    const bounceRate = measuredSessions === 0 ? 0 : roundMetric((bouncedSessions / measuredSessions) * 100, 1);
+
+    const averageDurationSeconds = measuredSessions === 0 ? 0 : roundMetric(totalDurationMs / measuredSessions / 1000, 1);
+
+    return {
+      visitors,
+      sessions,
+      pageViews,
+      bounceRate,
+      averageDurationSeconds,
+    };
+  }
+
+  private async loadOverviewTrend(websiteId: string, start: Date, end: Date, granularity: 'hour' | 'day'): Promise<OverviewAggregateRow[]> {
+    const where = {
+      websiteId,
+
+      dimension: AnalyticsAggregateDimension.OVERVIEW,
+
+      bucketStart: {
+        gte: start,
+        lt: end,
+      },
+    };
+
+    const select = {
+      bucketStart: true,
+
+      visitors: true,
+
+      sessions: true,
+
+      pageViews: true,
+    } as const;
+
+    if (granularity === 'hour') {
+      return this.prisma.analyticsHourlyAggregate.findMany({
+        where,
+        select,
+
+        orderBy: {
+          bucketStart: 'asc',
+        },
+      });
+    }
+
+    return this.prisma.analyticsDailyAggregate.findMany({
+      where,
+      select,
+
+      orderBy: {
+        bucketStart: 'asc',
+      },
+    });
+  }
+
+  private async loadBreakdownRows(
+    websiteId: string,
+    start: Date,
+    end: Date,
+    granularity: 'hour' | 'day',
+    dimension: AnalyticsAggregateDimension,
+  ): Promise<BreakdownAggregateRow[]> {
+    const where = {
+      websiteId,
+
+      dimension,
+
+      bucketStart: {
+        gte: start,
+        lt: end,
+      },
+    };
+
+    const select = {
+      dimensionValue: true,
+
+      dimensionLabel: true,
+
+      sessions: true,
+
+      pageViews: true,
+    } as const;
+
+    if (granularity === 'hour') {
+      return this.prisma.analyticsHourlyAggregate.findMany({
+        where,
+        select,
+      });
+    }
+
+    return this.prisma.analyticsDailyAggregate.findMany({
+      where,
+      select,
+    });
+  }
+
+  private mapTrendRows(rows: OverviewAggregateRow[]): AnalyticsTrendPointDto[] {
+    return rows.map((row) => ({
+      bucketStart: row.bucketStart.toISOString(),
+
+      visitors: row.visitors,
+
+      sessions: row.sessions,
+
+      pageViews: row.pageViews,
+    }));
+  }
+
+  private buildBreakdown(
+    rows: BreakdownAggregateRow[],
+
+    metric: 'sessions' | 'pageViews',
+  ): AnalyticsBreakdownItemDto[] {
+    const grouped = new Map<
+      string,
+      {
+        label: string;
+        value: number;
+      }
+    >();
+
+    for (const row of rows) {
+      const key = row.dimensionValue.trim() || 'unknown';
+
+      const label = row.dimensionLabel.trim() || 'Unknown';
+
+      const value = row[metric];
+
+      const existing = grouped.get(key);
+
+      if (existing) {
+        existing.value += value;
+      } else {
+        grouped.set(key, {
+          label,
+          value,
+        });
+      }
+    }
+
+    const total = Array.from(grouped.values()).reduce(
+      (sum, item) => sum + item.value,
+
+      0,
+    );
+
+    return Array.from(grouped.entries())
+      .map(([key, item]) => ({
+        key,
+
+        label: item.label,
+
+        value: item.value,
+
+        percentage: total === 0 ? 0 : roundMetric((item.value / total) * 100, 1),
+      }))
+      .sort((first, second) => second.value - first.value)
+      .slice(0, this.breakdownLimit);
+  }
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-processing\dto\analytics-processing-response.dto.ts
+==================================================
+import { ApiProperty } from '@nestjs/swagger';
+
+export class ProcessingRunDto {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  status!: string;
+
+  @ApiProperty()
+  trigger!: string;
+
+  @ApiProperty()
+  rangeStart!: string;
+
+  @ApiProperty()
+  rangeEnd!: string;
+
+  @ApiProperty()
+  retryCount!: number;
+
+  @ApiProperty()
+  maxRetries!: number;
+
+  @ApiProperty()
+  processedEvents!: number;
+
+  @ApiProperty()
+  failedEvents!: number;
+
+  @ApiProperty({
+    nullable: true,
+  })
+  errorMessage!: string | null;
+
+  @ApiProperty({
+    nullable: true,
+  })
+  startedAt!: string | null;
+
+  @ApiProperty({
+    nullable: true,
+  })
+  finishedAt!: string | null;
+
+  @ApiProperty()
+  createdAt!: string;
+}
+
+export class AnalyticsProcessingStatusDto {
+  @ApiProperty()
+  canReprocess!: boolean;
+
+  @ApiProperty()
+  pendingEvents!: number;
+
+  @ApiProperty()
+  unresolvedDeadLetters!: number;
+
+  @ApiProperty({
+    nullable: true,
+    type: ProcessingRunDto,
+  })
+  activeRun!: ProcessingRunDto | null;
+
+  @ApiProperty({
+    nullable: true,
+    type: ProcessingRunDto,
+  })
+  latestRun!: ProcessingRunDto | null;
+
+  @ApiProperty({
+    nullable: true,
+    type: ProcessingRunDto,
+  })
+  lastSuccessfulRun!: ProcessingRunDto | null;
+
+  @ApiProperty({
+    type: [ProcessingRunDto],
+  })
+  recentRuns!: ProcessingRunDto[];
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-processing\dto\reprocess-analytics.dto.ts
+==================================================
+import { ApiProperty } from '@nestjs/swagger';
+import { IsDateString } from 'class-validator';
+
+export class ReprocessAnalyticsDto {
+  @ApiProperty({
+    example: '2026-08-01T00:00:00.000Z',
+  })
+  @IsDateString()
+  from!: string;
+
+  @ApiProperty({
+    example: '2026-08-08T00:00:00.000Z',
+    description: 'Exclusive range end.',
+  })
+  @IsDateString()
+  to!: string;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-processing\services\analytics-processing-access.service.ts
+==================================================
+import { ForbiddenException, Injectable } from '@nestjs/common';
+import { PrismaService } from '../../../database/prisma.service';
+import { WorkspaceRole } from '../../../generated/prisma/client';
+
+@Injectable()
+export class AnalyticsProcessingAccessService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async assertCanReprocess(workspaceId: string, userId: string): Promise<void> {
+    await this.assertCanManageProcessing(workspaceId, userId);
+  }
+
+  async assertCanRetry(workspaceId: string, userId: string): Promise<void> {
+    await this.assertCanManageProcessing(workspaceId, userId);
+  }
+
+  /**
+   * Non-throwing variant of assertCanReprocess used by AnalyticsProcessingStatusService to
+   * populate AnalyticsProcessingStatusDto.canReprocess. A membership lookup miss (outsider)
+   * is treated as "cannot reprocess" rather than throwing, since WorkspaceAccessGuard already
+   * rejects outsiders before this ever runs; a member simply lacking OWNER/ADMIN role also
+   * resolves to false instead of throwing, matching the read-only nature of the status endpoint.
+   */
+  async getCanReprocess(workspaceId: string, userId: string): Promise<boolean> {
+    const membership = await this.prisma.workspaceMember.findUnique({
+      where: {
+        workspaceId_userId: {
+          workspaceId,
+          userId,
+        },
+      },
+
+      select: {
+        role: true,
+      },
+    });
+
+    return membership?.role === WorkspaceRole.OWNER || membership?.role === WorkspaceRole.ADMIN;
+  }
+
+  private async assertCanManageProcessing(workspaceId: string, userId: string): Promise<void> {
+    const membership = await this.prisma.workspaceMember.findUnique({
+      where: {
+        workspaceId_userId: {
+          workspaceId,
+          userId,
+        },
+      },
+
+      select: {
+        role: true,
+      },
+    });
+
+    if (!membership) {
+      throw new ForbiddenException('You do not have access to this workspace.');
+    }
+
+    const allowed = membership.role === WorkspaceRole.OWNER || membership.role === WorkspaceRole.ADMIN;
+
+    if (!allowed) {
+      throw new ForbiddenException('Your workspace role does not permit analytics reprocessing.');
+    }
+  }
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-processing\services\analytics-processing-queue.service.ts
+==================================================
+ 
+import { createHash } from 'node:crypto';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { PrismaService } from '../../../database/prisma.service';
+import { AnalyticsProcessingStatus, AnalyticsProcessingTrigger, Prisma } from '../../../generated/prisma/client';
+import type { TypedConfigService } from '../../../config/runtime-config';
+
+const MILLISECONDS_PER_DAY = 86_400_000;
+
+export interface QueueProcessingInput {
+  workspaceId: string;
+
+  websiteId: string;
+
+  initiatedByUserId?: string;
+
+  from: Date;
+
+  to: Date;
+
+  trigger: AnalyticsProcessingTrigger;
+}
+
+@Injectable()
+export class AnalyticsProcessingQueueService {
+  constructor(
+    private readonly prisma: PrismaService,
+
+    @Inject(ConfigService)
+    private readonly config: TypedConfigService,
+  ) {}
+
+  async queue(input: QueueProcessingInput) {
+    this.validateRange(input.from, input.to);
+
+    const website = await this.prisma.website.findFirst({
+      where: {
+        id: input.websiteId,
+
+        workspaceId: input.workspaceId,
+
+        archivedAt: null,
+      },
+
+      select: {
+        id: true,
+      },
+    });
+
+    if (!website) {
+      throw new NotFoundException('Website not found.');
+    }
+
+    const lockKey = ['analytics-processing', input.websiteId, input.from.toISOString(), input.to.toISOString()].join(':');
+
+    const activeKey = createHash('sha256').update(lockKey).digest('hex');
+
+    try {
+      return await this.prisma.analyticsProcessingRun.create({
+        data: {
+          workspaceId: input.workspaceId,
+
+          websiteId: input.websiteId,
+
+          initiatedByUserId: input.initiatedByUserId,
+
+          trigger: input.trigger,
+
+          status: AnalyticsProcessingStatus.QUEUED,
+
+          rangeStart: input.from,
+
+          rangeEnd: input.to,
+
+          lockKey,
+
+          activeKey,
+
+          maxRetries: this.config.get('ANALYTICS_MAX_RETRIES', {
+            infer: true,
+          }),
+        },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        const existing = await this.prisma.analyticsProcessingRun.findUnique({
+          where: {
+            activeKey,
+          },
+        });
+
+        if (existing) {
+          return existing;
+        }
+      }
+
+      throw error;
+    }
+  }
+
+  async retryDeadLetter(runId: string, userId: string) {
+    const run = await this.prisma.analyticsProcessingRun.findUnique({
+      where: {
+        id: runId,
+      },
+    });
+
+    if (!run || run.status !== AnalyticsProcessingStatus.DEAD_LETTERED) {
+      throw new NotFoundException('Dead-lettered processing run not found.');
+    }
+
+    return this.prisma.$transaction(async (transaction) => {
+      await transaction.analyticsProcessingDeadLetter.update({
+        where: {
+          runId: run.id,
+        },
+
+        data: {
+          resolvedAt: new Date(),
+
+          resolvedById: userId,
+        },
+      });
+
+      return transaction.analyticsProcessingRun.create({
+        data: {
+          workspaceId: run.workspaceId,
+
+          websiteId: run.websiteId,
+
+          initiatedByUserId: userId,
+
+          trigger: AnalyticsProcessingTrigger.RETRY,
+
+          status: AnalyticsProcessingStatus.QUEUED,
+
+          rangeStart: run.rangeStart,
+
+          rangeEnd: run.rangeEnd,
+
+          activeKey: run.lockKey,
+
+          lockKey: run.lockKey,
+
+          maxRetries: run.maxRetries,
+        },
+      });
+    });
+  }
+
+  private validateRange(from: Date, to: Date): void {
+    if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) {
+      throw new BadRequestException('Invalid processing date range.');
+    }
+
+    if (to <= from) {
+      throw new BadRequestException('to must be later than from.');
+    }
+
+    const rangeDays = (to.getTime() - from.getTime()) / MILLISECONDS_PER_DAY;
+
+    const maximumDays = this.config.get('ANALYTICS_REPROCESS_MAX_DAYS', {
+      infer: true,
+    });
+
+    if (rangeDays > maximumDays) {
+      throw new BadRequestException(`Reprocessing cannot exceed ${maximumDays} days.`);
+    }
+  }
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-processing\services\analytics-processing-scheduler.service.ts
+==================================================
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { PrismaService } from '../../../database/prisma.service';
+import { AnalyticsProcessingTrigger } from '../../../generated/prisma/client';
+import { AnalyticsProcessingQueueService } from './analytics-processing-queue.service';
+import type { TypedConfigService } from '../../../config/runtime-config';
+
+interface PendingWebsiteRange {
+  workspaceId: string;
+
+  websiteId: string;
+
+  firstOccurredAt: Date;
+
+  lastOccurredAt: Date;
+}
+
+@Injectable()
+export class AnalyticsProcessingSchedulerService {
+  private readonly logger = new Logger(AnalyticsProcessingSchedulerService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+
+    private readonly queue: AnalyticsProcessingQueueService,
+
+    @Inject(ConfigService)
+    private readonly config: TypedConfigService,
+  ) {}
+
+  @Cron(CronExpression.EVERY_MINUTE)
+  async schedulePendingEvents(): Promise<void> {
+    if (
+      !this.config.get('ANALYTICS_SCHEDULER_ENABLED', {
+        infer: true,
+      })
+    ) {
+      return;
+    }
+
+    const ranges = await this.getPendingRanges();
+
+    for (const range of ranges) {
+      try {
+        await this.queue.queue({
+          workspaceId: range.workspaceId,
+
+          websiteId: range.websiteId,
+
+          from: range.firstOccurredAt,
+
+          to: new Date(range.lastOccurredAt.getTime() + 1),
+
+          trigger: AnalyticsProcessingTrigger.SCHEDULED,
+        });
+      } catch (error) {
+        this.logger.error(
+          JSON.stringify({
+            event: 'analytics_schedule_failed',
+
+            websiteId: range.websiteId,
+
+            error: error instanceof Error ? error.message : String(error),
+          }),
+        );
+      }
+    }
+  }
+
+  private async getPendingRanges(): Promise<PendingWebsiteRange[]> {
+    const groups = await this.prisma.rawAnalyticsEvent.groupBy({
+      by: ['websiteId'],
+
+      where: {
+        processedAt: null,
+      },
+
+      _min: {
+        occurredAt: true,
+      },
+
+      _max: {
+        occurredAt: true,
+      },
+
+      orderBy: {
+        _min: {
+          occurredAt: 'asc',
+        },
+      },
+
+      take: 20,
+    });
+
+    if (groups.length === 0) {
+      return [];
+    }
+
+    const websiteIds = groups.map((group) => group.websiteId);
+
+    const websites = await this.prisma.website.findMany({
+      where: {
+        id: {
+          in: websiteIds,
+        },
+      },
+
+      select: {
+        id: true,
+        workspaceId: true,
+      },
+    });
+
+    const workspaceByWebsiteId = new Map(websites.map((website) => [website.id, website.workspaceId]));
+
+    return groups.flatMap((group) => {
+      const firstOccurredAt = group._min.occurredAt;
+      const lastOccurredAt = group._max.occurredAt;
+      const workspaceId = workspaceByWebsiteId.get(group.websiteId);
+
+      if (!workspaceId || !firstOccurredAt || !lastOccurredAt) {
+        return [];
+      }
+
+      return [
+        {
+          workspaceId,
+          websiteId: group.websiteId,
+          firstOccurredAt,
+          lastOccurredAt,
+        },
+      ];
+    });
+  }
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-processing\services\analytics-processing-status.service.ts
+==================================================
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../../database/prisma.service';
+import { AnalyticsProcessingStatus } from '../../../generated/prisma/client';
+import { AnalyticsProcessingAccessService } from './analytics-processing-access.service';
+import type { AnalyticsProcessingStatusDto, ProcessingRunDto } from '../dto/analytics-processing-response.dto';
+
+@Injectable()
+export class AnalyticsProcessingStatusService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly access: AnalyticsProcessingAccessService,
+  ) {}
+
+  async getStatus(workspaceId: string, websiteId: string, userId: string): Promise<AnalyticsProcessingStatusDto> {
+    const website = await this.prisma.website.findFirst({
+      where: {
+        id: websiteId,
+
+        workspaceId,
+
+        archivedAt: null,
+      },
+
+      select: {
+        id: true,
+      },
+    });
+
+    if (!website) {
+      throw new NotFoundException('Website not found.');
+    }
+
+    const [canReprocess, pendingEvents, unresolvedDeadLetters, activeRun, latestRun, lastSuccessfulRun, recentRuns] = await Promise.all([
+      this.access.getCanReprocess(workspaceId, userId),
+
+      this.prisma.rawAnalyticsEvent.count({
+        where: {
+          websiteId,
+
+          processedAt: null,
+        },
+      }),
+
+      this.prisma.analyticsProcessingDeadLetter.count({
+        where: {
+          websiteId,
+
+          resolvedAt: null,
+        },
+      }),
+
+      this.prisma.analyticsProcessingRun.findFirst({
+        where: {
+          websiteId,
+
+          status: {
+            in: [AnalyticsProcessingStatus.QUEUED, AnalyticsProcessingStatus.RUNNING],
+          },
+        },
+
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+
+      this.prisma.analyticsProcessingRun.findFirst({
+        where: {
+          websiteId,
+        },
+
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+
+      this.prisma.analyticsProcessingRun.findFirst({
+        where: {
+          websiteId,
+
+          status: AnalyticsProcessingStatus.SUCCEEDED,
+        },
+
+        orderBy: {
+          finishedAt: 'desc',
+        },
+      }),
+
+      this.prisma.analyticsProcessingRun.findMany({
+        where: {
+          websiteId,
+        },
+
+        orderBy: {
+          createdAt: 'desc',
+        },
+
+        take: 10,
+      }),
+    ]);
+
+    return {
+      canReprocess,
+
+      pendingEvents,
+
+      unresolvedDeadLetters,
+
+      activeRun: activeRun ? this.mapRun(activeRun) : null,
+
+      latestRun: latestRun ? this.mapRun(latestRun) : null,
+
+      lastSuccessfulRun: lastSuccessfulRun ? this.mapRun(lastSuccessfulRun) : null,
+
+      recentRuns: recentRuns.map(
+        (run: {
+          id: string;
+          status: unknown;
+          trigger: unknown;
+          rangeStart: Date;
+          rangeEnd: Date;
+          retryCount: number;
+          maxRetries: number;
+          rawEventsProcessed: number;
+          failedEvents: number;
+          errorMessage: string | null;
+          startedAt: Date | null;
+          finishedAt: Date | null;
+          createdAt: Date;
+        }) => this.mapRun(run),
+      ),
+    };
+  }
+
+  private mapRun(run: {
+    id: string;
+
+    status: unknown;
+
+    trigger: unknown;
+
+    rangeStart: Date;
+
+    rangeEnd: Date;
+
+    retryCount: number;
+
+    maxRetries: number;
+
+    rawEventsProcessed: number;
+
+    failedEvents: number;
+
+    errorMessage: string | null;
+
+    startedAt: Date | null;
+
+    finishedAt: Date | null;
+
+    createdAt: Date;
+  }): ProcessingRunDto {
+    return {
+      id: run.id,
+
+      status: String(run.status),
+
+      trigger: String(run.trigger),
+
+      rangeStart: run.rangeStart.toISOString(),
+
+      rangeEnd: run.rangeEnd.toISOString(),
+
+      retryCount: run.retryCount,
+
+      maxRetries: run.maxRetries,
+
+      processedEvents: run.rawEventsProcessed,
+
+      failedEvents: run.failedEvents,
+
+      errorMessage: run.errorMessage,
+
+      startedAt: run.startedAt?.toISOString() ?? null,
+
+      finishedAt: run.finishedAt?.toISOString() ?? null,
+
+      createdAt: run.createdAt.toISOString(),
+    };
+  }
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-processing\services\analytics-processing-worker.service.ts
+==================================================
+
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Interval } from '@nestjs/schedule';
+import { PrismaService } from '../../../database/prisma.service';
+import { AnalyticsProcessingStatus } from '../../../generated/prisma/client';
+import { PostgresAdvisoryLockService } from '../../../infrastructure/database/postgres-advisory-lock.service';
+import { AnalyticsRangeProcessorService } from './analytics-range-processor.service';
+import type { TypedConfigService } from '../../../config/runtime-config';
+
+const MAX_RETRY_DELAY_MS = 5 * 60 * 1_000;
+
+@Injectable()
+export class AnalyticsProcessingWorkerService {
+  private readonly logger = new Logger(AnalyticsProcessingWorkerService.name);
+
+  private running = false;
+
+  constructor(
+    private readonly prisma: PrismaService,
+
+    private readonly locks: PostgresAdvisoryLockService,
+
+    private readonly processor: AnalyticsRangeProcessorService,
+
+    @Inject(ConfigService)
+    private readonly config: TypedConfigService,
+  ) {}
+
+  @Interval(5_000)
+  async tick(): Promise<void> {
+    if (
+      !this.config.get('ANALYTICS_WORKER_ENABLED', {
+        infer: true,
+      }) ||
+      this.running
+    ) {
+      return;
+    }
+
+    this.running = true;
+
+    try {
+      await this.processNext();
+    } finally {
+      this.running = false;
+    }
+  }
+
+  private async processNext(): Promise<void> {
+    const run = await this.prisma.analyticsProcessingRun.findFirst({
+      where: {
+        status: AnalyticsProcessingStatus.QUEUED,
+
+        nextAttemptAt: {
+          lte: new Date(),
+        },
+      },
+
+      orderBy: [
+        {
+          nextAttemptAt: 'asc',
+        },
+
+        {
+          createdAt: 'asc',
+        },
+      ],
+    });
+
+    if (!run) {
+      return;
+    }
+
+    const lockResult = await this.locks.withLock(
+      run.lockKey,
+
+      async () => {
+        await this.processRun(run.id);
+      },
+    );
+
+    if (!lockResult.acquired) {
+      await this.prisma.analyticsProcessingRun.updateMany({
+        where: {
+          id: run.id,
+
+          status: AnalyticsProcessingStatus.QUEUED,
+        },
+
+        data: {
+          nextAttemptAt: new Date(Date.now() + 5_000),
+        },
+      });
+    }
+  }
+
+  private async processRun(runId: string): Promise<void> {
+    const claimed = await this.prisma.analyticsProcessingRun.updateMany({
+      where: {
+        id: runId,
+
+        status: AnalyticsProcessingStatus.QUEUED,
+      },
+
+      data: {
+        status: AnalyticsProcessingStatus.RUNNING,
+
+        startedAt: new Date(),
+
+        heartbeatAt: new Date(),
+
+        errorCode: null,
+
+        errorMessage: null,
+      },
+    });
+
+    if (claimed.count === 0) {
+      return;
+    }
+
+    const run = await this.prisma.analyticsProcessingRun.findUniqueOrThrow({
+      where: {
+        id: runId,
+      },
+    });
+
+    this.logger.log(
+      JSON.stringify({
+        event: 'analytics_processing_started',
+
+        runId: run.id,
+
+        websiteId: run.websiteId,
+
+        retryCount: run.retryCount,
+
+        rangeStart: run.rangeStart,
+
+        rangeEnd: run.rangeEnd,
+      }),
+    );
+
+    try {
+      const result = await this.processor.processRange({
+        workspaceId: run.workspaceId,
+
+        websiteId: run.websiteId,
+
+        from: run.rangeStart,
+
+        to: run.rangeEnd,
+      });
+
+      await this.prisma.analyticsProcessingRun.update({
+        where: {
+          id: run.id,
+        },
+
+        data: {
+          status: AnalyticsProcessingStatus.SUCCEEDED,
+
+          activeKey: null,
+
+          pendingEventsAtStart: result.pendingEventsAtStart,
+
+          rawEventsProcessed: result.processedEvents,
+
+          failedEvents: result.failedEvents,
+
+          heartbeatAt: new Date(),
+
+          finishedAt: new Date(),
+        },
+      });
+
+      this.logger.log(
+        JSON.stringify({
+          event: 'analytics_processing_succeeded',
+
+          runId: run.id,
+
+          websiteId: run.websiteId,
+
+          rawEventsProcessed: result.processedEvents,
+
+          failedEvents: result.failedEvents,
+        }),
+      );
+    } catch (error) {
+      await this.handleFailure(run, error);
+    }
+  }
+
+  private async handleFailure(
+    run: {
+      id: string;
+
+      workspaceId: string;
+
+      websiteId: string;
+
+      rangeStart: Date;
+
+      rangeEnd: Date;
+
+      retryCount: number;
+
+      maxRetries: number;
+    },
+
+    error: unknown,
+  ): Promise<void> {
+    const message = error instanceof Error ? error.message : String(error);
+
+    const code = error instanceof Error ? error.name : 'UnknownError';
+
+    const nextRetryCount = run.retryCount + 1;
+
+    if (nextRetryCount <= run.maxRetries) {
+      const delay = Math.min(
+        5_000 * 2 ** (nextRetryCount - 1),
+
+        MAX_RETRY_DELAY_MS,
+      );
+
+      await this.prisma.analyticsProcessingRun.update({
+        where: {
+          id: run.id,
+        },
+
+        data: {
+          status: AnalyticsProcessingStatus.QUEUED,
+
+          retryCount: nextRetryCount,
+
+          nextAttemptAt: new Date(Date.now() + delay),
+
+          errorCode: code,
+
+          errorMessage: message,
+
+          heartbeatAt: new Date(),
+        },
+      });
+
+      this.logger.warn(
+        JSON.stringify({
+          event: 'analytics_processing_retry_scheduled',
+
+          runId: run.id,
+
+          retryCount: nextRetryCount,
+
+          delay,
+
+          error: message,
+        }),
+      );
+
+      return;
+    }
+
+    await this.prisma.$transaction(async (transaction) => {
+      await transaction.analyticsProcessingRun.update({
+        where: {
+          id: run.id,
+        },
+
+        data: {
+          status: AnalyticsProcessingStatus.DEAD_LETTERED,
+
+          activeKey: null,
+
+          retryCount: nextRetryCount,
+
+          errorCode: code,
+
+          errorMessage: message,
+
+          heartbeatAt: new Date(),
+
+          finishedAt: new Date(),
+        },
+      });
+
+      await transaction.analyticsProcessingDeadLetter.create({
+        data: {
+          runId: run.id,
+
+          workspaceId: run.workspaceId,
+
+          websiteId: run.websiteId,
+
+          rangeStart: run.rangeStart,
+
+          rangeEnd: run.rangeEnd,
+
+          retryCount: nextRetryCount,
+
+          errorCode: code,
+
+          errorMessage: message,
+        },
+      });
+    });
+
+    this.logger.error(
+      JSON.stringify({
+        event: 'analytics_processing_dead_lettered',
+
+        runId: run.id,
+
+        retryCount: nextRetryCount,
+
+        error: message,
+      }),
+    );
+  }
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-processing\services\analytics-range-processor.service.ts
+==================================================
+
+import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { AnalyticsAggregationService } from 'src/modules/analytics-engine/services/analytics-aggregation.service';
+import { PageViewRebuilderService } from 'src/modules/analytics-engine/services/page-view-rebuilder.service';
+import { RawEventProcessingService } from 'src/modules/analytics-engine/services/raw-event-processing.service';
+import { SessionRebuilderService } from 'src/modules/analytics-engine/services/session-rebuilder.service';
+import { VisitorRebuilderService } from 'src/modules/analytics-engine/services/visitor-rebuilder.service';
+import { PrismaService } from '../../../database/prisma.service';
+import type { TypedConfigService } from '../../../config/runtime-config';
+
+export interface ProcessAnalyticsRangeInput {
+  workspaceId: string;
+
+  websiteId: string;
+
+  from: Date;
+
+  to: Date;
+}
+
+export interface ProcessAnalyticsRangeResult {
+  pendingEventsAtStart: number;
+  processedEvents: number;
+  failedEvents: number;
+}
+
+@Injectable()
+export class AnalyticsRangeProcessorService {
+  constructor(
+    private readonly prisma: PrismaService,
+
+    private readonly rawEvents: RawEventProcessingService,
+
+    private readonly visitors: VisitorRebuilderService,
+
+    private readonly sessions: SessionRebuilderService,
+
+    private readonly pageViews: PageViewRebuilderService,
+
+    private readonly aggregates: AnalyticsAggregationService,
+
+    @Inject(ConfigService)
+    private readonly config: TypedConfigService,
+  ) {}
+
+  async processRange(input: ProcessAnalyticsRangeInput): Promise<ProcessAnalyticsRangeResult> {
+    const timeout = this.config.get('ANALYTICS_PROCESSING_TIMEOUT_MS', {
+      infer: true,
+    });
+
+    return this.prisma.$transaction(
+      async (transaction) => {
+        const pendingEventsAtStart = await transaction.rawAnalyticsEvent.count({
+          where: {
+            websiteId: input.websiteId,
+
+            occurredAt: {
+              gte: input.from,
+
+              lt: input.to,
+            },
+
+            processedAt: null,
+          },
+        });
+
+        /*
+         * Run sequentially.
+         *
+         * Do not use Promise.all() with a transaction client.
+         * Each step must await completion before the next step.
+         */
+
+        const rawResult = await this.rawEvents.processRange(transaction, input);
+
+        await this.visitors.rebuildRange(transaction, input);
+
+        await this.sessions.rebuildRange(transaction, input);
+
+        await this.pageViews.rebuildRange(transaction, input);
+
+        await this.aggregates.rebuildRange(transaction, input);
+
+        return {
+          pendingEventsAtStart,
+
+          processedEvents: rawResult.processedEvents,
+
+          failedEvents: rawResult.failedEvents,
+        };
+      },
+      {
+        isolationLevel: 'Serializable',
+
+        maxWait: 10_000,
+
+        timeout,
+      },
+    );
+  }
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-processing\services\safe-http-client.service.spec.ts
+==================================================
+import { BadRequestException } from '@nestjs/common';
+import { SafeHttpClientService } from 'src/modules/monitoring/services/safe-http-client.service';
+
+describe(SafeHttpClientService.name, () => {
+  let service: SafeHttpClientService;
+
+  beforeEach(() => {
+    service = new SafeHttpClientService();
+  });
+
+  it.each([
+    'http://127.0.0.1:4000/health',
+
+    'http://0.0.0.0/health',
+
+    'http://localhost/health',
+
+    'http://169.254.169.254/latest/meta-data',
+
+    'http://[::1]/health',
+
+    'http://metadata.google.internal/',
+  ])('blocks unsafe destination %s', async (url) => {
+    await expect(service.validateUrl(url)).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it('rejects embedded credentials', async () => {
+    await expect(service.validateUrl('https://user:password@example.com/health')).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it('rejects non-HTTP protocols', async () => {
+    await expect(service.validateUrl('file:///etc/passwd')).rejects.toBeInstanceOf(BadRequestException);
+  });
+});
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-reports\dto\analytics-report-query.dto.ts
+==================================================
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsEnum, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
+import { AnalyticsOverviewQueryDto } from '../../analytics-overview/dto/analytics-overview-query.dto';
+import { ANALYTICS_REPORT_DEFAULT_LIMIT, ANALYTICS_REPORT_MAX_LIMIT, ANALYTICS_SEARCH_MAX_LENGTH } from '../analytics-reports.constants';
+
+export enum AnalyticsSortDirection {
+  ASC = 'asc',
+  DESC = 'desc',
+}
+
+export enum PageReportSortField {
+  VIEWS = 'views',
+  VISITORS = 'visitors',
+  SESSIONS = 'sessions',
+  ENTRANCES = 'entrances',
+  EXITS = 'exits',
+  BOUNCE_RATE = 'bounceRate',
+  AVERAGE_DURATION = 'averageDuration',
+  PATH = 'path',
+}
+
+export enum EventReportSortField {
+  EVENTS = 'events',
+  VISITORS = 'visitors',
+  SESSIONS = 'sessions',
+  NAME = 'name',
+}
+
+export enum DimensionReportSortField {
+  VISITORS = 'visitors',
+  SESSIONS = 'sessions',
+  PAGE_VIEWS = 'pageViews',
+  LABEL = 'label',
+}
+
+export enum AnalyticsReportDimension {
+  SOURCES = 'sources',
+  COUNTRIES = 'countries',
+  DEVICES = 'devices',
+  BROWSERS = 'browsers',
+  OPERATING_SYSTEMS = 'operating-systems',
+}
+
+export class AnalyticsReportQueryDto extends AnalyticsOverviewQueryDto {
+  @ApiPropertyOptional({
+    default: 1,
+    minimum: 1,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page = 1;
+
+  @ApiPropertyOptional({
+    default: ANALYTICS_REPORT_DEFAULT_LIMIT,
+
+    maximum: ANALYTICS_REPORT_MAX_LIMIT,
+
+    minimum: 1,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(ANALYTICS_REPORT_MAX_LIMIT)
+  limit = ANALYTICS_REPORT_DEFAULT_LIMIT;
+
+  @ApiPropertyOptional({
+    maxLength: ANALYTICS_SEARCH_MAX_LENGTH,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(ANALYTICS_SEARCH_MAX_LENGTH)
+  search?: string;
+
+  @ApiPropertyOptional({
+    enum: AnalyticsSortDirection,
+
+    default: AnalyticsSortDirection.DESC,
+  })
+  @IsOptional()
+  @IsEnum(AnalyticsSortDirection)
+  sortDirection = AnalyticsSortDirection.DESC;
+}
+
+export class PageReportQueryDto extends AnalyticsReportQueryDto {
+  @ApiPropertyOptional({
+    enum: PageReportSortField,
+
+    default: PageReportSortField.VIEWS,
+  })
+  @IsOptional()
+  @IsEnum(PageReportSortField)
+  sortBy = PageReportSortField.VIEWS;
+}
+
+export class EventReportQueryDto extends AnalyticsReportQueryDto {
+  @ApiPropertyOptional({
+    enum: EventReportSortField,
+
+    default: EventReportSortField.EVENTS,
+  })
+  @IsOptional()
+  @IsEnum(EventReportSortField)
+  sortBy = EventReportSortField.EVENTS;
+}
+
+export class DimensionReportQueryDto extends AnalyticsReportQueryDto {
+  @ApiPropertyOptional({
+    enum: DimensionReportSortField,
+
+    default: DimensionReportSortField.SESSIONS,
+  })
+  @IsOptional()
+  @IsEnum(DimensionReportSortField)
+  sortBy = DimensionReportSortField.SESSIONS;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-reports\dto\analytics-report-response.dto.ts
+==================================================
+import { ApiProperty } from '@nestjs/swagger';
+
+export class AnalyticsPaginationDto {
+  @ApiProperty()
+  page!: number;
+
+  @ApiProperty()
+  limit!: number;
+
+  @ApiProperty()
+  total!: number;
+
+  @ApiProperty()
+  totalPages!: number;
+
+  @ApiProperty()
+  hasPreviousPage!: boolean;
+
+  @ApiProperty()
+  hasNextPage!: boolean;
+}
+
+export class AnalyticsReportRangeDto {
+  @ApiProperty()
+  from!: string;
+
+  @ApiProperty()
+  to!: string;
+
+  @ApiProperty()
+  timeZone!: string;
+
+  @ApiProperty()
+  days!: number;
+}
+
+export class PageReportItemDto {
+  @ApiProperty()
+  path!: string;
+
+  @ApiProperty()
+  title!: string;
+
+  @ApiProperty()
+  views!: number;
+
+  @ApiProperty()
+  visitors!: number;
+
+  @ApiProperty()
+  sessions!: number;
+
+  @ApiProperty()
+  entrances!: number;
+
+  @ApiProperty()
+  exits!: number;
+
+  @ApiProperty()
+  bounceRate!: number;
+
+  @ApiProperty()
+  averageDurationSeconds!: number;
+}
+
+export class PageReportResponseDto {
+  @ApiProperty({
+    type: [PageReportItemDto],
+  })
+  items!: PageReportItemDto[];
+
+  @ApiProperty({
+    type: AnalyticsPaginationDto,
+  })
+  pagination!: AnalyticsPaginationDto;
+
+  @ApiProperty({
+    type: AnalyticsReportRangeDto,
+  })
+  range!: AnalyticsReportRangeDto;
+}
+
+export class EventReportItemDto {
+  @ApiProperty()
+  name!: string;
+
+  @ApiProperty()
+  events!: number;
+
+  @ApiProperty()
+  visitors!: number;
+
+  @ApiProperty()
+  sessions!: number;
+}
+
+export class EventReportSummaryDto {
+  @ApiProperty()
+  totalEvents!: number;
+
+  @ApiProperty()
+  uniqueVisitors!: number;
+
+  @ApiProperty()
+  uniqueSessions!: number;
+}
+
+export class EventReportResponseDto {
+  @ApiProperty({
+    type: [EventReportItemDto],
+  })
+  items!: EventReportItemDto[];
+
+  @ApiProperty({
+    type: EventReportSummaryDto,
+  })
+  summary!: EventReportSummaryDto;
+
+  @ApiProperty({
+    type: AnalyticsPaginationDto,
+  })
+  pagination!: AnalyticsPaginationDto;
+
+  @ApiProperty({
+    type: AnalyticsReportRangeDto,
+  })
+  range!: AnalyticsReportRangeDto;
+}
+
+export class DimensionReportItemDto {
+  @ApiProperty()
+  key!: string;
+
+  @ApiProperty()
+  label!: string;
+
+  @ApiProperty()
+  visitors!: number;
+
+  @ApiProperty()
+  sessions!: number;
+
+  @ApiProperty()
+  pageViews!: number;
+
+  @ApiProperty()
+  percentage!: number;
+}
+
+export class DimensionReportResponseDto {
+  @ApiProperty({
+    type: [DimensionReportItemDto],
+  })
+  items!: DimensionReportItemDto[];
+
+  @ApiProperty({
+    type: AnalyticsPaginationDto,
+  })
+  pagination!: AnalyticsPaginationDto;
+
+  @ApiProperty({
+    type: AnalyticsReportRangeDto,
+  })
+  range!: AnalyticsReportRangeDto;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-reports\services\analytics-reports.service.ts
+==================================================
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { Prisma } from 'src/generated/prisma/client';
+import { AnalyticsAggregateDimension } from 'src/generated/prisma/enums';
+import { resolveAnalyticsDateRange } from '../../analytics-overview/utils/analytics-date-range';
+import { roundMetric, toSafeNumber } from '../../analytics-overview/utils/analytics-overview-metrics';
+import { ANALYTICS_EXPORT_MAX_DAYS, ANALYTICS_EXPORT_MAX_ROWS } from '../analytics-reports.constants';
+import {
+  AnalyticsReportDimension,
+  AnalyticsSortDirection,
+  DimensionReportQueryDto,
+  DimensionReportSortField,
+  EventReportQueryDto,
+  EventReportSortField,
+  PageReportQueryDto,
+  PageReportSortField,
+} from '../dto/analytics-report-query.dto';
+import { createCsv, createCsvFilename } from '../utils/analytics-csv';
+import type {
+  AnalyticsPaginationDto,
+  AnalyticsReportRangeDto,
+  DimensionReportItemDto,
+  DimensionReportResponseDto,
+  EventReportItemDto,
+  EventReportResponseDto,
+  PageReportItemDto,
+  PageReportResponseDto,
+} from '../dto/analytics-report-response.dto';
+
+interface WebsiteReportContext {
+  websiteId: string;
+
+  websiteName: string;
+
+  timeZone: string;
+
+  range: ReturnType<typeof resolveAnalyticsDateRange>;
+}
+
+interface PageDatabaseRow {
+  path: string;
+
+  title: string | null;
+
+  views: bigint | number | string;
+
+  visitors: bigint | number | string;
+
+  sessions: bigint | number | string;
+
+  entrances: bigint | number | string;
+
+  exits: bigint | number | string;
+
+  bounced_sessions: bigint | number | string;
+
+  total_duration_ms: bigint | number | string;
+
+  total_count: bigint | number | string;
+}
+
+interface EventDatabaseRow {
+  name: string;
+
+  events: bigint | number | string;
+
+  visitors: bigint | number | string;
+
+  sessions: bigint | number | string;
+
+  total_count: bigint | number | string;
+}
+
+interface EventSummaryDatabaseRow {
+  total_events: bigint | number | string;
+
+  unique_visitors: bigint | number | string;
+
+  unique_sessions: bigint | number | string;
+}
+
+interface AggregateDimensionRow {
+  dimensionValue: string;
+
+  dimensionLabel: string;
+
+  visitors: number;
+
+  sessions: number;
+
+  pageViews: number;
+}
+
+export interface CsvExportResult {
+  filename: string;
+
+  content: string;
+}
+
+@Injectable()
+export class AnalyticsReportsService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async getPagesReport(workspaceId: string, websiteId: string, query: PageReportQueryDto): Promise<PageReportResponseDto> {
+    const context = await this.resolveContext(workspaceId, websiteId, query);
+
+    return this.loadPagesReport(context, query, query.page, query.limit);
+  }
+
+  async getEventsReport(workspaceId: string, websiteId: string, query: EventReportQueryDto): Promise<EventReportResponseDto> {
+    const context = await this.resolveContext(workspaceId, websiteId, query);
+
+    return this.loadEventsReport(context, query, query.page, query.limit);
+  }
+
+  async getDimensionReport(
+    workspaceId: string,
+    websiteId: string,
+    dimension: AnalyticsReportDimension,
+    query: DimensionReportQueryDto,
+  ): Promise<DimensionReportResponseDto> {
+    const context = await this.resolveContext(workspaceId, websiteId, query);
+
+    return this.loadDimensionReport(context, dimension, query, query.page, query.limit);
+  }
+
+  async exportPages(workspaceId: string, websiteId: string, query: PageReportQueryDto): Promise<CsvExportResult> {
+    const context = await this.resolveContext(workspaceId, websiteId, query);
+
+    this.assertExportRange(context);
+
+    const report = await this.loadPagesReport(context, query, 1, ANALYTICS_EXPORT_MAX_ROWS);
+
+    return {
+      filename: createCsvFilename('pages', context.range.current.from, context.range.current.to),
+
+      content: createCsv(
+        [
+          {
+            header: 'Path',
+
+            value: (row) => row.path,
+          },
+
+          {
+            header: 'Title',
+
+            value: (row) => row.title,
+          },
+
+          {
+            header: 'Views',
+
+            value: (row) => row.views,
+          },
+
+          {
+            header: 'Visitors',
+
+            value: (row) => row.visitors,
+          },
+
+          {
+            header: 'Sessions',
+
+            value: (row) => row.sessions,
+          },
+
+          {
+            header: 'Entrances',
+
+            value: (row) => row.entrances,
+          },
+
+          {
+            header: 'Exits',
+
+            value: (row) => row.exits,
+          },
+
+          {
+            header: 'Bounce Rate',
+
+            value: (row) => row.bounceRate,
+          },
+
+          {
+            header: 'Average Duration Seconds',
+
+            value: (row) => row.averageDurationSeconds,
+          },
+        ],
+
+        report.items,
+      ),
+    };
+  }
+
+  async exportEvents(workspaceId: string, websiteId: string, query: EventReportQueryDto): Promise<CsvExportResult> {
+    const context = await this.resolveContext(workspaceId, websiteId, query);
+
+    this.assertExportRange(context);
+
+    const report = await this.loadEventsReport(context, query, 1, ANALYTICS_EXPORT_MAX_ROWS);
+
+    return {
+      filename: createCsvFilename('events', context.range.current.from, context.range.current.to),
+
+      content: createCsv(
+        [
+          {
+            header: 'Event',
+
+            value: (row) => row.name,
+          },
+
+          {
+            header: 'Total Events',
+
+            value: (row) => row.events,
+          },
+
+          {
+            header: 'Unique Visitors',
+
+            value: (row) => row.visitors,
+          },
+
+          {
+            header: 'Sessions',
+
+            value: (row) => row.sessions,
+          },
+        ],
+
+        report.items,
+      ),
+    };
+  }
+
+  async exportDimension(workspaceId: string, websiteId: string, dimension: AnalyticsReportDimension, query: DimensionReportQueryDto): Promise<CsvExportResult> {
+    const context = await this.resolveContext(workspaceId, websiteId, query);
+
+    this.assertExportRange(context);
+
+    const report = await this.loadDimensionReport(context, dimension, query, 1, ANALYTICS_EXPORT_MAX_ROWS);
+
+    return {
+      filename: createCsvFilename(dimension, context.range.current.from, context.range.current.to),
+
+      content: createCsv(
+        [
+          {
+            header: 'Value',
+
+            value: (row) => row.label,
+          },
+
+          {
+            header: 'Visitors',
+
+            value: (row) => row.visitors,
+          },
+
+          {
+            header: 'Sessions',
+
+            value: (row) => row.sessions,
+          },
+
+          {
+            header: 'Page Views',
+
+            value: (row) => row.pageViews,
+          },
+
+          {
+            header: 'Percentage',
+
+            value: (row) => row.percentage,
+          },
+        ],
+
+        report.items,
+      ),
+    };
+  }
+
+  private async resolveContext(
+    workspaceId: string,
+    websiteId: string,
+    query:
+      | {
+          preset?: never;
+          from?: string;
+          to?: string;
+        }
+      | PageReportQueryDto
+      | EventReportQueryDto
+      | DimensionReportQueryDto,
+  ): Promise<WebsiteReportContext> {
+    const website = await this.prisma.website.findFirst({
+      where: {
+        id: websiteId,
+
+        workspaceId,
+
+        archivedAt: null,
+      },
+
+      select: {
+        id: true,
+
+        name: true,
+
+        timeZone: true,
+      },
+    });
+
+    if (!website) {
+      throw new NotFoundException('Website not found');
+    }
+
+    return {
+      websiteId: website.id,
+
+      websiteName: website.name,
+
+      timeZone: website.timeZone,
+
+      range: resolveAnalyticsDateRange(query as Parameters<typeof resolveAnalyticsDateRange>[0], website.timeZone),
+    };
+  }
+
+  private async loadPagesReport(
+    context: WebsiteReportContext,
+
+    query: PageReportQueryDto,
+
+    page: number,
+
+    limit: number,
+  ): Promise<PageReportResponseDto> {
+    const offset = (page - 1) * limit;
+
+    const search = query.search?.trim() ?? '';
+
+    const searchPattern = `%${search}%`;
+
+    const sortColumn = this.getPageSortColumn(query.sortBy);
+
+    const sortDirection = query.sortDirection === AnalyticsSortDirection.ASC ? Prisma.sql`ASC` : Prisma.sql`DESC`;
+
+    const rows = await this.prisma.$queryRaw<PageDatabaseRow[]>(
+      Prisma.sql`
+                        WITH page_report AS (
+                            SELECT
+                                pv.path AS path,
+
+                                COALESCE(
+                                    NULLIF(
+                                        MAX(
+                                            pv.title
+                                        ),
+                                        ''
+                                    ),
+                                    pv.path
+                                ) AS title,
+
+                                COUNT(*)::bigint
+                                    AS views,
+
+                                COUNT(
+                                    DISTINCT
+                                    pv.visitor_id
+                                )::bigint
+                                    AS visitors,
+
+                                COUNT(
+                                    DISTINCT
+                                    pv.session_id
+                                )::bigint
+                                    AS sessions,
+
+                                COUNT(
+                                    DISTINCT
+                                    pv.session_id
+                                ) FILTER (
+                                    WHERE
+                                        pv.is_entrance =
+                                            TRUE
+                                )::bigint
+                                    AS entrances,
+
+                                COUNT(
+                                    DISTINCT
+                                    pv.session_id
+                                ) FILTER (
+                                    WHERE
+                                        pv.is_exit =
+                                            TRUE
+                                )::bigint
+                                    AS exits,
+
+                                COUNT(
+                                    DISTINCT
+                                    pv.session_id
+                                ) FILTER (
+                                    WHERE
+                                        pv.is_entrance =
+                                            TRUE
+                                        AND
+                                        analytics_session
+                                            .bounced =
+                                            TRUE
+                                )::bigint
+                                    AS bounced_sessions,
+
+                                COALESCE(
+                                    SUM(
+                                        pv.duration_ms
+                                    ),
+                                    0
+                                )::bigint
+                                    AS total_duration_ms
+
+                            FROM
+                                analytics_page_views
+                                    AS pv
+
+                            LEFT JOIN
+                                analytics_sessions
+                                    AS analytics_session
+                                ON
+                                    analytics_session.id =
+                                        pv.session_id
+                                    AND
+                                    analytics_session.website_id =
+                                        pv.website_id
+
+                            WHERE
+                                pv.website_id =
+                                    ${context.websiteId}::uuid
+
+                                AND
+                                pv.occurred_at >=
+                                    ${context.range.current.start}
+
+                                AND
+                                pv.occurred_at <
+                                    ${context.range.current.end}
+
+                            GROUP BY
+                                pv.path
+                        ),
+
+                        filtered_report AS (
+                            SELECT
+                                *,
+
+                                COUNT(*) OVER()::bigint
+                                    AS total_count
+
+                            FROM
+                                page_report
+
+                            WHERE
+                                ${search} = ''
+                                OR
+                                path ILIKE
+                                    ${searchPattern}
+                                OR
+                                title ILIKE
+                                    ${searchPattern}
+                        )
+
+                        SELECT
+                            *
+
+                        FROM
+                            filtered_report
+
+                        ORDER BY
+                            ${sortColumn}
+                            ${sortDirection},
+
+                            path ASC
+
+                        LIMIT
+                            ${limit}
+
+                        OFFSET
+                            ${offset}
+                    `,
+    );
+
+    const total = toSafeNumber(rows[0]?.total_count);
+
+    const items = rows.map((row) => this.mapPageRow(row));
+
+    return {
+      items,
+
+      pagination: this.createPagination(page, limit, total),
+
+      range: this.createRangeDto(context),
+    };
+  }
+
+  private async loadEventsReport(
+    context: WebsiteReportContext,
+
+    query: EventReportQueryDto,
+
+    page: number,
+
+    limit: number,
+  ): Promise<EventReportResponseDto> {
+    const offset = (page - 1) * limit;
+
+    const search = query.search?.trim() ?? '';
+
+    const searchPattern = `%${search}%`;
+
+    const sortColumn = this.getEventSortColumn(query.sortBy);
+
+    const sortDirection = query.sortDirection === AnalyticsSortDirection.ASC ? Prisma.sql`ASC` : Prisma.sql`DESC`;
+
+    const [rows, summaryRows] = await Promise.all([
+      this.prisma.$queryRaw<EventDatabaseRow[]>(
+        Prisma.sql`
+                        WITH event_report AS (
+                            SELECT
+                                analytics_event
+                                    .event_name
+                                    AS name,
+
+                                COUNT(*)::bigint
+                                    AS events,
+
+                                COUNT(
+                                    DISTINCT
+                                    analytics_event
+                                        .visitor_id
+                                )::bigint
+                                    AS visitors,
+
+                                COUNT(
+                                    DISTINCT
+                                    analytics_event
+                                        .session_id
+                                )::bigint
+                                    AS sessions
+
+                            FROM
+                                analytics_events
+                                    AS analytics_event
+
+                            WHERE
+                                analytics_event.website_id =
+                                    ${context.websiteId}::uuid
+
+                                AND
+                                analytics_event.occurred_at >=
+                                    ${context.range.current.start}
+
+                                AND
+                                analytics_event.occurred_at <
+                                    ${context.range.current.end}
+
+                                AND
+                                analytics_event.event_name
+                                    IS NOT NULL
+
+                                AND
+                                analytics_event.event_name
+                                    <> ''
+
+                            GROUP BY
+                                analytics_event
+                                    .event_name
+                        ),
+
+                        filtered_report AS (
+                            SELECT
+                                *,
+
+                                COUNT(*) OVER()::bigint
+                                    AS total_count
+
+                            FROM
+                                event_report
+
+                            WHERE
+                                ${search} = ''
+                                OR
+                                name ILIKE
+                                    ${searchPattern}
+                        )
+
+                        SELECT
+                            *
+
+                        FROM
+                            filtered_report
+
+                        ORDER BY
+                            ${sortColumn}
+                            ${sortDirection},
+
+                            name ASC
+
+                        LIMIT
+                            ${limit}
+
+                        OFFSET
+                            ${offset}
+                    `,
+      ),
+
+      this.prisma.$queryRaw<EventSummaryDatabaseRow[]>(
+        Prisma.sql`
+                        SELECT
+                            COUNT(*)::bigint
+                                AS total_events,
+
+                            COUNT(
+                                DISTINCT
+                                visitor_id
+                            )::bigint
+                                AS unique_visitors,
+
+                            COUNT(
+                                DISTINCT
+                                session_id
+                            )::bigint
+                                AS unique_sessions
+
+                        FROM
+                            analytics_events
+
+                        WHERE
+                            website_id =
+                                ${context.websiteId}::uuid
+
+                            AND
+                            occurred_at >=
+                                ${context.range.current.start}
+
+                            AND
+                            occurred_at <
+                                ${context.range.current.end}
+
+                            AND
+                            event_name
+                                IS NOT NULL
+
+                            AND
+                            event_name
+                                <> ''
+                    `,
+      ),
+    ]);
+
+    const total = toSafeNumber(rows[0]?.total_count);
+
+    const summary = summaryRows[0];
+
+    return {
+      items: rows.map((row): EventReportItemDto => ({
+        name: row.name,
+
+        events: toSafeNumber(row.events),
+
+        visitors: toSafeNumber(row.visitors),
+
+        sessions: toSafeNumber(row.sessions),
+      })),
+
+      summary: {
+        totalEvents: toSafeNumber(summary?.total_events),
+
+        uniqueVisitors: toSafeNumber(summary?.unique_visitors),
+
+        uniqueSessions: toSafeNumber(summary?.unique_sessions),
+      },
+
+      pagination: this.createPagination(page, limit, total),
+
+      range: this.createRangeDto(context),
+    };
+  }
+
+  private async loadDimensionReport(
+    context: WebsiteReportContext,
+
+    dimension: AnalyticsReportDimension,
+
+    query: DimensionReportQueryDto,
+
+    page: number,
+
+    limit: number,
+  ): Promise<DimensionReportResponseDto> {
+    const aggregateDimension = this.mapDimension(dimension);
+
+    const where = {
+      websiteId: context.websiteId,
+
+      dimension: aggregateDimension,
+
+      bucketStart: {
+        gte: context.range.current.start,
+
+        lt: context.range.current.end,
+      },
+    };
+
+    const select = {
+      dimensionValue: true,
+
+      dimensionLabel: true,
+
+      visitors: true,
+
+      sessions: true,
+
+      pageViews: true,
+    } as const;
+
+    const rows: AggregateDimensionRow[] =
+      context.range.granularity === 'hour'
+        ? await this.prisma.analyticsHourlyAggregate.findMany({
+            where,
+            select,
+          })
+        : await this.prisma.analyticsDailyAggregate.findMany({
+            where,
+            select,
+          });
+
+    const grouped = new Map<
+      string,
+      {
+        label: string;
+        visitors: number;
+        sessions: number;
+        pageViews: number;
+      }
+    >();
+
+    for (const row of rows) {
+      const key = row.dimensionValue.trim() || 'unknown';
+
+      const label = row.dimensionLabel.trim() || 'Unknown';
+
+      const current = grouped.get(key);
+
+      if (current) {
+        current.visitors += row.visitors;
+
+        current.sessions += row.sessions;
+
+        current.pageViews += row.pageViews;
+      } else {
+        grouped.set(key, {
+          label,
+
+          visitors: row.visitors,
+
+          sessions: row.sessions,
+
+          pageViews: row.pageViews,
+        });
+      }
+    }
+
+    const search = query.search?.trim().toLowerCase() ?? '';
+
+    const filtered = Array.from(grouped.entries())
+      .map(([key, value]) => ({
+        key,
+
+        ...value,
+      }))
+      .filter((item) => search === '' || item.key.toLowerCase().includes(search) || item.label.toLowerCase().includes(search));
+
+    const totalSessions = filtered.reduce(
+      (total, item) => total + item.sessions,
+
+      0,
+    );
+
+    const items = filtered.map((item): DimensionReportItemDto => ({
+      ...item,
+
+      percentage:
+        totalSessions === 0
+          ? 0
+          : roundMetric(
+              (item.sessions / totalSessions) * 100,
+
+              1,
+            ),
+    }));
+
+    this.sortDimensionItems(items, query.sortBy, query.sortDirection);
+
+    const total = items.length;
+
+    const offset = (page - 1) * limit;
+
+    return {
+      items: items.slice(offset, offset + limit),
+
+      pagination: this.createPagination(page, limit, total),
+
+      range: this.createRangeDto(context),
+    };
+  }
+
+  private mapPageRow(row: PageDatabaseRow): PageReportItemDto {
+    const views = toSafeNumber(row.views);
+
+    const entrances = toSafeNumber(row.entrances);
+
+    const bouncedSessions = toSafeNumber(row.bounced_sessions);
+
+    const totalDurationMs = toSafeNumber(row.total_duration_ms);
+
+    return {
+      path: row.path,
+
+      title: row.title ?? row.path,
+
+      views,
+
+      visitors: toSafeNumber(row.visitors),
+
+      sessions: toSafeNumber(row.sessions),
+
+      entrances,
+
+      exits: toSafeNumber(row.exits),
+
+      bounceRate:
+        entrances === 0
+          ? 0
+          : roundMetric(
+              (bouncedSessions / entrances) * 100,
+
+              1,
+            ),
+
+      averageDurationSeconds:
+        views === 0
+          ? 0
+          : roundMetric(
+              totalDurationMs / views / 1000,
+
+              1,
+            ),
+    };
+  }
+
+  private getPageSortColumn(field: PageReportSortField): Prisma.Sql {
+    switch (field) {
+      case PageReportSortField.VISITORS:
+        return Prisma.sql`visitors`;
+
+      case PageReportSortField.SESSIONS:
+        return Prisma.sql`sessions`;
+
+      case PageReportSortField.ENTRANCES:
+        return Prisma.sql`entrances`;
+
+      case PageReportSortField.EXITS:
+        return Prisma.sql`exits`;
+
+      case PageReportSortField.BOUNCE_RATE:
+        return Prisma.sql`
+                    CASE
+                        WHEN entrances = 0
+                            THEN 0
+                        ELSE
+                            bounced_sessions::numeric /
+                            entrances
+                    END
+                `;
+
+      case PageReportSortField.AVERAGE_DURATION:
+        return Prisma.sql`
+                    CASE
+                        WHEN views = 0
+                            THEN 0
+                        ELSE
+                            total_duration_ms::numeric /
+                            views
+                    END
+                `;
+
+      case PageReportSortField.PATH:
+        return Prisma.sql`path`;
+
+      case PageReportSortField.VIEWS:
+      default:
+        return Prisma.sql`views`;
+    }
+  }
+
+  private getEventSortColumn(field: EventReportSortField): Prisma.Sql {
+    switch (field) {
+      case EventReportSortField.VISITORS:
+        return Prisma.sql`visitors`;
+
+      case EventReportSortField.SESSIONS:
+        return Prisma.sql`sessions`;
+
+      case EventReportSortField.NAME:
+        return Prisma.sql`name`;
+
+      case EventReportSortField.EVENTS:
+      default:
+        return Prisma.sql`events`;
+    }
+  }
+
+  private mapDimension(dimension: AnalyticsReportDimension): AnalyticsAggregateDimension {
+    switch (dimension) {
+      case AnalyticsReportDimension.SOURCES:
+        return AnalyticsAggregateDimension.SOURCE;
+
+      case AnalyticsReportDimension.COUNTRIES:
+        return AnalyticsAggregateDimension.COUNTRY;
+
+      case AnalyticsReportDimension.DEVICES:
+        return AnalyticsAggregateDimension.DEVICE;
+
+      case AnalyticsReportDimension.BROWSERS:
+        return AnalyticsAggregateDimension.BROWSER;
+
+      case AnalyticsReportDimension.OPERATING_SYSTEMS:
+        return AnalyticsAggregateDimension.OPERATING_SYSTEM;
+    }
+  }
+
+  private sortDimensionItems(
+    items: DimensionReportItemDto[],
+
+    field: DimensionReportSortField,
+
+    direction: AnalyticsSortDirection,
+  ): void {
+    const multiplier = direction === AnalyticsSortDirection.ASC ? 1 : -1;
+
+    items.sort((first, second) => {
+      if (field === DimensionReportSortField.LABEL) {
+        return first.label.localeCompare(second.label) * multiplier;
+      }
+
+      const firstValue =
+        field === DimensionReportSortField.VISITORS ? first.visitors : field === DimensionReportSortField.PAGE_VIEWS ? first.pageViews : first.sessions;
+
+      const secondValue =
+        field === DimensionReportSortField.VISITORS ? second.visitors : field === DimensionReportSortField.PAGE_VIEWS ? second.pageViews : second.sessions;
+
+      if (firstValue === secondValue) {
+        return first.label.localeCompare(second.label);
+      }
+
+      return (firstValue - secondValue) * multiplier;
+    });
+  }
+
+  private createPagination(page: number, limit: number, total: number): AnalyticsPaginationDto {
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+
+    return {
+      page,
+
+      limit,
+
+      total,
+
+      totalPages,
+
+      hasPreviousPage: page > 1,
+
+      hasNextPage: page < totalPages,
+    };
+  }
+
+  private createRangeDto(context: WebsiteReportContext): AnalyticsReportRangeDto {
+    return {
+      from: context.range.current.from,
+
+      to: context.range.current.to,
+
+      timeZone: context.timeZone,
+
+      days: context.range.days,
+    };
+  }
+
+  private assertExportRange(context: WebsiteReportContext): void {
+    if (context.range.days > ANALYTICS_EXPORT_MAX_DAYS) {
+      throw new BadRequestException(`CSV exports cannot exceed ${ANALYTICS_EXPORT_MAX_DAYS} days`);
+    }
+  }
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-ingestion\analytics-ingestion.module.ts
+==================================================
+import { Module } from '@nestjs/common';
+import { SharedRateLimitModule } from 'src/common/rate-limit/shared-rate-limit.module';
+import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-members.module';
+import { WorkspaceModule } from '../workspace/modules/workspaces.module';
+import { AnalyticsIngestionController } from './controllers/analytics-ingestion.controller';
+import { TrackingAdminController } from './controllers/tracking-admin.controller';
+import { AnalyticsIngestionService } from './services/analytics-ingestion.service';
+import { IngestionRateLimitService } from './services/ingestion-rate-limit.service';
+import { TrackingAdminService } from './services/tracking-admin.service';
+
+@Module({
+  imports: [SharedRateLimitModule, WorkspaceMembersModule, WorkspaceModule],
+
+  controllers: [AnalyticsIngestionController, TrackingAdminController],
+
+  providers: [AnalyticsIngestionService, IngestionRateLimitService, TrackingAdminService],
+
+  exports: [AnalyticsIngestionService, TrackingAdminService],
+})
+export class AnalyticsIngestionModule {}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-ingestion\controllers\analytics-ingestion.controller.ts
+==================================================
+import { Body, Controller, Headers, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
+import { ApiExcludeController } from '@nestjs/swagger';
+import { SharedRateLimit } from '../../../common/rate-limit/shared-rate-limit.decorator';
+import { SharedRateLimitGuard } from '../../../common/rate-limit/shared-rate-limit.guard';
+import { Public } from '../../auth/decorators/public.decorator';
+import { AnalyticsIngestionService } from '../services/analytics-ingestion.service';
+import type { Request } from 'express';
+
+@ApiExcludeController()
+@Public()
+@Controller('collect')
+@UseGuards(SharedRateLimitGuard)
+@SharedRateLimit({
+  scope: 'analytics-ingestion',
+  limit: 120,
+  windowSeconds: 60,
+})
+export class AnalyticsIngestionController {
+  constructor(private readonly ingestionService: AnalyticsIngestionService) {}
+
+  @Post()
+  @HttpCode(202)
+  collect(@Body() body: unknown, @Headers('origin') origin: string | undefined, @Headers('user-agent') userAgent: string | undefined, @Req() request: Request) {
+    return this.ingestionService.collect(body, {
+      origin,
+      userAgent,
+      ipAddress: request.ip ?? request.socket.remoteAddress,
+    });
+  }
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-ingestion\controllers\tracking-admin.controller.ts
+==================================================
+import { Controller, Get, Param, ParseUUIDPipe, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
+import { RawEventQueryDto } from '../dto/raw-event-query.dto';
+import { TrackingAdminService } from '../services/tracking-admin.service';
+
+@ApiTags('Website Tracking')
+@ApiBearerAuth('access-token')
+@Controller('workspaces/:workspaceId/websites/:websiteId/tracking')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard)
+export class TrackingAdminController {
+  constructor(private readonly trackingAdminService: TrackingAdminService) {}
+
+  @Get('status')
+  @ApiOperation({
+    summary: 'Get website tracking status',
+  })
+  getStatus(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('websiteId', ParseUUIDPipe)
+    websiteId: string,
+  ) {
+    return this.trackingAdminService.getStatus(workspaceId, websiteId);
+  }
+
+  @Get('events')
+  @ApiOperation({
+    summary: 'List raw tracking events',
+  })
+  listEvents(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('websiteId', ParseUUIDPipe)
+    websiteId: string,
+
+    @Query()
+    query: RawEventQueryDto,
+  ) {
+    return this.trackingAdminService.listEvents(workspaceId, websiteId, query);
+  }
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-ingestion\dto\collect-events.dto.ts
+==================================================
+import { Type } from 'class-transformer';
+import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsArray,
+  IsDateString,
+  IsEnum,
+  IsInt,
+  IsObject,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Matches,
+  Max,
+  MaxLength,
+  Min,
+  ValidateNested,
+} from 'class-validator';
+import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
+
+export class TrackerEventDto {
+  @IsString()
+  @Matches(/^[a-zA-Z0-9_-]{16,80}$/)
+  eventId!: string;
+
+  @IsEnum(RawAnalyticsEventType)
+  type!: RawAnalyticsEventType;
+
+  @IsString()
+  @Matches(/^[a-zA-Z0-9_-]{16,80}$/)
+  visitorId!: string;
+
+  @IsString()
+  @Matches(/^[a-zA-Z0-9_-]{16,80}$/)
+  sessionId!: string;
+
+  @IsDateString()
+  timestamp!: string;
+
+  @IsString()
+  @MaxLength(2048)
+  url!: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(512)
+  title?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(2048)
+  referrer?: string;
+
+  @IsOptional()
+  @IsString()
+  @Matches(/^[a-zA-Z][a-zA-Z0-9_.:-]{1,99}$/)
+  eventName?: string;
+
+  @IsOptional()
+  @IsObject()
+  properties?: Record<string, unknown>;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(100_000)
+  screenWidth?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(100_000)
+  screenHeight?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(100_000)
+  viewportWidth?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(100_000)
+  viewportHeight?: number;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(35)
+  language?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  timeZone?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(300_000)
+  durationMs?: number;
+}
+
+export class CollectEventsDto {
+  @IsUUID()
+  websiteId!: string;
+
+  @IsString()
+  @MaxLength(160)
+  trackingKey!: string;
+
+  @IsString()
+  @MaxLength(32)
+  sdkVersion!: string;
+
+  @IsDateString()
+  sentAt!: string;
+
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(25)
+  @ValidateNested({
+    each: true,
+  })
+  @Type(() => TrackerEventDto)
+  events!: TrackerEventDto[];
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-ingestion\dto\raw-event-query.dto.ts
+==================================================
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsDateString, IsEnum, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
+import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
+
+export class RawEventQueryDto {
+  @ApiPropertyOptional({
+    enum: RawAnalyticsEventType,
+  })
+  @IsOptional()
+  @IsEnum(RawAnalyticsEventType)
+  type?: RawAnalyticsEventType;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  eventName?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  visitorId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  sessionId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  dateFrom?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  dateTo?: string;
+
+  @ApiPropertyOptional({
+    default: 1,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page = 1;
+
+  @ApiPropertyOptional({
+    default: 50,
+    maximum: 100,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit = 50;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-ingestion\services\analytics-ingestion.service.ts
+==================================================
+import { createHash, timingSafeEqual } from 'node:crypto';
+import { BadRequestException, ForbiddenException, Injectable, PayloadTooLargeException, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
+import { PrismaService } from 'src/database/prisma.service';
+import { Prisma } from 'src/generated/prisma/client';
+import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
+import { CollectEventsDto } from '../dto/collect-events.dto';
+import { normalizeRequestOrigin, sanitizeEventProperties, sanitizeReferrerUrl, sanitizeTrackedUrl } from '../utils/ingestion-sanitizer';
+import { IngestionRateLimitService } from './ingestion-rate-limit.service';
+
+const MAX_BODY_BYTES = 64 * 1024;
+const MAX_FUTURE_EVENT_AGE_MS = 5 * 60 * 1000;
+const MAX_PAST_EVENT_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
+const TRACKING_KEY_PATTERN = /^cc_live_([a-f0-9]{16})_[A-Za-z0-9_-]{20,}$/;
+
+const SHA_256_HEX_PATTERN = /^[a-f0-9]{64}$/i;
+
+export interface CollectionContext {
+  origin?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  countryCode?: string;
+}
+
+interface ValidWebsite {
+  id: string;
+  enabled: boolean;
+  archivedAt: Date | null;
+  allowedOrigins: string[];
+  trackingKeyHash: string;
+}
+
+export interface CollectEventsResult {
+  accepted: number;
+  duplicates: number;
+  receivedAt: string;
+}
+
+@Injectable()
+export class AnalyticsIngestionService {
+  private readonly trustCountryHeader: boolean;
+  private readonly allowOriginless: boolean;
+  private readonly ipHashSalt: string;
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly rateLimit: IngestionRateLimitService,
+    private readonly configService: ConfigService,
+  ) {
+    this.trustCountryHeader = this.isEnabled(this.configService.get('ANALYTICS_TRUST_COUNTRY_HEADER'));
+
+    this.allowOriginless = this.isEnabled(process.env.ANALYTICS_ALLOW_ORIGINLESS ?? this.configService.get<string>('ANALYTICS_ALLOW_ORIGINLESS'));
+
+    this.ipHashSalt = this.configService.get<string>('ANALYTICS_IP_HASH_SALT')?.trim() || 'local-development-change-this';
+  }
+
+  async collect(rawBody: unknown, context: CollectionContext): Promise<CollectEventsResult> {
+    const suppliedOrigin = context.origin?.trim();
+
+    if ((!suppliedOrigin || suppliedOrigin === 'null') && !this.allowOriginless) {
+      throw new ForbiddenException('Tracking requests require a valid Origin header');
+    }
+    const payload = await this.parseAndValidatePayload(rawBody);
+
+    const website = await this.authenticateWebsite(payload.websiteId, payload.trackingKey);
+
+    this.ensureWebsiteAvailable(website);
+
+    const origin = this.resolveAndValidateOrigin(context.origin, website.allowedOrigins);
+
+    const normalizedIpAddress = this.normalizeIpAddress(context.ipAddress);
+
+    const ipHash = normalizedIpAddress ? this.hashIpAddress(normalizedIpAddress) : null;
+
+    const countryCode = this.normalizeCountryCode(context.countryCode);
+
+    const rateLimitIdentifier = ipHash ?? origin;
+
+    const rateLimitKey = `${website.id}:${rateLimitIdentifier}`;
+
+    this.rateLimit.consume(rateLimitKey, payload.events.length);
+
+    const receivedAt = new Date();
+
+    const sdkVersion = payload.sdkVersion.trim().slice(0, 32);
+
+    if (!sdkVersion) {
+      throw new BadRequestException('SDK version is required');
+    }
+
+    const data: Prisma.RawAnalyticsEventCreateManyInput[] = payload.events.map((event) => {
+      const occurredAt = this.validateEventTime(event.timestamp);
+
+      const trackedUrl = sanitizeTrackedUrl(event.url, origin);
+
+      const eventName = this.normalizeOptionalString(event.eventName, 100);
+
+      this.validateEventName(event.type, eventName);
+
+      const properties = sanitizeEventProperties(event.properties);
+
+      return {
+        websiteId: website.id,
+        eventId: event.eventId,
+        type: event.type,
+        visitorId: event.visitorId,
+        sessionId: event.sessionId,
+        occurredAt,
+        receivedAt,
+
+        pageUrl: trackedUrl.url,
+        pagePath: trackedUrl.path,
+
+        pageTitle: this.normalizeOptionalString(event.title, 512),
+
+        referrerUrl: sanitizeReferrerUrl(event.referrer),
+
+        eventName,
+
+        ...(properties
+          ? {
+              properties,
+            }
+          : {}),
+
+        screenWidth: event.screenWidth ?? null,
+
+        screenHeight: event.screenHeight ?? null,
+
+        viewportWidth: event.viewportWidth ?? null,
+
+        viewportHeight: event.viewportHeight ?? null,
+
+        language: this.normalizeOptionalString(event.language, 35),
+
+        clientTimeZone: this.sanitizeTimeZone(event.timeZone),
+
+        durationMs: event.durationMs ?? null,
+
+        origin,
+
+        userAgent: this.normalizeOptionalString(context.userAgent, 512),
+
+        ipHash,
+        countryCode,
+        sdkVersion,
+      };
+    });
+
+    const result = await this.prisma.$transaction(async (transaction) => {
+      const created = await transaction.rawAnalyticsEvent.createMany({
+        data,
+        skipDuplicates: true,
+      });
+
+      if (created.count > 0) {
+        await transaction.website.update({
+          where: {
+            id: website.id,
+          },
+          data: {
+            lastEventAt: receivedAt,
+          },
+        });
+      }
+
+      return created;
+    });
+
+    return {
+      accepted: result.count,
+      duplicates: data.length - result.count,
+      receivedAt: receivedAt.toISOString(),
+    };
+  }
+
+  private async parseAndValidatePayload(rawBody: unknown): Promise<CollectEventsDto> {
+    const parsed = this.parseRequestBody(rawBody);
+
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      throw new BadRequestException('Tracking payload must be a JSON object');
+    }
+
+    const payload = plainToInstance(CollectEventsDto, parsed);
+
+    const errors = await validate(payload, {
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      stopAtFirstError: true,
+    });
+
+    if (errors.length > 0) {
+      throw new BadRequestException({
+        message: 'Tracking payload validation failed',
+        errors: errors.map((error) => ({
+          property: error.property,
+          constraints: error.constraints ?? {},
+        })),
+      });
+    }
+
+    return payload;
+  }
+
+  private parseRequestBody(rawBody: unknown): unknown {
+    if (typeof rawBody === 'string') {
+      this.ensureBodySize(rawBody);
+
+      if (!rawBody.trim()) {
+        throw new BadRequestException('Tracking payload cannot be empty');
+      }
+
+      try {
+        return JSON.parse(rawBody);
+      } catch {
+        throw new BadRequestException('Tracking payload must contain valid JSON');
+      }
+    }
+
+    if (Buffer.isBuffer(rawBody)) {
+      if (rawBody.byteLength > MAX_BODY_BYTES) {
+        throw new PayloadTooLargeException('Tracking payload exceeds 64 KB');
+      }
+
+      const body = rawBody.toString('utf8');
+
+      if (!body.trim()) {
+        throw new BadRequestException('Tracking payload cannot be empty');
+      }
+
+      try {
+        return JSON.parse(body);
+      } catch {
+        throw new BadRequestException('Tracking payload must contain valid JSON');
+      }
+    }
+
+    this.ensureObjectBodySize(rawBody);
+
+    return rawBody;
+  }
+
+  private ensureBodySize(body: string): void {
+    const bodySize = Buffer.byteLength(body, 'utf8');
+
+    if (bodySize > MAX_BODY_BYTES) {
+      throw new PayloadTooLargeException('Tracking payload exceeds 64 KB');
+    }
+  }
+
+  private ensureObjectBodySize(body: unknown): void {
+    if (body === undefined || body === null) {
+      return;
+    }
+
+    try {
+      const serializedBody = JSON.stringify(body);
+
+      this.ensureBodySize(serializedBody);
+    } catch (error) {
+      if (error instanceof PayloadTooLargeException) {
+        throw error;
+      }
+
+      throw new BadRequestException('Tracking payload could not be processed');
+    }
+  }
+
+  private async authenticateWebsite(websiteId: string, trackingKey: string): Promise<ValidWebsite> {
+    const normalizedKey = trackingKey.trim();
+
+    const match = TRACKING_KEY_PATTERN.exec(normalizedKey);
+
+    const prefix = match?.[1];
+
+    if (!prefix) {
+      throw new UnauthorizedException('Invalid tracking credentials');
+    }
+
+    const website = await this.prisma.website.findFirst({
+      where: {
+        id: websiteId,
+        trackingKeyPrefix: prefix,
+      },
+
+      select: {
+        id: true,
+        enabled: true,
+        archivedAt: true,
+        allowedOrigins: true,
+        trackingKeyHash: true,
+      },
+    });
+
+    if (!website) {
+      throw new UnauthorizedException('Invalid tracking credentials');
+    }
+
+    const candidateHash = createHash('sha256').update(normalizedKey).digest('hex');
+
+    if (!this.safeHashEquals(candidateHash, website.trackingKeyHash)) {
+      throw new UnauthorizedException('Invalid tracking credentials');
+    }
+
+    return website;
+  }
+  private safeHashEquals(candidateHash: string, storedHash: string): boolean {
+    if (!SHA_256_HEX_PATTERN.test(candidateHash) || !SHA_256_HEX_PATTERN.test(storedHash)) {
+      return false;
+    }
+
+    const candidateBuffer = Buffer.from(candidateHash, 'hex');
+
+    const storedBuffer = Buffer.from(storedHash, 'hex');
+
+    return timingSafeEqual(candidateBuffer, storedBuffer);
+  }
+
+  private ensureWebsiteAvailable(website: ValidWebsite): void {
+    if (website.archivedAt !== null || !website.enabled) {
+      throw new ForbiddenException('Website tracking is disabled');
+    }
+  }
+
+  private resolveAndValidateOrigin(rawOrigin: string | undefined, allowedOrigins: string[]): string {
+    const suppliedOrigin = rawOrigin?.trim();
+
+    if (!suppliedOrigin || suppliedOrigin === 'null') {
+      if (this.allowOriginless) {
+        return 'originless://request';
+      }
+
+      throw new ForbiddenException('Tracking requests require a valid Origin header');
+    }
+
+    const requestOrigin = normalizeRequestOrigin(suppliedOrigin);
+
+    const normalizedAllowedOrigins = new Set(
+      allowedOrigins.map((allowedOrigin) => this.tryNormalizeOrigin(allowedOrigin)).filter((allowedOrigin): allowedOrigin is string => allowedOrigin !== null),
+    );
+
+    if (!normalizedAllowedOrigins.has(requestOrigin)) {
+      throw new ForbiddenException('Origin is not allowed for this website');
+    }
+
+    return requestOrigin;
+  }
+
+  private tryNormalizeOrigin(value: string): string | null {
+    try {
+      return normalizeRequestOrigin(value);
+    } catch {
+      return null;
+    }
+  }
+
+  private validateEventName(eventType: RawAnalyticsEventType, eventName: string | null): void {
+    if (eventType === RawAnalyticsEventType.CUSTOM && !eventName) {
+      throw new BadRequestException('Custom events require an event name');
+    }
+
+    if (eventType !== RawAnalyticsEventType.CUSTOM && eventName) {
+      throw new BadRequestException('Only custom events may contain an event name');
+    }
+  }
+
+  private validateEventTime(value: string): Date {
+    const date = new Date(value);
+    const timestamp = date.getTime();
+
+    if (Number.isNaN(timestamp)) {
+      throw new BadRequestException('Event timestamp is invalid');
+    }
+
+    const currentTime = Date.now();
+
+    const maximumFutureTime = currentTime + MAX_FUTURE_EVENT_AGE_MS;
+
+    const minimumPastTime = currentTime - MAX_PAST_EVENT_AGE_MS;
+
+    if (timestamp > maximumFutureTime || timestamp < minimumPastTime) {
+      throw new BadRequestException('Event timestamp is outside the accepted range');
+    }
+
+    return date;
+  }
+
+  private normalizeCountryCode(value?: string): string | null {
+    if (!this.trustCountryHeader || !value) {
+      return null;
+    }
+
+    const countryCode = value.trim().toUpperCase();
+
+    if (!/^[A-Z]{2}$/.test(countryCode)) {
+      return null;
+    }
+
+    if (countryCode === 'XX' || countryCode === 'T1') {
+      return null;
+    }
+
+    return countryCode;
+  }
+
+  private normalizeIpAddress(value?: string): string | null {
+    if (!value) {
+      return null;
+    }
+
+    const normalized = value.trim().replace(/^::ffff:/i, '');
+
+    return normalized || null;
+  }
+
+  private hashIpAddress(ipAddress: string): string {
+    return createHash('sha256').update(`${this.ipHashSalt}:${ipAddress}`).digest('hex');
+  }
+
+  private normalizeOptionalString(value: string | undefined, maximumLength: number): string | null {
+    if (!value) {
+      return null;
+    }
+
+    const normalized = value.trim().slice(0, maximumLength);
+
+    return normalized || null;
+  }
+
+  private sanitizeTimeZone(value?: string): string | null {
+    const timeZone = this.normalizeOptionalString(value, 64);
+
+    if (!timeZone) {
+      return null;
+    }
+
+    try {
+      new Intl.DateTimeFormat('en-US', {
+        timeZone,
+      }).format();
+
+      return timeZone;
+    } catch {
+      return null;
+    }
+  }
+
+  private isEnabled(value: unknown): boolean {
+    if (value === true) {
+      return true;
+    }
+
+    return typeof value === 'string' && value.trim().toLowerCase() === 'true';
+  }
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-ingestion\services\ingestion-rate-limit.service.ts
+==================================================
+import { BadRequestException, Injectable } from '@nestjs/common';
+
+interface RateLimitBucket {
+  count: number;
+  resetAt: number;
+}
+
+@Injectable()
+export class IngestionRateLimitService {
+  private readonly buckets = new Map<string, RateLimitBucket>();
+
+  private readonly windowMs = this.readPositiveInteger(process.env.ANALYTICS_RATE_WINDOW_MS, 60_000);
+
+  private readonly maxEvents = this.readPositiveInteger(process.env.ANALYTICS_RATE_MAX_EVENTS, 1_000);
+
+  consume(key: string, eventCount: number): void {
+    if (eventCount > this.maxEvents) {
+      throw new BadRequestException('Tracking rate limit exceeded');
+    }
+    const now = Date.now();
+
+    this.cleanupExpiredBuckets(now);
+
+    const existing = this.buckets.get(key);
+
+    if (!existing || existing.resetAt <= now) {
+      this.buckets.set(key, {
+        count: eventCount,
+        resetAt: now + this.windowMs,
+      });
+
+      return;
+    }
+
+    if (existing.count + eventCount > this.maxEvents) {
+      throw new BadRequestException('Tracking rate limit exceeded');
+    }
+
+    existing.count += eventCount;
+  }
+
+  private cleanupExpiredBuckets(now: number): void {
+    if (this.buckets.size < 2_000) {
+      return;
+    }
+
+    for (const [key, bucket] of this.buckets) {
+      if (bucket.resetAt <= now) {
+        this.buckets.delete(key);
+      }
+    }
+  }
+
+  private readPositiveInteger(value: string | undefined, fallback: number): number {
+    const parsed = Number(value);
+
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+  }
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-ingestion\services\tracking-admin.service.ts
+==================================================
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { Prisma } from 'src/generated/prisma/client';
+import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
+import { RawEventQueryDto } from '../dto/raw-event-query.dto';
+
+const rawEventSelect = {
+  id: true,
+  websiteId: true,
+  eventId: true,
+  type: true,
+  visitorId: true,
+  sessionId: true,
+  occurredAt: true,
+  receivedAt: true,
+  pageUrl: true,
+  pagePath: true,
+  pageTitle: true,
+  referrerUrl: true,
+  eventName: true,
+  properties: true,
+  screenWidth: true,
+  screenHeight: true,
+  viewportWidth: true,
+  viewportHeight: true,
+  language: true,
+  clientTimeZone: true,
+  durationMs: true,
+  origin: true,
+  sdkVersion: true,
+} satisfies Prisma.RawAnalyticsEventSelect;
+
+@Injectable()
+export class TrackingAdminService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async getStatus(workspaceId: string, websiteId: string) {
+    const website = await this.requireWebsite(workspaceId, websiteId);
+
+    const [totalEvents, grouped, recentEvents] = await this.prisma.$transaction([
+      this.prisma.rawAnalyticsEvent.count({
+        where: {
+          websiteId,
+        },
+      }),
+
+      this.prisma.rawAnalyticsEvent.groupBy({
+        by: ['type'],
+
+        where: {
+          websiteId,
+        },
+
+        orderBy: {
+          type: 'asc',
+        },
+
+        _count: {
+          id: true,
+        },
+      }),
+
+      this.prisma.rawAnalyticsEvent.findMany({
+        where: {
+          websiteId,
+        },
+
+        select: rawEventSelect,
+
+        orderBy: {
+          receivedAt: 'desc',
+        },
+
+        take: 5,
+      }),
+    ]);
+
+    const counts: Record<RawAnalyticsEventType, number> = {
+      PAGE_VIEW: 0,
+      HEARTBEAT: 0,
+      CUSTOM: 0,
+    };
+
+    for (const item of grouped) {
+      counts[item.type] = typeof item._count === 'object' && item._count !== null ? (item._count.id ?? 0) : 0;
+    }
+
+    return {
+      website: {
+        id: website.id,
+        name: website.name,
+        domain: website.domain,
+        enabled: website.enabled,
+        archivedAt: website.archivedAt,
+        lastEventAt: website.lastEventAt,
+        trackingKeyPrefix: website.trackingKeyPrefix,
+      },
+
+      connected: Boolean(website.lastEventAt),
+
+      totalEvents,
+
+      counts,
+
+      recentEvents,
+    };
+  }
+
+  async listEvents(workspaceId: string, websiteId: string, query: RawEventQueryDto) {
+    await this.requireWebsite(workspaceId, websiteId);
+
+    const where: Prisma.RawAnalyticsEventWhereInput = {
+      websiteId,
+
+      ...(query.type
+        ? {
+            type: query.type,
+          }
+        : {}),
+
+      ...(query.eventName
+        ? {
+            eventName: {
+              contains: query.eventName.trim(),
+
+              mode: 'insensitive',
+            },
+          }
+        : {}),
+
+      ...(query.visitorId
+        ? {
+            visitorId: query.visitorId,
+          }
+        : {}),
+
+      ...(query.sessionId
+        ? {
+            sessionId: query.sessionId,
+          }
+        : {}),
+
+      ...(query.dateFrom || query.dateTo
+        ? {
+            occurredAt: {
+              ...(query.dateFrom
+                ? {
+                    gte: new Date(query.dateFrom),
+                  }
+                : {}),
+
+              ...(query.dateTo
+                ? {
+                    lte: new Date(query.dateTo),
+                  }
+                : {}),
+            },
+          }
+        : {}),
+    };
+
+    const skip = (query.page - 1) * query.limit;
+
+    const [events, total] = await this.prisma.$transaction([
+      this.prisma.rawAnalyticsEvent.findMany({
+        where,
+
+        select: rawEventSelect,
+
+        orderBy: [
+          {
+            occurredAt: 'desc',
+          },
+
+          {
+            id: 'desc',
+          },
+        ],
+
+        skip,
+
+        take: query.limit,
+      }),
+
+      this.prisma.rawAnalyticsEvent.count({
+        where,
+      }),
+    ]);
+
+    const totalPages = Math.ceil(total / query.limit);
+
+    return {
+      data: events,
+
+      meta: {
+        page: query.page,
+        limit: query.limit,
+        total,
+        totalPages,
+
+        hasNextPage: query.page < totalPages,
+
+        hasPreviousPage: query.page > 1,
+      },
+    };
+  }
+
+  private async requireWebsite(workspaceId: string, websiteId: string) {
+    const website = await this.prisma.website.findFirst({
+      where: {
+        id: websiteId,
+        workspaceId,
+      },
+
+      select: {
+        id: true,
+        name: true,
+        domain: true,
+        enabled: true,
+        archivedAt: true,
+        lastEventAt: true,
+        trackingKeyPrefix: true,
+      },
+    });
+
+    if (!website) {
+      throw new NotFoundException('Website not found');
+    }
+
+    return website;
+  }
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-ingestion\utils\ingestion-sanitizer.ts
+==================================================
+import { BadRequestException } from '@nestjs/common';
+import { Prisma } from 'src/generated/prisma/client';
+
+const SENSITIVE_QUERY_PARAMETER =
+  /^(access_?token|refresh_?token|token|password|pass|secret|authorization|auth|api_?key|session|session_?id|jwt|email|code|otp)$/i;
+
+const SENSITIVE_PROPERTY_KEY = /(password|passcode|token|secret|authorization|cookie|session|email|phone|address|credit|card|cvv|ssn|private|api.?key)/i;
+
+const MAX_PROPERTY_KEYS = 20;
+const MAX_PROPERTY_STRING = 200;
+const MAX_ARRAY_ITEMS = 20;
+
+export function normalizeRequestOrigin(value: string): string {
+  let url: URL;
+
+  try {
+    url = new URL(value);
+  } catch {
+    throw new BadRequestException('Request origin is invalid');
+  }
+
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    throw new BadRequestException('Request origin must use HTTP or HTTPS');
+  }
+
+  return url.origin.toLowerCase();
+}
+
+export function sanitizeTrackedUrl(
+  value: string,
+  expectedOrigin?: string,
+): {
+  url: string;
+  path: string;
+} {
+  let url: URL;
+
+  try {
+    url = new URL(value);
+  } catch {
+    throw new BadRequestException('Tracked URL is invalid');
+  }
+
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    throw new BadRequestException('Tracked URL must use HTTP or HTTPS');
+  }
+
+  if (expectedOrigin && url.origin.toLowerCase() !== expectedOrigin) {
+    throw new BadRequestException('Tracked URL does not match the request origin');
+  }
+
+  url.username = '';
+  url.password = '';
+  url.hash = '';
+
+  for (const key of [...url.searchParams.keys()]) {
+    if (SENSITIVE_QUERY_PARAMETER.test(key)) {
+      url.searchParams.delete(key);
+    }
+  }
+
+  url.searchParams.sort();
+
+  const path = `${url.pathname}${url.search}`;
+
+  return {
+    url: url.toString().slice(0, 2048),
+
+    path: path.slice(0, 2048),
+  };
+}
+
+export function sanitizeReferrerUrl(value?: string): string | null {
+  if (!value) {
+    return null;
+  }
+
+  try {
+    return sanitizeTrackedUrl(value).url;
+  } catch {
+    return null;
+  }
+}
+
+export function sanitizeEventProperties(properties?: Record<string, unknown>): Prisma.InputJsonObject | undefined {
+  if (!properties) {
+    return undefined;
+  }
+
+  const sanitized: Record<string, Prisma.InputJsonValue | null> = {};
+
+  const entries = Object.entries(properties).slice(0, MAX_PROPERTY_KEYS);
+
+  for (const [rawKey, value] of entries) {
+    const key = rawKey.trim().slice(0, 64);
+
+    if (!key || SENSITIVE_PROPERTY_KEY.test(key)) {
+      continue;
+    }
+
+    const sanitizedValue = sanitizePropertyValue(value);
+
+    if (sanitizedValue !== undefined) {
+      sanitized[key] = sanitizedValue;
+    }
+  }
+
+  return Object.keys(sanitized).length > 0 ? sanitized : undefined;
+}
+
+function sanitizePropertyValue(value: unknown): Prisma.InputJsonValue | undefined {
+  if (typeof value === 'string') {
+    return value.slice(0, MAX_PROPERTY_STRING);
+  }
+
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : undefined;
+  }
+
+  if (typeof value === 'boolean') {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    const result = value
+      .slice(0, MAX_ARRAY_ITEMS)
+      .map(sanitizePropertyValue)
+      .filter((item): item is Prisma.InputJsonValue => item !== undefined);
+
+    return result;
+  }
+
+  return undefined;
+}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\tracker\src\index.ts
+==================================================
+// Reserved for the website analytics SDK in Release 2.
+export const TRACKER_IMPLEMENTATION_STATUS = 'NOT_STARTED' as const;
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\tracker\src\tracker.ts
+==================================================
+export {};
+
+type TrackerEventType = 'PAGE_VIEW' | 'HEARTBEAT' | 'CUSTOM';
+
+interface TrackerEvent {
+  eventId: string;
+  type: TrackerEventType;
+  visitorId: string;
+  sessionId: string;
+  timestamp: string;
+  url: string;
+  title?: string;
+  referrer?: string;
+  eventName?: string;
+  properties?: Record<string, string | number | boolean | Array<string | number | boolean>>;
+  screenWidth?: number;
+  screenHeight?: number;
+  viewportWidth?: number;
+  viewportHeight?: number;
+  language?: string;
+  timeZone?: string;
+  durationMs?: number;
+}
+
+interface TrackerPayload {
+  websiteId: string;
+  trackingKey: string;
+  sdkVersion: string;
+  sentAt: string;
+  events: TrackerEvent[];
+}
+
+interface TrackerConfiguration {
+  websiteId: string;
+  trackingKey: string;
+  endpoint: string;
+  respectDoNotTrack: boolean;
+  requireConsent: boolean;
+  heartbeatIntervalMs: number;
+  flushIntervalMs: number;
+  sessionTimeoutMs: number;
+}
+
+interface StoredSession {
+  id: string;
+  lastSeenAt: number;
+}
+
+interface AnalyticsApi {
+  track(eventName: string, properties?: Record<string, unknown>): void;
+
+  pageview(): void;
+
+  flush(): Promise<void>;
+
+  consent(decision: 'grant' | 'deny'): void;
+}
+
+declare global {
+  interface Window {
+    CommandCenterAnalytics?: AnalyticsApi;
+
+    __COMMAND_CENTER_TRACKER__?: boolean;
+  }
+}
+
+const SDK_VERSION = '1.0.0';
+
+const MAX_QUEUE_SIZE = 100;
+
+const MAX_BATCH_SIZE = 25;
+
+const SENSITIVE_QUERY_PARAMETER =
+  /^(access_?token|refresh_?token|token|password|pass|secret|authorization|auth|api_?key|session|session_?id|jwt|email|code|otp)$/i;
+
+const SENSITIVE_PROPERTY_KEY = /(password|passcode|token|secret|authorization|cookie|session|email|phone|address|credit|card|cvv|ssn|private|api.?key)/i;
+
+function safely(operation: () => void): void {
+  try {
+    operation();
+  } catch {
+    // Analytics must never break the host website.
+  }
+}
+
+function createIdentifier(): string {
+  try {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID().replace(/-/g, '');
+    }
+
+    const bytes = new Uint8Array(16);
+
+    crypto.getRandomValues(bytes);
+
+    return Array.from(bytes)
+      .map((value) => value.toString(16).padStart(2, '0'))
+      .join('');
+  } catch {
+    return `${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`;
+  }
+}
+
+function readStorage(storage: Storage, key: string): string | null {
+  try {
+    return storage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function writeStorage(storage: Storage, key: string, value: string): void {
+  try {
+    storage.setItem(key, value);
+  } catch {
+    // Storage may be unavailable.
+  }
+}
+
+function removeStorage(storage: Storage, key: string): void {
+  try {
+    storage.removeItem(key);
+  } catch {
+    // Storage may be unavailable.
+  }
+}
+
+function sanitizeUrl(rawValue: string): string {
+  try {
+    const url = new URL(rawValue, window.location.href);
+
+    url.username = '';
+    url.password = '';
+    url.hash = '';
+
+    for (const key of [...url.searchParams.keys()]) {
+      if (SENSITIVE_QUERY_PARAMETER.test(key)) {
+        url.searchParams.delete(key);
+      }
+    }
+
+    url.searchParams.sort();
+
+    return url.toString().slice(0, 2048);
+  } catch {
+    return window.location.origin;
+  }
+}
+
+function sanitizeProperties(source: Record<string, unknown> | undefined): TrackerEvent['properties'] {
+  if (!source) {
+    return undefined;
+  }
+
+  const result: NonNullable<TrackerEvent['properties']> = {};
+
+  for (const [rawKey, value] of Object.entries(source).slice(0, 20)) {
+    const key = rawKey.trim().slice(0, 64);
+
+    if (!key || SENSITIVE_PROPERTY_KEY.test(key)) {
+      continue;
+    }
+
+    if (typeof value === 'string') {
+      result[key] = value.slice(0, 200);
+
+      continue;
+    }
+
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      result[key] = value;
+      continue;
+    }
+
+    if (typeof value === 'boolean') {
+      result[key] = value;
+      continue;
+    }
+
+    if (Array.isArray(value)) {
+      result[key] = value
+        .slice(0, 20)
+        .filter(
+          (item): item is string | number | boolean =>
+            typeof item === 'string' || (typeof item === 'number' && Number.isFinite(item)) || typeof item === 'boolean',
+        )
+        .map((item) => (typeof item === 'string' ? item.slice(0, 200) : item));
+    }
+  }
+
+  return Object.keys(result).length > 0 ? result : undefined;
+}
+
+function readConfiguration(): TrackerConfiguration | null {
+  const script = document.currentScript as HTMLScriptElement | null;
+
+  if (!script) {
+    return null;
+  }
+
+  const websiteId = script.dataset.websiteId?.trim();
+
+  const trackingKey = script.dataset.trackingKey?.trim();
+
+  const endpoint = script.dataset.endpoint?.trim();
+
+  if (!websiteId || !trackingKey || !endpoint) {
+    return null;
+  }
+
+  return {
+    websiteId,
+    trackingKey,
+    endpoint,
+
+    respectDoNotTrack: script.dataset.respectDnt !== 'false',
+
+    requireConsent: script.dataset.requireConsent === 'true',
+
+    heartbeatIntervalMs: readPositiveInteger(script.dataset.heartbeatInterval, 15_000),
+
+    flushIntervalMs: readPositiveInteger(script.dataset.flushInterval, 3_000),
+
+    sessionTimeoutMs: readPositiveInteger(script.dataset.sessionTimeout, 30 * 60_000),
+  };
+}
+
+function readPositiveInteger(value: string | undefined, fallback: number): number {
+  const parsed = Number(value);
+
+  return Number.isFinite(parsed) && parsed > 0 ? Math.round(parsed) : fallback;
+}
+
+class CommandCenterTracker {
+  private readonly visitorKey: string;
+
+  private readonly sessionKey: string;
+
+  private readonly queueKey: string;
+
+  private readonly consentKey: string;
+
+  private readonly visitorId: string;
+
+  private session: StoredSession;
+
+  private queue: TrackerEvent[];
+
+  private flushTimer: number | null = null;
+
+  private heartbeatTimer: number | null = null;
+
+  private flushing = false;
+
+  private started = false;
+
+  private lastPageUrl = '';
+
+  private lastHeartbeatAt = Date.now();
+
+  constructor(private readonly config: TrackerConfiguration) {
+    this.visitorKey = `cc_visitor_${config.websiteId}`;
+
+    this.sessionKey = `cc_session_${config.websiteId}`;
+
+    this.queueKey = `cc_queue_${config.websiteId}`;
+
+    this.consentKey = `cc_consent_${config.websiteId}`;
+
+    this.visitorId = this.resolveVisitorId();
+
+    this.session = this.resolveSession();
+
+    this.queue = this.readQueue();
+  }
+
+  initialize(): void {
+    this.installPublicApi();
+
+    if (this.config.respectDoNotTrack && navigator.doNotTrack === '1') {
+      return;
+    }
+
+    if (this.config.requireConsent && !this.hasConsent()) {
+      return;
+    }
+
+    this.start();
+  }
+
+  trackCustomEvent(eventName: string, properties?: Record<string, unknown>): void {
+    if (!this.started) {
+      return;
+    }
+
+    const normalizedName = eventName.trim().slice(0, 100);
+
+    if (!/^[a-zA-Z][a-zA-Z0-9_.:-]{1,99}$/.test(normalizedName)) {
+      return;
+    }
+
+    this.enqueue({
+      ...this.baseEvent('CUSTOM'),
+
+      eventName: normalizedName,
+
+      properties: sanitizeProperties(properties),
+    });
+  }
+
+  trackPageView(): void {
+    if (!this.started) {
+      return;
+    }
+
+    const pageUrl = sanitizeUrl(window.location.href);
+
+    if (pageUrl === this.lastPageUrl) {
+      return;
+    }
+
+    this.lastPageUrl = pageUrl;
+
+    this.enqueue({
+      ...this.baseEvent('PAGE_VIEW'),
+
+      url: pageUrl,
+
+      title: document.title.trim().slice(0, 512),
+
+      referrer: document.referrer ? sanitizeUrl(document.referrer) : undefined,
+    });
+  }
+
+  async flush(useBeacon = false): Promise<void> {
+    if (this.flushing || this.queue.length === 0) {
+      return;
+    }
+
+    this.flushing = true;
+
+    const batch = this.queue.slice(0, MAX_BATCH_SIZE);
+
+    const payload: TrackerPayload = {
+      websiteId: this.config.websiteId,
+
+      trackingKey: this.config.trackingKey,
+
+      sdkVersion: SDK_VERSION,
+
+      sentAt: new Date().toISOString(),
+
+      events: batch,
+    };
+
+    const body = JSON.stringify(payload);
+
+    try {
+      if (useBeacon && typeof navigator.sendBeacon === 'function') {
+        const sent = navigator.sendBeacon(
+          this.config.endpoint,
+          new Blob([body], {
+            type: 'text/plain;charset=UTF-8',
+          }),
+        );
+
+        if (!sent) {
+          throw new Error('Beacon was rejected');
+        }
+      } else {
+        await fetch(this.config.endpoint, {
+          method: 'POST',
+
+          mode: 'no-cors',
+
+          keepalive: true,
+
+          headers: {
+            'Content-Type': 'text/plain;charset=UTF-8',
+          },
+
+          body,
+        });
+      }
+
+      this.queue.splice(0, batch.length);
+
+      this.persistQueue();
+    } catch {
+      this.persistQueue();
+    } finally {
+      this.flushing = false;
+    }
+  }
+
+  setConsent(decision: 'grant' | 'deny'): void {
+    writeStorage(localStorage, this.consentKey, decision);
+
+    if (decision === 'grant') {
+      this.start();
+      return;
+    }
+
+    this.stop();
+
+    this.queue = [];
+    this.persistQueue();
+  }
+
+  private start(): void {
+    if (this.started || (this.config.respectDoNotTrack && navigator.doNotTrack === '1')) {
+      return;
+    }
+
+    this.started = true;
+
+    this.installRouteTracking();
+    this.installLifecycleTracking();
+
+    this.trackPageView();
+
+    this.flushTimer = window.setInterval(() => {
+      void this.flush();
+    }, this.config.flushIntervalMs);
+
+    this.heartbeatTimer = window.setInterval(() => {
+      this.trackHeartbeat();
+    }, this.config.heartbeatIntervalMs);
+
+    if (navigator.onLine && this.queue.length > 0) {
+      void this.flush();
+    }
+  }
+
+  private stop(): void {
+    this.started = false;
+
+    if (this.flushTimer !== null) {
+      window.clearInterval(this.flushTimer);
+
+      this.flushTimer = null;
+    }
+
+    if (this.heartbeatTimer !== null) {
+      window.clearInterval(this.heartbeatTimer);
+
+      this.heartbeatTimer = null;
+    }
+  }
+
+  private enqueue(event: TrackerEvent): void {
+    this.refreshSession();
+
+    this.queue.push({
+      ...event,
+      sessionId: this.session.id,
+    });
+
+    if (this.queue.length > MAX_QUEUE_SIZE) {
+      this.queue.splice(0, this.queue.length - MAX_QUEUE_SIZE);
+    }
+
+    this.persistQueue();
+
+    if (this.queue.length >= 10) {
+      void this.flush();
+    }
+  }
+
+  private baseEvent(type: TrackerEventType): TrackerEvent {
+    return {
+      eventId: createIdentifier(),
+
+      type,
+
+      visitorId: this.visitorId,
+
+      sessionId: this.session.id,
+
+      timestamp: new Date().toISOString(),
+
+      url: sanitizeUrl(window.location.href),
+
+      title: document.title.trim().slice(0, 512),
+
+      screenWidth: window.screen?.width,
+
+      screenHeight: window.screen?.height,
+
+      viewportWidth: window.innerWidth,
+
+      viewportHeight: window.innerHeight,
+
+      language: navigator.language,
+
+      timeZone: this.resolveTimeZone(),
+    };
+  }
+
+  private trackHeartbeat(): void {
+    if (!this.started || document.visibilityState !== 'visible') {
+      return;
+    }
+
+    const now = Date.now();
+
+    const durationMs = Math.max(0, Math.min(now - this.lastHeartbeatAt, 300_000));
+
+    this.lastHeartbeatAt = now;
+
+    this.enqueue({
+      ...this.baseEvent('HEARTBEAT'),
+
+      durationMs,
+    });
+  }
+
+  private resolveVisitorId(): string {
+    const existing = readStorage(localStorage, this.visitorKey);
+
+    if (existing) {
+      return existing;
+    }
+
+    const created = createIdentifier();
+
+    writeStorage(localStorage, this.visitorKey, created);
+
+    return created;
+  }
+
+  private resolveSession(): StoredSession {
+    const now = Date.now();
+
+    const stored = readStorage(localStorage, this.sessionKey);
+
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored) as StoredSession;
+
+        if (parsed.id && now - parsed.lastSeenAt < this.config.sessionTimeoutMs) {
+          parsed.lastSeenAt = now;
+
+          this.persistSession(parsed);
+
+          return parsed;
+        }
+      } catch {
+        // Create a new session.
+      }
+    }
+
+    const created = {
+      id: createIdentifier(),
+      lastSeenAt: now,
+    };
+
+    this.persistSession(created);
+
+    return created;
+  }
+
+  private refreshSession(): void {
+    const now = Date.now();
+
+    if (now - this.session.lastSeenAt >= this.config.sessionTimeoutMs) {
+      this.session = {
+        id: createIdentifier(),
+
+        lastSeenAt: now,
+      };
+    } else {
+      this.session.lastSeenAt = now;
+    }
+
+    this.persistSession(this.session);
+  }
+
+  private persistSession(session: StoredSession): void {
+    writeStorage(localStorage, this.sessionKey, JSON.stringify(session));
+  }
+
+  private readQueue(): TrackerEvent[] {
+    const stored = readStorage(localStorage, this.queueKey);
+
+    if (!stored) {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(stored);
+
+      if (!Array.isArray(parsed)) {
+        return [];
+      }
+
+      return parsed.slice(-MAX_QUEUE_SIZE) as TrackerEvent[];
+    } catch {
+      return [];
+    }
+  }
+
+  private persistQueue(): void {
+    if (this.queue.length === 0) {
+      removeStorage(localStorage, this.queueKey);
+
+      return;
+    }
+
+    writeStorage(localStorage, this.queueKey, JSON.stringify(this.queue));
+  }
+
+  private installRouteTracking(): void {
+    const notify = () => {
+      window.setTimeout(() => {
+        this.trackPageView();
+      }, 0);
+    };
+
+    const originalPushState = history.pushState;
+
+    history.pushState = function pushState(...args: Parameters<History['pushState']>) {
+      const result = originalPushState.apply(this, args);
+
+      notify();
+
+      return result;
+    };
+
+    const originalReplaceState = history.replaceState;
+
+    history.replaceState = function replaceState(...args: Parameters<History['replaceState']>) {
+      const result = originalReplaceState.apply(this, args);
+
+      notify();
+
+      return result;
+    };
+
+    window.addEventListener('popstate', notify);
+
+    window.addEventListener('hashchange', notify);
+  }
+
+  private installLifecycleTracking(): void {
+    window.addEventListener('online', () => {
+      void this.flush();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        this.trackHeartbeat();
+
+        void this.flush(true);
+      } else {
+        this.lastHeartbeatAt = Date.now();
+      }
+    });
+
+    window.addEventListener('pagehide', () => {
+      this.trackHeartbeat();
+
+      void this.flush(true);
+    });
+  }
+
+  private installPublicApi(): void {
+    window.CommandCenterAnalytics = {
+      track: (eventName, properties) => {
+        safely(() => {
+          this.trackCustomEvent(eventName, properties);
+        });
+      },
+
+      pageview: () => {
+        safely(() => {
+          this.trackPageView();
+        });
+      },
+
+      flush: async () => {
+        await this.flush();
+      },
+
+      consent: (decision) => {
+        safely(() => {
+          this.setConsent(decision);
+        });
+      },
+    };
+  }
+
+  private hasConsent(): boolean {
+    return readStorage(localStorage, this.consentKey) === 'grant';
+  }
+
+  private resolveTimeZone(): string | undefined {
+    try {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    } catch {
+      return undefined;
+    }
+  }
+}
+
+safely(() => {
+  if (window.__COMMAND_CENTER_TRACKER__) {
+    return;
+  }
+
+  window.__COMMAND_CENTER_TRACKER__ = true;
+
+  const configuration = readConfiguration();
+
+  if (!configuration) {
+    return;
+  }
+
+  const tracker = new CommandCenterTracker(configuration);
+
+  tracker.initialize();
+});
+
+==================================================
+PRISMA ANALYTICS / TRACKING ENUMS
+==================================================
+
+> apps\api\prisma\enums\analytics.prisma:1:enum AnalyticsDeviceType {
+  apps\api\prisma\enums\analytics.prisma:2:  DESKTOP
+  apps\api\prisma\enums\analytics.prisma:3:  MOBILE
+  apps\api\prisma\enums\analytics.prisma:4:  TABLET
+  apps\api\prisma\enums\analytics.prisma:5:  BOT
+  apps\api\prisma\enums\analytics.prisma:6:  OTHER
+  apps\api\prisma\enums\analytics.prisma:7:}
+  apps\api\prisma\enums\analytics.prisma:8:
+> apps\api\prisma\enums\analytics.prisma:9:enum AnalyticsSourceType {
+  apps\api\prisma\enums\analytics.prisma:10:  DIRECT
+  apps\api\prisma\enums\analytics.prisma:11:  INTERNAL
+  apps\api\prisma\enums\analytics.prisma:12:  SEARCH
+  apps\api\prisma\enums\analytics.prisma:13:  SOCIAL
+  apps\api\prisma\enums\analytics.prisma:14:  REFERRAL
+  apps\api\prisma\enums\analytics.prisma:15:  UNKNOWN
+  apps\api\prisma\enums\analytics.prisma:16:}
+  apps\api\prisma\enums\analytics.prisma:17:
+> apps\api\prisma\enums\analytics.prisma:18:enum AnalyticsAggregateDimension {
+  apps\api\prisma\enums\analytics.prisma:19:  OVERVIEW
+  apps\api\prisma\enums\analytics.prisma:20:  PAGE
+  apps\api\prisma\enums\analytics.prisma:21:  SOURCE
+  apps\api\prisma\enums\analytics.prisma:22:  COUNTRY
+  apps\api\prisma\enums\analytics.prisma:23:  DEVICE
+  apps\api\prisma\enums\analytics.prisma:24:  BROWSER
+  apps\api\prisma\enums\analytics.prisma:25:  OPERATING_SYSTEM
+  apps\api\prisma\enums\analytics.prisma:26:  CUSTOM_EVENT
+  apps\api\prisma\enums\analytics.prisma:27:}
+  apps\api\prisma\enums\analytics.prisma:28:
+> apps\api\prisma\enums\analytics.prisma:29:enum AnalyticsProcessingStatus {
+  apps\api\prisma\enums\analytics.prisma:30:  QUEUED
+  apps\api\prisma\enums\analytics.prisma:31:  RUNNING
+  apps\api\prisma\enums\analytics.prisma:32:  COMPLETED
+  apps\api\prisma\enums\analytics.prisma:33:  SUCCEEDED
+  apps\api\prisma\enums\analytics.prisma:34:  FAILED
+  apps\api\prisma\enums\analytics.prisma:35:  DEAD_LETTERED
+  apps\api\prisma\enums\analytics.prisma:36:  CANCELLED
+  apps\api\prisma\enums\analytics.prisma:37:}
+  apps\api\prisma\enums\analytics.prisma:38:
+> apps\api\prisma\enums\analytics.prisma:39:enum AnalyticsProcessingTrigger {
+  apps\api\prisma\enums\analytics.prisma:40:  SCHEDULED
+  apps\api\prisma\enums\analytics.prisma:41:  MANUAL
+  apps\api\prisma\enums\analytics.prisma:42:  RETRY
+  apps\api\prisma\enums\analytics.prisma:43:}
+  apps\api\prisma\enums\analytics.prisma:44:
+> apps\api\prisma\enums\analytics.prisma:45:enum RawAnalyticsEventType {
+  apps\api\prisma\enums\analytics.prisma:46:  PAGE_VIEW
+  apps\api\prisma\enums\analytics.prisma:47:  HEARTBEAT
+  apps\api\prisma\enums\analytics.prisma:48:  CUSTOM
+  apps\api\prisma\enums\analytics.prisma:49:}
+> apps\api\prisma\enums\webhooks.prisma:1:enum WebhookEventType {
+  apps\api\prisma\enums\webhooks.prisma:2:  WEBHOOK_TEST
+  apps\api\prisma\enums\webhooks.prisma:3:
+  apps\api\prisma\enums\webhooks.prisma:4:  APPLICATION_CREATED
+  apps\api\prisma\enums\webhooks.prisma:5:  APPLICATION_UPDATED
+  apps\api\prisma\enums\webhooks.prisma:6:
+  apps\api\prisma\enums\webhooks.prisma:7:  DEPLOYMENT_STATUS_CHANGED
+  apps\api\prisma\enums\webhooks.prisma:8:  DEPLOYMENT_FAILED
+  apps\api\prisma\enums\webhooks.prisma:9:
+  apps\api\prisma\enums\webhooks.prisma:10:  HEALTH_INCIDENT_OPENED
+  apps\api\prisma\enums\webhooks.prisma:11:  HEALTH_INCIDENT_RESOLVED
+  apps\api\prisma\enums\webhooks.prisma:12:
+  apps\api\prisma\enums\webhooks.prisma:13:  ANALYTICS_PROCESSING_FAILED
+  apps\api\prisma\enums\webhooks.prisma:14:
+  apps\api\prisma\enums\webhooks.prisma:15:  WORKSPACE_ACTIVITY_CREATED
+  apps\api\prisma\enums\webhooks.prisma:16:}
+  apps\api\prisma\enums\webhooks.prisma:17:
+  apps\api\prisma\enums\webhooks.prisma:18:enum WebhookDeliveryStatus {
+  apps\api\prisma\enums\webhooks.prisma:19:  PENDING
+  apps\api\prisma\enums\webhooks.prisma:20:  PROCESSING
+  apps\api\prisma\enums\webhooks.prisma:21:  RETRY_SCHEDULED
+
+
+
+==================================================
+BATCH 6 SOURCE CHECK COMPLETE
+==================================================

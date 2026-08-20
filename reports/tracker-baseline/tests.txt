@@ -1,0 +1,72 @@
+$ pnpm build && node scripts/test.mjs
+$ node scripts/build.mjs
+
+  dist\tracker.js       7.7kb
+  dist\tracker.js.map  24.6kb
+
+Done in 16ms
+Tracker built successfully: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\tracker\dist\tracker.js
+✔ tracks a valid custom event (75.5618ms)
+✔ trims a valid custom event name (6.7104ms)
+✔ rejects empty and malformed custom event names (3.4869ms)
+✔ truncates custom event names to 100 characters (4.1275ms)
+✔ removes properties with sensitive keys (4.7023ms)
+✔ drops unsupported property values and non-finite numbers (16.0956ms)
+✔ truncates property keys and string values (3.5398ms)
+✔ keeps at most 20 properties (3.6427ms)
+✔ sanitizes arrays and keeps at most 20 supported values (18.1864ms)
+✔ uses the same visitor and session IDs for page views and custom events (6.324ms)
+✔ initializes with valid script configuration and exposes the public API (63.3046ms)
+✔ sends an initial page view for an online visitor (7.878ms)
+✔ does not initialize when the current script is unavailable (2.8645ms)
+✔ does not initialize when websiteId is missing (2.2625ms)
+✔ does not initialize when trackingKey is missing (2.3261ms)
+✔ does not initialize when endpoint is missing (2.7475ms)
+✔ prevents duplicate initialization when the bundle executes twice (4.9137ms)
+✔ respects Do Not Track by default (2.7019ms)
+✔ can explicitly disable Do Not Track enforcement (4.0932ms)
+✔ requires consent when configured and starts after consent is granted (3.972ms)
+✔ includes the expected page-view fields (86.3791ms)
+✔ removes sensitive query parameters, URL credentials, and fragments (6.2423ms)
+✔ sorts non-sensitive query parameters for stable page identity (4.4608ms)
+✔ truncates the document title to 512 characters (3.3673ms)
+✔ sanitizes the referrer URL (5.0574ms)
+✔ deduplicates repeated manual page-view calls for the same URL (4.1821ms)
+✔ tracks pushState navigation to a new URL (7.4822ms)
+✔ tracks replaceState navigation to a new URL (4.2664ms)
+✔ tracks popstate navigation after the location changes (5.8422ms)
+✔ does not create another page view for a hash-only change (3.4975ms)
+✔ records heartbeat duration while the document is visible (76.5136ms)
+✔ caps heartbeat duration at five minutes (5.4023ms)
+✔ does not record interval heartbeats while the page is hidden (3.0571ms)
+✔ flushes queued data when visibility changes to hidden (7.2ms)
+✔ resets heartbeat timing when the document becomes visible again (4.3892ms)
+✔ denying consent stops tracking and clears queued events (3.5635ms)
+✔ Do Not Track remains enforced even after consent is granted (2.8563ms)
+✔ storage failures do not break the host page (3.8189ms)
+✔ ignores malformed persisted queues (4.1746ms)
+✔ uses the configured endpoint and browser-safe request options (67.9782ms)
+✔ preserves queued events after a network failure (5.546ms)
+✔ removes queued events after a successful retry (3.6209ms)
+✔ retries persisted events when the browser comes online (3.4508ms)
+✔ sends no more than 25 events in one batch (4.0717ms)
+✔ caps the persisted queue at 100 events and drops the oldest entries (38.7121ms)
+✔ uses sendBeacon and clears the queue during pagehide (4.4253ms)
+✔ keeps the queue when sendBeacon rejects the payload (3.9508ms)
+✔ prevents overlapping flush requests (4.0656ms)
+✔ persists the visitor ID across tracker reloads for the same website (40.0503ms)
+✔ reuses an active session before the configured timeout (5.1609ms)
+✔ creates a new session after the configured timeout (3.4468ms)
+✔ honors a custom session timeout (5.1596ms)
+✔ uses separate visitor and session storage per website (6.1675ms)
+✔ recovers from a corrupted stored session (3.8811ms)
+✔ refreshes the session before enqueuing an event after timeout (6.5031ms)
+✔ updates session lastSeenAt when events are tracked (4.0913ms)
+ℹ tests 56
+ℹ suites 0
+ℹ pass 56
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 572.0544

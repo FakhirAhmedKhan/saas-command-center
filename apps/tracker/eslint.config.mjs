@@ -1,8 +1,41 @@
-import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
+﻿import baseConfig from '@command-center/eslint-config/base';
+import globals from 'globals';
 
-export default tseslint.config(
-  eslint.configs.recommended,
-  ...tseslint.configs.recommended,
-  { ignores: ['dist/**'] },
-);
+export default [
+  {
+    ignores: ['dist/**', 'dist-coverage/**', 'coverage/**', 'node_modules/**'],
+  },
+
+  ...baseConfig,
+
+  // Node.js build/dev/server/test scripts
+  {
+    files: ['scripts/**/*.mjs'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+
+  // Test harness uses Node + browser APIs
+  {
+    files: ['test-support/**/*.mjs', 'test/**/*.mjs'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.browser,
+      },
+    },
+  },
+
+  // Tracker source runs in browsers
+  {
+    files: ['src/**/*.{js,mjs,ts}'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+      },
+    },
+  },
+];

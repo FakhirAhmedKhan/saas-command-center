@@ -1,0 +1,19 @@
+PASS test/applications.e2e-spec.ts (13.028 s)
+  Applications E2E
+    √ creates an application with all supported fields (1769 ms)
+    √ creates an application using only required fields (712 ms)
+    √ rejects invalid application payloads (697 ms)
+    √ updates application fields (883 ms)
+    √ supports search and filters (865 ms)
+    √ supports sorting and pagination (846 ms)
+    √ archives and restores an application (890 ms)
+    √ rejects changes to an archived application (739 ms)
+    √ permanently deletes an archived application (789 ms)
+    √ prevents cross-workspace access (928 ms)
+    √ rejects malformed application UUID (584 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       11 passed, 11 total
+Snapshots:   0 total
+Time:        13.586 s
+Ran all test suites within paths "test/applications.e2e-spec.ts".

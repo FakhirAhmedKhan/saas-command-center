@@ -1,0 +1,86 @@
+model ApplicationMilestone {
+  id              String          @id @default(uuid()) @db.Uuid
+  applicationId   String          @map("application_id") @db.Uuid
+  title           String          @db.VarChar(160)
+  description     String?         @db.Text
+  status          MilestoneStatus @default(PLANNED)
+  weight          Int             @default(1)
+  position        Int             @default(0)
+  progressPercent Int             @default(0) @map("progress_percent")
+  startsAt        DateTime?       @map("starts_at")
+  dueAt           DateTime?       @map("due_at")
+  completedAt     DateTime?       @map("completed_at")
+  skippedAt       DateTime?       @map("skipped_at")
+  skipReason      String?         @map("skip_reason") @db.VarChar(500)
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  application SaasApplication      @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  tasks       ApplicationTask[]
+  blockers    ApplicationBlocker[]
+
+  @@index([applicationId, position])
+  @@index([applicationId, status])
+  @@index([applicationId, dueAt])
+  @@map("application_milestones")
+}
+
+model ApplicationTask {
+  id             String                @id @default(uuid()) @db.Uuid
+  milestoneId    String                @map("milestone_id") @db.Uuid
+  assigneeUserId String?               @map("assignee_user_id") @db.Uuid
+  title          String                @db.VarChar(200)
+  description    String?               @db.Text
+  status         ApplicationTaskStatus @default(TODO)
+  priority       WorkItemPriority      @default(MEDIUM)
+  weight         Int                   @default(1)
+  position       Int                   @default(0)
+  dueAt          DateTime?             @map("due_at")
+  completedAt    DateTime?             @map("completed_at")
+  skippedAt      DateTime?             @map("skipped_at")
+  skipReason     String?               @map("skip_reason") @db.VarChar(500)
+  createdAt      DateTime              @default(now()) @map("created_at")
+  updatedAt      DateTime              @updatedAt @map("updated_at")
+
+  milestone ApplicationMilestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  assignee  User?                @relation("ApplicationTaskAssignee", fields: [assigneeUserId], references: [id], onDelete: SetNull)
+  blockers  ApplicationBlocker[]
+
+  @@index([milestoneId, position])
+  @@index([milestoneId, status])
+  @@index([assigneeUserId])
+  @@index([dueAt, status])
+  @@map("application_tasks")
+}
+
+model ApplicationBlocker {
+  id               String           @id @default(uuid()) @db.Uuid
+  applicationId    String           @map("application_id") @db.Uuid
+  milestoneId      String?          @map("milestone_id") @db.Uuid
+  taskId           String?          @map("task_id") @db.Uuid
+  createdByUserId  String?          @map("created_by_user_id") @db.Uuid
+  resolvedByUserId String?          @map("resolved_by_user_id") @db.Uuid
+  title            String           @db.VarChar(200)
+  description      String?          @db.Text
+  severity         WorkItemPriority @default(HIGH)
+  status           BlockerStatus    @default(OPEN)
+  openedAt         DateTime         @default(now()) @map("opened_at")
+  resolvedAt       DateTime?        @map("resolved_at")
+  resolution       String?          @db.Text
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+
+  application SaasApplication       @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  milestone   ApplicationMilestone? @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+  task        ApplicationTask?      @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  createdBy  User? @relation("ApplicationBlockerCreator", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  resolvedBy User? @relation("ApplicationBlockerResolver", fields: [resolvedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([applicationId, status])
+  @@index([applicationId, severity])
+  @@index([milestoneId])
+  @@index([taskId])
+  @@index([openedAt])
+  @@map("application_blockers")
+}

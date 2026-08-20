@@ -1,9 +1,17 @@
-import { defineConfig, globalIgnores } from 'eslint/config';
+import importRules from '@command-center/eslint-config/import-rules';
 import nextVitals from 'eslint-config-next/core-web-vitals';
-import nextTypeScript from 'eslint-config-next/typescript';
+import nextTs from 'eslint-config-next/typescript';
 
-export default defineConfig([
+// eslint-disable-next-line import/no-anonymous-default-export
+export default [
   ...nextVitals,
-  ...nextTypeScript,
-  globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts']),
-]);
+  ...nextTs,
+
+  {
+    ...importRules,
+  },
+
+  {
+    ignores: ['.next/**', 'out/**', 'build/**', 'coverage/**', 'playwright-report/**', 'playwright-report-fullstack/**', 'test-results/**', 'next-env.d.ts'],
+  },
+];

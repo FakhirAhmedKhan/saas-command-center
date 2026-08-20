@@ -1,0 +1,13 @@
+PASS test/workspaces.e2e-spec.ts (7.061 s)
+  Workspaces E2E
+    √ creates an additional workspace for an authenticated user (1338 ms)
+    √ lists multiple explicitly created workspaces (686 ms)
+    √ rejects anonymous workspace creation (455 ms)
+    √ rejects invalid workspace names (548 ms)
+    √ prevents a user from accessing another workspace applications (673 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        7.576 s
+Ran all test suites within paths "test/workspaces.e2e-spec.ts".

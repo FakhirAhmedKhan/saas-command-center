@@ -1,0 +1,39 @@
+PASS test/phase20-code-explorer.e2e-spec.ts (17.954 s)
+  Phase 20 - Code Explorer E2E
+    authorization and tenant isolation
+      √ rejects anonymous code access (916 ms)
+      √ rejects an outsider who is not a workspace member (667 ms)
+      √ returns 404 for a repository ID from another workspace (761 ms)
+      √ allows VIEWER to use read-only Code Explorer endpoints (776 ms)
+      √ rejects a malformed repository UUID (339 ms)
+    branches and tree
+      √ returns repository branches (504 ms)
+      √ loads the recursive tree using the repository default branch (498 ms)
+      √ forwards an explicit branch to GitHub (481 ms)
+      √ preserves GitHub truncated-tree state (453 ms)
+      √ rejects a blank branch after normalization (497 ms)
+    repository search
+      √ searches repository paths case-insensitively (480 ms)
+      √ caps search results at 100 entries (526 ms)
+      √ rejects a blank search query (538 ms)
+    file viewing and file safety
+      √ decodes a UTF-8 text file from GitHub base64 content (459 ms)
+      √ returns image files as base64 image content (484 ms)
+      √ does not decode an arbitrary binary file as text (444 ms)
+      √ returns 404 when GitHub reports that a file does not exist (539 ms)
+      √ rejects files larger than the Code Explorer limit (487 ms)
+      √ rejects parent-directory traversal (477 ms)
+      √ rejects absolute repository paths (516 ms)
+      √ uses repository owner and name from the database instead of client input (517 ms)
+    diff viewer
+      √ returns decoded text for both sides of a text diff (449 ms)
+      √ supports a file that exists only on the base side (495 ms)
+      √ returns 404 when the file is absent from both refs (507 ms)
+      √ marks a binary comparison as non-text instead of decoding it (496 ms)
+      √ rejects traversal paths before making either GitHub file request (470 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       26 passed, 26 total
+Snapshots:   0 total
+Time:        18.418 s, estimated 21 s
+Ran all test suites within paths "test/phase20-code-explorer.e2e-spec.ts".

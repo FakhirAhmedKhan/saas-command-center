@@ -1,0 +1,79 @@
+model SaasApplication {
+  id               String              @id @default(uuid()) @db.Uuid
+  workspaceId      String              @map("workspace_id") @db.Uuid
+  name             String              @db.VarChar(160)
+  slug             String              @db.VarChar(160)
+  shortDescription String?             @map("short_description") @db.VarChar(280)
+  longDescription  String?             @map("long_description") @db.Text
+  category         ApplicationCategory @default(SAAS)
+  status           ApplicationStatus   @default(IDEA)
+  priority         ApplicationPriority @default(MEDIUM)
+  startedAt        DateTime?           @map("started_at")
+  targetLaunchAt   DateTime?           @map("target_launch_at")
+  launchedAt       DateTime?           @map("launched_at")
+  lastActivityAt   DateTime?           @map("last_activity_at")
+  archivedAt       DateTime?           @map("archived_at")
+  createdAt        DateTime            @default(now()) @map("created_at")
+  updatedAt        DateTime            @updatedAt @map("updated_at")
+
+  workspace    Workspace               @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  technologies ApplicationTechnology[]
+  links        ApplicationLink[]
+  activities   ApplicationActivity[]
+  websites     Website[]
+
+  healthChecks            HealthCheck[]
+  applicationEnvironments ApplicationEnvironment[]
+  releases                Release[]
+  deployments             Deployment[]
+  notifications           Notification[]
+
+  progressPercent     Int                      @default(0) @map("progress_percent")
+  progressUpdatedAt   DateTime?                @map("progress_updated_at")
+  developmentTemplate DevelopmentTemplateType? @map("development_template")
+  templateAppliedAt   DateTime?                @map("template_applied_at")
+
+  milestones            ApplicationMilestone[]
+  blockers              ApplicationBlocker[]
+  repositoryConnections RepositoryConnection[]
+
+  @@unique([workspaceId, slug])
+  @@index([workspaceId, archivedAt])
+  @@index([workspaceId, status])
+  @@index([workspaceId, priority])
+  @@index([workspaceId, category])
+  @@index([workspaceId, updatedAt])
+  @@map("saas_applications")
+}
+
+model ApplicationTechnology {
+  id            String         @id @default(uuid()) @db.Uuid
+  applicationId String         @map("application_id") @db.Uuid
+  name          String         @db.VarChar(80)
+  type          TechnologyType
+  version       String?        @db.VarChar(50)
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  application SaasApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@unique([applicationId, name, type])
+  @@index([applicationId, type])
+  @@map("application_technologies")
+}
+
+model ApplicationLink {
+  id            String              @id @default(uuid()) @db.Uuid
+  applicationId String              @map("application_id") @db.Uuid
+  label         String              @db.VarChar(80)
+  type          ApplicationLinkType
+  url           String              @db.VarChar(2048)
+  createdAt     DateTime            @default(now()) @map("created_at")
+  updatedAt     DateTime            @updatedAt @map("updated_at")
+
+  application SaasApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@unique([applicationId, url])
+  @@index([applicationId, type])
+  @@map("application_links")
+}

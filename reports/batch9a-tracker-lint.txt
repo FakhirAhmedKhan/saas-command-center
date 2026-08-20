@@ -1,0 +1,176 @@
+﻿=== TRACKER LINT FIX ===
+
+--- ESLINT AUTOFIX ---
+EXIT CODE: 1
+
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\tracker\dist-coverage\tracker.js
+   16:13  error  Empty block statement          no-empty
+   21:51  error  'crypto' is not defined        no-undef
+   22:16  error  'crypto' is not defined        no-undef
+   25:7   error  'crypto' is not defined        no-undef
+   41:13  error  Empty block statement          no-empty
+   47:13  error  Empty block statement          no-empty
+   52:23  error  'URL' is not defined           no-undef
+   52:37  error  'window' is not defined        no-undef
+   64:14  error  'window' is not defined        no-undef
+   98:20  error  'document' is not defined      no-undef
+  149:44  error  'navigator' is not defined     no-undef
+  175:35  error  'window' is not defined        no-undef
+  183:16  error  'document' is not defined      no-undef
+  184:19  error  'document' is not defined      no-undef
+  184:51  error  'document' is not defined      no-undef
+  202:33  error  'navigator' is not defined     no-undef
+  203:24  error  'navigator' is not defined     no-undef
+  205:17  error  'Blob' is not defined          no-undef
+  213:17  error  'fetch' is not defined         no-undef
+  232:20  error  'localStorage' is not defined  no-undef
+  242:60  error  'navigator' is not defined     no-undef
+  249:25  error  'window' is not defined        no-undef
+  252:29  error  'window' is not defined        no-undef
+  255:11  error  'navigator' is not defined     no-undef
+  262:9   error  'window' is not defined        no-undef
+  266:9   error  'window' is not defined        no-undef
+  291:26  error  'window' is not defined        no-undef
+  292:16  error  'document' is not defined      no-undef
+  293:22  error  'window' is not defined        no-undef
+  294:23  error  'window' is not defined        no-undef
+  295:24  error  'window' is not defined        no-undef
+  296:25  error  'window' is not defined        no-undef
+  297:19  error  'navigator' is not defined     no-undef
+  302:28  error  'document' is not defined      no-undef
+  314:36  error  'localStorage' is not defined  no-undef
+  319:20  error  'localStorage' is not defined  no-undef
+  324:34  error  'localStorage' is not defined  no-undef
+  333:17  error  Empty block statement          no-empty
+  356:20  error  'localStorage' is not defined  no-undef
+  359:34  error  'localStorage' is not defined  no-undef
+  375:23  error  'localStorage' is not defined  no-undef
+  378:20  error  'localStorage' is not defined  no-undef
+  382:9   error  'window' is not defined        no-undef
+  386:33  error  'history' is not defined       no-undef
+  387:7   error  'history' is not defined       no-undef
+  392:36  error  'history' is not defined       no-undef
+  393:7   error  'history' is not defined       no-undef
+  398:7   error  'window' is not defined        no-undef
+  399:7   error  'window' is not defined        no-undef
+  402:7   error  'window' is not defined        no-undef
+  405:7   error  'document' is not defined      no-undef
+  406:13  error  'document' is not defined      no-undef
+  413:7   error  'window' is not defined        no-undef
+  419:7   error  'window' is not defined        no-undef
+  441:26  error  'localStorage' is not defined  no-undef
+  452:9   error  'window' is not defined        no-undef
+  455:5   error  'window' is not defined        no-undef
+
+Γ£û 57 problems (57 errors, 0 warnings)
+
+undefined
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\tracker:
+ΓÇëERR_PNPM_RECURSIVE_EXEC_FIRST_FAILΓÇë Command failed with exit code 1: eslint . --fix
+
+--- TRACKER LINT ---
+EXIT CODE: 1
+pnpm.CMD : $ eslint .
+At line:32 char:1
++ & pnpm.cmd `
++ ~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ($ eslint .:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\tracker\dist-coverage\tracker.js
+   16:13  error  Empty block statement          no-empty
+   21:51  error  'crypto' is not defined        no-undef
+   22:16  error  'crypto' is not defined        no-undef
+   25:7   error  'crypto' is not defined        no-undef
+   41:13  error  Empty block statement          no-empty
+   47:13  error  Empty block statement          no-empty
+   52:23  error  'URL' is not defined           no-undef
+   52:37  error  'window' is not defined        no-undef
+   64:14  error  'window' is not defined        no-undef
+   98:20  error  'document' is not defined      no-undef
+  149:44  error  'navigator' is not defined     no-undef
+  175:35  error  'window' is not defined        no-undef
+  183:16  error  'document' is not defined      no-undef
+  184:19  error  'document' is not defined      no-undef
+  184:51  error  'document' is not defined      no-undef
+  202:33  error  'navigator' is not defined     no-undef
+  203:24  error  'navigator' is not defined     no-undef
+  205:17  error  'Blob' is not defined          no-undef
+  213:17  error  'fetch' is not defined         no-undef
+  232:20  error  'localStorage' is not defined  no-undef
+  242:60  error  'navigator' is not defined     no-undef
+  249:25  error  'window' is not defined        no-undef
+  252:29  error  'window' is not defined        no-undef
+  255:11  error  'navigator' is not defined     no-undef
+  262:9   error  'window' is not defined        no-undef
+  266:9   error  'window' is not defined        no-undef
+  291:26  error  'window' is not defined        no-undef
+  292:16  error  'document' is not defined      no-undef
+  293:22  error  'window' is not defined        no-undef
+  294:23  error  'window' is not defined        no-undef
+  295:24  error  'window' is not defined        no-undef
+  296:25  error  'window' is not defined        no-undef
+  297:19  error  'navigator' is not defined     no-undef
+  302:28  error  'document' is not defined      no-undef
+  314:36  error  'localStorage' is not defined  no-undef
+  319:20  error  'localStorage' is not defined  no-undef
+  324:34  error  'localStorage' is not defined  no-undef
+  333:17  error  Empty block statement          no-empty
+  356:20  error  'localStorage' is not defined  no-undef
+  359:34  error  'localStorage' is not defined  no-undef
+  375:23  error  'localStorage' is not defined  no-undef
+  378:20  error  'localStorage' is not defined  no-undef
+  382:9   error  'window' is not defined        no-undef
+  386:33  error  'history' is not defined       no-undef
+  387:7   error  'history' is not defined       no-undef
+  392:36  error  'history' is not defined       no-undef
+  393:7   error  'history' is not defined       no-undef
+  398:7   error  'window' is not defined        no-undef
+  399:7   error  'window' is not defined        no-undef
+  402:7   error  'window' is not defined        no-undef
+  405:7   error  'document' is not defined      no-undef
+  406:13  error  'document' is not defined      no-undef
+  413:7   error  'window' is not defined        no-undef
+  419:7   error  'window' is not defined        no-undef
+  441:26  error  'localStorage' is not defined  no-undef
+  452:9   error  'window' is not defined        no-undef
+  455:5   error  'window' is not defined        no-undef
+
+Γ£û 57 problems (57 errors, 0 warnings)
+
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\tracker:
+ΓÇëERR_PNPM_RECURSIVE_RUN_FIRST_FAILΓÇë @command-center/tracker@1.0.0 lint: `eslint .`
+Exit status 1
+
+--- TRACKER TYPECHECK ---
+EXIT CODE: 0
+pnpm.CMD : $ tsc --noEmit
+At line:52 char:1
++ & pnpm.cmd `
++ ~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ($ tsc --noEmit:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+--- TRACKER BUILD ---
+EXIT CODE: 0
+pnpm.CMD : $ node scripts/build.mjs
+At line:71 char:1
++ & pnpm.cmd `
++ ~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ($ node scripts/build.mjs:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+  dist\tracker.js       7.7kb
+  dist\tracker.js.map  24.6kb
+
+Done in 28ms
+Tracker built successfully: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\tracker\dist\tracker.js
+
+================ TRACKER RESULT ================
+Tracker Lint      : FAIL
+Tracker Typecheck : PASS
+Tracker Build     : PASS
+================================================

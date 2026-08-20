@@ -1,0 +1,16 @@
+(node:18516) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+PASS test/development-roles.e2e-spec.ts (14.784 s)
+  Development Roles E2E
+    √ allows all workspace members to read templates, summary, milestones, and blockers (3252 ms)
+    √ allows OWNER, ADMIN, and DEVELOPER to mutate development data (2458 ms)
+    √ prevents VIEWER from all development mutations (1556 ms)
+    √ prevents outsider and anonymous access (1475 ms)
+    √ prevents development access through a foreign application ID (900 ms)
+    √ rejects development mutations on archived applications (1593 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       6 passed, 6 total
+Snapshots:   0 total
+Time:        15.266 s
+Ran all test suites within paths "test/development-roles.e2e-spec.ts".

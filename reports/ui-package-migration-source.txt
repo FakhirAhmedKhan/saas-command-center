@@ -1,0 +1,866 @@
+﻿=== UI PACKAGE MIGRATION AUDIT ===
+
+=== EXISTING PACKAGES/UI ===
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\eslint.config.mjs
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\package.json
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\tsconfig.json
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\tsconfig.tsbuildinfo
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\src\index.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\ui\src\status-badge.tsx
+
+==================================================
+FILE: packages\ui\package.json
+==================================================
+{
+  "name": "@command-center/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src --max-warnings=0",
+    "test": "node --test"
+  },
+  "peerDependencies": {
+    "react": ">=19.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.34.0",
+    "@types/react": "^19.0.0",
+    "eslint": "^9.34.0",
+    "react": "^19.2.0",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.41.0"
+  }
+}
+
+==================================================
+FILE: packages\ui\tsconfig.json
+==================================================
+{
+  "extends": "../tsconfig/react.json",
+  "compilerOptions": {
+    "jsx": "react-jsx"
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
+}
+
+==================================================
+FILE: packages\ui\src\index.ts
+==================================================
+export { StatusBadge } from './status-badge';
+
+=== CURRENT WEB UI COMPONENTS ===
+
+==================================================
+FILE: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\badge.tsx
+==================================================
+import { cn } from '@/features/lib/api/cn';
+import { type HTMLAttributes } from 'react';
+
+type BadgeVariant = 'default' | 'blue' | 'green' | 'yellow' | 'orange' | 'red' | 'purple' | 'slate';
+
+interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
+  variant?: BadgeVariant;
+}
+
+const badgeVariants: Record<BadgeVariant, string> = {
+  default: 'bg-brand-50 text-brand-700 ring-brand-600/20',
+
+  blue: 'bg-blue-50 text-blue-700 ring-blue-600/20',
+
+  green: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+
+  yellow: 'bg-yellow-50 text-yellow-800 ring-yellow-600/20',
+
+  orange: 'bg-orange-50 text-orange-700 ring-orange-600/20',
+
+  red: 'bg-red-50 text-red-700 ring-red-600/20',
+
+  purple: 'bg-purple-50 text-purple-700 ring-purple-600/20',
+
+  slate: 'bg-slate-100 text-slate-700 ring-slate-500/20',
+};
+
+export function Badge({ className, variant = 'default', ...props }: BadgeProps) {
+  return (
+    <span
+      className={cn('inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset', badgeVariants[variant], className)}
+      {...props}
+    />
+  );
+}
+
+==================================================
+FILE: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\button.tsx
+==================================================
+import { cn } from '@/features/lib/api/cn';
+import { forwardRef, type ButtonHTMLAttributes } from 'react';
+
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+
+type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
+
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  loading?: boolean;
+}
+
+const variantClasses: Record<ButtonVariant, string> = {
+  primary: 'bg-brand-600 text-white shadow-sm hover:bg-brand-700 focus-visible:ring-brand-500',
+
+  secondary: 'bg-slate-900 text-white shadow-sm hover:bg-slate-800 focus-visible:ring-slate-500',
+
+  outline: 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-brand-500',
+
+  ghost: 'bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-slate-400',
+
+  danger: 'bg-red-600 text-white shadow-sm hover:bg-red-700 focus-visible:ring-red-500',
+};
+
+const sizeClasses: Record<ButtonSize, string> = {
+  sm: 'h-8 rounded-md px-2.5 text-[13px]',
+  md: 'h-9 rounded-lg px-3.5 text-sm',
+  lg: 'h-11 rounded-lg px-5 text-base',
+  icon: 'size-9 rounded-lg',
+};
+
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  { className, variant = 'primary', size = 'md', loading = false, disabled, children, type = 'button', ...props },
+  ref,
+) {
+  return (
+    <button
+      ref={ref}
+      type={type}
+      disabled={disabled || loading}
+      className={cn(
+        'inline-flex items-center justify-center gap-2 font-semibold transition',
+        'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-opacity-20',
+        'disabled:pointer-events-none disabled:opacity-50',
+        variantClasses[variant],
+        sizeClasses[size],
+        className,
+      )}
+      {...props}
+    >
+      {loading ? (
+        <>
+          <span aria-hidden='true' className='size-4 animate-spin rounded-full border-2 border-current border-r-transparent' />
+
+          <span>Loading...</span>
+        </>
+      ) : (
+        children
+      )}
+    </button>
+  );
+});
+
+==================================================
+FILE: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\card.tsx
+==================================================
+import { cn } from '@/features/lib/api/cn';
+import { type HTMLAttributes } from 'react';
+
+export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn('rounded-xl border border-slate-200 bg-white', className)} {...props} />;
+}
+
+export function CardHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn('border-b border-slate-100 p-4 sm:p-5', className)} {...props} />;
+}
+
+export function CardContent({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn('p-4 sm:p-5', className)} {...props} />;
+}
+
+export function CardFooter({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn('border-t border-slate-100 p-4 sm:p-5', className)} {...props} />;
+}
+
+==================================================
+FILE: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\checkbox.tsx
+==================================================
+import { cn } from '@/features/lib/api/cn';
+import { Check } from 'lucide-react';
+import { forwardRef, type InputHTMLAttributes } from 'react';
+
+export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
+  label?: string;
+}
+
+export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox({ className, label, id, ...props }, ref) {
+  const checkboxId = id ?? props.name ?? undefined;
+
+  const input = (
+    <span className='relative inline-flex size-4 shrink-0 items-center justify-center'>
+      <input
+        ref={ref}
+        id={checkboxId}
+        type='checkbox'
+        className={cn(
+          'peer size-4 shrink-0 appearance-none rounded-[5px] border border-slate-300 bg-white outline-none transition',
+          'checked:border-brand-600 checked:bg-brand-600',
+          'focus-visible:ring-4 focus-visible:ring-brand-500/20',
+          'disabled:cursor-not-allowed disabled:opacity-50',
+          className,
+        )}
+        {...props}
+      />
+
+      <Check className='pointer-events-none absolute size-3 text-white opacity-0 peer-checked:opacity-100' aria-hidden='true' strokeWidth={3} />
+    </span>
+  );
+
+  if (!label) {
+    return input;
+  }
+
+  return (
+    <label htmlFor={checkboxId} className='inline-flex cursor-pointer items-center gap-2 text-sm text-slate-700'>
+      {input}
+      {label}
+    </label>
+  );
+});
+
+==================================================
+FILE: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\data-table.tsx
+==================================================
+import { cn } from '@/features/lib/api/cn';
+import type { ReactNode } from 'react';
+
+export interface DataTableColumn<Row> {
+  key: string;
+  header: ReactNode;
+  cell: (row: Row) => ReactNode;
+  className?: string;
+  headerClassName?: string;
+  /** Hide this column below the given breakpoint prefix, e.g. "md" hides it below md. */
+  hideBelow?: 'sm' | 'md' | 'lg' | 'xl';
+}
+
+interface DataTableProps<Row> {
+  columns: DataTableColumn<Row>[];
+  rows: Row[];
+  getRowKey: (row: Row) => string;
+  onRowClick?: (row: Row) => void;
+  className?: string;
+}
+
+const HIDE_BELOW_CLASS: Record<NonNullable<DataTableColumn<unknown>['hideBelow']>, string> = {
+  sm: 'hidden sm:table-cell',
+  md: 'hidden md:table-cell',
+  lg: 'hidden lg:table-cell',
+  xl: 'hidden xl:table-cell',
+};
+
+export function DataTable<Row>({ columns, rows, getRowKey, onRowClick, className }: DataTableProps<Row>) {
+  return (
+    <div className={cn('overflow-x-auto rounded-xl border border-slate-200 bg-white', className)}>
+      <table className='w-full min-w-[560px] border-collapse text-left text-sm'>
+        <thead>
+          <tr className='border-b border-slate-100'>
+            {columns.map((column) => (
+              <th
+                key={column.key}
+                className={cn(
+                  'px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-slate-400',
+                  column.hideBelow ? HIDE_BELOW_CLASS[column.hideBelow] : undefined,
+                  column.headerClassName,
+                )}
+              >
+                {column.header}
+              </th>
+            ))}
+          </tr>
+        </thead>
+
+        <tbody>
+          {rows.map((row) => (
+            <tr
+              key={getRowKey(row)}
+              onClick={onRowClick ? () => onRowClick(row) : undefined}
+              className={cn('border-b border-slate-50 last:border-b-0', onRowClick && 'cursor-pointer transition hover:bg-slate-50')}
+            >
+              {columns.map((column) => (
+                <td
+                  key={column.key}
+                  className={cn('px-4 py-3 align-middle text-slate-700', column.hideBelow ? HIDE_BELOW_CLASS[column.hideBelow] : undefined, column.className)}
+                >
+                  {column.cell(row)}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+==================================================
+FILE: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\empty-state.tsx
+==================================================
+import { type ReactNode } from 'react';
+
+interface EmptyStateProps {
+  icon: ReactNode;
+  title: string;
+  description: string;
+  action?: ReactNode;
+}
+
+export function EmptyState({ icon, title, description, action }: EmptyStateProps) {
+  return (
+    <div className='flex min-h-64 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center'>
+      <div className='flex size-11 items-center justify-center rounded-lg bg-brand-50 text-brand-600'>{icon}</div>
+
+      <h3 className='mt-4 text-[15px] font-semibold text-slate-900'>{title}</h3>
+
+      <p className='mt-1.5 max-w-md text-sm leading-6 text-slate-500'>{description}</p>
+
+      {action ? <div className='mt-5'>{action}</div> : null}
+    </div>
+  );
+}
+
+==================================================
+FILE: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\error-state.tsx
+==================================================
+import { Button } from './button';
+import { Card, CardContent } from './card';
+import { TriangleAlert } from 'lucide-react';
+
+interface ErrorStateProps {
+  title?: string;
+  message: string;
+  onRetry?: () => void;
+  retryLabel?: string;
+}
+
+export function ErrorState({ title = 'Something went wrong', message, onRetry, retryLabel = 'Try again' }: ErrorStateProps) {
+  return (
+    <Card>
+      <CardContent className='flex min-h-64 flex-col items-center justify-center text-center'>
+        <div className='flex size-11 items-center justify-center rounded-lg bg-red-50 text-red-600'>
+          <TriangleAlert className='size-5' aria-hidden='true' />
+        </div>
+
+        <h2 className='mt-4 text-[15px] font-semibold text-slate-900'>{title}</h2>
+
+        <p className='mt-1.5 max-w-md text-sm leading-6 text-slate-500'>{message}</p>
+
+        {onRetry ? (
+          <Button className='mt-5' variant='outline' size='sm' onClick={onRetry}>
+            {retryLabel}
+          </Button>
+        ) : null}
+      </CardContent>
+    </Card>
+  );
+}
+
+==================================================
+FILE: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\input.tsx
+==================================================
+import { cn } from '@/features/lib/api/cn';
+import { forwardRef, type InputHTMLAttributes, type ReactNode } from 'react';
+
+export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
+  hint?: string;
+  leadingIcon?: ReactNode;
+}
+
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ className, label, error, hint, leadingIcon, id, ...props }, ref) {
+  const inputId = id ?? props.name ?? undefined;
+
+  return (
+    <div className='space-y-1.5'>
+      {label ? (
+        <label htmlFor={inputId} className='block text-[13px] font-medium text-slate-700'>
+          {label}
+        </label>
+      ) : null}
+
+      <div className='relative'>
+        {leadingIcon ? <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400'>{leadingIcon}</div> : null}
+
+        <input
+          ref={ref}
+          id={inputId}
+          className={cn(
+            'h-10 w-full rounded-lg border bg-white px-3 text-sm text-slate-900 outline-none transition',
+            'placeholder:text-slate-400',
+            'focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10',
+            'disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500',
+            leadingIcon && 'pl-10',
+            error ? 'border-red-400 focus:border-red-500 focus:ring-red-500/10' : 'border-slate-300',
+            className,
+          )}
+          aria-invalid={Boolean(error)}
+          {...props}
+        />
+      </div>
+
+      {error ? <p className='text-xs text-red-600'>{error}</p> : hint ? <p className='text-xs text-slate-500'>{hint}</p> : null}
+    </div>
+  );
+});
+
+==================================================
+FILE: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\progress.tsx
+==================================================
+import { cn } from '@/features/lib/api/cn';
+
+export interface ProgressProps {
+  value: number;
+  label?: string;
+  className?: string;
+  barClassName?: string;
+}
+
+export function Progress({ value, label, className, barClassName }: ProgressProps) {
+  const clampedValue = Math.min(100, Math.max(0, value));
+
+  return (
+    <div className={cn('space-y-1.5', className)}>
+      {label ? (
+        <div className='flex items-center justify-between text-xs'>
+          <span className='font-medium text-slate-500'>{label}</span>
+
+          <span className='font-semibold text-slate-700'>{clampedValue}%</span>
+        </div>
+      ) : null}
+
+      <div
+        role='progressbar'
+        aria-valuenow={clampedValue}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        className='h-1.5 w-full overflow-hidden rounded-full bg-slate-100'
+      >
+        <div className={cn('h-full rounded-full bg-brand-500 transition-[width]', barClassName)} style={{ width: `${clampedValue}%` }} />
+      </div>
+    </div>
+  );
+}
+
+==================================================
+FILE: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\search-input.tsx
+==================================================
+import { Input } from './input';
+import { Search } from 'lucide-react';
+import { forwardRef, type InputHTMLAttributes } from 'react';
+
+export interface SearchInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
+  label?: string;
+}
+
+export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(function SearchInput({ label, ...props }, ref) {
+  return <Input ref={ref} type='search' label={label} leadingIcon={<Search className='size-4' aria-hidden='true' />} {...props} />;
+});
+
+==================================================
+FILE: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\select.tsx
+==================================================
+import { cn } from '@/features/lib/api/cn';
+import { ChevronDown } from 'lucide-react';
+import { forwardRef, type SelectHTMLAttributes } from 'react';
+
+export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
+  label?: string;
+  error?: string;
+  hint?: string;
+}
+
+export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select({ className, label, error, hint, id, children, ...props }, ref) {
+  const selectId = id ?? props.name ?? undefined;
+
+  return (
+    <div className='space-y-1.5'>
+      {label ? (
+        <label htmlFor={selectId} className='block text-[13px] font-medium text-slate-700'>
+          {label}
+        </label>
+      ) : null}
+
+      <div className='relative'>
+        <select
+          ref={ref}
+          id={selectId}
+          className={cn(
+            'h-10 w-full appearance-none rounded-lg border bg-white px-3 pr-10 text-sm text-slate-900 outline-none transition',
+            'focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10',
+            'disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500',
+            error ? 'border-red-400 focus:border-red-500 focus:ring-red-500/10' : 'border-slate-300',
+            className,
+          )}
+          aria-invalid={Boolean(error)}
+          {...props}
+        >
+          {children}
+        </select>
+
+        <ChevronDown aria-hidden='true' className='pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-slate-400' />
+      </div>
+
+      {error ? <p className='text-xs text-red-600'>{error}</p> : hint ? <p className='text-xs text-slate-500'>{hint}</p> : null}
+    </div>
+  );
+});
+
+==================================================
+FILE: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\skeleton.tsx
+==================================================
+import { cn } from '@/features/lib/api/cn';
+import { type HTMLAttributes } from 'react';
+
+export function Skeleton({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <div aria-hidden='true' className={cn('animate-pulse rounded-md bg-slate-100', className)} {...props} />;
+}
+
+==================================================
+FILE: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\spinner.tsx
+==================================================
+import { cn } from '@/features/lib/api/cn';
+
+interface SpinnerProps {
+  className?: string;
+}
+
+export function Spinner({ className }: SpinnerProps) {
+  return (
+    <span
+      role='status'
+      aria-label='Loading'
+      className={cn('inline-block size-5 animate-spin rounded-full border-2 border-slate-300 border-r-brand-600', className)}
+    />
+  );
+}
+
+==================================================
+FILE: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\switch.tsx
+==================================================
+import { cn } from '@/features/lib/api/cn';
+import { forwardRef, type InputHTMLAttributes } from 'react';
+
+export interface SwitchProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
+  label?: string;
+}
+
+export const Switch = forwardRef<HTMLInputElement, SwitchProps>(function Switch({ className, label, id, ...props }, ref) {
+  const switchId = id ?? props.name ?? undefined;
+
+  const control = (
+    <span className='relative inline-flex h-5 w-9 shrink-0 items-center'>
+      <input ref={ref} id={switchId} type='checkbox' role='switch' className='peer sr-only' {...props} />
+
+      <span
+        aria-hidden='true'
+        className={cn(
+          'h-5 w-9 rounded-full bg-slate-200 transition-colors',
+          'peer-checked:bg-brand-600',
+          'peer-focus-visible:ring-4 peer-focus-visible:ring-brand-500/20',
+          'peer-disabled:cursor-not-allowed peer-disabled:opacity-50',
+          className,
+        )}
+      />
+
+      <span
+        aria-hidden='true'
+        className='pointer-events-none absolute left-0.5 size-4 translate-x-0 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-4'
+      />
+    </span>
+  );
+
+  if (!label) {
+    return control;
+  }
+
+  return (
+    <label htmlFor={switchId} className='inline-flex cursor-pointer items-center gap-2.5 text-sm text-slate-700'>
+      {control}
+      {label}
+    </label>
+  );
+});
+
+==================================================
+FILE: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\textarea.tsx
+==================================================
+import { cn } from '@/features/lib/api/cn';
+import { forwardRef, type TextareaHTMLAttributes } from 'react';
+
+export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
+  label?: string;
+  error?: string;
+  hint?: string;
+}
+
+export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function Textarea({ className, label, error, hint, id, rows = 5, ...props }, ref) {
+  const textareaId = id ?? props.name ?? undefined;
+
+  return (
+    <div className='space-y-1.5'>
+      {label ? (
+        <label htmlFor={textareaId} className='block text-[13px] font-medium text-slate-700'>
+          {label}
+        </label>
+      ) : null}
+
+      <textarea
+        ref={ref}
+        id={textareaId}
+        rows={rows}
+        className={cn(
+          'w-full resize-y rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition',
+          'placeholder:text-slate-400',
+          'focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10',
+          'disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500',
+          error ? 'border-red-400 focus:border-red-500 focus:ring-red-500/10' : 'border-slate-300',
+          className,
+        )}
+        aria-invalid={Boolean(error)}
+        {...props}
+      />
+
+      {error ? <p className='text-xs text-red-600'>{error}</p> : hint ? <p className='text-xs text-slate-500'>{hint}</p> : null}
+    </div>
+  );
+});
+
+=== WEB STATE COMPONENTS ===
+
+==================================================
+FILE: apps\web\src\components\states\page-error.tsx
+==================================================
+interface PageErrorProps {
+  title?: string;
+  message: string;
+  requestId?: string;
+  onRetry?: () => void;
+}
+
+export function PageError({
+  title = 'Unable to load this page',
+
+  message,
+
+  requestId,
+
+  onRetry,
+}: PageErrorProps) {
+  return (
+    <div className='rounded-xl border border-red-200 bg-red-50 p-5' role='alert'>
+      <h2 className='font-semibold text-red-950'>{title}</h2>
+
+      <p className='mt-1 text-sm text-red-800'>{message}</p>
+
+      {requestId ? <p className='mt-2 text-xs text-red-700'>Request ID: {requestId}</p> : null}
+
+      {onRetry ? (
+        <button type='button' className='mt-4 rounded-lg bg-red-950 px-4 py-2 text-sm font-medium text-white' onClick={onRetry}>
+          Try again
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+==================================================
+FILE: apps\web\src\components\states\page-loading.tsx
+==================================================
+interface PageLoadingProps {
+  label?: string;
+}
+
+export function PageLoading({ label = 'Loadingâ€¦' }: PageLoadingProps) {
+  return (
+    <div className='flex min-h-[240px] items-center justify-center p-6'>
+      <div className='flex items-center gap-3 text-sm text-slate-600' role='status' aria-live='polite'>
+        <span className='h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-slate-950' aria-hidden='true' />
+
+        <span>{label}</span>
+      </div>
+    </div>
+  );
+}
+
+=== CURRENT CN HELPER ===
+
+==================================================
+FILE: apps\web\src\features\lib\api\cn.ts
+==================================================
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+==================================================
+FILE: apps\web\src\lib\cn.ts
+==================================================
+NOT FOUND
+
+==================================================
+FILE: apps\web\src\lib\utils.ts
+==================================================
+NOT FOUND
+
+=== IMPORT USAGE ===
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(auth)\login\page.tsx:3: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(auth)\login\page.tsx:4: import { Input } from '@/components/ui/input';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(auth)\register\page.tsx:3: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(auth)\register\page.tsx:4: import { Input } from '@/components/ui/input';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\dashboard\page.tsx:3: import { EmptyState } from '@/components/ui/empty-state';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\notifications\page.tsx:3: import { EmptyState } from '@/components/ui/empty-state';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\notifications\page.tsx:4: import { Skeleton } from '@/components/ui/skeleton';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\new\new-workspace-client.tsx:3: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\new\new-workspace-client.tsx:4: import { Input } from '@/components/ui/input';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\activity\page.tsx:3: import { EmptyState } from '@/components/ui/empty-state';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\activity\page.tsx:4: import { ErrorState } from '@/components/ui/error-state';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\activity\page.tsx:5: import { Input } from '@/components/ui/input';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\activity\page.tsx:6: import { Select } from '@/components/ui/select';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\activity\page.tsx:7: import { Skeleton } from '@/components/ui/skeleton';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\applications\page.tsx:3: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\applications\[applicationId]\page.tsx:4: import { Badge } from '@/components/ui/badge';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\applications\[applicationId]\page.tsx:5: import { Card, CardContent, CardHeader } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\applications\[applicationId]\page.tsx:6: import { ErrorState } from '@/components/ui/error-state';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\applications\[applicationId]\page.tsx:7: import { Progress } from '@/components/ui/progress';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\applications\[applicationId]\settings\page.tsx:2: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\applications\[applicationId]\settings\page.tsx:3: import { Card, CardContent, CardHeader } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\applications\[applicationId]\settings\page.tsx:4: import { Spinner } from '@/components/ui/spinner';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\settings\page.tsx:4: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\settings\page.tsx:5: import { Input } from '@/components/ui/input';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\page.tsx:3: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\page.tsx:4: import { Card } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\page.tsx:5: import { EmptyState } from '@/components/ui/empty-state';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\page.tsx:6: import { ErrorState } from '@/components/ui/error-state';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\page.tsx:7: import { SearchInput } from '@/components/ui/search-input';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\page.tsx:8: import { Select } from '@/components/ui/select';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\page.tsx:9: import { Skeleton } from '@/components/ui/skeleton';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\new\page.tsx:3: import { Spinner } from '@/components/ui/spinner';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\page.tsx:4: import { Badge } from '@/components/ui/badge';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\page.tsx:5: import { Card, CardContent, CardHeader } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\page.tsx:6: import { ErrorState } from '@/components/ui/error-state';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\edit\page.tsx:3: import { Spinner } from '@/components/ui/spinner';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\events\page.tsx:3: import { Badge } from '@/components/ui/badge';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\events\page.tsx:4: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\events\page.tsx:5: import { Card } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\events\page.tsx:6: import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\events\page.tsx:7: import { EmptyState } from '@/components/ui/empty-state';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\events\page.tsx:8: import { ErrorState } from '@/components/ui/error-state';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\events\page.tsx:9: import { Input } from '@/components/ui/input';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\events\page.tsx:10: import { Select } from '@/components/ui/select';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\events\page.tsx:11: import { Skeleton } from '@/components/ui/skeleton';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\installation\page.tsx:4: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\installation\page.tsx:5: import { Card, CardContent, CardHeader } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\settings\page.tsx:4: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\settings\page.tsx:5: import { Card, CardContent, CardHeader } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\settings\page.tsx:6: import { Select } from '@/components/ui/select';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\api-health-card.tsx:4: import { StatusBadge } from '@command-center/ui';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\layout\app-shell.tsx:5: import { cn } from '@/features/lib/api/cn';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\layout\workspace-switcher.tsx:4: import { cn } from '@/features/lib/api/cn';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\badge.tsx:1: import { cn } from '@/features/lib/api/cn';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\button.tsx:1: import { cn } from '@/features/lib/api/cn';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\card.tsx:1: import { cn } from '@/features/lib/api/cn';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\checkbox.tsx:1: import { cn } from '@/features/lib/api/cn';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\data-table.tsx:1: import { cn } from '@/features/lib/api/cn';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\input.tsx:1: import { cn } from '@/features/lib/api/cn';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\progress.tsx:1: import { cn } from '@/features/lib/api/cn';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\select.tsx:1: import { cn } from '@/features/lib/api/cn';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\skeleton.tsx:1: import { cn } from '@/features/lib/api/cn';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\spinner.tsx:1: import { cn } from '@/features/lib/api/cn';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\switch.tsx:1: import { cn } from '@/features/lib/api/cn';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\components\ui\textarea.tsx:1: import { cn } from '@/features/lib/api/cn';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\activity\components\activity-feed.tsx:8: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\activity\components\activity-feed.tsx:9: import { Card, CardContent, CardHeader } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\activity\components\activity-feed.tsx:10: import { EmptyState } from '@/components/ui/empty-state';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\activity\components\activity-feed.tsx:11: import { Spinner } from '@/components/ui/spinner';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\activity\components\activity-filters.tsx:12: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\activity\components\activity-filters.tsx:13: import { Input } from '@/components/ui/input';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\activity\components\activity-filters.tsx:14: import { Select } from '@/components/ui/select';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\activity\components\activity-item.tsx:4: import { Badge } from '@/components/ui/badge';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\analytics-engine\components\analytics-engine-panel.tsx:6: import { Badge } from '@/components/ui/badge';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\analytics-engine\components\analytics-engine-panel.tsx:7: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\analytics-engine\components\analytics-engine-panel.tsx:8: import { Card, CardContent, CardHeader } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\analytics-engine\components\analytics-engine-panel.tsx:9: import { Input } from '@/components/ui/input';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\analytics-engine\components\analytics-engine-panel.tsx:10: import { Select } from '@/components/ui/select';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\analytics-engine\components\analytics-engine-panel.tsx:11: import { Spinner } from '@/components/ui/spinner';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\analytics-overview\analytics-overview-dashboard.tsx:7: import { EmptyState } from '@/components/ui/empty-state';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\analytics-reports\analytics-reports-dashboard.tsx:19: import { EmptyState } from '@/components/ui/empty-state';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\application-card.tsx:4: import { Badge } from '@/components/ui/badge';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\application-card.tsx:5: import { Card } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\application-card.tsx:6: import { Progress } from '@/components/ui/progress';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\application-filters.tsx:12: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\application-filters.tsx:13: import { Input } from '@/components/ui/input';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\application-filters.tsx:14: import { Select } from '@/components/ui/select';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\application-form.tsx:15: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\application-form.tsx:16: import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\application-form.tsx:17: import { Input } from '@/components/ui/input';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\application-form.tsx:18: import { Select } from '@/components/ui/select';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\application-form.tsx:19: import { Textarea } from '@/components/ui/textarea';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\application-sub-nav.tsx:3: import { cn } from '@/features/lib/api/cn';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\applications-empty-state.tsx:1: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\applications-empty-state.tsx:2: import { EmptyState } from '@/components/ui/empty-state';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\applications-error-state.tsx:1: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\applications-error-state.tsx:2: import { Card, CardContent } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\applications-header.tsx:1: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\applications-skeleton.tsx:1: import { Card } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\link-manager.tsx:7: import { Badge } from '@/components/ui/badge';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\link-manager.tsx:8: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\link-manager.tsx:9: import { Card, CardContent, CardHeader } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\link-manager.tsx:10: import { Input } from '@/components/ui/input';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\link-manager.tsx:11: import { Select } from '@/components/ui/select';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\technology-manager.tsx:7: import { Badge } from '@/components/ui/badge';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\technology-manager.tsx:8: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\technology-manager.tsx:9: import { Card, CardContent, CardHeader } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\technology-manager.tsx:10: import { Input } from '@/components/ui/input';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\applications\components\technology-manager.tsx:11: import { Select } from '@/components/ui/select';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\development\components\blocker-panel.tsx:7: import { Badge } from '@/components/ui/badge';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\development\components\blocker-panel.tsx:8: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\development\components\blocker-panel.tsx:9: import { Card, CardContent, CardHeader } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\development\components\blocker-panel.tsx:10: import { Input } from '@/components/ui/input';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\development\components\blocker-panel.tsx:11: import { Select } from '@/components/ui/select';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\development\components\development-board.tsx:11: import { Badge } from '@/components/ui/badge';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\development\components\development-board.tsx:12: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\development\components\development-board.tsx:13: import { Card, CardContent, CardHeader } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\development\components\development-board.tsx:14: import { Input } from '@/components/ui/input';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\development\components\development-board.tsx:15: import { Select } from '@/components/ui/select';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\development\components\development-board.tsx:16: import { Spinner } from '@/components/ui/spinner';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\development\components\development-timeline.tsx:4: import { Badge } from '@/components/ui/badge';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\development\components\development-timeline.tsx:5: import { Card, CardContent, CardHeader } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\development\components\milestone-card.tsx:29: import { Badge } from '@/components/ui/badge';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\development\components\milestone-card.tsx:30: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\development\components\milestone-card.tsx:31: import { Card, CardContent, CardHeader } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\development\components\milestone-card.tsx:32: import { Input } from '@/components/ui/input';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\development\components\milestone-card.tsx:33: import { Select } from '@/components/ui/select';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\development\components\task-kanban.tsx:7: import { Badge } from '@/components/ui/badge';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\development\components\task-kanban.tsx:8: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\integrations\webhook-integrations-dashboard.tsx:16: import { EmptyState } from '@/components/ui/empty-state';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\monitoring\monitoring-dashboard.tsx:27: import { EmptyState } from '@/components/ui/empty-state';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\releases\release-deployment-dashboard.tsx:17: import { EmptyState } from '@/components/ui/empty-state';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\tracking\components\tracking-status-panel.tsx:6: import { Badge } from '@/components/ui/badge';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\tracking\components\tracking-status-panel.tsx:7: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\tracking\components\tracking-status-panel.tsx:8: import { Card, CardContent, CardHeader } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\tracking\components\tracking-status-panel.tsx:9: import { Spinner } from '@/components/ui/spinner';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\websites\components\website-card.tsx:3: import { Badge } from '@/components/ui/badge';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\websites\components\website-card.tsx:4: import { Card } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\websites\components\website-form.tsx:5: import { Button } from '@/components/ui/button';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\websites\components\website-form.tsx:6: import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\websites\components\website-form.tsx:7: import { Input } from '@/components/ui/input';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\websites\components\website-form.tsx:8: import { Select } from '@/components/ui/select';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\websites\components\website-form.tsx:9: import { Textarea } from '@/components/ui/textarea';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\websites\components\website-sub-nav.tsx:3: import { cn } from '@/features/lib/api/cn';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\features\workspaces\components\workspace-settings-nav.tsx:3: import { cn } from '@/features/lib/api/cn';

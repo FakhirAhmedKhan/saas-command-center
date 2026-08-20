@@ -1,0 +1,74 @@
+model User {
+  id              String    @id @default(uuid()) @db.Uuid
+  email           String    @unique @db.VarChar(320)
+  passwordHash    String    @map("password_hash") @db.VarChar(255)
+  displayName     String?   @map("display_name") @db.VarChar(120)
+  isActive        Boolean   @default(true) @map("is_active")
+  emailVerifiedAt DateTime? @map("email_verified_at")
+  lastLoginAt     DateTime? @map("last_login_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+
+  ownedWorkspaces             Workspace[]           @relation("WorkspaceOwner")
+  memberships                 WorkspaceMember[]
+  authSessions                AuthSession[]
+  applicationActivities       ApplicationActivity[] @relation("ApplicationActivityActor")
+  assignedApplicationTasks    ApplicationTask[]     @relation("ApplicationTaskAssignee")
+  createdApplicationBlockers  ApplicationBlocker[]  @relation("ApplicationBlockerCreator")
+  resolvedApplicationBlockers ApplicationBlocker[]  @relation("ApplicationBlockerResolver")
+
+  initiatedAnalyticsProcessingRuns   AnalyticsProcessingRun[]        @relation("AnalyticsProcessingRunInitiatedBy")
+  resolvedAnalyticsProcessingLetters AnalyticsProcessingDeadLetter[] @relation("AnalyticsProcessingDeadLetterResolvedBy")
+
+  createdHealthChecks HealthCheck[] @relation("HealthCheckCreatedBy")
+  updatedHealthChecks HealthCheck[] @relation("HealthCheckUpdatedBy")
+
+  createdReleases Release[] @relation("ReleaseCreatedBy")
+  updatedReleases Release[] @relation("ReleaseUpdatedBy")
+
+  createdDeployments  Deployment[] @relation("DeploymentCreatedBy")
+  updatedDeployments  Deployment[] @relation("DeploymentUpdatedBy")
+  executedDeployments Deployment[] @relation("DeploymentDeployedBy")
+
+  deploymentActivities DeploymentActivity[]
+
+  sentWorkspaceInvitations     WorkspaceInvitation[] @relation("WorkspaceInvitationInvitedBy")
+  acceptedWorkspaceInvitations WorkspaceInvitation[] @relation("WorkspaceInvitationAcceptedBy")
+
+  notifications Notification[]
+
+  createdWebhookEndpoints WebhookEndpoint[] @relation("WebhookEndpointCreatedBy")
+  updatedWebhookEndpoints WebhookEndpoint[] @relation("WebhookEndpointUpdatedBy")
+
+  personalGithubConnectIntents PersonalGithubConnectIntent[]
+
+  @@index([deletedAt])
+  @@index([isActive])
+  @@map("users")
+}
+
+model AuthSession {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  familyId         String    @default(uuid()) @map("family_id") @db.Uuid
+  refreshTokenHash String    @unique @map("refresh_token_hash") @db.VarChar(128)
+  parentSessionId  String?   @unique @map("parent_session_id") @db.Uuid
+  userAgent        String?   @map("user_agent") @db.VarChar(512)
+  ipAddress        String?   @map("ip_address") @db.VarChar(64)
+  expiresAt        DateTime  @map("expires_at")
+  lastUsedAt       DateTime? @map("last_used_at")
+  revokedAt        DateTime? @map("revoked_at")
+  revokeReason     String?   @map("revoke_reason") @db.VarChar(120)
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentSession  AuthSession? @relation("AuthSessionRotation", fields: [parentSessionId], references: [id], onDelete: SetNull)
+  rotatedSession AuthSession? @relation("AuthSessionRotation")
+
+  @@index([userId, revokedAt])
+  @@index([familyId])
+  @@index([expiresAt])
+  @@map("auth_sessions")
+}

@@ -6,25 +6,44 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --max-warnings=0",
-    "typecheck": "tsc --noEmit",
-    "test": "node --test"
+    "typecheck": "next typegen && tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "verify": "pnpm typecheck && pnpm build"
   },
   "dependencies": {
     "@command-center/shared-types": "workspace:*",
     "@command-center/ui": "workspace:*",
-    "next": "16.2.12",
+    "@monaco-editor/react": "4.8.0-rc.3",
+    "lucide-react": "^1.28.0",
+    "monaco-editor": "^0.56.0",
+    "next": "16.3.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@command-center/eslint-config": "workspace:*",
     "@eslint/js": "^9.34.0",
+    "@playwright/test": "^1.62.1",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@testing-library/jest-dom": "^6",
+    "@testing-library/react": "^16",
+    "@testing-library/user-event": "^14",
+    "@types/jsdom": "^30.0.0",
     "@types/node": "^24.3.0",
+    "@types/pg": "^8.20.3",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.0.5",
+    "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^9.34.0",
-    "eslint-config-next": "16.2.12",
+    "eslint-config-next": "16.3.1",
+    "jsdom": "^30.0.1",
+    "pg": "^8.22.0",
+    "postcss": "^8.5.26",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5.9.2",
-    "typescript-eslint": "^8.41.0"
+    "typescript-eslint": "^8.67.0",
+    "vitest": "^4.1.10"
   }
 }

@@ -1,0 +1,55 @@
+model AnalyticsHourlyAggregate {
+  id              String                      @id @default(uuid()) @db.Uuid
+  websiteId       String                      @map("website_id") @db.Uuid
+  bucketStart     DateTime                    @map("bucket_start")
+  bucketEnd       DateTime                    @map("bucket_end")
+  timeZone        String                      @map("time_zone") @db.VarChar(64)
+  dimension       AnalyticsAggregateDimension
+  dimensionKey    String                      @map("dimension_key") @db.VarChar(64)
+  dimensionValue  String                      @map("dimension_value") @db.VarChar(2048)
+  dimensionLabel  String                      @map("dimension_label") @db.VarChar(256)
+  visitors        Int                         @default(0)
+  sessions        Int                         @default(0)
+  pageViews       Int                         @default(0) @map("page_views")
+  events          Int                         @default(0)
+  customEvents    Int                         @default(0) @map("custom_events")
+  bounces         Int                         @default(0)
+  totalDurationMs BigInt                      @default(0) @map("total_duration_ms")
+  generatedAt     DateTime                    @default(now()) @map("generated_at")
+  updatedAt       DateTime                    @updatedAt @map("updated_at")
+
+  website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@unique([websiteId, bucketStart, dimension, dimensionKey])
+  @@index([websiteId, dimension, bucketStart])
+  @@index([websiteId, bucketStart])
+  @@map("analytics_hourly_aggregates")
+}
+
+model AnalyticsDailyAggregate {
+  id              String                      @id @default(uuid()) @db.Uuid
+  websiteId       String                      @map("website_id") @db.Uuid
+  bucketStart     DateTime                    @map("bucket_start")
+  bucketEnd       DateTime                    @map("bucket_end")
+  timeZone        String                      @map("time_zone") @db.VarChar(64)
+  dimension       AnalyticsAggregateDimension
+  dimensionKey    String                      @map("dimension_key") @db.VarChar(64)
+  dimensionValue  String                      @map("dimension_value") @db.VarChar(2048)
+  dimensionLabel  String                      @map("dimension_label") @db.VarChar(256)
+  visitors        Int                         @default(0)
+  sessions        Int                         @default(0)
+  pageViews       Int                         @default(0) @map("page_views")
+  events          Int                         @default(0)
+  customEvents    Int                         @default(0) @map("custom_events")
+  bounces         Int                         @default(0)
+  totalDurationMs BigInt                      @default(0) @map("total_duration_ms")
+  generatedAt     DateTime                    @default(now()) @map("generated_at")
+  updatedAt       DateTime                    @updatedAt @map("updated_at")
+
+  website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@unique([websiteId, bucketStart, dimension, dimensionKey])
+  @@index([websiteId, dimension, bucketStart])
+  @@index([websiteId, bucketStart])
+  @@map("analytics_daily_aggregates")
+}

@@ -1,0 +1,123 @@
+model Release {
+  id            String @id @default(uuid()) @db.Uuid
+  workspaceId   String @map("workspace_id") @db.Uuid
+  applicationId String @map("application_id") @db.Uuid
+
+  version String
+  name    String?
+  notes   String? @db.Text
+
+  commitRef     String? @map("commit_ref")
+  repositoryUrl String? @map("repository_url") @db.Text
+
+  status ReleaseStatus @default(DRAFT)
+
+  scheduledAt DateTime? @map("scheduled_at") @db.Timestamptz(6)
+  releasedAt  DateTime? @map("released_at") @db.Timestamptz(6)
+
+  createdById String @map("created_by_id") @db.Uuid
+  updatedById String @map("updated_by_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  workspace   Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  application SaasApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  createdBy User @relation("ReleaseCreatedBy", fields: [createdById], references: [id])
+  updatedBy User @relation("ReleaseUpdatedBy", fields: [updatedById], references: [id])
+
+  deployments Deployment[]
+
+  @@unique([applicationId, version])
+  @@index([workspaceId, applicationId, createdAt(sort: Desc)])
+  @@index([applicationId, status])
+  @@map("releases")
+}
+
+model Deployment {
+  id            String @id @default(uuid()) @db.Uuid
+  workspaceId   String @map("workspace_id") @db.Uuid
+  applicationId String @map("application_id") @db.Uuid
+  environmentId String @map("environment_id") @db.Uuid
+  releaseId     String @map("release_id") @db.Uuid
+
+  attempt Int @default(1)
+
+  status DeploymentStatus @default(DRAFT)
+
+  commitRef String? @map("commit_ref")
+
+  repositoryUrl String? @map("repository_url") @db.Text
+  ciJobUrl      String? @map("ci_job_url") @db.Text
+  liveUrl       String? @map("live_url") @db.Text
+
+  deploymentNotes String? @map("deployment_notes") @db.Text
+  failureReason   String? @map("failure_reason") @db.Text
+
+  scheduledAt DateTime? @map("scheduled_at") @db.Timestamptz(6)
+  startedAt   DateTime? @map("started_at") @db.Timestamptz(6)
+  finishedAt  DateTime? @map("finished_at") @db.Timestamptz(6)
+
+  durationMs Int? @map("duration_ms")
+
+  statusChangedAt DateTime @default(now()) @map("status_changed_at") @db.Timestamptz(6)
+
+  deployedById String? @map("deployed_by_id") @db.Uuid
+  createdById  String  @map("created_by_id") @db.Uuid
+  updatedById  String  @map("updated_by_id") @db.Uuid
+
+  rollbackToDeploymentId String? @map("rollback_to_deployment_id") @db.Uuid
+  healthIncidentId       String? @map("health_incident_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  workspace   Workspace              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  application SaasApplication        @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  environment ApplicationEnvironment @relation(fields: [environmentId], references: [id], onDelete: Restrict)
+  release     Release                @relation(fields: [releaseId], references: [id], onDelete: Restrict)
+
+  deployedBy User? @relation("DeploymentDeployedBy", fields: [deployedById], references: [id])
+  createdBy  User  @relation("DeploymentCreatedBy", fields: [createdById], references: [id])
+  updatedBy  User  @relation("DeploymentUpdatedBy", fields: [updatedById], references: [id])
+
+  rollbackTo         Deployment?  @relation("DeploymentRollback", fields: [rollbackToDeploymentId], references: [id], onDelete: SetNull)
+  rollbackReferences Deployment[] @relation("DeploymentRollback")
+
+  healthIncident HealthIncident? @relation(fields: [healthIncidentId], references: [id], onDelete: SetNull)
+
+  activities DeploymentActivity[]
+
+  @@unique([releaseId, environmentId, attempt])
+  @@index([workspaceId, applicationId, createdAt(sort: Desc)])
+  @@index([environmentId, statusChangedAt(sort: Desc)])
+  @@index([applicationId, status])
+  @@index([healthIncidentId])
+  @@map("deployments")
+}
+
+model DeploymentActivity {
+  id           String @id @default(uuid()) @db.Uuid
+  workspaceId  String @map("workspace_id") @db.Uuid
+  deploymentId String @map("deployment_id") @db.Uuid
+  actorId      String @map("actor_id") @db.Uuid
+
+  action DeploymentActivityAction
+
+  fromStatus DeploymentStatus? @map("from_status")
+  toStatus   DeploymentStatus? @map("to_status")
+
+  message  String?
+  metadata Json?
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  workspace  Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  deployment Deployment @relation(fields: [deploymentId], references: [id], onDelete: Cascade)
+  actor      User       @relation(fields: [actorId], references: [id])
+
+  @@index([deploymentId, createdAt(sort: Desc)])
+  @@index([workspaceId, createdAt(sort: Desc)])
+  @@map("deployment_activities")
+}

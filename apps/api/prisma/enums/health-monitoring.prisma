@@ -1,0 +1,17 @@
+enum HealthTargetType {
+  APPLICATION
+  WEBSITE
+}
+
+enum HealthCheckStatus {
+  UNKNOWN
+  HEALTHY
+  DEGRADED
+  DOWN
+  DISABLED
+}
+
+enum HealthIncidentStatus {
+  OPEN
+  RESOLVED
+}

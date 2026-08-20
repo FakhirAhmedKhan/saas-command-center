@@ -1,0 +1,59 @@
+model Workspace {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String    @db.VarChar(120)
+  slug      String    @unique @db.VarChar(120)
+  ownerId   String    @map("owner_id") @db.Uuid
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  owner                 User                  @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  members               WorkspaceMember[]
+  saasApplications      SaasApplication[]
+  applicationActivities ApplicationActivity[]
+  websites              Website[]
+
+  analyticsProcessingRuns        AnalyticsProcessingRun[]
+  analyticsProcessingDeadLetters AnalyticsProcessingDeadLetter[]
+
+  healthChecks    HealthCheck[]
+  healthIncidents HealthIncident[]
+
+  applicationEnvironments ApplicationEnvironment[]
+  releases                Release[]
+  deployments             Deployment[]
+  deploymentActivities    DeploymentActivity[]
+
+  invitations   WorkspaceInvitation[]
+  notifications Notification[]
+
+  webhookEndpoints  WebhookEndpoint[]
+  webhookEvents     WebhookEvent[]
+  webhookDeliveries WebhookDelivery[]
+
+  repositoryConnectIntents RepositoryConnectIntent[]
+  repositoryInstallations  RepositoryInstallation[]
+  repositoryConnections    RepositoryConnection[]
+
+  @@index([ownerId])
+  @@index([deletedAt])
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String        @id @default(uuid()) @db.Uuid
+  workspaceId String        @map("workspace_id") @db.Uuid
+  userId      String        @map("user_id") @db.Uuid
+  role        WorkspaceRole @default(VIEWER)
+  joinedAt    DateTime      @default(now()) @map("joined_at")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([userId])
+  @@index([workspaceId, role])
+  @@map("workspace_members")
+}

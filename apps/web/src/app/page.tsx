@@ -1,50 +1,29 @@
-import { ApiHealthCard } from '@/components/api-health-card';
+'use client';
 
-const foundationItems = [
-  'Unique pnpm workspace package names',
-  'NestJS validation and consistent errors',
-  'Request IDs, CORS, Helmet, and Swagger',
-  'Separate development and test PostgreSQL',
-  'Browser-safe shared types and UI package',
-  'CI checks for format, lint, type-check, tests, and builds',
-];
+import { FullPageLoader } from '@/features/auth/auth-gates';
+import { useAuth } from '@/features/auth/auth-provider';
+import LandingPage from '@/features/landingpage';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function HomePage() {
-  return (
-    <main>
-      <div className="shell">
-        <header className="hero">
-          <p className="eyebrow">PROJECT VISIBILITY MVP</p>
-          <h1>SaaS Command Center</h1>
-          <p className="hero-copy">
-            The foundation is ready for secure workspaces, application records, milestones,
-            blockers, and evidence-based portfolio priorities.
-          </p>
-        </header>
+  const router = useRouter();
+  const { status } = useAuth();
 
-        <ApiHealthCard />
+  useEffect(() => {
+    // Only redirect if they are actually logged in
+    if (status === 'authenticated') {
+      router.replace('/dashboard');
+    }
+    // We REMOVED the unauthenticated redirect so they stay on the page!
+  }, [router, status]);
 
-        <section className="panel">
-          <div className="panel-heading">
-            <p className="eyebrow">PHASE 0–2</p>
-            <h2>Foundation included</h2>
-          </div>
-          <ul>
-            {foundationItems.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </section>
+  // Show the full page loader while checking auth status,
+  // or while waiting for the dashboard redirect to happen.
+  if (status === 'loading' || status === 'authenticated') {
+    return <FullPageLoader />;
+  }
 
-        <section className="next-step">
-          <p className="eyebrow">NEXT IMPLEMENTATION</p>
-          <h2>Database foundation</h2>
-          <p>
-            Add Prisma and the first ownership models: User, Workspace, WorkspaceMember, and
-            AuthSession. Product features remain blocked until workspace isolation is proven.
-          </p>
-        </section>
-      </div>
-    </main>
-  );
+  // Once we confirm they are unauthenticated, show the actual landing page
+  return <LandingPage />;
 }

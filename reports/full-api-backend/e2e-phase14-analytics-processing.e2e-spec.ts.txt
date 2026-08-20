@@ -1,0 +1,30 @@
+PASS test/phase14-analytics-processing.e2e-spec.ts (7.456 s)
+  Phase 14 Analytics Processing E2E
+    √ rejects anonymous access to the status endpoint (17 ms)
+    √ allows a VIEWER to read processing status (no role restriction on GET status) (133 ms)
+    √ blocks an outsider from reading another workspace processing status (34 ms)
+    √ rejects a VIEWER triggering manual reprocessing (requires OWNER or ADMIN) (36 ms)
+    √ rejects a DEVELOPER triggering manual reprocessing (requires OWNER or ADMIN) (42 ms)
+    √ rejects an outsider triggering manual reprocessing on a foreign website (50 ms)
+    √ reports zero pending events, zero dead letters, and no runs for a fresh website (69 ms)
+    √ reports canReprocess=false for a VIEWER (64 ms)
+    √ counts pending (unprocessed) raw events for the requested website (88 ms)
+    √ returns 404 for a nonexistent website (34 ms)
+    √ rejects a reprocess request where to <= from (31 ms)
+    √ rejects a reprocess request exceeding the maximum of 31 days (35 ms)
+    √ rejects a reprocess request with a malformed date (47 ms)
+    √ rejects a reprocess request missing required fields (38 ms)
+    √ queues a manual processing run and persists it with QUEUED status (174 ms)
+    √ returns the same run when the identical range is queued twice (idempotent enqueue) (253 ms)
+    √ claims and successfully processes a queued analytics run (436 ms)
+    √ rejects retry from a VIEWER (requires OWNER or ADMIN) (80 ms)
+    √ rejects retry for a run that is not dead-lettered (62 ms)
+    √ retries a dead-lettered run: creates a new QUEUED run and resolves the dead letter (101 ms)
+    √ prevents retrying a dead-lettered run from another workspace (78 ms)
+    √ never mixes pending-event counts or runs between two different websites (67 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       22 passed, 22 total
+Snapshots:   0 total
+Time:        7.918 s, estimated 8 s
+Ran all test suites within paths "test/phase14-analytics-processing.e2e-spec.ts".

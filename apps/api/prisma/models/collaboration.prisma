@@ -1,0 +1,74 @@
+model WorkspaceInvitation {
+  id           String  @id @default(uuid()) @db.Uuid
+  workspaceId  String  @map("workspace_id") @db.Uuid
+  invitedById  String  @map("invited_by_id") @db.Uuid
+  acceptedById String? @map("accepted_by_id") @db.Uuid
+
+  email String
+  role  WorkspaceRole
+
+  tokenHash String @unique @map("token_hash")
+
+  status WorkspaceInvitationStatus @default(PENDING)
+
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
+
+  acceptedAt DateTime? @map("accepted_at") @db.Timestamptz(6)
+  declinedAt DateTime? @map("declined_at") @db.Timestamptz(6)
+  revokedAt  DateTime? @map("revoked_at") @db.Timestamptz(6)
+
+  lastSentAt DateTime? @map("last_sent_at") @db.Timestamptz(6)
+  sendCount  Int       @default(0) @map("send_count")
+
+  deliveryStatus InvitationDeliveryStatus @default(NOT_REQUESTED) @map("delivery_status")
+  deliveryError  String?                  @map("delivery_error") @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  workspace  Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  invitedBy  User      @relation("WorkspaceInvitationInvitedBy", fields: [invitedById], references: [id])
+  acceptedBy User?     @relation("WorkspaceInvitationAcceptedBy", fields: [acceptedById], references: [id])
+
+  @@index([workspaceId, status, createdAt(sort: Desc)])
+  @@index([email, status])
+  @@index([expiresAt])
+  @@map("workspace_invitations")
+}
+
+model Notification {
+  id            String  @id @default(uuid()) @db.Uuid
+  workspaceId   String  @map("workspace_id") @db.Uuid
+  userId        String  @map("user_id") @db.Uuid
+  applicationId String? @map("application_id") @db.Uuid
+
+  type     NotificationType
+  priority NotificationPriority @default(INFO)
+
+  title   String
+  message String @db.Text
+
+  resourceType String? @map("resource_type")
+  resourceId   String? @map("resource_id") @db.Uuid
+
+  actionUrl String? @map("action_url") @db.Text
+  payload   Json?
+
+  dedupeKey String? @map("dedupe_key")
+
+  readAt    DateTime? @map("read_at") @db.Timestamptz(6)
+  expiresAt DateTime? @map("expires_at") @db.Timestamptz(6)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  workspace   Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  application SaasApplication? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dedupeKey])
+  @@index([userId, readAt, createdAt(sort: Desc)])
+  @@index([workspaceId, createdAt(sort: Desc)])
+  @@index([expiresAt])
+  @@map("notifications")
+}

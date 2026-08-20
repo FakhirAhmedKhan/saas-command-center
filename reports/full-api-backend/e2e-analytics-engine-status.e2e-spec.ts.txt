@@ -1,0 +1,13 @@
+PASS test/analytics-engine-status.e2e-spec.ts (10.275 s)
+  Analytics Engine Status E2E
+    √ returns an empty status before analytics processing (1782 ms)
+    √ returns processed counts, latest run, and recent sessions (1211 ms)
+    √ allows a VIEWER to read analytics-engine status (1076 ms)
+    √ prevents outsider and anonymous access (976 ms)
+    √ rejects malformed IDs and hides a foreign website (1034 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        10.868 s
+Ran all test suites within paths "test/analytics-engine-status.e2e-spec.ts".

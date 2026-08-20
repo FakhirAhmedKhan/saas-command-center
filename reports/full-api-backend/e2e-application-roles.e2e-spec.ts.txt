@@ -1,0 +1,15 @@
+PASS test/application-roles.e2e-spec.ts (15.543 s)
+  Application Roles E2E
+    √ allows OWNER, ADMIN, and DEVELOPER to create and update (2679 ms)
+    √ allows OWNER, ADMIN, and DEVELOPER to manage technologies and links (2037 ms)
+    √ allows VIEWER to read but prevents mutations (1491 ms)
+    √ prevents DEVELOPER from archive, restore, and delete (1496 ms)
+    √ allows ADMIN to archive and restore but not permanently delete (1593 ms)
+    √ allows OWNER to permanently delete archived application (1438 ms)
+    √ prevents outsider and anonymous access (1361 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       7 passed, 7 total
+Snapshots:   0 total
+Time:        16.099 s
+Ran all test suites within paths "test/application-roles.e2e-spec.ts".

@@ -1,0 +1,15 @@
+PASS test/analytics-sessions.e2e-spec.ts (11.102 s)
+  Analytics Sessions E2E
+    √ marks a single unengaged page view as a bounce (1787 ms)
+    √ marks a page view plus ten seconds of engagement as not bounced (986 ms)
+    √ marks two page views as not bounced and sets entry and exit paths (1082 ms)
+    √ supports a custom-event-only session with null entry and exit (1057 ms)
+    √ rebuilds session start and end when late events arrive (1192 ms)
+    √ caps overlapping engagement at the session wall duration (887 ms)
+    √ classifies bot user agents (824 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       7 passed, 7 total
+Snapshots:   0 total
+Time:        11.5 s
+Ran all test suites within paths "test/analytics-sessions.e2e-spec.ts".

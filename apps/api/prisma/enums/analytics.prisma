@@ -1,0 +1,49 @@
+enum AnalyticsDeviceType {
+  DESKTOP
+  MOBILE
+  TABLET
+  BOT
+  OTHER
+}
+
+enum AnalyticsSourceType {
+  DIRECT
+  INTERNAL
+  SEARCH
+  SOCIAL
+  REFERRAL
+  UNKNOWN
+}
+
+enum AnalyticsAggregateDimension {
+  OVERVIEW
+  PAGE
+  SOURCE
+  COUNTRY
+  DEVICE
+  BROWSER
+  OPERATING_SYSTEM
+  CUSTOM_EVENT
+}
+
+enum AnalyticsProcessingStatus {
+  QUEUED
+  RUNNING
+  COMPLETED
+  SUCCEEDED
+  FAILED
+  DEAD_LETTERED
+  CANCELLED
+}
+
+enum AnalyticsProcessingTrigger {
+  SCHEDULED
+  MANUAL
+  RETRY
+}
+
+enum RawAnalyticsEventType {
+  PAGE_VIEW
+  HEARTBEAT
+  CUSTOM
+}

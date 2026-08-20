@@ -1,0 +1,18 @@
+(node:25084) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+PASS test/development.e2e-spec.ts (12.636 s)
+  Development E2E
+    √ lists available development templates (1299 ms)
+    √ creates, lists, and updates a milestone (982 ms)
+    √ creates and updates a task inside a milestone (1288 ms)
+    √ moves and reorders tasks and milestones (1391 ms)
+    √ creates, updates, resolves, reopens, filters, and deletes a blocker (1362 ms)
+    √ deletes tasks and milestones (993 ms)
+    √ rejects invalid milestone, task, blocker, and reorder payloads (873 ms)
+    √ rejects child IDs belonging to another application (991 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        13.139 s
+Ran all test suites within paths "test/development.e2e-spec.ts".

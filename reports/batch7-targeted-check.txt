@@ -1,0 +1,2992 @@
+﻿
+==================================================
+apps\web\src\features\applications\application-types.ts
+==================================================
+import { APPLICATION_CATEGORIES, APPLICATION_PRIORITIES, APPLICATION_STATUSES } from '@command-center/shared-types';
+import type { ApplicationCategory, ApplicationPriority, ApplicationStatus } from '@command-center/shared-types';
+
+export { APPLICATION_CATEGORIES, APPLICATION_PRIORITIES, APPLICATION_STATUSES };
+
+export type {
+  ApplicationCategory,
+  ApplicationListQueryInput as ApplicationListQuery,
+  ApplicationPriority,
+  ApplicationStatus,
+  CreateApplicationInput as CreateApplicationPayload,
+  UpdateApplicationInput as UpdateApplicationPayload,
+} from '@command-center/shared-types';
+export const TECHNOLOGY_TYPES = ['FRONTEND', 'BACKEND', 'DATABASE', 'MOBILE', 'AI', 'INFRASTRUCTURE', 'OTHER'] as const;
+
+export type TechnologyType = (typeof TECHNOLOGY_TYPES)[number];
+
+export const APPLICATION_LINK_TYPES = ['PRODUCTION', 'STAGING', 'REPOSITORY', 'DOCUMENTATION', 'DESIGN', 'API', 'OTHER'] as const;
+
+export type ApplicationLinkType = (typeof APPLICATION_LINK_TYPES)[number];
+
+export interface ApplicationTechnology {
+  id: string;
+  applicationId: string;
+  name: string;
+  type: TechnologyType;
+  version: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ApplicationLink {
+  id: string;
+  applicationId: string;
+  label: string;
+  type: ApplicationLinkType;
+  url: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SaasApplication {
+  id: string;
+  workspaceId: string;
+  name: string;
+  slug: string;
+  shortDescription: string | null;
+  longDescription: string | null;
+  category: ApplicationCategory;
+  status: ApplicationStatus;
+  priority: ApplicationPriority;
+  startedAt: string | null;
+  targetLaunchAt: string | null;
+  launchedAt: string | null;
+  lastActivityAt: string | null;
+  archivedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  progressPercent: number;
+  progressUpdatedAt: string | null;
+  technologies: ApplicationTechnology[];
+  links: ApplicationLink[];
+  _count?: {
+    technologies: number;
+    links: number;
+    activities: number;
+  };
+}
+
+export interface ApplicationPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+export interface ApplicationListResponse {
+  data: SaasApplication[];
+  meta: ApplicationPagination;
+}
+
+export interface CreateTechnologyPayload {
+  name: string;
+  type: TechnologyType;
+  version?: string | null;
+}
+
+export type UpdateTechnologyPayload = Partial<CreateTechnologyPayload>;
+
+export interface CreateApplicationLinkPayload {
+  label: string;
+  type: ApplicationLinkType;
+  url: string;
+}
+
+export type UpdateApplicationLinkPayload = Partial<CreateApplicationLinkPayload>;
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\applications\dto\application-link.dto.ts
+==================================================
+import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { IsEnum, IsString, IsUrl, Length } from 'class-validator';
+import { ApplicationLinkType } from 'src/generated/prisma/enums';
+
+export class CreateApplicationLinkDto {
+  @ApiProperty({
+    example: 'Production website',
+  })
+  @IsString()
+  @Length(1, 80)
+  label!: string;
+
+  @ApiProperty({
+    enum: ApplicationLinkType,
+  })
+  @IsEnum(ApplicationLinkType)
+  type!: ApplicationLinkType;
+
+  @ApiProperty({
+    example: 'https://example.com',
+  })
+  @IsUrl(
+    {
+      protocols: ['http', 'https'],
+      require_protocol: true,
+      require_tld: false,
+    },
+    {
+      message: 'url must be a valid HTTP or HTTPS URL',
+    },
+  )
+  url!: string;
+}
+
+export class UpdateApplicationLinkDto extends PartialType(CreateApplicationLinkDto) {}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\applications\dto\application-technology.dto.ts
+==================================================
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { IsEnum, IsOptional, IsString, Length, MaxLength } from 'class-validator';
+import { TechnologyType } from 'src/generated/prisma/enums';
+
+export class CreateApplicationTechnologyDto {
+  @ApiProperty({
+    example: 'Next.js',
+  })
+  @IsString()
+  @Length(1, 80)
+  name!: string;
+
+  @ApiProperty({
+    enum: TechnologyType,
+  })
+  @IsEnum(TechnologyType)
+  type!: TechnologyType;
+
+  @ApiPropertyOptional({
+    example: '16.2.12',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  version?: string | null;
+}
+
+export class UpdateApplicationTechnologyDto extends PartialType(CreateApplicationTechnologyDto) {}
+
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\applications\dto\application.dto.ts
+==================================================
+import type { CreateApplicationInput } from '@command-center/shared-types';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { Transform, Type } from 'class-transformer';
+import { IsBoolean, IsEnum, IsInt, IsISO8601, IsOptional, IsString, Length, Matches, Max, MaxLength, Min } from 'class-validator';
+import { ApplicationCategory, ApplicationPriority, ApplicationStatus } from 'src/generated/prisma/enums';
+
+export enum ApplicationSortBy {
+  NAME = 'name',
+  STATUS = 'status',
+  PRIORITY = 'priority',
+  CREATED_AT = 'createdAt',
+  UPDATED_AT = 'updatedAt',
+  TARGET_LAUNCH_AT = 'targetLaunchAt',
+}
+
+export enum SortOrder {
+  ASC = 'asc',
+  DESC = 'desc',
+}
+
+export class CreateApplicationDto implements CreateApplicationInput {
+  @ApiProperty({
+    example: 'PriceScout AI',
+  })
+  @IsString()
+  @Length(2, 160)
+  name!: string;
+
+  @ApiPropertyOptional({
+    example: 'pricescout-ai',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(2, 160)
+  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
+    message: 'slug can contain lowercase letters, numbers and hyphens only',
+  })
+  slug?: string;
+
+  @ApiPropertyOptional({
+    example: 'AI-powered UAE product price comparison platform.',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(280)
+  shortDescription?: string | null;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(10_000)
+  longDescription?: string | null;
+
+  @ApiPropertyOptional({
+    enum: ApplicationCategory,
+    default: ApplicationCategory.SAAS,
+  })
+  @IsOptional()
+  @IsEnum(ApplicationCategory)
+  category?: ApplicationCategory;
+
+  @ApiPropertyOptional({
+    enum: ApplicationStatus,
+    default: ApplicationStatus.IDEA,
+  })
+  @IsOptional()
+  @IsEnum(ApplicationStatus)
+  status?: ApplicationStatus;
+
+  @ApiPropertyOptional({
+    enum: ApplicationPriority,
+    default: ApplicationPriority.MEDIUM,
+  })
+  @IsOptional()
+  @IsEnum(ApplicationPriority)
+  priority?: ApplicationPriority;
+
+  @ApiPropertyOptional({
+    example: '2026-08-01T00:00:00.000Z',
+    nullable: true,
+  })
+  @IsOptional()
+  @IsISO8601()
+  startedAt?: string | null;
+
+  @ApiPropertyOptional({
+    example: '2026-10-01T00:00:00.000Z',
+    nullable: true,
+  })
+  @IsOptional()
+  @IsISO8601()
+  targetLaunchAt?: string | null;
+
+  @ApiPropertyOptional({
+    nullable: true,
+  })
+  @IsOptional()
+  @IsISO8601()
+  launchedAt?: string | null;
+}
+
+export class UpdateApplicationDto extends PartialType(CreateApplicationDto) {}
+
+export class ApplicationListQueryDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(160)
+  search?: string;
+
+  @ApiPropertyOptional({
+    enum: ApplicationStatus,
+  })
+  @IsOptional()
+  @IsEnum(ApplicationStatus)
+  status?: ApplicationStatus;
+
+  @ApiPropertyOptional({
+    enum: ApplicationPriority,
+  })
+  @IsOptional()
+  @IsEnum(ApplicationPriority)
+  priority?: ApplicationPriority;
+
+  @ApiPropertyOptional({
+    enum: ApplicationCategory,
+  })
+  @IsOptional()
+  @IsEnum(ApplicationCategory)
+  category?: ApplicationCategory;
+
+  @ApiPropertyOptional({
+    default: false,
+  })
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value === true || value === 'true') {
+      return true;
+    }
+
+    if (value === false || value === 'false') {
+      return false;
+    }
+
+    return value;
+  })
+  @IsBoolean()
+  archived?: boolean;
+
+  @ApiPropertyOptional({
+    enum: ApplicationSortBy,
+    default: ApplicationSortBy.UPDATED_AT,
+  })
+  @IsOptional()
+  @IsEnum(ApplicationSortBy)
+  sortBy?: ApplicationSortBy;
+
+  @ApiPropertyOptional({
+    enum: SortOrder,
+    default: SortOrder.DESC,
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  sortOrder?: SortOrder;
+
+  @ApiPropertyOptional({
+    default: 1,
+    minimum: 1,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page = 1;
+
+  @ApiPropertyOptional({
+    default: 20,
+    minimum: 1,
+    maximum: 100,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit = 20;
+}
+
+==================================================
+apps\api\src\modules\applications\services\applications.service.ts
+==================================================
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { Prisma } from 'src/generated/prisma/client';
+import { ActivityActorType, ActivityEntityType, ApplicationActivityType } from 'src/generated/prisma/enums';
+import { ActivityWriterService } from '../../activity/services/activity-writer.service';
+import { CreateApplicationLinkDto, UpdateApplicationLinkDto } from '../dto/application-link.dto';
+import { CreateApplicationTechnologyDto, UpdateApplicationTechnologyDto } from '../dto/application-technology.dto';
+import { ApplicationListQueryDto, ApplicationSortBy, CreateApplicationDto, SortOrder, UpdateApplicationDto } from '../dto/application.dto';
+import type { ActivityWriteInput } from '../../activity/interfaces/activity-writer.interface';
+
+const applicationInclude = {
+  technologies: {
+    orderBy: [
+      {
+        type: 'asc',
+      },
+      {
+        name: 'asc',
+      },
+    ],
+  },
+
+  links: {
+    orderBy: [
+      {
+        type: 'asc',
+      },
+      {
+        label: 'asc',
+      },
+    ],
+  },
+
+  _count: {
+    select: {
+      technologies: true,
+      links: true,
+      activities: true,
+    },
+  },
+} satisfies Prisma.SaasApplicationInclude;
+
+export type ApplicationDetails = Prisma.SaasApplicationGetPayload<{
+  include: typeof applicationInclude;
+}>;
+
+@Injectable()
+export class ApplicationsService {
+  constructor(
+    private readonly prisma: PrismaService,
+
+    private readonly activityWriter: ActivityWriterService,
+  ) {}
+
+  async create(workspaceId: string, dto: CreateApplicationDto, actorUserId: string): Promise<ApplicationDetails> {
+    const name = this.normalizeRequiredText(dto.name, 'Application name');
+
+    const requestedSlug = dto.slug ? this.normalizeSlug(dto.slug) : this.normalizeSlug(name);
+
+    const slug = await this.generateUniqueSlug(workspaceId, requestedSlug);
+
+    const startedAt = this.toNullableDate(dto.startedAt);
+
+    const targetLaunchAt = this.toNullableDate(dto.targetLaunchAt);
+
+    const launchedAt = this.toNullableDate(dto.launchedAt);
+
+    this.validateDates(startedAt, targetLaunchAt, launchedAt);
+
+    try {
+      return await this.prisma.$transaction(async (transaction) => {
+        const application = await transaction.saasApplication.create({
+          data: {
+            workspaceId,
+            name,
+            slug,
+
+            shortDescription: this.normalizeOptionalText(dto.shortDescription),
+
+            longDescription: this.normalizeOptionalText(dto.longDescription),
+
+            ...(dto.category
+              ? {
+                  category: dto.category,
+                }
+              : {}),
+
+            ...(dto.status
+              ? {
+                  status: dto.status,
+                }
+              : {}),
+
+            ...(dto.priority
+              ? {
+                  priority: dto.priority,
+                }
+              : {}),
+
+            startedAt,
+            targetLaunchAt,
+            launchedAt,
+          },
+        });
+
+        await this.activityWriter.writeWithTransaction(transaction, {
+          workspaceId,
+
+          applicationId: application.id,
+
+          applicationName: application.name,
+
+          actorType: ActivityActorType.USER,
+
+          actorUserId,
+
+          activityType: ApplicationActivityType.APPLICATION_CREATED,
+
+          entityType: ActivityEntityType.APPLICATION,
+
+          entityId: application.id,
+
+          title: 'Application created',
+
+          description: `${application.name} was added to the SaaS registry.`,
+
+          metadata: {
+            category: application.category,
+
+            status: application.status,
+
+            priority: application.priority,
+
+            slug: application.slug,
+          },
+        });
+
+        return transaction.saasApplication.findUniqueOrThrow({
+          where: {
+            id: application.id,
+          },
+
+          include: applicationInclude,
+        });
+      });
+    } catch (error: unknown) {
+      this.handleUniqueConstraint(error);
+
+      throw error;
+    }
+  }
+
+  async list(workspaceId: string, query: ApplicationListQueryDto) {
+    const page = query.page;
+    const limit = query.limit;
+    const skip = (page - 1) * limit;
+
+    const search = query.search?.trim();
+
+    const where: Prisma.SaasApplicationWhereInput = {
+      workspaceId,
+
+      archivedAt:
+        query.archived === true
+          ? {
+              not: null,
+            }
+          : null,
+
+      ...(query.status
+        ? {
+            status: query.status,
+          }
+        : {}),
+
+      ...(query.priority
+        ? {
+            priority: query.priority,
+          }
+        : {}),
+
+      ...(query.category
+        ? {
+            category: query.category,
+          }
+        : {}),
+
+      ...(search
+        ? {
+            OR: [
+              {
+                name: {
+                  contains: search,
+                  mode: 'insensitive',
+                },
+              },
+
+              {
+                slug: {
+                  contains: search,
+                  mode: 'insensitive',
+                },
+              },
+
+              {
+                shortDescription: {
+                  contains: search,
+                  mode: 'insensitive',
+                },
+              },
+
+              {
+                longDescription: {
+                  contains: search,
+                  mode: 'insensitive',
+                },
+              },
+            ],
+          }
+        : {}),
+    };
+
+    const orderBy = this.buildOrderBy(query);
+
+    const [applications, total] = await this.prisma.$transaction([
+      this.prisma.saasApplication.findMany({
+        where,
+        include: applicationInclude,
+        orderBy,
+        skip,
+        take: limit,
+      }),
+
+      this.prisma.saasApplication.count({
+        where,
+      }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: applications,
+
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
+  }
+
+  async findOne(workspaceId: string, applicationId: string): Promise<ApplicationDetails> {
+    const application = await this.prisma.saasApplication.findFirst({
+      where: {
+        id: applicationId,
+        workspaceId,
+      },
+
+      include: applicationInclude,
+    });
+
+    if (!application) {
+      throw new NotFoundException('SaaS application not found');
+    }
+
+    return application;
+  }
+
+  async update(workspaceId: string, applicationId: string, dto: UpdateApplicationDto, actorUserId: string): Promise<ApplicationDetails> {
+    const existing = await this.findOne(workspaceId, applicationId);
+
+    this.ensureNotArchived(existing);
+
+    const data: Prisma.SaasApplicationUpdateInput = {};
+
+    const changedFields: string[] = [];
+
+    if (dto.name !== undefined) {
+      const name = this.normalizeRequiredText(dto.name, 'Application name');
+
+      if (name !== existing.name) {
+        data.name = name;
+        changedFields.push('name');
+      }
+    }
+
+    if (dto.slug !== undefined) {
+      const slug = this.normalizeSlug(dto.slug);
+
+      if (slug !== existing.slug) {
+        await this.ensureSlugAvailable(workspaceId, applicationId, slug);
+
+        data.slug = slug;
+        changedFields.push('slug');
+      }
+    }
+
+    if (dto.shortDescription !== undefined) {
+      const value = this.normalizeOptionalText(dto.shortDescription);
+
+      if (value !== existing.shortDescription) {
+        data.shortDescription = value;
+
+        changedFields.push('shortDescription');
+      }
+    }
+
+    if (dto.longDescription !== undefined) {
+      const value = this.normalizeOptionalText(dto.longDescription);
+
+      if (value !== existing.longDescription) {
+        data.longDescription = value;
+
+        changedFields.push('longDescription');
+      }
+    }
+
+    if (dto.category !== undefined && dto.category !== existing.category) {
+      data.category = dto.category;
+
+      changedFields.push('category');
+    }
+
+    if (dto.status !== undefined && dto.status !== existing.status) {
+      data.status = dto.status;
+
+      changedFields.push('status');
+    }
+
+    if (dto.priority !== undefined && dto.priority !== existing.priority) {
+      data.priority = dto.priority;
+
+      changedFields.push('priority');
+    }
+
+    const startedAt = dto.startedAt !== undefined ? this.toNullableDate(dto.startedAt) : existing.startedAt;
+
+    const targetLaunchAt = dto.targetLaunchAt !== undefined ? this.toNullableDate(dto.targetLaunchAt) : existing.targetLaunchAt;
+
+    const launchedAt = dto.launchedAt !== undefined ? this.toNullableDate(dto.launchedAt) : existing.launchedAt;
+
+    this.validateDates(startedAt, targetLaunchAt, launchedAt);
+
+    if (dto.startedAt !== undefined && !this.sameDate(startedAt, existing.startedAt)) {
+      data.startedAt = startedAt;
+
+      changedFields.push('startedAt');
+    }
+
+    if (dto.targetLaunchAt !== undefined && !this.sameDate(targetLaunchAt, existing.targetLaunchAt)) {
+      data.targetLaunchAt = targetLaunchAt;
+
+      changedFields.push('targetLaunchAt');
+    }
+
+    if (dto.launchedAt !== undefined && !this.sameDate(launchedAt, existing.launchedAt)) {
+      data.launchedAt = launchedAt;
+
+      changedFields.push('launchedAt');
+    }
+
+    if (changedFields.length === 0) {
+      return existing;
+    }
+
+    try {
+      return await this.prisma.$transaction(async (transaction) => {
+        const updated = await transaction.saasApplication.update({
+          where: {
+            id: applicationId,
+          },
+
+          data,
+        });
+
+        const events: ActivityWriteInput[] = [];
+
+        const generalFields = changedFields.filter((field) => field !== 'status' && field !== 'priority');
+
+        if (generalFields.length > 0) {
+          events.push({
+            workspaceId,
+            applicationId,
+            applicationName: updated.name,
+            actorType: ActivityActorType.USER,
+            actorUserId,
+            activityType: ApplicationActivityType.APPLICATION_UPDATED,
+            entityType: ActivityEntityType.APPLICATION,
+            entityId: applicationId,
+            title: 'Application updated',
+            description: `${updated.name} application information was updated.`,
+            metadata: {
+              changedFields: generalFields,
+            },
+          });
+        }
+
+        if (changedFields.includes('status')) {
+          events.push({
+            workspaceId,
+            applicationId,
+            applicationName: updated.name,
+            actorType: ActivityActorType.USER,
+            actorUserId,
+            activityType: ApplicationActivityType.APPLICATION_STATUS_CHANGED,
+            entityType: ActivityEntityType.APPLICATION,
+            entityId: applicationId,
+            title: 'Application status changed',
+            description: `${updated.name} moved from ${this.humanizeEnum(existing.status)} to ${this.humanizeEnum(updated.status)}.`,
+            metadata: {
+              previousStatus: existing.status,
+              currentStatus: updated.status,
+            },
+          });
+        }
+
+        if (changedFields.includes('priority')) {
+          events.push({
+            workspaceId,
+            applicationId,
+            applicationName: updated.name,
+            actorType: ActivityActorType.USER,
+            actorUserId,
+            activityType: ApplicationActivityType.APPLICATION_PRIORITY_CHANGED,
+            entityType: ActivityEntityType.APPLICATION,
+            entityId: applicationId,
+            title: 'Application priority changed',
+            description: `${updated.name} priority changed from ${this.humanizeEnum(existing.priority)} to ${this.humanizeEnum(updated.priority)}.`,
+            metadata: {
+              previousPriority: existing.priority,
+              currentPriority: updated.priority,
+            },
+          });
+        }
+
+        await this.activityWriter.writeManyWithTransaction(transaction, events);
+
+        return transaction.saasApplication.findUniqueOrThrow({
+          where: {
+            id: applicationId,
+          },
+
+          include: applicationInclude,
+        });
+      });
+    } catch (error: unknown) {
+      this.handleUniqueConstraint(error);
+
+      throw error;
+    }
+  }
+
+  async archive(workspaceId: string, applicationId: string, actorUserId: string): Promise<ApplicationDetails> {
+    const application = await this.findOne(workspaceId, applicationId);
+
+    if (application.archivedAt) {
+      return application;
+    }
+
+    return this.prisma.$transaction(async (transaction) => {
+      const updated = await transaction.saasApplication.update({
+        where: {
+          id: applicationId,
+        },
+
+        data: {
+          archivedAt: new Date(),
+        },
+      });
+
+      await this.activityWriter.writeWithTransaction(transaction, {
+        workspaceId,
+        applicationId,
+        applicationName: updated.name,
+        actorType: ActivityActorType.USER,
+        actorUserId,
+        activityType: ApplicationActivityType.APPLICATION_ARCHIVED,
+        entityType: ActivityEntityType.APPLICATION,
+        entityId: applicationId,
+        title: 'Application archived',
+        description: `${updated.name} was moved to the archive.`,
+      });
+
+      return transaction.saasApplication.findUniqueOrThrow({
+        where: {
+          id: applicationId,
+        },
+
+        include: applicationInclude,
+      });
+    });
+  }
+
+  async restore(workspaceId: string, applicationId: string, actorUserId: string): Promise<ApplicationDetails> {
+    const application = await this.findOne(workspaceId, applicationId);
+
+    if (!application.archivedAt) {
+      return application;
+    }
+
+    return this.prisma.$transaction(async (transaction) => {
+      const updated = await transaction.saasApplication.update({
+        where: {
+          id: applicationId,
+        },
+
+        data: {
+          archivedAt: null,
+        },
+      });
+
+      await this.activityWriter.writeWithTransaction(transaction, {
+        workspaceId,
+        applicationId,
+        applicationName: updated.name,
+        actorType: ActivityActorType.USER,
+        actorUserId,
+        activityType: ApplicationActivityType.APPLICATION_RESTORED,
+        entityType: ActivityEntityType.APPLICATION,
+        entityId: applicationId,
+        title: 'Application restored',
+        description: `${updated.name} was restored from the archive.`,
+      });
+
+      return transaction.saasApplication.findUniqueOrThrow({
+        where: {
+          id: applicationId,
+        },
+
+        include: applicationInclude,
+      });
+    });
+  }
+
+  async permanentDelete(workspaceId: string, applicationId: string, actorUserId: string): Promise<void> {
+    const application = await this.findOne(workspaceId, applicationId);
+
+    if (!application.archivedAt) {
+      throw new ConflictException('Archive the application before permanent deletion');
+    }
+
+    await this.prisma.$transaction(async (transaction) => {
+      await this.activityWriter.writeWithTransaction(transaction, {
+        workspaceId,
+        applicationId,
+        applicationName: application.name,
+        actorType: ActivityActorType.USER,
+        actorUserId,
+        activityType: ApplicationActivityType.APPLICATION_DELETED,
+        entityType: ActivityEntityType.APPLICATION,
+        entityId: applicationId,
+        title: 'Application permanently deleted',
+        description: `${application.name} and its related application records were permanently deleted.`,
+      });
+
+      await transaction.saasApplication.delete({
+        where: {
+          id: applicationId,
+        },
+      });
+    });
+  }
+
+  async addTechnology(workspaceId: string, applicationId: string, dto: CreateApplicationTechnologyDto, actorUserId: string) {
+    const application = await this.findOne(workspaceId, applicationId);
+
+    this.ensureNotArchived(application);
+
+    try {
+      return await this.prisma.$transaction(async (transaction) => {
+        const technology = await transaction.applicationTechnology.create({
+          data: {
+            applicationId,
+
+            name: this.normalizeRequiredText(dto.name, 'Technology name'),
+
+            type: dto.type,
+
+            version: this.normalizeOptionalText(dto.version),
+          },
+        });
+
+        await this.activityWriter.writeWithTransaction(transaction, {
+          workspaceId,
+          applicationId,
+          applicationName: application.name,
+          actorType: ActivityActorType.USER,
+          actorUserId,
+          activityType: ApplicationActivityType.TECHNOLOGY_ADDED,
+          entityType: ActivityEntityType.TECHNOLOGY,
+          entityId: technology.id,
+          title: 'Technology added',
+          description: `${technology.name} was added to ${application.name}.`,
+          metadata: {
+            technologyName: technology.name,
+            technologyType: technology.type,
+            version: technology.version,
+          },
+        });
+
+        return technology;
+      });
+    } catch (error: unknown) {
+      this.handleUniqueConstraint(error, 'This technology already exists on the application');
+
+      throw error;
+    }
+  }
+
+  async updateTechnology(workspaceId: string, applicationId: string, technologyId: string, dto: UpdateApplicationTechnologyDto, actorUserId: string) {
+    const application = await this.findOne(workspaceId, applicationId);
+
+    this.ensureNotArchived(application);
+
+    const technology = await this.prisma.applicationTechnology.findFirst({
+      where: {
+        id: technologyId,
+        applicationId,
+      },
+    });
+
+    if (!technology) {
+      throw new NotFoundException('Application technology not found');
+    }
+
+    const data: Prisma.ApplicationTechnologyUpdateInput = {};
+
+    const changedFields: string[] = [];
+
+    if (dto.name !== undefined) {
+      const name = this.normalizeRequiredText(dto.name, 'Technology name');
+
+      if (name !== technology.name) {
+        data.name = name;
+        changedFields.push('name');
+      }
+    }
+
+    if (dto.type !== undefined && dto.type !== technology.type) {
+      data.type = dto.type;
+      changedFields.push('type');
+    }
+
+    if (dto.version !== undefined) {
+      const version = this.normalizeOptionalText(dto.version);
+
+      if (version !== technology.version) {
+        data.version = version;
+        changedFields.push('version');
+      }
+    }
+
+    if (changedFields.length === 0) {
+      return technology;
+    }
+
+    try {
+      return await this.prisma.$transaction(async (transaction) => {
+        const updated = await transaction.applicationTechnology.update({
+          where: {
+            id: technologyId,
+          },
+
+          data,
+        });
+
+        await this.activityWriter.writeWithTransaction(transaction, {
+          workspaceId,
+          applicationId,
+          applicationName: application.name,
+          actorType: ActivityActorType.USER,
+          actorUserId,
+          activityType: ApplicationActivityType.TECHNOLOGY_UPDATED,
+          entityType: ActivityEntityType.TECHNOLOGY,
+          entityId: technologyId,
+          title: 'Technology updated',
+          description: `${updated.name} was updated on ${application.name}.`,
+          metadata: {
+            changedFields,
+            previous: {
+              name: technology.name,
+              type: technology.type,
+              version: technology.version,
+            },
+            current: {
+              name: updated.name,
+              type: updated.type,
+              version: updated.version,
+            },
+          },
+        });
+
+        return updated;
+      });
+    } catch (error: unknown) {
+      this.handleUniqueConstraint(error, 'This technology already exists on the application');
+
+      throw error;
+    }
+  }
+
+  async removeTechnology(workspaceId: string, applicationId: string, technologyId: string, actorUserId: string): Promise<void> {
+    const application = await this.findOne(workspaceId, applicationId);
+
+    this.ensureNotArchived(application);
+
+    const technology = await this.prisma.applicationTechnology.findFirst({
+      where: {
+        id: technologyId,
+        applicationId,
+      },
+    });
+
+    if (!technology) {
+      throw new NotFoundException('Application technology not found');
+    }
+
+    await this.prisma.$transaction(async (transaction) => {
+      await transaction.applicationTechnology.delete({
+        where: {
+          id: technologyId,
+        },
+      });
+
+      await this.activityWriter.writeWithTransaction(transaction, {
+        workspaceId,
+        applicationId,
+        applicationName: application.name,
+        actorType: ActivityActorType.USER,
+        actorUserId,
+        activityType: ApplicationActivityType.TECHNOLOGY_REMOVED,
+        entityType: ActivityEntityType.TECHNOLOGY,
+        entityId: technologyId,
+        title: 'Technology removed',
+        description: `${technology.name} was removed from ${application.name}.`,
+        metadata: {
+          technologyName: technology.name,
+          technologyType: technology.type,
+          version: technology.version,
+        },
+      });
+    });
+  }
+
+  async addLink(workspaceId: string, applicationId: string, dto: CreateApplicationLinkDto, actorUserId: string) {
+    const application = await this.findOne(workspaceId, applicationId);
+
+    this.ensureNotArchived(application);
+
+    try {
+      return await this.prisma.$transaction(async (transaction) => {
+        const link = await transaction.applicationLink.create({
+          data: {
+            applicationId,
+
+            label: this.normalizeRequiredText(dto.label, 'Link label'),
+
+            type: dto.type,
+
+            url: dto.url.trim(),
+          },
+        });
+
+        await this.activityWriter.writeWithTransaction(transaction, {
+          workspaceId,
+          applicationId,
+          applicationName: application.name,
+          actorType: ActivityActorType.USER,
+          actorUserId,
+          activityType: ApplicationActivityType.LINK_ADDED,
+          entityType: ActivityEntityType.LINK,
+          entityId: link.id,
+          title: 'Application link added',
+          description: `${link.label} was added to ${application.name}.`,
+          metadata: {
+            linkLabel: link.label,
+            linkType: link.type,
+            url: link.url,
+          },
+        });
+
+        return link;
+      });
+    } catch (error: unknown) {
+      this.handleUniqueConstraint(error, 'This URL already exists on the application');
+
+      throw error;
+    }
+  }
+
+  async updateLink(workspaceId: string, applicationId: string, linkId: string, dto: UpdateApplicationLinkDto, actorUserId: string) {
+    const application = await this.findOne(workspaceId, applicationId);
+
+    this.ensureNotArchived(application);
+
+    const link = await this.prisma.applicationLink.findFirst({
+      where: {
+        id: linkId,
+        applicationId,
+      },
+    });
+
+    if (!link) {
+      throw new NotFoundException('Application link not found');
+    }
+
+    const data: Prisma.ApplicationLinkUpdateInput = {};
+
+    const changedFields: string[] = [];
+
+    if (dto.label !== undefined) {
+      const label = this.normalizeRequiredText(dto.label, 'Link label');
+
+      if (label !== link.label) {
+        data.label = label;
+        changedFields.push('label');
+      }
+    }
+
+    if (dto.type !== undefined && dto.type !== link.type) {
+      data.type = dto.type;
+      changedFields.push('type');
+    }
+
+    if (dto.url !== undefined) {
+      const url = dto.url.trim();
+
+      if (url !== link.url) {
+        data.url = url;
+        changedFields.push('url');
+      }
+    }
+
+    if (changedFields.length === 0) {
+      return link;
+    }
+
+    try {
+      return await this.prisma.$transaction(async (transaction) => {
+        const updated = await transaction.applicationLink.update({
+          where: {
+            id: linkId,
+          },
+
+          data,
+        });
+
+        await this.activityWriter.writeWithTransaction(transaction, {
+          workspaceId,
+          applicationId,
+          applicationName: application.name,
+          actorType: ActivityActorType.USER,
+          actorUserId,
+          activityType: ApplicationActivityType.LINK_UPDATED,
+          entityType: ActivityEntityType.LINK,
+          entityId: linkId,
+          title: 'Application link updated',
+          description: `${updated.label} was updated on ${application.name}.`,
+          metadata: {
+            changedFields,
+            previous: {
+              label: link.label,
+              type: link.type,
+              url: link.url,
+            },
+            current: {
+              label: updated.label,
+              type: updated.type,
+              url: updated.url,
+            },
+          },
+        });
+
+        return updated;
+      });
+    } catch (error: unknown) {
+      this.handleUniqueConstraint(error, 'This URL already exists on the application');
+
+      throw error;
+    }
+  }
+
+  async removeLink(workspaceId: string, applicationId: string, linkId: string, actorUserId: string): Promise<void> {
+    const application = await this.findOne(workspaceId, applicationId);
+
+    this.ensureNotArchived(application);
+
+    const link = await this.prisma.applicationLink.findFirst({
+      where: {
+        id: linkId,
+        applicationId,
+      },
+    });
+
+    if (!link) {
+      throw new NotFoundException('Application link not found');
+    }
+
+    await this.prisma.$transaction(async (transaction) => {
+      await transaction.applicationLink.delete({
+        where: {
+          id: linkId,
+        },
+      });
+
+      await this.activityWriter.writeWithTransaction(transaction, {
+        workspaceId,
+        applicationId,
+        applicationName: application.name,
+        actorType: ActivityActorType.USER,
+        actorUserId,
+        activityType: ApplicationActivityType.LINK_REMOVED,
+        entityType: ActivityEntityType.LINK,
+        entityId: linkId,
+        title: 'Application link removed',
+        description: `${link.label} was removed from ${application.name}.`,
+        metadata: {
+          linkLabel: link.label,
+          linkType: link.type,
+          url: link.url,
+        },
+      });
+    });
+  }
+
+  private ensureNotArchived(application: ApplicationDetails): void {
+    if (application.archivedAt) {
+      throw new ConflictException('Restore the application before modifying it');
+    }
+  }
+
+  private async generateUniqueSlug(workspaceId: string, requestedSlug: string): Promise<string> {
+    let slug = requestedSlug;
+    let suffix = 1;
+
+    while (
+      await this.prisma.saasApplication.findUnique({
+        where: {
+          workspaceId_slug: {
+            workspaceId,
+            slug,
+          },
+        },
+
+        select: {
+          id: true,
+        },
+      })
+    ) {
+      suffix += 1;
+
+      const suffixText = `-${suffix}`;
+
+      slug = `${requestedSlug.slice(0, 160 - suffixText.length)}${suffixText}`;
+    }
+
+    return slug;
+  }
+
+  private async ensureSlugAvailable(workspaceId: string, applicationId: string, slug: string): Promise<void> {
+    const existing = await this.prisma.saasApplication.findFirst({
+      where: {
+        workspaceId,
+        slug,
+
+        id: {
+          not: applicationId,
+        },
+      },
+
+      select: {
+        id: true,
+      },
+    });
+
+    if (existing) {
+      throw new ConflictException('Application slug is already in use');
+    }
+  }
+
+  private buildOrderBy(query: ApplicationListQueryDto): Prisma.SaasApplicationOrderByWithRelationInput {
+    const order = query.sortOrder ?? SortOrder.DESC;
+
+    switch (query.sortBy) {
+      case ApplicationSortBy.NAME:
+        return {
+          name: order,
+        };
+
+      case ApplicationSortBy.STATUS:
+        return {
+          status: order,
+        };
+
+      case ApplicationSortBy.PRIORITY:
+        return {
+          priority: order,
+        };
+
+      case ApplicationSortBy.CREATED_AT:
+        return {
+          createdAt: order,
+        };
+
+      case ApplicationSortBy.TARGET_LAUNCH_AT:
+        return {
+          targetLaunchAt: order,
+        };
+
+      case ApplicationSortBy.UPDATED_AT:
+      default:
+        return {
+          updatedAt: order,
+        };
+    }
+  }
+
+  private normalizeSlug(value: string): string {
+    const slug = value
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+    if (slug.length < 2) {
+      throw new BadRequestException('Application slug is invalid');
+    }
+
+    if (slug.length > 160) {
+      throw new BadRequestException('Application slug cannot exceed 160 characters');
+    }
+
+    return slug;
+  }
+
+  private normalizeRequiredText(value: string, fieldName: string): string {
+    const normalized = value.trim().replace(/\s+/g, ' ');
+
+    if (!normalized) {
+      throw new BadRequestException(`${fieldName} is required`);
+    }
+
+    return normalized;
+  }
+
+  private normalizeOptionalText(value?: string | null): string | null {
+    if (value === undefined || value === null) {
+      return null;
+    }
+
+    const normalized = value.trim();
+
+    return normalized || null;
+  }
+
+  private toNullableDate(value?: string | null): Date | null {
+    if (!value) {
+      return null;
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      throw new BadRequestException('Invalid date value');
+    }
+
+    return date;
+  }
+
+  private sameDate(first: Date | null, second: Date | null): boolean {
+    return (first?.getTime() ?? null) === (second?.getTime() ?? null);
+  }
+
+  private validateDates(startedAt: Date | null, targetLaunchAt: Date | null, launchedAt: Date | null): void {
+    if (startedAt && targetLaunchAt && targetLaunchAt < startedAt) {
+      throw new BadRequestException('Target launch date cannot be before the start date');
+    }
+
+    if (startedAt && launchedAt && launchedAt < startedAt) {
+      throw new BadRequestException('Launch date cannot be before the start date');
+    }
+  }
+
+  private humanizeEnum(value: string): string {
+    return value
+      .toLowerCase()
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, (character) => character.toUpperCase());
+  }
+
+  private handleUniqueConstraint(error: unknown, message = 'An application with this value already exists'): void {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      throw new ConflictException(message);
+    }
+  }
+}
+
+==================================================
+apps\web\src\features\activity\workspace-activity-api.ts
+==================================================
+import { apiRequest } from '../lib/api/api-client';
+
+export interface WorkspaceActivity {
+  id: string;
+
+  activityType: string;
+
+  actorType: string;
+
+  entityType: string;
+
+  entityId: string | null;
+
+  description: string;
+
+  createdAt: string;
+
+  actorUser: {
+    id: string;
+    name: string | null;
+    email: string;
+  } | null;
+
+  application: {
+    id: string;
+    name: string;
+  } | null;
+}
+
+export interface ActivityFilters {
+  search?: string;
+  activityType?: string;
+  actorUserId?: string;
+  entityType?: string;
+  entityId?: string;
+  from?: string;
+  to?: string;
+}
+
+export function getWorkspaceActivities(
+  workspaceId: string,
+
+  filters: ActivityFilters,
+
+  signal?: AbortSignal,
+) {
+  const params = new URLSearchParams({
+    page: '1',
+    limit: '100',
+  });
+
+  for (const [key, value] of Object.entries(filters)) {
+    if (value) {
+      params.set(key, value);
+    }
+  }
+
+  return apiRequest<{
+    items: WorkspaceActivity[];
+
+    pagination: {
+      total: number;
+    };
+  }>(
+    `/workspaces/${workspaceId}/activities?${params.toString()}`,
+
+    {
+      method: 'GET',
+
+      signal,
+    },
+  );
+}
+
+==================================================
+apps\web\src\features\activity\activity-types.ts
+==================================================
+import type { ActivityActorType, ActivityEntityType, ApplicationActivityType } from '@command-center/shared-types';
+
+export { ACTIVITY_ACTOR_TYPES, ACTIVITY_ENTITY_TYPES, APPLICATION_ACTIVITY_TYPES } from '@command-center/shared-types';
+
+export type {
+  ActivityActor,
+  ActivityActorType,
+  ActivityApplication,
+  ActivityEntityType,
+  ActivityListResponse,
+  ActivityPagination,
+  ApplicationActivity,
+  ApplicationActivityType,
+} from '@command-center/shared-types';
+
+/**
+ * Frontend filter model.
+ *
+ * This intentionally remains frontend-local because the API transport
+ * currently accepts `from` / `to`, while the UI works with
+ * `dateFrom` / `dateTo`.
+ */
+export interface ActivityListQuery {
+  search?: string;
+  activityType?: ApplicationActivityType;
+  actorType?: ActivityActorType;
+  entityType?: ActivityEntityType;
+  actorUserId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  page?: number;
+  limit?: number;
+}
+
+==================================================
+apps\web\src\features\auth\auth.types.ts
+==================================================
+import type { WorkspaceRole } from '@command-center/shared-types';
+
+export type { LoginInput, RegisterInput, WorkspaceRole } from '@command-center/shared-types';
+export interface User {
+  id: string;
+  email: string;
+  displayName: string | null;
+  isActive: boolean;
+  emailVerifiedAt: string | null;
+  lastLoginAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
+export interface WorkspaceMembership {
+  role: WorkspaceRole;
+}
+
+export interface Workspace {
+  id: string;
+  name: string;
+  slug: string;
+  ownerId: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+
+  members?: WorkspaceMembership[];
+
+  _count?: {
+    members: number;
+  };
+}
+
+export interface WorkspaceMember {
+  id: string;
+  workspaceId: string;
+  userId: string;
+  role: WorkspaceRole;
+  joinedAt: string;
+  createdAt: string;
+  updatedAt: string;
+
+  user: {
+    id: string;
+    email: string;
+    displayName: string | null;
+    isActive: boolean;
+  };
+}
+
+export interface AuthUser extends User {
+  workspaces?: Workspace[];
+  currentWorkspaceId?: string | null;
+}
+
+export interface AuthResponse {
+  accessToken: string;
+
+  tokenType: 'Bearer';
+
+  expiresIn: number;
+
+  user: User;
+
+  workspaces: Workspace[];
+}
+
+export interface CurrentUserResponse {
+  user: User;
+
+  workspaces: Workspace[];
+}
+
+export interface AuthSession {
+  accessToken: string;
+
+  tokenType: 'Bearer';
+
+  expiresIn: number;
+
+  user: AuthUser;
+}
+
+==================================================
+apps\api\src\modules\auth\services\auth.service.ts
+==================================================
+import { randomUUID } from 'node:crypto';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { Prisma } from 'src/generated/prisma/client';
+import { publicUserSelect, UsersService } from 'src/modules/users/users.service';
+import { WorkspacesService } from 'src/modules/workspace/service/workspaces.service';
+import { LoginDto } from '../dto/login.dto';
+import { RegisterDto } from '../dto/register.dto';
+import { AuthSessionsService } from './auth-sessions.service';
+import { PasswordService } from './password.service';
+import { TokenPair, TokenService } from './token.service';
+
+export interface AuthRequestMetadata {
+  userAgent?: string | null;
+  ipAddress?: string | null;
+}
+
+export interface AuthResult {
+  accessToken: string;
+  refreshToken: string;
+  tokenType: 'Bearer';
+  expiresIn: number;
+  user: Awaited<ReturnType<UsersService['findByIdOrThrow']>>;
+  workspaces: Awaited<ReturnType<WorkspacesService['listForUser']>>;
+}
+
+@Injectable()
+export class AuthService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly usersService: UsersService,
+    private readonly workspacesService: WorkspacesService,
+    private readonly authSessionsService: AuthSessionsService,
+    private readonly passwordService: PasswordService,
+    private readonly tokenService: TokenService,
+  ) {}
+
+  async register(dto: RegisterDto, metadata: AuthRequestMetadata): Promise<AuthResult> {
+    const email = dto.email.trim().toLowerCase();
+
+    const passwordHash = await this.passwordService.hash(dto.password);
+
+    const userId = randomUUID();
+    const sessionId = randomUUID();
+    const familyId = randomUUID();
+
+    const tokens = await this.tokenService.issueTokenPair(userId, sessionId, familyId);
+
+    const refreshTokenHash = this.tokenService.hashRefreshToken(tokens.refreshToken);
+
+    try {
+      const user = await this.prisma.$transaction(async (transaction) => {
+        const createdUser = await transaction.user.create({
+          data: {
+            id: userId,
+            email,
+            passwordHash,
+            displayName: dto.displayName?.trim() || null,
+          },
+
+          select: publicUserSelect,
+        });
+
+        await transaction.authSession.create({
+          data: {
+            id: sessionId,
+            userId,
+            familyId,
+            refreshTokenHash,
+            expiresAt: tokens.refreshExpiresAt,
+
+            userAgent: this.normalizeMetadata(metadata.userAgent),
+
+            ipAddress: this.normalizeMetadata(metadata.ipAddress),
+          },
+        });
+
+        return createdUser;
+      });
+
+      const workspaces = await this.workspacesService.listForUser(user.id);
+
+      return this.createAuthResult(tokens, user, workspaces);
+    } catch (error: unknown) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        throw new ConflictException('Email is already in use');
+      }
+
+      throw error;
+    }
+  }
+  async login(dto: LoginDto, metadata: AuthRequestMetadata): Promise<AuthResult> {
+    const user = await this.usersService.findAuthenticationRecordByEmail(dto.email);
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const validPassword = await this.passwordService.verify(user.passwordHash, dto.password);
+
+    if (!validPassword) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const sessionId = randomUUID();
+    const familyId = randomUUID();
+
+    const tokens = await this.tokenService.issueTokenPair(user.id, sessionId, familyId);
+
+    const refreshTokenHash = this.tokenService.hashRefreshToken(tokens.refreshToken);
+
+    await this.prisma.$transaction(async (transaction) => {
+      await transaction.authSession.create({
+        data: {
+          id: sessionId,
+          userId: user.id,
+          familyId,
+          refreshTokenHash,
+          expiresAt: tokens.refreshExpiresAt,
+          userAgent: this.normalizeMetadata(metadata.userAgent),
+          ipAddress: this.normalizeMetadata(metadata.ipAddress),
+        },
+      });
+
+      await transaction.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          lastLoginAt: new Date(),
+        },
+      });
+    });
+
+    const publicUser = await this.usersService.findByIdOrThrow(user.id);
+
+    const workspaces = await this.workspacesService.listForUser(user.id);
+
+    return this.createAuthResult(tokens, publicUser, workspaces);
+  }
+
+  async refresh(rawRefreshToken: string, metadata: AuthRequestMetadata): Promise<AuthResult> {
+    const payload = await this.tokenService.verifyRefreshToken(rawRefreshToken);
+
+    const tokenHash = this.tokenService.hashRefreshToken(rawRefreshToken);
+
+    const currentSession = await this.authSessionsService.findByTokenHash(tokenHash);
+
+    if (!currentSession) {
+      throw new UnauthorizedException('Refresh session not found');
+    }
+
+    const payloadMismatch = currentSession.id !== payload.sid || currentSession.familyId !== payload.fid || currentSession.userId !== payload.sub;
+
+    if (payloadMismatch || currentSession.revokedAt) {
+      await this.authSessionsService.revokeFamilyBySessionId(currentSession.id);
+
+      throw new UnauthorizedException('Refresh token reuse detected');
+    }
+
+    if (currentSession.expiresAt <= new Date()) {
+      await this.authSessionsService.revokeSession(currentSession.id, 'EXPIRED');
+
+      throw new UnauthorizedException('Refresh session has expired');
+    }
+
+    const user = await this.usersService.findActiveById(currentSession.userId);
+
+    if (!user) {
+      await this.authSessionsService.revokeFamilyBySessionId(currentSession.id, 'USER_UNAVAILABLE');
+
+      throw new UnauthorizedException('User account is unavailable');
+    }
+
+    const newSessionId = randomUUID();
+
+    const tokens = await this.tokenService.issueTokenPair(user.id, newSessionId, currentSession.familyId);
+
+    const newRefreshTokenHash = this.tokenService.hashRefreshToken(tokens.refreshToken);
+
+    const rotated = await this.authSessionsService.rotateSession({
+      currentSessionId: currentSession.id,
+      newSessionId,
+      newRefreshTokenHash,
+      expiresAt: tokens.refreshExpiresAt,
+      userAgent: metadata.userAgent,
+      ipAddress: metadata.ipAddress,
+    });
+
+    if (!rotated) {
+      await this.authSessionsService.revokeFamilyBySessionId(currentSession.id);
+
+      throw new UnauthorizedException('Refresh token reuse detected');
+    }
+
+    const workspaces = await this.workspacesService.listForUser(user.id);
+
+    return this.createAuthResult(tokens, user, workspaces);
+  }
+
+  async logout(rawRefreshToken?: string): Promise<void> {
+    if (!rawRefreshToken) {
+      return;
+    }
+
+    const tokenHash = this.tokenService.hashRefreshToken(rawRefreshToken);
+
+    const session = await this.authSessionsService.findByTokenHash(tokenHash);
+
+    if (!session) {
+      return;
+    }
+
+    await this.authSessionsService.revokeSession(session.id);
+  }
+
+  async logoutAll(userId: string): Promise<number> {
+    return this.authSessionsService.revokeAllForUser(userId);
+  }
+
+  async getCurrentUser(userId: string) {
+    const user = await this.usersService.findByIdOrThrow(userId);
+
+    const workspaces = await this.workspacesService.listForUser(userId);
+
+    return {
+      user,
+      workspaces,
+    };
+  }
+
+  private createAuthResult(tokens: TokenPair, user: AuthResult['user'], workspaces: AuthResult['workspaces']): AuthResult {
+    return {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      tokenType: 'Bearer',
+      expiresIn: tokens.accessExpiresInSeconds,
+      user,
+      workspaces,
+    };
+  }
+
+  private normalizeMetadata(value?: string | null): string | null {
+    if (!value) {
+      return null;
+    }
+
+    const normalized = value.trim();
+
+    return normalized || null;
+  }
+}
+
+==================================================
+apps\web\src\features\workspaces\workspace-types.ts
+==================================================
+import type { WorkspaceRole } from '@command-center/shared-types';
+
+export type { CreateWorkspaceInput as CreateWorkspacePayload, WorkspaceRole } from '@command-center/shared-types';
+export interface CreatedWorkspace {
+  id: string;
+  name: string;
+  slug: string;
+  ownerId: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+
+  members: Array<{
+    id: string;
+    userId: string;
+    role: WorkspaceRole;
+    joinedAt: string;
+  }>;
+
+  _count: {
+    members: number;
+    saasApplications: number;
+  };
+}
+
+==================================================
+apps\api\src\modules\workspace\service\workspaces.service.ts
+==================================================
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../../database/prisma.service';
+import { Prisma, WorkspaceRole } from '../../../generated/prisma/client';
+
+const workspaceSummarySelect = {
+  id: true,
+  name: true,
+  slug: true,
+  ownerId: true,
+  createdAt: true,
+  updatedAt: true,
+  deletedAt: true,
+  _count: {
+    select: {
+      members: true,
+    },
+  },
+} satisfies Prisma.WorkspaceSelect;
+
+export type WorkspaceSummary = Prisma.WorkspaceGetPayload<{
+  select: typeof workspaceSummarySelect;
+}>;
+
+export interface CreateWorkspaceInput {
+  name: string;
+  slug?: string;
+  ownerId: string;
+}
+
+export interface UpdateWorkspaceInput {
+  name?: string;
+  slug?: string;
+}
+
+@Injectable()
+export class WorkspacesService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(input: CreateWorkspaceInput): Promise<WorkspaceSummary> {
+    const name = this.normalizeName(input.name);
+    const slug = this.normalizeSlug(input.slug || name);
+
+    return this.prisma.$transaction(async (transaction) => {
+      const owner = await transaction.user.findFirst({
+        where: {
+          id: input.ownerId,
+          isActive: true,
+          deletedAt: null,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      if (!owner) {
+        throw new NotFoundException('Workspace owner not found');
+      }
+
+      const workspace = await transaction.workspace.create({
+        data: {
+          name,
+          slug,
+          ownerId: input.ownerId,
+        },
+      });
+
+      await transaction.workspaceMember.create({
+        data: {
+          workspaceId: workspace.id,
+          userId: input.ownerId,
+          role: WorkspaceRole.OWNER,
+        },
+      });
+
+      return transaction.workspace.findUniqueOrThrow({
+        where: {
+          id: workspace.id,
+        },
+        select: workspaceSummarySelect,
+      });
+    });
+  }
+  async transferOwnership(workspaceId: string, currentOwnerId: string, newOwnerId: string): Promise<WorkspaceSummary> {
+    if (currentOwnerId === newOwnerId) {
+      throw new BadRequestException('The selected user already owns the workspace');
+    }
+
+    return this.prisma.$transaction(async (transaction) => {
+      const workspace = await transaction.workspace.findFirst({
+        where: {
+          id: workspaceId,
+          deletedAt: null,
+        },
+      });
+
+      if (!workspace) {
+        throw new NotFoundException('Workspace not found');
+      }
+
+      if (workspace.ownerId !== currentOwnerId) {
+        throw new ForbiddenException('Only the workspace owner can transfer ownership');
+      }
+
+      const newOwnerMembership = await transaction.workspaceMember.findUnique({
+        where: {
+          workspaceId_userId: {
+            workspaceId,
+            userId: newOwnerId,
+          },
+        },
+      });
+
+      if (!newOwnerMembership) {
+        throw new BadRequestException('The new owner must already be a workspace member');
+      }
+
+      await transaction.workspace.update({
+        where: {
+          id: workspaceId,
+        },
+        data: {
+          ownerId: newOwnerId,
+        },
+      });
+
+      await transaction.workspaceMember.update({
+        where: {
+          workspaceId_userId: {
+            workspaceId,
+            userId: currentOwnerId,
+          },
+        },
+        data: {
+          role: WorkspaceRole.ADMIN,
+        },
+      });
+
+      await transaction.workspaceMember.update({
+        where: {
+          workspaceId_userId: {
+            workspaceId,
+            userId: newOwnerId,
+          },
+        },
+        data: {
+          role: WorkspaceRole.OWNER,
+        },
+      });
+
+      return transaction.workspace.findUniqueOrThrow({
+        where: {
+          id: workspaceId,
+        },
+        select: workspaceSummarySelect,
+      });
+    });
+  }
+  async findById(id: string): Promise<WorkspaceSummary | null> {
+    return this.prisma.workspace.findFirst({
+      where: {
+        id,
+        deletedAt: null,
+      },
+      select: workspaceSummarySelect,
+    });
+  }
+
+  async findByIdOrThrow(id: string): Promise<WorkspaceSummary> {
+    const workspace = await this.findById(id);
+
+    if (!workspace) {
+      throw new NotFoundException('Workspace not found');
+    }
+
+    return workspace;
+  }
+
+  async findForUser(workspaceId: string, userId: string) {
+    return this.prisma.workspace.findFirst({
+      where: {
+        id: workspaceId,
+        deletedAt: null,
+        members: {
+          some: {
+            userId,
+          },
+        },
+      },
+      select: {
+        ...workspaceSummarySelect,
+        members: {
+          where: {
+            userId,
+          },
+          select: {
+            role: true,
+          },
+        },
+      },
+    });
+  }
+
+  async listForUser(userId: string) {
+    return this.prisma.workspace.findMany({
+      where: {
+        deletedAt: null,
+        members: {
+          some: {
+            userId,
+          },
+        },
+      },
+      select: {
+        ...workspaceSummarySelect,
+        members: {
+          where: {
+            userId,
+          },
+          select: {
+            role: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+  }
+
+  async update(id: string, input: UpdateWorkspaceInput): Promise<WorkspaceSummary> {
+    await this.findByIdOrThrow(id);
+
+    return this.prisma.workspace.update({
+      where: {
+        id,
+      },
+      data: {
+        ...(input.name !== undefined
+          ? {
+              name: this.normalizeName(input.name),
+            }
+          : {}),
+        ...(input.slug !== undefined
+          ? {
+              slug: this.normalizeSlug(input.slug),
+            }
+          : {}),
+      },
+      select: workspaceSummarySelect,
+    });
+  }
+
+  async softDelete(id: string): Promise<WorkspaceSummary> {
+    await this.findByIdOrThrow(id);
+
+    return this.prisma.workspace.update({
+      where: {
+        id,
+      },
+      data: {
+        deletedAt: new Date(),
+      },
+      select: workspaceSummarySelect,
+    });
+  }
+
+  private normalizeName(name: string): string {
+    const normalized = name.trim();
+
+    if (normalized.length < 2) {
+      throw new BadRequestException('Workspace name must contain at least 2 characters');
+    }
+
+    if (normalized.length > 120) {
+      throw new BadRequestException('Workspace name cannot exceed 120 characters');
+    }
+
+    return normalized;
+  }
+
+  private normalizeSlug(value: string): string {
+    const slug = value
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+    if (slug.length < 2) {
+      throw new BadRequestException('Workspace slug is invalid');
+    }
+
+    if (slug.length > 120) {
+      throw new BadRequestException('Workspace slug cannot exceed 120 characters');
+    }
+
+    return slug;
+  }
+}
+
+==================================================
+apps\web\src\features\analytics-engine\analytics-engine-types.ts
+==================================================
+import type { AnalyticsAggregateDimension, AnalyticsAggregatePeriod, AnalyticsDeviceType, AnalyticsSourceType } from '@command-center/shared-types';
+
+export type {
+  AnalyticsAggregateDimension,
+  AnalyticsAggregatePeriod,
+  AnalyticsDeviceType,
+  AnalyticsReprocessInput as ReprocessAnalyticsPayload,
+  AnalyticsSourceType,
+} from '@command-center/shared-types';
+export type AnalyticsProcessingStatus = 'RUNNING' | 'COMPLETED' | 'FAILED';
+
+export interface AnalyticsProcessingState {
+  websiteId: string;
+  status: AnalyticsProcessingStatus;
+  lastStartedAt: string | null;
+  lastCompletedAt: string | null;
+  lastFailedAt: string | null;
+  lastProcessedReceivedAt: string | null;
+  lastError: string | null;
+  totalRawEventsProcessed: string | number;
+  updatedAt: string;
+}
+
+export interface AnalyticsProcessingRun {
+  id: string;
+  websiteId: string;
+  initiatedByUserId: string | null;
+  status: AnalyticsProcessingStatus;
+  rawEventsProcessed: number;
+  sessionsRebuilt: number;
+  hourlyBuckets: number;
+  dailyBuckets: number;
+  startedAt: string;
+  completedAt: string | null;
+  failedAt: string | null;
+  errorMessage: string | null;
+}
+
+export interface AnalyticsSession {
+  id: string;
+  websiteId: string;
+  visitorId: string;
+  externalSessionId: string;
+  startedAt: string;
+  endedAt: string;
+  lastEventAt: string;
+  durationMs: number;
+  engagedDurationMs: number;
+  pageViewCount: number;
+  eventCount: number;
+  customEventCount: number;
+  bounced: boolean;
+  entryPath: string | null;
+  exitPath: string | null;
+  sourceType: AnalyticsSourceType;
+  sourceName: string;
+  countryCode: string | null;
+  deviceType: AnalyticsDeviceType;
+  browserName: string;
+  operatingSystem: string;
+
+  visitor: {
+    externalVisitorId: string;
+  };
+}
+
+export interface AnalyticsEngineStatus {
+  website: {
+    id: string;
+    name: string;
+    domain: string;
+    timeZone: string;
+    enabled: boolean;
+    archivedAt: string | null;
+    lastEventAt: string | null;
+  };
+
+  counts: {
+    rawEvents: number;
+    pendingRawEvents: number;
+    visitors: number;
+    sessions: number;
+    normalizedEvents: number;
+    pageViews: number;
+    hourlyAggregates: number;
+    dailyAggregates: number;
+  };
+
+  processingState: AnalyticsProcessingState | null;
+
+  latestRun: AnalyticsProcessingRun | null;
+
+  recentSessions: AnalyticsSession[];
+}
+
+export interface AnalyticsAggregate {
+  id: string;
+  websiteId: string;
+  bucketStart: string;
+  bucketEnd: string;
+  timeZone: string;
+  dimension: AnalyticsAggregateDimension;
+  dimensionKey: string;
+  dimensionValue: string;
+  dimensionLabel: string;
+  visitors: number;
+  sessions: number;
+  pageViews: number;
+  events: number;
+  customEvents: number;
+  bounces: number;
+  totalDurationMs: number;
+  generatedAt: string;
+  updatedAt: string;
+}
+
+export interface AnalyticsAggregateResponse {
+  period: AnalyticsAggregatePeriod;
+
+  dimension: AnalyticsAggregateDimension;
+
+  data: AnalyticsAggregate[];
+}
+
+export interface AnalyticsRetentionResult {
+  rawEventsDeleted: number;
+  sessionsDeleted: number;
+  visitorsDeleted: number;
+  hourlyAggregatesDeleted: number;
+  dailyAggregatesDeleted: number;
+}
+
+==================================================
+apps\api\src\modules\analytics-engine\dto\analytics-engine.dto.ts
+==================================================
+import { AnalyticsAggregatePeriod } from '@command-center/shared-types';
+import type { AnalyticsAggregateQueryInput, AnalyticsReprocessInput } from '@command-center/shared-types';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsDateString, IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
+import { AnalyticsAggregateDimension } from 'src/generated/prisma/enums';
+
+export class ProcessAnalyticsDto {
+  @ApiPropertyOptional({
+    default: 5000,
+    minimum: 1,
+    maximum: 50000,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(50000)
+  maxEvents = 5000;
+}
+
+export class ReprocessAnalyticsDto implements AnalyticsReprocessInput {
+  @ApiProperty({
+    example: '2026-08-01T00:00:00.000Z',
+  })
+  @IsDateString()
+  dateFrom!: string;
+
+  @ApiProperty({
+    example: '2026-08-03T00:00:00.000Z',
+  })
+  @IsDateString()
+  dateTo!: string;
+
+  @ApiPropertyOptional({
+    default: 50000,
+    minimum: 1,
+    maximum: 100000,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100000)
+  maxEvents = 50000;
+}
+
+export class AnalyticsAggregateQueryDto implements AnalyticsAggregateQueryInput {
+  @ApiPropertyOptional({
+    enum: AnalyticsAggregatePeriod,
+    default: AnalyticsAggregatePeriod.DAILY,
+  })
+  @IsOptional()
+  @IsEnum(AnalyticsAggregatePeriod)
+  period: AnalyticsAggregatePeriod = AnalyticsAggregatePeriod.DAILY;
+
+  @ApiPropertyOptional({
+    enum: AnalyticsAggregateDimension,
+    default: AnalyticsAggregateDimension.OVERVIEW,
+  })
+  @IsOptional()
+  @IsEnum(AnalyticsAggregateDimension)
+  dimension = AnalyticsAggregateDimension.OVERVIEW;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  dateFrom?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  dateTo?: string;
+
+  @ApiPropertyOptional({
+    default: 500,
+    maximum: 2000,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(2000)
+  limit = 500;
+}
+
+==================================================
+apps\api\src\modules\analytics-engine\services\analytics-engine-query.service.ts
+==================================================
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { AnalyticsAggregatePeriod } from '@command-center/shared-types';
+import { AnalyticsAggregateQueryDto } from '../dto/analytics-engine.dto';
+
+@Injectable()
+export class AnalyticsEngineQueryService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async getStatus(workspaceId: string, websiteId: string) {
+    const website = await this.requireWebsite(workspaceId, websiteId);
+
+    const [
+      rawEvents,
+      pendingRawEvents,
+      visitors,
+      sessions,
+      normalizedEvents,
+      pageViews,
+      hourlyAggregates,
+      dailyAggregates,
+      processingState,
+      latestRun,
+      recentSessions,
+    ] = await this.prisma.$transaction([
+      this.prisma.rawAnalyticsEvent.count({
+        where: {
+          websiteId,
+        },
+      }),
+
+      this.prisma.rawAnalyticsEvent.count({
+        where: {
+          websiteId,
+
+          analyticsEvent: null,
+        },
+      }),
+
+      this.prisma.analyticsVisitor.count({
+        where: {
+          websiteId,
+        },
+      }),
+
+      this.prisma.analyticsSession.count({
+        where: {
+          websiteId,
+        },
+      }),
+
+      this.prisma.analyticsEvent.count({
+        where: {
+          websiteId,
+        },
+      }),
+
+      this.prisma.analyticsPageView.count({
+        where: {
+          websiteId,
+        },
+      }),
+
+      this.prisma.analyticsHourlyAggregate.count({
+        where: {
+          websiteId,
+        },
+      }),
+
+      this.prisma.analyticsDailyAggregate.count({
+        where: {
+          websiteId,
+        },
+      }),
+
+      this.prisma.analyticsProcessingState.findUnique({
+        where: {
+          websiteId,
+        },
+      }),
+
+      this.prisma.analyticsProcessingRun.findFirst({
+        where: {
+          websiteId,
+        },
+
+        orderBy: {
+          startedAt: 'desc',
+        },
+      }),
+
+      this.prisma.analyticsSession.findMany({
+        where: {
+          websiteId,
+        },
+
+        orderBy: {
+          startedAt: 'desc',
+        },
+
+        take: 10,
+
+        include: {
+          visitor: {
+            select: {
+              externalVisitorId: true,
+            },
+          },
+        },
+      }),
+    ]);
+
+    return {
+      website,
+
+      counts: {
+        rawEvents,
+        pendingRawEvents,
+        visitors,
+        sessions,
+        normalizedEvents,
+        pageViews,
+        hourlyAggregates,
+        dailyAggregates,
+      },
+
+      processingState: processingState
+        ? {
+            ...processingState,
+
+            totalRawEventsProcessed: processingState.totalRawEventsProcessed.toString(),
+          }
+        : null,
+
+      latestRun,
+
+      recentSessions,
+    };
+  }
+
+  async listAggregates(workspaceId: string, websiteId: string, query: AnalyticsAggregateQueryDto) {
+    await this.requireWebsite(workspaceId, websiteId);
+
+    const now = new Date();
+
+    const defaultDays = query.period === AnalyticsAggregatePeriod.HOURLY ? 7 : 30;
+
+    const dateFrom = query.dateFrom ? new Date(query.dateFrom) : new Date(now.getTime() - defaultDays * 86_400_000);
+
+    const dateTo = query.dateTo ? new Date(query.dateTo) : now;
+
+    if (dateFrom > dateTo) {
+      throw new BadRequestException('Aggregate dateFrom must be before or equal to dateTo');
+    }
+
+    const where = {
+      websiteId,
+
+      dimension: query.dimension,
+
+      bucketStart: {
+        gte: dateFrom,
+        lte: dateTo,
+      },
+    };
+
+    if (query.period === AnalyticsAggregatePeriod.HOURLY) {
+      const data = await this.prisma.analyticsHourlyAggregate.findMany({
+        where,
+
+        orderBy: [
+          {
+            bucketStart: 'asc',
+          },
+          {
+            dimensionLabel: 'asc',
+          },
+        ],
+
+        take: query.limit,
+      });
+
+      return {
+        period: query.period,
+
+        dimension: query.dimension,
+
+        data: data.map(this.serializeAggregate),
+      };
+    }
+
+    const data = await this.prisma.analyticsDailyAggregate.findMany({
+      where,
+
+      orderBy: [
+        {
+          bucketStart: 'asc',
+        },
+        {
+          dimensionLabel: 'asc',
+        },
+      ],
+
+      take: query.limit,
+    });
+
+    return {
+      period: query.period,
+
+      dimension: query.dimension,
+
+      data: data.map(this.serializeAggregate),
+    };
+  }
+
+  private serializeAggregate(
+    this: void,
+    aggregate: {
+      id: string;
+      websiteId: string;
+      bucketStart: Date;
+      bucketEnd: Date;
+      timeZone: string;
+      dimension: string;
+      dimensionKey: string;
+      dimensionValue: string;
+      dimensionLabel: string;
+      visitors: number;
+      sessions: number;
+      pageViews: number;
+      events: number;
+      customEvents: number;
+      bounces: number;
+      totalDurationMs: bigint;
+      generatedAt: Date;
+      updatedAt: Date;
+    },
+  ) {
+    return {
+      ...aggregate,
+
+      totalDurationMs:
+        aggregate.totalDurationMs <= BigInt(Number.MAX_SAFE_INTEGER) && aggregate.totalDurationMs >= BigInt(Number.MIN_SAFE_INTEGER)
+          ? Number(aggregate.totalDurationMs)
+          : aggregate.totalDurationMs.toString(),
+    };
+  }
+
+  private async requireWebsite(workspaceId: string, websiteId: string) {
+    const website = await this.prisma.website.findFirst({
+      where: {
+        id: websiteId,
+        workspaceId,
+      },
+
+      select: {
+        id: true,
+        name: true,
+        domain: true,
+        timeZone: true,
+        enabled: true,
+        archivedAt: true,
+        lastEventAt: true,
+      },
+    });
+
+    if (!website) {
+      throw new NotFoundException('Website not found');
+    }
+
+    return website;
+  }
+}
+
+==================================================
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\applications\[applicationId]\settings\page.tsx
+==================================================
+'use client';
+
+import { Archive, RotateCcw, Trash2 } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Spinner } from '@/components/ui/spinner';
+import { archiveApplication, getApplication, permanentlyDeleteApplication, restoreApplication } from '@/features/applications/application-api';
+import type { SaasApplication } from '@/features/applications/application-types';
+import { getErrorMessage } from '@/features/applications/application-utils';
+import { ApplicationSubNav } from '@/features/applications/components/application-sub-nav';
+import { apiRequest } from '@/features/lib/api/api-client';
+
+type WorkspaceRole = 'OWNER' | 'ADMIN' | 'DEVELOPER' | 'VIEWER';
+
+interface AuthMeResponse {
+  user: {
+    id: string;
+    email: string;
+  };
+
+  workspaces: Array<{
+    id?: string;
+    workspaceId?: string;
+    role?: WorkspaceRole;
+  }>;
+}
+
+export default function ApplicationSettingsPage() {
+  const params = useParams<{
+    workspaceId: string;
+    applicationId: string;
+  }>();
+
+  const router = useRouter();
+
+  const { workspaceId, applicationId } = params;
+
+  const [application, setApplication] = useState<SaasApplication | null>(null);
+
+  const [me, setMe] = useState<AuthMeResponse | null>(null);
+
+  const [loading, setLoading] = useState(true);
+
+  const [actionLoading, setActionLoading] = useState<'archive' | 'restore' | 'delete' | null>(null);
+
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadSettings(): Promise<void> {
+      try {
+        const [applicationResponse, meResponse] = await Promise.all([getApplication(workspaceId, applicationId), apiRequest<AuthMeResponse>('/auth/me')]);
+
+        if (cancelled) {
+          return;
+        }
+
+        setApplication(applicationResponse);
+
+        setMe(meResponse);
+        setError(null);
+      } catch (loadError: unknown) {
+        if (!cancelled) {
+          setError(getErrorMessage(loadError, 'Unable to load application settings.'));
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void loadSettings();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [workspaceId, applicationId]);
+
+  const currentRole = useMemo(() => {
+    const workspace = me?.workspaces.find((item) => (item.id ?? item.workspaceId) === workspaceId);
+
+    return workspace?.role ?? 'VIEWER';
+  }, [me, workspaceId]);
+
+  const canArchive = currentRole === 'OWNER' || currentRole === 'ADMIN';
+
+  const canDelete = currentRole === 'OWNER';
+
+  async function handleArchive(): Promise<void> {
+    const confirmed = window.confirm('Archive this application?');
+
+    if (!confirmed) {
+      return;
+    }
+
+    setActionLoading('archive');
+    setError(null);
+
+    try {
+      const response = await archiveApplication(workspaceId, applicationId);
+
+      setApplication(response);
+    } catch (actionError: unknown) {
+      setError(getErrorMessage(actionError, 'Unable to archive application.'));
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  async function handleRestore(): Promise<void> {
+    setActionLoading('restore');
+    setError(null);
+
+    try {
+      const response = await restoreApplication(workspaceId, applicationId);
+
+      setApplication(response);
+    } catch (actionError: unknown) {
+      setError(getErrorMessage(actionError, 'Unable to restore application.'));
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  async function handleDelete(): Promise<void> {
+    if (!application) {
+      return;
+    }
+
+    const confirmation = window.prompt(`Type "${application.name}" to permanently delete this application.`);
+
+    if (confirmation !== application.name) {
+      return;
+    }
+
+    setActionLoading('delete');
+    setError(null);
+
+    try {
+      await permanentlyDeleteApplication(workspaceId, applicationId);
+
+      router.replace(`/workspaces/${workspaceId}/applications`);
+
+      router.refresh();
+    } catch (actionError: unknown) {
+      setError(getErrorMessage(actionError, 'Unable to permanently delete application.'));
+
+      setActionLoading(null);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className='flex min-h-80 items-center justify-center'>
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (!application) {
+    return <div className='rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700'>{error ?? 'Application was not found.'}</div>;
+  }
+
+  return (
+    <div className='mx-auto w-full max-w-[1600px] space-y-5 p-4 sm:p-6 lg:p-8'>
+      <ApplicationSubNav workspaceId={workspaceId} applicationId={applicationId} />
+
+      <div className='mx-auto max-w-2xl space-y-5'>
+        <div>
+          <h1 className='text-xl font-semibold tracking-tight text-slate-950'>Settings</h1>
+          <p className='mt-1 text-sm leading-6 text-slate-500'>Manage the application lifecycle and deletion settings.</p>
+        </div>
+
+        {error ? <div className='rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700'>{error}</div> : null}
+
+        <Card>
+          <CardHeader>
+            <h2 className='text-[15px] font-semibold text-slate-950'>Archive application</h2>
+
+            <p className='mt-1 text-sm text-slate-500'>Archived applications remain in the database but cannot be edited.</p>
+          </CardHeader>
+
+          <CardContent>
+            {!canArchive ? (
+              <p className='text-sm text-slate-500'>Only workspace owners and administrators can archive or restore applications.</p>
+            ) : application.archivedAt ? (
+              <Button variant='outline' size='sm' loading={actionLoading === 'restore'} onClick={() => void handleRestore()}>
+                <RotateCcw className='size-3.5' />
+                Restore application
+              </Button>
+            ) : (
+              <Button variant='outline' size='sm' loading={actionLoading === 'archive'} onClick={() => void handleArchive()}>
+                <Archive className='size-3.5' />
+                Archive application
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className='border-red-200'>
+          <CardHeader>
+            <h2 className='text-[15px] font-semibold text-red-700'>Danger zone</h2>
+
+            <p className='mt-1 text-sm text-slate-500'>Permanent deletion removes the application, technology stack and links forever.</p>
+          </CardHeader>
+
+          <CardContent>
+            {!canDelete ? (
+              <p className='text-sm text-slate-500'>Only the workspace owner can permanently delete an application.</p>
+            ) : !application.archivedAt ? (
+              <p className='text-sm text-amber-700'>Archive the application before permanently deleting it.</p>
+            ) : (
+              <Button variant='danger' size='sm' loading={actionLoading === 'delete'} onClick={() => void handleDelete()}>
+                <Trash2 className='size-3.5' />
+                Permanently delete
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+=== NON-GENERATED TASKSTATUS REFERENCES ===
+apps\api\test\helpers\development.ts:90 taskStatus(workspaceId: string, applicationId: string, taskId: string): string {
+apps\api\test\helpers\development.ts:408 .post(developmentRoutes.taskStatus(actor.workspaceId, applicationId, taskId))
+apps\web\src\features\development\development-types.ts:1 export { APPLICATION_TASK_STATUSES as TASK_STATUSES, DEVELOPMENT_TEMPLATE_TYPES, MILESTONE_STATUSES, WORK_ITEM_PRIORITIES } from '@command-center/shared-types';
+packages\shared-types\src\index.ts:1 export const TASK_STATUSES = ['NOT_STARTED', 'IN_PROGRESS', 'BLOCKED', 'IN_REVIEW', 'COMPLETED', 'SKIPPED'] as const;
+packages\shared-types\src\index.ts:2 export type TaskStatus = (typeof TASK_STATUSES)[number];

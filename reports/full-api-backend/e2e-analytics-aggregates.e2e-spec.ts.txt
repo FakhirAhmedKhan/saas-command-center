@@ -1,0 +1,16 @@
+PASS test/analytics-aggregates.e2e-spec.ts (12.422 s)
+  Analytics Aggregates E2E
+    √ builds correct hourly and daily overview totals (1932 ms)
+    √ builds PAGE and CUSTOM_EVENT dimensions (1149 ms)
+    √ builds SOURCE, COUNTRY, DEVICE, BROWSER, and OPERATING_SYSTEM dimensions (1165 ms)
+    √ filters by period, dimension, date range, and limit (610 ms)
+    √ rebuilds aggregates idempotently (960 ms)
+    √ allows VIEWER reads and denies outsider and anonymous reads (1108 ms)
+    √ rejects malformed aggregate queries and hides foreign websites (1005 ms)
+    √ serializes BigInt duration without precision loss (717 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        12.95 s
+Ran all test suites within paths "test/analytics-aggregates.e2e-spec.ts".
