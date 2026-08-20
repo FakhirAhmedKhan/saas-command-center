@@ -1,0 +1,66 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="140" y1="120" x2="900" y2="920" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#06173A"/>
+      <stop offset="0.6" stop-color="#031238"/>
+      <stop offset="1" stop-color="#24105F"/>
+    </linearGradient>
+
+    <linearGradient id="ringGrad" x1="120" y1="140" x2="880" y2="900" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#67A8FF"/>
+      <stop offset="0.55" stop-color="#0A6BFF"/>
+      <stop offset="1" stop-color="#8B4DFF"/>
+    </linearGradient>
+
+    <linearGradient id="logoTop" x1="280" y1="250" x2="720" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FAFDFF"/>
+      <stop offset="0.52" stop-color="#B9DFFF"/>
+      <stop offset="1" stop-color="#67A6FF"/>
+    </linearGradient>
+
+    <linearGradient id="logoBottom" x1="290" y1="500" x2="740" y2="790" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0B83FF"/>
+      <stop offset="0.45" stop-color="#176BFF"/>
+      <stop offset="1" stop-color="#AF54FF"/>
+    </linearGradient>
+
+    <filter id="outerGlow" x="0" y="0" width="1024" height="1024" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="24" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 0.6 0 0 0  0 0 1 0 0  0 0 0 0.65 0"/>
+      <feBlend in="SourceGraphic" mode="screen"/>
+    </filter>
+
+    <filter id="softGlow" x="180" y="170" width="680" height="690" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="16" result="b"/>
+      <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 0.5 0 0 0  0 0 1 0 0  0 0 0 0.5 0"/>
+      <feBlend in="SourceGraphic" mode="screen"/>
+    </filter>
+  </defs>
+
+  <rect width="1024" height="1024" rx="170" fill="#010714"/>
+
+  <g filter="url(#outerGlow)">
+    <rect x="60" y="60" width="904" height="904" rx="165" fill="url(#bgGrad)"/>
+    <rect x="60" y="60" width="904" height="904" rx="165" stroke="url(#ringGrad)" stroke-width="8"/>
+  </g>
+
+  <g opacity="0.75">
+    <ellipse cx="250" cy="880" rx="180" ry="80" fill="#0A46FF" fill-opacity="0.18"/>
+    <ellipse cx="760" cy="860" rx="220" ry="120" fill="#A14BFF" fill-opacity="0.16"/>
+    <ellipse cx="320" cy="220" rx="180" ry="110" fill="#2664FF" fill-opacity="0.10"/>
+  </g>
+
+  <g filter="url(#softGlow)">
+    <!-- Top mark -->
+    <path d="M499.5 267.7C507.3 263.2 516.7 263.2 524.5 267.7L757.4 402.1C775.7 412.6 775.7 439 757.4 449.5L725 468.2C717.2 472.7 707.7 472.7 700 468.2L503.3 354.6L279.2 484C261 494.5 238.2 481.3 238.2 460.2V393.4C238.2 382.2 244.1 371.8 253.8 366.2L499.5 267.7Z" fill="url(#logoTop)"/>
+
+    <!-- Bottom mark -->
+    <path d="M265 546.2L311.5 519.2C319.4 514.7 329.1 514.8 336.8 519.5L531.8 637C551.9 649.1 577.5 649.3 597.8 637.4L654.3 604.2C672.6 593.4 695.5 606.6 695.5 627.8V630.2C695.5 641.2 689.8 651.5 680.4 657.2L524.2 752.5C516.2 757.3 506.1 757.3 498.2 752.5L265.2 611.8C247.6 601.2 247.5 575.1 265 564.4V546.2Z" fill="url(#logoBottom)"/>
+
+    <!-- Connector curve / inner negative-inspired accent -->
+    <path d="M399 594.7C402.1 579.5 415.4 568.6 430.9 568.6H642.3C657.8 568.6 670.6 581.8 670.1 597.3C669.8 609.4 663.2 620.5 652.7 626.7L599.5 658C577.7 670.8 550.8 670.6 529.2 657.6L412.9 587.8C406.2 583.8 398.1 589.5 399 597.2V594.7Z" fill="#050D2E" fill-opacity="0.8"/>
+
+    <!-- Center cutout -->
+    <path d="M457.4 416.6C464.6 412.4 473.6 412.4 480.8 416.5L622.2 498.6C640.6 509.2 640.5 535.7 622.1 546.2L566 578.5C558.7 582.7 549.8 582.7 542.5 578.5L401.1 496.6C382.7 485.9 382.7 459.4 401.1 448.8L457.4 416.6Z" fill="#06133B"/>
+  </g>
+</svg>
