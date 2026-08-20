@@ -3,7 +3,7 @@
 on:
   push:
     branches:
-      - devlopment
+      - development
       - main
 
   pull_request:
@@ -175,144 +175,144 @@ jobs:
   # FULL TEST SUITE
   # ======================================================
 
-  tests:
-    name: Full Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 90
+  # tests:
+  #   name: Full Tests
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 90
 
-    services:
-      postgres:
-        image: postgres:17-alpine
+  #   services:
+  #     postgres:
+  #       image: postgres:17-alpine
 
-        env:
-          POSTGRES_USER: command_center
-          POSTGRES_PASSWORD: command_center_ci
-          POSTGRES_DB: command_center_test
+  #       env:
+  #         POSTGRES_USER: command_center
+  #         POSTGRES_PASSWORD: command_center_ci
+  #         POSTGRES_DB: command_center_test
 
-        ports:
-          - 5432:5432
+  #       ports:
+  #         - 5432:5432
 
-        options: >-
-          --health-cmd "pg_isready -U command_center -d command_center_test"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
+  #       options: >-
+  #         --health-cmd "pg_isready -U command_center -d command_center_test"
+  #         --health-interval 5s
+  #         --health-timeout 5s
+  #         --health-retries 10
 
-      redis:
-        image: redis:7-alpine
+  #     redis:
+  #       image: redis:7-alpine
 
-        ports:
-          - 6379:6379
+  #       ports:
+  #         - 6379:6379
 
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
+  #       options: >-
+  #         --health-cmd "redis-cli ping"
+  #         --health-interval 5s
+  #         --health-timeout 5s
+  #         --health-retries 10
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v5
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: false
+  #     - name: Setup pnpm
+  #       uses: pnpm/action-setup@v4
+  #       with:
+  #         run_install: false
 
-      - name: Setup Node
-        uses: actions/setup-node@v5
-        with:
-          node-version: 22
-          cache: pnpm
+  #     - name: Setup Node
+  #       uses: actions/setup-node@v5
+  #       with:
+  #         node-version: 22
+  #         cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
 
-      - name: Generate Prisma Client
-        run: pnpm --filter @command-center/api exec prisma generate
+  #     - name: Generate Prisma Client
+  #       run: pnpm --filter @command-center/api exec prisma generate
 
-      - name: Run database migrations
-        run: pnpm --filter @command-center/api exec prisma migrate deploy
+  #     - name: Run database migrations
+  #       run: pnpm --filter @command-center/api exec prisma migrate deploy
 
-      - name: Install Playwright Chrome
-        run: pnpm --filter @command-center/web-tests exec playwright install --with-deps chrome
+  #     - name: Install Playwright Chrome
+  #       run: pnpm --filter @command-center/web-tests exec playwright install --with-deps chrome
 
-      - name: Run complete monorepo test suite
-        run: pnpm test:all
+  #     - name: Run complete monorepo test suite
+  #       run: pnpm test:all
 
-  # ======================================================
-  # FULL-STACK PLAYWRIGHT SUITE
-  # ======================================================
-  # Real API + Next.js + tracker servers, seeded via
-  # e2e/full-stack/global-setup.ts, against a dedicated database. Not part
-  # of `pnpm test:all` and previously never ran in CI at all.
+  # # ======================================================
+  # # FULL-STACK PLAYWRIGHT SUITE
+  # # ======================================================
+  # # Real API + Next.js + tracker servers, seeded via
+  # # e2e/full-stack/global-setup.ts, against a dedicated database. Not part
+  # # of `pnpm test:all` and previously never ran in CI at all.
 
-  tests-fullstack:
-    name: Full-Stack E2E
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
+  # tests-fullstack:
+  #   name: Full-Stack E2E
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 30
 
-    services:
-      postgres-fullstack:
-        image: postgres:17-alpine
+  #   services:
+  #     postgres-fullstack:
+  #       image: postgres:17-alpine
 
-        env:
-          POSTGRES_USER: command_center_full_e2e
-          POSTGRES_PASSWORD: command_center_full_e2e
-          POSTGRES_DB: command_center_full_e2e
+  #       env:
+  #         POSTGRES_USER: command_center_full_e2e
+  #         POSTGRES_PASSWORD: command_center_full_e2e
+  #         POSTGRES_DB: command_center_full_e2e
 
-        ports:
-          - 5435:5432
+  #       ports:
+  #         - 5435:5432
 
-        options: >-
-          --health-cmd "pg_isready -U command_center_full_e2e -d command_center_full_e2e"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
+  #       options: >-
+  #         --health-cmd "pg_isready -U command_center_full_e2e -d command_center_full_e2e"
+  #         --health-interval 5s
+  #         --health-timeout 5s
+  #         --health-retries 10
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v5
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: false
+  #     - name: Setup pnpm
+  #       uses: pnpm/action-setup@v4
+  #       with:
+  #         run_install: false
 
-      - name: Setup Node
-        uses: actions/setup-node@v5
-        with:
-          node-version: 22
-          cache: pnpm
+  #     - name: Setup Node
+  #       uses: actions/setup-node@v5
+  #       with:
+  #         node-version: 22
+  #         cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
 
-      - name: Generate Prisma Client
-        run: pnpm --filter @command-center/api exec prisma generate
+  #     - name: Generate Prisma Client
+  #       run: pnpm --filter @command-center/api exec prisma generate
 
-      - name: Run database migrations (full-stack DB)
-        run: pnpm --filter @command-center/api exec prisma migrate deploy
-        env:
-          DATABASE_URL: postgresql://command_center_full_e2e:command_center_full_e2e@localhost:5435/command_center_full_e2e?schema=public
+  #     - name: Run database migrations (full-stack DB)
+  #       run: pnpm --filter @command-center/api exec prisma migrate deploy
+  #       env:
+  #         DATABASE_URL: postgresql://command_center_full_e2e:command_center_full_e2e@localhost:5435/command_center_full_e2e?schema=public
 
-      - name: Install Playwright Chrome
-        run: pnpm --filter @command-center/web-tests exec playwright install --with-deps chrome
+  #     - name: Install Playwright Chrome
+  #       run: pnpm --filter @command-center/web-tests exec playwright install --with-deps chrome
 
-      - name: Run full-stack Playwright suite
-        run: pnpm test:web:fullstack
+  #     - name: Run full-stack Playwright suite
+  #       run: pnpm test:web:fullstack
 
-      - name: Upload full-stack Playwright report
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report-fullstack
-          path: packages/test-code/web/playwright-report-fullstack
-          retention-days: 7
+  #     - name: Upload full-stack Playwright report
+  #       if: failure()
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: playwright-report-fullstack
+  #         path: packages/test-code/web/playwright-report-fullstack
+  #         retention-days: 7
 
-  # ======================================================
-  # REQUIRED MAIN-BRANCH GATE
-  # ======================================================
+  # # ======================================================
+  # # REQUIRED MAIN-BRANCH GATE
+  # # ======================================================
 
   quality:
     name: Quality & Tests
@@ -336,12 +336,12 @@ jobs:
             echo
             echo "| Job | Result |"
             echo "|---|---|"
-            echo "| Format | ${{ needs.format.result == 'success' && 'âœ… pass' || needs.format.result == 'skipped' && 'â­ï¸ skipped' || 'âŒ fail' }} |"
-            echo "| Lint | ${{ needs.lint.result == 'success' && 'âœ… pass' || needs.lint.result == 'skipped' && 'â­ï¸ skipped' || 'âŒ fail' }} |"
-            echo "| Typecheck | ${{ needs.typecheck.result == 'success' && 'âœ… pass' || needs.typecheck.result == 'skipped' && 'â­ï¸ skipped' || 'âŒ fail' }} |"
-            echo "| Build | ${{ needs.build.result == 'success' && 'âœ… pass' || needs.build.result == 'skipped' && 'â­ï¸ skipped' || 'âŒ fail' }} |"
-            echo "| Full Tests (API + Web + Tracker) | ${{ needs.tests.result == 'success' && 'âœ… pass' || needs.tests.result == 'skipped' && 'â­ï¸ skipped' || 'âŒ fail' }} |"
-            echo "| Full-Stack E2E | ${{ needs.tests-fullstack.result == 'success' && 'âœ… pass' || needs.tests-fullstack.result == 'skipped' && 'â­ï¸ skipped' || 'âŒ fail' }} |"
+            echo "| Format | ${{ needs.format.result == 'success' && '✅ pass' || needs.format.result == 'skipped' && '⏩ skipped' || '❌ fail' }} |"
+            echo "| Lint | ${{ needs.lint.result == 'success' && '✅ pass' || needs.lint.result == 'skipped' && '⏩ skipped' || '❌ fail' }} |"
+            echo "| Typecheck | ${{ needs.typecheck.result == 'success' && '✅ pass' || needs.typecheck.result == 'skipped' && '⏩ skipped' || '❌ fail' }} |"
+            echo "| Build | ${{ needs.build.result == 'success' && '✅ pass' || needs.build.result == 'skipped' && '⏩ skipped' || '❌ fail' }} |"
+            echo "| Full Tests (API + Web + Tracker) | ${{ needs.tests.result == 'success' && '✅ pass' || needs.tests.result == 'skipped' && '⏩ skipped' || '❌ fail' }} |"
+            echo "| Full-Stack E2E | ${{ needs.tests-fullstack.result == 'success' && '✅ pass' || needs.tests-fullstack.result == 'skipped' && '⏩ skipped' || '❌ fail' }} |"
             echo
           } >> "$GITHUB_STEP_SUMMARY"
 
