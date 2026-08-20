@@ -18,7 +18,7 @@ export default function HomePage() {
     // We REMOVED the unauthenticated redirect so they stay on the page!
   }, [router, status]);
 
-  // Show the full page loader while checking auth status, 
+  // Show the full page loader while checking auth status,
   // or while waiting for the dashboard redirect to happen.
   if (status === 'loading' || status === 'authenticated') {
     return <FullPageLoader />;

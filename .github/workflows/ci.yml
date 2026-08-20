@@ -102,6 +102,12 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Build workspace packages
         run: pnpm build:packages
+      - name: Build workspace packages
+        run: pnpm build:packages
+      - name: Build workspace packages
+        run: pnpm build:packages
+      - name: Build workspace packages
+        run: pnpm build:packages
 
       - name: Generate Prisma Client
         run: pnpm --filter @command-center/api exec prisma generate
