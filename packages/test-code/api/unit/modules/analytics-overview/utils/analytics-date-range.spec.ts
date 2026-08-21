@@ -60,7 +60,6 @@ describe('resolveAnalyticsDateRange', () => {
       resolveAnalyticsDateRange(
         {
           from: '2026-08-07',
-
           to: '2026-08-01',
           preset: AnalyticsDatePreset.TODAY,
         },

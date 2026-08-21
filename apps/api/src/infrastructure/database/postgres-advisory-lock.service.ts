@@ -29,9 +29,7 @@ export class PostgresAdvisoryLockService implements OnModuleDestroy {
       }),
 
       max: 5,
-
       idleTimeoutMillis: 30_000,
-
       connectionTimeoutMillis: 10_000,
     });
   }

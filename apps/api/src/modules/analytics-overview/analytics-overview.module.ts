@@ -6,11 +6,8 @@ import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-
 
 @Module({
   imports: [WorkspaceMembersModule, DatabaseModule],
-
   controllers: [AnalyticsOverviewController],
-
   providers: [AnalyticsOverviewService],
-
   exports: [AnalyticsOverviewService],
 })
 export class AnalyticsOverviewModule {}

@@ -15,9 +15,7 @@ const VERSION_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9._-]{0,63}$/;
 
 const URL_OPTIONS = {
   protocols: ['http', 'https'],
-
   require_protocol: true,
-
   require_tld: false,
 };
 

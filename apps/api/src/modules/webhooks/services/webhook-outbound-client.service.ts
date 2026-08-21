@@ -58,15 +58,7 @@ export class WebhookOutboundClientService {
     await this.resolvePublicAddresses(url.hostname);
   }
 
-  async sendJson(
-    rawUrl: string,
-
-    rawBody: string,
-
-    headers: Record<string, string>,
-
-    timeoutMs: number,
-  ): Promise<WebhookHttpResult> {
+  async sendJson(rawUrl: string, rawBody: string, headers: Record<string, string>, timeoutMs: number): Promise<WebhookHttpResult> {
     const startedAt = performance.now();
 
     let dispatcher: Agent | undefined;
@@ -95,11 +87,8 @@ export class WebhookOutboundClientService {
 
         dispatcher,
         headersTimeout: timeoutMs,
-
         bodyTimeout: timeoutMs,
-
         signal: AbortSignal.timeout(timeoutMs),
-
         headers: {
           accept: 'application/json,text/plain,*/*',
 
@@ -123,13 +112,11 @@ export class WebhookOutboundClientService {
         success,
 
         retriable: !success && isRetriableStatus(response.statusCode),
-
         statusCode: response.statusCode,
 
         durationMs,
 
         errorCode: success ? null : 'HTTP_STATUS',
-
         errorMessage: success ? null : `Webhook returned HTTP ${response.statusCode}.`,
       };
     } catch (error) {
@@ -141,15 +128,12 @@ export class WebhookOutboundClientService {
 
       return {
         success: false,
-
         retriable: !unsafeDestination,
-
         statusCode: null,
 
         durationMs,
 
         errorCode: unsafeDestination ? 'UNSAFE_DESTINATION' : error instanceof Error ? error.name : 'UNKNOWN_ERROR',
-
         errorMessage: message,
       };
     } finally {
@@ -194,7 +178,6 @@ export class WebhookOutboundClientService {
       return [
         {
           address: hostname,
-
           family: addressFamily as 4 | 6,
         },
       ];
@@ -206,12 +189,10 @@ export class WebhookOutboundClientService {
       addresses = (
         await lookup(hostname, {
           all: true,
-
           verbatim: true,
         })
       ).map((address) => ({
         address: address.address,
-
         family: address.family as 4 | 6,
       }));
     } catch {

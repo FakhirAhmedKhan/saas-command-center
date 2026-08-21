@@ -37,7 +37,6 @@ export class RepositoryConnectService {
         userId,
 
         installStateHash: this.hash(installState),
-
         expiresAt: new Date(Date.now() + CONNECT_TTL_MS),
       },
     });

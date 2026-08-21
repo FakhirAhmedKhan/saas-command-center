@@ -48,7 +48,6 @@ export class HealthMonitoringSchedulerService {
       const dueChecks = await this.prisma.healthCheck.findMany({
         where: {
           enabled: true,
-
           nextRunAt: {
             lte: new Date(),
           },
@@ -56,7 +55,6 @@ export class HealthMonitoringSchedulerService {
 
         select: {
           id: true,
-
           workspaceId: true,
         },
 
@@ -96,11 +94,7 @@ export class HealthMonitoringSchedulerService {
     this.logger.log(`Deleted ${result.count} expired health-check history records.`);
   }
 
-  private async runWithLock(
-    workspaceId: string,
-
-    checkId: string,
-  ): Promise<void> {
+  private async runWithLock(workspaceId: string, checkId: string): Promise<void> {
     const lockResult = await this.locks.withLock(
       `health-check:${checkId}`,
 
@@ -112,7 +106,6 @@ export class HealthMonitoringSchedulerService {
             workspaceId,
 
             enabled: true,
-
             nextRunAt: {
               lte: new Date(),
             },

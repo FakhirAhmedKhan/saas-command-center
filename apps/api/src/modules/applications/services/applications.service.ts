@@ -76,7 +76,6 @@ export class ApplicationsService {
             slug,
 
             shortDescription: this.normalizeOptionalText(dto.shortDescription),
-
             longDescription: this.normalizeOptionalText(dto.longDescription),
 
             ...(dto.category
@@ -107,30 +106,20 @@ export class ApplicationsService {
           workspaceId,
 
           applicationId: application.id,
-
           applicationName: application.name,
-
           actorType: ActivityActorType.USER,
 
           actorUserId,
 
           activityType: ApplicationActivityType.APPLICATION_CREATED,
-
           entityType: ActivityEntityType.APPLICATION,
-
           entityId: application.id,
-
           title: 'Application created',
-
           description: `${application.name} was added to the SaaS registry.`,
-
           metadata: {
             category: application.category,
-
             status: application.status,
-
             priority: application.priority,
-
             slug: application.slug,
           },
         });
@@ -240,7 +229,6 @@ export class ApplicationsService {
 
     return {
       data: applications,
-
       meta: {
         page,
         limit,
@@ -576,9 +564,7 @@ export class ApplicationsService {
             applicationId,
 
             name: this.normalizeRequiredText(dto.name, 'Technology name'),
-
             type: dto.type,
-
             version: this.normalizeOptionalText(dto.version),
           },
         });
@@ -757,9 +743,7 @@ export class ApplicationsService {
             applicationId,
 
             label: this.normalizeRequiredText(dto.label, 'Link label'),
-
             type: dto.type,
-
             url: dto.url.trim(),
           },
         });

@@ -7,29 +7,19 @@ const websiteId = '22222222-2222-4222-8222-222222222222';
 const analyticsResponse = {
   website: {
     id: websiteId,
-
     name: 'Demo Website',
-
     domain: 'demo.example.com',
-
     timeZone: 'Asia/Dubai',
-
     lastEventAt: '2026-08-07T01:00:00.000Z',
   },
 
   range: {
     preset: '7d',
-
     from: '2026-08-01',
-
     to: '2026-08-07',
-
     previousFrom: '2026-07-25',
-
     previousTo: '2026-07-31',
-
     granularity: 'day',
-
     days: 7,
   },
 
@@ -68,21 +58,15 @@ const analyticsResponse = {
   trend: [
     {
       bucketStart: '2026-07-31T20:00:00.000Z',
-
       visitors: 40,
-
       sessions: 50,
-
       pageViews: 150,
     },
 
     {
       bucketStart: '2026-08-01T20:00:00.000Z',
-
       visitors: 48,
-
       sessions: 60,
-
       pageViews: 190,
     },
   ],
@@ -149,15 +133,11 @@ test.describe('Phase 12 analytics overview', () => {
     await page.route('**/auth/refresh', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           accessToken: 'test-access-token',
-
           user: {
             id: '33333333-3333-4333-8333-333333333333',
-
             email: 'phase12@example.com',
           },
         }),
@@ -167,9 +147,7 @@ test.describe('Phase 12 analytics overview', () => {
     await page.route('**/workspaces/*/websites/*/analytics/overview*', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify(analyticsResponse),
       });
     });

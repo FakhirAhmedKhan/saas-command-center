@@ -70,13 +70,9 @@ export function buildWebsitePayload(overrides: Partial<WebsitePayload> = {}): We
 
   return {
     name: `Batch 5 Website ${suffix}`,
-
     domain: `batch-5-${suffix}.example.test`,
-
     timeZone: 'Asia/Dubai',
-
     allowedOrigins: [`https://batch-5-${suffix}.example.test`, 'http://localhost:3000'],
-
     enabled: true,
 
     ...overrides,

@@ -1,4 +1,4 @@
-import {
+﻿import {
   createRawAnalyticsEvent,
   findAggregate,
   getAnonymousAnalyticsAggregates,
@@ -113,19 +113,19 @@ describe('Analytics Aggregates E2E', () => {
 
       expect(overview).toBeDefined();
 
-      expect(readNumber(overview, 'visitors')).toBe(1);
+      expect(readNumber(overview!, 'visitors')).toBe(1);
 
-      expect(readNumber(overview, 'sessions')).toBe(1);
+      expect(readNumber(overview!, 'sessions')).toBe(1);
 
-      expect(readNumber(overview, 'pageViews')).toBe(1);
+      expect(readNumber(overview!, 'pageViews')).toBe(1);
 
-      expect(readNumber(overview, 'events')).toBe(3);
+      expect(readNumber(overview!, 'events')).toBe(3);
 
-      expect(readNumber(overview, 'customEvents')).toBe(1);
+      expect(readNumber(overview!, 'customEvents')).toBe(1);
 
-      expect(readNumber(overview, 'bounces')).toBe(0);
+      expect(readNumber(overview!, 'bounces')).toBe(0);
 
-      expect(readNumber(overview, 'totalDurationMs')).toBe(135_000);
+      expect(readNumber(overview!, 'totalDurationMs')).toBe(135_000);
     }
   });
 
@@ -169,7 +169,7 @@ describe('Analytics Aggregates E2E', () => {
 
     expect(page).toBeDefined();
 
-    expect(readNumber(page, 'pageViews')).toBe(1);
+    expect(readNumber(page!, 'pageViews')).toBe(1);
 
     const customResult = readAnalyticsAggregateList(
       await listAnalyticsAggregates(owner, owner.workspaceId, website.id, {
@@ -182,7 +182,7 @@ describe('Analytics Aggregates E2E', () => {
 
     expect(custom).toBeDefined();
 
-    expect(readNumber(custom, 'customEvents')).toBe(1);
+    expect(readNumber(custom!, 'customEvents')).toBe(1);
   });
 
   it('builds SOURCE, COUNTRY, DEVICE, BROWSER, and OPERATING_SYSTEM dimensions', async () => {
@@ -265,7 +265,7 @@ describe('Analytics Aggregates E2E', () => {
 
     expect(result.data).toHaveLength(2);
 
-    expect(readString(result.data[0], 'bucketStart')).toBe(start.toISOString());
+    expect(readString(result.data[0]!, 'bucketStart')).toBe(start.toISOString());
   });
 
   it('rebuilds aggregates idempotently', async () => {
@@ -364,7 +364,7 @@ describe('Analytics Aggregates E2E', () => {
         dateTo: '2026-08-01T00:00:00.000Z',
       },
     ]) {
-      expect((await listAnalyticsAggregates(owner, owner.workspaceId, website.id, query)).status).toBe(400);
+      expect((await listAnalyticsAggregates(owner, owner.workspaceId, website.id, query as unknown as Record<string, string | number>)).status).toBe(400);
     }
 
     const foreignResponse = await listAnalyticsAggregates(foreignOwner, owner.workspaceId, website.id);

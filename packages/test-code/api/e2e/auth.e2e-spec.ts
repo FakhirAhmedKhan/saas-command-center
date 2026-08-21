@@ -195,7 +195,6 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
 
       const response = await loginUser(createAgent(app), {
         email: user.email,
-
         password: 'IncorrectPassword123!',
       });
 
@@ -217,7 +216,6 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
 
       const response = await loginUser(createAgent(app), {
         email: `missing-${user.email}`,
-
         password: user.password,
       });
 

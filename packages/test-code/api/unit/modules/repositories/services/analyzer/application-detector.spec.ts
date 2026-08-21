@@ -15,10 +15,8 @@ describe('detectApplication', () => {
     const result = detectApplication(
       candidate({
         rootDirectory: 'apps/web',
-
         packageJson: {
           name: '@acme/web',
-
           dependencies: {
             next: '^15.0.0',
           },
@@ -42,10 +40,8 @@ describe('detectApplication', () => {
     const result = detectApplication(
       candidate({
         rootDirectory: 'apps/api',
-
         packageJson: {
           name: '@acme/api',
-
           dependencies: {
             '@nestjs/core': '^11.0.0',
           },
@@ -66,10 +62,8 @@ describe('detectApplication', () => {
     const result = detectApplication(
       candidate({
         rootDirectory: 'packages/shared-types',
-
         packageJson: {
           name: '@acme/shared-types',
-
           scripts: {
             build: 'tsc',
           },
@@ -86,7 +80,6 @@ describe('detectApplication', () => {
     const result = detectApplication(
       candidate({
         rootDirectory: 'packages/eslint-config',
-
         packageJson: {
           name: '@acme/eslint-config',
         },
@@ -101,10 +94,8 @@ describe('detectApplication', () => {
     const result = detectApplication(
       candidate({
         rootDirectory: 'apps/worker',
-
         packageJson: {
           name: '@acme/worker',
-
           scripts: {
             start: 'node index.js',
           },
@@ -121,10 +112,8 @@ describe('detectApplication', () => {
     const result = detectApplication(
       candidate({
         rootDirectory: 'packages/utils',
-
         packageJson: {
           name: '@acme/utils',
-
           scripts: {
             build: 'tsc',
           },

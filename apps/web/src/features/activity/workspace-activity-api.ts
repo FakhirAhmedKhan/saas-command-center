@@ -39,7 +39,6 @@ export interface ActivityFilters {
 
 export function getWorkspaceActivities(
   workspaceId: string,
-
   filters: ActivityFilters,
 
   signal?: AbortSignal,

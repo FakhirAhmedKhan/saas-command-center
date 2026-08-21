@@ -1,17 +1,12 @@
 import type { CurrentEnvironmentVersion, Deployment, DeploymentOptions, DeploymentStatus, PaginatedResponse, Release } from './release-management.types';
 import { apiRequest } from '../lib/api/api-client';
 
-function createApplicationPath(
-  workspaceId: string,
-
-  applicationId: string,
-): string {
+function createApplicationPath(workspaceId: string, applicationId: string): string {
   return `/workspaces/${workspaceId}/applications/${applicationId}`;
 }
 
 export function getReleaseOptions(
   workspaceId: string,
-
   applicationId: string,
 
   signal?: AbortSignal,
@@ -29,7 +24,6 @@ export function getReleaseOptions(
 
 export function getReleases(
   workspaceId: string,
-
   applicationId: string,
 
   signal?: AbortSignal,
@@ -47,9 +41,7 @@ export function getReleases(
 
 export function createRelease(
   workspaceId: string,
-
   applicationId: string,
-
   input: {
     version: string;
     name?: string;
@@ -64,7 +56,6 @@ export function createRelease(
 
     {
       method: 'POST',
-
       body: input,
     },
   );
@@ -72,9 +63,7 @@ export function createRelease(
 
 export function getDeployments(
   workspaceId: string,
-
   applicationId: string,
-
   filters: {
     environmentId?: string;
     status?: DeploymentStatus;
@@ -107,7 +96,6 @@ export function getDeployments(
 
 export function getCurrentVersions(
   workspaceId: string,
-
   applicationId: string,
 
   signal?: AbortSignal,
@@ -125,9 +113,7 @@ export function getCurrentVersions(
 
 export function createDeployment(
   workspaceId: string,
-
   applicationId: string,
-
   input: {
     releaseId: string;
     environmentId: string;
@@ -145,7 +131,6 @@ export function createDeployment(
 
     {
       method: 'POST',
-
       body: input,
     },
   );
@@ -153,11 +138,8 @@ export function createDeployment(
 
 export function transitionDeployment(
   workspaceId: string,
-
   applicationId: string,
-
   deploymentId: string,
-
   input: {
     status: DeploymentStatus;
     scheduledAt?: string;
@@ -172,7 +154,6 @@ export function transitionDeployment(
 
     {
       method: 'POST',
-
       body: input,
     },
   );

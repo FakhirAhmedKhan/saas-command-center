@@ -50,7 +50,6 @@ export function processAnalytics(workspaceId: string, websiteId: string, maxEven
     status: AnalyticsEngineStatus;
   }>(`${basePath(workspaceId, websiteId)}/process`, {
     method: 'POST',
-
     body: JSON.stringify({
       maxEvents,
     }),
@@ -64,7 +63,6 @@ export function reprocessAnalytics(workspaceId: string, websiteId: string, paylo
     status: AnalyticsEngineStatus;
   }>(`${basePath(workspaceId, websiteId)}/reprocess`, {
     method: 'POST',
-
     body: JSON.stringify(payload),
   });
 }

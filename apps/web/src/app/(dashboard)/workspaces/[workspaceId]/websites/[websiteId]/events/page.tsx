@@ -11,7 +11,6 @@ import { useEffect, useState } from 'react';
 
 const EMPTY_RESPONSE: RawEventsResponse = {
   data: [],
-
   meta: {
     page: 1,
     limit: 50,

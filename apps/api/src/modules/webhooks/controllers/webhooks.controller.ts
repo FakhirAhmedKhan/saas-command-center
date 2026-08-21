@@ -43,9 +43,7 @@ export class WebhooksController {
   @Post()
   @SharedRateLimit({
     scope: 'webhook-create',
-
     limit: readPositiveInteger(process.env.WEBHOOK_CREATE_RATE_LIMIT, 20),
-
     windowSeconds: 60 * 60,
   })
   @ApiOperation({
@@ -98,9 +96,7 @@ export class WebhooksController {
   @Post(':endpointId/rotate-secret')
   @SharedRateLimit({
     scope: 'webhook-secret-rotation',
-
     limit: 5,
-
     windowSeconds: 60 * 60,
   })
   rotateSecret(
@@ -119,9 +115,7 @@ export class WebhooksController {
   @Post(':endpointId/test')
   @SharedRateLimit({
     scope: 'webhook-test-delivery',
-
     limit: 10,
-
     windowSeconds: 5 * 60,
   })
   testDelivery(

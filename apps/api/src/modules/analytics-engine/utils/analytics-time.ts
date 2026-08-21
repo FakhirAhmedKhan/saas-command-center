@@ -1,4 +1,4 @@
-﻿import { AnalyticsAggregatePeriod } from '@command-center/shared-types';
+import { AnalyticsAggregatePeriod } from '@command-center/shared-types';
 import { DateTime } from 'luxon';
 
 export interface AnalyticsBucket {
@@ -28,7 +28,6 @@ export function getAnalyticsBucket(value: Date, timeZone: string, period: Analyt
 
   return {
     start: start.toUTC().toJSDate(),
-
     end: end.toUTC().toJSDate(),
   };
 }

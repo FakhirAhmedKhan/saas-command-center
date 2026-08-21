@@ -1,4 +1,4 @@
-import { createAgent, createTestUser, registerUser, withBearer } from '../helpers/auth';
+﻿import { createAgent, createTestUser, registerUser, withBearer } from '../helpers/auth';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { readAccessToken, readResourceId } from '../helpers/response';
@@ -10,24 +10,24 @@ import { randomUUID } from 'node:crypto';
 import request, { type Response } from 'supertest';
 
 /**
- * Phase 15 Ã¢â‚¬â€ Monitoring E2E
+ * Phase 15 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Monitoring E2E
  *
  * NOTE: apps/api/test/monitoring.e2e-spec.ts already exists but references undefined variables
  * (workspaceId, adminAccessToken, applicationId, anotherWorkspaceId, viewerAccessToken are never
- * declared anywhere in that file Ã¢â‚¬â€ its fixture-setup block at lines 15-19 is only a comment).
+ * declared anywhere in that file ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â its fixture-setup block at lines 15-19 is only a comment).
  * That file cannot compile/run as written; it is a pre-existing test-file (fixture) bug, not
  * something introduced here. This Phase 15 suite is written standalone against the real
  * implementation, is fully self-contained, and does not depend on or duplicate that broken file.
  *
  * Real routes (apps/api/src/modules/monitoring/controllers/monitoring.controller.ts), all
  * mounted under /api/v1/workspaces/:workspaceId/monitoring, guarded by
- * JwtAuthGuard + WorkspaceAccessGuard (class-level; no WorkspaceRolesGuard Ã¢â‚¬â€ write operations
+ * JwtAuthGuard + WorkspaceAccessGuard (class-level; no WorkspaceRolesGuard ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â write operations
  * are guarded in-service via MonitoringAccessService.assertCanManage, which requires
- * OWNER, ADMIN, or DEVELOPER Ã¢â‚¬â€ monitoring-access.service.ts MANAGEMENT_ROLES):
+ * OWNER, ADMIN, or DEVELOPER ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â monitoring-access.service.ts MANAGEMENT_ROLES):
  *   GET   /monitoring/summary
  *   GET   /monitoring/targets
  *   GET   /monitoring/checks                      (HealthCheckListQueryDto: status, targetType,
- *                                                   enabled, applicationId, websiteId Ã¢â‚¬â€ no page/
+ *                                                   enabled, applicationId, websiteId ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no page/
  *                                                   limit; service caps at take: 200)
  *   POST  /monitoring/checks                       (CreateHealthCheckDto)
  *   GET   /monitoring/checks/:checkId
@@ -37,7 +37,7 @@ import request, { type Response } from 'supertest';
  *   GET   /monitoring/incidents                     (IncidentListQueryDto: status)
  *   GET   /monitoring/applications/:applicationId/summary
  *
- * There is NO delete/archive endpoint for health checks in this implementation Ã¢â‚¬â€ only enable/
+ * There is NO delete/archive endpoint for health checks in this implementation ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â only enable/
  * disable via PATCH { enabled: false }, which additionally auto-resolves any open incident
  * (MonitoringService.update -> resolveOpenIncident when merged.enabled === false).
  *
@@ -72,7 +72,7 @@ import request, { type Response } from 'supertest';
  * assumed reachable in CI; instead this suite drives HealthCheckHistory/HealthCheck/HealthIncident
  * state directly via Prisma to assert the CONTRACT (list/detail/history/incident endpoints,
  * privacy, tenant isolation, pagination-equivalent behavior), and separately exercises the REAL
- * runner (HealthCheckRunnerService.run, resolved from the Nest DI container Ã¢â‚¬â€ not a mock) against
+ * runner (HealthCheckRunnerService.run, resolved from the Nest DI container ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â not a mock) against
  * a URL that is guaranteed to fail DNS resolution (an RFC 2606 reserved, non-resolvable domain),
  * which deterministically produces a DOWN result without depending on any real external service
  * being up. This still exercises the true runner code path end-to-end (HTTP attempt -> failure
@@ -82,7 +82,7 @@ import request, { type Response } from 'supertest';
 
 const API_PREFIX = '/api/v1';
 
-// RFC 2606 reserved TLD guaranteed to never resolve Ã¢â‚¬â€ used to deterministically exercise the
+// RFC 2606 reserved TLD guaranteed to never resolve ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â used to deterministically exercise the
 // REAL HealthCheckRunnerService failure path without depending on any external network service.
 const UNRESOLVABLE_URL = 'https://phase15-guaranteed-unresolvable.invalid/health';
 
@@ -472,7 +472,7 @@ describe('Phase 15 Monitoring E2E', () => {
     const checkId = body(createResponse).id as string;
 
     // Directly seed an OPEN incident to verify the disable path resolves it (no delete endpoint
-    // exists in this implementation Ã¢â‚¬â€ disabling is the closest analogue to "archive").
+    // exists in this implementation ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â disabling is the closest analogue to "archive").
     await prisma.healthIncident.create({
       data: {
         healthCheckId: checkId,
@@ -739,7 +739,7 @@ describe('Phase 15 Monitoring E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // E. Health history Ã¢â‚¬â€ exercising the REAL runner against a guaranteed-unresolvable host
+  // E. Health history ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â exercising the REAL runner against a guaranteed-unresolvable host
   // ---------------------------------------------------------------------------------------
 
   it('recording a failed health-check run: writes history, updates the check, and increments consecutiveFailures', async () => {
@@ -758,6 +758,10 @@ describe('Phase 15 Monitoring E2E', () => {
     const result = await runner.run(workspaceId, checkId);
 
     expect(result.status).toBe(HealthCheckStatus.DOWN);
+    if (result.status === 'DISABLED') {
+      throw new Error('Expected an executed health check result.');
+    }
+
     expect(result.statusCode).toBeNull();
     expect(typeof result.responseTimeMs).toBe('number');
     expect(result.consecutiveFailures).toBe(1);
@@ -862,7 +866,7 @@ describe('Phase 15 Monitoring E2E', () => {
 
     // Simulate recovery directly through the runner's own resolution logic without requiring a
     // live external HTTP success (the "success" branch of HealthCheckRunnerService.run resolves
-    // any OPEN incident for that check unconditionally when isFailure is false Ã¢â‚¬â€ reproduced here
+    // any OPEN incident for that check unconditionally when isFailure is false ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â reproduced here
     // via the same production update the runner performs, to assert the incident-resolution
     // contract deterministically).
     await prisma.$transaction(async (transaction) => {
@@ -967,7 +971,7 @@ describe('Phase 15 Monitoring E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // H. Pagination/filtering/sorting (per real DTO Ã¢â‚¬â€ no page/limit; filter fields only)
+  // H. Pagination/filtering/sorting (per real DTO ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no page/limit; filter fields only)
   // ---------------------------------------------------------------------------------------
 
   it('filters checks by targetType', async () => {

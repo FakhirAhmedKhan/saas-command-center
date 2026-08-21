@@ -1,4 +1,4 @@
-﻿import { AnalyticsProcessingTrigger } from '../../../generated/prisma/client';
+import { AnalyticsProcessingTrigger } from '../../../generated/prisma/client';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
@@ -72,11 +72,8 @@ export class AnalyticsProcessingController {
       websiteId,
 
       initiatedByUserId: user.id,
-
       from: new Date(body.from),
-
       to: new Date(body.to),
-
       trigger: AnalyticsProcessingTrigger.MANUAL,
     });
   }

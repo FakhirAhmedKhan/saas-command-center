@@ -44,9 +44,7 @@ describe('Application Links E2E', () => {
 
     const addResponse = await addLink(owner, application.id, {
       label: 'Production Website',
-
       type: enumValue(ApplicationLinkType),
-
       url: 'https://example.com',
     });
 
@@ -56,9 +54,7 @@ describe('Application Links E2E', () => {
 
     const updateResponse = await updateLink(owner, application.id, linkId, {
       label: 'Updated Production',
-
       type: enumValue(ApplicationLinkType, 1),
-
       url: 'https://updated.example.com',
     });
 
@@ -98,7 +94,6 @@ describe('Application Links E2E', () => {
         .set('Authorization', `Bearer ${owner.accessToken}`)
         .send({
           label: 'Unsafe Link',
-
           type: enumValue(ApplicationLinkType),
 
           url,

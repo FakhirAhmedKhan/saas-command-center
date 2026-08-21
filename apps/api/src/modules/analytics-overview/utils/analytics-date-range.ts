@@ -48,17 +48,11 @@ function getDateParts(date: Date, timeZone: string): DateParts {
     timeZone,
 
     year: 'numeric',
-
     month: '2-digit',
-
     day: '2-digit',
-
     hour: '2-digit',
-
     minute: '2-digit',
-
     second: '2-digit',
-
     hourCycle: 'h23',
   });
 
@@ -72,15 +66,10 @@ function getDateParts(date: Date, timeZone: string): DateParts {
 
   return {
     year: Number(values.get('year')),
-
     month: Number(values.get('month')),
-
     day: Number(values.get('day')),
-
     hour: Number(values.get('hour')),
-
     minute: Number(values.get('minute')),
-
     second: Number(values.get('second')),
   };
 }
@@ -189,7 +178,6 @@ function resolvePresetStart(preset: AnalyticsDatePreset, today: string): string 
 
 export function resolveAnalyticsDateRange(
   query: AnalyticsOverviewQueryDto,
-
   timeZone: string,
 
   now = new Date(),
@@ -230,24 +218,17 @@ export function resolveAnalyticsDateRange(
     days,
 
     granularity: days <= 2 ? 'hour' : 'day',
-
     current: {
       from: currentFrom,
-
       to: currentTo,
-
       start: startOfDateInTimeZone(currentFrom, timeZone),
-
       end: startOfDateInTimeZone(addDateKeyDays(currentTo, 1), timeZone),
     },
 
     previous: {
       from: previousFrom,
-
       to: previousTo,
-
       start: startOfDateInTimeZone(previousFrom, timeZone),
-
       end: startOfDateInTimeZone(currentFrom, timeZone),
     },
   };

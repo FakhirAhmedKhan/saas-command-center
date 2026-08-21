@@ -34,12 +34,10 @@ const TECHNOLOGY_TYPE_BY_LABEL: Record<string, TechnologyType> = {
   'Node.js': TechnologyType.BACKEND,
   GraphQL: TechnologyType.BACKEND,
   tRPC: TechnologyType.BACKEND,
-
   Prisma: TechnologyType.DATABASE,
   PostgreSQL: TechnologyType.DATABASE,
   MongoDB: TechnologyType.DATABASE,
   Redis: TechnologyType.DATABASE,
-
   Docker: TechnologyType.INFRASTRUCTURE,
 
   'JWT Auth': TechnologyType.OTHER,

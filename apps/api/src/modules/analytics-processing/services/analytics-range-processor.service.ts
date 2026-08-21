@@ -45,7 +45,6 @@ export class AnalyticsRangeProcessorService {
         const pendingEventsAtStart = await transaction.rawAnalyticsEvent.count({
           where: {
             websiteId: input.websiteId,
-
             occurredAt: {
               gte: input.from,
               lt: input.to,

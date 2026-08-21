@@ -107,7 +107,6 @@ describe('Workspace Roles and Ownership E2E', () => {
 
     const developerResponse = await developer.agent.post(workspaceRoutes.members(owner.workspaceId)).set(withBearer(developer.accessToken)).send({
       email: target.input.email,
-
       role: WorkspaceRole.VIEWER,
     });
 
@@ -115,7 +114,6 @@ describe('Workspace Roles and Ownership E2E', () => {
 
     const viewerResponse = await viewer.agent.post(workspaceRoutes.members(owner.workspaceId)).set(withBearer(viewer.accessToken)).send({
       email: target.input.email,
-
       role: WorkspaceRole.VIEWER,
     });
 
@@ -137,7 +135,6 @@ describe('Workspace Roles and Ownership E2E', () => {
 
     const adminAddResponse = await admin.agent.post(workspaceRoutes.members(owner.workspaceId)).set(withBearer(admin.accessToken)).send({
       email: target.input.email,
-
       role: WorkspaceRole.DEVELOPER,
     });
 

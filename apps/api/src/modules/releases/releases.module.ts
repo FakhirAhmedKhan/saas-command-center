@@ -9,11 +9,8 @@ import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-
 
 @Module({
   imports: [WorkspaceMembersModule, DatabaseModule],
-
   controllers: [ReleasesController, DeploymentsController],
-
   providers: [ReleaseAccessService, DeploymentTransitionService, ReleaseDeploymentService],
-
   exports: [ReleaseDeploymentService],
 })
 export class ReleasesModule {}

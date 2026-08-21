@@ -22,7 +22,6 @@ const websiteSelect = {
   archivedAt: true,
   createdAt: true,
   updatedAt: true,
-
   application: {
     select: {
       id: true,
@@ -115,20 +114,13 @@ export class WebsitesService {
 
         await this.writeActivity(transaction, created, actorUserId, {
           activityType: ApplicationActivityType.WEBSITE_CREATED,
-
           title: 'Website created',
-
           description: `${created.name} was added to the website registry.`,
-
           metadata: {
             domain: created.domain,
-
             timeZone: created.timeZone,
-
             enabled: created.enabled,
-
             allowedOrigins: created.allowedOrigins,
-
             applicationId: created.applicationId,
           },
         });
@@ -252,7 +244,6 @@ export class WebsitesService {
 
     return {
       data: websites,
-
       meta: {
         page: query.page,
         limit: query.limit,
@@ -296,7 +287,6 @@ export class WebsitesService {
           where: {
             workspaceId,
             domain: newDomain,
-
             id: {
               not: websiteId,
             },
@@ -373,11 +363,8 @@ export class WebsitesService {
 
         await this.writeActivity(transaction, updated, actorUserId, {
           activityType: ApplicationActivityType.WEBSITE_UPDATED,
-
           title: 'Website updated',
-
           description: `${updated.name} configuration was updated.`,
-
           metadata: {
             changedFields,
 
@@ -453,9 +440,7 @@ export class WebsitesService {
 
       await this.writeActivity(transaction, updated, actorUserId, {
         activityType: ApplicationActivityType.WEBSITE_ARCHIVED,
-
         title: 'Website archived',
-
         description: `${updated.name} was archived and tracking was disabled.`,
       });
 
@@ -490,9 +475,7 @@ export class WebsitesService {
 
       await this.writeActivity(transaction, updated, actorUserId, {
         activityType: ApplicationActivityType.WEBSITE_RESTORED,
-
         title: 'Website restored',
-
         description: `${updated.name} was restored. Tracking remains disabled until enabled manually.`,
       });
 
@@ -522,9 +505,7 @@ export class WebsitesService {
 
         data: {
           trackingKeyPrefix: generatedKey.prefix,
-
           trackingKeyHash: generatedKey.hash,
-
           trackingKeyRotatedAt: new Date(),
         },
 
@@ -533,14 +514,10 @@ export class WebsitesService {
 
       await this.writeActivity(transaction, updated, actorUserId, {
         activityType: ApplicationActivityType.WEBSITE_TRACKING_KEY_ROTATED,
-
         title: 'Tracking key rotated',
-
         description: `${updated.name} received a new tracking key.`,
-
         metadata: {
           previousPrefix: website.trackingKeyPrefix,
-
           currentPrefix: updated.trackingKeyPrefix,
         },
       });
@@ -578,16 +555,11 @@ export class WebsitesService {
 
       await this.writeActivity(transaction, updated, actorUserId, {
         activityType: ApplicationActivityType.WEBSITE_CONNECTED,
-
         title: 'Website connected',
-
         description: `${updated.name} was connected to ${application.name}.`,
-
         metadata: {
           previousApplicationId: website.applicationId,
-
           currentApplicationId: application.id,
-
           currentApplicationName: application.name,
         },
       });
@@ -622,14 +594,10 @@ export class WebsitesService {
 
       await this.writeActivity(transaction, updated, actorUserId, {
         activityType: ApplicationActivityType.WEBSITE_DISCONNECTED,
-
         title: 'Website disconnected',
-
         description: `${updated.name} was disconnected from its SaaS application.`,
-
         metadata: {
           previousApplicationId: website.applicationId,
-
           previousApplicationName: previousApplication?.name,
         },
       });
@@ -654,11 +622,8 @@ export class WebsitesService {
 
       await this.writeActivity(transaction, updated, actorUserId, {
         activityType: enabled ? ApplicationActivityType.WEBSITE_ENABLED : ApplicationActivityType.WEBSITE_DISABLED,
-
         title: enabled ? 'Website enabled' : 'Website disabled',
-
         description: enabled ? `${updated.name} is ready to accept tracking events.` : `${updated.name} will reject new tracking events.`,
-
         metadata: {
           enabled,
         },
@@ -846,30 +811,20 @@ export class WebsitesService {
   ): Promise<void> {
     await this.activityWriter.writeWithTransaction(transaction, {
       workspaceId: website.workspaceId,
-
       applicationId: website.applicationId,
-
       applicationName: website.application?.name ?? website.name,
-
       actorType: ActivityActorType.USER,
 
       actorUserId,
 
       activityType: input.activityType,
-
       entityType: ActivityEntityType.WEBSITE,
-
       entityId: website.id,
-
       title: input.title,
-
       description: input.description,
-
       metadata: {
         websiteId: website.id,
-
         websiteName: website.name,
-
         domain: website.domain,
 
         ...input.metadata,

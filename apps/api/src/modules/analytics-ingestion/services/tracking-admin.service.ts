@@ -46,7 +46,6 @@ export class TrackingAdminService {
 
       this.prisma.rawAnalyticsEvent.groupBy({
         by: ['type'],
-
         where: {
           websiteId,
         },
@@ -66,7 +65,6 @@ export class TrackingAdminService {
         },
 
         select: rawEventSelect,
-
         orderBy: {
           receivedAt: 'desc',
         },
@@ -122,7 +120,6 @@ export class TrackingAdminService {
         ? {
             eventName: {
               contains: query.eventName.trim(),
-
               mode: 'insensitive',
             },
           }
@@ -166,7 +163,6 @@ export class TrackingAdminService {
         where,
 
         select: rawEventSelect,
-
         orderBy: [
           {
             occurredAt: 'desc',
@@ -191,7 +187,6 @@ export class TrackingAdminService {
 
     return {
       data: events,
-
       meta: {
         page: query.page,
         limit: query.limit,
@@ -199,7 +194,6 @@ export class TrackingAdminService {
         totalPages,
 
         hasNextPage: query.page < totalPages,
-
         hasPreviousPage: query.page > 1,
       },
     };

@@ -38,7 +38,6 @@ export class TeamOperationsCleanupService {
       this.prisma.workspaceInvitation.updateMany({
         where: {
           status: WorkspaceInvitationStatus.PENDING,
-
           expiresAt: {
             lte: now,
           },
@@ -73,11 +72,8 @@ export class TeamOperationsCleanupService {
     this.logger.log(
       JSON.stringify({
         event: 'team_operations_cleanup',
-
         expiredInvitations: expiredInvitations.count,
-
         expiredNotifications: expiredNotifications.count,
-
         oldReadNotifications: oldReadNotifications.count,
       }),
     );

@@ -1,4 +1,4 @@
-﻿import { HealthCheckStatus, HealthIncidentStatus, HealthTargetType } from '../../../generated/prisma/client';
+import { HealthCheckStatus, HealthIncidentStatus, HealthTargetType } from '../../../generated/prisma/client';
 import type { HealthCheckListQueryInput, IncidentListQueryInput, SaveHealthCheckInput, UpdateHealthCheckInput } from '@command-center/shared-types';
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
@@ -33,7 +33,6 @@ export class CreateHealthCheckDto implements SaveHealthCheckInput {
   })
   @IsUrl({
     protocols: ['http', 'https'],
-
     require_protocol: true,
   })
   @MaxLength(2_000)

@@ -1,4 +1,4 @@
-﻿import type { TypedConfigService } from '../../../config/runtime-config';
+import type { TypedConfigService } from '../../../config/runtime-config';
 import { PrismaService } from '../../../database/prisma.service';
 import { AnalyticsProcessingStatus, AnalyticsProcessingTrigger, Prisma } from '../../../generated/prisma/client';
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
@@ -36,9 +36,7 @@ export class AnalyticsProcessingQueueService {
     const website = await this.prisma.website.findFirst({
       where: {
         id: input.websiteId,
-
         workspaceId: input.workspaceId,
-
         archivedAt: null,
       },
 
@@ -59,17 +57,11 @@ export class AnalyticsProcessingQueueService {
       return await this.prisma.analyticsProcessingRun.create({
         data: {
           workspaceId: input.workspaceId,
-
           websiteId: input.websiteId,
-
           initiatedByUserId: input.initiatedByUserId,
-
           trigger: input.trigger,
-
           status: AnalyticsProcessingStatus.QUEUED,
-
           rangeStart: input.from,
-
           rangeEnd: input.to,
 
           lockKey,
@@ -120,7 +112,6 @@ export class AnalyticsProcessingQueueService {
 
         data: {
           resolvedAt: new Date(),
-
           resolvedById: userId,
         },
       });
@@ -128,23 +119,14 @@ export class AnalyticsProcessingQueueService {
       return transaction.analyticsProcessingRun.create({
         data: {
           workspaceId: run.workspaceId,
-
           websiteId: run.websiteId,
-
           initiatedByUserId: userId,
-
           trigger: AnalyticsProcessingTrigger.RETRY,
-
           status: AnalyticsProcessingStatus.QUEUED,
-
           rangeStart: run.rangeStart,
-
           rangeEnd: run.rangeEnd,
-
           activeKey: run.lockKey,
-
           lockKey: run.lockKey,
-
           maxRetries: run.maxRetries,
         },
       });

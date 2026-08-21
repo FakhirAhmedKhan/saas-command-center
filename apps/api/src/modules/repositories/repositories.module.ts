@@ -21,9 +21,7 @@ import { Module } from '@nestjs/common';
 
 @Module({
   imports: [DatabaseModule, WorkspaceMembersModule, ActivityModule],
-
   controllers: [RepositoriesController, GithubConnectController, GithubWebhookController, CodeExplorerController, RepositoryImportController],
-
   providers: [
     GithubAppService,
     GithubCodeService,

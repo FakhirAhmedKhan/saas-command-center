@@ -1,4 +1,4 @@
-﻿import { resolveAnalyticsDateRange } from '../../analytics-overview/utils/analytics-date-range';
+import { resolveAnalyticsDateRange } from '../../analytics-overview/utils/analytics-date-range';
 import { roundMetric, toSafeNumber } from '../../analytics-overview/utils/analytics-overview-metrics';
 import { ANALYTICS_EXPORT_MAX_DAYS, ANALYTICS_EXPORT_MAX_ROWS } from '../analytics-reports.constants';
 import {
@@ -137,60 +137,50 @@ export class AnalyticsReportsService {
 
     return {
       filename: createCsvFilename('pages', context.range.current.from, context.range.current.to),
-
       content: createCsv(
         [
           {
             header: 'Path',
-
             value: (row) => row.path,
           },
 
           {
             header: 'Title',
-
             value: (row) => row.title,
           },
 
           {
             header: 'Views',
-
             value: (row) => row.views,
           },
 
           {
             header: 'Visitors',
-
             value: (row) => row.visitors,
           },
 
           {
             header: 'Sessions',
-
             value: (row) => row.sessions,
           },
 
           {
             header: 'Entrances',
-
             value: (row) => row.entrances,
           },
 
           {
             header: 'Exits',
-
             value: (row) => row.exits,
           },
 
           {
             header: 'Bounce Rate',
-
             value: (row) => row.bounceRate,
           },
 
           {
             header: 'Average Duration Seconds',
-
             value: (row) => row.averageDurationSeconds,
           },
         ],
@@ -209,30 +199,25 @@ export class AnalyticsReportsService {
 
     return {
       filename: createCsvFilename('events', context.range.current.from, context.range.current.to),
-
       content: createCsv(
         [
           {
             header: 'Event',
-
             value: (row) => row.name,
           },
 
           {
             header: 'Total Events',
-
             value: (row) => row.events,
           },
 
           {
             header: 'Unique Visitors',
-
             value: (row) => row.visitors,
           },
 
           {
             header: 'Sessions',
-
             value: (row) => row.sessions,
           },
         ],
@@ -251,36 +236,30 @@ export class AnalyticsReportsService {
 
     return {
       filename: createCsvFilename(dimension, context.range.current.from, context.range.current.to),
-
       content: createCsv(
         [
           {
             header: 'Value',
-
             value: (row) => row.label,
           },
 
           {
             header: 'Visitors',
-
             value: (row) => row.visitors,
           },
 
           {
             header: 'Sessions',
-
             value: (row) => row.sessions,
           },
 
           {
             header: 'Page Views',
-
             value: (row) => row.pageViews,
           },
 
           {
             header: 'Percentage',
-
             value: (row) => row.percentage,
           },
         ],
@@ -314,9 +293,7 @@ export class AnalyticsReportsService {
 
       select: {
         id: true,
-
         name: true,
-
         timeZone: true,
       },
     });
@@ -327,24 +304,13 @@ export class AnalyticsReportsService {
 
     return {
       websiteId: website.id,
-
       websiteName: website.name,
-
       timeZone: website.timeZone,
-
       range: resolveAnalyticsDateRange(query as Parameters<typeof resolveAnalyticsDateRange>[0], website.timeZone),
     };
   }
 
-  private async loadPagesReport(
-    context: WebsiteReportContext,
-
-    query: PageReportQueryDto,
-
-    page: number,
-
-    limit: number,
-  ): Promise<PageReportResponseDto> {
+  private async loadPagesReport(context: WebsiteReportContext, query: PageReportQueryDto, page: number, limit: number): Promise<PageReportResponseDto> {
     const offset = (page - 1) * limit;
 
     const search = query.search?.trim() ?? '';
@@ -517,20 +483,11 @@ export class AnalyticsReportsService {
       items,
 
       pagination: this.createPagination(page, limit, total),
-
       range: this.createRangeDto(context),
     };
   }
 
-  private async loadEventsReport(
-    context: WebsiteReportContext,
-
-    query: EventReportQueryDto,
-
-    page: number,
-
-    limit: number,
-  ): Promise<EventReportResponseDto> {
+  private async loadEventsReport(context: WebsiteReportContext, query: EventReportQueryDto, page: number, limit: number): Promise<EventReportResponseDto> {
     const offset = (page - 1) * limit;
 
     const search = query.search?.trim() ?? '';
@@ -684,37 +641,27 @@ export class AnalyticsReportsService {
     return {
       items: rows.map((row): EventReportItemDto => ({
         name: row.name,
-
         events: toSafeNumber(row.events),
-
         visitors: toSafeNumber(row.visitors),
-
         sessions: toSafeNumber(row.sessions),
       })),
 
       summary: {
         totalEvents: toSafeNumber(summary?.total_events),
-
         uniqueVisitors: toSafeNumber(summary?.unique_visitors),
-
         uniqueSessions: toSafeNumber(summary?.unique_sessions),
       },
 
       pagination: this.createPagination(page, limit, total),
-
       range: this.createRangeDto(context),
     };
   }
 
   private async loadDimensionReport(
     context: WebsiteReportContext,
-
     dimension: AnalyticsReportDimension,
-
     query: DimensionReportQueryDto,
-
     page: number,
-
     limit: number,
   ): Promise<DimensionReportResponseDto> {
     const aggregateDimension = this.mapDimension(dimension);
@@ -826,15 +773,12 @@ export class AnalyticsReportsService {
 
       return {
         key: row.key,
-
         label: row.label,
-
         visitors: toSafeNumber(row.visitors),
 
         sessions,
 
         pageViews: toSafeNumber(row.page_views),
-
         percentage: totalSessions === 0 ? 0 : roundMetric((sessions / totalSessions) * 100, 1),
       };
     });
@@ -843,7 +787,6 @@ export class AnalyticsReportsService {
       items,
 
       pagination: this.createPagination(page, limit, total),
-
       range: this.createRangeDto(context),
     };
   }
@@ -859,19 +802,16 @@ export class AnalyticsReportsService {
 
     return {
       path: row.path,
-
       title: row.title ?? row.path,
 
       views,
 
       visitors: toSafeNumber(row.visitors),
-
       sessions: toSafeNumber(row.sessions),
 
       entrances,
 
       exits: toSafeNumber(row.exits),
-
       bounceRate:
         entrances === 0
           ? 0
@@ -1003,7 +943,6 @@ export class AnalyticsReportsService {
       totalPages,
 
       hasPreviousPage: page > 1,
-
       hasNextPage: page < totalPages,
     };
   }
@@ -1011,11 +950,8 @@ export class AnalyticsReportsService {
   private createRangeDto(context: WebsiteReportContext): AnalyticsReportRangeDto {
     return {
       from: context.range.current.from,
-
       to: context.range.current.to,
-
       timeZone: context.timeZone,
-
       days: context.range.days,
     };
   }

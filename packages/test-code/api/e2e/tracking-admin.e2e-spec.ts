@@ -81,19 +81,16 @@ describe('Tracking Admin E2E', () => {
 
       buildTrackerEvent(trackedWebsite.origin, {
         type: RawAnalyticsEventType.CUSTOM,
-
         eventName: 'cta_clicked',
       }),
 
       buildTrackerEvent(trackedWebsite.origin, {
         type: RawAnalyticsEventType.CUSTOM,
-
         eventName: 'checkout_started',
       }),
 
       buildTrackerEvent(trackedWebsite.origin, {
         type: RawAnalyticsEventType.CUSTOM,
-
         eventName: 'checkout_completed',
       }),
     ];

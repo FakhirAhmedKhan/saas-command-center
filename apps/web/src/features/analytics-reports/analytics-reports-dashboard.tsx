@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable react-hooks/exhaustive-deps */
 
@@ -628,9 +628,7 @@ export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsR
               onClick={() => {
                 updateUrl({
                   tab: item.value,
-
                   sort: getDefaultSort(item.value),
-
                   direction: 'desc',
                 });
               }}

@@ -9,7 +9,7 @@ import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import request, { type Response } from 'supertest';
 
 /**
- * Phase 13 Ã¢â‚¬â€ Analytics Reports E2E
+ * Phase 13 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Analytics Reports E2E
  *
  * Real routes (apps/api/src/modules/analytics-reports/controllers/analytics-reports.controller.ts):
  *   GET /api/v1/workspaces/:workspaceId/websites/:websiteId/analytics/reports/pages
@@ -51,7 +51,7 @@ import request, { type Response } from 'supertest';
 
 const API_PREFIX = '/api/v1';
 
-// Date keys (YYYY-MM-DD) Ã¢â‚¬â€ the only format the DTO accepts for from/to.
+// Date keys (YYYY-MM-DD) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â the only format the DTO accepts for from/to.
 const FROM = '2026-08-01';
 const TO = '2026-08-04';
 
@@ -537,7 +537,6 @@ async function seedNormalizedAnalytics(prisma: PrismaService, websiteId: string)
           normalizedPath: page.path,
           pageTitle: page.title,
           referrerUrl: null,
-          properties: null,
           durationMs: 15_000,
           sourceType: session.sourceType,
           sourceName: session.sourceName,
@@ -990,7 +989,7 @@ describe('Phase 13 Analytics Reports E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // E. Dimensions report Ã¢â‚¬â€ every implemented AnalyticsReportDimension enum value
+  // E. Dimensions report ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â every implemented AnalyticsReportDimension enum value
   // ---------------------------------------------------------------------------------------
 
   it('returns the sources dimension report reconciling total page views to 40', async () => {
@@ -1400,10 +1399,10 @@ describe('Phase 13 Analytics Reports E2E', () => {
   });
 
   it('bounds the CSV export at ANALYTICS_EXPORT_MAX_ROWS regardless of requested limit', async () => {
-    // The export routes reuse PageReportQueryDto, whose `limit` caps at 100 via @Max Ã¢â‚¬â€
+    // The export routes reuse PageReportQueryDto, whose `limit` caps at 100 via @Max ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â
     // the export path itself always internally requests ANALYTICS_EXPORT_MAX_ROWS (5000)
     // rows via loadPagesReport(..., 1, ANALYTICS_EXPORT_MAX_ROWS), ignoring any client-supplied
-    // limit. Only 4 distinct paths exist in the fixture, so the export can never exceed 4 rows Ã¢â‚¬â€
+    // limit. Only 4 distinct paths exist in the fixture, so the export can never exceed 4 rows ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â
     // verifying the export ignores/ is not bypassable via an oversized `limit` query value.
     const response = await get(exportPagesUrl(), ownerAccessToken, {
       from: FROM,

@@ -1,3 +1,4 @@
+import request from 'supertest';
 import { createAgent, createTestUser, registerUser, withBearer } from './auth';
 import type { TestUserInput } from './contracts';
 import { expectSuccessfulStatus, readAccessToken, readResponseArray } from './response';
@@ -27,7 +28,7 @@ export const workspaceRoutes = {
 } as const;
 
 export interface WorkspaceTestUser {
-  agent: SuperAgentTest;
+  agent: ReturnType<typeof request.agent>;
   input: TestUserInput;
   accessToken: string;
   userId: string;
@@ -78,7 +79,6 @@ export async function registerWorkspaceTestUser(
   const ownerMembership = await prisma.workspaceMember.findFirst({
     where: {
       userId: databaseUser.id,
-
       role: WorkspaceRole.OWNER,
     },
 
@@ -96,7 +96,6 @@ export async function registerWorkspaceTestUser(
     input,
     accessToken,
     userId: databaseUser.id,
-
     workspaceId: ownerMembership.workspaceId,
   };
 }

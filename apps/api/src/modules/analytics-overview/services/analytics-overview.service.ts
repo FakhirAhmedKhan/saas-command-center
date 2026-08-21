@@ -77,29 +77,19 @@ export class AnalyticsOverviewService {
     return {
       website: {
         id: website.id,
-
         name: website.name,
-
         domain: website.domain,
-
         timeZone: website.timeZone,
-
         lastEventAt: website.lastEventAt?.toISOString() ?? null,
       },
 
       range: {
         preset: range.preset,
-
         from: range.current.from,
-
         to: range.current.to,
-
         previousFrom: range.previous.from,
-
         previousTo: range.previous.to,
-
         granularity: range.granularity,
-
         days: range.days,
       },
 
@@ -136,19 +126,12 @@ export class AnalyticsOverviewService {
       },
 
       trend: this.mapTrendRows(trendRows),
-
       topPages: this.buildBreakdown(pageRows, 'pageViews'),
-
       topSources: this.buildBreakdown(sourceRows, 'sessions'),
-
       topCountries: this.buildBreakdown(countryRows, 'sessions'),
-
       topDevices: this.buildBreakdown(deviceRows, 'sessions'),
-
       topBrowsers: this.buildBreakdown(browserRows, 'sessions'),
-
       topOperatingSystems: this.buildBreakdown(operatingSystemRows, 'sessions'),
-
       empty: currentMetrics.sessions === 0 && currentMetrics.pageViews === 0,
     };
   }
@@ -165,13 +148,9 @@ export class AnalyticsOverviewService {
 
       select: {
         id: true,
-
         name: true,
-
         domain: true,
-
         timeZone: true,
-
         lastEventAt: true,
       },
     });
@@ -313,7 +292,6 @@ export class AnalyticsOverviewService {
       websiteId,
 
       dimension: AnalyticsAggregateDimension.OVERVIEW,
-
       bucketStart: {
         gte: start,
         lt: end,
@@ -322,11 +300,8 @@ export class AnalyticsOverviewService {
 
     const select = {
       bucketStart: true,
-
       visitors: true,
-
       sessions: true,
-
       pageViews: true,
     } as const;
 
@@ -371,11 +346,8 @@ export class AnalyticsOverviewService {
 
     const select = {
       dimensionValue: true,
-
       dimensionLabel: true,
-
       sessions: true,
-
       pageViews: true,
     } as const;
 
@@ -395,20 +367,13 @@ export class AnalyticsOverviewService {
   private mapTrendRows(rows: OverviewAggregateRow[]): AnalyticsTrendPointDto[] {
     return rows.map((row) => ({
       bucketStart: row.bucketStart.toISOString(),
-
       visitors: row.visitors,
-
       sessions: row.sessions,
-
       pageViews: row.pageViews,
     }));
   }
 
-  private buildBreakdown(
-    rows: BreakdownAggregateRow[],
-
-    metric: 'sessions' | 'pageViews',
-  ): AnalyticsBreakdownItemDto[] {
+  private buildBreakdown(rows: BreakdownAggregateRow[], metric: 'sessions' | 'pageViews'): AnalyticsBreakdownItemDto[] {
     const grouped = new Map<
       string,
       {
@@ -447,9 +412,7 @@ export class AnalyticsOverviewService {
         key,
 
         label: item.label,
-
         value: item.value,
-
         percentage: total === 0 ? 0 : roundMetric((item.value / total) * 100, 1),
       }))
       .sort((first, second) => second.value - first.value)

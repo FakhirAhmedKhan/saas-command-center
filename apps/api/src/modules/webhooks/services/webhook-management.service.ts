@@ -27,11 +27,7 @@ export class WebhookManagementService {
     private readonly publisher: WebhookEventPublisherService,
   ) {}
 
-  async list(
-    workspaceId: string,
-
-    userId: string,
-  ) {
+  async list(workspaceId: string, userId: string) {
     const [canManage, endpoints] = await Promise.all([
       this.access.canManage(workspaceId, userId),
 
@@ -44,15 +40,10 @@ export class WebhookManagementService {
           deliveries: {
             select: {
               id: true,
-
               status: true,
-
               responseStatus: true,
-
               responseDurationMs: true,
-
               createdAt: true,
-
               deliveredAt: true,
             },
 
@@ -80,18 +71,11 @@ export class WebhookManagementService {
       canManage,
 
       eventCatalog: WEBHOOK_EVENT_CATALOG,
-
       items: endpoints.map((endpoint) => this.mapEndpoint(endpoint)),
     };
   }
 
-  async create(
-    workspaceId: string,
-
-    userId: string,
-
-    input: CreateWebhookEndpointDto,
-  ) {
+  async create(workspaceId: string, userId: string, input: CreateWebhookEndpointDto) {
     await this.access.assertCanManage(workspaceId, userId);
 
     this.validateSubscriptions(input.eventTypes);
@@ -108,21 +92,13 @@ export class WebhookManagementService {
           workspaceId,
 
           name: input.name.trim(),
-
           url: input.url.trim(),
-
           eventTypes: input.eventTypes,
-
           payloadVersion: WEBHOOK_PAYLOAD_VERSION,
-
           secretCiphertext: encrypted.ciphertext,
-
           secretIv: encrypted.iv,
-
           secretAuthTag: encrypted.authTag,
-
           secretKeyVersion: encrypted.keyVersion,
-
           timeoutMs:
             input.timeoutMs ??
             this.config.get('WEBHOOK_DEFAULT_TIMEOUT_MS', {
@@ -136,16 +112,13 @@ export class WebhookManagementService {
             }),
 
           enabled: input.enabled ?? true,
-
           createdById: userId,
-
           updatedById: userId,
         },
       });
 
       return {
         endpoint: this.mapEndpoint(endpoint),
-
         secret: rawSecret,
       };
     } catch (error) {
@@ -157,15 +130,7 @@ export class WebhookManagementService {
     }
   }
 
-  async update(
-    workspaceId: string,
-
-    endpointId: string,
-
-    userId: string,
-
-    input: UpdateWebhookEndpointDto,
-  ) {
+  async update(workspaceId: string, endpointId: string, userId: string, input: UpdateWebhookEndpointDto) {
     await this.access.assertCanManage(workspaceId, userId);
 
     const endpoint = await this.requireEndpoint(workspaceId, endpointId);
@@ -186,17 +151,11 @@ export class WebhookManagementService {
 
         data: {
           name: input.name?.trim(),
-
           url: input.url?.trim(),
-
           eventTypes: input.eventTypes,
-
           timeoutMs: input.timeoutMs,
-
           maxAttempts: input.maxAttempts,
-
           enabled: input.enabled,
-
           updatedById: userId,
         },
       });
@@ -205,7 +164,6 @@ export class WebhookManagementService {
         await transaction.webhookDelivery.updateMany({
           where: {
             endpointId: endpoint.id,
-
             status: {
               in: [WebhookDeliveryStatus.PENDING, WebhookDeliveryStatus.RETRY_SCHEDULED],
             },
@@ -213,11 +171,8 @@ export class WebhookManagementService {
 
           data: {
             status: WebhookDeliveryStatus.CANCELLED,
-
             failureCode: 'ENDPOINT_DISABLED',
-
             failureReason: 'Webhook endpoint was disabled.',
-
             finishedAt: new Date(),
           },
         });
@@ -229,25 +184,13 @@ export class WebhookManagementService {
     return this.mapEndpoint(updated);
   }
 
-  async disable(
-    workspaceId: string,
-
-    endpointId: string,
-
-    userId: string,
-  ) {
+  async disable(workspaceId: string, endpointId: string, userId: string) {
     return this.update(workspaceId, endpointId, userId, {
       enabled: false,
     });
   }
 
-  async rotateSecret(
-    workspaceId: string,
-
-    endpointId: string,
-
-    userId: string,
-  ) {
+  async rotateSecret(workspaceId: string, endpointId: string, userId: string) {
     await this.access.assertCanManage(workspaceId, userId);
 
     const endpoint = await this.requireEndpoint(workspaceId, endpointId);
@@ -263,13 +206,9 @@ export class WebhookManagementService {
 
       data: {
         secretCiphertext: encrypted.ciphertext,
-
         secretIv: encrypted.iv,
-
         secretAuthTag: encrypted.authTag,
-
         secretKeyVersion: encrypted.keyVersion,
-
         updatedById: userId,
       },
     });
@@ -279,13 +218,7 @@ export class WebhookManagementService {
     };
   }
 
-  async testDelivery(
-    workspaceId: string,
-
-    endpointId: string,
-
-    userId: string,
-  ) {
+  async testDelivery(workspaceId: string, endpointId: string, userId: string) {
     await this.access.assertCanManage(workspaceId, userId);
 
     const endpoint = await this.requireEndpoint(workspaceId, endpointId);
@@ -298,18 +231,11 @@ export class WebhookManagementService {
 
     return {
       deliveryId: delivery.id,
-
       status: delivery.status,
     };
   }
 
-  async listDeliveries(
-    workspaceId: string,
-
-    endpointId: string,
-
-    query: WebhookDeliveryListQueryDto,
-  ) {
+  async listDeliveries(workspaceId: string, endpointId: string, query: WebhookDeliveryListQueryDto) {
     await this.requireEndpoint(workspaceId, endpointId);
 
     const where: Prisma.WebhookDeliveryWhereInput = {
@@ -332,15 +258,10 @@ export class WebhookManagementService {
           event: {
             select: {
               id: true,
-
               type: true,
-
               payloadVersion: true,
-
               resourceType: true,
-
               resourceId: true,
-
               occurredAt: true,
             },
           },
@@ -357,7 +278,6 @@ export class WebhookManagementService {
         },
 
         skip: (query.page - 1) * query.limit,
-
         take: query.limit,
       }),
     ]);
@@ -365,27 +285,16 @@ export class WebhookManagementService {
     return {
       items: deliveries.map((delivery) => ({
         id: delivery.id,
-
         status: delivery.status,
-
         attemptCount: delivery.attemptCount,
-
         maxAttempts: delivery.maxAttempts,
-
         nextAttemptAt: delivery.nextAttemptAt.toISOString(),
-
         responseStatus: delivery.responseStatus,
-
         responseDurationMs: delivery.responseDurationMs,
-
         failureCode: delivery.failureCode,
-
         failureReason: delivery.failureReason,
-
         deliveredAt: delivery.deliveredAt?.toISOString() ?? null,
-
         createdAt: delivery.createdAt.toISOString(),
-
         event: {
           ...delivery.event,
 
@@ -394,28 +303,19 @@ export class WebhookManagementService {
 
         attempts: delivery.attempts.map((attempt) => ({
           id: attempt.id,
-
           attemptNumber: attempt.attemptNumber,
-
           outcome: attempt.outcome,
-
           responseStatus: attempt.responseStatus,
-
           durationMs: attempt.durationMs,
-
           errorCode: attempt.errorCode,
-
           errorMessage: attempt.errorMessage,
-
           startedAt: attempt.startedAt.toISOString(),
-
           finishedAt: attempt.finishedAt.toISOString(),
         })),
       })),
 
       pagination: {
         page: query.page,
-
         limit: query.limit,
 
         total,
@@ -425,11 +325,7 @@ export class WebhookManagementService {
     };
   }
 
-  private async requireEndpoint(
-    workspaceId: string,
-
-    endpointId: string,
-  ) {
+  private async requireEndpoint(workspaceId: string, endpointId: string) {
     const endpoint = await this.prisma.webhookEndpoint.findFirst({
       where: {
         id: endpointId,
@@ -504,43 +400,26 @@ export class WebhookManagementService {
   }) {
     return {
       id: endpoint.id,
-
       workspaceId: endpoint.workspaceId,
-
       name: endpoint.name,
-
       url: endpoint.url,
-
       eventTypes: endpoint.eventTypes,
-
       payloadVersion: endpoint.payloadVersion,
-
       timeoutMs: endpoint.timeoutMs,
-
       maxAttempts: endpoint.maxAttempts,
-
       enabled: endpoint.enabled,
-
       secretConfigured: true,
-
       lastDeliveryAt: endpoint.lastDeliveryAt?.toISOString() ?? null,
-
       lastSuccessAt: endpoint.lastSuccessAt?.toISOString() ?? null,
-
       lastFailureAt: endpoint.lastFailureAt?.toISOString() ?? null,
-
       createdAt: endpoint.createdAt.toISOString(),
-
       updatedAt: endpoint.updatedAt.toISOString(),
-
       deliveryCount: endpoint._count?.deliveries ?? 0,
-
       latestDelivery: endpoint.deliveries?.[0]
         ? {
             ...endpoint.deliveries[0],
 
             createdAt: endpoint.deliveries[0].createdAt.toISOString(),
-
             deliveredAt: endpoint.deliveries[0].deliveredAt?.toISOString() ?? null,
           }
         : null,

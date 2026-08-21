@@ -10,11 +10,8 @@ import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-
 
 @Module({
   imports: [SharedRateLimitModule, WorkspaceMembersModule, WorkspaceModule],
-
   controllers: [AnalyticsIngestionController, TrackingAdminController],
-
   providers: [AnalyticsIngestionService, IngestionRateLimitService, TrackingAdminService],
-
   exports: [AnalyticsIngestionService, TrackingAdminService],
 })
 export class AnalyticsIngestionModule {}

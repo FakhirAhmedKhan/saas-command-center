@@ -191,7 +191,6 @@ describe('Analytics Ingestion Security E2E', () => {
 
     const customWithoutName = buildTrackerEvent(trackedWebsite.origin, {
       type: RawAnalyticsEventType.CUSTOM,
-
       eventName: 'temporary_name',
     });
 
@@ -204,7 +203,6 @@ describe('Analytics Ingestion Security E2E', () => {
         await collectEvents(app, trackedWebsite, [
           buildTrackerEvent(trackedWebsite.origin, {
             type: RawAnalyticsEventType.PAGE_VIEW,
-
             eventName: 'not_allowed',
           }),
         ])
@@ -256,24 +254,15 @@ describe('Analytics Ingestion Security E2E', () => {
 
     const event = buildTrackerEvent(trackedWebsite.origin, {
       url: `${trackedWebsite.origin}/checkout?token=secret&safe=value&a=1#private`,
-
       referrer: 'https://referrer.example.test/page?password=secret&campaign=summer#hidden',
-
       properties: {
         password: 'must-be-removed',
-
         email: 'person@example.test',
-
         apiKey: 'must-be-removed',
-
         plan: 'enterprise',
-
         seats: 12,
-
         active: true,
-
         tags: ['analytics', 'saas'],
-
         nested: {
           ignored: true,
         },
@@ -287,7 +276,6 @@ describe('Analytics Ingestion Security E2E', () => {
     const stored = await prisma.rawAnalyticsEvent.findFirstOrThrow({
       where: {
         websiteId: trackedWebsite.id,
-
         eventId: event.eventId,
       },
     });

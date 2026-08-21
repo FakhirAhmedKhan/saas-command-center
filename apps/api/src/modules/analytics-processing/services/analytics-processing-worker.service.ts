@@ -50,7 +50,6 @@ export class AnalyticsProcessingWorkerService {
     const run = await this.prisma.analyticsProcessingRun.findFirst({
       where: {
         status: AnalyticsProcessingStatus.QUEUED,
-
         nextAttemptAt: {
           lte: new Date(),
         },
@@ -83,7 +82,6 @@ export class AnalyticsProcessingWorkerService {
       await this.prisma.analyticsProcessingRun.updateMany({
         where: {
           id: run.id,
-
           status: AnalyticsProcessingStatus.QUEUED,
         },
 
@@ -98,19 +96,14 @@ export class AnalyticsProcessingWorkerService {
     const claimed = await this.prisma.analyticsProcessingRun.updateMany({
       where: {
         id: runId,
-
         status: AnalyticsProcessingStatus.QUEUED,
       },
 
       data: {
         status: AnalyticsProcessingStatus.RUNNING,
-
         startedAt: new Date(),
-
         heartbeatAt: new Date(),
-
         errorCode: null,
-
         errorMessage: null,
       },
     });
@@ -128,15 +121,10 @@ export class AnalyticsProcessingWorkerService {
     this.logger.log(
       JSON.stringify({
         event: 'analytics_processing_started',
-
         runId: run.id,
-
         websiteId: run.websiteId,
-
         retryCount: run.retryCount,
-
         rangeStart: run.rangeStart,
-
         rangeEnd: run.rangeEnd,
       }),
     );
@@ -144,11 +132,8 @@ export class AnalyticsProcessingWorkerService {
     try {
       const result = await this.processor.processRange({
         workspaceId: run.workspaceId,
-
         websiteId: run.websiteId,
-
         from: run.rangeStart,
-
         to: run.rangeEnd,
       });
 
@@ -159,17 +144,11 @@ export class AnalyticsProcessingWorkerService {
 
         data: {
           status: AnalyticsProcessingStatus.SUCCEEDED,
-
           activeKey: null,
-
           pendingEventsAtStart: result.pendingEventsAtStart,
-
           rawEventsProcessed: result.processedEvents,
-
           failedEvents: result.failedEvents,
-
           heartbeatAt: new Date(),
-
           finishedAt: new Date(),
         },
       });
@@ -177,13 +156,9 @@ export class AnalyticsProcessingWorkerService {
       this.logger.log(
         JSON.stringify({
           event: 'analytics_processing_succeeded',
-
           runId: run.id,
-
           websiteId: run.websiteId,
-
           rawEventsProcessed: result.processedEvents,
-
           failedEvents: result.failedEvents,
         }),
       );
@@ -231,15 +206,10 @@ export class AnalyticsProcessingWorkerService {
 
         data: {
           status: AnalyticsProcessingStatus.QUEUED,
-
           retryCount: nextRetryCount,
-
           nextAttemptAt: new Date(Date.now() + delay),
-
           errorCode: code,
-
           errorMessage: message,
-
           heartbeatAt: new Date(),
         },
       });
@@ -247,9 +217,7 @@ export class AnalyticsProcessingWorkerService {
       this.logger.warn(
         JSON.stringify({
           event: 'analytics_processing_retry_scheduled',
-
           runId: run.id,
-
           retryCount: nextRetryCount,
 
           delay,
@@ -269,17 +237,11 @@ export class AnalyticsProcessingWorkerService {
 
         data: {
           status: AnalyticsProcessingStatus.DEAD_LETTERED,
-
           activeKey: null,
-
           retryCount: nextRetryCount,
-
           errorCode: code,
-
           errorMessage: message,
-
           heartbeatAt: new Date(),
-
           finishedAt: new Date(),
         },
       });
@@ -287,19 +249,12 @@ export class AnalyticsProcessingWorkerService {
       await transaction.analyticsProcessingDeadLetter.create({
         data: {
           runId: run.id,
-
           workspaceId: run.workspaceId,
-
           websiteId: run.websiteId,
-
           rangeStart: run.rangeStart,
-
           rangeEnd: run.rangeEnd,
-
           retryCount: nextRetryCount,
-
           errorCode: code,
-
           errorMessage: message,
         },
       });
@@ -308,11 +263,8 @@ export class AnalyticsProcessingWorkerService {
     this.logger.error(
       JSON.stringify({
         event: 'analytics_processing_dead_lettered',
-
         runId: run.id,
-
         retryCount: nextRetryCount,
-
         error: message,
       }),
     );

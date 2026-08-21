@@ -24,19 +24,11 @@ export class ActivityWriterService {
     });
   }
 
-  async writeWithTransaction(
-    transaction: Prisma.TransactionClient,
-
-    input: ActivityWriteInput,
-  ): Promise<void> {
+  async writeWithTransaction(transaction: Prisma.TransactionClient, input: ActivityWriteInput): Promise<void> {
     await this.writeManyWithTransaction(transaction, [input]);
   }
 
-  async writeManyWithTransaction(
-    transaction: Prisma.TransactionClient,
-
-    inputs: ActivityWriteInput[],
-  ): Promise<void> {
+  async writeManyWithTransaction(transaction: Prisma.TransactionClient, inputs: ActivityWriteInput[]): Promise<void> {
     if (inputs.length === 0) {
       return;
     }
@@ -48,23 +40,14 @@ export class ActivityWriterService {
 
       return {
         workspaceId: input.workspaceId,
-
         applicationId: input.applicationId ?? null,
-
         applicationName: input.applicationName.trim().slice(0, 160),
-
         actorType: input.actorType,
-
         actorUserId: input.actorUserId ?? null,
-
         activityType: input.activityType,
-
         entityType: input.entityType,
-
         entityId: input.entityId ?? null,
-
         title: input.title.trim().slice(0, 180),
-
         description: input.description?.trim().slice(0, 500) ?? null,
 
         ...(metadata

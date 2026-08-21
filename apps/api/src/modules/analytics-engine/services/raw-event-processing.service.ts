@@ -1,4 +1,4 @@
-﻿import { normalizeAnalyticsPage, normalizeSource, parseUserAgent } from '../utils/analytics-normalization';
+import { normalizeAnalyticsPage, normalizeSource, parseUserAgent } from '../utils/analytics-normalization';
 import { getAnalyticsBucket } from '../utils/analytics-time';
 import { AnalyticsAggregatePeriod } from '@command-center/shared-types';
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -53,7 +53,6 @@ export class RawEventProcessingService {
         where: {
           websiteId_externalVisitorId: {
             websiteId: website.id,
-
             externalVisitorId: raw.visitorId,
           },
         },
@@ -63,11 +62,8 @@ export class RawEventProcessingService {
         visitor = await transaction.analyticsVisitor.create({
           data: {
             websiteId: website.id,
-
             externalVisitorId: raw.visitorId,
-
             firstSeenAt: raw.occurredAt,
-
             lastSeenAt: raw.occurredAt,
           },
         });
@@ -77,7 +73,6 @@ export class RawEventProcessingService {
         where: {
           websiteId_externalSessionId: {
             websiteId: website.id,
-
             externalSessionId: raw.sessionId,
           },
         },
@@ -91,35 +86,22 @@ export class RawEventProcessingService {
         session = await transaction.analyticsSession.create({
           data: {
             websiteId: website.id,
-
             visitorId: visitor.id,
-
             externalSessionId: raw.sessionId,
-
             startedAt: raw.occurredAt,
-
             endedAt: raw.occurredAt,
-
             lastEventAt: raw.occurredAt,
-
             referrerUrl: raw.referrerUrl,
-
             sourceType: source.sourceType,
-
             sourceName: source.sourceName,
-
             sourceDomain: source.sourceDomain,
 
             countryCode,
 
             deviceType: agent.deviceType,
-
             browserName: agent.browserName,
-
             browserVersion: agent.browserVersion,
-
             operatingSystem: agent.operatingSystem,
-
             operatingSystemVersion: agent.operatingSystemVersion,
           },
         });
@@ -131,24 +113,17 @@ export class RawEventProcessingService {
         where: {
           websiteId_sourceEventId: {
             websiteId: website.id,
-
             sourceEventId: raw.eventId,
           },
         },
 
         update: {
           rawEventId: raw.id,
-
           receivedAt: raw.receivedAt,
-
           pageUrl: page.pageUrl,
-
           normalizedPath: page.normalizedPath,
-
           pageTitle: raw.pageTitle,
-
           referrerUrl: raw.referrerUrl,
-
           eventName: raw.eventName,
 
           ...(raw.properties !== null
@@ -158,51 +133,32 @@ export class RawEventProcessingService {
             : {}),
 
           durationMs: raw.durationMs,
-
           sourceType: source.sourceType,
-
           sourceName: source.sourceName,
-
           sourceDomain: source.sourceDomain,
 
           countryCode,
 
           deviceType: agent.deviceType,
-
           browserName: agent.browserName,
-
           browserVersion: agent.browserVersion,
-
           operatingSystem: agent.operatingSystem,
-
           operatingSystemVersion: agent.operatingSystemVersion,
         },
 
         create: {
           websiteId: website.id,
-
           visitorId: eventVisitorId,
-
           sessionId: session.id,
-
           rawEventId: raw.id,
-
           sourceEventId: raw.eventId,
-
           type: raw.type,
-
           eventName: raw.eventName,
-
           occurredAt: raw.occurredAt,
-
           receivedAt: raw.receivedAt,
-
           pageUrl: page.pageUrl,
-
           normalizedPath: page.normalizedPath,
-
           pageTitle: raw.pageTitle,
-
           referrerUrl: raw.referrerUrl,
 
           ...(raw.properties !== null
@@ -212,23 +168,16 @@ export class RawEventProcessingService {
             : {}),
 
           durationMs: raw.durationMs,
-
           sourceType: source.sourceType,
-
           sourceName: source.sourceName,
-
           sourceDomain: source.sourceDomain,
 
           countryCode,
 
           deviceType: agent.deviceType,
-
           browserName: agent.browserName,
-
           browserVersion: agent.browserVersion,
-
           operatingSystem: agent.operatingSystem,
-
           operatingSystemVersion: agent.operatingSystemVersion,
         },
       });
@@ -245,65 +194,41 @@ export class RawEventProcessingService {
 
           update: {
             visitorId: eventVisitorId,
-
             sessionId: session.id,
-
             occurredAt: raw.occurredAt,
-
             pageUrl: page.pageUrl,
-
             normalizedPath: page.normalizedPath,
-
             title: raw.pageTitle,
-
             referrerUrl: raw.referrerUrl,
-
             sourceType: source.sourceType,
-
             sourceName: source.sourceName,
-
             sourceDomain: source.sourceDomain,
 
             countryCode,
 
             deviceType: agent.deviceType,
-
             browserName: agent.browserName,
-
             operatingSystem: agent.operatingSystem,
           },
 
           create: {
             websiteId: website.id,
-
             visitorId: eventVisitorId,
-
             sessionId: session.id,
-
             analyticsEventId: analyticsEvent.id,
-
             occurredAt: raw.occurredAt,
-
             pageUrl: page.pageUrl,
-
             normalizedPath: page.normalizedPath,
-
             title: raw.pageTitle,
-
             referrerUrl: raw.referrerUrl,
-
             sourceType: source.sourceType,
-
             sourceName: source.sourceName,
-
             sourceDomain: source.sourceDomain,
 
             countryCode,
 
             deviceType: agent.deviceType,
-
             browserName: agent.browserName,
-
             operatingSystem: agent.operatingSystem,
           },
         });
@@ -327,15 +252,10 @@ export class RawEventProcessingService {
     return {
       processedEvents,
       failedEvents: 0,
-
       affectedSessionIds: [...affectedSessions],
-
       affectedVisitorIds: [...affectedVisitors],
-
       hourlyBuckets: [...hourlyBuckets],
-
       dailyBuckets: [...dailyBuckets],
-
       lastReceivedAt: rawEvents.at(-1)?.receivedAt ?? null,
     };
   }
@@ -359,9 +279,7 @@ export class RawEventProcessingService {
     const website = await transaction.website.findFirstOrThrow({
       where: {
         id: input.websiteId,
-
         workspaceId: input.workspaceId,
-
         archivedAt: null,
       },
 
@@ -375,10 +293,8 @@ export class RawEventProcessingService {
     const rawEvents = await transaction.rawAnalyticsEvent.findMany({
       where: {
         websiteId: input.websiteId,
-
         occurredAt: {
           gte: input.from,
-
           lt: input.to,
         },
 

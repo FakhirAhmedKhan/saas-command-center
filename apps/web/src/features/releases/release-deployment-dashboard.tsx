@@ -43,7 +43,6 @@ function formatDateTime(value: string | null): string {
 
   return new Intl.DateTimeFormat('en-US', {
     dateStyle: 'medium',
-
     timeStyle: 'short',
   }).format(new Date(value));
 }
@@ -99,13 +98,9 @@ function ReleaseForm({
           version,
 
           name: name || undefined,
-
           notes: notes || undefined,
-
           commitRef: commitRef || undefined,
-
           repositoryUrl: repositoryUrl || undefined,
-
           scheduledAt: scheduledAt ? new Date(scheduledAt).toISOString() : undefined,
         });
       }}
@@ -258,11 +253,8 @@ function DeploymentForm({
           environmentId,
 
           ciJobUrl: ciJobUrl || undefined,
-
           liveUrl: liveUrl || undefined,
-
           deploymentNotes: deploymentNotes || undefined,
-
           healthIncidentId: healthIncidentId || undefined,
         });
       }}
@@ -431,7 +423,6 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
           applicationId,
           {
             environmentId: environmentFilter || undefined,
-
             status: statusFilter || undefined,
           },
 
@@ -449,7 +440,6 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
         options,
 
         releases: releases.items,
-
         deployments: deployments.items,
 
         currentVersions,
@@ -513,11 +503,7 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
     }
   }
 
-  async function changeStatus(
-    deployment: Deployment,
-
-    target: DeploymentStatus,
-  ): Promise<void> {
+  async function changeStatus(deployment: Deployment, target: DeploymentStatus): Promise<void> {
     const input: {
       status: DeploymentStatus;
 

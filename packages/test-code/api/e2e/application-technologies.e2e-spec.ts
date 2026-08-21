@@ -43,9 +43,7 @@ describe('Application Technologies E2E', () => {
 
     const addResponse = await addTechnology(owner, application.id, {
       name: 'Next.js',
-
       type: enumValue(TechnologyType),
-
       version: '16.2.12',
     });
 
@@ -55,9 +53,7 @@ describe('Application Technologies E2E', () => {
 
     const updateResponse = await updateTechnology(owner, application.id, technologyId, {
       name: 'Next.js Updated',
-
       type: enumValue(TechnologyType, 1),
-
       version: '17.0.0',
     });
 
@@ -100,7 +96,6 @@ describe('Application Technologies E2E', () => {
       .set('Authorization', `Bearer ${owner.accessToken}`)
       .send({
         name: 'Invalid Technology',
-
         type: 'INVALID_TECHNOLOGY',
       });
 

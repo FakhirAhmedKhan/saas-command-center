@@ -69,7 +69,6 @@ const githubAppMock = {
   }),
 
   userCanAccessInstallation: jest.fn(async (_userAccessToken: string, _installationId: string): Promise<boolean> => true),
-
   listInstallationRepositories: jest.fn(async (_installationId: string) => {
     return [
       {
@@ -109,7 +108,6 @@ const githubAppMock = {
   }),
 
   getWebhookSecret: jest.fn((): string => WEBHOOK_SECRET),
-
   verifyWebhookSignature: jest.fn((body: Buffer | string, signature: string): boolean => {
     const rawBody = Buffer.isBuffer(body) ? body : Buffer.from(body, 'utf8');
     const expected = `sha256=${createHmac('sha256', WEBHOOK_SECRET).update(rawBody).digest('hex')}`;

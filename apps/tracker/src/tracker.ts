@@ -214,13 +214,9 @@ function readConfiguration(): TrackerConfiguration | null {
     endpoint,
 
     respectDoNotTrack: script.dataset.respectDnt !== 'false',
-
     requireConsent: script.dataset.requireConsent === 'true',
-
     heartbeatIntervalMs: readPositiveInteger(script.dataset.heartbeatInterval, 15_000),
-
     flushIntervalMs: readPositiveInteger(script.dataset.flushInterval, 3_000),
-
     sessionTimeoutMs: readPositiveInteger(script.dataset.sessionTimeout, 30 * 60_000),
   };
 }
@@ -303,7 +299,6 @@ class CommandCenterTracker {
       ...this.baseEvent('CUSTOM'),
 
       eventName: normalizedName,
-
       properties: sanitizeProperties(properties),
     });
   }
@@ -325,9 +320,7 @@ class CommandCenterTracker {
       ...this.baseEvent('PAGE_VIEW'),
 
       url: pageUrl,
-
       title: document.title.trim().slice(0, 512),
-
       referrer: document.referrer ? sanitizeUrl(document.referrer) : undefined,
     });
   }
@@ -343,13 +336,9 @@ class CommandCenterTracker {
 
     const payload: TrackerPayload = {
       websiteId: this.config.websiteId,
-
       trackingKey: this.config.trackingKey,
-
       sdkVersion: SDK_VERSION,
-
       sentAt: new Date().toISOString(),
-
       events: batch,
     };
 
@@ -370,11 +359,8 @@ class CommandCenterTracker {
       } else {
         await fetch(this.config.endpoint, {
           method: 'POST',
-
           mode: 'no-cors',
-
           keepalive: true,
-
           headers: {
             'Content-Type': 'text/plain;charset=UTF-8',
           },
@@ -474,25 +460,15 @@ class CommandCenterTracker {
       type,
 
       visitorId: this.visitorId,
-
       sessionId: this.session.id,
-
       timestamp: new Date().toISOString(),
-
       url: sanitizeUrl(window.location.href),
-
       title: document.title.trim().slice(0, 512),
-
       screenWidth: window.screen?.width,
-
       screenHeight: window.screen?.height,
-
       viewportWidth: window.innerWidth,
-
       viewportHeight: window.innerHeight,
-
       language: navigator.language,
-
       timeZone: this.resolveTimeZone(),
     };
   }
@@ -566,7 +542,6 @@ class CommandCenterTracker {
     if (now - this.session.lastSeenAt >= this.config.sessionTimeoutMs) {
       this.session = {
         id: createIdentifier(),
-
         lastSeenAt: now,
       };
     } else {

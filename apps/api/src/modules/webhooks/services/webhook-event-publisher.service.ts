@@ -26,17 +26,11 @@ export class WebhookEventPublisherService {
       const event = await transaction.webhookEvent.create({
         data: {
           workspaceId: input.workspaceId,
-
           type: input.type,
-
           payloadVersion: WEBHOOK_PAYLOAD_VERSION,
-
           resourceType: input.resourceType,
-
           resourceId: input.resourceId,
-
           payload: input.data,
-
           occurredAt: input.occurredAt ?? new Date(),
         },
       });
@@ -44,9 +38,7 @@ export class WebhookEventPublisherService {
       const endpoints = await transaction.webhookEndpoint.findMany({
         where: {
           workspaceId: input.workspaceId,
-
           enabled: true,
-
           eventTypes: {
             has: input.type,
           },
@@ -54,7 +46,6 @@ export class WebhookEventPublisherService {
 
         select: {
           id: true,
-
           maxAttempts: true,
         },
       });
@@ -63,15 +54,10 @@ export class WebhookEventPublisherService {
         await transaction.webhookDelivery.createMany({
           data: endpoints.map((endpoint) => ({
             workspaceId: input.workspaceId,
-
             endpointId: endpoint.id,
-
             eventId: event.id,
-
             status: WebhookDeliveryStatus.PENDING,
-
             maxAttempts: endpoint.maxAttempts,
-
             nextAttemptAt: new Date(),
           })),
 
@@ -81,17 +67,12 @@ export class WebhookEventPublisherService {
 
       return {
         eventId: event.id,
-
         queuedDeliveries: endpoints.length,
       };
     });
   }
 
-  async publishTest(
-    workspaceId: string,
-
-    endpointId: string,
-  ) {
+  async publishTest(workspaceId: string, endpointId: string) {
     return this.prisma.$transaction(async (transaction) => {
       const endpoint = await transaction.webhookEndpoint.findFirstOrThrow({
         where: {
@@ -104,7 +85,6 @@ export class WebhookEventPublisherService {
 
         select: {
           id: true,
-
           maxAttempts: true,
         },
       });
@@ -114,18 +94,12 @@ export class WebhookEventPublisherService {
           workspaceId,
 
           type: WebhookEventType.WEBHOOK_TEST,
-
           payloadVersion: WEBHOOK_PAYLOAD_VERSION,
-
           resourceType: 'WEBHOOK_ENDPOINT',
-
           resourceId: endpoint.id,
-
           occurredAt: new Date(),
-
           payload: {
             message: 'SaaS Command Center webhook test delivery.',
-
             endpointId: endpoint.id,
           },
         },
@@ -136,13 +110,9 @@ export class WebhookEventPublisherService {
           workspaceId,
 
           endpointId: endpoint.id,
-
           eventId: event.id,
-
           status: WebhookDeliveryStatus.PENDING,
-
           maxAttempts: endpoint.maxAttempts,
-
           nextAttemptAt: new Date(),
         },
       });

@@ -55,9 +55,7 @@ export class AnalyticsReportQueryDto extends AnalyticsOverviewQueryDto {
 
   @ApiPropertyOptional({
     default: ANALYTICS_REPORT_DEFAULT_LIMIT,
-
     maximum: ANALYTICS_REPORT_MAX_LIMIT,
-
     minimum: 1,
   })
   @IsOptional()
@@ -77,7 +75,6 @@ export class AnalyticsReportQueryDto extends AnalyticsOverviewQueryDto {
 
   @ApiPropertyOptional({
     enum: AnalyticsSortDirection,
-
     default: AnalyticsSortDirection.DESC,
   })
   @IsOptional()
@@ -88,7 +85,6 @@ export class AnalyticsReportQueryDto extends AnalyticsOverviewQueryDto {
 export class PageReportQueryDto extends AnalyticsReportQueryDto {
   @ApiPropertyOptional({
     enum: PageReportSortField,
-
     default: PageReportSortField.VIEWS,
   })
   @IsOptional()
@@ -99,7 +95,6 @@ export class PageReportQueryDto extends AnalyticsReportQueryDto {
 export class EventReportQueryDto extends AnalyticsReportQueryDto {
   @ApiPropertyOptional({
     enum: EventReportSortField,
-
     default: EventReportSortField.EVENTS,
   })
   @IsOptional()
@@ -110,7 +105,6 @@ export class EventReportQueryDto extends AnalyticsReportQueryDto {
 export class DimensionReportQueryDto extends AnalyticsReportQueryDto {
   @ApiPropertyOptional({
     enum: DimensionReportSortField,
-
     default: DimensionReportSortField.SESSIONS,
   })
   @IsOptional()

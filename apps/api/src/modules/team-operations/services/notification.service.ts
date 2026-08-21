@@ -56,7 +56,6 @@ export class NotificationService {
       const existing = await this.prisma.notification.findFirst({
         where: {
           userId: input.userId,
-
           dedupeKey: input.dedupeKey,
         },
       });
@@ -70,29 +69,17 @@ export class NotificationService {
       return await this.prisma.notification.create({
         data: {
           workspaceId: input.workspaceId,
-
           userId: input.userId,
-
           applicationId: input.applicationId ?? null,
-
           type: input.type,
-
           priority: input.priority ?? NotificationPriority.INFO,
-
           title: input.title,
-
           message: input.message,
-
           resourceType: input.resourceType ?? null,
-
           resourceId: input.resourceId ?? null,
-
           actionUrl: input.actionUrl ?? null,
-
           payload: input.payload,
-
           dedupeKey: input.dedupeKey ?? null,
-
           expiresAt: input.expiresAt ?? null,
         },
       });
@@ -106,7 +93,6 @@ export class NotificationService {
         const existing = await this.prisma.notification.findFirst({
           where: {
             userId: input.userId,
-
             dedupeKey: input.dedupeKey,
           },
         });
@@ -150,13 +136,9 @@ export class NotificationService {
     const items = await this.prisma.notification.findMany({
       where: {
         userId: input.userId,
-
         workspaceId: input.workspaceId,
-
         type: input.type,
-
         readAt: input.unreadOnly ? null : undefined,
-
         OR: [
           {
             expiresAt: null,
@@ -192,7 +174,6 @@ export class NotificationService {
 
     return {
       items: results,
-
       nextCursor: hasMore ? (results[results.length - 1]?.id ?? null) : null,
     };
   }
@@ -218,7 +199,6 @@ export class NotificationService {
         workspaceId,
 
         readAt: null,
-
         OR: [
           {
             expiresAt: null,

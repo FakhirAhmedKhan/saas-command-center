@@ -9,15 +9,11 @@ test.describe('Phase 13 analytics reports', () => {
     await page.route('**/auth/refresh', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           accessToken: 'phase-13-token',
-
           user: {
             id: '33333333-3333-4333-8333-333333333333',
-
             email: 'phase13@example.com',
           },
         }),
@@ -27,53 +23,35 @@ test.describe('Phase 13 analytics reports', () => {
     await page.route('**/analytics/reports/pages*', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           items: [
             {
               path: '/dashboard',
-
               title: 'Dashboard',
-
               views: 1200,
-
               visitors: 410,
-
               sessions: 520,
-
               entrances: 310,
-
               exits: 180,
-
               bounceRate: 24.5,
-
               averageDurationSeconds: 95,
             },
           ],
 
           pagination: {
             page: 1,
-
             limit: 25,
-
             total: 1,
-
             totalPages: 1,
-
             hasPreviousPage: false,
-
             hasNextPage: false,
           },
 
           range: {
             from: '2026-08-01',
-
             to: '2026-08-07',
-
             timeZone: 'Asia/Dubai',
-
             days: 7,
           },
         }),
@@ -131,12 +109,9 @@ test.describe('Phase 13 analytics reports', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           items: [],
-
           pagination: {
             page: 1,
             limit: 25,
@@ -169,12 +144,9 @@ test.describe('Phase 13 analytics reports', () => {
     await page.route('**/analytics/reports/pages*', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           items: [],
-
           pagination: {
             page: 1,
             limit: 25,
@@ -205,12 +177,9 @@ test.describe('Phase 13 analytics reports', () => {
     await page.route('**/analytics/reports/pages*', async (route) => {
       await route.fulfill({
         status: 500,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           statusCode: 500,
-
           message: 'Internal server error',
         }),
       });
@@ -235,18 +204,13 @@ test.describe('Phase 13 analytics reports', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           items: [
             {
               path: requestedPage === '2' ? '/blog' : '/dashboard',
-
               title: requestedPage === '2' ? 'Blog' : 'Dashboard',
-
               views: requestedPage === '2' ? 300 : 1200,
-
               visitors: 100,
               sessions: 120,
               entrances: 90,
@@ -312,9 +276,7 @@ test.describe('Phase 13 analytics reports', () => {
     await page.route('**/analytics/reports/exports/pages*', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'text/csv; charset=utf-8',
-
         headers: {
           'content-disposition': 'attachment; filename="pages_2026-08-01_2026-08-07.csv"',
         },
@@ -342,12 +304,9 @@ test.describe('Phase 13 analytics reports', () => {
     await page.route('**/analytics/reports/exports/pages*', async (route) => {
       await route.fulfill({
         status: 400,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           statusCode: 400,
-
           message: 'CSV exports cannot exceed 90 days',
         }),
       });

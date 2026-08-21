@@ -45,7 +45,6 @@ export class AuthCookieService {
 
     return {
       httpOnly: true,
-
       secure: this.config.get('COOKIE_SECURE', {
         infer: true,
       }),

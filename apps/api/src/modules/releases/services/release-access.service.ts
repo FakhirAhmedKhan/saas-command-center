@@ -7,11 +7,7 @@ const RELEASE_MANAGEMENT_ROLES = new Set(['OWNER', 'ADMIN', 'DEVELOPER']);
 export class ReleaseAccessService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async canManage(
-    workspaceId: string,
-
-    userId: string,
-  ): Promise<boolean> {
+  async canManage(workspaceId: string, userId: string): Promise<boolean> {
     const membership = await this.prisma.workspaceMember.findFirst({
       where: {
         workspaceId,
@@ -31,11 +27,7 @@ export class ReleaseAccessService {
     return RELEASE_MANAGEMENT_ROLES.has(String(membership.role));
   }
 
-  async assertCanManage(
-    workspaceId: string,
-
-    userId: string,
-  ): Promise<void> {
+  async assertCanManage(workspaceId: string, userId: string): Promise<void> {
     const allowed = await this.canManage(workspaceId, userId);
 
     if (!allowed) {

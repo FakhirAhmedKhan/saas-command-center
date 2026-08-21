@@ -43,7 +43,6 @@ export class SessionRebuilderService {
     if (!firstEvent) {
       return {
         previousStartedAt: existingSession.startedAt,
-
         session: existingSession,
       };
     }
@@ -59,56 +58,33 @@ export class SessionRebuilderService {
 
       data: {
         startedAt: metrics.startedAt,
-
         endedAt: metrics.endedAt,
-
         lastEventAt: lastEvent.occurredAt,
-
         durationMs: metrics.durationMs,
-
         engagedDurationMs: metrics.engagedDurationMs,
-
         eventCount: metrics.eventCount,
-
         pageViewCount: metrics.pageViewCount,
-
         customEventCount: metrics.customEventCount,
-
         bounced: metrics.bounced,
-
         entryPath: firstPage?.normalizedPath ?? null,
-
         exitPath: lastPage?.normalizedPath ?? null,
-
         entryTitle: firstPage?.title ?? null,
-
         exitTitle: lastPage?.title ?? null,
-
         referrerUrl: firstPage?.referrerUrl ?? firstEvent.referrerUrl,
-
         sourceType: firstPage?.sourceType ?? firstEvent.sourceType,
-
         sourceName: firstPage?.sourceName ?? firstEvent.sourceName,
-
         sourceDomain: firstPage?.sourceDomain ?? firstEvent.sourceDomain,
-
         countryCode: firstEvent.countryCode,
-
         deviceType: firstEvent.deviceType,
-
         browserName: firstEvent.browserName,
-
         browserVersion: firstEvent.browserVersion,
-
         operatingSystem: firstEvent.operatingSystem,
-
         operatingSystemVersion: firstEvent.operatingSystemVersion,
       },
     });
 
     return {
       previousStartedAt: existingSession.startedAt,
-
       session: updatedSession,
     };
   }

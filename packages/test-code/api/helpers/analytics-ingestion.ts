@@ -106,27 +106,16 @@ export function buildTrackerEvent(origin: string, overrides: Partial<TrackerEven
     type,
 
     visitorId: uniqueTrackerId('visitor'),
-
     sessionId: uniqueTrackerId('session'),
-
     timestamp: new Date().toISOString(),
-
     url: `${origin}/dashboard`,
-
     title: 'Analytics dashboard',
-
     referrer: 'https://search.example.test/results',
-
     screenWidth: 1920,
-
     screenHeight: 1080,
-
     viewportWidth: 1440,
-
     viewportHeight: 900,
-
     language: 'en-US',
-
     timeZone: 'Asia/Dubai',
 
     ...overrides,
@@ -146,11 +135,8 @@ export function buildCollectPayload(
 ): CollectEventsPayload {
   return {
     websiteId: trackedWebsite.id,
-
     trackingKey: trackedWebsite.trackingKey,
-
     sdkVersion: '1.0.0-e2e',
-
     sentAt: new Date().toISOString(),
 
     events,
@@ -173,9 +159,7 @@ export async function createTrackedWebsite(
 
   const website = await createWebsite(actor, {
     domain: parsedOrigin.host,
-
     allowedOrigins: options.allowedOrigins ?? [origin],
-
     enabled: options.enabled ?? true,
   });
 
@@ -213,11 +197,8 @@ export async function collectEvents(
 ): Promise<Response> {
   const payload = buildCollectPayload(trackedWebsite, events, {
     trackingKey: options.trackingKey ?? trackedWebsite.trackingKey,
-
     websiteId: options.websiteId ?? trackedWebsite.id,
-
     sdkVersion: options.sdkVersion ?? '1.0.0-e2e',
-
     sentAt: options.sentAt ?? new Date().toISOString(),
   });
 
@@ -247,9 +228,7 @@ export function readCollectResult(response: Response): CollectResponseBody {
 
   return {
     accepted: body.accepted,
-
     duplicates: body.duplicates,
-
     receivedAt: body.receivedAt,
   };
 }
@@ -289,9 +268,7 @@ export function readTrackingStatus(response: Response): TrackingStatusBody {
     website,
 
     connected: body.connected,
-
     totalEvents: body.totalEvents,
-
     counts: normalizedCounts,
 
     recentEvents,
@@ -323,15 +300,10 @@ export function readRawEventList(response: Response): RawEventListBody {
 
     meta: {
       page: meta.page,
-
       limit: meta.limit,
-
       total: meta.total,
-
       totalPages: meta.totalPages,
-
       hasNextPage: meta.hasNextPage,
-
       hasPreviousPage: meta.hasPreviousPage,
     },
   };

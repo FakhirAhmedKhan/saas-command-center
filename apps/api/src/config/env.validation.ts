@@ -374,106 +374,58 @@ export function validateEnvironment(config: Record<string, unknown>): Environmen
     GITHUB_APP_PRIVATE_KEY_BASE64: getOptionalString(config, 'GITHUB_APP_PRIVATE_KEY_BASE64'),
     GITHUB_APP_SLUG: getOptionalString(config, 'GITHUB_APP_SLUG'),
     GITHUB_APP_WEBHOOK_SECRET: getOptionalString(config, 'GITHUB_APP_WEBHOOK_SECRET'),
-
     WEBHOOK_ENCRYPTION_KEY: webhookEncryptionKey,
-
     WEBHOOK_WORKER_ENABLED: getBoolean(config, 'WEBHOOK_WORKER_ENABLED', true),
-
     WEBHOOK_WORKER_BATCH_SIZE: getPositiveInteger(config, 'WEBHOOK_WORKER_BATCH_SIZE', 20),
-
     WEBHOOK_WORKER_CONCURRENCY: getPositiveInteger(config, 'WEBHOOK_WORKER_CONCURRENCY', 5),
-
     WEBHOOK_PROCESSING_TIMEOUT_MS: getPositiveInteger(config, 'WEBHOOK_PROCESSING_TIMEOUT_MS', 120_000),
-
     WEBHOOK_DEFAULT_TIMEOUT_MS: webhookDefaultTimeoutMs,
-
     WEBHOOK_MAX_TIMEOUT_MS: webhookMaxTimeoutMs,
-
     WEBHOOK_DEFAULT_MAX_ATTEMPTS: webhookDefaultMaxAttempts,
-
     WEBHOOK_MAX_ATTEMPTS: webhookMaxAttempts,
-
     WEBHOOK_RETENTION_DAYS: getPositiveInteger(config, 'WEBHOOK_RETENTION_DAYS', 90),
-
     WEBHOOK_CLEANUP_ENABLED: getBoolean(config, 'WEBHOOK_CLEANUP_ENABLED', true),
-
     GITHUB_CONNECT_INTENT_CLEANUP_ENABLED: getBoolean(config, 'GITHUB_CONNECT_INTENT_CLEANUP_ENABLED', true),
     INVITATION_TOKEN_PEPPER: invitationTokenPepper,
-
     INVITATION_TTL_HOURS: getPositiveInteger(config, 'INVITATION_TTL_HOURS', 72),
-
     INVITATION_EMAIL_ENABLED: getBoolean(config, 'INVITATION_EMAIL_ENABLED', false),
-
     NOTIFICATION_RETENTION_DAYS: getPositiveInteger(config, 'NOTIFICATION_RETENTION_DAYS', 90),
-
     NOTIFICATION_CLEANUP_ENABLED: getBoolean(config, 'NOTIFICATION_CLEANUP_ENABLED', true),
     HEALTH_MONITOR_ENABLED: getBoolean(config, 'HEALTH_MONITOR_ENABLED', true),
-
     HEALTH_MONITOR_BATCH_SIZE: getPositiveInteger(config, 'HEALTH_MONITOR_BATCH_SIZE', 20),
-
     HEALTH_MONITOR_CONCURRENCY: getPositiveInteger(config, 'HEALTH_MONITOR_CONCURRENCY', 5),
-
     HEALTH_MIN_INTERVAL_SECONDS: getPositiveInteger(config, 'HEALTH_MIN_INTERVAL_SECONDS', 60),
-
     HEALTH_MAX_INTERVAL_SECONDS: getPositiveInteger(config, 'HEALTH_MAX_INTERVAL_SECONDS', 86_400),
-
     HEALTH_MIN_TIMEOUT_MS: getPositiveInteger(config, 'HEALTH_MIN_TIMEOUT_MS', 1_000),
-
     HEALTH_MAX_TIMEOUT_MS: getPositiveInteger(config, 'HEALTH_MAX_TIMEOUT_MS', 30_000),
-
     HEALTH_HISTORY_RETENTION_DAYS: getPositiveInteger(config, 'HEALTH_HISTORY_RETENTION_DAYS', 30),
-
     HEALTH_DEFAULT_FAILURE_THRESHOLD: getPositiveInteger(config, 'HEALTH_DEFAULT_FAILURE_THRESHOLD', 3),
     REDIS_URL: getRequiredString(config, 'REDIS_URL'),
-
     ANALYTICS_WORKER_ENABLED: getBoolean(config, 'ANALYTICS_WORKER_ENABLED', true),
-
     ANALYTICS_WORKER_INTERVAL_MS: getPositiveInteger(config, 'ANALYTICS_WORKER_INTERVAL_MS', 5_000),
-
     ANALYTICS_SCHEDULER_ENABLED: getBoolean(config, 'ANALYTICS_SCHEDULER_ENABLED', true),
-
     ANALYTICS_MAX_RETRIES: getPositiveInteger(config, 'ANALYTICS_MAX_RETRIES', 3),
-
     ANALYTICS_REPROCESS_MAX_DAYS: getPositiveInteger(config, 'ANALYTICS_REPROCESS_MAX_DAYS', 31),
-
     ANALYTICS_PROCESSING_TIMEOUT_MS: getPositiveInteger(config, 'ANALYTICS_PROCESSING_TIMEOUT_MS', 120_000),
-
     ANALYTICS_INGESTION_LIMIT: getPositiveInteger(config, 'ANALYTICS_INGESTION_LIMIT', 120),
-
     ANALYTICS_INGESTION_WINDOW_SECONDS: getPositiveInteger(config, 'ANALYTICS_INGESTION_WINDOW_SECONDS', 60),
-
     ANALYTICS_IP_HASH_SALT: resolveAnalyticsIpHashSalt(config, nodeEnvironment),
     NODE_ENV: nodeEnvironment,
-
     PORT: getPositiveInteger(config, 'PORT', 4000),
-
     DATABASE_URL: databaseUrl,
     TEST_DATABASE_URL: testDatabaseUrl,
-
     JWT_ACCESS_SECRET: jwtAccessSecret,
-
     JWT_REFRESH_SECRET: jwtRefreshSecret,
-
     FRONTEND_URL: frontendUrl,
-
     CORS_ORIGINS: corsOrigins,
-
     TRUST_PROXY: getOptionalString(config, 'TRUST_PROXY') ?? 'false',
-
     COOKIE_NAME: getOptionalString(config, 'COOKIE_NAME') ?? 'command_center_refresh_token',
-
     COOKIE_DOMAIN: getOptionalString(config, 'COOKIE_DOMAIN'),
-
     COOKIE_SECURE: cookieSecure,
-
     COOKIE_SAME_SITE: cookieSameSite,
-
     COOKIE_MAX_AGE_MS: getPositiveInteger(config, 'COOKIE_MAX_AGE_MS', 30 * 24 * 60 * 60 * 1000),
-
     BODY_LIMIT: getOptionalString(config, 'BODY_LIMIT') ?? '1mb',
-
     SWAGGER_ENABLED: getBoolean(config, 'SWAGGER_ENABLED', nodeEnvironment !== 'production'),
-
     APP_VERSION: getOptionalString(config, 'APP_VERSION') ?? '0.1.0',
   };
 }

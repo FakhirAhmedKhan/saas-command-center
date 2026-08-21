@@ -65,7 +65,6 @@ export class SharedRateLimitService {
       limit,
 
       remaining: Math.max(limit - count, 0),
-
       retryAfterSeconds: count > limit ? resetAfterSeconds : 0,
 
       resetAfterSeconds,

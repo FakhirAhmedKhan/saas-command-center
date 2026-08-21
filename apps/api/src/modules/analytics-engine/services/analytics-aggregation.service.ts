@@ -1,4 +1,4 @@
-﻿import { getAnalyticsBucket } from '../utils/analytics-time';
+import { getAnalyticsBucket } from '../utils/analytics-time';
 import { AnalyticsAggregatePeriod } from '@command-center/shared-types';
 import { Injectable } from '@nestjs/common';
 import { createHash } from 'node:crypto';
@@ -56,7 +56,6 @@ export class AnalyticsAggregationService {
     const events = await transaction.analyticsEvent.findMany({
       where: {
         websiteId: website.id,
-
         occurredAt: {
           gte: bucket.start,
           lt: bucket.end,
@@ -74,7 +73,6 @@ export class AnalyticsAggregationService {
     const pageViews = await transaction.analyticsPageView.findMany({
       where: {
         websiteId: website.id,
-
         occurredAt: {
           gte: bucket.start,
           lt: bucket.end,
@@ -92,7 +90,6 @@ export class AnalyticsAggregationService {
     const sessions = await transaction.analyticsSession.findMany({
       where: {
         websiteId: website.id,
-
         startedAt: {
           gte: bucket.start,
           lt: bucket.end,
@@ -286,15 +283,7 @@ export class AnalyticsAggregationService {
     }
   }
 
-  private getAggregate(
-    collection: Map<string, MutableAggregate>,
-
-    dimension: AnalyticsAggregateDimension,
-
-    value: string,
-
-    label: string,
-  ): MutableAggregate {
+  private getAggregate(collection: Map<string, MutableAggregate>, dimension: AnalyticsAggregateDimension, value: string, label: string): MutableAggregate {
     const key = `${dimension}:${value}`;
 
     const existing = collection.get(key);
@@ -309,17 +298,11 @@ export class AnalyticsAggregationService {
       label,
 
       visitors: new Set<string>(),
-
       sessions: new Set<string>(),
-
       pageViews: 0,
-
       events: 0,
-
       customEvents: 0,
-
       bounces: 0,
-
       totalDurationMs: 0n,
     };
 
@@ -330,13 +313,9 @@ export class AnalyticsAggregationService {
 
   private addSessionDimension(
     collection: Map<string, MutableAggregate>,
-
     dimension: AnalyticsAggregateDimension,
-
     value: string,
-
     label: string,
-
     session: {
       id: string;
       visitorId: string;
@@ -364,11 +343,7 @@ export class AnalyticsAggregationService {
     aggregate.totalDurationMs += BigInt(session.durationMs);
   }
 
-  private createDimensionKey(
-    dimension: AnalyticsAggregateDimension,
-
-    value: string,
-  ): string {
+  private createDimensionKey(dimension: AnalyticsAggregateDimension, value: string): string {
     if (dimension === AnalyticsAggregateDimension.OVERVIEW) {
       return 'overview';
     }

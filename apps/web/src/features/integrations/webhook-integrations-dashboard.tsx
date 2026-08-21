@@ -37,15 +37,10 @@ interface WebhookFormState {
 
 const INITIAL_FORM: WebhookFormState = {
   name: '',
-
   url: '',
-
   eventTypes: [],
-
   timeoutMs: 10_000,
-
   maxAttempts: 5,
-
   enabled: true,
 };
 
@@ -56,7 +51,6 @@ function formatDateTime(value: string | null): string {
 
   return new Intl.DateTimeFormat('en-US', {
     dateStyle: 'medium',
-
     timeStyle: 'short',
   }).format(new Date(value));
 }
@@ -109,15 +103,10 @@ function WebhookForm({
 
     setForm({
       name: editing.name,
-
       url: editing.url,
-
       eventTypes: editing.eventTypes,
-
       timeoutMs: editing.timeoutMs,
-
       maxAttempts: editing.maxAttempts,
-
       enabled: editing.enabled,
     });
   }, [editing]);

@@ -13,9 +13,7 @@ import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-
 
 @Module({
   imports: [WorkspaceMembersModule, WorkspaceModule],
-
   controllers: [AnalyticsEngineController],
-
   providers: [
     AnalyticsEngineQueryService,
     AnalyticsProcessingService,

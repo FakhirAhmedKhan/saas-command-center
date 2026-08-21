@@ -26,11 +26,7 @@ function escapeCsvValue(value: CsvValue): string {
   return `"${normalized.replace(/"/g, '""')}"`;
 }
 
-export function createCsv<T>(
-  columns: CsvColumn<T>[],
-
-  rows: T[],
-): string {
+export function createCsv<T>(columns: CsvColumn<T>[], rows: T[]): string {
   const header = columns.map((column) => escapeCsvValue(column.header)).join(',');
 
   const content = rows.map((row) => columns.map((column) => escapeCsvValue(column.value(row))).join(','));

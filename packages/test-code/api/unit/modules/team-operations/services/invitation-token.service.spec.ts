@@ -5,9 +5,7 @@ describe(InvitationTokenService.name, () => {
     get(key: string) {
       const values: Record<string, unknown> = {
         INVITATION_TOKEN_PEPPER: 'test-pepper-with-more-than-thirty-two-characters',
-
         INVITATION_TTL_HOURS: 72,
-
         FRONTEND_URL: 'http://localhost:3000',
       };
 

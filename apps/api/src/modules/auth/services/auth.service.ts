@@ -68,9 +68,7 @@ export class AuthService {
             familyId,
             refreshTokenHash,
             expiresAt: tokens.refreshExpiresAt,
-
             userAgent: this.normalizeMetadata(metadata.userAgent),
-
             ipAddress: this.normalizeMetadata(metadata.ipAddress),
           },
         });

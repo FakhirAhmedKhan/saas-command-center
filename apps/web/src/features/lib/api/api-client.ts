@@ -131,9 +131,7 @@ function performRefresh(): Promise<RefreshPayload | null> {
     try {
       const response = await fetch(buildUrl('/auth/refresh'), {
         method: 'POST',
-
         credentials: 'include',
-
         headers: {
           Accept: 'application/json',
         },
@@ -201,7 +199,6 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
       ...requestInit,
 
       body: serializeBody(body),
-
       headers: buildHeaders({
         ...options,
         body,
@@ -250,7 +247,6 @@ async function executeDownloadRequest(path: string): Promise<Response> {
 
   return fetch(buildUrl(path), {
     method: 'GET',
-
     credentials: 'include',
 
     headers,

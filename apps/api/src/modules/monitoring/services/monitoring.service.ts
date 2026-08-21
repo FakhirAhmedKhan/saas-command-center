@@ -38,13 +38,7 @@ export class MonitoringService {
     private readonly safeHttp: SafeHttpClientService,
   ) {}
 
-  async create(
-    workspaceId: string,
-
-    userId: string,
-
-    input: CreateHealthCheckDto,
-  ): Promise<HealthCheckDto> {
+  async create(workspaceId: string, userId: string, input: CreateHealthCheckDto): Promise<HealthCheckDto> {
     await this.access.assertCanManage(workspaceId, userId);
 
     this.validateConfiguration(input);
@@ -58,35 +52,20 @@ export class MonitoringService {
         workspaceId,
 
         targetType: input.targetType,
-
         applicationId: input.targetType === HealthTargetType.APPLICATION ? input.applicationId : null,
-
         websiteId: input.targetType === HealthTargetType.WEBSITE ? input.websiteId : null,
-
         name: input.name.trim(),
-
         url: input.url.trim(),
-
         intervalSeconds: input.intervalSeconds,
-
         timeoutMs: input.timeoutMs,
-
         expectedStatusMin: input.expectedStatusMin,
-
         expectedStatusMax: input.expectedStatusMax,
-
         degradedAfterMs: input.degradedAfterMs,
-
         failureThreshold: input.failureThreshold,
-
         enabled: input.enabled,
-
         latestStatus: input.enabled ? HealthCheckStatus.UNKNOWN : HealthCheckStatus.DISABLED,
-
         nextRunAt: new Date(),
-
         createdById: userId,
-
         updatedById: userId,
       },
 
@@ -96,42 +75,23 @@ export class MonitoringService {
     return this.mapCheck(created);
   }
 
-  async update(
-    workspaceId: string,
-
-    checkId: string,
-
-    userId: string,
-
-    input: UpdateHealthCheckDto,
-  ): Promise<HealthCheckDto> {
+  async update(workspaceId: string, checkId: string, userId: string, input: UpdateHealthCheckDto): Promise<HealthCheckDto> {
     await this.access.assertCanManage(workspaceId, userId);
 
     const existing = await this.requireCheck(workspaceId, checkId);
 
     const merged = {
       targetType: input.targetType ?? existing.targetType,
-
       applicationId: input.applicationId !== undefined ? input.applicationId : (existing.applicationId ?? undefined),
-
       websiteId: input.websiteId !== undefined ? input.websiteId : (existing.websiteId ?? undefined),
-
       name: input.name ?? existing.name,
-
       url: input.url ?? existing.url,
-
       intervalSeconds: input.intervalSeconds ?? existing.intervalSeconds,
-
       timeoutMs: input.timeoutMs ?? existing.timeoutMs,
-
       expectedStatusMin: input.expectedStatusMin ?? existing.expectedStatusMin,
-
       expectedStatusMax: input.expectedStatusMax ?? existing.expectedStatusMax,
-
       degradedAfterMs: input.degradedAfterMs ?? existing.degradedAfterMs,
-
       failureThreshold: input.failureThreshold ?? existing.failureThreshold,
-
       enabled: input.enabled ?? existing.enabled,
     };
 
@@ -152,35 +112,20 @@ export class MonitoringService {
 
       data: {
         targetType: merged.targetType,
-
         applicationId: merged.targetType === HealthTargetType.APPLICATION ? merged.applicationId : null,
-
         websiteId: merged.targetType === HealthTargetType.WEBSITE ? merged.websiteId : null,
-
         name: merged.name.trim(),
-
         url: merged.url.trim(),
-
         intervalSeconds: merged.intervalSeconds,
-
         timeoutMs: merged.timeoutMs,
-
         expectedStatusMin: merged.expectedStatusMin,
-
         expectedStatusMax: merged.expectedStatusMax,
-
         degradedAfterMs: merged.degradedAfterMs,
-
         failureThreshold: merged.failureThreshold,
-
         enabled: merged.enabled,
-
         latestStatus: merged.enabled ? (existing.enabled ? existing.latestStatus : HealthCheckStatus.UNKNOWN) : HealthCheckStatus.DISABLED,
-
         consecutiveFailures: merged.enabled ? existing.consecutiveFailures : 0,
-
         nextRunAt: new Date(),
-
         updatedById: userId,
       },
 
@@ -194,28 +139,19 @@ export class MonitoringService {
     return this.mapCheck(updated);
   }
 
-  async list(
-    workspaceId: string,
-
-    query: HealthCheckListQueryDto,
-  ): Promise<HealthCheckDto[]> {
+  async list(workspaceId: string, query: HealthCheckListQueryDto): Promise<HealthCheckDto[]> {
     const checks = await this.prisma.healthCheck.findMany({
       where: {
         workspaceId,
 
         latestStatus: query.status,
-
         targetType: query.targetType,
-
         enabled: query.enabled,
-
         applicationId: query.applicationId,
-
         websiteId: query.websiteId,
       },
 
       include: this.targetInclude(),
-
       orderBy: [
         {
           latestStatus: 'asc',
@@ -232,19 +168,11 @@ export class MonitoringService {
     return checks.map((check) => this.mapCheck(check));
   }
 
-  async getOne(
-    workspaceId: string,
-
-    checkId: string,
-  ): Promise<HealthCheckDto> {
+  async getOne(workspaceId: string, checkId: string): Promise<HealthCheckDto> {
     return this.mapCheck(await this.requireCheck(workspaceId, checkId));
   }
 
-  async getHistory(
-    workspaceId: string,
-
-    checkId: string,
-  ): Promise<HealthCheckHistoryDto[]> {
+  async getHistory(workspaceId: string, checkId: string): Promise<HealthCheckHistoryDto[]> {
     await this.requireCheck(workspaceId, checkId);
 
     const history = await this.prisma.healthCheckHistory.findMany({
@@ -261,24 +189,15 @@ export class MonitoringService {
 
     return history.map((item) => ({
       id: item.id,
-
       status: item.status,
-
       statusCode: item.statusCode,
-
       responseTimeMs: item.responseTimeMs,
-
       failureReason: item.failureReason,
-
       checkedAt: item.checkedAt.toISOString(),
     }));
   }
 
-  async getIncidents(
-    workspaceId: string,
-
-    query: IncidentListQueryDto,
-  ): Promise<HealthIncidentDto[]> {
+  async getIncidents(workspaceId: string, query: IncidentListQueryDto): Promise<HealthIncidentDto[]> {
     const incidents = await this.prisma.healthIncident.findMany({
       where: {
         workspaceId,
@@ -301,40 +220,25 @@ export class MonitoringService {
 
     return incidents.map((incident) => ({
       id: incident.id,
-
       healthCheckId: incident.healthCheckId,
-
       healthCheckName: incident.healthCheck.name,
-
       targetName: this.getTargetName(incident.healthCheck),
-
       status: incident.status,
-
       summary: incident.summary,
-
       failureCount: incident.failureCount,
-
       firstFailureAt: incident.firstFailureAt.toISOString(),
-
       lastFailureAt: incident.lastFailureAt.toISOString(),
-
       startedAt: incident.startedAt.toISOString(),
-
       resolvedAt: incident.resolvedAt?.toISOString() ?? null,
     }));
   }
 
-  async getSummary(
-    workspaceId: string,
-
-    userId: string,
-  ): Promise<MonitoringSummaryDto> {
+  async getSummary(workspaceId: string, userId: string): Promise<MonitoringSummaryDto> {
     const [canManage, groupedStatuses, activeIncidents] = await Promise.all([
       this.access.canManage(workspaceId, userId),
 
       this.prisma.healthCheck.groupBy({
         by: ['latestStatus'],
-
         where: {
           workspaceId,
         },
@@ -384,11 +288,7 @@ export class MonitoringService {
     };
   }
 
-  async getApplicationSummary(
-    workspaceId: string,
-
-    applicationId: string,
-  ) {
+  async getApplicationSummary(workspaceId: string, applicationId: string) {
     const application = await this.prisma.saasApplication.findFirst({
       where: {
         id: applicationId,
@@ -398,7 +298,6 @@ export class MonitoringService {
 
       select: {
         id: true,
-
         name: true,
       },
     });
@@ -416,9 +315,7 @@ export class MonitoringService {
 
       select: {
         latestStatus: true,
-
         lastResponseTimeMs: true,
-
         lastCheckedAt: true,
       },
     });
@@ -429,15 +326,12 @@ export class MonitoringService {
 
     return {
       applicationId: application.id,
-
       applicationName: application.name,
 
       status,
 
       checks: checks.length,
-
       averageResponseTimeMs: this.average(checks.map((check) => check.lastResponseTimeMs).filter((value): value is number => value !== null)),
-
       lastCheckedAt:
         checks
           .map((check) => check.lastCheckedAt)
@@ -458,7 +352,6 @@ export class MonitoringService {
 
         select: {
           id: true,
-
           name: true,
         },
 
@@ -476,9 +369,7 @@ export class MonitoringService {
 
         select: {
           id: true,
-
           name: true,
-
           domain: true,
         },
 
@@ -491,21 +382,15 @@ export class MonitoringService {
     return [
       ...applications.map((application): MonitoringTargetDto => ({
         id: application.id,
-
         type: HealthTargetType.APPLICATION,
-
         name: application.name,
-
         subtitle: null,
       })),
 
       ...websites.map((website): MonitoringTargetDto => ({
         id: website.id,
-
         type: HealthTargetType.WEBSITE,
-
         name: website.name,
-
         subtitle: website.domain,
       })),
     ];
@@ -573,7 +458,6 @@ export class MonitoringService {
 
   private async assertTargetExists(
     workspaceId: string,
-
     targetType: HealthTargetType,
 
     applicationId?: string,
@@ -621,11 +505,7 @@ export class MonitoringService {
     }
   }
 
-  private async requireCheck(
-    workspaceId: string,
-
-    checkId: string,
-  ): Promise<HealthCheckWithTarget> {
+  private async requireCheck(workspaceId: string, checkId: string): Promise<HealthCheckWithTarget> {
     const check = await this.prisma.healthCheck.findFirst({
       where: {
         id: checkId,
@@ -653,9 +533,7 @@ export class MonitoringService {
 
       data: {
         status: HealthIncidentStatus.RESOLVED,
-
         activeKey: null,
-
         resolvedAt: new Date(),
       },
     });
@@ -672,7 +550,6 @@ export class MonitoringService {
       website: {
         select: {
           name: true,
-
           domain: true,
         },
       },
@@ -684,53 +561,31 @@ export class MonitoringService {
 
     return {
       id: check.id,
-
       targetType: check.targetType,
 
       targetId,
 
       targetName: this.getTargetName(check),
-
       applicationId: check.applicationId,
-
       websiteId: check.websiteId,
-
       name: check.name,
-
       url: check.url,
-
       intervalSeconds: check.intervalSeconds,
-
       timeoutMs: check.timeoutMs,
-
       expectedStatusMin: check.expectedStatusMin,
-
       expectedStatusMax: check.expectedStatusMax,
-
       degradedAfterMs: check.degradedAfterMs,
-
       failureThreshold: check.failureThreshold,
-
       enabled: check.enabled,
-
       latestStatus: check.latestStatus,
-
       lastStatusCode: check.lastStatusCode,
-
       lastResponseTimeMs: check.lastResponseTimeMs,
-
       lastFailureReason: check.lastFailureReason,
-
       consecutiveFailures: check.consecutiveFailures,
-
       lastCheckedAt: check.lastCheckedAt?.toISOString() ?? null,
-
       lastSuccessfulAt: check.lastSuccessfulAt?.toISOString() ?? null,
-
       nextRunAt: check.nextRunAt.toISOString(),
-
       createdAt: check.createdAt.toISOString(),
-
       updatedAt: check.updatedAt.toISOString(),
     };
   }

@@ -7,15 +7,11 @@ test.describe('Phase 15 monitoring', () => {
     await page.route('**/auth/refresh', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           accessToken: 'phase-15-token',
-
           user: {
             id: '33333333-3333-4333-8333-333333333333',
-
             email: 'admin@example.com',
           },
         }),
@@ -25,24 +21,15 @@ test.describe('Phase 15 monitoring', () => {
     await page.route('**/monitoring/summary', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           canManage: true,
-
           total: 3,
-
           healthy: 1,
-
           degraded: 1,
-
           down: 1,
-
           unknown: 0,
-
           disabled: 0,
-
           activeIncidents: 1,
         }),
       });
@@ -51,17 +38,12 @@ test.describe('Phase 15 monitoring', () => {
     await page.route('**/monitoring/targets', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify([
           {
             id: '44444444-4444-4444-8444-444444444444',
-
             type: 'APPLICATION',
-
             name: 'Demo API',
-
             subtitle: null,
           },
         ]),
@@ -72,9 +54,7 @@ test.describe('Phase 15 monitoring', () => {
       if (route.request().method() === 'POST') {
         await route.fulfill({
           status: 201,
-
           contentType: 'application/json',
-
           body: JSON.stringify({
             id: 'new-check',
           }),
@@ -85,59 +65,33 @@ test.describe('Phase 15 monitoring', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify([
           {
             id: '55555555-5555-4555-8555-555555555555',
-
             targetType: 'APPLICATION',
-
             targetId: '44444444-4444-4444-8444-444444444444',
-
             targetName: 'Demo API',
-
             applicationId: '44444444-4444-4444-8444-444444444444',
-
             websiteId: null,
-
             name: 'Production API',
-
             url: 'https://example.com/health',
-
             intervalSeconds: 300,
-
             timeoutMs: 10000,
-
             expectedStatusMin: 200,
-
             expectedStatusMax: 399,
-
             degradedAfterMs: 1500,
-
             failureThreshold: 3,
-
             enabled: true,
-
             latestStatus: 'HEALTHY',
-
             lastStatusCode: 200,
-
             lastResponseTimeMs: 120,
-
             lastFailureReason: null,
-
             consecutiveFailures: 0,
-
             lastCheckedAt: '2026-08-07T01:00:00.000Z',
-
             lastSuccessfulAt: '2026-08-07T01:00:00.000Z',
-
             nextRunAt: '2026-08-07T01:05:00.000Z',
-
             createdAt: '2026-08-01T00:00:00.000Z',
-
             updatedAt: '2026-08-07T01:00:00.000Z',
           },
         ]),
@@ -147,31 +101,19 @@ test.describe('Phase 15 monitoring', () => {
     await page.route('**/monitoring/incidents', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify([
           {
             id: 'incident-1',
-
             healthCheckId: 'check-2',
-
             healthCheckName: 'Website',
-
             targetName: 'Public Website',
-
             status: 'OPEN',
-
             summary: 'Website returned HTTP 500.',
-
             failureCount: 3,
-
             firstFailureAt: '2026-08-07T00:00:00.000Z',
-
             lastFailureAt: '2026-08-07T00:10:00.000Z',
-
             startedAt: '2026-08-07T00:10:00.000Z',
-
             resolvedAt: null,
           },
         ]),
@@ -229,24 +171,15 @@ test.describe('Phase 15 monitoring', () => {
     await page.route('**/monitoring/summary', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           canManage: false,
-
           total: 1,
-
           healthy: 1,
-
           degraded: 0,
-
           down: 0,
-
           unknown: 0,
-
           disabled: 0,
-
           activeIncidents: 0,
         }),
       });
@@ -277,24 +210,15 @@ test.describe('Phase 15 monitoring', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           canManage: true,
-
           total: 0,
-
           healthy: 0,
-
           degraded: 0,
-
           down: 0,
-
           unknown: 0,
-
           disabled: 0,
-
           activeIncidents: 0,
         }),
       });
@@ -313,12 +237,9 @@ test.describe('Phase 15 monitoring', () => {
     await page.route('**/monitoring/summary', async (route) => {
       await route.fulfill({
         status: 500,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           statusCode: 500,
-
           message: 'Internal server error',
         }),
       });
@@ -339,9 +260,7 @@ test.describe('Phase 15 monitoring', () => {
     await page.route('**/monitoring/checks', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify([]),
       });
     });
@@ -357,9 +276,7 @@ test.describe('Phase 15 monitoring', () => {
     await page.route('**/monitoring/incidents', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify([]),
       });
     });
@@ -377,22 +294,14 @@ test.describe('Phase 15 monitoring', () => {
 
       await route.fulfill({
         status: 201,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           healthCheckId: '55555555-5555-4555-8555-555555555555',
-
           status: 'HEALTHY',
-
           statusCode: 200,
-
           responseTimeMs: 120,
-
           failureReason: null,
-
           consecutiveFailures: 0,
-
           nextRunAt: '2026-08-07T01:10:00.000Z',
         }),
       });
@@ -414,12 +323,9 @@ test.describe('Phase 15 monitoring', () => {
       if (route.request().method() === 'PATCH') {
         await route.fulfill({
           status: 400,
-
           contentType: 'application/json',
-
           body: JSON.stringify({
             statusCode: 400,
-
             message: 'Unable to disable this health check right now.',
           }),
         });
@@ -445,21 +351,14 @@ test.describe('Phase 15 monitoring', () => {
     await page.route('**/monitoring/checks/55555555-5555-4555-8555-555555555555/history', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify([
           {
             id: 'history-1',
-
             status: 'HEALTHY',
-
             statusCode: 200,
-
             responseTimeMs: 118,
-
             failureReason: null,
-
             checkedAt: '2026-08-07T01:00:00.000Z',
           },
         ]),

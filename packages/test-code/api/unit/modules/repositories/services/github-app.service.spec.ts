@@ -13,7 +13,6 @@ const GITHUB_ENV_KEYS = [
 function validPrivateKeyBase64(): string {
   const { privateKey } = generateKeyPairSync('rsa', {
     modulusLength: 2048,
-
     privateKeyEncoding: {
       type: 'pkcs1',
       format: 'pem',

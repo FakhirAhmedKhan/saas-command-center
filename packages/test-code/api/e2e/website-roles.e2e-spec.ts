@@ -65,9 +65,7 @@ describe('Website Roles E2E', () => {
       owner,
 
       admin: inWorkspace(rawAdmin, owner.workspaceId),
-
       developer: inWorkspace(rawDeveloper, owner.workspaceId),
-
       viewer: inWorkspace(rawViewer, owner.workspaceId),
     };
   }
@@ -118,7 +116,6 @@ describe('Website Roles E2E', () => {
       .set('Authorization', `Bearer ${matrix.viewer.accessToken}`)
       .send({
         name: 'Viewer Website',
-
         domain: 'viewer.example.test',
       });
 

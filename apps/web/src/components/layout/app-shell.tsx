@@ -4,7 +4,23 @@ import { WorkspaceSwitcher } from './workspace-switcher';
 import { useAuth } from '@/features/auth/auth-provider';
 import { NotificationBell } from '@/features/team-operations/notification-bell';
 import { cn } from '@command-center/ui';
-import { Activity, Boxes, Building2, GitBranch, Globe2, LayoutDashboard, LogOut, Menu, Radio, Settings, X } from 'lucide-react';
+import {
+  Activity,
+  Boxes,
+  Building2,
+  Code2Icon,
+  GitBranch,
+  Globe2,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Radio,
+  Settings,
+  X,
+  type LucideIcon,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -16,7 +32,7 @@ interface AppShellProps {
 interface NavItem {
   label: string;
   href: string;
-  icon: typeof Boxes;
+  icon: LucideIcon;
   match: (pathname: string, workspaceId: string) => boolean;
 }
 
@@ -88,12 +104,17 @@ const NAV_GROUPS: NavGroup[] = [
 interface SidebarContentProps {
   pathname: string;
   workspaceId: string;
+  collapsed?: boolean;
   onNavigate?: () => void;
 }
 
-function SidebarContent({ pathname, workspaceId, onNavigate }: SidebarContentProps) {
+function SidebarContent({
+  pathname,
+  workspaceId,
+  collapsed = false,
+  onNavigate,
+}: SidebarContentProps) {
   const { user, logout } = useAuth();
-
   const router = useRouter();
 
   async function handleLogout(): Promise<void> {
@@ -102,86 +123,154 @@ function SidebarContent({ pathname, workspaceId, onNavigate }: SidebarContentPro
   }
 
   return (
-    <div className='flex h-full flex-col gap-1 px-3 py-4'>
+    <div
+      className={cn(
+        'flex h-full flex-col overflow-hidden py-4 transition-all duration-200',
+        collapsed ? 'px-2' : 'px-3',
+      )}
+    >
+      {/* Brand */}
       <Link
         href='/dashboard'
         onClick={onNavigate}
-        className='mb-3 flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-slate-950 transition hover:bg-slate-100'
+        title={collapsed ? 'SaaS Command Center' : undefined}
+        className={cn(
+          'mb-4 flex h-10 items-center rounded-xl text-slate-950 transition hover:bg-slate-100',
+          collapsed ? 'justify-center' : 'gap-2.5 px-2',
+        )}
       >
-        <span className='flex size-7 shrink-0 items-center justify-center rounded-md bg-brand-600 text-[11px] font-bold text-white'>SC</span>
+        <span className='flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-[11px] font-bold text-white shadow-sm'>
+          SC
+        </span>
 
-        <span className='truncate text-[13px] font-bold leading-tight'>SaaS Command Center</span>
+        {!collapsed ? (
+          <span className='truncate text-[13px] font-bold'>
+            SaaS Command Center
+          </span>
+        ) : null}
       </Link>
 
-      {workspaceId ? (
-        <div className='mb-3'>
+      {/* Workspace */}
+      {workspaceId && !collapsed ? (
+        <div className='mb-4'>
           <WorkspaceSwitcher workspaceId={workspaceId} />
         </div>
       ) : null}
 
-      <nav className='flex-1 space-y-4 overflow-y-auto' aria-label='Primary'>
+      {/* Navigation */}
+      <nav
+        className={cn(
+          'flex-1 overflow-y-auto overflow-x-hidden',
+          collapsed ? 'space-y-3' : 'space-y-4',
+        )}
+        aria-label='Primary'
+      >
         <Link
           href='/dashboard'
           onClick={onNavigate}
+          title={collapsed ? 'Overview' : undefined}
           className={cn(
-            'flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm font-medium transition',
-            pathname === '/dashboard' ? 'bg-brand-50 text-brand-700' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+            'flex h-10 items-center rounded-xl text-sm font-medium transition',
+            collapsed ? 'justify-center' : 'gap-3 px-3',
+            pathname === '/dashboard'
+              ? 'bg-brand-50 text-brand-700'
+              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950',
           )}
         >
-          <LayoutDashboard className='size-[17px] shrink-0' aria-hidden='true' />
-          Overview
+          <LayoutDashboard className='size-[18px] shrink-0' />
+
+          {!collapsed ? <span>Overview</span> : null}
         </Link>
 
         {workspaceId
           ? NAV_GROUPS.map((group) => (
-              <div key={group.label}>
-                <p className='mb-1 px-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400'>{group.label}</p>
+            <div key={group.label}>
+              {!collapsed ? (
+                <p className='mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400'>
+                  {group.label}
+                </p>
+              ) : (
+                <div className='mx-auto mb-2 h-px w-7 bg-slate-200' />
+              )}
 
-                <div className='space-y-0.5'>
-                  {group.items.map((item) => {
-                    const Icon = item.icon;
+              <div className='space-y-1'>
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = item.match(pathname, workspaceId);
 
-                    const isActive = item.match(pathname, workspaceId);
+                  return (
+                    <Link
+                      key={`${group.label}-${item.href}-${item.label}`}
+                      href={`/workspaces/${workspaceId}${item.href}`}
+                      onClick={onNavigate}
+                      aria-current={isActive ? 'page' : undefined}
+                      title={collapsed ? item.label : undefined}
+                      className={cn(
+                        'relative flex h-10 items-center rounded-xl text-sm font-medium transition',
+                        collapsed ? 'justify-center' : 'gap-3 px-3',
+                        isActive
+                          ? 'bg-brand-50 text-brand-700'
+                          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950',
+                      )}
+                    >
+                      {isActive && collapsed ? (
+                        <span className='absolute left-0 h-5 w-[3px] rounded-r-full bg-brand-600' />
+                      ) : null}
 
-                    return (
-                      <Link
-                        key={item.label}
-                        href={`/workspaces/${workspaceId}${item.href}`}
-                        onClick={onNavigate}
-                        aria-current={isActive ? 'page' : undefined}
-                        className={cn(
-                          'flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm font-medium transition',
-                          isActive ? 'bg-brand-50 text-brand-700' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
-                        )}
-                      >
-                        <Icon className='size-[17px] shrink-0' aria-hidden='true' />
-                        {item.label}
-                      </Link>
-                    );
-                  })}
-                </div>
+                      <Icon className='size-[18px] shrink-0' aria-hidden='true' />
+
+                      {!collapsed ? <span>{item.label}</span> : null}
+                    </Link>
+                  );
+                })}
               </div>
-            ))
+            </div>
+          ))
           : null}
       </nav>
 
-      <div className='mt-2 flex items-center gap-2.5 border-t border-slate-100 pt-3'>
-        <div className='flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white'>
-          {(user?.displayName || user?.email || 'U').charAt(0).toUpperCase()}
+      {/* Account */}
+      <div
+        className={cn(
+          'mt-4 border-t border-slate-200 pt-4',
+          collapsed
+            ? 'flex flex-col items-center gap-2'
+            : 'flex items-center gap-2.5',
+        )}
+      >
+        <div
+          title={
+            collapsed
+              ? user?.displayName || user?.email || 'Account'
+              : undefined
+          }
+          className='flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white'
+        >
+          {(user?.displayName || user?.email || 'U')
+            .charAt(0)
+            .toUpperCase()}
         </div>
 
-        <div className='min-w-0 flex-1'>
-          <p className='truncate text-[13px] font-semibold text-slate-900'>{user?.displayName || 'Account owner'}</p>
-          <p className='truncate text-xs text-slate-400'>{user?.email}</p>
-        </div>
+        {!collapsed ? (
+          <div className='min-w-0 flex-1'>
+            <p className='truncate text-[13px] font-semibold text-slate-900'>
+              {user?.displayName || 'Account owner'}
+            </p>
+
+            <p className='truncate text-xs text-slate-400'>
+              {user?.email}
+            </p>
+          </div>
+        ) : null}
 
         <button
           type='button'
           onClick={() => void handleLogout()}
           aria-label='Sign out'
-          className='flex size-8 shrink-0 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700'
+          title='Sign out'
+          className='flex size-8 shrink-0 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-800'
         >
-          <LogOut className='size-4' aria-hidden='true' />
+          <LogOut className='size-4' />
         </button>
       </div>
     </div>
@@ -192,6 +281,7 @@ export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [desktopNavCollapsed, setDesktopNavCollapsed] = useState(false);
 
   const workspaceId = pathname.match(/\/workspaces\/([^/]+)/)?.[1] ?? '';
 
@@ -205,8 +295,31 @@ export function AppShell({ children }: AppShellProps) {
       </a>
 
       <div className='mx-auto flex min-h-screen w-full max-w-[1920px]'>
-        <aside className='sticky top-0 hidden h-screen w-62 shrink-0 border-r border-slate-200 bg-white lg:block'>
-          <SidebarContent pathname={pathname} workspaceId={workspaceId} />
+        <aside
+          className={cn(
+            'sticky top-0 relative hidden h-screen shrink-0 overflow-visible border-r border-slate-200 bg-white transition-[width] duration-200 ease-out lg:block',
+            desktopNavCollapsed ? 'w-[72px]' : 'w-[280px]',
+          )}
+        >
+          <button
+            type='button'
+            onClick={() => setDesktopNavCollapsed((current) => !current)}
+            aria-label={desktopNavCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            title={desktopNavCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            className='absolute -right-3.5 top-7 z-50 flex size-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900'
+          >
+            {desktopNavCollapsed ? (
+              <PanelLeftOpen className='size-4' />
+            ) : (
+              <PanelLeftClose className='size-4' />
+            )}
+          </button>
+
+          <SidebarContent
+            pathname={pathname}
+            workspaceId={workspaceId}
+            collapsed={desktopNavCollapsed}
+          />
         </aside>
 
         {mobileNavOpen ? (

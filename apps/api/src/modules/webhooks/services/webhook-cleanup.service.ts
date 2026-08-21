@@ -59,9 +59,7 @@ export class WebhookCleanupService {
     this.logger.log(
       JSON.stringify({
         event: 'webhook_retention_cleanup',
-
         removedDeliveries: deliveries.count,
-
         removedEvents: events.count,
       }),
     );

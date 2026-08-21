@@ -67,7 +67,6 @@ export class TokenService {
       accessToken,
       refreshToken,
       accessExpiresInSeconds: this.accessExpiresInSeconds,
-
       refreshExpiresAt: new Date(Date.now() + this.refreshExpiresInSeconds * 1000),
     };
   }

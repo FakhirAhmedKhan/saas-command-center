@@ -37,9 +37,7 @@ export function calculatePercentageChange(current: number, previous: number): nu
 export function createMetricComparison(current: number, previous: number): AnalyticsMetricDto {
   return {
     value: current,
-
     previousValue: previous,
-
     changePercent: calculatePercentageChange(current, previous),
   };
 }

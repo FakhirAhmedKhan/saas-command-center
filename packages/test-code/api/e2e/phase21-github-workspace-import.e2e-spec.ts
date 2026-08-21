@@ -27,7 +27,6 @@ const DEFAULT_OWNER = 'phase21-org';
 function githubAppMockFactory() {
   return {
     buildInstallationUrl: jest.fn((state: string): string => `https://github.test/apps/command-center/installations/new?state=${encodeURIComponent(state)}`),
-
     buildUserAuthorizationUrl: jest.fn((state: string, codeChallenge: string): string => {
       const url = new URL('https://github.test/login/oauth/authorize');
       url.searchParams.set('state', state);
@@ -36,7 +35,6 @@ function githubAppMockFactory() {
     }),
 
     exchangeUserCode: jest.fn(async (): Promise<string> => 'ghu_phase21_test_user_token'),
-
     getInstallation: jest.fn(async (installationId: string): Promise<GithubInstallation> => ({
       id: installationId,
       accountLogin: DEFAULT_OWNER,
@@ -44,13 +42,9 @@ function githubAppMockFactory() {
     })),
 
     userCanAccessInstallation: jest.fn(async (): Promise<boolean> => true),
-
     listImportableInstallationRepositories: jest.fn(async (): Promise<GithubImportableRepository[]> => []),
-
     listInstallationRepositories: jest.fn(async () => []),
-
     getInstallationAccessToken: jest.fn(async (): Promise<string> => 'ghs_phase21_test_installation_token'),
-
     getWebhookSecret: jest.fn((): string => 'phase21-e2e-webhook-secret'),
   };
 }
@@ -58,7 +52,6 @@ function githubAppMockFactory() {
 function githubCodeMockFactory() {
   return {
     listBranches: jest.fn(),
-
     getTree: jest.fn(async (): Promise<GithubRepositoryTree> => ({
       sha: 'tree-sha',
       truncated: false,
@@ -83,7 +76,6 @@ function repositoryFixture(overrides: Partial<GithubImportableRepository> = {}):
     defaultBranch: 'main',
     htmlUrl: `https://github.com/${DEFAULT_OWNER}/demo-app`,
     updatedAt: '2026-08-09T12:00:00.000Z',
-
     owner: {
       login: DEFAULT_OWNER,
       avatarUrl: 'https://avatars.githubusercontent.com/u/1',
@@ -382,7 +374,8 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
         ],
       });
 
-      githubCodeMock.getFile.mockImplementation(async (_installationId: string, _owner: string, _repo: string, path: string) => {
+      githubCodeMock.getFile.mockImplementation(async (...args: unknown[]) => {
+        const path = args[3] as string;
         if (path === 'package.json') {
           return {
             name: 'package.json',
@@ -436,7 +429,8 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
         ],
       });
 
-      githubCodeMock.getFile.mockImplementation(async (_installationId: string, _owner: string, _repo: string, path: string) => {
+      githubCodeMock.getFile.mockImplementation(async (...args: unknown[]) => {
+        const path = args[3] as string;
         const files: Record<string, { content: string } | undefined> = {
           'pnpm-workspace.yaml': {
             content: Buffer.from("packages:\n  - 'apps/*'\n  - 'packages/*'\n", 'utf8').toString('base64'),
@@ -531,7 +525,8 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
         ],
       });
 
-      githubCodeMock.getFile.mockImplementation(async (_installationId: string, _owner: string, _repo: string, path: string) => {
+      githubCodeMock.getFile.mockImplementation(async (...args: unknown[]) => {
+        const path = args[3] as string;
         if (path === 'package.json') {
           return {
             name: 'package.json',

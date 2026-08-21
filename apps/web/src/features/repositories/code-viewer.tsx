@@ -52,25 +52,17 @@ export function CodeViewer({ file }: CodeViewerProps) {
       theme='vs-dark'
       options={{
         readOnly: true,
-
         minimap: {
           enabled: true,
         },
 
         fontSize: 14,
-
         wordWrap: 'off',
-
         automaticLayout: true,
-
         scrollBeyondLastLine: false,
-
         renderWhitespace: 'selection',
-
         folding: true,
-
         lineNumbers: 'on',
-
         bracketPairColorization: {
           enabled: true,
         },

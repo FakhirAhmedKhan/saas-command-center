@@ -52,7 +52,6 @@ export class HealthService {
     return {
       status: 'ready',
       service: 'command-center-api',
-
       version: this.config.get('APP_VERSION', {
         infer: true,
       }),
@@ -62,7 +61,6 @@ export class HealthService {
       }),
 
       timestamp: new Date().toISOString(),
-
       database: {
         status: 'up',
         responseTimeMs: databaseResponseTimeMs,

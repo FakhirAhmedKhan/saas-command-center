@@ -67,7 +67,6 @@ describe('Development E2E', () => {
 
     const milestone = await createMilestone(owner, application.id, {
       title: 'Backend Foundation',
-
       weight: 4,
     });
 
@@ -75,7 +74,6 @@ describe('Development E2E', () => {
 
     const updateResponse = await updateMilestone(owner, application.id, milestone.id, {
       title: 'Backend Foundation Updated',
-
       weight: 5,
     });
 
@@ -103,13 +101,11 @@ describe('Development E2E', () => {
 
     const task = await createTask(owner, application.id, milestone.id, {
       title: 'Create Authentication',
-
       weight: 3,
     });
 
     const updateResponse = await updateTask(owner, application.id, task.id, {
       title: 'Create Secure Authentication',
-
       priority: enumValue(WorkItemPriority, 1),
     });
 
@@ -183,9 +179,7 @@ describe('Development E2E', () => {
 
     const blocker = await createBlocker(owner, application.id, {
       title: 'Waiting for Credentials',
-
       milestoneId: milestone.id,
-
       taskId: task.id,
     });
 

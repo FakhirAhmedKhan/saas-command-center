@@ -13,11 +13,7 @@ export class HealthCheckRunnerService {
     private readonly safeHttp: SafeHttpClientService,
   ) {}
 
-  async run(
-    workspaceId: string,
-
-    healthCheckId: string,
-  ) {
+  async run(workspaceId: string, healthCheckId: string) {
     const healthCheck = await this.prisma.healthCheck.findFirst({
       where: {
         id: healthCheckId,
@@ -40,13 +36,9 @@ export class HealthCheckRunnerService {
 
     const result = await this.safeHttp.execute({
       url: healthCheck.url,
-
       timeoutMs: healthCheck.timeoutMs,
-
       expectedStatusMin: healthCheck.expectedStatusMin,
-
       expectedStatusMax: healthCheck.expectedStatusMax,
-
       degradedAfterMs: healthCheck.degradedAfterMs,
     });
 
@@ -62,15 +54,10 @@ export class HealthCheckRunnerService {
       await transaction.healthCheckHistory.create({
         data: {
           healthCheckId: healthCheck.id,
-
           status: result.status,
-
           statusCode: result.statusCode,
-
           responseTimeMs: result.responseTimeMs,
-
           failureReason: result.failureReason,
-
           checkedAt: now,
         },
       });
@@ -82,17 +69,13 @@ export class HealthCheckRunnerService {
 
         data: {
           latestStatus: result.status,
-
           lastStatusCode: result.statusCode,
-
           lastResponseTimeMs: result.responseTimeMs,
-
           lastFailureReason: result.failureReason,
 
           consecutiveFailures,
 
           lastCheckedAt: now,
-
           lastSuccessfulAt: isFailure ? healthCheck.lastSuccessfulAt : now,
 
           nextRunAt,
@@ -113,15 +96,12 @@ export class HealthCheckRunnerService {
         await transaction.healthIncident.updateMany({
           where: {
             healthCheckId: healthCheck.id,
-
             status: HealthIncidentStatus.OPEN,
           },
 
           data: {
             status: HealthIncidentStatus.RESOLVED,
-
             activeKey: null,
-
             resolvedAt: now,
           },
         });
@@ -131,15 +111,10 @@ export class HealthCheckRunnerService {
     this.logger.log(
       JSON.stringify({
         event: 'health_check_completed',
-
         healthCheckId: healthCheck.id,
-
         workspaceId: healthCheck.workspaceId,
-
         status: result.status,
-
         statusCode: result.statusCode,
-
         responseTimeMs: result.responseTimeMs,
 
         consecutiveFailures,
@@ -159,17 +134,11 @@ export class HealthCheckRunnerService {
 
   private async openOrUpdateIncident(
     transaction: Parameters<Parameters<PrismaService['$transaction']>[0]>[0],
-
     healthCheckId: string,
-
     workspaceId: string,
-
     healthCheckName: string,
-
     reason: string,
-
     failureCount: number,
-
     now: Date,
   ): Promise<void> {
     const existing = await transaction.healthIncident.findFirst({
@@ -207,7 +176,6 @@ export class HealthCheckRunnerService {
         workspaceId,
 
         status: HealthIncidentStatus.OPEN,
-
         activeKey: `health-check:${healthCheckId}`,
 
         summary,
@@ -215,9 +183,7 @@ export class HealthCheckRunnerService {
         failureCount,
 
         firstFailureAt: now,
-
         lastFailureAt: now,
-
         startedAt: now,
       },
     });

@@ -16,7 +16,6 @@ export class CreateWebhookEndpointDto {
   })
   @IsUrl({
     protocols: ['http', 'https'],
-
     require_protocol: true,
   })
   @MaxLength(2_000)
@@ -24,7 +23,6 @@ export class CreateWebhookEndpointDto {
 
   @ApiProperty({
     enum: WebhookEventType,
-
     isArray: true,
   })
   @IsArray()

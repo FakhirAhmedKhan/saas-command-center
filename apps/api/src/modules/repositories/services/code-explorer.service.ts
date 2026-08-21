@@ -1,4 +1,4 @@
-﻿import { GithubCodeService, GithubRepositoryContent, GithubTreeEntry } from './github-code.service';
+import { GithubCodeService, GithubRepositoryContent, GithubTreeEntry } from './github-code.service';
 import { RepositoriesService } from './repositories.service';
 import type { CodeTreeNode, RepositoryCodeFile } from '@command-center/shared-types';
 import { BadRequestException, Injectable, NotFoundException, PayloadTooLargeException } from '@nestjs/common';
@@ -20,7 +20,6 @@ export class CodeExplorerService {
 
     return {
       defaultBranch: repository.defaultBranch,
-
       branches: await this.githubCodeService.listBranches(
         repository.installation.externalInstallationId,
 
@@ -48,13 +47,9 @@ export class CodeExplorerService {
 
     return {
       repositoryId: repository.id,
-
       branch: selectedBranch,
-
       sha: tree.sha,
-
       truncated: tree.truncated,
-
       nodes: this.buildTree(tree.entries),
     };
   }
@@ -85,19 +80,14 @@ export class CodeExplorerService {
       .slice(0, 100)
       .map((entry) => ({
         name: this.fileName(entry.path),
-
         path: entry.path,
-
         sha: entry.sha,
-
         size: entry.size,
       }));
 
     return {
       branch: selectedBranch,
-
       query: query.trim(),
-
       truncated: tree.truncated,
 
       matches,
@@ -177,9 +167,7 @@ export class CodeExplorerService {
 
     return {
       path: safePath,
-
       base: baseBranch,
-
       head: headBranch,
 
       textDiff,
@@ -192,11 +180,7 @@ export class CodeExplorerService {
     };
   }
 
-  private transformFile(
-    file: GithubRepositoryContent,
-
-    branch: string,
-  ): CodeFile {
+  private transformFile(file: GithubRepositoryContent, branch: string): CodeFile {
     if (file.size > MAX_CODE_FILE_SIZE) {
       throw new PayloadTooLargeException('Files larger than 1 MB are not opened in the Code Explorer.');
     }
@@ -208,23 +192,18 @@ export class CodeExplorerService {
     if (file.encoding !== 'base64' || !file.content) {
       return {
         name: file.name,
-
         path: file.path,
 
         branch,
 
         sha: file.sha,
-
         size: file.size,
-
         kind: 'binary',
 
         language,
 
         mimeType: null,
-
         content: null,
-
         encoding: null,
       };
     }
@@ -234,23 +213,16 @@ export class CodeExplorerService {
     if (imageMimeType) {
       return {
         name: file.name,
-
         path: file.path,
 
         branch,
 
         sha: file.sha,
-
         size: file.size,
-
         kind: 'image',
-
         language: 'plaintext',
-
         mimeType: imageMimeType,
-
         content: base64,
-
         encoding: 'base64',
       };
     }
@@ -260,46 +232,36 @@ export class CodeExplorerService {
     if (this.isBinary(buffer)) {
       return {
         name: file.name,
-
         path: file.path,
 
         branch,
 
         sha: file.sha,
-
         size: file.size,
-
         kind: 'binary',
 
         language,
 
         mimeType: null,
-
         content: null,
-
         encoding: null,
       };
     }
 
     return {
       name: file.name,
-
       path: file.path,
 
       branch,
 
       sha: file.sha,
-
       size: file.size,
-
       kind: 'text',
 
       language,
 
       mimeType: 'text/plain',
-
       content: buffer.toString('utf8'),
-
       encoding: 'utf8',
     };
   }
@@ -324,13 +286,9 @@ export class CodeExplorerService {
     for (const entry of sorted) {
       const node: CodeTreeNode = {
         name: this.fileName(entry.path),
-
         path: entry.path,
-
         type: entry.type,
-
         sha: entry.sha,
-
         size: entry.size,
 
         ...(entry.type === 'directory'
@@ -427,15 +385,10 @@ export class CodeExplorerService {
 
     const types: Record<string, string> = {
       png: 'image/png',
-
       jpg: 'image/jpeg',
-
       jpeg: 'image/jpeg',
-
       gif: 'image/gif',
-
       webp: 'image/webp',
-
       svg: 'image/svg+xml',
     };
 
@@ -447,7 +400,6 @@ export class CodeExplorerService {
 
     const exact: Record<string, string> = {
       dockerfile: 'dockerfile',
-
       makefile: 'makefile',
 
       '.gitignore': 'plaintext',
@@ -463,75 +415,40 @@ export class CodeExplorerService {
 
     const languages: Record<string, string> = {
       ts: 'typescript',
-
       tsx: 'typescript',
-
       js: 'javascript',
-
       jsx: 'javascript',
-
       json: 'json',
-
       jsonc: 'json',
-
       css: 'css',
-
       scss: 'scss',
-
       less: 'less',
-
       html: 'html',
-
       htm: 'html',
-
       md: 'markdown',
-
       markdown: 'markdown',
-
       prisma: 'plaintext',
-
       sql: 'sql',
-
       py: 'python',
-
       java: 'java',
-
       kt: 'kotlin',
-
       kts: 'kotlin',
-
       go: 'go',
-
       rs: 'rust',
-
       php: 'php',
-
       rb: 'ruby',
-
       sh: 'shell',
-
       bash: 'shell',
-
       yml: 'yaml',
-
       yaml: 'yaml',
-
       xml: 'xml',
-
       graphql: 'graphql',
-
       gql: 'graphql',
-
       c: 'c',
-
       cpp: 'cpp',
-
       cc: 'cpp',
-
       h: 'cpp',
-
       hpp: 'cpp',
-
       cs: 'csharp',
     };
 

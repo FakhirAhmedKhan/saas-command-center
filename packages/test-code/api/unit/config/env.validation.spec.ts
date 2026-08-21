@@ -29,7 +29,6 @@ function productionConfig(overrides: Record<string, unknown> = {}): Record<strin
     NODE_ENV: 'production',
     COOKIE_SECURE: 'true',
     FRONTEND_URL: 'https://app.example.com',
-
     GITHUB_APP_CALLBACK_URL: 'https://app.example.com/github/callback',
     GITHUB_APP_CLIENT_ID: 'Iv1.production-test-client',
     GITHUB_APP_CLIENT_SECRET: 'g'.repeat(40),

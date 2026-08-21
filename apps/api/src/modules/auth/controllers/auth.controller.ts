@@ -59,7 +59,6 @@ type AuthRequestMetadata = Parameters<AuthService['login']>[1];
 function getAuthRequestMetadata(request: Request): AuthRequestMetadata {
   return {
     userAgent: request.get('user-agent')?.slice(0, 512),
-
     ipAddress: request.ip ?? request.socket.remoteAddress,
   };
 }

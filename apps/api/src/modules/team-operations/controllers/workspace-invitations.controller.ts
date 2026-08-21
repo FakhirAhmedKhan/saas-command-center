@@ -40,9 +40,7 @@ export class WorkspaceInvitationsController {
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN)
   @SharedRateLimit({
     scope: 'workspace-invitation-create',
-
     limit: 20,
-
     windowSeconds: 60 * 60,
   })
   create(
@@ -62,9 +60,7 @@ export class WorkspaceInvitationsController {
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN)
   @SharedRateLimit({
     scope: 'workspace-invitation-resend',
-
     limit: 5,
-
     windowSeconds: 15 * 60,
   })
   resend(

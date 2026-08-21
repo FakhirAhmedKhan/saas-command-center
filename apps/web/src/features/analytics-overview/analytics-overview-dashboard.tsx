@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import type { AnalyticsBreakdownItem, AnalyticsMetric, AnalyticsOverviewResponse, AnalyticsPreset, AnalyticsTrendPoint } from './analytics-overview.types';
 import { useAnalyticsOverview } from './use-analytics-overview';
@@ -81,7 +81,6 @@ function formatMetricChange(changePercent: number | null): {
   if (changePercent === null) {
     return {
       label: 'New activity',
-
       className: 'text-blue-700 bg-blue-50',
     };
   }
@@ -89,7 +88,6 @@ function formatMetricChange(changePercent: number | null): {
   if (changePercent > 0) {
     return {
       label: `↑ ${Math.abs(changePercent)}%`,
-
       className: 'text-emerald-700 bg-emerald-50',
     };
   }
@@ -97,14 +95,12 @@ function formatMetricChange(changePercent: number | null): {
   if (changePercent < 0) {
     return {
       label: `↓ ${Math.abs(changePercent)}%`,
-
       className: 'text-red-700 bg-red-50',
     };
   }
 
   return {
     label: 'No change',
-
     className: 'text-slate-600 bg-slate-100',
   };
 }
@@ -206,16 +202,13 @@ function formatTrendLabel(value: string, timeZone: string, granularity: 'hour' |
           timeZone,
 
           hour: 'numeric',
-
           month: 'short',
-
           day: 'numeric',
         }
       : {
           timeZone,
 
           month: 'short',
-
           day: 'numeric',
         },
   ).format(date);

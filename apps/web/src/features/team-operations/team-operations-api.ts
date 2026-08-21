@@ -19,7 +19,6 @@ export function getWorkspaceInvitations(
 
 export function createWorkspaceInvitation(
   workspaceId: string,
-
   input: {
     email: string;
     role: WorkspaceRole;
@@ -30,17 +29,12 @@ export function createWorkspaceInvitation(
 
     {
       method: 'POST',
-
       body: input,
     },
   );
 }
 
-export function resendWorkspaceInvitation(
-  workspaceId: string,
-
-  invitationId: string,
-): Promise<InvitationMutationResponse> {
+export function resendWorkspaceInvitation(workspaceId: string, invitationId: string): Promise<InvitationMutationResponse> {
   return apiRequest<InvitationMutationResponse>(
     `/workspaces/${workspaceId}/invitations/${invitationId}/resend`,
 
@@ -52,7 +46,6 @@ export function resendWorkspaceInvitation(
 
 export function revokeWorkspaceInvitation(
   workspaceId: string,
-
   invitationId: string,
 ): Promise<{
   success: true;
@@ -80,7 +73,6 @@ export function getInvitationPreview(
       signal,
 
       skipAuthentication: true,
-
       skipRefresh: true,
     },
   );
@@ -124,7 +116,6 @@ export function getNotifications(
 ) {
   const params = new URLSearchParams({
     page: String(options.page ?? 1),
-
     limit: String(options.limit ?? 20),
   });
 

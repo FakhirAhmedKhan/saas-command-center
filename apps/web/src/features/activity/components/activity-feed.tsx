@@ -46,17 +46,11 @@ function toIsoEndDate(value: string): string | undefined {
 function filtersToQuery(filters: ActivityFilterValue): ActivityListQuery {
   return {
     search: filters.search.trim() || undefined,
-
     activityType: filters.activityType || undefined,
-
     actorType: filters.actorType || undefined,
-
     entityType: filters.entityType || undefined,
-
     dateFrom: toIsoStartDate(filters.dateFrom),
-
     dateTo: toIsoEndDate(filters.dateTo),
-
     page: 1,
     limit: 20,
   };

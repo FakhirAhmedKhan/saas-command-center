@@ -1,4 +1,4 @@
-import {
+﻿import {
   addLink,
   addTechnology,
   applicationRoutes,
@@ -149,15 +149,15 @@ describe('Application Activity E2E', () => {
       limit: 1,
     };
 
-    const activityType = recordString(first, 'activityType', 'type');
+    const activityType = recordString(first!, 'activityType', 'type');
 
-    const actorType = recordString(first, 'actorType');
+    const actorType = recordString(first!, 'actorType');
 
-    const entityType = recordString(first, 'entityType');
+    const entityType = recordString(first!, 'entityType');
 
-    const actorUserId = recordString(first, 'actorUserId');
+    const actorUserId = recordString(first!, 'actorUserId');
 
-    const createdAt = recordString(first, 'createdAt');
+    const createdAt = recordString(first!, 'createdAt');
 
     if (activityType) {
       query.activityType = activityType;

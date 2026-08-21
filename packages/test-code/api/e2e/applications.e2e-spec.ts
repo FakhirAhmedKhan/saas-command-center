@@ -45,7 +45,6 @@ describe('Applications E2E', () => {
 
     const created = await createApplication(owner, {
       name: 'Complete Batch 3 App',
-
       slug: 'complete-batch-3-app',
     });
 
@@ -95,7 +94,6 @@ describe('Applications E2E', () => {
 
     const invalidSlug = await owner.agent.post(applicationRoutes.root(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
       name: 'Invalid Slug',
-
       slug: 'Invalid Slug!',
     });
 
@@ -103,11 +101,8 @@ describe('Applications E2E', () => {
 
     const invalidEnums = await owner.agent.post(applicationRoutes.root(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
       name: 'Invalid Enums',
-
       status: 'INVALID_STATUS',
-
       priority: 'INVALID_PRIORITY',
-
       category: 'INVALID_CATEGORY',
     });
 
@@ -115,7 +110,6 @@ describe('Applications E2E', () => {
 
     const unknownField = await owner.agent.post(applicationRoutes.root(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
       name: 'Unknown Field',
-
       ownerId: owner.userId,
     });
 
@@ -133,7 +127,6 @@ describe('Applications E2E', () => {
 
     const response = await updateApplication(owner, created.id, {
       name: 'Updated Application',
-
       shortDescription: 'Updated description',
 
       status,
@@ -168,11 +161,8 @@ describe('Applications E2E', () => {
 
     const alpha = await createApplication(owner, {
       name: 'Alpha Search Product',
-
       slug: 'alpha-search-product',
-
       status: statusOne,
-
       priority: priorityOne,
 
       category,
@@ -180,11 +170,8 @@ describe('Applications E2E', () => {
 
     const beta = await createApplication(owner, {
       name: 'Beta Search Product',
-
       slug: 'beta-search-product',
-
       status: statusTwo,
-
       priority: priorityTwo,
 
       category,
@@ -204,7 +191,6 @@ describe('Applications E2E', () => {
 
     const filterResponse = await listApplications(owner, {
       status: statusTwo,
-
       priority: priorityTwo,
 
       category,
@@ -220,13 +206,11 @@ describe('Applications E2E', () => {
 
     await createApplication(owner, {
       name: 'Alpha Pagination',
-
       slug: 'alpha-pagination',
     });
 
     await createApplication(owner, {
       name: 'Beta Pagination',
-
       slug: 'beta-pagination',
     });
 
@@ -252,7 +236,7 @@ describe('Applications E2E', () => {
 
     expect(pageTwo).toHaveLength(1);
 
-    expect(recordString(pageOne[0], 'id')).not.toBe(recordString(pageTwo[0], 'id'));
+    expect(recordString(pageOne[0]!, 'id')).not.toBe(recordString(pageTwo[0]!, 'id'));
 
     const invalidPage = await listApplications(owner, {
       page: 0,

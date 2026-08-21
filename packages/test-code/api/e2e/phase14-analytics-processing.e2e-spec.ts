@@ -10,14 +10,14 @@ import { randomUUID } from 'node:crypto';
 import request, { type Response } from 'supertest';
 
 /**
- * Phase 14 Ã¢â‚¬â€ Analytics Processing E2E
+ * Phase 14 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Analytics Processing E2E
  *
  * Real routes (apps/api/src/modules/analytics-processing/controllers/analytics-processing.controller.ts):
  *   GET  /api/v1/workspaces/:workspaceId/websites/:websiteId/analytics/processing/status
  *   POST /api/v1/workspaces/:workspaceId/websites/:websiteId/analytics/processing/reprocess
  *   POST /api/v1/workspaces/:workspaceId/websites/:websiteId/analytics/processing/runs/:runId/retry
  *
- * Guards: JwtAuthGuard + WorkspaceAccessGuard (class-level). No WorkspaceRolesGuard Ã¢â‚¬â€ role
+ * Guards: JwtAuthGuard + WorkspaceAccessGuard (class-level). No WorkspaceRolesGuard ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â role
  * enforcement for reprocess/retry is done in-service via
  * AnalyticsProcessingAccessService.assertCanReprocess/assertCanRetry, which requires
  * OWNER or ADMIN (apps/api/src/modules/analytics-processing/services/analytics-processing-access.service.ts).
@@ -37,12 +37,12 @@ import request, { type Response } from 'supertest';
  * AnalyticsRangeProcessorService.processRange (analytics-range-processor.service.ts) calls, in
  * order: RawEventProcessingService.processRange (real), then
  * VisitorRebuilderService.rebuildRange, SessionRebuilderService.rebuildRange,
- * PageViewRebuilderService.rebuildRange, AnalyticsAggregationService.rebuildRange Ã¢â‚¬â€ all four of
+ * PageViewRebuilderService.rebuildRange, AnalyticsAggregationService.rebuildRange ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â all four of
  * which are unimplemented stubs that unconditionally `throw new Error('Method not implemented.')`
  * (confirmed by direct source read). Therefore ANY run that reaches AnalyticsProcessingWorkerService
  * processing will deterministically fail at the visitors.rebuildRange step on every attempt, and
  * after exhausting `maxRetries` (default 3) will land in DEAD_LETTERED with a corresponding
- * AnalyticsProcessingDeadLetter row. The tests below assert this REAL, current behavior Ã¢â‚¬â€ they do
+ * AnalyticsProcessingDeadLetter row. The tests below assert this REAL, current behavior ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â they do
  * not assert that reprocessing "succeeds", because it does not. This is intentional: weakening
  * these assertions to a passing status would hide a Critical production bug. See the retry-related
  * tests further down for the resulting availability impact.
@@ -52,7 +52,7 @@ import request, { type Response } from 'supertest';
  * would not fire during this Jest process either). To exercise the worker deterministically and
  * synchronously in this suite (instead of asserting on a timer that will never elapse), tests
  * resolve the real AnalyticsProcessingWorkerService from the Nest DI container and invoke its
- * public tick() method directly. This is not a mock Ã¢â‚¬â€ it runs the exact same production code path
+ * public tick() method directly. This is not a mock ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â it runs the exact same production code path
  * (claim -> advisory lock -> processRange -> success/failure handling) against the real test
  * database; it merely replaces "wait 5 real seconds for a timer that is never armed" with a direct
  * call to the same public method the timer would have called.
@@ -115,7 +115,6 @@ describe('Phase 14 Analytics Processing E2E', () => {
         pageTitle: 'Home',
         referrerUrl: null,
         eventName: null,
-        properties: null,
         screenWidth: 1920,
         screenHeight: 1080,
         viewportWidth: 1440,
@@ -419,7 +418,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // C. Processing execution (manual trigger) Ã¢â‚¬â€ validation
+  // C. Processing execution (manual trigger) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â validation
   // ---------------------------------------------------------------------------------------
 
   it('rejects a reprocess request where to <= from', async () => {
@@ -456,7 +455,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // C (cont). Processing execution Ã¢â‚¬â€ valid trigger creates a real, persisted run
+  // C (cont). Processing execution ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â valid trigger creates a real, persisted run
   // ---------------------------------------------------------------------------------------
 
   it('queues a manual processing run and persists it with QUEUED status', async () => {
@@ -497,7 +496,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // D. Idempotency Ã¢â‚¬â€ enqueueing the same range twice must not create duplicate runs
+  // D. Idempotency ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â enqueueing the same range twice must not create duplicate runs
   // ---------------------------------------------------------------------------------------
 
   it('returns the same run when the identical range is queued twice (idempotent enqueue)', async () => {

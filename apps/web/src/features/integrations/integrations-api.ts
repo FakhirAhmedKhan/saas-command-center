@@ -23,7 +23,6 @@ export function getWebhookEndpoints(
 
 export function createWebhookEndpoint(
   workspaceId: string,
-
   input: SaveWebhookInput,
 ): Promise<{
   endpoint: WebhookEndpoint;
@@ -35,35 +34,23 @@ export function createWebhookEndpoint(
 
     {
       method: 'POST',
-
       body: input,
     },
   );
 }
 
-export function updateWebhookEndpoint(
-  workspaceId: string,
-
-  endpointId: string,
-
-  input: Partial<SaveWebhookInput>,
-): Promise<WebhookEndpoint> {
+export function updateWebhookEndpoint(workspaceId: string, endpointId: string, input: Partial<SaveWebhookInput>): Promise<WebhookEndpoint> {
   return apiRequest(
     `${createBasePath(workspaceId)}/${endpointId}`,
 
     {
       method: 'PATCH',
-
       body: input,
     },
   );
 }
 
-export function disableWebhookEndpoint(
-  workspaceId: string,
-
-  endpointId: string,
-): Promise<WebhookEndpoint> {
+export function disableWebhookEndpoint(workspaceId: string, endpointId: string): Promise<WebhookEndpoint> {
   return apiRequest(
     `${createBasePath(workspaceId)}/${endpointId}/disable`,
 
@@ -75,7 +62,6 @@ export function disableWebhookEndpoint(
 
 export function rotateWebhookSecret(
   workspaceId: string,
-
   endpointId: string,
 ): Promise<{
   secret: string;
@@ -91,7 +77,6 @@ export function rotateWebhookSecret(
 
 export function sendWebhookTest(
   workspaceId: string,
-
   endpointId: string,
 ): Promise<{
   deliveryId: string;
@@ -109,7 +94,6 @@ export function sendWebhookTest(
 
 export function getWebhookDeliveries(
   workspaceId: string,
-
   endpointId: string,
 
   signal?: AbortSignal,

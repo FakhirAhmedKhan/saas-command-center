@@ -30,7 +30,6 @@ export class PersonalGithubConnectService {
         userId,
 
         installStateHash: this.hash(installState),
-
         expiresAt: new Date(Date.now() + CONNECT_TTL_MS),
       },
     });
@@ -157,7 +156,6 @@ export class PersonalGithubConnectService {
       },
 
       distinct: ['installationId'],
-
       select: {
         installationId: true,
       },

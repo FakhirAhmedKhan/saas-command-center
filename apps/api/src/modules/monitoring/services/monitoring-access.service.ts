@@ -7,11 +7,7 @@ const MANAGEMENT_ROLES = new Set(['OWNER', 'ADMIN', 'DEVELOPER']);
 export class MonitoringAccessService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async canManage(
-    workspaceId: string,
-
-    userId: string,
-  ): Promise<boolean> {
+  async canManage(workspaceId: string, userId: string): Promise<boolean> {
     const membership = await this.prisma.workspaceMember.findFirst({
       where: {
         workspaceId,
@@ -31,11 +27,7 @@ export class MonitoringAccessService {
     return MANAGEMENT_ROLES.has(String(membership.role));
   }
 
-  async assertCanManage(
-    workspaceId: string,
-
-    userId: string,
-  ): Promise<void> {
+  async assertCanManage(workspaceId: string, userId: string): Promise<void> {
     if (!(await this.canManage(workspaceId, userId))) {
       throw new ForbiddenException('Your workspace role cannot manage health checks.');
     }

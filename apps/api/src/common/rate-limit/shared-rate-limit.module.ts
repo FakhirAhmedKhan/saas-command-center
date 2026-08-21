@@ -4,7 +4,6 @@ import { Module } from '@nestjs/common';
 
 @Module({
   providers: [SharedRateLimitService, SharedRateLimitGuard],
-
   exports: [SharedRateLimitService, SharedRateLimitGuard],
 })
 export class SharedRateLimitModule {}

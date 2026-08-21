@@ -3,15 +3,10 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 
 const TRANSITIONS: Record<DeploymentStatus, readonly DeploymentStatus[]> = {
   DRAFT: [DeploymentStatus.SCHEDULED, DeploymentStatus.IN_PROGRESS],
-
   SCHEDULED: [DeploymentStatus.DRAFT, DeploymentStatus.IN_PROGRESS],
-
   IN_PROGRESS: [DeploymentStatus.SUCCESSFUL, DeploymentStatus.FAILED],
-
   SUCCESSFUL: [DeploymentStatus.ROLLED_BACK],
-
   FAILED: [DeploymentStatus.IN_PROGRESS, DeploymentStatus.ROLLED_BACK],
-
   ROLLED_BACK: [],
 };
 
@@ -21,11 +16,7 @@ export class DeploymentTransitionService {
     return [...TRANSITIONS[status]];
   }
 
-  assertTransition(
-    current: DeploymentStatus,
-
-    target: DeploymentStatus,
-  ): void {
+  assertTransition(current: DeploymentStatus, target: DeploymentStatus): void {
     if (current === target) {
       throw new BadRequestException(`Deployment is already ${target}.`);
     }

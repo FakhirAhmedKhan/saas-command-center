@@ -7,11 +7,8 @@ import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-
 
 @Module({
   imports: [WorkspaceMembersModule, WorkspaceModule],
-
   controllers: [WorkspaceActivityController, ApplicationActivityController],
-
   providers: [ActivityWriterService, ActivityQueryService],
-
   exports: [ActivityWriterService, ActivityQueryService],
 })
 export class ActivityModule {}

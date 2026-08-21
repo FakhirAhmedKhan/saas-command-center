@@ -87,11 +87,7 @@ export default function WebsiteInstallationPage() {
   }
 );`;
 
-  async function copy(
-    type: 'key' | 'snippet' | 'custom',
-
-    value: string,
-  ): Promise<void> {
+  async function copy(type: 'key' | 'snippet' | 'custom', value: string): Promise<void> {
     await navigator.clipboard.writeText(value);
 
     setCopied(type);

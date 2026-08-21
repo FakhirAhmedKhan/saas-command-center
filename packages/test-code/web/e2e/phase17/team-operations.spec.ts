@@ -7,15 +7,11 @@ test.describe('Phase 17 team operations', () => {
     await page.route('**/auth/refresh', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           accessToken: 'phase-17-token',
-
           user: {
             id: '33333333-3333-4333-8333-333333333333',
-
             email: 'admin@example.com',
           },
         }),
@@ -26,9 +22,7 @@ test.describe('Phase 17 team operations', () => {
       if (route.request().method() === 'POST') {
         await route.fulfill({
           status: 201,
-
           contentType: 'application/json',
-
           body: JSON.stringify({
             invitation: {
               id: 'invitation-1',
@@ -36,34 +30,20 @@ test.describe('Phase 17 team operations', () => {
               workspaceId,
 
               email: 'developer@example.com',
-
               role: 'DEVELOPER',
-
               status: 'PENDING',
-
               deliveryStatus: 'NOT_REQUESTED',
-
               deliveryError: null,
-
               expiresAt: '2026-08-10T00:00:00.000Z',
-
               acceptedAt: null,
-
               declinedAt: null,
-
               revokedAt: null,
-
               lastSentAt: '2026-08-07T00:00:00.000Z',
-
               sendCount: 1,
-
               createdAt: '2026-08-07T00:00:00.000Z',
-
               invitedBy: {
                 id: 'user-1',
-
                 name: 'Admin',
-
                 email: 'admin@example.com',
               },
 
@@ -79,9 +59,7 @@ test.describe('Phase 17 team operations', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify([]),
       });
     });
@@ -89,9 +67,7 @@ test.describe('Phase 17 team operations', () => {
     await page.route('**/notifications?*', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           items: [
             {
@@ -100,25 +76,15 @@ test.describe('Phase 17 team operations', () => {
               workspaceId,
 
               applicationId: null,
-
               type: 'HEALTH_INCIDENT_OPENED',
-
               priority: 'CRITICAL',
-
               title: 'Health incident opened',
-
               message: 'Production API is down.',
-
               resourceType: 'HEALTH_INCIDENT',
-
               resourceId: 'incident-1',
-
               actionUrl: `/workspaces/${workspaceId}/monitoring`,
-
               readAt: null,
-
               expiresAt: null,
-
               createdAt: '2026-08-07T00:00:00.000Z',
             },
           ],
@@ -176,9 +142,7 @@ test.describe('Phase 17 team operations', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify([]),
       });
     });
@@ -202,9 +166,7 @@ test.describe('Phase 17 team operations', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify([]),
       });
     });
@@ -219,12 +181,9 @@ test.describe('Phase 17 team operations', () => {
       if (route.request().method() === 'POST') {
         await route.fulfill({
           status: 409,
-
           contentType: 'application/json',
-
           body: JSON.stringify({
             statusCode: 409,
-
             message: 'This user is already a workspace member.',
           }),
         });
@@ -234,9 +193,7 @@ test.describe('Phase 17 team operations', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify([]),
       });
     });
@@ -264,9 +221,7 @@ test.describe('Phase 17 team operations', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify([
           {
             id: 'invitation-1',
@@ -274,34 +229,20 @@ test.describe('Phase 17 team operations', () => {
             workspaceId,
 
             email: 'developer@example.com',
-
             role: 'DEVELOPER',
-
             status: 'PENDING',
-
             deliveryStatus: 'SENT',
-
             deliveryError: null,
-
             expiresAt: '2026-08-10T00:00:00.000Z',
-
             acceptedAt: null,
-
             declinedAt: null,
-
             revokedAt: null,
-
             lastSentAt: '2026-08-07T00:00:00.000Z',
-
             sendCount: 1,
-
             createdAt: '2026-08-07T00:00:00.000Z',
-
             invitedBy: {
               id: 'user-1',
-
               name: 'Admin',
-
               email: 'admin@example.com',
             },
 
@@ -318,9 +259,7 @@ test.describe('Phase 17 team operations', () => {
 
       await route.fulfill({
         status: 201,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           invitation: {
             id: 'invitation-1',
@@ -328,34 +267,20 @@ test.describe('Phase 17 team operations', () => {
             workspaceId,
 
             email: 'developer@example.com',
-
             role: 'DEVELOPER',
-
             status: 'PENDING',
-
             deliveryStatus: 'SENT',
-
             deliveryError: null,
-
             expiresAt: '2026-08-11T00:00:00.000Z',
-
             acceptedAt: null,
-
             declinedAt: null,
-
             revokedAt: null,
-
             lastSentAt: '2026-08-08T00:00:00.000Z',
-
             sendCount: 2,
-
             createdAt: '2026-08-07T00:00:00.000Z',
-
             invitedBy: {
               id: 'user-1',
-
               name: 'Admin',
-
               email: 'admin@example.com',
             },
 
@@ -390,9 +315,7 @@ test.describe('Phase 17 team operations', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify([
           {
             id: 'invitation-1',
@@ -400,34 +323,20 @@ test.describe('Phase 17 team operations', () => {
             workspaceId,
 
             email: 'developer@example.com',
-
             role: 'DEVELOPER',
-
             status: 'PENDING',
-
             deliveryStatus: 'SENT',
-
             deliveryError: null,
-
             expiresAt: '2026-08-10T00:00:00.000Z',
-
             acceptedAt: null,
-
             declinedAt: null,
-
             revokedAt: null,
-
             lastSentAt: '2026-08-07T00:00:00.000Z',
-
             sendCount: 1,
-
             createdAt: '2026-08-07T00:00:00.000Z',
-
             invitedBy: {
               id: 'user-1',
-
               name: 'Admin',
-
               email: 'admin@example.com',
             },
 
@@ -444,9 +353,7 @@ test.describe('Phase 17 team operations', () => {
 
       await route.fulfill({
         status: 201,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           success: true,
         }),
@@ -478,9 +385,7 @@ test.describe('Phase 17 team operations', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify([
           {
             id: 'invitation-1',
@@ -488,34 +393,20 @@ test.describe('Phase 17 team operations', () => {
             workspaceId,
 
             email: 'developer@example.com',
-
             role: 'DEVELOPER',
-
             status: 'PENDING',
-
             deliveryStatus: 'SENT',
-
             deliveryError: null,
-
             expiresAt: '2026-08-10T00:00:00.000Z',
-
             acceptedAt: null,
-
             declinedAt: null,
-
             revokedAt: null,
-
             lastSentAt: '2026-08-07T00:00:00.000Z',
-
             sendCount: 1,
-
             createdAt: '2026-08-07T00:00:00.000Z',
-
             invitedBy: {
               id: 'user-1',
-
               name: 'Admin',
-
               email: 'admin@example.com',
             },
 
@@ -532,9 +423,7 @@ test.describe('Phase 17 team operations', () => {
 
       await route.fulfill({
         status: 201,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           success: true,
         }),
@@ -560,12 +449,9 @@ test.describe('Phase 17 team operations', () => {
     await page.route('**/notifications?*', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           items: [],
-
           nextCursor: null,
         }),
       });
@@ -586,9 +472,7 @@ test.describe('Phase 17 team operations', () => {
 
       await route.fulfill({
         status: 201,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           updated: 1,
         }),
@@ -616,12 +500,9 @@ test.describe('Phase 17 team operations', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           items: [],
-
           nextCursor: null,
         }),
       });
@@ -645,9 +526,7 @@ test.describe('Phase 17 team operations', () => {
     await page.route('**/notifications/unread-count', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           count: 4,
         }),
@@ -665,9 +544,7 @@ test.describe('Phase 17 team operations', () => {
     await page.route('**/notifications/unread-count', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           count: 150,
         }),

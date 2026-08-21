@@ -126,26 +126,17 @@ export function normalizeAnalyticsPage(value: string): NormalizedPage {
 
   return {
     pageUrl: url.toString().slice(0, 2048),
-
     normalizedPath: normalizedPath.slice(0, 2048),
-
     origin: url.origin.toLowerCase(),
-
     hostname: url.hostname.toLowerCase(),
   };
 }
 
-export function normalizeSource(
-  referrerUrl: string | null,
-
-  pageOrigin: string,
-): NormalizedSource {
+export function normalizeSource(referrerUrl: string | null, pageOrigin: string): NormalizedSource {
   if (!referrerUrl) {
     return {
       sourceType: AnalyticsSourceType.DIRECT,
-
       sourceName: 'Direct',
-
       sourceDomain: null,
     };
   }
@@ -157,9 +148,7 @@ export function normalizeSource(
   } catch {
     return {
       sourceType: AnalyticsSourceType.UNKNOWN,
-
       sourceName: 'Unknown',
-
       sourceDomain: null,
     };
   }
@@ -169,9 +158,7 @@ export function normalizeSource(
   if (referrer.origin.toLowerCase() === pageOrigin) {
     return {
       sourceType: AnalyticsSourceType.INTERNAL,
-
       sourceName: 'Internal',
-
       sourceDomain: domain,
     };
   }
@@ -181,9 +168,7 @@ export function normalizeSource(
   if (searchEngine) {
     return {
       sourceType: AnalyticsSourceType.SEARCH,
-
       sourceName: searchEngine.name,
-
       sourceDomain: domain,
     };
   }
@@ -193,18 +178,14 @@ export function normalizeSource(
   if (socialNetwork) {
     return {
       sourceType: AnalyticsSourceType.SOCIAL,
-
       sourceName: socialNetwork.name,
-
       sourceDomain: domain,
     };
   }
 
   return {
     sourceType: AnalyticsSourceType.REFERRAL,
-
     sourceName: domain,
-
     sourceDomain: domain,
   };
 }
@@ -215,13 +196,9 @@ export function parseUserAgent(userAgent: string | null): ParsedUserAgent {
   if (/bot|crawler|spider|slurp|headless|facebookexternalhit|preview/i.test(value)) {
     return {
       deviceType: AnalyticsDeviceType.BOT,
-
       browserName: 'Bot',
-
       browserVersion: null,
-
       operatingSystem: 'Unknown',
-
       operatingSystemVersion: null,
     };
   }
@@ -240,11 +217,8 @@ export function parseUserAgent(userAgent: string | null): ParsedUserAgent {
     deviceType,
 
     browserName: browser.name,
-
     browserVersion: browser.version,
-
     operatingSystem: operatingSystem.name,
-
     operatingSystemVersion: operatingSystem.version,
   };
 }

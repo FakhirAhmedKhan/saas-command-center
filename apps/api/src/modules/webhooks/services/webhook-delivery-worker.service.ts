@@ -109,7 +109,6 @@ export class WebhookDeliveryWorkerService {
 
       include: {
         endpoint: true,
-
         event: true,
       },
     });
@@ -122,7 +121,6 @@ export class WebhookDeliveryWorkerService {
       await this.prisma.webhookDelivery.updateMany({
         where: {
           id: delivery.id,
-
           status: {
             in: [WebhookDeliveryStatus.PENDING, WebhookDeliveryStatus.RETRY_SCHEDULED],
           },
@@ -130,11 +128,8 @@ export class WebhookDeliveryWorkerService {
 
         data: {
           status: WebhookDeliveryStatus.CANCELLED,
-
           failureCode: 'ENDPOINT_DISABLED',
-
           failureReason: 'Webhook endpoint is disabled.',
-
           finishedAt: new Date(),
         },
       });
@@ -145,7 +140,6 @@ export class WebhookDeliveryWorkerService {
     const claimed = await this.prisma.webhookDelivery.updateMany({
       where: {
         id: delivery.id,
-
         status: {
           in: [WebhookDeliveryStatus.PENDING, WebhookDeliveryStatus.RETRY_SCHEDULED],
         },
@@ -153,7 +147,6 @@ export class WebhookDeliveryWorkerService {
 
       data: {
         status: WebhookDeliveryStatus.PROCESSING,
-
         startedAt: new Date(),
       },
     });
@@ -168,20 +161,13 @@ export class WebhookDeliveryWorkerService {
 
     const rawPayload = JSON.stringify({
       apiVersion: delivery.event.payloadVersion,
-
       id: delivery.event.id,
-
       type: delivery.event.type,
-
       source: 'saas-command-center',
-
       time: delivery.event.occurredAt.toISOString(),
-
       workspaceId: delivery.workspaceId,
-
       resource: {
         type: delivery.event.resourceType,
-
         id: delivery.event.resourceId,
       },
 
@@ -195,11 +181,8 @@ export class WebhookDeliveryWorkerService {
     try {
       const secret = this.crypto.decrypt({
         ciphertext: delivery.endpoint.secretCiphertext,
-
         iv: delivery.endpoint.secretIv,
-
         authTag: delivery.endpoint.secretAuthTag,
-
         keyVersion: delivery.endpoint.secretKeyVersion,
       });
 
@@ -229,15 +212,10 @@ export class WebhookDeliveryWorkerService {
     } catch (error) {
       result = {
         success: false,
-
         retriable: false,
-
         statusCode: null,
-
         durationMs: Math.max(0, Date.now() - attemptStartedAt.getTime()),
-
         errorCode: error instanceof Error ? error.name : 'SECRET_DECRYPTION_FAILED',
-
         errorMessage: error instanceof Error ? error.message.slice(0, 500) : 'Webhook delivery failed.',
       };
     }
@@ -266,17 +244,11 @@ export class WebhookDeliveryWorkerService {
           attemptNumber,
 
           outcome: result.success ? WebhookAttemptOutcome.SUCCEEDED : WebhookAttemptOutcome.FAILED,
-
           responseStatus: result.statusCode,
-
           durationMs: result.durationMs,
-
           errorCode: result.errorCode,
-
           errorMessage: result.errorMessage,
-
           startedAt: attemptStartedAt,
-
           finishedAt: attemptFinishedAt,
         },
       });
@@ -288,21 +260,13 @@ export class WebhookDeliveryWorkerService {
 
         data: {
           status: finalStatus,
-
           attemptCount: attemptNumber,
-
           nextAttemptAt: shouldRetry ? new Date(Date.now() + nextDelay) : delivery.nextAttemptAt,
-
           responseStatus: result.statusCode,
-
           responseDurationMs: result.durationMs,
-
           failureCode: result.success ? null : result.errorCode,
-
           failureReason: result.success ? null : result.errorMessage,
-
           deliveredAt: result.success ? attemptFinishedAt : null,
-
           finishedAt: shouldRetry ? null : attemptFinishedAt,
         },
       });
@@ -314,9 +278,7 @@ export class WebhookDeliveryWorkerService {
 
         data: {
           lastDeliveryAt: attemptFinishedAt,
-
           lastSuccessAt: result.success ? attemptFinishedAt : undefined,
-
           lastFailureAt: result.success ? undefined : attemptFinishedAt,
         },
       });
@@ -325,19 +287,14 @@ export class WebhookDeliveryWorkerService {
     this.logger.log(
       JSON.stringify({
         event: 'webhook_delivery_completed',
-
         deliveryId: delivery.id,
-
         endpointId: delivery.endpointId,
-
         eventType: delivery.event.type,
-
         status: finalStatus,
 
         attemptNumber,
 
         responseStatus: result.statusCode,
-
         durationMs: result.durationMs,
       }),
     );
@@ -353,7 +310,6 @@ export class WebhookDeliveryWorkerService {
     await this.prisma.webhookDelivery.updateMany({
       where: {
         status: WebhookDeliveryStatus.PROCESSING,
-
         startedAt: {
           lt: staleBefore,
         },
@@ -361,11 +317,8 @@ export class WebhookDeliveryWorkerService {
 
       data: {
         status: WebhookDeliveryStatus.RETRY_SCHEDULED,
-
         nextAttemptAt: new Date(),
-
         failureCode: 'PROCESSING_TIMEOUT',
-
         failureReason: 'Previous delivery worker stopped before completing the delivery.',
       },
     });

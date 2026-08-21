@@ -1,4 +1,4 @@
-﻿import { AnalyticsAggregateQueryDto } from '../dto/analytics-engine.dto';
+import { AnalyticsAggregateQueryDto } from '../dto/analytics-engine.dto';
 import { AnalyticsAggregatePeriod } from '@command-center/shared-types';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
@@ -99,7 +99,6 @@ export class AnalyticsEngineQueryService {
         },
 
         take: 10,
-
         include: {
           visitor: {
             select: {
@@ -157,7 +156,6 @@ export class AnalyticsEngineQueryService {
       websiteId,
 
       dimension: query.dimension,
-
       bucketStart: {
         gte: dateFrom,
         lte: dateTo,
@@ -182,9 +180,7 @@ export class AnalyticsEngineQueryService {
 
       return {
         period: query.period,
-
         dimension: query.dimension,
-
         data: data.map(this.serializeAggregate),
       };
     }
@@ -206,9 +202,7 @@ export class AnalyticsEngineQueryService {
 
     return {
       period: query.period,
-
       dimension: query.dimension,
-
       data: data.map(this.serializeAggregate),
     };
   }

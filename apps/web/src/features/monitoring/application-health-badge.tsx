@@ -7,11 +7,8 @@ import { useEffect, useState } from 'react';
 
 interface ApplicationHealthSummary {
   status: HealthCheckStatus;
-
   checks: number;
-
   averageResponseTimeMs: number | null;
-
   lastCheckedAt: string | null;
 }
 
@@ -33,7 +30,6 @@ export function ApplicationHealthBadge({
 
       {
         method: 'GET',
-
         signal: controller.signal,
       },
     )

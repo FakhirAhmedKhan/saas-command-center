@@ -20,13 +20,9 @@ function getReportDimension(request: AnalyticsReportRequest): AnalyticsDimension
 function createSearchParams(request: AnalyticsReportRequest): URLSearchParams {
   const params = new URLSearchParams({
     preset: request.preset,
-
     page: String(request.page),
-
     limit: String(request.limit),
-
     sortBy: request.sortBy,
-
     sortDirection: request.sortDirection,
   });
 
@@ -70,7 +66,6 @@ export async function getAnalyticsReport(request: AnalyticsReportRequest): Promi
 
   return apiRequest<AnalyticsReportResponse>(`${path}?${params.toString()}`, {
     method: 'GET',
-
     signal: request.signal,
   });
 }
@@ -80,7 +75,6 @@ export async function downloadAnalyticsReport(request: AnalyticsReportRequest): 
     ...request,
 
     page: 1,
-
     limit: 100,
   });
 

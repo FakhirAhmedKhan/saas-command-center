@@ -245,17 +245,13 @@ export class AnalyticsProcessingService {
     const run = await this.prisma.analyticsProcessingRun.create({
       data: {
         workspaceId: website.workspaceId,
-
         websiteId: website.id,
 
         initiatedByUserId,
 
         status: AnalyticsProcessingStatus.RUNNING,
-
         rangeStart: runRangeStart,
-
         rangeEnd: runRangeEnd,
-
         lockKey: runLockKey,
       },
     });

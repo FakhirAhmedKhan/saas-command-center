@@ -51,11 +51,8 @@ export class WebhookSecretCryptoService {
 
     return {
       ciphertext: ciphertext.toString('base64'),
-
       iv: iv.toString('base64'),
-
       authTag: authTag.toString('base64'),
-
       keyVersion: 1,
     };
   }

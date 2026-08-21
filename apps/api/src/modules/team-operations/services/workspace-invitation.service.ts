@@ -18,13 +18,7 @@ export class WorkspaceInvitationService {
     private readonly notifications: NotificationService,
   ) {}
 
-  async create(
-    workspaceId: string,
-
-    invitedById: string,
-
-    input: CreateWorkspaceInvitationDto,
-  ) {
+  async create(workspaceId: string, invitedById: string, input: CreateWorkspaceInvitationDto) {
     const email = this.normalizeEmail(input.email);
 
     const [workspace, inviter, existingUser] = await Promise.all([
@@ -55,7 +49,6 @@ export class WorkspaceInvitationService {
         where: {
           email: {
             equals: email,
-
             mode: 'insensitive',
           },
         },
@@ -105,13 +98,9 @@ export class WorkspaceInvitationService {
           email,
 
           role: input.role,
-
           tokenHash: generated.tokenHash,
-
           expiresAt: this.tokens.getExpiresAt(),
-
           sendCount: 1,
-
           lastSentAt: new Date(),
         },
 
@@ -134,9 +123,7 @@ export class WorkspaceInvitationService {
         email,
 
         workspaceName: workspace.name,
-
         inviterName: inviter.displayName ?? inviter.email,
-
         role: invitation.role,
 
         invitationUrl,
@@ -150,19 +137,12 @@ export class WorkspaceInvitationService {
         workspaceId,
 
         userId: existingUser.id,
-
         type: NotificationType.WORKSPACE_INVITATION,
-
         title: `Invitation to ${workspace.name}`,
-
         message: `${inviter.displayName ?? inviter.email} invited you as ${invitation.role}.`,
-
         resourceType: 'WORKSPACE_INVITATION',
-
         resourceId: invitation.id,
-
         actionUrl: `/invitations/${generated.rawToken}`,
-
         dedupeKey: `workspace-invitation:${invitation.id}`,
       });
     }
@@ -182,11 +162,7 @@ export class WorkspaceInvitationService {
     };
   }
 
-  async list(
-    workspaceId: string,
-
-    query: InvitationListQueryDto,
-  ) {
+  async list(workspaceId: string, query: InvitationListQueryDto) {
     await this.expireAllWorkspaceInvitations(workspaceId);
 
     const invitations = await this.prisma.workspaceInvitation.findMany({
@@ -197,7 +173,6 @@ export class WorkspaceInvitationService {
       },
 
       include: this.invitationInclude(),
-
       orderBy: {
         createdAt: 'desc',
       },
@@ -208,11 +183,7 @@ export class WorkspaceInvitationService {
     return invitations.map((invitation) => this.mapInvitation(invitation));
   }
 
-  async resend(
-    workspaceId: string,
-
-    invitationId: string,
-  ) {
+  async resend(workspaceId: string, invitationId: string) {
     const invitation = await this.requireInvitation(workspaceId, invitationId);
 
     if (invitation.status !== WorkspaceInvitationStatus.PENDING) {
@@ -228,17 +199,13 @@ export class WorkspaceInvitationService {
 
       data: {
         tokenHash: generated.tokenHash,
-
         expiresAt: this.tokens.getExpiresAt(),
-
         lastSentAt: new Date(),
-
         sendCount: {
           increment: 1,
         },
 
         deliveryStatus: InvitationDeliveryStatus.NOT_REQUESTED,
-
         deliveryError: null,
       },
 
@@ -252,11 +219,8 @@ export class WorkspaceInvitationService {
 
       {
         email: updated.email,
-
         workspaceName: updated.workspace.name,
-
         inviterName: updated.invitedBy.displayName ?? updated.invitedBy.email,
-
         role: updated.role,
 
         invitationUrl,
@@ -280,11 +244,7 @@ export class WorkspaceInvitationService {
     };
   }
 
-  async revoke(
-    workspaceId: string,
-
-    invitationId: string,
-  ) {
+  async revoke(workspaceId: string, invitationId: string) {
     const result = await this.prisma.workspaceInvitation.updateMany({
       where: {
         id: invitationId,
@@ -296,7 +256,6 @@ export class WorkspaceInvitationService {
 
       data: {
         status: WorkspaceInvitationStatus.REVOKED,
-
         revokedAt: new Date(),
       },
     });
@@ -317,22 +276,18 @@ export class WorkspaceInvitationService {
 
     return {
       id: invitation.id,
-
       email: invitation.email,
-
       role: invitation.role,
 
       status,
 
       workspace: {
         id: invitation.workspace.id,
-
         name: invitation.workspace.name,
       },
 
       invitedBy: {
         name: invitation.invitedBy.displayName,
-
         email: invitation.invitedBy.email,
       },
 
@@ -340,11 +295,7 @@ export class WorkspaceInvitationService {
     };
   }
 
-  async accept(
-    rawToken: string,
-
-    userId: string,
-  ) {
+  async accept(rawToken: string, userId: string) {
     const invitation = await this.findByToken(rawToken);
 
     await this.assertUsable(invitation);
@@ -373,11 +324,8 @@ export class WorkspaceInvitationService {
       const consumed = await transaction.workspaceInvitation.updateMany({
         where: {
           id: invitation.id,
-
           tokenHash: invitation.tokenHash,
-
           status: WorkspaceInvitationStatus.PENDING,
-
           expiresAt: {
             gt: new Date(),
           },
@@ -385,9 +333,7 @@ export class WorkspaceInvitationService {
 
         data: {
           status: WorkspaceInvitationStatus.ACCEPTED,
-
           acceptedById: user.id,
-
           acceptedAt: new Date(),
         },
       });
@@ -399,7 +345,6 @@ export class WorkspaceInvitationService {
       const membership = await transaction.workspaceMember.findFirst({
         where: {
           workspaceId: invitation.workspaceId,
-
           userId: user.id,
         },
 
@@ -412,9 +357,7 @@ export class WorkspaceInvitationService {
         await transaction.workspaceMember.create({
           data: {
             workspaceId: invitation.workspaceId,
-
             userId: user.id,
-
             role: invitation.role,
           },
         });
@@ -423,36 +366,23 @@ export class WorkspaceInvitationService {
 
     await this.notifications.createForUser({
       workspaceId: invitation.workspaceId,
-
       userId: invitation.invitedById,
-
       type: NotificationType.WORKSPACE_INVITATION_ACCEPTED,
-
       title: 'Workspace invitation accepted',
-
       message: `${user.displayName ?? user.email} joined ${invitation.workspace.name}.`,
-
       resourceType: 'WORKSPACE_INVITATION',
-
       resourceId: invitation.id,
-
       actionUrl: `/workspaces/${invitation.workspaceId}/settings/members`,
-
       dedupeKey: `workspace-invitation-accepted:${invitation.id}`,
     });
 
     return {
       success: true,
-
       workspaceId: invitation.workspaceId,
     };
   }
 
-  async decline(
-    rawToken: string,
-
-    userId: string,
-  ) {
+  async decline(rawToken: string, userId: string) {
     const invitation = await this.findByToken(rawToken);
 
     await this.assertUsable(invitation);
@@ -474,11 +404,8 @@ export class WorkspaceInvitationService {
     const result = await this.prisma.workspaceInvitation.updateMany({
       where: {
         id: invitation.id,
-
         tokenHash: invitation.tokenHash,
-
         status: WorkspaceInvitationStatus.PENDING,
-
         expiresAt: {
           gt: new Date(),
         },
@@ -486,7 +413,6 @@ export class WorkspaceInvitationService {
 
       data: {
         status: WorkspaceInvitationStatus.DECLINED,
-
         declinedAt: new Date(),
       },
     });
@@ -500,11 +426,7 @@ export class WorkspaceInvitationService {
     };
   }
 
-  private async deliverInvitation(
-    invitationId: string,
-
-    input: Parameters<InvitationMailer['send']>[0],
-  ): Promise<void> {
+  private async deliverInvitation(invitationId: string, input: Parameters<InvitationMailer['send']>[0]): Promise<void> {
     try {
       const result = await this.mailer.send(input);
 
@@ -515,7 +437,6 @@ export class WorkspaceInvitationService {
 
         data: {
           deliveryStatus: result.sent ? InvitationDeliveryStatus.SENT : InvitationDeliveryStatus.NOT_REQUESTED,
-
           deliveryError: null,
         },
       });
@@ -527,7 +448,6 @@ export class WorkspaceInvitationService {
 
         data: {
           deliveryStatus: InvitationDeliveryStatus.FAILED,
-
           deliveryError: error instanceof Error ? error.message.slice(0, 1_000) : 'Invitation email delivery failed.',
         },
       });
@@ -571,7 +491,6 @@ export class WorkspaceInvitationService {
       await this.prisma.workspaceInvitation.updateMany({
         where: {
           id: invitation.id,
-
           status: WorkspaceInvitationStatus.PENDING,
         },
 
@@ -586,23 +505,17 @@ export class WorkspaceInvitationService {
     return invitation.status;
   }
 
-  private async expirePendingInvitations(
-    workspaceId: string,
-
-    email: string,
-  ): Promise<void> {
+  private async expirePendingInvitations(workspaceId: string, email: string): Promise<void> {
     await this.prisma.workspaceInvitation.updateMany({
       where: {
         workspaceId,
 
         email: {
           equals: email,
-
           mode: 'insensitive',
         },
 
         status: WorkspaceInvitationStatus.PENDING,
-
         expiresAt: {
           lte: new Date(),
         },
@@ -620,7 +533,6 @@ export class WorkspaceInvitationService {
         workspaceId,
 
         status: WorkspaceInvitationStatus.PENDING,
-
         expiresAt: {
           lte: new Date(),
         },
@@ -632,11 +544,7 @@ export class WorkspaceInvitationService {
     });
   }
 
-  private async requireInvitation(
-    workspaceId: string,
-
-    invitationId: string,
-  ) {
+  private async requireInvitation(workspaceId: string, invitationId: string) {
     const invitation = await this.prisma.workspaceInvitation.findFirst({
       where: {
         id: invitationId,
@@ -684,35 +592,20 @@ export class WorkspaceInvitationService {
   private mapInvitation(invitation: Awaited<ReturnType<WorkspaceInvitationService['requireInvitation']>>) {
     return {
       id: invitation.id,
-
       workspaceId: invitation.workspaceId,
-
       email: invitation.email,
-
       role: invitation.role,
-
       status: invitation.status,
-
       deliveryStatus: invitation.deliveryStatus,
-
       deliveryError: invitation.deliveryError,
-
       expiresAt: invitation.expiresAt.toISOString(),
-
       acceptedAt: invitation.acceptedAt?.toISOString() ?? null,
-
       declinedAt: invitation.declinedAt?.toISOString() ?? null,
-
       revokedAt: invitation.revokedAt?.toISOString() ?? null,
-
       lastSentAt: invitation.lastSentAt?.toISOString() ?? null,
-
       sendCount: invitation.sendCount,
-
       createdAt: invitation.createdAt.toISOString(),
-
       invitedBy: invitation.invitedBy,
-
       acceptedBy: invitation.acceptedBy,
     };
   }

@@ -7,15 +7,11 @@ test.describe('Phase 18 webhook integrations', () => {
     await page.route('**/auth/refresh', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           accessToken: 'phase-18-token',
-
           user: {
             id: '33333333-3333-4333-8333-333333333333',
-
             email: 'admin@example.com',
           },
         }),
@@ -26,9 +22,7 @@ test.describe('Phase 18 webhook integrations', () => {
       if (route.request().method() === 'POST') {
         await route.fulfill({
           status: 201,
-
           contentType: 'application/json',
-
           body: JSON.stringify({
             endpoint: {
               id: 'webhook-1',
@@ -36,33 +30,19 @@ test.describe('Phase 18 webhook integrations', () => {
               workspaceId,
 
               name: 'Production automation',
-
               url: 'https://automation.example.com/webhook',
-
               eventTypes: ['DEPLOYMENT_FAILED'],
-
               payloadVersion: '2026-08-01',
-
               timeoutMs: 10000,
-
               maxAttempts: 5,
-
               enabled: true,
-
               secretConfigured: true,
-
               lastDeliveryAt: null,
-
               lastSuccessAt: null,
-
               lastFailureAt: null,
-
               createdAt: '2026-08-07T00:00:00.000Z',
-
               updatedAt: '2026-08-07T00:00:00.000Z',
-
               deliveryCount: 0,
-
               latestDelivery: null,
             },
 
@@ -75,26 +55,19 @@ test.describe('Phase 18 webhook integrations', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           canManage: true,
-
           eventCatalog: [
             {
               type: 'DEPLOYMENT_FAILED',
-
               label: 'Deployment failed',
-
               description: 'A deployment enters the Failed state.',
             },
 
             {
               type: 'HEALTH_INCIDENT_OPENED',
-
               label: 'Health incident opened',
-
               description: 'Monitoring opens a new incident.',
             },
           ],
@@ -140,14 +113,10 @@ test.describe('Phase 18 webhook integrations', () => {
     await page.route('**/integrations/webhooks', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           canManage: false,
-
           eventCatalog: [],
-
           items: [],
         }),
       });
@@ -178,14 +147,10 @@ test.describe('Phase 18 webhook integrations', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           canManage: true,
-
           eventCatalog: [],
-
           items: [],
         }),
       });
@@ -210,12 +175,9 @@ test.describe('Phase 18 webhook integrations', () => {
 
       await route.fulfill({
         status: 500,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           statusCode: 500,
-
           message: 'Internal server error',
         }),
       });
@@ -242,14 +204,10 @@ test.describe('Phase 18 webhook integrations', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           canManage: true,
-
           eventCatalog: [],
-
           items: [],
         }),
       });
@@ -267,12 +225,9 @@ test.describe('Phase 18 webhook integrations', () => {
       if (route.request().method() === 'POST') {
         await route.fulfill({
           status: 400,
-
           contentType: 'application/json',
-
           body: JSON.stringify({
             statusCode: 400,
-
             message: 'Private or internal webhook destinations are not allowed.',
           }),
         });
@@ -282,18 +237,13 @@ test.describe('Phase 18 webhook integrations', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           canManage: true,
-
           eventCatalog: [
             {
               type: 'DEPLOYMENT_FAILED',
-
               label: 'Deployment failed',
-
               description: 'A deployment enters the Failed state.',
             },
           ],
@@ -341,14 +291,10 @@ test.describe('Phase 18 webhook integrations', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           canManage: true,
-
           eventCatalog: [],
-
           items: [
             {
               id: 'webhook-1',
@@ -356,33 +302,19 @@ test.describe('Phase 18 webhook integrations', () => {
               workspaceId,
 
               name: 'Production automation',
-
               url: 'https://automation.example.com/webhook',
-
               eventTypes: ['DEPLOYMENT_FAILED'],
-
               payloadVersion: '2026-08-01',
-
               timeoutMs: 10000,
-
               maxAttempts: 5,
-
               enabled: true,
-
               secretConfigured: true,
-
               lastDeliveryAt: null,
-
               lastSuccessAt: null,
-
               lastFailureAt: null,
-
               createdAt: '2026-08-07T00:00:00.000Z',
-
               updatedAt: '2026-08-07T00:00:00.000Z',
-
               deliveryCount: 0,
-
               latestDelivery: null,
             },
           ],
@@ -397,9 +329,7 @@ test.describe('Phase 18 webhook integrations', () => {
 
       await route.fulfill({
         status: 201,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           secret: 'rotated-webhook-secret',
         }),
@@ -433,14 +363,10 @@ test.describe('Phase 18 webhook integrations', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           canManage: true,
-
           eventCatalog: [],
-
           items: [
             {
               id: 'webhook-1',
@@ -448,33 +374,19 @@ test.describe('Phase 18 webhook integrations', () => {
               workspaceId,
 
               name: 'Production automation',
-
               url: 'https://automation.example.com/webhook',
-
               eventTypes: ['DEPLOYMENT_FAILED'],
-
               payloadVersion: '2026-08-01',
-
               timeoutMs: 10000,
-
               maxAttempts: 5,
-
               enabled: true,
-
               secretConfigured: true,
-
               lastDeliveryAt: null,
-
               lastSuccessAt: null,
-
               lastFailureAt: null,
-
               createdAt: '2026-08-07T00:00:00.000Z',
-
               updatedAt: '2026-08-07T00:00:00.000Z',
-
               deliveryCount: 0,
-
               latestDelivery: null,
             },
           ],
@@ -489,9 +401,7 @@ test.describe('Phase 18 webhook integrations', () => {
 
       await route.fulfill({
         status: 201,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           secret: 'rotated-webhook-secret',
         }),
@@ -523,14 +433,10 @@ test.describe('Phase 18 webhook integrations', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           canManage: true,
-
           eventCatalog: [],
-
           items: [
             {
               id: 'webhook-1',
@@ -538,33 +444,19 @@ test.describe('Phase 18 webhook integrations', () => {
               workspaceId,
 
               name: 'Production automation',
-
               url: 'https://automation.example.com/webhook',
-
               eventTypes: ['DEPLOYMENT_FAILED'],
-
               payloadVersion: '2026-08-01',
-
               timeoutMs: 10000,
-
               maxAttempts: 5,
-
               enabled: true,
-
               secretConfigured: true,
-
               lastDeliveryAt: null,
-
               lastSuccessAt: null,
-
               lastFailureAt: null,
-
               createdAt: '2026-08-07T00:00:00.000Z',
-
               updatedAt: '2026-08-07T00:00:00.000Z',
-
               deliveryCount: 0,
-
               latestDelivery: null,
             },
           ],
@@ -579,12 +471,9 @@ test.describe('Phase 18 webhook integrations', () => {
 
       await route.fulfill({
         status: 201,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           id: 'webhook-1',
-
           enabled: false,
         }),
       });
@@ -615,14 +504,10 @@ test.describe('Phase 18 webhook integrations', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           canManage: true,
-
           eventCatalog: [],
-
           items: [
             {
               id: 'webhook-1',
@@ -630,33 +515,19 @@ test.describe('Phase 18 webhook integrations', () => {
               workspaceId,
 
               name: 'Production automation',
-
               url: 'https://automation.example.com/webhook',
-
               eventTypes: ['DEPLOYMENT_FAILED'],
-
               payloadVersion: '2026-08-01',
-
               timeoutMs: 10000,
-
               maxAttempts: 5,
-
               enabled: true,
-
               secretConfigured: true,
-
               lastDeliveryAt: null,
-
               lastSuccessAt: null,
-
               lastFailureAt: null,
-
               createdAt: '2026-08-07T00:00:00.000Z',
-
               updatedAt: '2026-08-07T00:00:00.000Z',
-
               deliveryCount: 0,
-
               latestDelivery: null,
             },
           ],
@@ -671,12 +542,9 @@ test.describe('Phase 18 webhook integrations', () => {
 
       await route.fulfill({
         status: 201,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           deliveryId: 'delivery-1',
-
           status: 'PENDING',
         }),
       });
@@ -685,12 +553,9 @@ test.describe('Phase 18 webhook integrations', () => {
     await page.route('**/integrations/webhooks/webhook-1/deliveries*', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           items: [],
-
           pagination: {
             page: 1,
             limit: 25,
@@ -722,14 +587,10 @@ test.describe('Phase 18 webhook integrations', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           canManage: true,
-
           eventCatalog: [],
-
           items: [
             {
               id: 'webhook-1',
@@ -737,33 +598,19 @@ test.describe('Phase 18 webhook integrations', () => {
               workspaceId,
 
               name: 'Production automation',
-
               url: 'https://automation.example.com/webhook',
-
               eventTypes: ['DEPLOYMENT_FAILED'],
-
               payloadVersion: '2026-08-01',
-
               timeoutMs: 10000,
-
               maxAttempts: 5,
-
               enabled: true,
-
               secretConfigured: true,
-
               lastDeliveryAt: null,
-
               lastSuccessAt: null,
-
               lastFailureAt: null,
-
               createdAt: '2026-08-07T00:00:00.000Z',
-
               updatedAt: '2026-08-07T00:00:00.000Z',
-
               deliveryCount: 0,
-
               latestDelivery: null,
             },
           ],
@@ -774,12 +621,9 @@ test.describe('Phase 18 webhook integrations', () => {
     await page.route('**/integrations/webhooks/webhook-1/deliveries*', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           items: [],
-
           pagination: {
             page: 1,
             limit: 25,
@@ -819,14 +663,10 @@ test.describe('Phase 18 webhook integrations', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           canManage: true,
-
           eventCatalog: [],
-
           items: [
             {
               id: 'webhook-1',
@@ -834,33 +674,19 @@ test.describe('Phase 18 webhook integrations', () => {
               workspaceId,
 
               name: 'Production automation',
-
               url: 'https://automation.example.com/webhook',
-
               eventTypes: ['DEPLOYMENT_FAILED'],
-
               payloadVersion: '2026-08-01',
-
               timeoutMs: 10000,
-
               maxAttempts: 5,
-
               enabled: true,
-
               secretConfigured: true,
-
               lastDeliveryAt: null,
-
               lastSuccessAt: null,
-
               lastFailureAt: null,
-
               createdAt: '2026-08-07T00:00:00.000Z',
-
               updatedAt: '2026-08-07T00:00:00.000Z',
-
               deliveryCount: 1,
-
               latestDelivery: null,
             },
           ],
@@ -871,45 +697,27 @@ test.describe('Phase 18 webhook integrations', () => {
     await page.route('**/integrations/webhooks/webhook-1/deliveries*', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           items: [
             {
               id: 'delivery-1',
-
               status: 'DEAD_LETTERED',
-
               attemptCount: 5,
-
               maxAttempts: 5,
-
               nextAttemptAt: '2026-08-07T01:00:00.000Z',
-
               responseStatus: 503,
-
               responseDurationMs: 342,
-
               failureCode: 'HTTP_5XX',
-
               failureReason: 'Service Unavailable',
-
               deliveredAt: null,
-
               createdAt: '2026-08-07T00:00:00.000Z',
-
               event: {
                 id: 'event-1',
-
                 type: 'DEPLOYMENT_FAILED',
-
                 payloadVersion: '2026-08-01',
-
                 resourceType: 'DEPLOYMENT',
-
                 resourceId: 'deployment-1',
-
                 occurredAt: '2026-08-07T00:00:00.000Z',
               },
 

@@ -1,4 +1,4 @@
-﻿import { PrismaService } from '../../../database/prisma.service';
+import { PrismaService } from '../../../database/prisma.service';
 import { ActivityQueryDto } from '../dto/activity-query.dto';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from 'src/generated/prisma/client';
@@ -7,23 +7,13 @@ import { Prisma } from 'src/generated/prisma/client';
 export class ActivityQueryService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async listWorkspaceActivities(
-    workspaceId: string,
-
-    query: ActivityQueryDto,
-  ) {
+  async listWorkspaceActivities(workspaceId: string, query: ActivityQueryDto) {
     const where = this.buildWhere(workspaceId, undefined, query);
 
     return this.list(where, query);
   }
 
-  async listApplicationActivities(
-    workspaceId: string,
-
-    applicationId: string,
-
-    query: ActivityQueryDto,
-  ) {
+  async listApplicationActivities(workspaceId: string, applicationId: string, query: ActivityQueryDto) {
     const application = await this.prisma.saasApplication.findFirst({
       where: {
         id: applicationId,
@@ -44,11 +34,7 @@ export class ActivityQueryService {
     return this.list(where, query);
   }
 
-  private async list(
-    where: Prisma.ApplicationActivityWhereInput,
-
-    query: ActivityQueryDto,
-  ) {
+  private async list(where: Prisma.ApplicationActivityWhereInput, query: ActivityQueryDto) {
     const [total, items] = await Promise.all([
       this.prisma.applicationActivity.count({
         where,
@@ -85,7 +71,6 @@ export class ActivityQueryService {
         ],
 
         skip: (query.page - 1) * query.limit,
-
         take: query.limit,
       }),
     ]);
@@ -99,7 +84,6 @@ export class ActivityQueryService {
 
       pagination: {
         page: query.page,
-
         limit: query.limit,
 
         total,
@@ -109,13 +93,7 @@ export class ActivityQueryService {
     };
   }
 
-  private buildWhere(
-    workspaceId: string,
-
-    applicationId: string | undefined,
-
-    query: ActivityQueryDto,
-  ): Prisma.ApplicationActivityWhereInput {
+  private buildWhere(workspaceId: string, applicationId: string | undefined, query: ActivityQueryDto): Prisma.ApplicationActivityWhereInput {
     const from = query.from ? new Date(query.from) : undefined;
 
     const to = query.to ? new Date(query.to) : undefined;
@@ -130,15 +108,10 @@ export class ActivityQueryService {
       applicationId,
 
       activityType: query.activityType,
-
       actorType: query.actorType,
-
       actorUserId: query.actorUserId,
-
       entityType: query.entityType,
-
       entityId: query.entityId,
-
       createdAt:
         from || to
           ? {
@@ -152,7 +125,6 @@ export class ActivityQueryService {
             {
               description: {
                 contains: query.search,
-
                 mode: 'insensitive',
               },
             },
@@ -161,7 +133,6 @@ export class ActivityQueryService {
               actor: {
                 displayName: {
                   contains: query.search,
-
                   mode: 'insensitive',
                 },
               },
@@ -171,7 +142,6 @@ export class ActivityQueryService {
               actor: {
                 email: {
                   contains: query.search,
-
                   mode: 'insensitive',
                 },
               },
@@ -181,7 +151,6 @@ export class ActivityQueryService {
               application: {
                 name: {
                   contains: query.search,
-
                   mode: 'insensitive',
                 },
               },

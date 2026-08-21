@@ -7,11 +7,8 @@ import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-
 
 @Module({
   imports: [WorkspaceMembersModule, WorkspaceModule, ActivityModule],
-
   controllers: [WebsitesController],
-
   providers: [WebsitesService],
-
   exports: [WebsitesService],
 })
 export class WebsitesModule {}

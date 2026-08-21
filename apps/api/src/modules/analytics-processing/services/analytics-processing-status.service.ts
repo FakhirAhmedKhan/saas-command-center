@@ -106,11 +106,8 @@ export class AnalyticsProcessingStatusService {
       unresolvedDeadLetters,
 
       activeRun: activeRun ? this.mapRun(activeRun) : null,
-
       latestRun: latestRun ? this.mapRun(latestRun) : null,
-
       lastSuccessfulRun: lastSuccessfulRun ? this.mapRun(lastSuccessfulRun) : null,
-
       recentRuns: recentRuns.map(
         (run: {
           id: string;
@@ -160,29 +157,17 @@ export class AnalyticsProcessingStatusService {
   }): ProcessingRunDto {
     return {
       id: run.id,
-
       status: String(run.status),
-
       trigger: String(run.trigger),
-
       rangeStart: run.rangeStart.toISOString(),
-
       rangeEnd: run.rangeEnd.toISOString(),
-
       retryCount: run.retryCount,
-
       maxRetries: run.maxRetries,
-
       processedEvents: run.rawEventsProcessed,
-
       failedEvents: run.failedEvents,
-
       errorMessage: run.errorMessage,
-
       startedAt: run.startedAt?.toISOString() ?? null,
-
       finishedAt: run.finishedAt?.toISOString() ?? null,
-
       createdAt: run.createdAt.toISOString(),
     };
   }

@@ -1,7 +1,0 @@
-$ node scripts/build.mjs
-
-  dist\tracker.js       7.7kb
-  dist\tracker.js.map  24.6kb
-
-Done in 13ms
-Tracker built successfully: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\tracker\dist\tracker.js

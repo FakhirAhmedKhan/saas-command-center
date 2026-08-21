@@ -13,9 +13,7 @@ import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-
 
 @Module({
   imports: [WorkspaceMembersModule, DatabaseModule, SharedRateLimitModule],
-
   controllers: [WorkspaceInvitationsController, InvitationResponseController, NotificationsController],
-
   providers: [
     InvitationTokenService,
 
@@ -27,7 +25,6 @@ import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-
 
     {
       provide: InvitationMailer,
-
       useClass: DisabledInvitationMailer,
     },
   ],

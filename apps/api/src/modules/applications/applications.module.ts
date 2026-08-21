@@ -7,11 +7,8 @@ import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-
 
 @Module({
   imports: [WorkspaceMembersModule, WorkspaceModule, ActivityModule],
-
   controllers: [ApplicationsController],
-
   providers: [ApplicationsService],
-
   exports: [ApplicationsService],
 })
 export class ApplicationsModule {}

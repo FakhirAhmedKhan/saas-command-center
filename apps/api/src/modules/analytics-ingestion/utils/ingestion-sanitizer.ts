@@ -75,7 +75,6 @@ export function sanitizeTrackedUrl(
 
   return {
     url: url.toString().slice(0, 2048),
-
     path: path.slice(0, 2048),
   };
 }

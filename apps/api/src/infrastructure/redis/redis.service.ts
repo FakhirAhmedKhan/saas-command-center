@@ -19,9 +19,7 @@ export class RedisService implements OnApplicationBootstrap, OnModuleDestroy {
       }),
       {
         enableReadyCheck: true,
-
         maxRetriesPerRequest: 3,
-
         lazyConnect: true,
 
         retryStrategy(attempt) {

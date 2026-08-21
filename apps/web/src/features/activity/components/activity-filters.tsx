@@ -67,7 +67,6 @@ export function ActivityFilters({ value, onChange, onApply, onReset }: ActivityF
           onChange={(event) => update('activityType', event.target.value as ApplicationActivityType | '')}
         >
           <option value=''>All activities</option>
-
           {APPLICATION_ACTIVITY_TYPES.map((type) => (
             <option key={type} value={type}>
               {ACTIVITY_TYPE_LABELS[type]}
@@ -80,6 +79,7 @@ export function ActivityFilters({ value, onChange, onApply, onReset }: ActivityF
 
           {ACTIVITY_ACTOR_TYPES.map((type) => (
             <option key={type} value={type}>
+              {' '}
               {ACTOR_TYPE_LABELS[type]}
             </option>
           ))}
@@ -87,7 +87,6 @@ export function ActivityFilters({ value, onChange, onApply, onReset }: ActivityF
 
         <Select aria-label='Entity type' value={value.entityType} onChange={(event) => update('entityType', event.target.value as ActivityEntityType | '')}>
           <option value=''>All entities</option>
-
           {ACTIVITY_ENTITY_TYPES.map((type) => (
             <option key={type} value={type}>
               {ENTITY_TYPE_LABELS[type]}

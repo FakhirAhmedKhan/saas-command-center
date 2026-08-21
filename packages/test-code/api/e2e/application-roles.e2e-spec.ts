@@ -62,9 +62,7 @@ describe('Application Roles E2E', () => {
       owner,
 
       admin: inWorkspace(rawAdmin, owner.workspaceId),
-
       developer: inWorkspace(rawDeveloper, owner.workspaceId),
-
       viewer: inWorkspace(rawViewer, owner.workspaceId),
     };
   }

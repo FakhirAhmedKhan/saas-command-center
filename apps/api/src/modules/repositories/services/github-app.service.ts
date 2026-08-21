@@ -139,7 +139,6 @@ export class GithubAppService {
 
     const response = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
-
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -227,7 +226,6 @@ export class GithubAppService {
           defaultBranch: repository.default_branch,
           htmlUrl: repository.html_url,
           updatedAt: repository.updated_at,
-
           owner: {
             login: repository.owner.login,
             avatarUrl: repository.owner.avatar_url,

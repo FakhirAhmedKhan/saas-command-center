@@ -69,25 +69,15 @@ interface HealthCheckFormState {
 
 const INITIAL_FORM: HealthCheckFormState = {
   targetType: 'APPLICATION',
-
   targetId: '',
-
   name: '',
-
   url: '',
-
   intervalSeconds: 300,
-
   timeoutMs: 10_000,
-
   expectedStatusMin: 200,
-
   expectedStatusMax: 399,
-
   degradedAfterMs: 1_500,
-
   failureThreshold: 3,
-
   enabled: true,
 };
 
@@ -100,7 +90,6 @@ function formatDateTime(value: string | null): string {
 
   return new Intl.DateTimeFormat('en-US', {
     dateStyle: 'medium',
-
     timeStyle: 'short',
   }).format(new Date(value));
 }
@@ -150,25 +139,15 @@ function MonitoringForm({
 
     setForm({
       targetType: editing.targetType,
-
       targetId: editing.targetId,
-
       name: editing.name,
-
       url: editing.url,
-
       intervalSeconds: editing.intervalSeconds,
-
       timeoutMs: editing.timeoutMs,
-
       expectedStatusMin: editing.expectedStatusMin,
-
       expectedStatusMax: editing.expectedStatusMax,
-
       degradedAfterMs: editing.degradedAfterMs,
-
       failureThreshold: editing.failureThreshold,
-
       enabled: editing.enabled,
     });
   }, [editing]);
@@ -180,27 +159,16 @@ function MonitoringForm({
 
     await onSave({
       targetType: form.targetType,
-
       applicationId: form.targetType === 'APPLICATION' ? form.targetId : undefined,
-
       websiteId: form.targetType === 'WEBSITE' ? form.targetId : undefined,
-
       name: form.name,
-
       url: form.url,
-
       intervalSeconds: form.intervalSeconds,
-
       timeoutMs: form.timeoutMs,
-
       expectedStatusMin: form.expectedStatusMin,
-
       expectedStatusMax: form.expectedStatusMax,
-
       degradedAfterMs: form.degradedAfterMs,
-
       failureThreshold: form.failureThreshold,
-
       enabled: form.enabled,
     });
   }
@@ -230,7 +198,6 @@ function MonitoringForm({
                 ...current,
 
                 targetType: event.target.value as HealthTargetType,
-
                 targetId: '',
               }));
             }}

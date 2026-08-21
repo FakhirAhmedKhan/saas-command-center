@@ -14,9 +14,7 @@ import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-
 
 @Module({
   imports: [WorkspaceMembersModule, DatabaseModule, AnalyticsEngineModule, SharedRateLimitModule],
-
   controllers: [AnalyticsProcessingController],
-
   providers: [
     PostgresAdvisoryLockService,
 

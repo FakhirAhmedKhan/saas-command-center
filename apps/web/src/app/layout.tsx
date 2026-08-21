@@ -6,7 +6,6 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'SaaS Command Center',
-
   description: 'Manage applications, analytics, releases, and operational health.',
 };
 

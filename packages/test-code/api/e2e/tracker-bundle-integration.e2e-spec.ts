@@ -1,4 +1,4 @@
-import { processAnalytics } from '../helpers/analytics-engine-old';
+﻿import { processAnalytics } from '../helpers/analytics-engine-old';
 import { createTrackedWebsite } from '../helpers/analytics-ingestion';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
@@ -107,13 +107,13 @@ describe('Actual Tracker Bundle -> API -> Analytics E2E', () => {
       expect(captured.mode).toBe('no-cors');
       expect(captured.keepalive).toBe(true);
 
-      expect(captured.headers['Content-Type']).toBe('text/plain;charset=UTF-8');
+      expect(captured.headers['Content-Type']!).toBe('text/plain;charset=UTF-8');
 
       const response = await request(app.getHttpServer())
         .post('/api/v1/collect')
         .set('Origin', trackedWebsite.origin)
         .set('User-Agent', 'Actual-CommandCenter-Tracker/1.0.0')
-        .set('Content-Type', captured.headers['Content-Type'])
+        .set('Content-Type', captured.headers['Content-Type']!)
         .send(captured.body);
 
       if (response.status !== 202) {

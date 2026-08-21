@@ -31,7 +31,6 @@ export function beginGithubConnect(workspaceId: string): Promise<GithubConnectSt
 export function completeGithubSetup(installState: string, installationId: string): Promise<GithubSetupResult> {
   return apiRequest<GithubSetupResult>('/repositories/github/setup', {
     method: 'POST',
-
     body: {
       installState,
       installationId,
@@ -49,7 +48,6 @@ export function completeGithubSetup(installState: string, installationId: string
 export function completeGithubCallback(code: string, state: string): Promise<GithubCallbackResult> {
   return apiRequest<GithubCallbackResult>('/repositories/github/callback', {
     method: 'POST',
-
     body: {
       code,
       state,
@@ -95,7 +93,6 @@ export function getRepository(workspaceId: string, repositoryId: string): Promis
 export function linkRepositoryApplication(workspaceId: string, repositoryId: string, applicationId: string): Promise<RepositoryConnection> {
   return apiRequest<RepositoryConnection>(`/workspaces/${workspaceId}/repositories/${repositoryId}/application`, {
     method: 'PATCH',
-
     body: {
       applicationId,
     },

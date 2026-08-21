@@ -120,9 +120,7 @@ export class AnalyticsIngestionService {
 
         pageUrl: trackedUrl.url,
         pagePath: trackedUrl.path,
-
         pageTitle: this.normalizeOptionalString(event.title, 512),
-
         referrerUrl: sanitizeReferrerUrl(event.referrer),
 
         eventName,
@@ -134,17 +132,11 @@ export class AnalyticsIngestionService {
           : {}),
 
         screenWidth: event.screenWidth ?? null,
-
         screenHeight: event.screenHeight ?? null,
-
         viewportWidth: event.viewportWidth ?? null,
-
         viewportHeight: event.viewportHeight ?? null,
-
         language: this.normalizeOptionalString(event.language, 35),
-
         clientTimeZone: this.sanitizeTimeZone(event.timeZone),
-
         durationMs: event.durationMs ?? null,
 
         origin,

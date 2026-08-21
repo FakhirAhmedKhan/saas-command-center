@@ -40,7 +40,6 @@ export class GithubConnectIntentCleanupService {
       this.prisma.personalGithubConnectIntent.deleteMany({
         where: {
           consumedAt: null,
-
           expiresAt: {
             lte: now,
           },
@@ -59,9 +58,7 @@ export class GithubConnectIntentCleanupService {
     this.logger.log(
       JSON.stringify({
         event: 'github_connect_intent_cleanup',
-
         removedPersonalIntents: personalIntents.count,
-
         removedRepositoryIntents: repositoryIntents.count,
       }),
     );

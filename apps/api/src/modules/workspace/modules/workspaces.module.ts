@@ -11,11 +11,8 @@ import { UsersModule } from 'src/modules/users/users.module';
 
 @Module({
   imports: [UsersModule],
-
   controllers: [WorkspacesController, WorkspaceMembersController, WorkspaceCreationController],
-
   providers: [WorkspacesService, WorkspaceMembersService, WorkspaceCreationService, WorkspaceAccessGuard, WorkspaceRolesGuard],
-
   exports: [WorkspacesService, WorkspaceMembersService, WorkspaceCreationService, WorkspaceAccessGuard, WorkspaceRolesGuard],
 })
 export class WorkspaceModule {}

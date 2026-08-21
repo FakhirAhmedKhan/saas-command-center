@@ -96,11 +96,8 @@ export class SafeHttpClientService {
 
         dispatcher,
         headersTimeout: input.timeoutMs,
-
         bodyTimeout: input.timeoutMs,
-
         signal: AbortSignal.timeout(input.timeoutMs),
-
         headers: {
           accept: 'application/json,text/plain,*/*',
 
@@ -154,7 +151,6 @@ export class SafeHttpClientService {
 
       return {
         status: HealthCheckStatus.DOWN,
-
         statusCode: null,
 
         responseTimeMs,
@@ -201,7 +197,6 @@ export class SafeHttpClientService {
       return [
         {
           address: hostname,
-
           family: isIP(hostname) as 4 | 6,
         },
       ];
@@ -213,12 +208,10 @@ export class SafeHttpClientService {
       addresses = (
         await lookup(hostname, {
           all: true,
-
           verbatim: true,
         })
       ).map((item) => ({
         address: item.address,
-
         family: item.family as 4 | 6,
       }));
     } catch {

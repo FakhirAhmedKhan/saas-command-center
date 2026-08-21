@@ -54,13 +54,11 @@ describe('Workspace Members E2E', () => {
       expect.arrayContaining([
         expect.objectContaining({
           userId: owner.userId,
-
           role: WorkspaceRole.OWNER,
         }),
 
         expect.objectContaining({
           userId: developer.userId,
-
           role: WorkspaceRole.DEVELOPER,
         }),
       ]),
@@ -88,7 +86,6 @@ describe('Workspace Members E2E', () => {
 
     const response = await owner.agent.post(workspaceRoutes.members(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
       email: 'missing-user@example.test',
-
       role: WorkspaceRole.VIEWER,
     });
 
@@ -113,7 +110,6 @@ describe('Workspace Members E2E', () => {
     const memberships = await prisma.workspaceMember.count({
       where: {
         workspaceId: owner.workspaceId,
-
         userId: member.userId,
       },
     });
@@ -204,7 +200,6 @@ describe('Workspace Members E2E', () => {
 
     const response = await owner.agent.post(workspaceRoutes.members(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
       email: member.input.email,
-
       role: 'SUPER_ADMIN',
     });
 

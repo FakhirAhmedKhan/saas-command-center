@@ -3,15 +3,10 @@ export const API_PREFIX = '/api/v1';
 export const TEST_ROUTES = {
   auth: {
     register: `${API_PREFIX}/auth/register`,
-
     login: `${API_PREFIX}/auth/login`,
-
     refresh: `${API_PREFIX}/auth/refresh`,
-
     logout: `${API_PREFIX}/auth/logout`,
-
     logoutAll: `${API_PREFIX}/auth/logout-all`,
-
     me: `${API_PREFIX}/auth/me`,
   },
 
@@ -55,7 +50,6 @@ export function buildRegisterPayload(user: TestUserInput) {
 export function buildLoginPayload(user: Pick<TestUserInput, 'email' | 'password'>) {
   return {
     email: user.email,
-
     password: user.password,
   };
 }

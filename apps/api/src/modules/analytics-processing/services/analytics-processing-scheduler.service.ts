@@ -45,22 +45,16 @@ export class AnalyticsProcessingSchedulerService {
       try {
         await this.queue.queue({
           workspaceId: range.workspaceId,
-
           websiteId: range.websiteId,
-
           from: range.firstOccurredAt,
-
           to: new Date(range.lastOccurredAt.getTime() + 1),
-
           trigger: AnalyticsProcessingTrigger.SCHEDULED,
         });
       } catch (error) {
         this.logger.error(
           JSON.stringify({
             event: 'analytics_schedule_failed',
-
             websiteId: range.websiteId,
-
             error: error instanceof Error ? error.message : String(error),
           }),
         );
@@ -71,7 +65,6 @@ export class AnalyticsProcessingSchedulerService {
   private async getPendingRanges(): Promise<PendingWebsiteRange[]> {
     const groups = await this.prisma.rawAnalyticsEvent.groupBy({
       by: ['websiteId'],
-
       where: {
         processedAt: null,
       },

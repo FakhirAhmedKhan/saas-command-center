@@ -30,7 +30,7 @@ export class RepositoriesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly githubApp: GithubAppService,
-  ) {}
+  ) { }
 
   async list(workspaceId: string) {
     const [installations, repositories] = await Promise.all([
@@ -61,7 +61,6 @@ export class RepositoriesService {
         },
 
         include: repositoryInclude,
-
         orderBy: {
           fullName: 'asc',
         },
@@ -99,91 +98,108 @@ export class RepositoriesService {
   ): Promise<{
     repositoryCount: number;
   }> {
-    const installation = await this.githubApp.getInstallation(externalInstallationId);
-
-    const repositories = await this.githubApp.listInstallationRepositories(externalInstallationId);
+    const [installation, repositories] = await Promise.all([
+      this.githubApp.getInstallation(externalInstallationId),
+      this.githubApp.listInstallationRepositories(externalInstallationId),
+    ]);
 
     const now = new Date();
 
-    await this.prisma.$transaction(async (transaction) => {
-      const localInstallation = await transaction.repositoryInstallation.upsert({
-        where: {
-          workspaceId_provider_externalInstallationId: {
-            workspaceId,
-            provider: RepositoryProvider.GITHUB,
-            externalInstallationId,
-          },
-        },
-
-        create: {
+    const localInstallation = await this.prisma.repositoryInstallation.upsert({
+      where: {
+        workspaceId_provider_externalInstallationId: {
           workspaceId,
           provider: RepositoryProvider.GITHUB,
           externalInstallationId,
-          accountLogin: installation.accountLogin,
-          accountType: installation.accountType,
-          connectedById: connectedById ?? null,
-          connectedAt: now,
-          lastSyncedAt: now,
         },
+      },
 
-        update: {
-          accountLogin: installation.accountLogin,
-          accountType: installation.accountType,
-          lastSyncedAt: now,
-        },
-      });
+      create: {
+        workspaceId,
+        provider: RepositoryProvider.GITHUB,
+        externalInstallationId,
+        accountLogin: installation.accountLogin,
+        accountType: installation.accountType,
+        connectedById: connectedById ?? null,
+        connectedAt: now,
+        lastSyncedAt: now,
+      },
 
-      await transaction.repositoryConnection.updateMany({
-        where: {
-          workspaceId,
-          installationId: localInstallation.id,
-        },
+      update: {
+        accountLogin: installation.accountLogin,
+        accountType: installation.accountType,
+        lastSyncedAt: now,
+      },
+    });
 
-        data: {
-          isAvailable: false,
-        },
-      });
+    const BATCH_SIZE = 10;
 
-      for (const repository of repositories) {
-        await transaction.repositoryConnection.upsert({
-          where: {
-            workspaceId_provider_externalRepoId: {
+    for (let index = 0; index < repositories.length; index += BATCH_SIZE) {
+      const batch = repositories.slice(index, index + BATCH_SIZE);
+
+      await Promise.all(
+        batch.map((repository) =>
+          this.prisma.repositoryConnection.upsert({
+            where: {
+              workspaceId_provider_externalRepoId: {
+                workspaceId,
+                provider: RepositoryProvider.GITHUB,
+                externalRepoId: repository.id,
+              },
+            },
+
+            create: {
               workspaceId,
+              installationId: localInstallation.id,
               provider: RepositoryProvider.GITHUB,
               externalRepoId: repository.id,
+              owner: repository.owner,
+              name: repository.name,
+              fullName: repository.fullName,
+              defaultBranch: repository.defaultBranch,
+              isPrivate: repository.isPrivate,
+              htmlUrl: repository.htmlUrl,
+              archived: repository.archived,
+              isAvailable: true,
+              lastSyncedAt: now,
             },
-          },
 
-          create: {
-            workspaceId,
-            installationId: localInstallation.id,
-            provider: RepositoryProvider.GITHUB,
-            externalRepoId: repository.id,
-            owner: repository.owner,
-            name: repository.name,
-            fullName: repository.fullName,
-            defaultBranch: repository.defaultBranch,
-            isPrivate: repository.isPrivate,
-            htmlUrl: repository.htmlUrl,
-            archived: repository.archived,
-            isAvailable: true,
-            lastSyncedAt: now,
-          },
+            update: {
+              installationId: localInstallation.id,
+              owner: repository.owner,
+              name: repository.name,
+              fullName: repository.fullName,
+              defaultBranch: repository.defaultBranch,
+              isPrivate: repository.isPrivate,
+              htmlUrl: repository.htmlUrl,
+              archived: repository.archived,
+              isAvailable: true,
+              lastSyncedAt: now,
+            },
+          }),
+        ),
+      );
+    }
 
-          update: {
-            installationId: localInstallation.id,
-            owner: repository.owner,
-            name: repository.name,
-            fullName: repository.fullName,
-            defaultBranch: repository.defaultBranch,
-            isPrivate: repository.isPrivate,
-            htmlUrl: repository.htmlUrl,
-            archived: repository.archived,
-            isAvailable: true,
-            lastSyncedAt: now,
-          },
-        });
-      }
+    const currentRepositoryIds = repositories.map((repository) => repository.id);
+
+    await this.prisma.repositoryConnection.updateMany({
+      where: {
+        workspaceId,
+        installationId: localInstallation.id,
+
+        ...(currentRepositoryIds.length > 0
+          ? {
+            externalRepoId: {
+              notIn: currentRepositoryIds,
+            },
+          }
+          : {}),
+      },
+
+      data: {
+        isAvailable: false,
+      },
     });
 
     return {

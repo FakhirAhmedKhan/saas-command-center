@@ -95,13 +95,11 @@ describe('Raw Events E2E', () => {
 
     const checkout = buildTrackerEvent(trackedWebsite.origin, {
       type: RawAnalyticsEventType.CUSTOM,
-
       eventName: 'Checkout_Completed',
     });
 
     const signup = buildTrackerEvent(trackedWebsite.origin, {
       type: RawAnalyticsEventType.CUSTOM,
-
       eventName: 'signup_completed',
     });
 
@@ -143,13 +141,11 @@ describe('Raw Events E2E', () => {
 
     const firstEvent = buildTrackerEvent(trackedWebsite.origin, {
       visitorId: visitorA,
-
       sessionId: sessionA,
     });
 
     const secondEvent = buildTrackerEvent(trackedWebsite.origin, {
       visitorId: visitorB,
-
       sessionId: sessionB,
     });
 
@@ -196,7 +192,6 @@ describe('Raw Events E2E', () => {
     const ranged = readRawEventList(
       await listRawEvents(owner, trackedWebsite.id, {
         dateFrom: new Date(now - 60 * 60 * 1000).toISOString(),
-
         dateTo: new Date(now).toISOString(),
       }),
     );

@@ -88,9 +88,7 @@ export function AnalyticsEnginePanel({ workspaceId, websiteId }: AnalyticsEngine
             dimension,
 
             dateFrom: dateFrom ? new Date(`${dateFrom}T00:00:00.000Z`).toISOString() : undefined,
-
             dateTo: dateTo ? new Date(`${dateTo}T23:59:59.999Z`).toISOString() : undefined,
-
             limit: 1000,
           }),
         ]);
@@ -160,9 +158,7 @@ export function AnalyticsEnginePanel({ workspaceId, websiteId }: AnalyticsEngine
     await runAction('reprocess', () =>
       reprocessAnalytics(workspaceId, websiteId, {
         dateFrom: new Date(`${reprocessFrom}T00:00:00.000Z`).toISOString(),
-
         dateTo: new Date(`${reprocessTo}T23:59:59.999Z`).toISOString(),
-
         maxEvents: 100000,
       }),
     );

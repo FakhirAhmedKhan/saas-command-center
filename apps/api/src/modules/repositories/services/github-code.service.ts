@@ -92,9 +92,7 @@ export class GithubCodeService {
       for (const branch of result) {
         branches.push({
           name: branch.name,
-
           sha: branch.commit.sha,
-
           protected: branch.protected,
         });
       }
@@ -117,16 +115,11 @@ export class GithubCodeService {
 
     return {
       sha: result.sha,
-
       truncated: result.truncated,
-
       entries: result.tree.map((entry) => ({
         path: entry.path,
-
         type: this.mapTreeType(entry.type),
-
         sha: entry.sha,
-
         size: entry.size ?? null,
       })),
     };
@@ -152,15 +145,10 @@ export class GithubCodeService {
 
     return {
       name: response.name,
-
       path: response.path,
-
       sha: response.sha,
-
       size: response.size,
-
       encoding: response.encoding ?? null,
-
       content: response.content ?? null,
     };
   }
@@ -168,9 +156,7 @@ export class GithubCodeService {
   private async requestJson<T>(token: string, path: string): Promise<T> {
     const response = await fetch(`https://api.github.com${path}`, {
       method: 'GET',
-
       headers: this.headers(token),
-
       signal: AbortSignal.timeout(15_000),
     });
 
@@ -186,9 +172,7 @@ export class GithubCodeService {
   private async requestJsonOrNull<T>(token: string, path: string): Promise<T | null> {
     const response = await fetch(`https://api.github.com${path}`, {
       method: 'GET',
-
       headers: this.headers(token),
-
       signal: AbortSignal.timeout(15_000),
     });
 
@@ -208,7 +192,6 @@ export class GithubCodeService {
   private headers(token: string): Record<string, string> {
     return {
       Accept: 'application/vnd.github+json',
-
       Authorization: `Bearer ${token}`,
 
       'X-GitHub-Api-Version': this.apiVersion,

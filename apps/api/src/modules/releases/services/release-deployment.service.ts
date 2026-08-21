@@ -22,13 +22,7 @@ export class ReleaseDeploymentService {
     private readonly transitions: DeploymentTransitionService,
   ) {}
 
-  async getOptions(
-    workspaceId: string,
-
-    applicationId: string,
-
-    userId: string,
-  ) {
+  async getOptions(workspaceId: string, applicationId: string, userId: string) {
     await this.requireApplication(workspaceId, applicationId);
 
     const [canManage, environments, incidents] = await Promise.all([
@@ -45,7 +39,6 @@ export class ReleaseDeploymentService {
 
         select: {
           id: true,
-
           name: true,
         },
 
@@ -59,7 +52,6 @@ export class ReleaseDeploymentService {
           workspaceId,
 
           status: HealthIncidentStatus.OPEN,
-
           healthCheck: {
             applicationId,
           },
@@ -67,11 +59,8 @@ export class ReleaseDeploymentService {
 
         select: {
           id: true,
-
           summary: true,
-
           startedAt: true,
-
           healthCheck: {
             select: {
               name: true,
@@ -94,25 +83,14 @@ export class ReleaseDeploymentService {
 
       openIncidents: incidents.map((incident) => ({
         id: incident.id,
-
         name: incident.healthCheck.name,
-
         summary: incident.summary,
-
         startedAt: incident.startedAt.toISOString(),
       })),
     };
   }
 
-  async createRelease(
-    workspaceId: string,
-
-    applicationId: string,
-
-    userId: string,
-
-    input: CreateReleaseDto,
-  ) {
+  async createRelease(workspaceId: string, applicationId: string, userId: string, input: CreateReleaseDto) {
     await this.access.assertCanManage(workspaceId, userId);
 
     await this.requireApplication(workspaceId, applicationId);
@@ -125,21 +103,13 @@ export class ReleaseDeploymentService {
           applicationId,
 
           version: input.version.trim(),
-
           name: input.name?.trim() || null,
-
           notes: input.notes?.trim() || null,
-
           commitRef: input.commitRef?.trim() || null,
-
           repositoryUrl: input.repositoryUrl?.trim() || null,
-
           scheduledAt: input.scheduledAt ? new Date(input.scheduledAt) : null,
-
           status: input.scheduledAt ? ReleaseStatus.SCHEDULED : ReleaseStatus.DRAFT,
-
           createdById: userId,
-
           updatedById: userId,
         },
 
@@ -168,17 +138,7 @@ export class ReleaseDeploymentService {
     }
   }
 
-  async updateRelease(
-    workspaceId: string,
-
-    applicationId: string,
-
-    releaseId: string,
-
-    userId: string,
-
-    input: UpdateReleaseDto,
-  ) {
+  async updateRelease(workspaceId: string, applicationId: string, releaseId: string, userId: string, input: UpdateReleaseDto) {
     await this.access.assertCanManage(workspaceId, userId);
 
     const release = await this.requireRelease(workspaceId, applicationId, releaseId);
@@ -195,17 +155,11 @@ export class ReleaseDeploymentService {
 
         data: {
           version: input.version?.trim(),
-
           name: input.name === undefined ? undefined : input.name.trim() || null,
-
           notes: input.notes === undefined ? undefined : input.notes.trim() || null,
-
           commitRef: input.commitRef === undefined ? undefined : input.commitRef.trim() || null,
-
           repositoryUrl: input.repositoryUrl === undefined ? undefined : input.repositoryUrl.trim() || null,
-
           scheduledAt: input.scheduledAt === undefined ? undefined : new Date(input.scheduledAt),
-
           updatedById: userId,
         },
       });
@@ -218,13 +172,7 @@ export class ReleaseDeploymentService {
     }
   }
 
-  async listReleases(
-    workspaceId: string,
-
-    applicationId: string,
-
-    query: ReleaseListQueryDto,
-  ) {
+  async listReleases(workspaceId: string, applicationId: string, query: ReleaseListQueryDto) {
     await this.requireApplication(workspaceId, applicationId);
 
     const where: Prisma.ReleaseWhereInput = {
@@ -237,7 +185,6 @@ export class ReleaseDeploymentService {
             {
               version: {
                 contains: query.search,
-
                 mode: 'insensitive',
               },
             },
@@ -245,7 +192,6 @@ export class ReleaseDeploymentService {
             {
               name: {
                 contains: query.search,
-
                 mode: 'insensitive',
               },
             },
@@ -253,7 +199,6 @@ export class ReleaseDeploymentService {
             {
               commitRef: {
                 contains: query.search,
-
                 mode: 'insensitive',
               },
             },
@@ -290,37 +235,21 @@ export class ReleaseDeploymentService {
         },
 
         skip: (query.page - 1) * query.limit,
-
         take: query.limit,
       }),
     ]);
 
     return {
       items: releases,
-
       pagination: this.createPagination(query.page, query.limit, total),
     };
   }
 
-  async getRelease(
-    workspaceId: string,
-
-    applicationId: string,
-
-    releaseId: string,
-  ) {
+  async getRelease(workspaceId: string, applicationId: string, releaseId: string) {
     return this.requireRelease(workspaceId, applicationId, releaseId);
   }
 
-  async createDeployment(
-    workspaceId: string,
-
-    applicationId: string,
-
-    userId: string,
-
-    input: CreateDeploymentDto,
-  ) {
+  async createDeployment(workspaceId: string, applicationId: string, userId: string, input: CreateDeploymentDto) {
     await this.access.assertCanManage(workspaceId, userId);
 
     const [release, environment] = await Promise.all([
@@ -338,7 +267,6 @@ export class ReleaseDeploymentService {
         const maximumAttempt = await transaction.deployment.aggregate({
           where: {
             releaseId: release.id,
-
             environmentId: environment.id,
           },
 
@@ -356,29 +284,19 @@ export class ReleaseDeploymentService {
             applicationId,
 
             environmentId: environment.id,
-
             releaseId: release.id,
 
             attempt,
 
             status: DeploymentStatus.DRAFT,
-
             commitRef: input.commitRef?.trim() || release.commitRef,
-
             repositoryUrl: input.repositoryUrl?.trim() || release.repositoryUrl,
-
             ciJobUrl: input.ciJobUrl?.trim() || null,
-
             liveUrl: input.liveUrl?.trim() || null,
-
             deploymentNotes: input.deploymentNotes?.trim() || null,
-
             scheduledAt: input.scheduledAt ? new Date(input.scheduledAt) : null,
-
             healthIncidentId: input.healthIncidentId,
-
             createdById: userId,
-
             updatedById: userId,
           },
         });
@@ -388,22 +306,14 @@ export class ReleaseDeploymentService {
             workspaceId,
 
             deploymentId: deployment.id,
-
             actorId: userId,
-
             action: DeploymentActivityAction.CREATED,
-
             toStatus: DeploymentStatus.DRAFT,
-
             message: `Deployment attempt ${attempt} created for ${environment.name}.`,
-
             metadata: {
               releaseId: release.id,
-
               releaseVersion: release.version,
-
               environmentId: environment.id,
-
               environmentName: environment.name,
 
               attempt,
@@ -419,17 +329,7 @@ export class ReleaseDeploymentService {
     );
   }
 
-  async transitionDeployment(
-    workspaceId: string,
-
-    applicationId: string,
-
-    deploymentId: string,
-
-    userId: string,
-
-    input: TransitionDeploymentDto,
-  ) {
+  async transitionDeployment(workspaceId: string, applicationId: string, deploymentId: string, userId: string, input: TransitionDeploymentDto) {
     await this.access.assertCanManage(workspaceId, userId);
 
     const deployment = await this.requireDeployment(workspaceId, applicationId, deploymentId);
@@ -484,15 +384,12 @@ export class ReleaseDeploymentService {
       const changed = await transaction.deployment.updateMany({
         where: {
           id: deployment.id,
-
           status: deployment.status,
         },
 
         data: {
           status: input.status,
-
           statusChangedAt: now,
-
           scheduledAt: input.status === DeploymentStatus.DRAFT ? null : input.scheduledAt ? new Date(input.scheduledAt) : undefined,
 
           startedAt,
@@ -502,13 +399,9 @@ export class ReleaseDeploymentService {
           durationMs,
 
           failureReason: input.status === DeploymentStatus.FAILED ? input.failureReason?.trim() : null,
-
           rollbackToDeploymentId: rollbackTarget?.id,
-
           healthIncidentId: input.healthIncidentId ?? deployment.healthIncidentId,
-
           deployedById: terminal ? userId : deployment.deployedById,
-
           updatedById: userId,
         },
       });
@@ -524,9 +417,7 @@ export class ReleaseDeploymentService {
 
         data: {
           status: this.mapReleaseStatus(input.status),
-
           releasedAt: input.status === DeploymentStatus.SUCCESSFUL ? now : undefined,
-
           updatedById: userId,
         },
       });
@@ -536,15 +427,10 @@ export class ReleaseDeploymentService {
           workspaceId,
 
           deploymentId: deployment.id,
-
           actorId: userId,
-
           action: input.status === DeploymentStatus.ROLLED_BACK ? DeploymentActivityAction.ROLLBACK_RECORDED : DeploymentActivityAction.STATUS_CHANGED,
-
           fromStatus: deployment.status,
-
           toStatus: input.status,
-
           message:
             input.message?.trim() ||
             this.getTransitionMessage(
@@ -557,11 +443,8 @@ export class ReleaseDeploymentService {
 
           metadata: {
             failureReason: input.failureReason,
-
             rollbackToDeploymentId: rollbackTarget?.id,
-
             rollbackToVersion: rollbackTarget?.release.version,
-
             healthIncidentId: input.healthIncidentId,
           },
         },
@@ -571,13 +454,7 @@ export class ReleaseDeploymentService {
     });
   }
 
-  async listDeployments(
-    workspaceId: string,
-
-    applicationId: string,
-
-    query: DeploymentListQueryDto,
-  ) {
+  async listDeployments(workspaceId: string, applicationId: string, query: DeploymentListQueryDto) {
     await this.requireApplication(workspaceId, applicationId);
 
     const where: Prisma.DeploymentWhereInput = {
@@ -586,9 +463,7 @@ export class ReleaseDeploymentService {
       applicationId,
 
       environmentId: query.environmentId,
-
       releaseId: query.releaseId,
-
       status: query.status,
     };
 
@@ -601,7 +476,6 @@ export class ReleaseDeploymentService {
         where,
 
         include: this.deploymentInclude(),
-
         orderBy: [
           {
             statusChangedAt: 'desc',
@@ -613,33 +487,21 @@ export class ReleaseDeploymentService {
         ],
 
         skip: (query.page - 1) * query.limit,
-
         take: query.limit,
       }),
     ]);
 
     return {
       items: deployments.map((deployment) => this.mapDeployment(deployment)),
-
       pagination: this.createPagination(query.page, query.limit, total),
     };
   }
 
-  async getDeployment(
-    workspaceId: string,
-
-    applicationId: string,
-
-    deploymentId: string,
-  ) {
+  async getDeployment(workspaceId: string, applicationId: string, deploymentId: string) {
     return this.mapDeployment(await this.requireDeployment(workspaceId, applicationId, deploymentId));
   }
 
-  async getCurrentVersions(
-    workspaceId: string,
-
-    applicationId: string,
-  ) {
+  async getCurrentVersions(workspaceId: string, applicationId: string) {
     await this.requireApplication(workspaceId, applicationId);
 
     const environments = await this.prisma.applicationEnvironment.findMany({
@@ -653,7 +515,6 @@ export class ReleaseDeploymentService {
 
       select: {
         id: true,
-
         name: true,
       },
 
@@ -671,7 +532,6 @@ export class ReleaseDeploymentService {
             applicationId,
 
             environmentId: environment.id,
-
             status: {
               in: [DeploymentStatus.SUCCESSFUL, DeploymentStatus.ROLLED_BACK],
             },
@@ -679,7 +539,6 @@ export class ReleaseDeploymentService {
 
           include: {
             release: true,
-
             rollbackTo: {
               include: {
                 release: true,
@@ -695,19 +554,12 @@ export class ReleaseDeploymentService {
         if (!latestTerminal) {
           return {
             environmentId: environment.id,
-
             environmentName: environment.name,
-
             deploymentId: null,
-
             releaseId: null,
-
             version: null,
-
             status: null,
-
             deployedAt: null,
-
             liveUrl: null,
           };
         }
@@ -716,30 +568,19 @@ export class ReleaseDeploymentService {
 
         return {
           environmentId: environment.id,
-
           environmentName: environment.name,
-
           deploymentId: effective.id,
-
           releaseId: effective.releaseId,
-
           version: effective.release.version,
-
           status: latestTerminal.status,
-
           deployedAt: latestTerminal.statusChangedAt.toISOString(),
-
           liveUrl: effective.liveUrl,
         };
       }),
     );
   }
 
-  private async requireApplication(
-    workspaceId: string,
-
-    applicationId: string,
-  ) {
+  private async requireApplication(workspaceId: string, applicationId: string) {
     const application = await this.prisma.saasApplication.findFirst({
       where: {
         id: applicationId,
@@ -751,7 +592,6 @@ export class ReleaseDeploymentService {
 
       select: {
         id: true,
-
         name: true,
       },
     });
@@ -763,13 +603,7 @@ export class ReleaseDeploymentService {
     return application;
   }
 
-  private async requireEnvironment(
-    workspaceId: string,
-
-    applicationId: string,
-
-    environmentId: string,
-  ) {
+  private async requireEnvironment(workspaceId: string, applicationId: string, environmentId: string) {
     const environment = await this.prisma.applicationEnvironment.findFirst({
       where: {
         id: environmentId,
@@ -783,7 +617,6 @@ export class ReleaseDeploymentService {
 
       select: {
         id: true,
-
         name: true,
       },
     });
@@ -795,13 +628,7 @@ export class ReleaseDeploymentService {
     return environment;
   }
 
-  private async requireRelease(
-    workspaceId: string,
-
-    applicationId: string,
-
-    releaseId: string,
-  ) {
+  private async requireRelease(workspaceId: string, applicationId: string, releaseId: string) {
     const release = await this.prisma.release.findFirst({
       where: {
         id: releaseId,
@@ -839,13 +666,7 @@ export class ReleaseDeploymentService {
     return release;
   }
 
-  private async requireDeployment(
-    workspaceId: string,
-
-    applicationId: string,
-
-    deploymentId: string,
-  ) {
+  private async requireDeployment(workspaceId: string, applicationId: string, deploymentId: string) {
     const deployment = await this.prisma.deployment.findFirst({
       where: {
         id: deploymentId,
@@ -865,13 +686,7 @@ export class ReleaseDeploymentService {
     return deployment;
   }
 
-  private async requireHealthIncident(
-    workspaceId: string,
-
-    applicationId: string,
-
-    incidentId: string,
-  ) {
+  private async requireHealthIncident(workspaceId: string, applicationId: string, incidentId: string) {
     const incident = await this.prisma.healthIncident.findFirst({
       where: {
         id: incidentId,
@@ -898,7 +713,6 @@ export class ReleaseDeploymentService {
   private deploymentInclude() {
     return {
       release: true,
-
       environment: {
         select: {
           id: true,
@@ -927,7 +741,6 @@ export class ReleaseDeploymentService {
       rollbackTo: {
         include: {
           release: true,
-
           environment: {
             select: {
               id: true,
@@ -955,11 +768,7 @@ export class ReleaseDeploymentService {
     } as const;
   }
 
-  private async getDeploymentById(
-    transaction: Prisma.TransactionClient,
-
-    deploymentId: string,
-  ) {
+  private async getDeploymentById(transaction: Prisma.TransactionClient, deploymentId: string) {
     const deployment = await transaction.deployment.findUniqueOrThrow({
       where: {
         id: deploymentId,
@@ -976,23 +785,16 @@ export class ReleaseDeploymentService {
       ...deployment,
 
       scheduledAt: deployment.scheduledAt?.toISOString() ?? null,
-
       startedAt: deployment.startedAt?.toISOString() ?? null,
-
       finishedAt: deployment.finishedAt?.toISOString() ?? null,
-
       statusChangedAt: deployment.statusChangedAt.toISOString(),
-
       createdAt: deployment.createdAt.toISOString(),
-
       updatedAt: deployment.updatedAt.toISOString(),
-
       healthIncident: deployment.healthIncident
         ? {
             ...deployment.healthIncident,
 
             startedAt: deployment.healthIncident.startedAt.toISOString(),
-
             resolvedAt: deployment.healthIncident.resolvedAt?.toISOString() ?? null,
           }
         : null,
@@ -1013,7 +815,6 @@ export class ReleaseDeploymentService {
 
   private getTransitionMessage(
     from: DeploymentStatus,
-
     to: DeploymentStatus,
 
     rollbackVersion?: string,
@@ -1025,13 +826,7 @@ export class ReleaseDeploymentService {
     return `Deployment changed from ${from} to ${to}.`;
   }
 
-  private createPagination(
-    page: number,
-
-    limit: number,
-
-    total: number,
-  ) {
+  private createPagination(page: number, limit: number, total: number) {
     const totalPages = Math.max(1, Math.ceil(total / limit));
 
     return {
@@ -1044,7 +839,6 @@ export class ReleaseDeploymentService {
       totalPages,
 
       hasPreviousPage: page > 1,
-
       hasNextPage: page < totalPages,
     };
   }

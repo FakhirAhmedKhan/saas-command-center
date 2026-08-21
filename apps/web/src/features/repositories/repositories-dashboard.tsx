@@ -13,6 +13,7 @@ import {
   Unlock,
   Unplug,
 } from 'lucide-react';
+import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface RepositoriesDashboardProps {
@@ -306,6 +307,7 @@ export function RepositoriesDashboard({ workspaceId }: RepositoriesDashboardProp
             {repositories.map((repository) => (
               <RepositoryCard
                 key={repository.id}
+                workspaceId={workspaceId}
                 repository={repository}
                 busy={busyKey === `repo:${repository.id}`}
                 onSync={() => handleSyncRepository(repository.id)}
@@ -319,6 +321,8 @@ export function RepositoriesDashboard({ workspaceId }: RepositoriesDashboardProp
 }
 
 interface RepositoryCardProps {
+  workspaceId: string;
+
   repository: RepositoryConnection;
 
   busy: boolean;
@@ -326,7 +330,7 @@ interface RepositoryCardProps {
   onSync(): Promise<void>;
 }
 
-function RepositoryCard({ repository, busy, onSync }: RepositoryCardProps) {
+function RepositoryCard({ workspaceId, repository, busy, onSync }: RepositoryCardProps) {
   return (
     <article className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
       <div className='flex items-start justify-between gap-4'>
@@ -370,17 +374,26 @@ function RepositoryCard({ repository, busy, onSync }: RepositoryCardProps) {
       <div className='mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-4'>
         <p className='text-xs text-slate-500'>Last synced: {formatDate(repository.lastSyncedAt)}</p>
 
-        <button
-          type='button'
-          onClick={() => {
-            void onSync();
-          }}
-          disabled={busy}
-          className='inline-flex h-9 items-center gap-2 rounded-lg border border-slate-200 px-3 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50'
-        >
-          <RefreshCw className={`size-3.5 ${busy ? 'animate-spin' : ''}`} />
-          Sync
-        </button>
+        <div className='flex items-center gap-2'>
+          <Link
+            href={`/workspaces/${workspaceId}/repositories/${repository.id}/code`}
+            className='inline-flex h-9 items-center justify-center rounded-lg border border-brand-200 bg-brand-50 px-3 text-xs font-semibold text-brand-700 transition hover:bg-brand-100'
+          >
+            Browse Code
+          </Link>
+
+          <button
+            type='button'
+            onClick={() => {
+              void onSync();
+            }}
+            disabled={busy}
+            className='inline-flex h-9 items-center gap-2 rounded-lg border border-slate-200 px-3 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50'
+          >
+            <RefreshCw className={`size-3.5 ${busy ? 'animate-spin' : ''}`} />
+            Sync
+          </button>
+        </div>
       </div>
     </article>
   );

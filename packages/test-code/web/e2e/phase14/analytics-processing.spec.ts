@@ -9,15 +9,11 @@ test.describe('Phase 14 analytics processing', () => {
     await page.route('**/auth/refresh', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           accessToken: 'phase-14-token',
-
           user: {
             id: '33333333-3333-4333-8333-333333333333',
-
             email: 'admin@example.com',
           },
         }),
@@ -27,45 +23,26 @@ test.describe('Phase 14 analytics processing', () => {
     await page.route('**/analytics/processing/status', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           canReprocess: true,
-
           pendingEvents: 42,
-
           unresolvedDeadLetters: 1,
-
           activeRun: null,
-
           latestRun: null,
-
           lastSuccessfulRun: {
             id: 'run-success',
-
             status: 'SUCCEEDED',
-
             trigger: 'SCHEDULED',
-
             rangeStart: '2026-08-01T00:00:00.000Z',
-
             rangeEnd: '2026-08-02T00:00:00.000Z',
-
             retryCount: 0,
-
             maxRetries: 3,
-
             processedEvents: 100,
-
             failedEvents: 0,
-
             errorMessage: null,
-
             startedAt: '2026-08-02T01:00:00.000Z',
-
             finishedAt: '2026-08-02T01:01:00.000Z',
-
             createdAt: '2026-08-02T01:00:00.000Z',
           },
 
@@ -77,12 +54,9 @@ test.describe('Phase 14 analytics processing', () => {
     await page.route('**/analytics/processing/reprocess', async (route) => {
       await route.fulfill({
         status: 201,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           id: 'queued-run',
-
           status: 'QUEUED',
         }),
       });
@@ -121,22 +95,14 @@ test.describe('Phase 14 analytics processing', () => {
     await page.route('**/analytics/processing/status', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           canReprocess: false,
-
           pendingEvents: 0,
-
           unresolvedDeadLetters: 0,
-
           activeRun: null,
-
           latestRun: null,
-
           lastSuccessfulRun: null,
-
           recentRuns: [],
         }),
       });
@@ -161,22 +127,14 @@ test.describe('Phase 14 analytics processing', () => {
 
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           canReprocess: true,
-
           pendingEvents: 0,
-
           unresolvedDeadLetters: 0,
-
           activeRun: null,
-
           latestRun: null,
-
           lastSuccessfulRun: null,
-
           recentRuns: [],
         }),
       });
@@ -195,12 +153,9 @@ test.describe('Phase 14 analytics processing', () => {
     await page.route('**/analytics/processing/status', async (route) => {
       await route.fulfill({
         status: 500,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           statusCode: 500,
-
           message: 'Internal server error',
         }),
       });
@@ -221,22 +176,14 @@ test.describe('Phase 14 analytics processing', () => {
     await page.route('**/analytics/processing/status', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           canReprocess: true,
-
           pendingEvents: 0,
-
           unresolvedDeadLetters: 0,
-
           activeRun: null,
-
           latestRun: null,
-
           lastSuccessfulRun: null,
-
           recentRuns: [],
         }),
       });
@@ -271,12 +218,9 @@ test.describe('Phase 14 analytics processing', () => {
 
       await route.fulfill({
         status: 201,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           id: 'queued-run',
-
           status: 'QUEUED',
         }),
       });
@@ -301,12 +245,9 @@ test.describe('Phase 14 analytics processing', () => {
     await page.route('**/analytics/processing/reprocess', async (route) => {
       await route.fulfill({
         status: 400,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           statusCode: 400,
-
           message: 'Reprocessing cannot exceed 31 days.',
         }),
       });
@@ -331,48 +272,28 @@ test.describe('Phase 14 analytics processing', () => {
     await page.route('**/analytics/processing/status', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           canReprocess: true,
-
           pendingEvents: 0,
-
           unresolvedDeadLetters: 1,
-
           activeRun: null,
-
           latestRun: null,
-
           lastSuccessfulRun: null,
-
           recentRuns: [
             {
               id: 'run-dead-letter',
-
               status: 'DEAD_LETTERED',
-
               trigger: 'MANUAL',
-
               rangeStart: '2026-08-01T00:00:00.000Z',
-
               rangeEnd: '2026-08-02T00:00:00.000Z',
-
               retryCount: 3,
-
               maxRetries: 3,
-
               processedEvents: 0,
-
               failedEvents: 12,
-
               errorMessage: 'Method not implemented.',
-
               startedAt: '2026-08-02T01:00:00.000Z',
-
               finishedAt: '2026-08-02T01:01:00.000Z',
-
               createdAt: '2026-08-02T01:00:00.000Z',
             },
           ],
@@ -399,48 +320,28 @@ test.describe('Phase 14 analytics processing', () => {
     await page.route('**/analytics/processing/status', async (route) => {
       await route.fulfill({
         status: 200,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           canReprocess: true,
-
           pendingEvents: 0,
-
           unresolvedDeadLetters: 1,
-
           activeRun: null,
-
           latestRun: null,
-
           lastSuccessfulRun: null,
-
           recentRuns: [
             {
               id: 'run-dead-letter',
-
               status: 'DEAD_LETTERED',
-
               trigger: 'MANUAL',
-
               rangeStart: '2026-08-01T00:00:00.000Z',
-
               rangeEnd: '2026-08-02T00:00:00.000Z',
-
               retryCount: 3,
-
               maxRetries: 3,
-
               processedEvents: 0,
-
               failedEvents: 12,
-
               errorMessage: 'Method not implemented.',
-
               startedAt: '2026-08-02T01:00:00.000Z',
-
               finishedAt: '2026-08-02T01:01:00.000Z',
-
               createdAt: '2026-08-02T01:00:00.000Z',
             },
           ],
@@ -455,12 +356,9 @@ test.describe('Phase 14 analytics processing', () => {
 
       await route.fulfill({
         status: 201,
-
         contentType: 'application/json',
-
         body: JSON.stringify({
           id: 'retry-run',
-
           status: 'QUEUED',
         }),
       });

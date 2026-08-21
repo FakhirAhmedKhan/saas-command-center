@@ -56,7 +56,6 @@ export function detectFramework(
     if (rule.dependencies.some((dependency) => dependencyNames.has(dependency))) {
       return {
         framework: rule.framework,
-
         language: hasTypescriptConfig || dependencyNames.has('typescript') ? 'TypeScript' : 'JavaScript',
       };
     }
@@ -67,7 +66,6 @@ export function detectFramework(
   if (hasNodeEntrypoint) {
     return {
       framework: 'Node.js',
-
       language: hasTypescriptConfig || dependencyNames.has('typescript') ? 'TypeScript' : 'JavaScript',
     };
   }

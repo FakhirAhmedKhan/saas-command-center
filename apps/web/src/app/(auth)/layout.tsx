@@ -12,10 +12,8 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
       <main className='flex min-h-screen w-full bg-app-bg'>
         <section className='hidden w-[42%] max-w-md flex-col justify-between bg-slate-950 px-10 py-10 text-white lg:flex'>
           <span className='flex items-center gap-2.5 text-sm font-semibold'>
-            <span className='flex size-7 shrink-0 items-center justify-center rounded-m text-[11px] font-bold text-slate-950'>
-            </span>
+            <span className='flex size-7 shrink-0 items-center justify-center rounded-m text-[11px] font-bold text-slate-950'></span>
             <Image src='/icon.svg' alt='SaaS Command Center' width={50} height={50} />
-
             SaaS Command Center
           </span>
 

@@ -110,11 +110,8 @@ function AuthProviderRoot({ children }: PropsWithChildren) {
     async (input: LoginInput) => {
       const response = await apiRequest<AuthResponse>('/auth/login', {
         method: 'POST',
-
         body: input,
-
         skipAuthentication: true,
-
         skipRefresh: true,
       });
 
@@ -127,11 +124,8 @@ function AuthProviderRoot({ children }: PropsWithChildren) {
     async (input: RegisterInput) => {
       const response = await apiRequest<AuthResponse>('/auth/register', {
         method: 'POST',
-
         body: input,
-
         skipAuthentication: true,
-
         skipRefresh: true,
       });
 
@@ -146,7 +140,6 @@ function AuthProviderRoot({ children }: PropsWithChildren) {
         success: true;
       }>('/auth/logout', {
         method: 'POST',
-
         skipRefresh: true,
       });
     } finally {
@@ -160,7 +153,6 @@ function AuthProviderRoot({ children }: PropsWithChildren) {
         success: true;
       }>('/auth/logout-all', {
         method: 'POST',
-
         skipRefresh: true,
       });
     } finally {

@@ -76,7 +76,6 @@ const githubAppMock = {
   }),
 
   userCanAccessInstallation: jest.fn(async (_userAccessToken: string, _installationId: string): Promise<boolean> => true),
-
   listInstallationRepositories: jest.fn(async (_installationId: string) => {
     return [
       {

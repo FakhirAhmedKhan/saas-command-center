@@ -1,0 +1,17 @@
+{
+  "name": "@command-center/test-code",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "pnpm run build:api && pnpm run build:web",
+    "build:api": "pnpm --filter @command-center/api-tests build",
+    "build:web": "pnpm --filter @command-center/web-tests build",
+    "typecheck": "pnpm run typecheck:api && pnpm run typecheck:web",
+    "typecheck:api": "pnpm --filter @command-center/api-tests typecheck",
+    "typecheck:web": "pnpm --filter @command-center/web-tests typecheck",
+    "test": "pnpm run test:api && pnpm run test:web && pnpm run test:tracker",
+    "test:api": "pnpm --filter @command-center/api-tests test",
+    "test:web": "pnpm --filter @command-center/web-tests test",
+    "test:tracker": "pnpm --filter @command-center/tracker-tests test"
+  }
+}

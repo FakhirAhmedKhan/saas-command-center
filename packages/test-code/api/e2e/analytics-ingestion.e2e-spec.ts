@@ -51,7 +51,6 @@ describe('Analytics Ingestion E2E', () => {
         sessionId,
 
         url: `${trackedWebsite.origin}/pricing`,
-
         title: 'Pricing',
       }),
 
@@ -63,7 +62,6 @@ describe('Analytics Ingestion E2E', () => {
         sessionId,
 
         url: `${trackedWebsite.origin}/pricing`,
-
         durationMs: 15_000,
       }),
 
@@ -75,9 +73,7 @@ describe('Analytics Ingestion E2E', () => {
         sessionId,
 
         url: `${trackedWebsite.origin}/pricing`,
-
         eventName: 'trial_started',
-
         properties: {
           plan: 'pro',
         },
@@ -122,7 +118,6 @@ describe('Analytics Ingestion E2E', () => {
       await prisma.rawAnalyticsEvent.count({
         where: {
           websiteId: trackedWebsite.id,
-
           eventId: event.eventId,
         },
       }),
@@ -187,7 +182,6 @@ describe('Analytics Ingestion E2E', () => {
 
       buildTrackerEvent(trackedWebsite.origin, {
         type: RawAnalyticsEventType.CUSTOM,
-
         eventName: 'checkout_started',
       }),
     ];
@@ -242,7 +236,6 @@ describe('Analytics Ingestion E2E', () => {
     const stored = await prisma.rawAnalyticsEvent.findFirstOrThrow({
       where: {
         websiteId: trackedWebsite.id,
-
         eventId: event.eventId,
       },
     });

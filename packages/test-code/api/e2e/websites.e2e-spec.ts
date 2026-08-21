@@ -30,11 +30,8 @@ describe('Websites E2E', () => {
 
     const website = await createWebsite(owner, {
       name: 'Command Center Website',
-
       domain: 'https://Command-Center.Example.com',
-
       timeZone: 'Asia/Dubai',
-
       allowedOrigins: ['https://command-center.example.com', 'http://localhost:3000'],
     });
 
@@ -58,7 +55,6 @@ describe('Websites E2E', () => {
 
     const response = await owner.agent.post(websiteRoutes.root(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
       name: 'Minimal Website',
-
       domain: 'minimal.example.test',
     });
 
@@ -91,9 +87,7 @@ describe('Websites E2E', () => {
       .set(withBearer(owner.accessToken))
       .send({
         name: 'Invalid Origins',
-
         domain: 'invalid-origins.example.test',
-
         allowedOrigins: Array.from(
           {
             length: 21,
@@ -106,9 +100,7 @@ describe('Websites E2E', () => {
 
     const invalidApplication = await owner.agent.post(websiteRoutes.root(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
       name: 'Invalid App Website',
-
       domain: 'invalid-app.example.test',
-
       applicationId: 'not-a-uuid',
     });
 
@@ -116,9 +108,7 @@ describe('Websites E2E', () => {
 
     const unknownField = await owner.agent.post(websiteRoutes.root(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
       name: 'Unknown Field Website',
-
       domain: 'unknown-field.example.test',
-
       trackingKey: 'injected-key',
     });
 
@@ -141,7 +131,6 @@ describe('Websites E2E', () => {
       .set(withBearer(alphaOwner.accessToken))
       .send({
         name: 'Duplicate Website',
-
         domain: `https://${domain}`,
       });
 
@@ -161,11 +150,8 @@ describe('Websites E2E', () => {
 
     const response = await updateWebsite(owner, website.id, {
       name: 'Updated Website',
-
       domain: 'updated.example.test',
-
       timeZone: 'UTC',
-
       allowedOrigins: ['https://updated.example.test'],
     });
 
@@ -191,17 +177,13 @@ describe('Websites E2E', () => {
 
     const alpha = await createWebsite(owner, {
       name: 'Alpha Analytics',
-
       domain: 'alpha-analytics.example.test',
-
       enabled: true,
     });
 
     const beta = await createWebsite(owner, {
       name: 'Beta Storefront',
-
       domain: 'beta-storefront.example.test',
-
       enabled: false,
     });
 

@@ -38,7 +38,6 @@ export class PageViewRebuilderService {
 
       data: {
         isEntry: false,
-
         isExit: false,
       },
     });
@@ -51,7 +50,6 @@ export class PageViewRebuilderService {
 
         data: {
           isEntry: true,
-
           isExit: true,
         },
       });

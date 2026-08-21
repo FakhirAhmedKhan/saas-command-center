@@ -1,4 +1,4 @@
-import { AppModule } from 'src/app.module';
+﻿import { AppModule } from 'src/app.module';
 import { configureApplication } from 'src/bootstrap/configure-application';
 import { createAgent, createTestUser, registerUser, withBearer } from '../helpers/auth';
 import { resetDatabase } from '../helpers/database';
@@ -16,27 +16,27 @@ import { randomUUID } from 'node:crypto';
 import request from 'supertest';
 
 /**
- * Webhook delivery worker E2E — retry/backoff/dead-letter logic.
+ * Webhook delivery worker E2E â€” retry/backoff/dead-letter logic.
  *
  * apps/api/src/modules/webhooks/services/webhook-delivery-worker.service.ts's @Interval(5_000)
  * tick() never fires deterministically under Jest (and CI runs with WEBHOOK_WORKER_ENABLED=false
- * anyway — see apps/api/.env.test), and existing phase18-webhook-integrations.e2e-spec.ts only
+ * anyway â€” see apps/api/.env.test), and existing phase18-webhook-integrations.e2e-spec.ts only
  * seeds already-DEAD_LETTERED rows as fixtures; it never exercises the worker's actual
  * claim -> deliver -> retry-decision code path. This suite closes that gap by resolving the real
  * WebhookDeliveryWorkerService from the Nest DI container and invoking its private
  * runWithLock(deliveryId) method directly (the exact method tick() calls per due delivery, minus
- * the WEBHOOK_WORKER_ENABLED gate and the batch-selection query) — not a reimplementation, the
+ * the WEBHOOK_WORKER_ENABLED gate and the batch-selection query) â€” not a reimplementation, the
  * same production code path.
  *
  * WebhookOutboundClientService performs real DNS-resolving, SSRF-guarded HTTP calls via undici;
  * there is no local/network endpoint available in this test environment to receive a real
  * delivery. Per the same pattern phase19-repository-integrations.e2e-spec.ts uses for
  * GithubAppService, WebhookOutboundClientService is overridden via
- * Test.createTestingModule(...).overrideProvider(...).useValue(...) with a jest.fn() stand-in —
+ * Test.createTestingModule(...).overrideProvider(...).useValue(...) with a jest.fn() stand-in â€”
  * a real DI override of the exact same injectable the worker calls, not a network intercept.
  *
  * Tenant scoping: WebhookDeliveryWorkerService.tick()'s batch query
- * (this.prisma.webhookDelivery.findMany) has no workspaceId filter — it is a single global
+ * (this.prisma.webhookDelivery.findMany) has no workspaceId filter â€” it is a single global
  * worker that claims due deliveries system-wide across all workspaces, scoped only by
  * status/nextAttemptAt/endpoint.enabled. There is no per-tenant processing mode to test, so no
  * "workspace B does not touch workspace A's delivery" test is included here (confirmed by direct
@@ -383,7 +383,7 @@ describe('Webhook Delivery Worker E2E', () => {
     const attempts = await prisma.webhookDeliveryAttempt.findMany({ where: { deliveryId } });
 
     expect(attempts).toHaveLength(1);
-    expect(attempts[0].outcome).toBe(WebhookAttemptOutcome.FAILED);
+    expect(attempts[0]!.outcome).toBe(WebhookAttemptOutcome.FAILED);
   });
 
   it('does not retry a non-retriable failure even with attempts remaining (dead-letters immediately)', async () => {
@@ -408,7 +408,7 @@ describe('Webhook Delivery Worker E2E', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // 5. Claim protection — no double processing on concurrent calls for the same delivery
+  // 5. Claim protection â€” no double processing on concurrent calls for the same delivery
   // ---------------------------------------------------------------------------------------
 
   it('does not double-process the same due delivery when invoked twice concurrently', async () => {

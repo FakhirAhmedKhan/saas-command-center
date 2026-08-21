@@ -20,7 +20,7 @@ describe('Tracker -> API Transport E2E', () => {
   });
 
   afterAll(async () => {
-    await app.close();
+    if (app) await app.close();
   });
 
   it('accepts the Tracker text/plain wire format and persists the event', async () => {

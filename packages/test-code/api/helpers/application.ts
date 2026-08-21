@@ -40,25 +40,18 @@ export interface CreatedApplication {
 
 export const applicationRoutes = {
   root: (workspaceId: string): string => `/api/v1/workspaces/${workspaceId}/applications`,
-
   details: (workspaceId: string, applicationId: string): string => `/api/v1/workspaces/${workspaceId}/applications/${applicationId}`,
-
   archive: (workspaceId: string, applicationId: string): string => `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/archive`,
-
   restore: (workspaceId: string, applicationId: string): string => `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/restore`,
-
   technologies: (workspaceId: string, applicationId: string): string => `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/technologies`,
-
   technology: (workspaceId: string, applicationId: string, technologyId: string): string =>
     `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/technologies/${technologyId}`,
 
   links: (workspaceId: string, applicationId: string): string => `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/links`,
-
   link: (workspaceId: string, applicationId: string, linkId: string): string =>
     `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/links/${linkId}`,
 
   workspaceActivities: (workspaceId: string): string => `/api/v1/workspaces/${workspaceId}/activities`,
-
   applicationActivities: (workspaceId: string, applicationId: string): string => `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/activities`,
 } as const;
 
@@ -83,23 +76,14 @@ export function buildApplicationPayload(overrides: Partial<CreateApplicationPayl
 
   return {
     name: `Batch 3 Application ${suffix}`,
-
     slug: `batch-3-${suffix}`,
-
     shortDescription: 'Batch 3 E2E short description',
-
     longDescription: 'Batch 3 E2E long description',
-
     category: enumValue(ApplicationCategory),
-
     status: enumValue(ApplicationStatus),
-
     priority: enumValue(ApplicationPriority),
-
     startedAt: '2026-08-01T00:00:00.000Z',
-
     targetLaunchAt: '2026-10-01T00:00:00.000Z',
-
     launchedAt: null,
 
     ...overrides,
@@ -109,9 +93,7 @@ export function buildApplicationPayload(overrides: Partial<CreateApplicationPayl
 export function buildTechnologyPayload(overrides: Partial<TechnologyPayload> = {}): TechnologyPayload {
   return {
     name: `Technology ${uniqueSuffix()}`,
-
     type: enumValue(TechnologyType),
-
     version: '1.0.0',
 
     ...overrides,
@@ -121,9 +103,7 @@ export function buildTechnologyPayload(overrides: Partial<TechnologyPayload> = {
 export function buildLinkPayload(overrides: Partial<LinkPayload> = {}): LinkPayload {
   return {
     label: `Production ${uniqueSuffix()}`,
-
     type: enumValue(ApplicationLinkType),
-
     url: `https://example-${uniqueSuffix()}.test`,
 
     ...overrides,

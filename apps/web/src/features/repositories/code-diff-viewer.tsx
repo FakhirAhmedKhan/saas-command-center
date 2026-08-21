@@ -29,13 +29,9 @@ export function CodeDiffViewer({ diff }: CodeDiffViewerProps) {
       theme='vs-dark'
       options={{
         readOnly: true,
-
         originalEditable: false,
-
         automaticLayout: true,
-
         renderSideBySide: true,
-
         minimap: {
           enabled: false,
         },

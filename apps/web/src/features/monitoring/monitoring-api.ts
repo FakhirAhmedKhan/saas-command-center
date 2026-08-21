@@ -55,7 +55,6 @@ export async function getHealthChecks(
 
 export async function getHealthCheckHistory(
   workspaceId: string,
-
   checkId: string,
 
   signal?: AbortSignal,
@@ -87,45 +86,29 @@ export async function getHealthIncidents(
   );
 }
 
-export async function createHealthCheck(
-  workspaceId: string,
-
-  input: SaveHealthCheckInput,
-): Promise<HealthCheck> {
+export async function createHealthCheck(workspaceId: string, input: SaveHealthCheckInput): Promise<HealthCheck> {
   return apiRequest<HealthCheck>(
     `${createBasePath(workspaceId)}/checks`,
 
     {
       method: 'POST',
-
       body: input,
     },
   );
 }
 
-export async function updateHealthCheck(
-  workspaceId: string,
-
-  checkId: string,
-
-  input: Partial<SaveHealthCheckInput>,
-): Promise<HealthCheck> {
+export async function updateHealthCheck(workspaceId: string, checkId: string, input: Partial<SaveHealthCheckInput>): Promise<HealthCheck> {
   return apiRequest<HealthCheck>(
     `${createBasePath(workspaceId)}/checks/${checkId}`,
 
     {
       method: 'PATCH',
-
       body: input,
     },
   );
 }
 
-export async function runHealthCheckNow(
-  workspaceId: string,
-
-  checkId: string,
-): Promise<void> {
+export async function runHealthCheckNow(workspaceId: string, checkId: string): Promise<void> {
   await apiRequest(
     `${createBasePath(workspaceId)}/checks/${checkId}/run`,
 

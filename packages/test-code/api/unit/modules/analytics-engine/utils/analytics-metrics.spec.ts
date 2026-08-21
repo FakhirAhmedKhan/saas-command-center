@@ -34,16 +34,12 @@ describe('calculateSessionMetrics', () => {
       [
         {
           type: RawAnalyticsEventType.PAGE_VIEW,
-
           occurredAt: new Date('2026-08-01T10:00:00.000Z'),
-
           durationMs: null,
         },
         {
           type: RawAnalyticsEventType.HEARTBEAT,
-
           occurredAt: new Date('2026-08-01T10:00:15.000Z'),
-
           durationMs: 15_000,
         },
       ],
@@ -64,16 +60,12 @@ describe('calculateSessionMetrics', () => {
       [
         {
           type: RawAnalyticsEventType.PAGE_VIEW,
-
           occurredAt: new Date('2026-08-01T10:00:00.000Z'),
-
           durationMs: null,
         },
         {
           type: RawAnalyticsEventType.PAGE_VIEW,
-
           occurredAt: new Date('2026-08-01T10:00:05.000Z'),
-
           durationMs: null,
         },
       ],

@@ -13,18 +13,12 @@ interface ProcessingState {
   error: unknown | null;
 }
 
-export function useAnalyticsProcessing(
-  workspaceId: string,
-
-  websiteId: string,
-) {
+export function useAnalyticsProcessing(workspaceId: string, websiteId: string) {
   const [reloadKey, setReloadKey] = useState(0);
 
   const [state, setState] = useState<ProcessingState>({
     data: null,
-
     loading: true,
-
     error: null,
   });
 
@@ -55,7 +49,6 @@ export function useAnalyticsProcessing(
           data,
 
           loading: false,
-
           error: null,
         });
 
@@ -71,7 +64,6 @@ export function useAnalyticsProcessing(
 
         setState({
           data: null,
-
           loading: false,
 
           error,
@@ -84,7 +76,6 @@ export function useAnalyticsProcessing(
         ...previous,
 
         loading: previous.data === null,
-
         error: null,
       }));
     });

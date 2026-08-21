@@ -135,9 +135,7 @@ function uniqueSuffix(): string {
 export function buildMilestonePayload(overrides: Partial<MilestonePayload> = {}): MilestonePayload {
   return {
     title: `Milestone ${uniqueSuffix()}`,
-
     description: 'Batch 4 development milestone',
-
     weight: 1,
 
     ...overrides,
@@ -147,11 +145,8 @@ export function buildMilestonePayload(overrides: Partial<MilestonePayload> = {})
 export function buildTaskPayload(overrides: Partial<TaskPayload> = {}): TaskPayload {
   return {
     title: `Task ${uniqueSuffix()}`,
-
     description: 'Batch 4 development task',
-
     priority: enumValue(WorkItemPriority),
-
     weight: 1,
 
     ...overrides,
@@ -161,9 +156,7 @@ export function buildTaskPayload(overrides: Partial<TaskPayload> = {}): TaskPayl
 export function buildBlockerPayload(overrides: Partial<BlockerPayload> = {}): BlockerPayload {
   return {
     title: `Blocker ${uniqueSuffix()}`,
-
     description: 'Batch 4 development blocker',
-
     severity: enumValue(WorkItemPriority, 1),
 
     ...overrides,

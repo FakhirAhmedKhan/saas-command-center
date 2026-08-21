@@ -73,7 +73,6 @@ export function ReviewConfiguration({ analysis, onSubmit }: ReviewConfigurationP
         installationId: analysis.repository.installationId,
         repositoryId: analysis.repository.id,
         defaultBranch: analysis.repository.defaultBranch,
-
         workspace: {
           name: normalizedName,
           slug: workspaceSlug.trim() || undefined,

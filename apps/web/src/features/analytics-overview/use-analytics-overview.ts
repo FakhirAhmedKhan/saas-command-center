@@ -49,7 +49,6 @@ export function useAnalyticsOverview({ workspaceId, websiteId, preset, from, to 
       ...previous,
 
       loading: true,
-
       error: null,
     }));
 
@@ -71,7 +70,6 @@ export function useAnalyticsOverview({ workspaceId, websiteId, preset, from, to 
           data,
 
           loading: false,
-
           error: null,
         });
       })
@@ -82,7 +80,6 @@ export function useAnalyticsOverview({ workspaceId, websiteId, preset, from, to 
 
         setState({
           data: null,
-
           loading: false,
 
           error,
