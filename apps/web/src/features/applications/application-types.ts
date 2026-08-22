@@ -1,3 +1,8 @@
+import { APPLICATION_TYPES } from '@command-center/shared-types';
+import type { ApplicationType, MobileApplication } from '@command-center/shared-types';
+
+export { APPLICATION_TYPES };
+export type { ApplicationType, MobileApplication };
 export { APPLICATION_CATEGORIES, APPLICATION_LINK_TYPES, APPLICATION_PRIORITIES, APPLICATION_STATUSES, TECHNOLOGY_TYPES } from '@command-center/shared-types';
 
 export type {

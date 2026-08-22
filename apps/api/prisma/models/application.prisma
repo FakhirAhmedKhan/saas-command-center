@@ -6,6 +6,7 @@ model SaasApplication {
   shortDescription String?             @map("short_description") @db.VarChar(280)
   longDescription  String?             @map("long_description") @db.Text
   category         ApplicationCategory @default(SAAS)
+  type             ApplicationType     @default(OTHER)
   status           ApplicationStatus   @default(IDEA)
   priority         ApplicationPriority @default(MEDIUM)
   startedAt        DateTime?           @map("started_at")
@@ -16,12 +17,12 @@ model SaasApplication {
   createdAt        DateTime            @default(now()) @map("created_at")
   updatedAt        DateTime            @updatedAt @map("updated_at")
 
-  workspace    Workspace               @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  technologies ApplicationTechnology[]
-  links        ApplicationLink[]
-  activities   ApplicationActivity[]
-  websites     Website[]
-
+  workspace               Workspace                @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  technologies            ApplicationTechnology[]
+  links                   ApplicationLink[]
+  activities              ApplicationActivity[]
+  websites                Website[]
+  mobileApplication       MobileApplication?
   healthChecks            HealthCheck[]
   applicationEnvironments ApplicationEnvironment[]
   releases                Release[]
@@ -43,6 +44,7 @@ model SaasApplication {
   @@index([workspaceId, priority])
   @@index([workspaceId, category])
   @@index([workspaceId, updatedAt])
+  @@index([workspaceId, type])
   @@map("saas_applications")
 }
 

@@ -1,0 +1,14 @@
+enum MobilePlatform {
+  ANDROID
+  IOS
+  CROSS_PLATFORM
+}
+
+enum MobileFramework {
+  ANDROID_NATIVE
+  IOS_NATIVE
+  FLUTTER
+  REACT_NATIVE
+  KMP
+  OTHER
+}

@@ -15,6 +15,14 @@ enum ApplicationPriority {
   CRITICAL
 }
 
+enum ApplicationType {
+  WEB
+  API
+  MOBILE
+  WORKER
+  OTHER
+}
+
 enum ApplicationCategory {
   SAAS
   AI

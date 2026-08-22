@@ -30,7 +30,7 @@ export class RepositoriesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly githubApp: GithubAppService,
-  ) { }
+  ) {}
 
   async list(workspaceId: string) {
     const [installations, repositories] = await Promise.all([
@@ -190,10 +190,10 @@ export class RepositoriesService {
 
         ...(currentRepositoryIds.length > 0
           ? {
-            externalRepoId: {
-              notIn: currentRepositoryIds,
-            },
-          }
+              externalRepoId: {
+                notIn: currentRepositoryIds,
+              },
+            }
           : {}),
       },
 

@@ -1,3 +1,5 @@
+import type { MobileApplication, MobileFramework, MobilePlatform } from '../mobile-apps';
+
 export const APPLICATION_STATUSES = ['IDEA', 'PLANNING', 'IN_DEVELOPMENT', 'TESTING', 'LIVE', 'MAINTENANCE', 'PAUSED'] as const;
 
 export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
@@ -78,22 +80,33 @@ export interface SaasApplication {
   workspaceId: string;
   name: string;
   slug: string;
+
   shortDescription: string | null;
   longDescription: string | null;
+
   category: ApplicationCategory;
+  type: ApplicationType;
+
   status: ApplicationStatus;
   priority: ApplicationPriority;
+
   startedAt: string | null;
   targetLaunchAt: string | null;
   launchedAt: string | null;
   lastActivityAt: string | null;
   archivedAt: string | null;
+
   createdAt: string;
   updatedAt: string;
+
   progressPercent: number;
   progressUpdatedAt: string | null;
+
+  mobileApplication?: MobileApplication | null;
+
   technologies: ApplicationTechnology[];
   links: ApplicationLink[];
+
   _count?: {
     technologies: number;
     links: number;
@@ -130,3 +143,44 @@ export interface CreateApplicationLinkInput {
 }
 
 export type UpdateApplicationLinkInput = Partial<CreateApplicationLinkInput>;
+
+export const APPLICATION_TYPES = ['WEB', 'API', 'MOBILE', 'WORKER', 'OTHER'] as const;
+
+export type ApplicationType = (typeof APPLICATION_TYPES)[number];
+
+export interface CreateMobileApplicationInput {
+  name: string;
+
+  platform: MobilePlatform;
+  framework: MobileFramework;
+
+  packageId?: string | null;
+  bundleId?: string | null;
+
+  minOsVersion?: string | null;
+  targetOsVersion?: string | null;
+
+  currentVersion?: string | null;
+  currentBuildNumber?: string | null;
+}
+
+export type UpdateMobileApplicationInput = Partial<CreateMobileApplicationInput>;
+
+export interface MobileApplicationParent {
+  id: string;
+  workspaceId: string;
+
+  name: string;
+  slug: string;
+
+  type: 'MOBILE';
+
+  archivedAt: string | null;
+
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MobileApplicationDetails extends MobileApplication {
+  application: MobileApplicationParent;
+}

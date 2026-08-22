@@ -30,6 +30,7 @@ const applicationInclude = {
       },
     ],
   },
+  mobileApplication: true,
 
   _count: {
     select: {

@@ -12,6 +12,7 @@ import { AuthSessionsModule } from './modules/auth/module/auth-sessions.module';
 import { AuthModule } from './modules/auth/module/auth.module';
 import { DevelopmentModule } from './modules/development/development.module';
 import { HealthModule } from './modules/health/health.module';
+import { MobileAppsModule } from './modules/mobile-apps/mobile-apps.module';
 import { MonitoringModule } from './modules/monitoring/monitoring.module';
 import { ReleasesModule } from './modules/releases/releases.module';
 import { RepositoriesModule } from './modules/repositories/repositories.module';
@@ -63,6 +64,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     AnalyticsOverviewModule,
     AnalyticsReportsModule,
 
+    MobileAppsModule,
     RedisModule,
     MonitoringModule,
     TeamOperationsModule,

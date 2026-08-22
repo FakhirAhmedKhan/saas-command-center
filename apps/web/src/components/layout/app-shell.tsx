@@ -108,12 +108,7 @@ interface SidebarContentProps {
   onNavigate?: () => void;
 }
 
-function SidebarContent({
-  pathname,
-  workspaceId,
-  collapsed = false,
-  onNavigate,
-}: SidebarContentProps) {
+function SidebarContent({ pathname, workspaceId, collapsed = false, onNavigate }: SidebarContentProps) {
   const { user, logout } = useAuth();
   const router = useRouter();
 
@@ -123,31 +118,17 @@ function SidebarContent({
   }
 
   return (
-    <div
-      className={cn(
-        'flex h-full flex-col overflow-hidden py-4 transition-all duration-200',
-        collapsed ? 'px-2' : 'px-3',
-      )}
-    >
+    <div className={cn('flex h-full flex-col overflow-hidden py-4 transition-all duration-200', collapsed ? 'px-2' : 'px-3')}>
       {/* Brand */}
       <Link
         href='/dashboard'
         onClick={onNavigate}
         title={collapsed ? 'SaaS Command Center' : undefined}
-        className={cn(
-          'mb-4 flex h-10 items-center rounded-xl text-slate-950 transition hover:bg-slate-100',
-          collapsed ? 'justify-center' : 'gap-2.5 px-2',
-        )}
+        className={cn('mb-4 flex h-10 items-center rounded-xl text-slate-950 transition hover:bg-slate-100', collapsed ? 'justify-center' : 'gap-2.5 px-2')}
       >
-        <span className='flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-[11px] font-bold text-white shadow-sm'>
-          SC
-        </span>
+        <span className='flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-[11px] font-bold text-white shadow-sm'>SC</span>
 
-        {!collapsed ? (
-          <span className='truncate text-[13px] font-bold'>
-            SaaS Command Center
-          </span>
-        ) : null}
+        {!collapsed ? <span className='truncate text-[13px] font-bold'>SaaS Command Center</span> : null}
       </Link>
 
       {/* Workspace */}
@@ -158,13 +139,7 @@ function SidebarContent({
       ) : null}
 
       {/* Navigation */}
-      <nav
-        className={cn(
-          'flex-1 overflow-y-auto overflow-x-hidden',
-          collapsed ? 'space-y-3' : 'space-y-4',
-        )}
-        aria-label='Primary'
-      >
+      <nav className={cn('flex-1 overflow-y-auto overflow-x-hidden', collapsed ? 'space-y-3' : 'space-y-4')} aria-label='Primary'>
         <Link
           href='/dashboard'
           onClick={onNavigate}
@@ -172,9 +147,7 @@ function SidebarContent({
           className={cn(
             'flex h-10 items-center rounded-xl text-sm font-medium transition',
             collapsed ? 'justify-center' : 'gap-3 px-3',
-            pathname === '/dashboard'
-              ? 'bg-brand-50 text-brand-700'
-              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950',
+            pathname === '/dashboard' ? 'bg-brand-50 text-brand-700' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950',
           )}
         >
           <LayoutDashboard className='size-[18px] shrink-0' />
@@ -184,82 +157,59 @@ function SidebarContent({
 
         {workspaceId
           ? NAV_GROUPS.map((group) => (
-            <div key={group.label}>
-              {!collapsed ? (
-                <p className='mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400'>
-                  {group.label}
-                </p>
-              ) : (
-                <div className='mx-auto mb-2 h-px w-7 bg-slate-200' />
-              )}
+              <div key={group.label}>
+                {!collapsed ? (
+                  <p className='mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400'>{group.label}</p>
+                ) : (
+                  <div className='mx-auto mb-2 h-px w-7 bg-slate-200' />
+                )}
 
-              <div className='space-y-1'>
-                {group.items.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = item.match(pathname, workspaceId);
+                <div className='space-y-1'>
+                  {group.items.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = item.match(pathname, workspaceId);
 
-                  return (
-                    <Link
-                      key={`${group.label}-${item.href}-${item.label}`}
-                      href={`/workspaces/${workspaceId}${item.href}`}
-                      onClick={onNavigate}
-                      aria-current={isActive ? 'page' : undefined}
-                      title={collapsed ? item.label : undefined}
-                      className={cn(
-                        'relative flex h-10 items-center rounded-xl text-sm font-medium transition',
-                        collapsed ? 'justify-center' : 'gap-3 px-3',
-                        isActive
-                          ? 'bg-brand-50 text-brand-700'
-                          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950',
-                      )}
-                    >
-                      {isActive && collapsed ? (
-                        <span className='absolute left-0 h-5 w-[3px] rounded-r-full bg-brand-600' />
-                      ) : null}
+                    return (
+                      <Link
+                        key={`${group.label}-${item.href}-${item.label}`}
+                        href={`/workspaces/${workspaceId}${item.href}`}
+                        onClick={onNavigate}
+                        aria-current={isActive ? 'page' : undefined}
+                        title={collapsed ? item.label : undefined}
+                        className={cn(
+                          'relative flex h-10 items-center rounded-xl text-sm font-medium transition',
+                          collapsed ? 'justify-center' : 'gap-3 px-3',
+                          isActive ? 'bg-brand-50 text-brand-700' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950',
+                        )}
+                      >
+                        {isActive && collapsed ? <span className='absolute left-0 h-5 w-[3px] rounded-r-full bg-brand-600' /> : null}
 
-                      <Icon className='size-[18px] shrink-0' aria-hidden='true' />
+                        <Icon className='size-[18px] shrink-0' aria-hidden='true' />
 
-                      {!collapsed ? <span>{item.label}</span> : null}
-                    </Link>
-                  );
-                })}
+                        {!collapsed ? <span>{item.label}</span> : null}
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))
+            ))
           : null}
       </nav>
 
       {/* Account */}
-      <div
-        className={cn(
-          'mt-4 border-t border-slate-200 pt-4',
-          collapsed
-            ? 'flex flex-col items-center gap-2'
-            : 'flex items-center gap-2.5',
-        )}
-      >
+      <div className={cn('mt-4 border-t border-slate-200 pt-4', collapsed ? 'flex flex-col items-center gap-2' : 'flex items-center gap-2.5')}>
         <div
-          title={
-            collapsed
-              ? user?.displayName || user?.email || 'Account'
-              : undefined
-          }
+          title={collapsed ? user?.displayName || user?.email || 'Account' : undefined}
           className='flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white'
         >
-          {(user?.displayName || user?.email || 'U')
-            .charAt(0)
-            .toUpperCase()}
+          {(user?.displayName || user?.email || 'U').charAt(0).toUpperCase()}
         </div>
 
         {!collapsed ? (
           <div className='min-w-0 flex-1'>
-            <p className='truncate text-[13px] font-semibold text-slate-900'>
-              {user?.displayName || 'Account owner'}
-            </p>
+            <p className='truncate text-[13px] font-semibold text-slate-900'>{user?.displayName || 'Account owner'}</p>
 
-            <p className='truncate text-xs text-slate-400'>
-              {user?.email}
-            </p>
+            <p className='truncate text-xs text-slate-400'>{user?.email}</p>
           </div>
         ) : null}
 
@@ -308,18 +258,10 @@ export function AppShell({ children }: AppShellProps) {
             title={desktopNavCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             className='absolute -right-3.5 top-7 z-50 flex size-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900'
           >
-            {desktopNavCollapsed ? (
-              <PanelLeftOpen className='size-4' />
-            ) : (
-              <PanelLeftClose className='size-4' />
-            )}
+            {desktopNavCollapsed ? <PanelLeftOpen className='size-4' /> : <PanelLeftClose className='size-4' />}
           </button>
 
-          <SidebarContent
-            pathname={pathname}
-            workspaceId={workspaceId}
-            collapsed={desktopNavCollapsed}
-          />
+          <SidebarContent pathname={pathname} workspaceId={workspaceId} collapsed={desktopNavCollapsed} />
         </aside>
 
         {mobileNavOpen ? (

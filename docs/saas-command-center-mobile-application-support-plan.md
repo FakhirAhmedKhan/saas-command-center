@@ -104,26 +104,26 @@ Overview
 
 # 4. Phase Summary
 
-| Phase | Feature | Backend | Frontend | E2E Focus |
-|---|---|---|---|---|
-| 1 | Mobile Foundation | Models, enums, migrations, contracts | Shared types only | Schema + isolation foundations |
-| 2 | Mobile App CRUD | CRUD APIs + guards | API client layer | Create/read/update/archive |
-| 3 | Mobile Apps UI | Existing APIs | List/create/edit UI | Full CRUD from browser |
-| 4 | Repository Linking | Link repository to app | Repository selector | Link/unlink + workspace isolation |
-| 5 | Project Detection | Extend repository analyzer | Detection results UI | Android/iOS/Flutter/RN detection |
-| 6 | Mobile Overview | Aggregated overview endpoint | App detail overview | Metadata + repository display |
-| 7 | Code Explorer | Reuse current code APIs | Mobile-to-code navigation | Browse linked mobile repo |
-| 8 | Build Tracking | Build models + ingestion | Builds page | Build create/update/status flow |
-| 9 | Test Tracking | Test run/result models | Tests page | Build-to-test relationship |
-| 10 | Releases | Release models + APIs | Releases page | Release lifecycle |
-| 11 | Telemetry Foundation | Provider abstraction | Integration settings | Provider connect/config flow |
-| 12 | Android Performance | Android metric ingestion | Android metrics UI | Crash/ANR/startup metrics |
-| 13 | iOS Performance | iOS metric ingestion | iOS metrics UI | Crash/hang/startup metrics |
-| 14 | Performance Dashboard | Normalized metric queries | Unified dashboard | Version comparison |
-| 15 | Alerts | Rules + evaluation | Alert configuration | Trigger/resolve notification flow |
-| 16 | AI Analysis | Context aggregation | AI analysis UI | Grounded analysis requests |
-| 17 | Security | Authorization hardening | Permission-aware UI | Cross-workspace/role tests |
-| 18 | Full Verification | Final hardening | Final hardening | Full stack regression |
+| Phase | Feature               | Backend                              | Frontend                  | E2E Focus                         |
+| ----- | --------------------- | ------------------------------------ | ------------------------- | --------------------------------- |
+| 1     | Mobile Foundation     | Models, enums, migrations, contracts | Shared types only         | Schema + isolation foundations    |
+| 2     | Mobile App CRUD       | CRUD APIs + guards                   | API client layer          | Create/read/update/archive        |
+| 3     | Mobile Apps UI        | Existing APIs                        | List/create/edit UI       | Full CRUD from browser            |
+| 4     | Repository Linking    | Link repository to app               | Repository selector       | Link/unlink + workspace isolation |
+| 5     | Project Detection     | Extend repository analyzer           | Detection results UI      | Android/iOS/Flutter/RN detection  |
+| 6     | Mobile Overview       | Aggregated overview endpoint         | App detail overview       | Metadata + repository display     |
+| 7     | Code Explorer         | Reuse current code APIs              | Mobile-to-code navigation | Browse linked mobile repo         |
+| 8     | Build Tracking        | Build models + ingestion             | Builds page               | Build create/update/status flow   |
+| 9     | Test Tracking         | Test run/result models               | Tests page                | Build-to-test relationship        |
+| 10    | Releases              | Release models + APIs                | Releases page             | Release lifecycle                 |
+| 11    | Telemetry Foundation  | Provider abstraction                 | Integration settings      | Provider connect/config flow      |
+| 12    | Android Performance   | Android metric ingestion             | Android metrics UI        | Crash/ANR/startup metrics         |
+| 13    | iOS Performance       | iOS metric ingestion                 | iOS metrics UI            | Crash/hang/startup metrics        |
+| 14    | Performance Dashboard | Normalized metric queries            | Unified dashboard         | Version comparison                |
+| 15    | Alerts                | Rules + evaluation                   | Alert configuration       | Trigger/resolve notification flow |
+| 16    | AI Analysis           | Context aggregation                  | AI analysis UI            | Grounded analysis requests        |
+| 17    | Security              | Authorization hardening              | Permission-aware UI       | Cross-workspace/role tests        |
+| 18    | Full Verification     | Final hardening                      | Final hardening           | Full stack regression             |
 
 ---
 
