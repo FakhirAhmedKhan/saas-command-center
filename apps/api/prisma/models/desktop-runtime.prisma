@@ -1,0 +1,74 @@
+enum DesktopPerformanceMetricType {
+  CRASH_FREE_USERS_PERCENT
+  CRASH_FREE_SESSIONS_PERCENT
+  STARTUP_MS
+  MEMORY_MB
+  CPU_PERCENT
+  HANG_RATE_PERCENT
+  NETWORK_LATENCY_MS
+  API_FAILURE_RATE_PERCENT
+  VERSION_ADOPTION_PERCENT
+}
+
+model DesktopMetric {
+  id                     String @id @default(uuid()) @db.Uuid
+  workspaceId            String @map("workspace_id") @db.Uuid
+  desktopAppId           String @map("desktop_app_id") @db.Uuid
+  telemetryIntegrationId String @map("telemetry_integration_id") @db.Uuid
+
+  externalId String @map("external_id") @db.VarChar(255)
+  type       DesktopPerformanceMetricType
+  value      Float
+  unit       String @db.VarChar(32)
+
+  version      String?               @db.VarChar(64)
+  platform     DesktopPlatform?
+  architecture DesktopArchitecture?
+  channel      DesktopReleaseChannel?
+
+  recordedAt DateTime @map("recorded_at") @db.Timestamptz(6)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  desktopApp DesktopApplication          @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  integration DesktopTelemetryIntegration @relation(fields: [telemetryIntegrationId], references: [id], onDelete: Cascade)
+
+  @@unique([telemetryIntegrationId, externalId])
+  @@index([workspaceId, desktopAppId, recordedAt(sort: Desc)])
+  @@index([desktopAppId, type, recordedAt(sort: Desc)])
+  @@index([desktopAppId, version, platform, architecture])
+  @@map("desktop_metrics")
+}
+
+model DesktopCrash {
+  id                     String @id @default(uuid()) @db.Uuid
+  workspaceId            String @map("workspace_id") @db.Uuid
+  desktopAppId           String @map("desktop_app_id") @db.Uuid
+  telemetryIntegrationId String @map("telemetry_integration_id") @db.Uuid
+
+  externalId    String @map("external_id") @db.VarChar(255)
+  fingerprint   String @db.VarChar(512)
+  message       String @db.Text
+  count         Int    @default(1)
+  affectedUsers Int    @default(0) @map("affected_users")
+
+  version      String?               @db.VarChar(64)
+  platform     DesktopPlatform?
+  architecture DesktopArchitecture?
+  channel      DesktopReleaseChannel?
+
+  firstSeenAt DateTime @map("first_seen_at") @db.Timestamptz(6)
+  lastSeenAt  DateTime @map("last_seen_at") @db.Timestamptz(6)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  desktopApp DesktopApplication          @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  integration DesktopTelemetryIntegration @relation(fields: [telemetryIntegrationId], references: [id], onDelete: Cascade)
+
+  @@unique([telemetryIntegrationId, externalId])
+  @@index([workspaceId, desktopAppId, lastSeenAt(sort: Desc)])
+  @@index([desktopAppId, version, platform, architecture])
+  @@index([desktopAppId, fingerprint])
+  @@map("desktop_crashes")
+}

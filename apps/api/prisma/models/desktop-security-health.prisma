@@ -1,0 +1,94 @@
+enum DesktopDependencyEcosystem {
+    NPM
+    CARGO
+    NUGET
+    MAVEN
+    GRADLE
+    CMAKE
+    CONAN
+    VCPKG
+    OTHER
+}
+
+enum DesktopDependencyRiskStatus {
+    CURRENT
+    UPDATE_AVAILABLE
+    VULNERABLE
+    UNKNOWN
+}
+
+enum DesktopSecuritySeverity {
+    INFO
+    LOW
+    MEDIUM
+    HIGH
+    CRITICAL
+}
+
+enum DesktopSecurityCheckType {
+    WINDOWS_SIGNING
+    MACOS_SIGNING
+    MACOS_NOTARIZATION
+    PACKAGING_CONFIGURATION
+    DEPENDENCY_VULNERABILITY
+}
+
+enum DesktopSecurityCheckStatus {
+    PASS
+    WARN
+    FAIL
+    UNKNOWN
+}
+
+model DesktopDependency {
+    id           String @id @default(uuid()) @db.Uuid
+    workspaceId  String @map("workspace_id") @db.Uuid
+    desktopAppId String @map("desktop_app_id") @db.Uuid
+
+    ecosystem      DesktopDependencyEcosystem
+    manifestPath   String                      @map("manifest_path") @db.VarChar(1024)
+    name           String                      @db.VarChar(255)
+    currentVersion String                      @map("current_version") @db.VarChar(255)
+    latestVersion  String?                     @map("latest_version") @db.VarChar(255)
+    direct         Boolean                     @default(true)
+    riskStatus     DesktopDependencyRiskStatus @default(UNKNOWN) @map("risk_status")
+    severity       DesktopSecuritySeverity?
+    advisoryIds    Json                        @default("[]") @map("advisory_ids")
+
+    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+    desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+
+    @@unique([desktopAppId, manifestPath, name])
+    @@index([workspaceId, desktopAppId])
+    @@index([desktopAppId, riskStatus])
+    @@index([desktopAppId, ecosystem])
+    @@map("desktop_dependencies")
+}
+
+model DesktopSecurityFinding {
+    id           String @id @default(uuid()) @db.Uuid
+    workspaceId  String @map("workspace_id") @db.Uuid
+    desktopAppId String @map("desktop_app_id") @db.Uuid
+
+    findingKey String                     @map("finding_key") @db.VarChar(255)
+    type       DesktopSecurityCheckType
+    status     DesktopSecurityCheckStatus
+    severity   DesktopSecuritySeverity
+    title      String                     @db.VarChar(255)
+    message    String                     @db.Text
+    sourcePath String?                    @map("source_path") @db.VarChar(1024)
+    evidence   Json                       @default("[]")
+
+    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+    desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+
+    @@unique([desktopAppId, findingKey])
+    @@index([workspaceId, desktopAppId])
+    @@index([desktopAppId, status, severity])
+    @@index([desktopAppId, type])
+    @@map("desktop_security_findings")
+}

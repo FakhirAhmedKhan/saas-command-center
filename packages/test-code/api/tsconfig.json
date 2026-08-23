@@ -5,5 +5,5 @@
     "rootDir": "../../..",
     "types": ["jest", "node"]
   },
-  "include": ["./**/*.ts", "../../../apps/api/src/**/*.ts"]
+  "include": ["./**/*.ts", "../../../apps/api/src/**/*.ts", "../web/e2e/full-stack/fullstack-desktop-phases-12-14.spec.ts", "../web/unit/features/desktop-apps/desktop-project-detector.spec.ts", "../web/unit/features/desktop-apps/desktop-security-parsers.spec.ts", "../web/unit/features/desktop-apps/desktop-telemetry-api.test.ts", "../web/unit/features/desktop-apps/desktop-telemetry-secret.service.spec.ts"]
 }

@@ -19,32 +19,66 @@ import { Module } from '@nestjs/common';
 import { DesktopTestsService } from './services/desktop-tests.service';
 import { DesktopReleasesController } from './controllers/desktop-releases.controller';
 import { DesktopReleasesService } from './services/desktop-releases.service';
+import { DesktopCrashesController } from './controllers/desktop-crashes.controller';
+import { DesktopPerformanceController } from './controllers/desktop-performance.controller';
+import { DesktopSecurityHealthController } from './controllers/desktop-security-health.controller';
+import { DesktopTelemetryController } from './controllers/desktop-telemetry.controller';
+import { DesktopCrashesService } from './services/desktop-crashes.service';
+import { DesktopDependencyHealthService } from './services/desktop-dependency-health.service';
+import { DesktopPerformanceService } from './services/desktop-performance.service';
+import { DesktopRepositoryMetadataService } from './services/desktop-repository-metadata.service';
+import { DesktopRuntimeService } from './services/desktop-runtime.service';
+import { DesktopSecurityService } from './services/desktop-security.service';
+import { DesktopTelemetryProviderRegistryService } from './services/desktop-telemetry-provider-registry.service';
+import { DesktopTelemetrySecretService } from './services/desktop-telemetry-secret.service';
+import { DesktopTelemetryUrlPolicyService } from './services/desktop-telemetry-url-policy.service';
+import { DesktopTelemetryService } from './services/desktop-telemetry.service';
+import { NormalizedHttpDesktopTelemetryProvider } from './telemetry/normalized-http-desktop-telemetry.provider';
 
 @Module({
-  imports: [DatabaseModule, WorkspaceMembersModule, ActivityModule, RepositoriesModule],
+    imports: [DatabaseModule, WorkspaceMembersModule, ActivityModule, RepositoriesModule],
 
-  controllers: [
-    DesktopAppsController,
-    DesktopRepositoriesController,
-    DesktopProjectDetectionController,
-    DesktopOverviewController,
-    DesktopBuildsController,
-    DesktopBuildArtifactsController,
-    DesktopTestsController,
-    DesktopReleasesController,
-  ],
+    controllers: [
+        DesktopTelemetryController,
+        DesktopPerformanceController,
+        DesktopCrashesController,
+        DesktopSecurityHealthController,
+        DesktopAppsController,
+        DesktopRepositoriesController,
+        DesktopProjectDetectionController,
+        DesktopOverviewController,
+        DesktopBuildsController,
+        DesktopBuildArtifactsController,
+        DesktopTestsController,
+        DesktopReleasesController,
+    ],
 
-  providers: [
-    DesktopAppsService,
-    DesktopRepositoryService,
-    DesktopProjectDetectionService,
-    DesktopBuildsService,
-    DesktopBuildArtifactsService,
-    DesktopTestsService,
-    DesktopReleasesService,
-    DesktopOverviewService,
-  ],
+    providers: [
+        DesktopTelemetrySecretService,
+        DesktopTelemetryUrlPolicyService,
+        NormalizedHttpDesktopTelemetryProvider,
+        DesktopTelemetryProviderRegistryService,
+        DesktopTelemetryService,
+        DesktopRuntimeService,
+        DesktopPerformanceService,
+        DesktopCrashesService,
+        DesktopRepositoryMetadataService,
+        DesktopDependencyHealthService,
+        DesktopSecurityService,
+        DesktopAppsService,
+        DesktopRepositoryService,
+        DesktopProjectDetectionService,
+        DesktopBuildsService,
+        DesktopBuildArtifactsService,
+        DesktopTestsService,
+        DesktopReleasesService,
+        DesktopOverviewService,
+    ],
 
-  exports: [DesktopAppsService, DesktopRepositoryService, DesktopBuildsService, DesktopTestsService, DesktopReleasesService],
+    exports: [DesktopAppsService, DesktopTelemetryService,
+        DesktopPerformanceService,
+        DesktopCrashesService,
+        DesktopDependencyHealthService,
+        DesktopSecurityService, , DesktopRepositoryService, DesktopBuildsService, DesktopTestsService, DesktopReleasesService],
 })
-export class DesktopAppsModule {}
+export class DesktopAppsModule { }

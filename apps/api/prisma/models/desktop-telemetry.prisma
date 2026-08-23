@@ -1,0 +1,43 @@
+enum DesktopTelemetryProvider {
+    SENTRY
+    DATADOG
+    NEW_RELIC
+    OPENTELEMETRY
+    CUSTOM
+}
+
+enum DesktopTelemetryIntegrationStatus {
+    CONNECTED
+    ERROR
+    DISCONNECTED
+}
+
+model DesktopTelemetryIntegration {
+    id           String @id @default(uuid()) @db.Uuid
+    workspaceId  String @map("workspace_id") @db.Uuid
+    desktopAppId String @map("desktop_app_id") @db.Uuid
+
+    provider          DesktopTelemetryProvider
+    status            DesktopTelemetryIntegrationStatus @default(CONNECTED)
+    externalProjectId String                            @map("external_project_id") @db.VarChar(255)
+    endpointUrl       String                            @map("endpoint_url") @db.VarChar(2048)
+
+    // AES-256-GCM ciphertext. The plaintext provider token is never returned.
+    secretCiphertext String @map("secret_ciphertext") @db.Text
+
+    configuredAt DateTime  @default(now()) @map("configured_at") @db.Timestamptz(6)
+    lastSyncedAt DateTime? @map("last_synced_at") @db.Timestamptz(6)
+    lastError    String?   @map("last_error") @db.Text
+
+    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+    desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+    metrics    DesktopMetric[]
+    crashes    DesktopCrash[]
+
+    @@unique([desktopAppId, provider])
+    @@index([workspaceId, desktopAppId])
+    @@index([desktopAppId, status])
+    @@map("desktop_telemetry_integrations")
+}

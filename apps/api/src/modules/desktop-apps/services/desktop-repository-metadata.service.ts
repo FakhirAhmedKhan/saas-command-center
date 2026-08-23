@@ -1,0 +1,113 @@
+import { GithubCodeService } from '../../repositories/services/github-code.service';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { DesktopRepositoryService } from './desktop-repository.service';
+
+export interface DesktopRepositoryMetadataSnapshot {
+  repositoryId: string;
+  repositoryFullName: string;
+  branch: string;
+  paths: string[];
+  files: Record<string, string>;
+  truncated: boolean;
+}
+
+const MAX_FILES = 120;
+const MAX_FILE_SIZE = 500_000;
+
+@Injectable()
+export class DesktopRepositoryMetadataService {
+  constructor(
+    private readonly desktopRepositories: DesktopRepositoryService,
+    private readonly githubCode: GithubCodeService,
+  ) {}
+
+  async load(
+    workspaceId: string,
+    desktopAppId: string,
+  ): Promise<DesktopRepositoryMetadataSnapshot> {
+    const repository =
+      await this.desktopRepositories.getLinkedRepository(
+        workspaceId,
+        desktopAppId,
+      );
+
+    if (!repository) {
+      throw new BadRequestException(
+        'Connect a repository before scanning dependencies or security configuration.',
+      );
+    }
+
+    if (repository.archived || !repository.isAvailable) {
+      throw new BadRequestException(
+        'The linked repository is not available.',
+      );
+    }
+
+    const tree = await this.githubCode.getTree(
+      repository.installation.externalInstallationId,
+      repository.owner,
+      repository.name,
+      repository.defaultBranch,
+    );
+
+    const entries = tree.entries
+      .filter(
+        (entry) =>
+          entry.type === 'file' &&
+          this.isInteresting(entry.path) &&
+          (entry.size === null ||
+            entry.size === undefined ||
+            entry.size <= MAX_FILE_SIZE),
+      )
+      .slice(0, MAX_FILES);
+
+    const files: Record<string, string> = {};
+
+    for (const entry of entries) {
+      try {
+        const file = await this.githubCode.getFile(
+          repository.installation.externalInstallationId,
+          repository.owner,
+          repository.name,
+          entry.path,
+          repository.defaultBranch,
+        );
+
+        if (file.size <= MAX_FILE_SIZE) {
+          files[entry.path] = file.content;
+        }
+      } catch {
+        // A deleted/unreadable manifest is ignored; the scan still returns
+        // the safely available repository evidence.
+      }
+    }
+
+    return {
+      repositoryId: repository.id,
+      repositoryFullName: repository.fullName,
+      branch: repository.defaultBranch,
+      paths: tree.entries
+        .filter((entry) => entry.type === 'file')
+        .map((entry) => entry.path),
+      files,
+      truncated: tree.truncated || entries.length >= MAX_FILES,
+    };
+  }
+
+  private isInteresting(path: string): boolean {
+    return (
+      /(^|\/)package\.json$/i.test(path) ||
+      /(^|\/)(package-lock\.json|pnpm-lock\.yaml|yarn\.lock)$/i.test(path) ||
+      /(^|\/)Cargo\.toml$/i.test(path) ||
+      /(^|\/)Cargo\.lock$/i.test(path) ||
+      /\.(csproj|fsproj|vbproj)$/i.test(path) ||
+      /(^|\/)(packages\.lock\.json|Directory\.Packages\.props)$/i.test(path) ||
+      /(^|\/)(pom\.xml|build\.gradle|build\.gradle\.kts)$/i.test(path) ||
+      /(^|\/)(CMakeLists\.txt|conanfile\.(txt|py)|vcpkg\.json)$/i.test(path) ||
+      /(^|\/)src-tauri\/tauri\.conf\.(json|json5)$/i.test(path) ||
+      /(^|\/)(electron-builder\.(yml|yaml|json|json5)|forge\.config\.(js|cjs|mjs|ts))$/i.test(path) ||
+      /(^|\/)[^/]+\.xcodeproj\/project\.pbxproj$/i.test(path) ||
+      /(^|\/)(osv-scanner\.json|npm-audit\.json|pnpm-audit\.json)$/i.test(path)
+    );
+  }
+}

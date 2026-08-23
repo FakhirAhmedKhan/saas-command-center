@@ -392,3 +392,242 @@ export interface CreateDesktopReleaseInput {
   buildNumber?: string;
   releaseNotes?: string | null;
 }
+
+
+export type DesktopTelemetryProvider =
+  | 'SENTRY'
+  | 'DATADOG'
+  | 'NEW_RELIC'
+  | 'OPENTELEMETRY'
+  | 'CUSTOM';
+
+export type DesktopTelemetryIntegrationStatus =
+  | 'CONNECTED'
+  | 'ERROR'
+  | 'DISCONNECTED';
+
+export interface DesktopTelemetryIntegration {
+  id: string;
+  workspaceId: string;
+  desktopAppId: string;
+  provider: DesktopTelemetryProvider;
+  status: DesktopTelemetryIntegrationStatus;
+  externalProjectId: string;
+  endpointUrl: string;
+  configuredAt: string;
+  lastSyncedAt: string | null;
+  lastError: string | null;
+  createdAt: string;
+  updatedAt: string;
+  hasSecret: boolean;
+}
+
+export interface ConnectDesktopTelemetryInput {
+  provider: DesktopTelemetryProvider;
+  externalProjectId: string;
+  endpointUrl: string;
+  secret: string;
+}
+
+export type DesktopPerformanceMetricType =
+  | 'CRASH_FREE_USERS_PERCENT'
+  | 'CRASH_FREE_SESSIONS_PERCENT'
+  | 'STARTUP_MS'
+  | 'MEMORY_MB'
+  | 'CPU_PERCENT'
+  | 'HANG_RATE_PERCENT'
+  | 'NETWORK_LATENCY_MS'
+  | 'API_FAILURE_RATE_PERCENT'
+  | 'VERSION_ADOPTION_PERCENT';
+
+export interface DesktopTelemetryPerformanceSample {
+  externalId: string;
+  type: DesktopPerformanceMetricType;
+  value: number;
+  unit: string;
+  recordedAt: string;
+  version?: string | null;
+  platform?: DesktopPlatform | null;
+  architecture?: DesktopArchitecture | null;
+  channel?: DesktopReleaseChannel | null;
+}
+
+export interface DesktopTelemetryCrashSample {
+  externalId: string;
+  fingerprint: string;
+  message: string;
+  count: number;
+  affectedUsers: number;
+  firstSeenAt: string;
+  lastSeenAt: string;
+  version?: string | null;
+  platform?: DesktopPlatform | null;
+  architecture?: DesktopArchitecture | null;
+  channel?: DesktopReleaseChannel | null;
+}
+
+export interface DesktopTelemetryVersionSample {
+  version: string;
+  users: number;
+  sessions: number;
+}
+
+export interface DesktopTelemetrySnapshot {
+  performance: DesktopTelemetryPerformanceSample[];
+  crashes: DesktopTelemetryCrashSample[];
+  versions: DesktopTelemetryVersionSample[];
+}
+
+export interface DesktopTelemetrySyncResult {
+  integration: DesktopTelemetryIntegration;
+  performanceInserted: number;
+  performanceUpdated: number;
+  crashesUpserted: number;
+  versionsSeen: number;
+}
+
+export interface DesktopRuntimeFilters {
+  from?: string;
+  to?: string;
+  version?: string;
+  platform?: DesktopPlatform;
+  architecture?: DesktopArchitecture;
+  channel?: DesktopReleaseChannel;
+}
+
+export interface DesktopMetric {
+  id: string;
+  workspaceId: string;
+  desktopAppId: string;
+  telemetryIntegrationId: string;
+  externalId: string;
+  type: DesktopPerformanceMetricType;
+  value: number;
+  unit: string;
+  version: string | null;
+  platform: DesktopPlatform | null;
+  architecture: DesktopArchitecture | null;
+  channel: DesktopReleaseChannel | null;
+  recordedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DesktopPerformanceSummary {
+  crashFreeUsersPercent: number | null;
+  crashFreeSessionsPercent: number | null;
+  startupMs: number | null;
+  memoryMb: number | null;
+  cpuPercent: number | null;
+  hangRatePercent: number | null;
+  networkLatencyMs: number | null;
+  apiFailureRatePercent: number | null;
+  versionAdoptionPercent: number | null;
+  sampleCount: number;
+  from: string | null;
+  to: string | null;
+}
+
+export interface DesktopPerformanceResponse {
+  summary: DesktopPerformanceSummary;
+  metrics: DesktopMetric[];
+}
+
+export interface DesktopCrash {
+  id: string;
+  workspaceId: string;
+  desktopAppId: string;
+  telemetryIntegrationId: string;
+  externalId: string;
+  fingerprint: string;
+  message: string;
+  count: number;
+  affectedUsers: number;
+  version: string | null;
+  platform: DesktopPlatform | null;
+  architecture: DesktopArchitecture | null;
+  channel: DesktopReleaseChannel | null;
+  firstSeenAt: string;
+  lastSeenAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type DesktopDependencyEcosystem =
+  | 'NPM'
+  | 'CARGO'
+  | 'NUGET'
+  | 'MAVEN'
+  | 'GRADLE'
+  | 'CMAKE'
+  | 'CONAN'
+  | 'VCPKG'
+  | 'OTHER';
+
+export type DesktopDependencyRiskStatus =
+  | 'CURRENT'
+  | 'UPDATE_AVAILABLE'
+  | 'VULNERABLE'
+  | 'UNKNOWN';
+
+export type DesktopSecuritySeverity =
+  | 'INFO'
+  | 'LOW'
+  | 'MEDIUM'
+  | 'HIGH'
+  | 'CRITICAL';
+
+export interface DesktopDependency {
+  id: string;
+  workspaceId: string;
+  desktopAppId: string;
+  ecosystem: DesktopDependencyEcosystem;
+  manifestPath: string;
+  name: string;
+  currentVersion: string;
+  latestVersion: string | null;
+  direct: boolean;
+  riskStatus: DesktopDependencyRiskStatus;
+  severity: DesktopSecuritySeverity | null;
+  advisoryIds: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type DesktopSecurityCheckType =
+  | 'WINDOWS_SIGNING'
+  | 'MACOS_SIGNING'
+  | 'MACOS_NOTARIZATION'
+  | 'PACKAGING_CONFIGURATION'
+  | 'DEPENDENCY_VULNERABILITY';
+
+export type DesktopSecurityCheckStatus =
+  | 'PASS'
+  | 'WARN'
+  | 'FAIL'
+  | 'UNKNOWN';
+
+export interface DesktopSecurityFinding {
+  id: string;
+  workspaceId: string;
+  desktopAppId: string;
+  findingKey: string;
+  type: DesktopSecurityCheckType;
+  status: DesktopSecurityCheckStatus;
+  severity: DesktopSecuritySeverity;
+  title: string;
+  message: string;
+  sourcePath: string | null;
+  evidence: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DesktopSecuritySummary {
+  windowsSigning: DesktopSecurityCheckStatus;
+  macosSigning: DesktopSecurityCheckStatus;
+  notarization: DesktopSecurityCheckStatus;
+  criticalRisks: number;
+  highRisks: number;
+  findings: DesktopSecurityFinding[];
+}
