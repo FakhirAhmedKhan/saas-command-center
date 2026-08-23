@@ -34,9 +34,21 @@ import { DesktopTelemetrySecretService } from './services/desktop-telemetry-secr
 import { DesktopTelemetryUrlPolicyService } from './services/desktop-telemetry-url-policy.service';
 import { DesktopTelemetryService } from './services/desktop-telemetry.service';
 import { NormalizedHttpDesktopTelemetryProvider } from './telemetry/normalized-http-desktop-telemetry.provider';
+import { TeamOperationsModule } from '../team-operations/team-operations.module';
+import { ConfiguredDesktopAnalysisProvider } from './analysis/desktop-analysis.provider';
+import { DesktopAlertsController } from './controllers/desktop-alerts.controller';
+import { DesktopAnalysisController } from './controllers/desktop-analysis.controller';
+import { DesktopSecurityController } from './controllers/desktop-security.controller';
+import { DesktopResourceScopeService } from './security/desktop-resource-scope.service';
+import { DesktopSecretSanitizerService } from './security/desktop-secret-sanitizer.service';
+import { DesktopAlertWorkerService } from './services/desktop-alert-worker.service';
+import { DesktopAlertsService } from './services/desktop-alerts.service';
+import { DesktopAnalysisContextService } from './services/desktop-analysis-context.service';
+import { DesktopAnalysisService } from './services/desktop-analysis.service';
+import { DesktopPermissionsService } from './services/desktop-permissions.service';
 
 @Module({
-    imports: [DatabaseModule, WorkspaceMembersModule, ActivityModule, RepositoriesModule],
+    imports: [DatabaseModule, WorkspaceMembersModule, ActivityModule, RepositoriesModule, TeamOperationsModule,],
 
     controllers: [
         DesktopTelemetryController,
@@ -51,6 +63,9 @@ import { NormalizedHttpDesktopTelemetryProvider } from './telemetry/normalized-h
         DesktopBuildArtifactsController,
         DesktopTestsController,
         DesktopReleasesController,
+        DesktopAlertsController,
+        DesktopAnalysisController,
+        DesktopSecurityController,
     ],
 
     providers: [
@@ -73,11 +88,21 @@ import { NormalizedHttpDesktopTelemetryProvider } from './telemetry/normalized-h
         DesktopTestsService,
         DesktopReleasesService,
         DesktopOverviewService,
+        DesktopAlertsService,
+        DesktopAlertWorkerService,
+        DesktopAnalysisContextService,
+        ConfiguredDesktopAnalysisProvider,
+        DesktopAnalysisService,
+        DesktopPermissionsService,
+        DesktopResourceScopeService,
+        DesktopSecretSanitizerService,
     ],
 
     exports: [DesktopAppsService, DesktopTelemetryService,
         DesktopPerformanceService,
-        DesktopCrashesService,
+        DesktopCrashesService, DesktopAlertsService,
+        DesktopAnalysisService,
+        DesktopPermissionsService,
         DesktopDependencyHealthService,
         DesktopSecurityService, , DesktopRepositoryService, DesktopBuildsService, DesktopTestsService, DesktopReleasesService],
 })

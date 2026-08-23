@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { DesktopRepositoryPanel } from '@/features/desktop-apps/desktop-repository-panel';
+import { DesktopAnalysisPanel } from '@/features/desktop-apps/desktop-analysis-panel';
 
 export default function DesktopAppDetailsPage() {
   const params = useParams<{
@@ -174,6 +175,7 @@ export default function DesktopAppDetailsPage() {
 
           <p className='mt-1 text-sm text-slate-500'>Current desktop application metadata.</p>
         </div>
+        <DesktopAnalysisPanel workspaceId={workspaceId} desktopAppId={desktopAppId} />
 
         <dl className='mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
           <OverviewItem label='Platform' value={DESKTOP_PLATFORM_LABELS[desktopApp.platform]} />

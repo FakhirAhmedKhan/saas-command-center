@@ -1,0 +1,84 @@
+enum DesktopAlertRuleType {
+  BUILD_FAILED
+  CRASH_RATE
+  STARTUP
+  MEMORY
+  CPU
+  RELEASE_REGRESSION
+  SIGNING_FAILURE
+  TELEMETRY_UNAVAILABLE
+}
+
+enum DesktopAlertOperator {
+  GT
+  GTE
+}
+
+enum DesktopAlertIncidentStatus {
+  OPEN
+  RESOLVED
+}
+
+model DesktopAlertRule {
+  id           String @id @default(uuid()) @db.Uuid
+  workspaceId  String @map("workspace_id") @db.Uuid
+  desktopAppId String @map("desktop_app_id") @db.Uuid
+
+  name     String               @db.VarChar(160)
+  type     DesktopAlertRuleType
+  operator DesktopAlertOperator @default(GT)
+
+  threshold       Float?
+  cooldownMinutes Int     @default(60) @map("cooldown_minutes")
+  enabled         Boolean @default(true)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  incidents  DesktopAlertIncident[]
+
+  @@index([workspaceId, desktopAppId])
+  @@index([desktopAppId, enabled])
+  @@index([desktopAppId, type])
+  @@map("desktop_alert_rules")
+}
+
+model DesktopAlertIncident {
+  id           String @id @default(uuid()) @db.Uuid
+  workspaceId  String @map("workspace_id") @db.Uuid
+  desktopAppId String @map("desktop_app_id") @db.Uuid
+  ruleId       String @map("rule_id") @db.Uuid
+
+  status DesktopAlertIncidentStatus @default(OPEN)
+
+  title   String @db.VarChar(255)
+  message String @db.Text
+
+  actualValue Float? @map("actual_value")
+  threshold   Float?
+
+  version String? @db.VarChar(64)
+  buildId String? @map("build_id") @db.Uuid
+
+  // Only OPEN incidents keep an activeKey. On resolution it becomes null.
+  // This gives DB-level protection against duplicate active incidents.
+  activeKey String? @unique @map("active_key") @db.VarChar(255)
+
+  evidence Json @default("{}")
+
+  triggeredAt     DateTime  @default(now()) @map("triggered_at") @db.Timestamptz(6)
+  lastTriggeredAt DateTime  @default(now()) @map("last_triggered_at") @db.Timestamptz(6)
+  resolvedAt      DateTime? @map("resolved_at") @db.Timestamptz(6)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  rule       DesktopAlertRule   @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, desktopAppId])
+  @@index([desktopAppId, status, triggeredAt(sort: Desc)])
+  @@index([ruleId, status])
+  @@map("desktop_alert_incidents")
+}

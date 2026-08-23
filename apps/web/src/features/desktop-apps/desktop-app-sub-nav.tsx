@@ -18,6 +18,7 @@ const LIVE_TABS = [
     { label: 'Crashes', path: '/crashes' },
     { label: 'Dependencies', path: '/dependencies' },
     { label: 'Security', path: '/security' },
+    { label: 'Alerts', path: '/alerts' },
     { label: 'Settings', path: '/settings' },
 ] as const;
 

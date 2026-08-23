@@ -1,0 +1,34 @@
+enum DesktopAnalysisAction {
+  BUILD_FAILURE
+  CRASH_INCREASE
+  PERFORMANCE_REGRESSION
+  RELEASE_HEALTH
+  CUSTOM
+}
+
+enum DesktopAnalysisConfidence {
+  LIMITED
+  SUPPORTED
+}
+
+model DesktopAiAnalysis {
+  id              String @id @default(uuid()) @db.Uuid
+  workspaceId     String @map("workspace_id") @db.Uuid
+  desktopAppId    String @map("desktop_app_id") @db.Uuid
+  createdByUserId String @map("created_by_user_id") @db.Uuid
+
+  action   DesktopAnalysisAction
+  question String?               @db.Text
+
+  answer     String                    @db.Text
+  confidence DesktopAnalysisConfidence
+  evidence   Json
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, desktopAppId, createdAt(sort: Desc)])
+  @@index([createdByUserId, createdAt(sort: Desc)])
+  @@map("desktop_ai_analyses")
+}

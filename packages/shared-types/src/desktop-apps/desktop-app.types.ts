@@ -631,3 +631,114 @@ export interface DesktopSecuritySummary {
   highRisks: number;
   findings: DesktopSecurityFinding[];
 }
+
+export const DESKTOP_ALERT_RULE_TYPES = [
+  'BUILD_FAILED',
+  'CRASH_RATE',
+  'STARTUP',
+  'MEMORY',
+  'CPU',
+  'RELEASE_REGRESSION',
+  'SIGNING_FAILURE',
+  'TELEMETRY_UNAVAILABLE',
+] as const;
+
+export type DesktopAlertRuleType = (typeof DESKTOP_ALERT_RULE_TYPES)[number];
+
+export type DesktopAlertOperator = 'GT' | 'GTE';
+export type DesktopAlertIncidentStatus = 'OPEN' | 'RESOLVED';
+
+export interface DesktopAlertRule {
+  id: string;
+  workspaceId: string;
+  desktopAppId: string;
+  name: string;
+  type: DesktopAlertRuleType;
+  operator: DesktopAlertOperator;
+  threshold: number | null;
+  cooldownMinutes: number;
+  enabled: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateDesktopAlertRuleInput {
+  name: string;
+  type: DesktopAlertRuleType;
+  operator?: DesktopAlertOperator;
+  threshold?: number | null;
+  cooldownMinutes?: number;
+  enabled?: boolean;
+}
+
+export type UpdateDesktopAlertRuleInput = Partial<Pick<CreateDesktopAlertRuleInput, 'name' | 'operator' | 'threshold' | 'cooldownMinutes' | 'enabled'>>;
+
+export interface DesktopAlertIncident {
+  id: string;
+  workspaceId: string;
+  desktopAppId: string;
+  ruleId: string;
+  status: DesktopAlertIncidentStatus;
+  title: string;
+  message: string;
+  actualValue: number | null;
+  threshold: number | null;
+  version: string | null;
+  buildId: string | null;
+  evidence: Record<string, unknown>;
+  triggeredAt: string;
+  lastTriggeredAt: string;
+  resolvedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DesktopAlertEvaluationResult {
+  rulesEvaluated: number;
+  triggered: number;
+  resolved: number;
+  unchanged: number;
+}
+
+export const DESKTOP_ANALYSIS_ACTIONS = ['BUILD_FAILURE', 'CRASH_INCREASE', 'PERFORMANCE_REGRESSION', 'RELEASE_HEALTH', 'CUSTOM'] as const;
+
+export type DesktopAnalysisAction = (typeof DESKTOP_ANALYSIS_ACTIONS)[number];
+
+export type DesktopAnalysisConfidence = 'LIMITED' | 'SUPPORTED';
+
+export type DesktopAnalysisEvidenceType =
+  'REPOSITORY' | 'BUILD' | 'ARTIFACT' | 'TEST' | 'RELEASE' | 'CRASH' | 'PERFORMANCE' | 'DEPENDENCY' | 'SECURITY' | 'ALERT';
+
+export interface DesktopAnalysisEvidence {
+  type: DesktopAnalysisEvidenceType;
+  id: string;
+  label: string;
+  href?: string;
+}
+
+export interface AnalyzeDesktopAppInput {
+  action: DesktopAnalysisAction;
+  question?: string;
+  buildId?: string;
+  releaseId?: string;
+  crashId?: string;
+}
+
+export interface DesktopAnalysisResult {
+  id: string;
+  action: DesktopAnalysisAction;
+  answer: string;
+  confidence: DesktopAnalysisConfidence;
+  evidence: DesktopAnalysisEvidence[];
+  createdAt: string;
+}
+export type DesktopWorkspaceRole = 'OWNER' | 'ADMIN' | 'DEVELOPER' | 'VIEWER';
+
+export interface DesktopPermissions {
+  role: DesktopWorkspaceRole;
+  canRead: true;
+  canWrite: boolean;
+  canManage: boolean;
+  canAnalyze: boolean;
+  canConfigureSecrets: boolean;
+}

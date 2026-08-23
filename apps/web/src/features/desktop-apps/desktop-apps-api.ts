@@ -322,3 +322,53 @@ export function scanDesktopSecurity(
         },
     );
 }
+
+export function listDesktopAlertRules(workspaceId: string, desktopAppId: string) {
+    return apiRequest<DesktopAlertRule[]>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/alerts/rules`);
+}
+
+export function createDesktopAlertRule(workspaceId: string, desktopAppId: string, input: CreateDesktopAlertRuleInput) {
+    return apiRequest<DesktopAlertRule>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/alerts/rules`, {
+        method: 'POST',
+        body: input,
+    });
+}
+
+export function updateDesktopAlertRule(workspaceId: string, desktopAppId: string, ruleId: string, input: UpdateDesktopAlertRuleInput) {
+    return apiRequest<DesktopAlertRule>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/alerts/rules/${ruleId}`, {
+        method: 'PATCH',
+        body: input,
+    });
+}
+
+export function deleteDesktopAlertRule(workspaceId: string, desktopAppId: string, ruleId: string) {
+    return apiRequest<{ success: true }>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/alerts/rules/${ruleId}`, {
+        method: 'DELETE',
+    });
+}
+
+export function listDesktopAlertIncidents(workspaceId: string, desktopAppId: string) {
+    return apiRequest<DesktopAlertIncident[]>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/alerts/incidents`);
+}
+
+export function evaluateDesktopAlerts(workspaceId: string, desktopAppId: string) {
+    return apiRequest<{
+        rulesEvaluated: number;
+        triggered: number;
+        resolved: number;
+        unchanged: number;
+    }>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/alerts/evaluate`, {
+        method: 'POST',
+    });
+}
+
+export function analyzeDesktopApplication(workspaceId: string, desktopAppId: string, input: AnalyzeDesktopAppInput) {
+    return apiRequest<DesktopAnalysisResult>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/analysis`, {
+        method: 'POST',
+        body: input,
+    });
+}
+
+export function getDesktopPermissions(workspaceId: string, desktopAppId: string) {
+    return apiRequest<DesktopPermissions>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/permissions`);
+}
