@@ -1,4 +1,5 @@
 # SaaS Command Center — Desktop Application Support
+
 # Phases 15–18 Full Implementation Bundle
 
 > Assumption: Desktop Phases 1–14 are already implemented exactly as the previous bundles described and are green in your repository.
@@ -224,8 +225,7 @@ export const DESKTOP_ALERT_RULE_TYPES = [
   'TELEMETRY_UNAVAILABLE',
 ] as const;
 
-export type DesktopAlertRuleType =
-  (typeof DESKTOP_ALERT_RULE_TYPES)[number];
+export type DesktopAlertRuleType = (typeof DESKTOP_ALERT_RULE_TYPES)[number];
 
 export type DesktopAlertOperator = 'GT' | 'GTE';
 export type DesktopAlertIncidentStatus = 'OPEN' | 'RESOLVED';
@@ -253,12 +253,7 @@ export interface CreateDesktopAlertRuleInput {
   enabled?: boolean;
 }
 
-export type UpdateDesktopAlertRuleInput = Partial<
-  Pick<
-    CreateDesktopAlertRuleInput,
-    'name' | 'operator' | 'threshold' | 'cooldownMinutes' | 'enabled'
-  >
->;
+export type UpdateDesktopAlertRuleInput = Partial<Pick<CreateDesktopAlertRuleInput, 'name' | 'operator' | 'threshold' | 'cooldownMinutes' | 'enabled'>>;
 
 export interface DesktopAlertIncident {
   id: string;
@@ -301,21 +296,8 @@ apps/api/src/modules/desktop-apps/dto/desktop-alert.dto.ts
 ```ts
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsEnum,
-  IsInt,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Max,
-  MaxLength,
-  Min,
-} from 'class-validator';
-import {
-  DesktopAlertOperator,
-  DesktopAlertRuleType,
-} from 'src/generated/prisma/enums';
+import { IsBoolean, IsEnum, IsInt, IsNumber, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
+import { DesktopAlertOperator, DesktopAlertRuleType } from 'src/generated/prisma/enums';
 
 export class CreateDesktopAlertRuleDto {
   @ApiProperty({ example: 'Crash rate > 2%' })
@@ -352,9 +334,7 @@ export class CreateDesktopAlertRuleDto {
   enabled?: boolean;
 }
 
-export class UpdateDesktopAlertRuleDto extends PartialType(
-  CreateDesktopAlertRuleDto,
-) {}
+export class UpdateDesktopAlertRuleDto extends PartialType(CreateDesktopAlertRuleDto) {}
 ```
 
 ---
@@ -415,11 +395,7 @@ export class DesktopAlertsService {
     private readonly notifications: NotificationService,
   ) {}
 
-  async createRule(
-    workspaceId: string,
-    desktopAppId: string,
-    dto: CreateDesktopAlertRuleDto,
-  ) {
+  async createRule(workspaceId: string, desktopAppId: string, dto: CreateDesktopAlertRuleDto) {
     await this.desktopApps.findOne(workspaceId, desktopAppId);
 
     if (this.requiresThreshold(dto.type) && dto.threshold === undefined) {
@@ -449,12 +425,7 @@ export class DesktopAlertsService {
     });
   }
 
-  async updateRule(
-    workspaceId: string,
-    desktopAppId: string,
-    ruleId: string,
-    dto: UpdateDesktopAlertRuleDto,
-  ) {
+  async updateRule(workspaceId: string, desktopAppId: string, ruleId: string, dto: UpdateDesktopAlertRuleDto) {
     const rule = await this.requireRule(workspaceId, desktopAppId, ruleId);
 
     const nextType = dto.type ?? rule.type;
@@ -471,19 +442,13 @@ export class DesktopAlertsService {
         ...(dto.type !== undefined ? { type: dto.type } : {}),
         ...(dto.operator !== undefined ? { operator: dto.operator } : {}),
         ...(dto.threshold !== undefined ? { threshold: dto.threshold } : {}),
-        ...(dto.cooldownMinutes !== undefined
-          ? { cooldownMinutes: dto.cooldownMinutes }
-          : {}),
+        ...(dto.cooldownMinutes !== undefined ? { cooldownMinutes: dto.cooldownMinutes } : {}),
         ...(dto.enabled !== undefined ? { enabled: dto.enabled } : {}),
       },
     });
   }
 
-  async deleteRule(
-    workspaceId: string,
-    desktopAppId: string,
-    ruleId: string,
-  ) {
+  async deleteRule(workspaceId: string, desktopAppId: string, ruleId: string) {
     const rule = await this.requireRule(workspaceId, desktopAppId, ruleId);
 
     await this.prisma.desktopAlertRule.delete({ where: { id: rule.id } });
@@ -530,13 +495,7 @@ export class DesktopAlertsService {
       const signal = await this.evaluateRule(workspaceId, desktopAppId, rule);
 
       if (signal.breached) {
-        const created = await this.trigger(
-          workspaceId,
-          desktopAppId,
-          app.applicationId,
-          rule,
-          signal,
-        );
+        const created = await this.trigger(workspaceId, desktopAppId, app.applicationId, rule, signal);
 
         if (created) triggered += 1;
         else unchanged += 1;
@@ -555,11 +514,7 @@ export class DesktopAlertsService {
     };
   }
 
-  private async evaluateRule(
-    workspaceId: string,
-    desktopAppId: string,
-    rule: RuleRecord,
-  ): Promise<AlertSignal> {
+  private async evaluateRule(workspaceId: string, desktopAppId: string, rule: RuleRecord): Promise<AlertSignal> {
     switch (rule.type) {
       case DesktopAlertRuleType.BUILD_FAILED:
         return this.buildFailedSignal(workspaceId, desktopAppId);
@@ -581,10 +536,7 @@ export class DesktopAlertsService {
     }
   }
 
-  private async buildFailedSignal(
-    workspaceId: string,
-    desktopAppId: string,
-  ): Promise<AlertSignal> {
+  private async buildFailedSignal(workspaceId: string, desktopAppId: string): Promise<AlertSignal> {
     const build = await this.prisma.desktopBuild.findFirst({
       where: { workspaceId, desktopAppId },
       orderBy: { createdAt: 'desc' },
@@ -617,11 +569,7 @@ export class DesktopAlertsService {
     };
   }
 
-  private async performanceSignal(
-    workspaceId: string,
-    desktopAppId: string,
-    rule: RuleRecord,
-  ): Promise<AlertSignal> {
+  private async performanceSignal(workspaceId: string, desktopAppId: string, rule: RuleRecord): Promise<AlertSignal> {
     const result = await this.performance.get(workspaceId, desktopAppId, {});
     const threshold = rule.threshold ?? 0;
 
@@ -629,10 +577,7 @@ export class DesktopAlertsService {
     let label = 'Performance threshold';
 
     if (rule.type === DesktopAlertRuleType.CRASH_RATE) {
-      actual =
-        result.summary.crashFreeUsersPercent === null
-          ? null
-          : Math.max(0, 100 - result.summary.crashFreeUsersPercent);
+      actual = result.summary.crashFreeUsersPercent === null ? null : Math.max(0, 100 - result.summary.crashFreeUsersPercent);
       label = 'Crash rate';
     }
 
@@ -651,18 +596,14 @@ export class DesktopAlertsService {
       label = 'CPU';
     }
 
-    const breached =
-      actual !== null && this.compare(actual, threshold, rule.operator);
+    const breached = actual !== null && this.compare(actual, threshold, rule.operator);
 
     return {
       breached,
       actualValue: actual,
       threshold,
       title: `${label} alert`,
-      message:
-        actual === null
-          ? `${label} has no runtime data.`
-          : `${label} is ${actual.toFixed(2)} and the configured threshold is ${threshold}.`,
+      message: actual === null ? `${label} has no runtime data.` : `${label} is ${actual.toFixed(2)} and the configured threshold is ${threshold}.`,
       version: this.latestVersion(result.metrics),
       buildId: null,
       dimension: `${rule.type}:current`,
@@ -675,11 +616,7 @@ export class DesktopAlertsService {
     };
   }
 
-  private async releaseRegressionSignal(
-    workspaceId: string,
-    desktopAppId: string,
-    rule: RuleRecord,
-  ): Promise<AlertSignal> {
+  private async releaseRegressionSignal(workspaceId: string, desktopAppId: string, rule: RuleRecord): Promise<AlertSignal> {
     const releases = await this.prisma.desktopRelease.findMany({
       where: {
         workspaceId,
@@ -706,40 +643,17 @@ export class DesktopAlertsService {
 
     const [current, previous] = releases;
 
-    const [currentStartup, previousStartup, currentCrashFree, previousCrashFree] =
-      await Promise.all([
-        this.metricAverage(
-          workspaceId,
-          desktopAppId,
-          current.version,
-          DesktopPerformanceMetricType.STARTUP_MS,
-        ),
-        this.metricAverage(
-          workspaceId,
-          desktopAppId,
-          previous.version,
-          DesktopPerformanceMetricType.STARTUP_MS,
-        ),
-        this.metricAverage(
-          workspaceId,
-          desktopAppId,
-          current.version,
-          DesktopPerformanceMetricType.CRASH_FREE_USERS_PERCENT,
-        ),
-        this.metricAverage(
-          workspaceId,
-          desktopAppId,
-          previous.version,
-          DesktopPerformanceMetricType.CRASH_FREE_USERS_PERCENT,
-        ),
-      ]);
+    const [currentStartup, previousStartup, currentCrashFree, previousCrashFree] = await Promise.all([
+      this.metricAverage(workspaceId, desktopAppId, current.version, DesktopPerformanceMetricType.STARTUP_MS),
+      this.metricAverage(workspaceId, desktopAppId, previous.version, DesktopPerformanceMetricType.STARTUP_MS),
+      this.metricAverage(workspaceId, desktopAppId, current.version, DesktopPerformanceMetricType.CRASH_FREE_USERS_PERCENT),
+      this.metricAverage(workspaceId, desktopAppId, previous.version, DesktopPerformanceMetricType.CRASH_FREE_USERS_PERCENT),
+    ]);
 
     const startupDelta = this.percentIncrease(previousStartup, currentStartup);
 
-    const previousCrashRate =
-      previousCrashFree === null ? null : Math.max(0, 100 - previousCrashFree);
-    const currentCrashRate =
-      currentCrashFree === null ? null : Math.max(0, 100 - currentCrashFree);
+    const previousCrashRate = previousCrashFree === null ? null : Math.max(0, 100 - previousCrashFree);
+    const currentCrashRate = currentCrashFree === null ? null : Math.max(0, 100 - currentCrashFree);
     const crashDelta = this.percentIncrease(previousCrashRate, currentCrashRate);
 
     const regression = Math.max(startupDelta ?? 0, crashDelta ?? 0);
@@ -765,10 +679,7 @@ export class DesktopAlertsService {
     };
   }
 
-  private async signingFailureSignal(
-    workspaceId: string,
-    desktopAppId: string,
-  ): Promise<AlertSignal> {
+  private async signingFailureSignal(workspaceId: string, desktopAppId: string): Promise<AlertSignal> {
     const security = await this.security.get(workspaceId, desktopAppId);
 
     const failed = security.findings.filter(
@@ -784,13 +695,15 @@ export class DesktopAlertsService {
       actualValue: failed.length,
       threshold: 0,
       title: 'Desktop signing/security failure',
-      message:
-        failed.length > 0
-          ? `${failed.length} signing or notarization check(s) failed.`
-          : 'Signing and notarization checks contain no failures.',
+      message: failed.length > 0 ? `${failed.length} signing or notarization check(s) failed.` : 'Signing and notarization checks contain no failures.',
       version: null,
       buildId: null,
-      dimension: `signing:${failed.map((finding) => finding.findingKey).sort().join('|') || 'healthy'}`,
+      dimension: `signing:${
+        failed
+          .map((finding) => finding.findingKey)
+          .sort()
+          .join('|') || 'healthy'
+      }`,
       evidence: {
         findingIds: failed.map((finding) => finding.id),
         findingKeys: failed.map((finding) => finding.findingKey),
@@ -798,10 +711,7 @@ export class DesktopAlertsService {
     };
   }
 
-  private async telemetryUnavailableSignal(
-    workspaceId: string,
-    desktopAppId: string,
-  ): Promise<AlertSignal> {
+  private async telemetryUnavailableSignal(workspaceId: string, desktopAppId: string): Promise<AlertSignal> {
     const integrations = await this.prisma.desktopTelemetryIntegration.findMany({
       where: { workspaceId, desktopAppId },
       select: {
@@ -813,18 +723,14 @@ export class DesktopAlertsService {
       },
     });
 
-    const connected = integrations.some(
-      (item) => item.status === DesktopTelemetryIntegrationStatus.CONNECTED,
-    );
+    const connected = integrations.some((item) => item.status === DesktopTelemetryIntegrationStatus.CONNECTED);
 
     return {
       breached: !connected,
       actualValue: connected ? 0 : 1,
       threshold: 0,
       title: 'Desktop telemetry unavailable',
-      message: connected
-        ? 'At least one desktop telemetry provider is connected.'
-        : 'No desktop telemetry provider is currently connected.',
+      message: connected ? 'At least one desktop telemetry provider is connected.' : 'No desktop telemetry provider is currently connected.',
       version: null,
       buildId: null,
       dimension: 'telemetry:availability',
@@ -839,13 +745,7 @@ export class DesktopAlertsService {
     };
   }
 
-  private async trigger(
-    workspaceId: string,
-    desktopAppId: string,
-    applicationId: string,
-    rule: RuleRecord,
-    signal: AlertSignal,
-  ): Promise<boolean> {
+  private async trigger(workspaceId: string, desktopAppId: string, applicationId: string, rule: RuleRecord, signal: AlertSignal): Promise<boolean> {
     const activeKey = `${rule.id}:${signal.dimension}`.slice(0, 255);
 
     const existing = await this.prisma.desktopAlertIncident.findFirst({
@@ -886,11 +786,7 @@ export class DesktopAlertsService {
       select: { resolvedAt: true },
     });
 
-    if (
-      latestResolved?.resolvedAt &&
-      Date.now() - latestResolved.resolvedAt.getTime() <
-        rule.cooldownMinutes * 60_000
-    ) {
+    if (latestResolved?.resolvedAt && Date.now() - latestResolved.resolvedAt.getTime() < rule.cooldownMinutes * 60_000) {
       return false;
     }
 
@@ -914,43 +810,24 @@ export class DesktopAlertsService {
         },
       });
     } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
-      ) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
         return false;
       }
 
       throw error;
     }
 
-    await this.notifyWorkspace(
-      workspaceId,
-      applicationId,
-      desktopAppId,
-      incident.id,
-      signal,
-    );
+    await this.notifyWorkspace(workspaceId, applicationId, desktopAppId, incident.id, signal);
 
     return true;
   }
 
-  private async notifyWorkspace(
-    workspaceId: string,
-    applicationId: string,
-    desktopAppId: string,
-    incidentId: string,
-    signal: AlertSignal,
-  ) {
+  private async notifyWorkspace(workspaceId: string, applicationId: string, desktopAppId: string, incidentId: string, signal: AlertSignal) {
     const members = await this.prisma.workspaceMember.findMany({
       where: {
         workspaceId,
         role: {
-          in: [
-            WorkspaceRole.OWNER,
-            WorkspaceRole.ADMIN,
-            WorkspaceRole.DEVELOPER,
-          ],
+          in: [WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER],
         },
       },
       select: { userId: true },
@@ -1005,11 +882,7 @@ export class DesktopAlertsService {
     return result.count;
   }
 
-  async requireRule(
-    workspaceId: string,
-    desktopAppId: string,
-    ruleId: string,
-  ) {
+  async requireRule(workspaceId: string, desktopAppId: string, ruleId: string) {
     const rule = await this.prisma.desktopAlertRule.findFirst({
       where: {
         id: ruleId,
@@ -1026,35 +899,18 @@ export class DesktopAlertsService {
   }
 
   private requiresThreshold(type: DesktopAlertRuleType): boolean {
-    return ![
-      DesktopAlertRuleType.BUILD_FAILED,
-      DesktopAlertRuleType.SIGNING_FAILURE,
-      DesktopAlertRuleType.TELEMETRY_UNAVAILABLE,
-    ].includes(type);
+    return ![DesktopAlertRuleType.BUILD_FAILED, DesktopAlertRuleType.SIGNING_FAILURE, DesktopAlertRuleType.TELEMETRY_UNAVAILABLE].includes(type);
   }
 
-  private compare(
-    actual: number,
-    threshold: number,
-    operator: DesktopAlertOperator,
-  ): boolean {
-    return operator === DesktopAlertOperator.GTE
-      ? actual >= threshold
-      : actual > threshold;
+  private compare(actual: number, threshold: number, operator: DesktopAlertOperator): boolean {
+    return operator === DesktopAlertOperator.GTE ? actual >= threshold : actual > threshold;
   }
 
-  private latestVersion(
-    metrics: Array<{ version: string | null; recordedAt: Date }>,
-  ): string | null {
+  private latestVersion(metrics: Array<{ version: string | null; recordedAt: Date }>): string | null {
     return metrics.find((metric) => metric.version)?.version ?? null;
   }
 
-  private async metricAverage(
-    workspaceId: string,
-    desktopAppId: string,
-    version: string,
-    type: DesktopPerformanceMetricType,
-  ): Promise<number | null> {
+  private async metricAverage(workspaceId: string, desktopAppId: string, version: string, type: DesktopPerformanceMetricType): Promise<number | null> {
     const result = await this.prisma.desktopMetric.aggregate({
       where: {
         workspaceId,
@@ -1068,10 +924,7 @@ export class DesktopAlertsService {
     return result._avg.value ?? null;
   }
 
-  private percentIncrease(
-    previous: number | null,
-    current: number | null,
-  ): number | null {
+  private percentIncrease(previous: number | null, current: number | null): number | null {
     if (previous === null || current === null || previous <= 0) return null;
     return ((current - previous) / previous) * 100;
   }
@@ -1097,17 +950,7 @@ import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.gu
 import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
 import { CreateDesktopAlertRuleDto, UpdateDesktopAlertRuleDto } from '../dto/desktop-alert.dto';
 import { DesktopAlertsService } from '../services/desktop-alerts.service';
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { WorkspaceRole } from 'src/generated/prisma/enums';
 
@@ -1119,19 +962,12 @@ export class DesktopAlertsController {
   constructor(private readonly service: DesktopAlertsService) {}
 
   @Get('rules')
-  rules(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-  ) {
+  rules(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string) {
     return this.service.listRules(workspaceId, desktopAppId);
   }
 
   @Post('rules')
-  @WorkspaceRoles(
-    WorkspaceRole.OWNER,
-    WorkspaceRole.ADMIN,
-    WorkspaceRole.DEVELOPER,
-  )
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
   createRule(
     @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
     @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
@@ -1141,11 +977,7 @@ export class DesktopAlertsController {
   }
 
   @Patch('rules/:ruleId')
-  @WorkspaceRoles(
-    WorkspaceRole.OWNER,
-    WorkspaceRole.ADMIN,
-    WorkspaceRole.DEVELOPER,
-  )
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
   updateRule(
     @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
     @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
@@ -1166,23 +998,13 @@ export class DesktopAlertsController {
   }
 
   @Get('incidents')
-  incidents(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-  ) {
+  incidents(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string) {
     return this.service.listIncidents(workspaceId, desktopAppId);
   }
 
   @Post('evaluate')
-  @WorkspaceRoles(
-    WorkspaceRole.OWNER,
-    WorkspaceRole.ADMIN,
-    WorkspaceRole.DEVELOPER,
-  )
-  evaluate(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-  ) {
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  evaluate(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string) {
     return this.service.evaluateApp(workspaceId, desktopAppId);
   }
 }
@@ -1245,10 +1067,7 @@ export class DesktopAlertWorkerService {
           evaluated += 1;
         } catch (error) {
           failed += 1;
-          this.logger.error(
-            `Desktop alert evaluation failed for ${app.id}`,
-            error instanceof Error ? error.stack : undefined,
-          );
+          this.logger.error(`Desktop alert evaluation failed for ${app.id}`, error instanceof Error ? error.stack : undefined);
         }
       }
 
@@ -1329,30 +1148,14 @@ aiAnalyses DesktopAiAnalysis[]
 Append to the desktop shared type file:
 
 ```ts
-export const DESKTOP_ANALYSIS_ACTIONS = [
-  'BUILD_FAILURE',
-  'CRASH_INCREASE',
-  'PERFORMANCE_REGRESSION',
-  'RELEASE_HEALTH',
-  'CUSTOM',
-] as const;
+export const DESKTOP_ANALYSIS_ACTIONS = ['BUILD_FAILURE', 'CRASH_INCREASE', 'PERFORMANCE_REGRESSION', 'RELEASE_HEALTH', 'CUSTOM'] as const;
 
-export type DesktopAnalysisAction =
-  (typeof DESKTOP_ANALYSIS_ACTIONS)[number];
+export type DesktopAnalysisAction = (typeof DESKTOP_ANALYSIS_ACTIONS)[number];
 
 export type DesktopAnalysisConfidence = 'LIMITED' | 'SUPPORTED';
 
 export type DesktopAnalysisEvidenceType =
-  | 'REPOSITORY'
-  | 'BUILD'
-  | 'ARTIFACT'
-  | 'TEST'
-  | 'RELEASE'
-  | 'CRASH'
-  | 'PERFORMANCE'
-  | 'DEPENDENCY'
-  | 'SECURITY'
-  | 'ALERT';
+  'REPOSITORY' | 'BUILD' | 'ARTIFACT' | 'TEST' | 'RELEASE' | 'CRASH' | 'PERFORMANCE' | 'DEPENDENCY' | 'SECURITY' | 'ALERT';
 
 export interface DesktopAnalysisEvidence {
   type: DesktopAnalysisEvidenceType;
@@ -1391,13 +1194,7 @@ apps/api/src/modules/desktop-apps/dto/desktop-analysis.dto.ts
 
 ```ts
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsEnum,
-  IsOptional,
-  IsString,
-  IsUUID,
-  MaxLength,
-} from 'class-validator';
+import { IsEnum, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 import { DesktopAnalysisAction } from 'src/generated/prisma/enums';
 
 export class AnalyzeDesktopAppDto {
@@ -1460,33 +1257,24 @@ apps/api/src/modules/desktop-apps/analysis/desktop-analysis.provider.ts
 ```
 
 ```ts
-import type {
-  DesktopAnalysisProvider,
-  DesktopAnalysisProviderInput,
-} from './desktop-analysis-provider.interface';
+import type { DesktopAnalysisProvider, DesktopAnalysisProviderInput } from './desktop-analysis-provider.interface';
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 
 @Injectable()
-export class ConfiguredDesktopAnalysisProvider
-  implements DesktopAnalysisProvider
-{
+export class ConfiguredDesktopAnalysisProvider implements DesktopAnalysisProvider {
   async analyze(input: DesktopAnalysisProviderInput): Promise<string> {
     const endpoint = process.env.DESKTOP_AI_ANALYSIS_URL?.trim();
     const apiKey = process.env.DESKTOP_AI_ANALYSIS_API_KEY?.trim();
     const model = process.env.DESKTOP_AI_ANALYSIS_MODEL?.trim();
 
     if (!endpoint || !apiKey || !model) {
-      throw new ServiceUnavailableException(
-        'Desktop AI analysis provider is not configured.',
-      );
+      throw new ServiceUnavailableException('Desktop AI analysis provider is not configured.');
     }
 
     const url = new URL(endpoint);
 
     if (url.protocol !== 'https:' && process.env.NODE_ENV !== 'test') {
-      throw new ServiceUnavailableException(
-        'Desktop AI analysis endpoint must use HTTPS.',
-      );
+      throw new ServiceUnavailableException('Desktop AI analysis endpoint must use HTTPS.');
     }
 
     const controller = new AbortController();
@@ -1508,26 +1296,20 @@ export class ConfiguredDesktopAnalysisProvider
       });
 
       if (!response.ok) {
-        throw new ServiceUnavailableException(
-          'Desktop AI analysis provider failed.',
-        );
+        throw new ServiceUnavailableException('Desktop AI analysis provider failed.');
       }
 
       const data = (await response.json()) as { text?: unknown };
 
       if (typeof data.text !== 'string' || !data.text.trim()) {
-        throw new ServiceUnavailableException(
-          'Desktop AI analysis provider returned an invalid response.',
-        );
+        throw new ServiceUnavailableException('Desktop AI analysis provider returned an invalid response.');
       }
 
       return data.text.trim();
     } catch (error) {
       if (error instanceof ServiceUnavailableException) throw error;
 
-      throw new ServiceUnavailableException(
-        'Desktop AI analysis provider failed.',
-      );
+      throw new ServiceUnavailableException('Desktop AI analysis provider failed.');
     } finally {
       clearTimeout(timer);
     }
@@ -1558,8 +1340,7 @@ apps/api/src/modules/desktop-apps/security/desktop-secret-sanitizer.service.ts
 ```ts
 import { Injectable } from '@nestjs/common';
 
-const SECRET_KEY =
-  /(secret|token|password|private[_-]?key|api[_-]?key|authorization|credential|certificate|cert|dsn)/i;
+const SECRET_KEY = /(secret|token|password|private[_-]?key|api[_-]?key|authorization|credential|certificate|cert|dsn)/i;
 
 const SECRET_VALUE_PATTERNS = [
   /-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/gi,
@@ -1649,128 +1430,127 @@ export class DesktopAnalysisContextService {
   ) {
     const app = await this.desktopApps.findOne(workspaceId, desktopAppId);
 
-    const [repository, builds, releases, crashes, metrics, dependencies, security, alerts] =
-      await Promise.all([
-        this.prisma.repositoryConnection.findFirst({
-          where: {
-            workspaceId,
-            applicationId: app.applicationId,
-          },
-          select: {
-            id: true,
-            fullName: true,
-            defaultBranch: true,
-            htmlUrl: true,
-            lastSyncedAt: true,
-          },
-        }),
+    const [repository, builds, releases, crashes, metrics, dependencies, security, alerts] = await Promise.all([
+      this.prisma.repositoryConnection.findFirst({
+        where: {
+          workspaceId,
+          applicationId: app.applicationId,
+        },
+        select: {
+          id: true,
+          fullName: true,
+          defaultBranch: true,
+          htmlUrl: true,
+          lastSyncedAt: true,
+        },
+      }),
 
-        this.prisma.desktopBuild.findMany({
-          where: {
-            workspaceId,
-            desktopAppId,
-            ...(options.buildId ? { id: options.buildId } : {}),
+      this.prisma.desktopBuild.findMany({
+        where: {
+          workspaceId,
+          desktopAppId,
+          ...(options.buildId ? { id: options.buildId } : {}),
+        },
+        include: {
+          artifacts: true,
+          testRuns: {
+            include: { failures: true },
           },
-          include: {
-            artifacts: true,
-            testRuns: {
-              include: { failures: true },
-            },
-          },
-          orderBy: { createdAt: 'desc' },
-          take: options.buildId ? 1 : 5,
-        }),
+        },
+        orderBy: { createdAt: 'desc' },
+        take: options.buildId ? 1 : 5,
+      }),
 
-        this.prisma.desktopRelease.findMany({
-          where: {
-            workspaceId,
-            desktopAppId,
-            ...(options.releaseId ? { id: options.releaseId } : {}),
-          },
-          orderBy: { createdAt: 'desc' },
-          take: options.releaseId ? 1 : 5,
-        }),
+      this.prisma.desktopRelease.findMany({
+        where: {
+          workspaceId,
+          desktopAppId,
+          ...(options.releaseId ? { id: options.releaseId } : {}),
+        },
+        orderBy: { createdAt: 'desc' },
+        take: options.releaseId ? 1 : 5,
+      }),
 
-        this.prisma.desktopCrash.findMany({
-          where: {
-            workspaceId,
-            desktopAppId,
-            ...(options.crashId ? { id: options.crashId } : {}),
-          },
-          orderBy: { lastSeenAt: 'desc' },
-          take: options.crashId ? 1 : 20,
-        }),
+      this.prisma.desktopCrash.findMany({
+        where: {
+          workspaceId,
+          desktopAppId,
+          ...(options.crashId ? { id: options.crashId } : {}),
+        },
+        orderBy: { lastSeenAt: 'desc' },
+        take: options.crashId ? 1 : 20,
+      }),
 
-        this.prisma.desktopMetric.findMany({
-          where: { workspaceId, desktopAppId },
-          select: {
-            id: true,
-            type: true,
-            value: true,
-            unit: true,
-            version: true,
-            platform: true,
-            architecture: true,
-            channel: true,
-            recordedAt: true,
-          },
-          orderBy: { recordedAt: 'desc' },
-          take: 100,
-        }),
+      this.prisma.desktopMetric.findMany({
+        where: { workspaceId, desktopAppId },
+        select: {
+          id: true,
+          type: true,
+          value: true,
+          unit: true,
+          version: true,
+          platform: true,
+          architecture: true,
+          channel: true,
+          recordedAt: true,
+        },
+        orderBy: { recordedAt: 'desc' },
+        take: 100,
+      }),
 
-        this.prisma.desktopDependency.findMany({
-          where: { workspaceId, desktopAppId },
-          select: {
-            id: true,
-            ecosystem: true,
-            manifestPath: true,
-            name: true,
-            currentVersion: true,
-            latestVersion: true,
-            direct: true,
-            riskStatus: true,
-            severity: true,
-            advisoryIds: true,
-          },
-          orderBy: { updatedAt: 'desc' },
-          take: 100,
-        }),
+      this.prisma.desktopDependency.findMany({
+        where: { workspaceId, desktopAppId },
+        select: {
+          id: true,
+          ecosystem: true,
+          manifestPath: true,
+          name: true,
+          currentVersion: true,
+          latestVersion: true,
+          direct: true,
+          riskStatus: true,
+          severity: true,
+          advisoryIds: true,
+        },
+        orderBy: { updatedAt: 'desc' },
+        take: 100,
+      }),
 
-        this.prisma.desktopSecurityFinding.findMany({
-          where: { workspaceId, desktopAppId },
-          select: {
-            id: true,
-            findingKey: true,
-            type: true,
-            status: true,
-            severity: true,
-            title: true,
-            message: true,
-            sourcePath: true,
-            evidence: true,
-          },
-          orderBy: { updatedAt: 'desc' },
-          take: 100,
-        }),
+      this.prisma.desktopSecurityFinding.findMany({
+        where: { workspaceId, desktopAppId },
+        select: {
+          id: true,
+          findingKey: true,
+          type: true,
+          status: true,
+          severity: true,
+          title: true,
+          message: true,
+          sourcePath: true,
+          evidence: true,
+        },
+        orderBy: { updatedAt: 'desc' },
+        take: 100,
+      }),
 
-        this.prisma.desktopAlertIncident.findMany({
-          where: { workspaceId, desktopAppId },
-          select: {
-            id: true,
-            status: true,
-            title: true,
-            message: true,
-            actualValue: true,
-            threshold: true,
-            version: true,
-            buildId: true,
-            triggeredAt: true,
-            resolvedAt: true,
-          },
-          orderBy: { triggeredAt: 'desc' },
-          take: 20,
-        }),
-      ]);
+      this.prisma.desktopAlertIncident.findMany({
+        where: { workspaceId, desktopAppId },
+        select: {
+          id: true,
+          status: true,
+          title: true,
+          message: true,
+          actualValue: true,
+          threshold: true,
+          version: true,
+          buildId: true,
+          triggeredAt: true,
+          resolvedAt: true,
+        },
+        orderBy: { triggeredAt: 'desc' },
+        take: 20,
+      }),
+    ]);
 
     if (options.buildId && builds.length === 0) {
       throw new NotFoundException('Desktop build not found.');
@@ -1901,10 +1681,7 @@ import { ConfiguredDesktopAnalysisProvider } from '../analysis/desktop-analysis.
 import { AnalyzeDesktopAppDto } from '../dto/desktop-analysis.dto';
 import { DesktopAnalysisContextService } from './desktop-analysis-context.service';
 import { BadGatewayException, Injectable } from '@nestjs/common';
-import {
-  DesktopAnalysisConfidence,
-  Prisma,
-} from 'src/generated/prisma/client';
+import { DesktopAnalysisConfidence, Prisma } from 'src/generated/prisma/client';
 
 @Injectable()
 export class DesktopAnalysisService {
@@ -1926,12 +1703,7 @@ export class DesktopAnalysisService {
     this.provider = provider;
   }
 
-  async analyze(
-    workspaceId: string,
-    desktopAppId: string,
-    userId: string,
-    dto: AnalyzeDesktopAppDto,
-  ) {
+  async analyze(workspaceId: string, desktopAppId: string, userId: string, dto: AnalyzeDesktopAppDto) {
     const context = await this.context.build(workspaceId, desktopAppId, {
       buildId: dto.buildId,
       releaseId: dto.releaseId,
@@ -1940,10 +1712,7 @@ export class DesktopAnalysisService {
 
     const evidence = this.evidence(context, workspaceId, desktopAppId);
 
-    const confidence =
-      evidence.length >= 2
-        ? DesktopAnalysisConfidence.SUPPORTED
-        : DesktopAnalysisConfidence.LIMITED;
+    const confidence = evidence.length >= 2 ? DesktopAnalysisConfidence.SUPPORTED : DesktopAnalysisConfidence.LIMITED;
 
     const system = `
 You analyze desktop engineering data from SaaS Command Center.
@@ -1986,9 +1755,7 @@ Rules:
     try {
       answer = await this.provider.analyze({ system, prompt });
     } catch {
-      throw new BadGatewayException(
-        'Desktop AI analysis is temporarily unavailable.',
-      );
+      throw new BadGatewayException('Desktop AI analysis is temporarily unavailable.');
     }
 
     answer = this.ensureGroundingSections(answer);
@@ -2016,11 +1783,7 @@ Rules:
     };
   }
 
-  private evidence(
-    context: Awaited<ReturnType<DesktopAnalysisContextService['build']>>,
-    workspaceId: string,
-    desktopAppId: string,
-  ): DesktopAnalysisEvidence[] {
+  private evidence(context: Awaited<ReturnType<DesktopAnalysisContextService['build']>>, workspaceId: string, desktopAppId: string): DesktopAnalysisEvidence[] {
     const evidence: DesktopAnalysisEvidence[] = [];
 
     if (context.repository) {
@@ -2088,9 +1851,7 @@ Rules:
       });
     }
 
-    for (const dependency of context.dependencies
-      .filter((item) => item.riskStatus !== 'CURRENT')
-      .slice(0, 10)) {
+    for (const dependency of context.dependencies.filter((item) => item.riskStatus !== 'CURRENT').slice(0, 10)) {
       evidence.push({
         type: 'DEPENDENCY',
         id: dependency.id,
@@ -2099,9 +1860,7 @@ Rules:
       });
     }
 
-    for (const finding of context.securityFindings
-      .filter((item) => item.status !== 'PASS')
-      .slice(0, 10)) {
+    for (const finding of context.securityFindings.filter((item) => item.status !== 'PASS').slice(0, 10)) {
       evidence.push({
         type: 'SECURITY',
         id: finding.id,
@@ -2171,15 +1930,7 @@ import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.gu
 import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
 import { AnalyzeDesktopAppDto } from '../dto/desktop-analysis.dto';
 import { DesktopAnalysisService } from '../services/desktop-analysis.service';
-import {
-  Body,
-  Controller,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { WorkspaceRole } from 'src/generated/prisma/enums';
@@ -2196,27 +1947,17 @@ export class DesktopAnalysisController {
   constructor(private readonly service: DesktopAnalysisService) {}
 
   @Post()
-  @WorkspaceRoles(
-    WorkspaceRole.OWNER,
-    WorkspaceRole.ADMIN,
-    WorkspaceRole.DEVELOPER,
-  )
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
   analyze(
     @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
     @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
     @Req() request: AuthenticatedRequest,
     @Body() dto: AnalyzeDesktopAppDto,
   ) {
-    return this.service.analyze(
-      workspaceId,
-      desktopAppId,
-      request.user.id,
-      dto,
-    );
+    return this.service.analyze(workspaceId, desktopAppId, request.user.id, dto);
   }
 }
 ```
-
 
 ---
 
@@ -2233,11 +1974,7 @@ packages/shared-types/src/desktop-apps/desktop-app.types.ts
 ```
 
 ```ts
-export type DesktopWorkspaceRole =
-  | 'OWNER'
-  | 'ADMIN'
-  | 'DEVELOPER'
-  | 'VIEWER';
+export type DesktopWorkspaceRole = 'OWNER' | 'ADMIN' | 'DEVELOPER' | 'VIEWER';
 
 export interface DesktopPermissions {
   role: DesktopWorkspaceRole;
@@ -2269,10 +2006,7 @@ import { WorkspaceRole } from 'src/generated/prisma/enums';
 export class DesktopPermissionsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async get(
-    workspaceId: string,
-    userId: string,
-  ): Promise<DesktopPermissions> {
+  async get(workspaceId: string, userId: string): Promise<DesktopPermissions> {
     const membership = await this.prisma.workspaceMember.findFirst({
       where: {
         workspaceId,
@@ -2287,14 +2021,9 @@ export class DesktopPermissionsService {
       throw new ForbiddenException('Workspace access denied.');
     }
 
-    const canWrite =
-      membership.role === WorkspaceRole.OWNER ||
-      membership.role === WorkspaceRole.ADMIN ||
-      membership.role === WorkspaceRole.DEVELOPER;
+    const canWrite = membership.role === WorkspaceRole.OWNER || membership.role === WorkspaceRole.ADMIN || membership.role === WorkspaceRole.DEVELOPER;
 
-    const canManage =
-      membership.role === WorkspaceRole.OWNER ||
-      membership.role === WorkspaceRole.ADMIN;
+    const canManage = membership.role === WorkspaceRole.OWNER || membership.role === WorkspaceRole.ADMIN;
 
     return {
       role: membership.role,
@@ -2346,11 +2075,7 @@ export class DesktopResourceScopeService {
     return value;
   }
 
-  async build(
-    workspaceId: string,
-    desktopAppId: string,
-    buildId: string,
-  ) {
+  async build(workspaceId: string, desktopAppId: string, buildId: string) {
     const value = await this.prisma.desktopBuild.findFirst({
       where: {
         id: buildId,
@@ -2366,11 +2091,7 @@ export class DesktopResourceScopeService {
     return value;
   }
 
-  async artifact(
-    workspaceId: string,
-    desktopAppId: string,
-    artifactId: string,
-  ) {
+  async artifact(workspaceId: string, desktopAppId: string, artifactId: string) {
     const value = await this.prisma.desktopBuildArtifact.findFirst({
       where: {
         id: artifactId,
@@ -2388,11 +2109,7 @@ export class DesktopResourceScopeService {
     return value;
   }
 
-  async testRun(
-    workspaceId: string,
-    desktopAppId: string,
-    testRunId: string,
-  ) {
+  async testRun(workspaceId: string, desktopAppId: string, testRunId: string) {
     const value = await this.prisma.desktopTestRun.findFirst({
       where: {
         id: testRunId,
@@ -2408,11 +2125,7 @@ export class DesktopResourceScopeService {
     return value;
   }
 
-  async release(
-    workspaceId: string,
-    desktopAppId: string,
-    releaseId: string,
-  ) {
+  async release(workspaceId: string, desktopAppId: string, releaseId: string) {
     const value = await this.prisma.desktopRelease.findFirst({
       where: {
         id: releaseId,
@@ -2428,11 +2141,7 @@ export class DesktopResourceScopeService {
     return value;
   }
 
-  async telemetryIntegration(
-    workspaceId: string,
-    desktopAppId: string,
-    integrationId: string,
-  ) {
+  async telemetryIntegration(workspaceId: string, desktopAppId: string, integrationId: string) {
     const value = await this.prisma.desktopTelemetryIntegration.findFirst({
       where: {
         id: integrationId,
@@ -2448,11 +2157,7 @@ export class DesktopResourceScopeService {
     return value;
   }
 
-  async crash(
-    workspaceId: string,
-    desktopAppId: string,
-    crashId: string,
-  ) {
+  async crash(workspaceId: string, desktopAppId: string, crashId: string) {
     const value = await this.prisma.desktopCrash.findFirst({
       where: {
         id: crashId,
@@ -2468,11 +2173,7 @@ export class DesktopResourceScopeService {
     return value;
   }
 
-  async dependency(
-    workspaceId: string,
-    desktopAppId: string,
-    dependencyId: string,
-  ) {
+  async dependency(workspaceId: string, desktopAppId: string, dependencyId: string) {
     const value = await this.prisma.desktopDependency.findFirst({
       where: {
         id: dependencyId,
@@ -2488,11 +2189,7 @@ export class DesktopResourceScopeService {
     return value;
   }
 
-  async securityFinding(
-    workspaceId: string,
-    desktopAppId: string,
-    findingId: string,
-  ) {
+  async securityFinding(workspaceId: string, desktopAppId: string, findingId: string) {
     const value = await this.prisma.desktopSecurityFinding.findFirst({
       where: {
         id: findingId,
@@ -2508,11 +2205,7 @@ export class DesktopResourceScopeService {
     return value;
   }
 
-  async alertRule(
-    workspaceId: string,
-    desktopAppId: string,
-    ruleId: string,
-  ) {
+  async alertRule(workspaceId: string, desktopAppId: string, ruleId: string) {
     const value = await this.prisma.desktopAlertRule.findFirst({
       where: {
         id: ruleId,
@@ -2528,11 +2221,7 @@ export class DesktopResourceScopeService {
     return value;
   }
 
-  async alertIncident(
-    workspaceId: string,
-    desktopAppId: string,
-    incidentId: string,
-  ) {
+  async alertIncident(workspaceId: string, desktopAppId: string, incidentId: string) {
     const value = await this.prisma.desktopAlertIncident.findFirst({
       where: {
         id: incidentId,
@@ -2548,11 +2237,7 @@ export class DesktopResourceScopeService {
     return value;
   }
 
-  async analysis(
-    workspaceId: string,
-    desktopAppId: string,
-    analysisId: string,
-  ) {
+  async analysis(workspaceId: string, desktopAppId: string, analysisId: string) {
     const value = await this.prisma.desktopAiAnalysis.findFirst({
       where: {
         id: analysisId,
@@ -2588,14 +2273,7 @@ import { WorkspaceRoles } from '../../workspace/decorators/workspace-roles.decor
 import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
 import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
 import { DesktopPermissionsService } from '../security/desktop-permissions.service';
-import {
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Param, ParseUUIDPipe, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { WorkspaceRole } from 'src/generated/prisma/enums';
@@ -2612,12 +2290,7 @@ export class DesktopSecurityController {
   constructor(private readonly permissions: DesktopPermissionsService) {}
 
   @Get('permissions')
-  @WorkspaceRoles(
-    WorkspaceRole.OWNER,
-    WorkspaceRole.ADMIN,
-    WorkspaceRole.DEVELOPER,
-    WorkspaceRole.VIEWER,
-  )
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER, WorkspaceRole.VIEWER)
   getPermissions(
     @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
     @Param('desktopAppId', ParseUUIDPipe) _desktopAppId: string,
@@ -2800,104 +2473,54 @@ import type {
 Then append:
 
 ```ts
-export function listDesktopAlertRules(
-  workspaceId: string,
-  desktopAppId: string,
-) {
-  return apiRequest<DesktopAlertRule[]>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/alerts/rules`,
-  );
+export function listDesktopAlertRules(workspaceId: string, desktopAppId: string) {
+  return apiRequest<DesktopAlertRule[]>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/alerts/rules`);
 }
 
-export function createDesktopAlertRule(
-  workspaceId: string,
-  desktopAppId: string,
-  input: CreateDesktopAlertRuleInput,
-) {
-  return apiRequest<DesktopAlertRule>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/alerts/rules`,
-    {
-      method: 'POST',
-      body: input,
-    },
-  );
+export function createDesktopAlertRule(workspaceId: string, desktopAppId: string, input: CreateDesktopAlertRuleInput) {
+  return apiRequest<DesktopAlertRule>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/alerts/rules`, {
+    method: 'POST',
+    body: input,
+  });
 }
 
-export function updateDesktopAlertRule(
-  workspaceId: string,
-  desktopAppId: string,
-  ruleId: string,
-  input: UpdateDesktopAlertRuleInput,
-) {
-  return apiRequest<DesktopAlertRule>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/alerts/rules/${ruleId}`,
-    {
-      method: 'PATCH',
-      body: input,
-    },
-  );
+export function updateDesktopAlertRule(workspaceId: string, desktopAppId: string, ruleId: string, input: UpdateDesktopAlertRuleInput) {
+  return apiRequest<DesktopAlertRule>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/alerts/rules/${ruleId}`, {
+    method: 'PATCH',
+    body: input,
+  });
 }
 
-export function deleteDesktopAlertRule(
-  workspaceId: string,
-  desktopAppId: string,
-  ruleId: string,
-) {
-  return apiRequest<{ success: true }>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/alerts/rules/${ruleId}`,
-    {
-      method: 'DELETE',
-    },
-  );
+export function deleteDesktopAlertRule(workspaceId: string, desktopAppId: string, ruleId: string) {
+  return apiRequest<{ success: true }>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/alerts/rules/${ruleId}`, {
+    method: 'DELETE',
+  });
 }
 
-export function listDesktopAlertIncidents(
-  workspaceId: string,
-  desktopAppId: string,
-) {
-  return apiRequest<DesktopAlertIncident[]>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/alerts/incidents`,
-  );
+export function listDesktopAlertIncidents(workspaceId: string, desktopAppId: string) {
+  return apiRequest<DesktopAlertIncident[]>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/alerts/incidents`);
 }
 
-export function evaluateDesktopAlerts(
-  workspaceId: string,
-  desktopAppId: string,
-) {
+export function evaluateDesktopAlerts(workspaceId: string, desktopAppId: string) {
   return apiRequest<{
     rulesEvaluated: number;
     triggered: number;
     resolved: number;
     unchanged: number;
-  }>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/alerts/evaluate`,
-    {
-      method: 'POST',
-    },
-  );
+  }>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/alerts/evaluate`, {
+    method: 'POST',
+  });
 }
 
-export function analyzeDesktopApplication(
-  workspaceId: string,
-  desktopAppId: string,
-  input: AnalyzeDesktopAppInput,
-) {
-  return apiRequest<DesktopAnalysisResult>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/analysis`,
-    {
-      method: 'POST',
-      body: input,
-    },
-  );
+export function analyzeDesktopApplication(workspaceId: string, desktopAppId: string, input: AnalyzeDesktopAppInput) {
+  return apiRequest<DesktopAnalysisResult>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/analysis`, {
+    method: 'POST',
+    body: input,
+  });
 }
 
-export function getDesktopPermissions(
-  workspaceId: string,
-  desktopAppId: string,
-) {
-  return apiRequest<DesktopPermissions>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/permissions`,
-  );
+export function getDesktopPermissions(workspaceId: string, desktopAppId: string) {
+  return apiRequest<DesktopPermissions>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/permissions`);
 }
 ```
 
@@ -2917,12 +2540,7 @@ apps/web/src/features/desktop-apps/desktop-permission-gate.tsx
 import type { DesktopPermissions } from '@command-center/shared-types';
 import type { ReactNode } from 'react';
 
-type DesktopPermissionRequirement =
-  | 'read'
-  | 'write'
-  | 'manage'
-  | 'analyze'
-  | 'secrets';
+type DesktopPermissionRequirement = 'read' | 'write' | 'manage' | 'analyze' | 'secrets';
 
 interface Props {
   permissions: DesktopPermissions | null;
@@ -2931,10 +2549,7 @@ interface Props {
   fallback?: ReactNode;
 }
 
-function allowed(
-  permissions: DesktopPermissions,
-  requirement: DesktopPermissionRequirement,
-) {
+function allowed(permissions: DesktopPermissions, requirement: DesktopPermissionRequirement) {
   switch (requirement) {
     case 'read':
       return permissions.canRead;
@@ -2949,12 +2564,7 @@ function allowed(
   }
 }
 
-export function DesktopPermissionGate({
-  permissions,
-  require,
-  children,
-  fallback = null,
-}: Props) {
+export function DesktopPermissionGate({ permissions, require, children, fallback = null }: Props) {
   if (!permissions || !allowed(permissions, require)) {
     return <>{fallback}</>;
   }
@@ -2989,12 +2599,7 @@ import {
 } from './desktop-apps-api';
 import { DesktopPermissionGate } from './desktop-permission-gate';
 import { getErrorMessage } from '@/features/lib/api/api-error';
-import type {
-  DesktopAlertIncident,
-  DesktopAlertRule,
-  DesktopAlertRuleType,
-  DesktopPermissions,
-} from '@command-center/shared-types';
+import type { DesktopAlertIncident, DesktopAlertRule, DesktopAlertRuleType, DesktopPermissions } from '@command-center/shared-types';
 import { BellRing, RefreshCcw, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -3060,9 +2665,7 @@ const TYPES: Array<{
 ];
 
 function incidentTone(status: DesktopAlertIncident['status']) {
-  return status === 'OPEN'
-    ? 'border-red-200 bg-red-50 text-red-800'
-    : 'border-emerald-200 bg-emerald-50 text-emerald-800';
+  return status === 'OPEN' ? 'border-red-200 bg-red-50 text-red-800' : 'border-emerald-200 bg-emerald-50 text-emerald-800';
 }
 
 export function DesktopAlerts({ workspaceId, desktopAppId }: Props) {
@@ -3078,10 +2681,7 @@ export function DesktopAlerts({ workspaceId, desktopAppId }: Props) {
   const [threshold, setThreshold] = useState('2');
   const [cooldownMinutes, setCooldownMinutes] = useState('60');
 
-  const selected = useMemo(
-    () => TYPES.find((candidate) => candidate.value === type) ?? TYPES[0],
-    [type],
-  );
+  const selected = useMemo(() => TYPES.find((candidate) => candidate.value === type) ?? TYPES[0], [type]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -3147,12 +2747,7 @@ export function DesktopAlerts({ workspaceId, desktopAppId }: Props) {
     setError(null);
 
     try {
-      await updateDesktopAlertRule(
-        workspaceId,
-        desktopAppId,
-        rule.id,
-        { enabled },
-      );
+      await updateDesktopAlertRule(workspaceId, desktopAppId, rule.id, { enabled });
       await load();
     } catch (updateError) {
       setError(getErrorMessage(updateError));
@@ -3186,10 +2781,7 @@ export function DesktopAlerts({ workspaceId, desktopAppId }: Props) {
 
   if (loading) {
     return (
-      <div
-        className='rounded-2xl border bg-white p-6 text-sm text-slate-500'
-        data-testid='desktop-alerts-loading'
-      >
+      <div className='rounded-2xl border bg-white p-6 text-sm text-slate-500' data-testid='desktop-alerts-loading'>
         Loading desktop alerts…
       </div>
     );
@@ -3203,9 +2795,7 @@ export function DesktopAlerts({ workspaceId, desktopAppId }: Props) {
             <BellRing className='size-5' aria-hidden='true' />
             <h1 className='text-xl font-semibold'>Desktop Alerts</h1>
           </div>
-          <p className='mt-1 text-sm text-slate-500'>
-            Build, runtime, release, signing, and telemetry alert rules.
-          </p>
+          <p className='mt-1 text-sm text-slate-500'>Build, runtime, release, signing, and telemetry alert rules.</p>
         </div>
 
         <DesktopPermissionGate permissions={permissions} require='write'>
@@ -3222,10 +2812,7 @@ export function DesktopAlerts({ workspaceId, desktopAppId }: Props) {
       </div>
 
       {error ? (
-        <div
-          role='alert'
-          className='rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800'
-        >
+        <div role='alert' className='rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800'>
           {error}
         </div>
       ) : null}
@@ -3237,12 +2824,7 @@ export function DesktopAlerts({ workspaceId, desktopAppId }: Props) {
           <div className='mt-4 grid gap-3 lg:grid-cols-4'>
             <label className='space-y-1 text-sm'>
               <span>Name</span>
-              <input
-                aria-label='Alert name'
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                className='h-10 w-full rounded-lg border px-3'
-              />
+              <input aria-label='Alert name' value={name} onChange={(event) => setName(event.target.value)} className='h-10 w-full rounded-lg border px-3' />
             </label>
 
             <label className='space-y-1 text-sm'>
@@ -3314,10 +2896,7 @@ export function DesktopAlerts({ workspaceId, desktopAppId }: Props) {
         ) : (
           <div className='mt-4 divide-y'>
             {rules.map((rule) => (
-              <div
-                key={rule.id}
-                className='flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between'
-              >
+              <div key={rule.id} className='flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between'>
                 <div>
                   <p className='font-medium'>{rule.name}</p>
                   <p className='text-sm text-slate-500'>
@@ -3366,22 +2945,14 @@ export function DesktopAlerts({ workspaceId, desktopAppId }: Props) {
             {incidents.map((incident) => (
               <article key={incident.id} className='rounded-xl border p-4'>
                 <div className='flex flex-wrap items-center gap-2'>
-                  <span
-                    className={`rounded-full border px-2 py-0.5 text-xs font-medium ${incidentTone(
-                      incident.status,
-                    )}`}
-                  >
-                    {incident.status}
-                  </span>
+                  <span className={`rounded-full border px-2 py-0.5 text-xs font-medium ${incidentTone(incident.status)}`}>{incident.status}</span>
                   <span className='font-medium'>{incident.title}</span>
                 </div>
 
                 <p className='mt-2 text-sm text-slate-600'>{incident.message}</p>
                 <p className='mt-2 text-xs text-slate-400'>
                   Triggered {new Date(incident.triggeredAt).toLocaleString()}
-                  {incident.resolvedAt
-                    ? ` · resolved ${new Date(incident.resolvedAt).toLocaleString()}`
-                    : ''}
+                  {incident.resolvedAt ? ` · resolved ${new Date(incident.resolvedAt).toLocaleString()}` : ''}
                 </p>
               </article>
             ))}
@@ -3406,17 +2977,10 @@ apps/web/src/features/desktop-apps/desktop-analysis-panel.tsx
 ```tsx
 'use client';
 
-import {
-  analyzeDesktopApplication,
-  getDesktopPermissions,
-} from './desktop-apps-api';
+import { analyzeDesktopApplication, getDesktopPermissions } from './desktop-apps-api';
 import { DesktopPermissionGate } from './desktop-permission-gate';
 import { getErrorMessage } from '@/features/lib/api/api-error';
-import type {
-  DesktopAnalysisResult,
-  DesktopAnalysisAction,
-  DesktopPermissions,
-} from '@command-center/shared-types';
+import type { DesktopAnalysisResult, DesktopAnalysisAction, DesktopPermissions } from '@command-center/shared-types';
 import { Bot, ExternalLink } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -3442,13 +3006,7 @@ const ACTIONS: Array<{
   { value: 'CUSTOM', label: 'Ask a custom question' },
 ];
 
-export function DesktopAnalysisPanel({
-  workspaceId,
-  desktopAppId,
-  buildId,
-  releaseId,
-  crashId,
-}: Props) {
+export function DesktopAnalysisPanel({ workspaceId, desktopAppId, buildId, releaseId, crashId }: Props) {
   const [permissions, setPermissions] = useState<DesktopPermissions | null>(null);
   const [action, setAction] = useState<DesktopAnalysisAction>('RELEASE_HEALTH');
   const [question, setQuestion] = useState('');
@@ -3481,17 +3039,13 @@ export function DesktopAnalysisPanel({
     setError(null);
 
     try {
-      const result = await analyzeDesktopApplication(
-        workspaceId,
-        desktopAppId,
-        {
-          action,
-          question: question.trim() || undefined,
-          buildId,
-          releaseId,
-          crashId,
-        },
-      );
+      const result = await analyzeDesktopApplication(workspaceId, desktopAppId, {
+        action,
+        question: question.trim() || undefined,
+        buildId,
+        releaseId,
+        crashId,
+      });
 
       setAnalysis(result);
     } catch (runError) {
@@ -3507,17 +3061,12 @@ export function DesktopAnalysisPanel({
         <Bot className='size-5' aria-hidden='true' />
         <div>
           <h2 className='font-semibold'>AI Desktop Analysis</h2>
-          <p className='text-sm text-slate-500'>
-            Evidence-grounded analysis from your desktop engineering data.
-          </p>
+          <p className='text-sm text-slate-500'>Evidence-grounded analysis from your desktop engineering data.</p>
         </div>
       </div>
 
       {error ? (
-        <div
-          role='alert'
-          className='mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800'
-        >
+        <div role='alert' className='mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800'>
           {error}
         </div>
       ) : null}
@@ -3525,13 +3074,7 @@ export function DesktopAnalysisPanel({
       <DesktopPermissionGate
         permissions={permissions}
         require='analyze'
-        fallback={
-          permissions ? (
-            <p className='mt-4 text-sm text-slate-500'>
-              Your workspace role has read-only access to AI analysis.
-            </p>
-          ) : null
-        }
+        fallback={permissions ? <p className='mt-4 text-sm text-slate-500'>Your workspace role has read-only access to AI analysis.</p> : null}
       >
         <div className='mt-4 grid gap-3 md:grid-cols-[280px_1fr]'>
           <label className='space-y-1 text-sm'>
@@ -3539,9 +3082,7 @@ export function DesktopAnalysisPanel({
             <select
               aria-label='Analysis action'
               value={action}
-              onChange={(event) =>
-                setAction(event.target.value as DesktopAnalysisAction)
-              }
+              onChange={(event) => setAction(event.target.value as DesktopAnalysisAction)}
               className='h-10 w-full rounded-lg border px-3'
             >
               {ACTIONS.map((item) => (
@@ -3577,39 +3118,27 @@ export function DesktopAnalysisPanel({
       {analysis ? (
         <div className='mt-5 space-y-4'>
           <div className='flex items-center gap-2 text-sm'>
-            <span className='rounded-full border px-2 py-0.5'>
-              {analysis.confidence}
-            </span>
+            <span className='rounded-full border px-2 py-0.5'>{analysis.confidence}</span>
             <span className='text-slate-500'>{analysis.action}</span>
           </div>
 
-          <pre className='whitespace-pre-wrap rounded-xl bg-slate-950 p-4 text-sm leading-6 text-slate-100'>
-            {analysis.answer}
-          </pre>
+          <pre className='whitespace-pre-wrap rounded-xl bg-slate-950 p-4 text-sm leading-6 text-slate-100'>{analysis.answer}</pre>
 
           <div>
             <h3 className='text-sm font-semibold'>Evidence</h3>
             {analysis.evidence.length === 0 ? (
-              <p className='mt-2 text-sm text-slate-500'>
-                No evidence references were available.
-              </p>
+              <p className='mt-2 text-sm text-slate-500'>No evidence references were available.</p>
             ) : (
               <ul className='mt-2 space-y-2'>
                 {analysis.evidence.map((item) => (
-                  <li
-                    key={`${item.type}:${item.id}`}
-                    className='flex items-center justify-between gap-3 rounded-lg border px-3 py-2 text-sm'
-                  >
+                  <li key={`${item.type}:${item.id}`} className='flex items-center justify-between gap-3 rounded-lg border px-3 py-2 text-sm'>
                     <span>
                       <span className='font-medium'>{item.type}</span>
                       <span className='ml-2 text-slate-500'>{item.label}</span>
                     </span>
 
                     {item.href ? (
-                      <a
-                        href={item.href}
-                        className='inline-flex items-center gap-1 text-xs font-medium underline'
-                      >
+                      <a href={item.href} className='inline-flex items-center gap-1 text-xs font-medium underline'>
                         Open
                         <ExternalLink className='size-3' aria-hidden='true' />
                       </a>
@@ -3652,10 +3181,7 @@ export default async function DesktopAlertsPage({ params }: Props) {
 
   return (
     <div className='space-y-6'>
-      <DesktopAppSubNav
-        workspaceId={workspaceId}
-        desktopAppId={desktopAppId}
-      />
+      <DesktopAppSubNav workspaceId={workspaceId} desktopAppId={desktopAppId} />
 
       <DesktopAlerts workspaceId={workspaceId} desktopAppId={desktopAppId} />
     </div>
@@ -3682,10 +3208,7 @@ import { DesktopAnalysisPanel } from '@/features/desktop-apps/desktop-analysis-p
 Then, after the existing overview component inside the page body, mount:
 
 ```tsx
-<DesktopAnalysisPanel
-  workspaceId={workspaceId}
-  desktopAppId={desktopAppId}
-/>
+<DesktopAnalysisPanel workspaceId={workspaceId} desktopAppId={desktopAppId} />
 ```
 
 This keeps Phase 6 intact and adds the Phase 16 action panel below the real overview data.
@@ -3767,22 +3290,14 @@ import {
 } from 'src/generated/prisma/enums';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
-import {
-  API,
-  createDesktopApp,
-  createRepository,
-} from './helpers/desktop-test-fixtures';
+import { API, createDesktopApp, createRepository } from './helpers/desktop-test-fixtures';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
 
 function alertsPath(workspaceId: string, desktopAppId: string) {
   return `${API}/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/alerts`;
 }
 
-async function createTelemetry(
-  prisma: PrismaService,
-  workspaceId: string,
-  desktopAppId: string,
-) {
+async function createTelemetry(prisma: PrismaService, workspaceId: string, desktopAppId: string) {
   return prisma.desktopTelemetryIntegration.create({
     data: {
       workspaceId,
@@ -3816,11 +3331,7 @@ describe('Desktop Alerts E2E', () => {
   it('does not create an incident below a crash-rate threshold', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
     const desktop = await createDesktopApp(owner);
-    const telemetry = await createTelemetry(
-      prisma,
-      owner.workspaceId,
-      desktop.id,
-    );
+    const telemetry = await createTelemetry(prisma, owner.workspaceId, desktop.id);
 
     await owner.agent
       .post(`${alertsPath(owner.workspaceId, desktop.id)}/rules`)
@@ -3862,11 +3373,7 @@ describe('Desktop Alerts E2E', () => {
   it('creates one incident above threshold and does not spam duplicates', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
     const desktop = await createDesktopApp(owner);
-    const telemetry = await createTelemetry(
-      prisma,
-      owner.workspaceId,
-      desktop.id,
-    );
+    const telemetry = await createTelemetry(prisma, owner.workspaceId, desktop.id);
 
     await owner.agent
       .post(`${alertsPath(owner.workspaceId, desktop.id)}/rules`)
@@ -3913,11 +3420,7 @@ describe('Desktop Alerts E2E', () => {
   it('resolves an open incident after the metric recovers', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
     const desktop = await createDesktopApp(owner);
-    const telemetry = await createTelemetry(
-      prisma,
-      owner.workspaceId,
-      desktop.id,
-    );
+    const telemetry = await createTelemetry(prisma, owner.workspaceId, desktop.id);
 
     await owner.agent
       .post(`${alertsPath(owner.workspaceId, desktop.id)}/rules`)
@@ -3979,11 +3482,7 @@ describe('Desktop Alerts E2E', () => {
   it('does not evaluate a disabled rule', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
     const desktop = await createDesktopApp(owner);
-    const telemetry = await createTelemetry(
-      prisma,
-      owner.workspaceId,
-      desktop.id,
-    );
+    const telemetry = await createTelemetry(prisma, owner.workspaceId, desktop.id);
 
     await owner.agent
       .post(`${alertsPath(owner.workspaceId, desktop.id)}/rules`)
@@ -4022,11 +3521,7 @@ describe('Desktop Alerts E2E', () => {
   it('creates a failed-build alert', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
     const desktop = await createDesktopApp(owner);
-    const repository = await createRepository(
-      prisma,
-      owner.workspaceId,
-      desktop.applicationId,
-    );
+    const repository = await createRepository(prisma, owner.workspaceId, desktop.applicationId);
 
     await owner.agent
       .post(`${alertsPath(owner.workspaceId, desktop.id)}/rules`)
@@ -4166,9 +3661,7 @@ describe('DesktopSecretSanitizerService', () => {
   });
 
   it('redacts bearer-like values embedded in strings', () => {
-    expect(
-      service.sanitize('Authorization: Bearer abc.def.secret'),
-    ).toContain('[REDACTED]');
+    expect(service.sanitize('Authorization: Bearer abc.def.secret')).toContain('[REDACTED]');
   });
 });
 ```
@@ -4191,11 +3684,7 @@ import { DesktopAnalysisService } from 'src/modules/desktop-apps/services/deskto
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
-import {
-  API,
-  createDesktopApp,
-  createRepository,
-} from './helpers/desktop-test-fixtures';
+import { API, createDesktopApp, createRepository } from './helpers/desktop-test-fixtures';
 
 class FakeDesktopAnalysisProvider implements DesktopAnalysisProvider {
   calls: Array<{ system: string; prompt: string }> = [];
@@ -4380,9 +3869,7 @@ describe('Desktop AI Analysis E2E', () => {
       .send({ action: 'CUSTOM', question: 'What happened?' })
       .expect(502);
 
-    expect(JSON.stringify(response.body)).not.toContain(
-      'provider leaked internal detail',
-    );
+    expect(JSON.stringify(response.body)).not.toContain('provider leaked internal detail');
   });
 });
 ```
@@ -4405,10 +3892,7 @@ import { PrismaService } from 'src/database/prisma.service';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
-import {
-  API,
-  createDesktopApp,
-} from './helpers/desktop-test-fixtures';
+import { API, createDesktopApp } from './helpers/desktop-test-fixtures';
 import request from 'supertest';
 
 function desktopBase(workspaceId: string, desktopAppId: string) {
@@ -4477,9 +3961,7 @@ describe('Desktop Phase 17 Security E2E', () => {
     ];
 
     for (const path of paths) {
-      const response = await workspaceA.agent
-        .get(path)
-        .set('Authorization', `Bearer ${workspaceA.accessToken}`);
+      const response = await workspaceA.agent.get(path).set('Authorization', `Bearer ${workspaceA.accessToken}`);
 
       expect([403, 404]).toContain(response.status);
     }
@@ -4621,19 +4103,9 @@ describe('desktop Phase 15-17 API client', () => {
     await listDesktopAlertIncidents(W, A);
     await evaluateDesktopAlerts(W, A);
 
-    expect(mockedApiRequest).toHaveBeenNthCalledWith(
-      1,
-      `/workspaces/${W}/desktop-apps/${A}/alerts/rules`,
-    );
-    expect(mockedApiRequest).toHaveBeenNthCalledWith(
-      2,
-      `/workspaces/${W}/desktop-apps/${A}/alerts/incidents`,
-    );
-    expect(mockedApiRequest).toHaveBeenNthCalledWith(
-      3,
-      `/workspaces/${W}/desktop-apps/${A}/alerts/evaluate`,
-      { method: 'POST' },
-    );
+    expect(mockedApiRequest).toHaveBeenNthCalledWith(1, `/workspaces/${W}/desktop-apps/${A}/alerts/rules`);
+    expect(mockedApiRequest).toHaveBeenNthCalledWith(2, `/workspaces/${W}/desktop-apps/${A}/alerts/incidents`);
+    expect(mockedApiRequest).toHaveBeenNthCalledWith(3, `/workspaces/${W}/desktop-apps/${A}/alerts/evaluate`, { method: 'POST' });
   });
 
   it('creates, updates, and deletes alert rules', async () => {
@@ -4646,30 +4118,18 @@ describe('desktop Phase 15-17 API client', () => {
     await updateDesktopAlertRule(W, A, R, { enabled: false });
     await deleteDesktopAlertRule(W, A, R);
 
-    expect(mockedApiRequest).toHaveBeenNthCalledWith(
-      1,
-      `/workspaces/${W}/desktop-apps/${A}/alerts/rules`,
-      {
-        method: 'POST',
-        body: {
-          name: 'Build failed',
-          type: 'BUILD_FAILED',
-          enabled: true,
-        },
+    expect(mockedApiRequest).toHaveBeenNthCalledWith(1, `/workspaces/${W}/desktop-apps/${A}/alerts/rules`, {
+      method: 'POST',
+      body: {
+        name: 'Build failed',
+        type: 'BUILD_FAILED',
+        enabled: true,
       },
-    );
+    });
 
-    expect(mockedApiRequest).toHaveBeenNthCalledWith(
-      2,
-      `/workspaces/${W}/desktop-apps/${A}/alerts/rules/${R}`,
-      { method: 'PATCH', body: { enabled: false } },
-    );
+    expect(mockedApiRequest).toHaveBeenNthCalledWith(2, `/workspaces/${W}/desktop-apps/${A}/alerts/rules/${R}`, { method: 'PATCH', body: { enabled: false } });
 
-    expect(mockedApiRequest).toHaveBeenNthCalledWith(
-      3,
-      `/workspaces/${W}/desktop-apps/${A}/alerts/rules/${R}`,
-      { method: 'DELETE' },
-    );
+    expect(mockedApiRequest).toHaveBeenNthCalledWith(3, `/workspaces/${W}/desktop-apps/${A}/alerts/rules/${R}`, { method: 'DELETE' });
   });
 
   it('uses the AI analysis and permissions endpoints', async () => {
@@ -4679,22 +4139,15 @@ describe('desktop Phase 15-17 API client', () => {
     });
     await getDesktopPermissions(W, A);
 
-    expect(mockedApiRequest).toHaveBeenNthCalledWith(
-      1,
-      `/workspaces/${W}/desktop-apps/${A}/analysis`,
-      {
-        method: 'POST',
-        body: {
-          action: 'RELEASE_HEALTH',
-          question: 'Healthy?',
-        },
+    expect(mockedApiRequest).toHaveBeenNthCalledWith(1, `/workspaces/${W}/desktop-apps/${A}/analysis`, {
+      method: 'POST',
+      body: {
+        action: 'RELEASE_HEALTH',
+        question: 'Healthy?',
       },
-    );
+    });
 
-    expect(mockedApiRequest).toHaveBeenNthCalledWith(
-      2,
-      `/workspaces/${W}/desktop-apps/${A}/permissions`,
-    );
+    expect(mockedApiRequest).toHaveBeenNthCalledWith(2, `/workspaces/${W}/desktop-apps/${A}/permissions`);
   });
 });
 ```
@@ -4860,9 +4313,7 @@ describe('DesktopAlerts', () => {
     await screen.findByText('No desktop alert rules yet.');
 
     expect(screen.queryByText('Create alert rule')).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: 'Evaluate now' }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Evaluate now' })).not.toBeInTheDocument();
   });
 });
 ```
@@ -4932,9 +4383,7 @@ describe('DesktopAnalysisPanel', () => {
 
     render(<DesktopAnalysisPanel workspaceId={W} desktopAppId={A} />);
 
-    await waitFor(() =>
-      expect(api.getDesktopPermissions).toHaveBeenCalledWith(W, A),
-    );
+    await waitFor(() => expect(api.getDesktopPermissions).toHaveBeenCalledWith(W, A));
 
     fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
 
@@ -4955,11 +4404,7 @@ describe('DesktopAnalysisPanel', () => {
 
     render(<DesktopAnalysisPanel workspaceId={W} desktopAppId={A} />);
 
-    expect(
-      await screen.findByText(
-        'Your workspace role has read-only access to AI analysis.',
-      ),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('Your workspace role has read-only access to AI analysis.')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Analyze' })).not.toBeInTheDocument();
   });
 });
@@ -5002,12 +4447,7 @@ import {
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
-import {
-  API,
-  createDesktopApp,
-  createRepository,
-  ingestSuccessfulBuild,
-} from './helpers/desktop-test-fixtures';
+import { API, createDesktopApp, createRepository, ingestSuccessfulBuild } from './helpers/desktop-test-fixtures';
 
 class FinalDesktopAiProvider implements DesktopAnalysisProvider {
   async analyze() {
@@ -5039,9 +4479,7 @@ describe('Desktop Phase 18 full flow E2E', () => {
     process.env.NODE_ENV = 'test';
     app = await createTestApp();
     prisma = app.get(PrismaService);
-    app
-      .get(DesktopAnalysisService)
-      .setProviderForTesting(new FinalDesktopAiProvider());
+    app.get(DesktopAnalysisService).setProviderForTesting(new FinalDesktopAiProvider());
   });
 
   afterEach(async () => {
@@ -5060,18 +4498,9 @@ describe('Desktop Phase 18 full flow E2E', () => {
       currentBuildNumber: '300',
     });
 
-    const repository = await createRepository(
-      prisma,
-      owner.workspaceId,
-      desktop.applicationId,
-    );
+    const repository = await createRepository(prisma, owner.workspaceId, desktop.applicationId);
 
-    const build = await ingestSuccessfulBuild(
-      owner,
-      desktop.id,
-      repository.id,
-      'desktop-final-electron',
-    );
+    const build = await ingestSuccessfulBuild(owner, desktop.id, repository.id, 'desktop-final-electron');
 
     const artifact = await prisma.desktopBuildArtifact.create({
       data: {
@@ -5281,28 +4710,25 @@ describe('Desktop Phase 18 full flow E2E', () => {
     ['TAURI', 'WINDOWS', 'X64'],
     ['DOTNET', 'WINDOWS', 'X64'],
     ['NATIVE_MACOS', 'MACOS', 'ARM64'],
-  ] as const)(
-    'creates and reads %s desktop metadata without breaking workspace isolation',
-    async (framework, platform, architecture) => {
-      const owner = await registerWorkspaceTestUser(app, prisma);
-      const desktop = await createDesktopApp(owner, {
-        name: `${framework} Final`,
-        framework,
-        platform,
-        architecture,
-        packageName: `com.commandcenter.${framework.toLowerCase()}.final`,
-      });
+  ] as const)('creates and reads %s desktop metadata without breaking workspace isolation', async (framework, platform, architecture) => {
+    const owner = await registerWorkspaceTestUser(app, prisma);
+    const desktop = await createDesktopApp(owner, {
+      name: `${framework} Final`,
+      framework,
+      platform,
+      architecture,
+      packageName: `com.commandcenter.${framework.toLowerCase()}.final`,
+    });
 
-      const response = await owner.agent
-        .get(`${API}/workspaces/${owner.workspaceId}/desktop-apps/${desktop.id}`)
-        .set('Authorization', `Bearer ${owner.accessToken}`)
-        .expect(200);
+    const response = await owner.agent
+      .get(`${API}/workspaces/${owner.workspaceId}/desktop-apps/${desktop.id}`)
+      .set('Authorization', `Bearer ${owner.accessToken}`)
+      .expect(200);
 
-      expect(response.body.framework).toBe(framework);
-      expect(response.body.platform).toBe(platform);
-      expect(response.body.architecture).toBe(architecture);
-    },
-  );
+    expect(response.body.framework).toBe(framework);
+    expect(response.body.platform).toBe(platform);
+    expect(response.body.architecture).toBe(architecture);
+  });
 });
 ```
 
@@ -5327,15 +4753,8 @@ packages/test-code/web/e2e/full-stack/fullstack-desktop-final.spec.ts
 ```
 
 ```ts
-import {
-  authorizedApiRequest,
-  loginThroughUi,
-  uniqueValue,
-} from './fixtures/helpers';
-import {
-  readFullStackState,
-  type FullStackState,
-} from './fixtures/state';
+import { authorizedApiRequest, loginThroughUi, uniqueValue } from './fixtures/helpers';
+import { readFullStackState, type FullStackState } from './fixtures/state';
 import { expect, test, type APIRequestContext, type Route } from '@playwright/test';
 
 let state: FullStackState;
@@ -5343,24 +4762,18 @@ let state: FullStackState;
 test.describe.configure({ mode: 'serial' });
 
 async function createDesktopApp(request: APIRequestContext) {
-  const response = await authorizedApiRequest(
-    request,
-    state,
-    state.owner.accessToken,
-    `/workspaces/${state.owner.workspaceId}/desktop-apps`,
-    {
-      method: 'POST',
-      data: {
-        name: uniqueValue('Desktop Final', state.runId),
-        platform: 'CROSS_PLATFORM',
-        framework: 'ELECTRON',
-        architecture: 'X64',
-        packageName: `com.commandcenter.final.${Date.now()}`,
-        currentVersion: '3.0.0',
-        currentBuildNumber: '300',
-      },
+  const response = await authorizedApiRequest(request, state, state.owner.accessToken, `/workspaces/${state.owner.workspaceId}/desktop-apps`, {
+    method: 'POST',
+    data: {
+      name: uniqueValue('Desktop Final', state.runId),
+      platform: 'CROSS_PLATFORM',
+      framework: 'ELECTRON',
+      architecture: 'X64',
+      packageName: `com.commandcenter.final.${Date.now()}`,
+      currentVersion: '3.0.0',
+      currentBuildNumber: '300',
     },
-  );
+  });
 
   expect(response.status()).toBe(201);
   return (await response.json()) as { id: string };
@@ -5379,16 +4792,11 @@ test.describe('Desktop Phase 18 final frontend', () => {
     state = readFullStackState();
   });
 
-  test('renders Alerts with loading, empty, create, incident, and responsive navigation states', async ({
-    page,
-    request,
-  }) => {
+  test('renders Alerts with loading, empty, create, incident, and responsive navigation states', async ({ page, request }) => {
     await loginThroughUi(page, state.owner);
     const desktop = await createDesktopApp(request);
 
-    const apiBase =
-      `/api/v1/workspaces/${state.owner.workspaceId}` +
-      `/desktop-apps/${desktop.id}`;
+    const apiBase = `/api/v1/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktop.id}`;
 
     let rules: Array<Record<string, unknown>> = [];
     let incidents: Array<Record<string, unknown>> = [];
@@ -5432,9 +4840,7 @@ test.describe('Desktop Phase 18 final frontend', () => {
 
       if (method === 'PATCH' && id) {
         const input = route.request().postDataJSON() as Record<string, unknown>;
-        rules = rules.map((rule) =>
-          rule.id === id ? { ...rule, ...input } : rule,
-        );
+        rules = rules.map((rule) => (rule.id === id ? { ...rule, ...input } : rule));
         await json(route, rules[0]);
         return;
       }
@@ -5448,9 +4854,7 @@ test.describe('Desktop Phase 18 final frontend', () => {
       await route.fallback();
     });
 
-    await page.route(`**${apiBase}/alerts/incidents`, (route) =>
-      json(route, incidents),
-    );
+    await page.route(`**${apiBase}/alerts/incidents`, (route) => json(route, incidents));
 
     await page.route(`**${apiBase}/alerts/evaluate`, async (route) => {
       incidents = [
@@ -5475,17 +4879,19 @@ test.describe('Desktop Phase 18 final frontend', () => {
         },
       ];
 
-      await json(route, {
-        rulesEvaluated: 1,
-        triggered: 1,
-        resolved: 0,
-        unchanged: 0,
-      }, 201);
+      await json(
+        route,
+        {
+          rulesEvaluated: 1,
+          triggered: 1,
+          resolved: 0,
+          unchanged: 0,
+        },
+        201,
+      );
     });
 
-    await page.goto(
-      `/workspaces/${state.owner.workspaceId}/desktop-apps/${desktop.id}/alerts`,
-    );
+    await page.goto(`/workspaces/${state.owner.workspaceId}/desktop-apps/${desktop.id}/alerts`);
 
     await expect(page.getByRole('heading', { name: 'Desktop Alerts' })).toBeVisible();
     await expect(page.getByText('No desktop alert rules yet.')).toBeVisible();
@@ -5505,16 +4911,11 @@ test.describe('Desktop Phase 18 final frontend', () => {
     await expect(page.getByText('Alerts', { exact: true }).first()).toBeVisible();
   });
 
-  test('renders evidence-grounded AI analysis and never renders a secret', async ({
-    page,
-    request,
-  }) => {
+  test('renders evidence-grounded AI analysis and never renders a secret', async ({ page, request }) => {
     await loginThroughUi(page, state.owner);
     const desktop = await createDesktopApp(request);
 
-    const apiBase =
-      `/api/v1/workspaces/${state.owner.workspaceId}` +
-      `/desktop-apps/${desktop.id}`;
+    const apiBase = `/api/v1/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktop.id}`;
 
     await page.route(`**${apiBase}/permissions`, (route) =>
       json(route, {
@@ -5573,9 +4974,7 @@ test.describe('Desktop Phase 18 final frontend', () => {
       ),
     );
 
-    await page.goto(
-      `/workspaces/${state.owner.workspaceId}/desktop-apps/${desktop.id}`,
-    );
+    await page.goto(`/workspaces/${state.owner.workspaceId}/desktop-apps/${desktop.id}`);
 
     await expect(page.getByTestId('desktop-ai-panel')).toBeVisible();
     await page.getByRole('button', { name: 'Analyze' }).click();
@@ -5590,9 +4989,7 @@ test.describe('Desktop Phase 18 final frontend', () => {
     await loginThroughUi(page, state.owner);
     const desktop = await createDesktopApp(request);
 
-    const apiBase =
-      `/api/v1/workspaces/${state.owner.workspaceId}` +
-      `/desktop-apps/${desktop.id}`;
+    const apiBase = `/api/v1/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktop.id}`;
 
     await page.route(`**${apiBase}/permissions`, (route) =>
       json(route, {
@@ -5607,9 +5004,7 @@ test.describe('Desktop Phase 18 final frontend', () => {
     await page.route(`**${apiBase}/alerts/rules`, (route) => json(route, []));
     await page.route(`**${apiBase}/alerts/incidents`, (route) => json(route, []));
 
-    await page.goto(
-      `/workspaces/${state.owner.workspaceId}/desktop-apps/${desktop.id}/alerts`,
-    );
+    await page.goto(`/workspaces/${state.owner.workspaceId}/desktop-apps/${desktop.id}/alerts`);
 
     await expect(page.getByRole('heading', { name: 'Desktop Alerts' })).toBeVisible();
     await expect(page.getByText('Create alert rule')).toHaveCount(0);

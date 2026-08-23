@@ -19,6 +19,7 @@ enum ApplicationType {
   WEB
   API
   MOBILE
+  DESKTOP
   WORKER
   OTHER
 }

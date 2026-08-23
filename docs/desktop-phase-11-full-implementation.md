@@ -211,24 +211,9 @@ apps/api/src/modules/desktop-apps/dto/desktop-release.dto.ts
 ```
 
 ```ts
-import {
-  DesktopArchitecture,
-  DesktopPlatform,
-  DesktopReleaseChannel,
-  DesktopReleaseStatus,
-} from 'src/generated/prisma/enums';
-import {
-  ApiProperty,
-  ApiPropertyOptional,
-} from '@nestjs/swagger';
-import {
-  IsEnum,
-  IsOptional,
-  IsString,
-  IsUUID,
-  Length,
-  MaxLength,
-} from 'class-validator';
+import { DesktopArchitecture, DesktopPlatform, DesktopReleaseChannel, DesktopReleaseStatus } from 'src/generated/prisma/enums';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEnum, IsOptional, IsString, IsUUID, Length, MaxLength } from 'class-validator';
 
 export class CreateDesktopReleaseDto {
   @ApiProperty({
@@ -320,21 +305,9 @@ apps/api/src/modules/desktop-apps/services/desktop-releases.service.ts
 
 ```ts
 import { PrismaService } from '../../../database/prisma.service';
-import {
-  DesktopBuildStatus,
-  DesktopReleaseStatus,
-} from 'src/generated/prisma/enums';
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import type {
-  CreateDesktopReleaseDto,
-  DesktopReleaseQueryDto,
-  UpdateDesktopReleaseStatusDto,
-} from '../dto/desktop-release.dto';
+import { DesktopBuildStatus, DesktopReleaseStatus } from 'src/generated/prisma/enums';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import type { CreateDesktopReleaseDto, DesktopReleaseQueryDto, UpdateDesktopReleaseStatusDto } from '../dto/desktop-release.dto';
 import { DesktopAppsService } from './desktop-apps.service';
 import { DesktopBuildsService } from './desktop-builds.service';
 
@@ -346,52 +319,29 @@ export class DesktopReleasesService {
     private readonly desktopBuilds: DesktopBuildsService,
   ) {}
 
-  async create(
-    workspaceId: string,
-    desktopAppId: string,
-    dto: CreateDesktopReleaseDto,
-  ) {
-    const desktopApp = await this.desktopApps.findOne(
-      workspaceId,
-      desktopAppId,
-    );
+  async create(workspaceId: string, desktopAppId: string, dto: CreateDesktopReleaseDto) {
+    const desktopApp = await this.desktopApps.findOne(workspaceId, desktopAppId);
 
     if (desktopApp.application.archivedAt) {
-      throw new BadRequestException(
-        'Archived desktop applications cannot create releases.',
-      );
+      throw new BadRequestException('Archived desktop applications cannot create releases.');
     }
 
-    const build = await this.desktopBuilds.findOne(
-      workspaceId,
-      desktopAppId,
-      dto.buildId,
-    );
+    const build = await this.desktopBuilds.findOne(workspaceId, desktopAppId, dto.buildId);
 
     if (build.status !== DesktopBuildStatus.SUCCESS) {
-      throw new BadRequestException(
-        'Only successful desktop builds can be released.',
-      );
+      throw new BadRequestException('Only successful desktop builds can be released.');
     }
 
-    const version =
-      this.requiredText(dto.version) ??
-      this.requiredText(build.version);
+    const version = this.requiredText(dto.version) ?? this.requiredText(build.version);
 
     if (!version) {
-      throw new BadRequestException(
-        'Release version is required. Add a version to the build or provide one when creating the release.',
-      );
+      throw new BadRequestException('Release version is required. Add a version to the build or provide one when creating the release.');
     }
 
-    const buildNumber =
-      this.requiredText(dto.buildNumber) ??
-      this.requiredText(build.buildNumber);
+    const buildNumber = this.requiredText(dto.buildNumber) ?? this.requiredText(build.buildNumber);
 
     if (!buildNumber) {
-      throw new BadRequestException(
-        'Release build number is required. Add a build number to the build or provide one when creating the release.',
-      );
+      throw new BadRequestException('Release build number is required. Add a build number to the build or provide one when creating the release.');
     }
 
     const existing = await this.prisma.desktopRelease.findFirst({
@@ -405,9 +355,7 @@ export class DesktopReleasesService {
     });
 
     if (existing) {
-      throw new ConflictException(
-        'This desktop build already has a release for the selected update channel.',
-      );
+      throw new ConflictException('This desktop build already has a release for the selected update channel.');
     }
 
     const release = await this.prisma.desktopRelease.create({
@@ -429,11 +377,7 @@ export class DesktopReleasesService {
     return this.serialize(release);
   }
 
-  async list(
-    workspaceId: string,
-    desktopAppId: string,
-    query: DesktopReleaseQueryDto,
-  ) {
+  async list(workspaceId: string, desktopAppId: string, query: DesktopReleaseQueryDto) {
     await this.desktopApps.findOne(workspaceId, desktopAppId);
 
     const releases = await this.prisma.desktopRelease.findMany({
@@ -476,11 +420,7 @@ export class DesktopReleasesService {
     return releases.map((release) => this.serialize(release));
   }
 
-  async findOne(
-    workspaceId: string,
-    desktopAppId: string,
-    releaseId: string,
-  ) {
+  async findOne(workspaceId: string, desktopAppId: string, releaseId: string) {
     const release = await this.prisma.desktopRelease.findFirst({
       where: {
         id: releaseId,
@@ -497,12 +437,7 @@ export class DesktopReleasesService {
     return this.serialize(release);
   }
 
-  async updateStatus(
-    workspaceId: string,
-    desktopAppId: string,
-    releaseId: string,
-    dto: UpdateDesktopReleaseStatusDto,
-  ) {
+  async updateStatus(workspaceId: string, desktopAppId: string, releaseId: string, dto: UpdateDesktopReleaseStatusDto) {
     const current = await this.prisma.desktopRelease.findFirst({
       where: {
         id: releaseId,
@@ -532,10 +467,7 @@ export class DesktopReleasesService {
       },
       data: {
         status: dto.status,
-        releasedAt:
-          dto.status === DesktopReleaseStatus.PUBLISHED
-            ? current.releasedAt ?? new Date()
-            : current.releasedAt,
+        releasedAt: dto.status === DesktopReleaseStatus.PUBLISHED ? (current.releasedAt ?? new Date()) : current.releasedAt,
       },
       include: this.releaseInclude(),
     });
@@ -543,10 +475,7 @@ export class DesktopReleasesService {
     return this.serialize(updated);
   }
 
-  async getLatestPublished(
-    workspaceId: string,
-    desktopAppId: string,
-  ) {
+  async getLatestPublished(workspaceId: string, desktopAppId: string) {
     const release = await this.prisma.desktopRelease.findFirst({
       where: {
         workspaceId,
@@ -567,44 +496,26 @@ export class DesktopReleasesService {
     return release ? this.serialize(release) : null;
   }
 
-  private assertTransition(
-    current: DesktopReleaseStatus,
-    next: DesktopReleaseStatus,
-  ): void {
-    const allowed: Record<
-      DesktopReleaseStatus,
-      DesktopReleaseStatus[]
-    > = {
-      DRAFT: [
-        DesktopReleaseStatus.READY,
-        DesktopReleaseStatus.FAILED,
-      ],
-      READY: [
-        DesktopReleaseStatus.PUBLISHED,
-        DesktopReleaseStatus.FAILED,
-      ],
+  private assertTransition(current: DesktopReleaseStatus, next: DesktopReleaseStatus): void {
+    const allowed: Record<DesktopReleaseStatus, DesktopReleaseStatus[]> = {
+      DRAFT: [DesktopReleaseStatus.READY, DesktopReleaseStatus.FAILED],
+      READY: [DesktopReleaseStatus.PUBLISHED, DesktopReleaseStatus.FAILED],
       PUBLISHED: [DesktopReleaseStatus.ROLLED_BACK],
       FAILED: [],
       ROLLED_BACK: [],
     };
 
     if (!allowed[current].includes(next)) {
-      throw new BadRequestException(
-        `Invalid desktop release transition: ${current} -> ${next}`,
-      );
+      throw new BadRequestException(`Invalid desktop release transition: ${current} -> ${next}`);
     }
   }
 
-  private requiredText(
-    value: string | null | undefined,
-  ): string | null {
+  private requiredText(value: string | null | undefined): string | null {
     const normalized = value?.trim();
     return normalized ? normalized : null;
   }
 
-  private optionalText(
-    value: string | null | undefined,
-  ): string | null {
+  private optionalText(value: string | null | undefined): string | null {
     return this.requiredText(value);
   }
 
@@ -637,10 +548,7 @@ export class DesktopReleasesService {
         ...release.build,
         artifacts: release.build.artifacts.map((artifact) => ({
           ...artifact,
-          sizeBytes:
-            artifact.sizeBytes === null
-              ? null
-              : Number(artifact.sizeBytes),
+          sizeBytes: artifact.sizeBytes === null ? null : Number(artifact.sizeBytes),
         })),
       },
     };
@@ -667,44 +575,18 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { WorkspaceRoles } from '../../workspace/decorators/workspace-roles.decorator';
 import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
 import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
-import {
-  CreateDesktopReleaseDto,
-  DesktopReleaseQueryDto,
-  UpdateDesktopReleaseStatusDto,
-} from '../dto/desktop-release.dto';
+import { CreateDesktopReleaseDto, DesktopReleaseQueryDto, UpdateDesktopReleaseStatusDto } from '../dto/desktop-release.dto';
 import { DesktopReleasesService } from '../services/desktop-releases.service';
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { WorkspaceRole } from 'src/generated/prisma/enums';
 
 @ApiTags('Desktop Releases')
 @ApiBearerAuth('access-token')
-@Controller(
-  'workspaces/:workspaceId/desktop-apps/:desktopAppId/releases',
-)
-@UseGuards(
-  JwtAuthGuard,
-  WorkspaceAccessGuard,
-  WorkspaceRolesGuard,
-)
+@Controller('workspaces/:workspaceId/desktop-apps/:desktopAppId/releases')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard, WorkspaceRolesGuard)
 export class DesktopReleasesController {
-  constructor(
-    private readonly service: DesktopReleasesService,
-  ) {}
+  constructor(private readonly service: DesktopReleasesService) {}
 
   @Get()
   @ApiOperation({
@@ -720,11 +602,7 @@ export class DesktopReleasesController {
     @Query()
     query: DesktopReleaseQueryDto,
   ) {
-    return this.service.list(
-      workspaceId,
-      desktopAppId,
-      query,
-    );
+    return this.service.list(workspaceId, desktopAppId, query);
   }
 
   @Get(':releaseId')
@@ -741,19 +619,11 @@ export class DesktopReleasesController {
     @Param('releaseId', ParseUUIDPipe)
     releaseId: string,
   ) {
-    return this.service.findOne(
-      workspaceId,
-      desktopAppId,
-      releaseId,
-    );
+    return this.service.findOne(workspaceId, desktopAppId, releaseId);
   }
 
   @Post()
-  @WorkspaceRoles(
-    WorkspaceRole.OWNER,
-    WorkspaceRole.ADMIN,
-    WorkspaceRole.DEVELOPER,
-  )
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
   @ApiOperation({
     summary: 'Create a desktop release from a successful build',
   })
@@ -767,19 +637,11 @@ export class DesktopReleasesController {
     @Body()
     dto: CreateDesktopReleaseDto,
   ) {
-    return this.service.create(
-      workspaceId,
-      desktopAppId,
-      dto,
-    );
+    return this.service.create(workspaceId, desktopAppId, dto);
   }
 
   @Patch(':releaseId/status')
-  @WorkspaceRoles(
-    WorkspaceRole.OWNER,
-    WorkspaceRole.ADMIN,
-    WorkspaceRole.DEVELOPER,
-  )
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
   @ApiOperation({
     summary: 'Transition a desktop release status',
   })
@@ -796,12 +658,7 @@ export class DesktopReleasesController {
     @Body()
     dto: UpdateDesktopReleaseStatusDto,
   ) {
-    return this.service.updateStatus(
-      workspaceId,
-      desktopAppId,
-      releaseId,
-      dto,
-    );
+    return this.service.updateStatus(workspaceId, desktopAppId, releaseId, dto);
   }
 }
 ```
@@ -832,30 +689,14 @@ export class DesktopOverviewService {
     private readonly desktopReleases: DesktopReleasesService,
   ) {}
 
-  async get(
-    workspaceId: string,
-    desktopAppId: string,
-  ) {
-    const desktopApp = await this.desktopApps.findOne(
-      workspaceId,
-      desktopAppId,
-    );
+  async get(workspaceId: string, desktopAppId: string) {
+    const desktopApp = await this.desktopApps.findOne(workspaceId, desktopAppId);
 
-    const [repository, latestBuild, latestRelease] =
-      await Promise.all([
-        this.desktopRepositories.getLinkedRepository(
-          workspaceId,
-          desktopAppId,
-        ),
-        this.desktopBuilds.getLatest(
-          workspaceId,
-          desktopAppId,
-        ),
-        this.desktopReleases.getLatestPublished(
-          workspaceId,
-          desktopAppId,
-        ),
-      ]);
+    const [repository, latestBuild, latestRelease] = await Promise.all([
+      this.desktopRepositories.getLinkedRepository(workspaceId, desktopAppId),
+      this.desktopBuilds.getLatest(workspaceId, desktopAppId),
+      this.desktopReleases.getLatestPublished(workspaceId, desktopAppId),
+    ]);
 
     return {
       desktopApp,
@@ -891,12 +732,7 @@ Then add the controller/service without removing any Phase 1–10 registration:
 
 ```ts
 @Module({
-  imports: [
-    DatabaseModule,
-    WorkspaceMembersModule,
-    ActivityModule,
-    RepositoriesModule,
-  ],
+  imports: [DatabaseModule, WorkspaceMembersModule, ActivityModule, RepositoriesModule],
 
   controllers: [
     DesktopAppsController,
@@ -920,13 +756,7 @@ Then add the controller/service without removing any Phase 1–10 registration:
     DesktopOverviewService,
   ],
 
-  exports: [
-    DesktopAppsService,
-    DesktopRepositoryService,
-    DesktopBuildsService,
-    DesktopTestsService,
-    DesktopReleasesService,
-  ],
+  exports: [DesktopAppsService, DesktopRepositoryService, DesktopBuildsService, DesktopTestsService, DesktopReleasesService],
 })
 export class DesktopAppsModule {}
 ```
@@ -946,16 +776,9 @@ apps/web/src/features/desktop-apps/desktop-release-utils.ts
 ```
 
 ```ts
-import type {
-  DesktopRelease,
-  DesktopReleaseChannel,
-  DesktopReleaseStatus,
-} from '@command-center/shared-types';
+import type { DesktopRelease, DesktopReleaseChannel, DesktopReleaseStatus } from '@command-center/shared-types';
 
-export const DESKTOP_RELEASE_CHANNEL_LABELS: Record<
-  DesktopReleaseChannel,
-  string
-> = {
+export const DESKTOP_RELEASE_CHANNEL_LABELS: Record<DesktopReleaseChannel, string> = {
   DEV: 'Dev',
   ALPHA: 'Alpha',
   BETA: 'Beta',
@@ -963,10 +786,7 @@ export const DESKTOP_RELEASE_CHANNEL_LABELS: Record<
   LTS: 'LTS',
 };
 
-export const DESKTOP_RELEASE_STATUS_LABELS: Record<
-  DesktopReleaseStatus,
-  string
-> = {
+export const DESKTOP_RELEASE_STATUS_LABELS: Record<DesktopReleaseStatus, string> = {
   DRAFT: 'Draft',
   READY: 'Ready',
   PUBLISHED: 'Published',
@@ -974,9 +794,7 @@ export const DESKTOP_RELEASE_STATUS_LABELS: Record<
   ROLLED_BACK: 'Rolled Back',
 };
 
-export function nextDesktopReleaseActions(
-  status: DesktopReleaseStatus,
-): Array<{
+export function nextDesktopReleaseActions(status: DesktopReleaseStatus): Array<{
   label: string;
   status: DesktopReleaseStatus;
 }> {
@@ -1019,36 +837,17 @@ export function nextDesktopReleaseActions(
   }
 }
 
-export function formatReleaseTarget(
-  release: Pick<
-    DesktopRelease,
-    'platform' | 'architecture'
-  >,
-): string {
+export function formatReleaseTarget(release: Pick<DesktopRelease, 'platform' | 'architecture'>): string {
   const platform =
-    release.platform === 'MACOS'
-      ? 'macOS'
-      : release.platform === 'WINDOWS'
-        ? 'Windows'
-        : release.platform === 'LINUX'
-          ? 'Linux'
-          : 'Cross-platform';
+    release.platform === 'MACOS' ? 'macOS' : release.platform === 'WINDOWS' ? 'Windows' : release.platform === 'LINUX' ? 'Linux' : 'Cross-platform';
 
   const architecture =
-    release.architecture === 'ARM64'
-      ? 'arm64'
-      : release.architecture === 'X64'
-        ? 'x64'
-        : release.architecture === 'X86'
-          ? 'x86'
-          : 'Universal';
+    release.architecture === 'ARM64' ? 'arm64' : release.architecture === 'X64' ? 'x64' : release.architecture === 'X86' ? 'x86' : 'Universal';
 
   return `${platform} • ${architecture}`;
 }
 
-export function formatReleaseDate(
-  value: string | null,
-): string {
+export function formatReleaseDate(value: string | null): string {
   if (!value) {
     return 'Not published';
   }
@@ -1079,22 +878,13 @@ apps/web/src/features/desktop-apps/desktop-apps-api.ts
 Add these types to the existing `@command-center/shared-types` import:
 
 ```ts
-import type {
-  CreateDesktopReleaseInput,
-  DesktopRelease,
-  DesktopReleaseFilters,
-  DesktopReleaseStatus,
-} from '@command-center/shared-types';
+import type { CreateDesktopReleaseInput, DesktopRelease, DesktopReleaseFilters, DesktopReleaseStatus } from '@command-center/shared-types';
 ```
 
 Append these functions:
 
 ```ts
-export function listDesktopReleases(
-  workspaceId: string,
-  desktopAppId: string,
-  filters: DesktopReleaseFilters = {},
-) {
+export function listDesktopReleases(workspaceId: string, desktopAppId: string, filters: DesktopReleaseFilters = {}) {
   const search = new URLSearchParams();
 
   if (filters.channel) {
@@ -1115,52 +905,27 @@ export function listDesktopReleases(
 
   const query = search.toString();
 
-  return apiRequest<DesktopRelease[]>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/releases${
-      query ? `?${query}` : ''
-    }`,
-  );
+  return apiRequest<DesktopRelease[]>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/releases${query ? `?${query}` : ''}`);
 }
 
-export function getDesktopRelease(
-  workspaceId: string,
-  desktopAppId: string,
-  releaseId: string,
-) {
-  return apiRequest<DesktopRelease>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/releases/${releaseId}`,
-  );
+export function getDesktopRelease(workspaceId: string, desktopAppId: string, releaseId: string) {
+  return apiRequest<DesktopRelease>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/releases/${releaseId}`);
 }
 
-export function createDesktopRelease(
-  workspaceId: string,
-  desktopAppId: string,
-  input: CreateDesktopReleaseInput,
-) {
-  return apiRequest<DesktopRelease>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/releases`,
-    {
-      method: 'POST',
-      body: JSON.stringify(input),
-    },
-  );
+export function createDesktopRelease(workspaceId: string, desktopAppId: string, input: CreateDesktopReleaseInput) {
+  return apiRequest<DesktopRelease>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/releases`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
 }
 
-export function updateDesktopReleaseStatus(
-  workspaceId: string,
-  desktopAppId: string,
-  releaseId: string,
-  status: DesktopReleaseStatus,
-) {
-  return apiRequest<DesktopRelease>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/releases/${releaseId}/status`,
-    {
-      method: 'PATCH',
-      body: JSON.stringify({
-        status,
-      }),
-    },
-  );
+export function updateDesktopReleaseStatus(workspaceId: string, desktopAppId: string, releaseId: string, status: DesktopReleaseStatus) {
+  return apiRequest<DesktopRelease>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/releases/${releaseId}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      status,
+    }),
+  });
 }
 ```
 
@@ -1180,12 +945,7 @@ apps/web/src/features/desktop-apps/desktop-releases.tsx
 /* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
-import {
-  createDesktopRelease,
-  listDesktopBuilds,
-  listDesktopReleases,
-  updateDesktopReleaseStatus,
-} from './desktop-apps-api';
+import { createDesktopRelease, listDesktopBuilds, listDesktopReleases, updateDesktopReleaseStatus } from './desktop-apps-api';
 import {
   DESKTOP_RELEASE_CHANNEL_LABELS,
   DESKTOP_RELEASE_STATUS_LABELS,
@@ -1205,61 +965,23 @@ import type {
   DesktopReleaseFilters,
   DesktopReleaseStatus,
 } from '@command-center/shared-types';
-import {
-  AlertTriangle,
-  CheckCircle2,
-  ExternalLink,
-  PackageCheck,
-  RefreshCw,
-  RotateCcw,
-  Rocket,
-} from 'lucide-react';
-import {
-  FormEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { AlertTriangle, CheckCircle2, ExternalLink, PackageCheck, RefreshCw, RotateCcw, Rocket } from 'lucide-react';
+import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
 interface Props {
   workspaceId: string;
   desktopAppId: string;
 }
 
-const CHANNELS: DesktopReleaseChannel[] = [
-  'DEV',
-  'ALPHA',
-  'BETA',
-  'STABLE',
-  'LTS',
-];
+const CHANNELS: DesktopReleaseChannel[] = ['DEV', 'ALPHA', 'BETA', 'STABLE', 'LTS'];
 
-const STATUSES: DesktopReleaseStatus[] = [
-  'DRAFT',
-  'READY',
-  'PUBLISHED',
-  'FAILED',
-  'ROLLED_BACK',
-];
+const STATUSES: DesktopReleaseStatus[] = ['DRAFT', 'READY', 'PUBLISHED', 'FAILED', 'ROLLED_BACK'];
 
-const PLATFORMS: DesktopPlatform[] = [
-  'WINDOWS',
-  'MACOS',
-  'LINUX',
-  'CROSS_PLATFORM',
-];
+const PLATFORMS: DesktopPlatform[] = ['WINDOWS', 'MACOS', 'LINUX', 'CROSS_PLATFORM'];
 
-const ARCHITECTURES: DesktopArchitecture[] = [
-  'X64',
-  'ARM64',
-  'X86',
-  'UNIVERSAL',
-];
+const ARCHITECTURES: DesktopArchitecture[] = ['X64', 'ARM64', 'X86', 'UNIVERSAL'];
 
-function releaseStatusClasses(
-  status: DesktopReleaseStatus,
-): string {
+function releaseStatusClasses(status: DesktopReleaseStatus): string {
   switch (status) {
     case 'PUBLISHED':
       return 'border-emerald-200 bg-emerald-50 text-emerald-700';
@@ -1281,17 +1003,12 @@ function releaseStatusClasses(
 
 function buildLabel(build: DesktopBuild): string {
   const version = build.version ?? 'No version';
-  const number = build.buildNumber
-    ? ` #${build.buildNumber}`
-    : '';
+  const number = build.buildNumber ? ` #${build.buildNumber}` : '';
 
   return `${version}${number} • ${build.platform} • ${build.architecture} • ${shortSha(build.commitSha)}`;
 }
 
-export function DesktopReleases({
-  workspaceId,
-  desktopAppId,
-}: Props) {
+export function DesktopReleases({ workspaceId, desktopAppId }: Props) {
   const [releases, setReleases] = useState<DesktopRelease[]>([]);
   const [successfulBuilds, setSuccessfulBuilds] = useState<DesktopBuild[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1315,18 +1032,10 @@ export function DesktopReleases({
 
     try {
       const [releaseRows, builds] = await Promise.all([
-        listDesktopReleases(
-          workspaceId,
-          desktopAppId,
-          filters,
-        ),
-        listDesktopBuilds(
-          workspaceId,
-          desktopAppId,
-          {
-            status: 'SUCCESS',
-          },
-        ),
+        listDesktopReleases(workspaceId, desktopAppId, filters),
+        listDesktopBuilds(workspaceId, desktopAppId, {
+          status: 'SUCCESS',
+        }),
       ]);
 
       setReleases(releaseRows);
@@ -1336,23 +1045,13 @@ export function DesktopReleases({
     } finally {
       setLoading(false);
     }
-  }, [
-    workspaceId,
-    desktopAppId,
-    filters,
-  ]);
+  }, [workspaceId, desktopAppId, filters]);
 
   useEffect(() => {
     void load();
   }, [load]);
 
-  const selectedBuild = useMemo(
-    () =>
-      successfulBuilds.find(
-        (build) => build.id === buildId,
-      ) ?? null,
-    [successfulBuilds, buildId],
-  );
+  const selectedBuild = useMemo(() => successfulBuilds.find((build) => build.id === buildId) ?? null, [successfulBuilds, buildId]);
 
   useEffect(() => {
     if (!selectedBuild) {
@@ -1364,20 +1063,12 @@ export function DesktopReleases({
   }, [selectedBuild]);
 
   const availableBuilds = useMemo(() => {
-    const used = new Set(
-      releases
-        .filter((release) => release.channel === channel)
-        .map((release) => release.buildId),
-    );
+    const used = new Set(releases.filter((release) => release.channel === channel).map((release) => release.buildId));
 
-    return successfulBuilds.filter(
-      (build) => !used.has(build.id),
-    );
+    return successfulBuilds.filter((build) => !used.has(build.id));
   }, [successfulBuilds, releases, channel]);
 
-  async function submitRelease(
-    event: FormEvent<HTMLFormElement>,
-  ) {
+  async function submitRelease(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!buildId) {
@@ -1409,11 +1100,7 @@ export function DesktopReleases({
     };
 
     try {
-      await createDesktopRelease(
-        workspaceId,
-        desktopAppId,
-        payload,
-      );
+      await createDesktopRelease(workspaceId, desktopAppId, payload);
 
       setBuildId('');
       setVersion('');
@@ -1429,10 +1116,7 @@ export function DesktopReleases({
     }
   }
 
-  async function transition(
-    release: DesktopRelease,
-    status: DesktopReleaseStatus,
-  ) {
+  async function transition(release: DesktopRelease, status: DesktopReleaseStatus) {
     const confirmed = window.confirm(
       status === 'ROLLED_BACK'
         ? `Roll back ${release.version} on ${DESKTOP_RELEASE_CHANNEL_LABELS[release.channel]}?`
@@ -1447,12 +1131,7 @@ export function DesktopReleases({
     setActionError(null);
 
     try {
-      await updateDesktopReleaseStatus(
-        workspaceId,
-        desktopAppId,
-        release.id,
-        status,
-      );
+      await updateDesktopReleaseStatus(workspaceId, desktopAppId, release.id, status);
 
       await load();
     } catch (caughtError: unknown) {
@@ -1464,10 +1143,7 @@ export function DesktopReleases({
 
   if (loading) {
     return (
-      <section
-        aria-label='Desktop releases loading'
-        className='space-y-4'
-      >
+      <section aria-label='Desktop releases loading' className='space-y-4'>
         <div className='h-28 animate-pulse rounded-2xl bg-slate-100' />
         <div className='h-44 animate-pulse rounded-2xl bg-slate-100' />
         <div className='h-44 animate-pulse rounded-2xl bg-slate-100' />
@@ -1481,12 +1157,8 @@ export function DesktopReleases({
         <div className='flex items-start gap-3'>
           <AlertTriangle className='mt-0.5 h-5 w-5 text-red-600' />
           <div className='min-w-0 flex-1'>
-            <h2 className='font-semibold text-red-900'>
-              Releases could not be loaded
-            </h2>
-            <p className='mt-1 text-sm text-red-700'>
-              {error}
-            </p>
+            <h2 className='font-semibold text-red-900'>Releases could not be loaded</h2>
+            <p className='mt-1 text-sm text-red-700'>{error}</p>
             <button
               type='button'
               onClick={() => void load()}
@@ -1507,13 +1179,9 @@ export function DesktopReleases({
         <div>
           <div className='flex items-center gap-2'>
             <Rocket className='h-5 w-5 text-slate-700' />
-            <h2 className='text-lg font-semibold text-slate-950'>
-              Desktop Releases
-            </h2>
+            <h2 className='text-lg font-semibold text-slate-950'>Desktop Releases</h2>
           </div>
-          <p className='mt-1 text-sm text-slate-600'>
-            Promote successful builds through Dev, Alpha, Beta, Stable, and LTS update channels.
-          </p>
+          <p className='mt-1 text-sm text-slate-600'>Promote successful builds through Dev, Alpha, Beta, Stable, and LTS update channels.</p>
         </div>
 
         <button
@@ -1525,33 +1193,21 @@ export function DesktopReleases({
           className='inline-flex items-center justify-center gap-2 rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800'
         >
           <PackageCheck className='h-4 w-4' />
-          {showCreateForm
-            ? 'Close Form'
-            : 'Create Release'}
+          {showCreateForm ? 'Close Form' : 'Create Release'}
         </button>
       </div>
 
       {actionError ? (
-        <div
-          role='alert'
-          className='rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700'
-        >
+        <div role='alert' className='rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700'>
           {actionError}
         </div>
       ) : null}
 
       {showCreateForm ? (
-        <form
-          onSubmit={submitRelease}
-          className='space-y-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'
-        >
+        <form onSubmit={submitRelease} className='space-y-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
           <div>
-            <h3 className='font-semibold text-slate-950'>
-              Create release from successful build
-            </h3>
-            <p className='mt-1 text-sm text-slate-600'>
-              Platform and architecture are inherited from the selected build and cannot be forged by the browser.
-            </p>
+            <h3 className='font-semibold text-slate-950'>Create release from successful build</h3>
+            <p className='mt-1 text-sm text-slate-600'>Platform and architecture are inherited from the selected build and cannot be forged by the browser.</p>
           </div>
 
           <div className='grid gap-4 lg:grid-cols-2'>
@@ -1566,10 +1222,7 @@ export function DesktopReleases({
               >
                 <option value=''>Select build</option>
                 {availableBuilds.map((build) => (
-                  <option
-                    key={build.id}
-                    value={build.id}
-                  >
+                  <option key={build.id} value={build.id}>
                     {buildLabel(build)}
                   </option>
                 ))}
@@ -1581,18 +1234,11 @@ export function DesktopReleases({
               <select
                 aria-label='Update channel'
                 value={channel}
-                onChange={(event) =>
-                  setChannel(
-                    event.target.value as DesktopReleaseChannel,
-                  )
-                }
+                onChange={(event) => setChannel(event.target.value as DesktopReleaseChannel)}
                 className='h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm'
               >
                 {CHANNELS.map((value) => (
-                  <option
-                    key={value}
-                    value={value}
-                  >
+                  <option key={value} value={value}>
                     {DESKTOP_RELEASE_CHANNEL_LABELS[value]}
                   </option>
                 ))}
@@ -1626,9 +1272,7 @@ export function DesktopReleases({
 
           {selectedBuild ? (
             <div className='rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700'>
-              <div className='font-semibold text-slate-900'>
-                Build source
-              </div>
+              <div className='font-semibold text-slate-900'>Build source</div>
               <div className='mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4'>
                 <span>{selectedBuild.platform}</span>
                 <span>{selectedBuild.architecture}</span>
@@ -1657,9 +1301,7 @@ export function DesktopReleases({
               disabled={submitting || !buildId}
               className='inline-flex items-center justify-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50'
             >
-              {submitting
-                ? 'Creating...'
-                : 'Create Desktop Release'}
+              {submitting ? 'Creating...' : 'Create Desktop Release'}
             </button>
 
             <button
@@ -1680,19 +1322,14 @@ export function DesktopReleases({
           onChange={(event) =>
             setFilters((current) => ({
               ...current,
-              channel:
-                (event.target.value as DesktopReleaseChannel) ||
-                undefined,
+              channel: (event.target.value as DesktopReleaseChannel) || undefined,
             }))
           }
           className='h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm'
         >
           <option value=''>All channels</option>
           {CHANNELS.map((value) => (
-            <option
-              key={value}
-              value={value}
-            >
+            <option key={value} value={value}>
               {DESKTOP_RELEASE_CHANNEL_LABELS[value]}
             </option>
           ))}
@@ -1704,19 +1341,14 @@ export function DesktopReleases({
           onChange={(event) =>
             setFilters((current) => ({
               ...current,
-              status:
-                (event.target.value as DesktopReleaseStatus) ||
-                undefined,
+              status: (event.target.value as DesktopReleaseStatus) || undefined,
             }))
           }
           className='h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm'
         >
           <option value=''>All statuses</option>
           {STATUSES.map((value) => (
-            <option
-              key={value}
-              value={value}
-            >
+            <option key={value} value={value}>
               {DESKTOP_RELEASE_STATUS_LABELS[value]}
             </option>
           ))}
@@ -1728,19 +1360,14 @@ export function DesktopReleases({
           onChange={(event) =>
             setFilters((current) => ({
               ...current,
-              platform:
-                (event.target.value as DesktopPlatform) ||
-                undefined,
+              platform: (event.target.value as DesktopPlatform) || undefined,
             }))
           }
           className='h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm'
         >
           <option value=''>All platforms</option>
           {PLATFORMS.map((value) => (
-            <option
-              key={value}
-              value={value}
-            >
+            <option key={value} value={value}>
               {value}
             </option>
           ))}
@@ -1752,19 +1379,14 @@ export function DesktopReleases({
           onChange={(event) =>
             setFilters((current) => ({
               ...current,
-              architecture:
-                (event.target.value as DesktopArchitecture) ||
-                undefined,
+              architecture: (event.target.value as DesktopArchitecture) || undefined,
             }))
           }
           className='h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm'
         >
           <option value=''>All architectures</option>
           {ARCHITECTURES.map((value) => (
-            <option
-              key={value}
-              value={value}
-            >
+            <option key={value} value={value}>
               {value}
             </option>
           ))}
@@ -1774,9 +1396,7 @@ export function DesktopReleases({
       {releases.length === 0 ? (
         <div className='rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center'>
           <Rocket className='mx-auto h-8 w-8 text-slate-400' />
-          <h3 className='mt-3 font-semibold text-slate-950'>
-            No desktop releases yet
-          </h3>
+          <h3 className='mt-3 font-semibold text-slate-950'>No desktop releases yet</h3>
           <p className='mx-auto mt-1 max-w-xl text-sm text-slate-600'>
             Create a release from a successful desktop build. The release will keep its build, commit, target, and artifact history traceable.
           </p>
@@ -1788,24 +1408,17 @@ export function DesktopReleases({
             const busy = transitioningId === release.id;
 
             return (
-              <article
-                key={release.id}
-                className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'
-              >
+              <article key={release.id} className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
                 <div className='flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between'>
                   <div className='min-w-0'>
                     <div className='flex flex-wrap items-center gap-2'>
-                      <h3 className='text-lg font-semibold text-slate-950'>
-                        {release.version}
-                      </h3>
+                      <h3 className='text-lg font-semibold text-slate-950'>{release.version}</h3>
 
                       <span className='rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700'>
                         {DESKTOP_RELEASE_CHANNEL_LABELS[release.channel]}
                       </span>
 
-                      <span
-                        className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${releaseStatusClasses(release.status)}`}
-                      >
+                      <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${releaseStatusClasses(release.status)}`}>
                         {DESKTOP_RELEASE_STATUS_LABELS[release.status]}
                       </span>
                     </div>
@@ -1817,9 +1430,7 @@ export function DesktopReleases({
                       <span>Commit {shortSha(release.build.commitSha)}</span>
                     </div>
 
-                    <p className='mt-2 text-xs text-slate-500'>
-                      Published: {formatReleaseDate(release.releasedAt)}
-                    </p>
+                    <p className='mt-2 text-xs text-slate-500'>Published: {formatReleaseDate(release.releasedAt)}</p>
                   </div>
 
                   {actions.length > 0 ? (
@@ -1829,9 +1440,7 @@ export function DesktopReleases({
                           key={action.status}
                           type='button'
                           disabled={busy}
-                          onClick={() =>
-                            void transition(release, action.status)
-                          }
+                          onClick={() => void transition(release, action.status)}
                           className='inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50'
                         >
                           {action.status === 'ROLLED_BACK' ? (
@@ -1850,41 +1459,26 @@ export function DesktopReleases({
 
                 {release.releaseNotes ? (
                   <div className='mt-4 rounded-xl bg-slate-50 p-4'>
-                    <div className='text-xs font-semibold uppercase tracking-wide text-slate-500'>
-                      Release notes
-                    </div>
-                    <p className='mt-2 whitespace-pre-wrap text-sm text-slate-700'>
-                      {release.releaseNotes}
-                    </p>
+                    <div className='text-xs font-semibold uppercase tracking-wide text-slate-500'>Release notes</div>
+                    <p className='mt-2 whitespace-pre-wrap text-sm text-slate-700'>{release.releaseNotes}</p>
                   </div>
                 ) : null}
 
                 <div className='mt-4 border-t border-slate-100 pt-4'>
                   <div className='flex flex-wrap items-center justify-between gap-2'>
-                    <h4 className='text-sm font-semibold text-slate-900'>
-                      Source → Build → Artifact → Release
-                    </h4>
-                    <span className='text-xs text-slate-500'>
-                      Workflow run {release.build.workflowRunId}
-                    </span>
+                    <h4 className='text-sm font-semibold text-slate-900'>Source → Build → Artifact → Release</h4>
+                    <span className='text-xs text-slate-500'>Workflow run {release.build.workflowRunId}</span>
                   </div>
 
                   {release.build.artifacts.length === 0 ? (
-                    <p className='mt-3 text-sm text-slate-500'>
-                      This release is traceable to its build, but that build has no artifact metadata recorded.
-                    </p>
+                    <p className='mt-3 text-sm text-slate-500'>This release is traceable to its build, but that build has no artifact metadata recorded.</p>
                   ) : (
                     <ul className='mt-3 grid gap-2 md:grid-cols-2'>
                       {release.build.artifacts.map((artifact) => (
-                        <li
-                          key={artifact.id}
-                          className='rounded-xl border border-slate-200 bg-slate-50 p-3'
-                        >
+                        <li key={artifact.id} className='rounded-xl border border-slate-200 bg-slate-50 p-3'>
                           <div className='flex items-start justify-between gap-3'>
                             <div className='min-w-0'>
-                              <div className='truncate text-sm font-semibold text-slate-900'>
-                                {artifact.fileName}
-                              </div>
+                              <div className='truncate text-sm font-semibold text-slate-900'>{artifact.fileName}</div>
                               <div className='mt-1 text-xs text-slate-500'>
                                 {artifact.type} • {artifact.platform} • {artifact.architecture}
                               </div>
@@ -1943,26 +1537,16 @@ export default function DesktopReleasesPage() {
   return (
     <main className='mx-auto w-full max-w-7xl space-y-6 p-4 pt-8 sm:p-6 sm:pt-10 lg:p-8'>
       <header>
-        <p className='text-sm font-medium text-slate-500'>
-          Desktop Application
-        </p>
-        <h1 className='mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl'>
-          Releases & Update Channels
-        </h1>
+        <p className='text-sm font-medium text-slate-500'>Desktop Application</p>
+        <h1 className='mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl'>Releases & Update Channels</h1>
         <p className='mt-2 max-w-3xl text-sm text-slate-600'>
           Track versioned desktop releases across Dev, Alpha, Beta, Stable, and LTS channels while preserving the exact build and artifact source.
         </p>
       </header>
 
-      <DesktopAppSubNav
-        workspaceId={params.workspaceId}
-        desktopAppId={params.desktopAppId}
-      />
+      <DesktopAppSubNav workspaceId={params.workspaceId} desktopAppId={params.desktopAppId} />
 
-      <DesktopReleases
-        workspaceId={params.workspaceId}
-        desktopAppId={params.desktopAppId}
-      />
+      <DesktopReleases workspaceId={params.workspaceId} desktopAppId={params.desktopAppId} />
     </main>
   );
 }
@@ -2004,12 +1588,7 @@ const LIVE_TABS = [
   },
 ] as const;
 
-const FUTURE_TABS = [
-  'Performance',
-  'Crashes',
-  'Dependencies',
-  'Security',
-] as const;
+const FUTURE_TABS = ['Performance', 'Crashes', 'Dependencies', 'Security'] as const;
 ```
 
 Keep the remainder of the existing Phase 6 `DesktopAppSubNav` component unchanged.
@@ -2044,22 +1623,11 @@ packages/shared-types/src/desktop-apps/desktop-app.types.ts
 Append:
 
 ```ts
-export type DesktopReleaseChannel =
-  | 'DEV'
-  | 'ALPHA'
-  | 'BETA'
-  | 'STABLE'
-  | 'LTS';
+export type DesktopReleaseChannel = 'DEV' | 'ALPHA' | 'BETA' | 'STABLE' | 'LTS';
 
-export type DesktopReleaseStatus =
-  | 'DRAFT'
-  | 'READY'
-  | 'PUBLISHED'
-  | 'FAILED'
-  | 'ROLLED_BACK';
+export type DesktopReleaseStatus = 'DRAFT' | 'READY' | 'PUBLISHED' | 'FAILED' | 'ROLLED_BACK';
 
-export interface DesktopReleaseBuildSummary
-  extends DesktopBuild {
+export interface DesktopReleaseBuildSummary extends DesktopBuild {
   artifacts: DesktopBuildArtifact[];
 }
 
@@ -2234,11 +1802,7 @@ import { PrismaService } from 'src/database/prisma.service';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
-import {
-  buildPath,
-  createLinkedDesktopFixture,
-  ingestSuccessfulBuild,
-} from './helpers/desktop-test-fixtures';
+import { buildPath, createLinkedDesktopFixture, ingestSuccessfulBuild } from './helpers/desktop-test-fixtures';
 
 const API = '/api/v1';
 
@@ -2258,23 +1822,11 @@ describe('Desktop Releases E2E', () => {
 
   async function createSuccessfulFixture() {
     const fixture = await createLinkedDesktopFixture(app, prisma);
-    const build = await ingestSuccessfulBuild(
-      fixture.owner,
-      fixture.desktopApp.id,
-      fixture.repository.id,
-    );
+    const build = await ingestSuccessfulBuild(fixture.owner, fixture.desktopApp.id, fixture.repository.id);
 
     const artifactResponse = await fixture.owner.agent
-      .post(
-        `${buildPath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        )}/${build.id}/artifacts`,
-      )
-      .set(
-        'Authorization',
-        `Bearer ${fixture.owner.accessToken}`,
-      )
+      .post(`${buildPath(fixture.owner.workspaceId, fixture.desktopApp.id)}/${build.id}/artifacts`)
+      .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
       .send({
         providerArtifactId: `phase11-artifact-${Date.now()}`,
         platform: 'WINDOWS',
@@ -2283,8 +1835,7 @@ describe('Desktop Releases E2E', () => {
         fileName: 'command-center-1.0.0-x64.msi',
         sizeBytes: 88_000_000,
         checksum: 'sha256:phase11',
-        externalUrl:
-          'https://example.test/artifacts/command-center-1.0.0-x64.msi',
+        externalUrl: 'https://example.test/artifacts/command-center-1.0.0-x64.msi',
       });
 
     expect(artifactResponse.status).toBe(201);
@@ -2299,31 +1850,14 @@ describe('Desktop Releases E2E', () => {
     };
   }
 
-  function releasePath(
-    workspaceId: string,
-    desktopAppId: string,
-  ) {
-    return (
-      `${API}/workspaces/${workspaceId}` +
-      `/desktop-apps/${desktopAppId}/releases`
-    );
+  function releasePath(workspaceId: string, desktopAppId: string) {
+    return `${API}/workspaces/${workspaceId}` + `/desktop-apps/${desktopAppId}/releases`;
   }
 
-  async function createRelease(
-    fixture: Awaited<ReturnType<typeof createSuccessfulFixture>>,
-    overrides: Record<string, unknown> = {},
-  ) {
+  async function createRelease(fixture: Awaited<ReturnType<typeof createSuccessfulFixture>>, overrides: Record<string, unknown> = {}) {
     return fixture.owner.agent
-      .post(
-        releasePath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        ),
-      )
-      .set(
-        'Authorization',
-        `Bearer ${fixture.owner.accessToken}`,
-      )
+      .post(releasePath(fixture.owner.workspaceId, fixture.desktopApp.id))
+      .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
       .send({
         buildId: fixture.build.id,
         channel: 'STABLE',
@@ -2334,14 +1868,7 @@ describe('Desktop Releases E2E', () => {
   it('rejects anonymous release access', async () => {
     const fixture = await createSuccessfulFixture();
 
-    await fixture.owner.agent
-      .get(
-        releasePath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        ),
-      )
-      .expect(401);
+    await fixture.owner.agent.get(releasePath(fixture.owner.workspaceId, fixture.desktopApp.id)).expect(401);
   });
 
   it('creates a release from a successful build and inherits target metadata', async () => {
@@ -2392,21 +1919,12 @@ describe('Desktop Releases E2E', () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
 
     const failedBuildResponse = await fixture.owner.agent
-      .post(
-        `${buildPath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        )}/ingest/github`,
-      )
-      .set(
-        'Authorization',
-        `Bearer ${fixture.owner.accessToken}`,
-      )
+      .post(`${buildPath(fixture.owner.workspaceId, fixture.desktopApp.id)}/ingest/github`)
+      .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
       .send({
         repositoryId: fixture.repository.id,
         workflowRunId: `phase11-failed-${Date.now()}`,
-        commitSha:
-          'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+        commitSha: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
         branch: 'main',
         version: '1.0.1',
         buildNumber: '101',
@@ -2420,16 +1938,8 @@ describe('Desktop Releases E2E', () => {
     expect(failedBuildResponse.status).toBe(201);
 
     await fixture.owner.agent
-      .post(
-        releasePath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        ),
-      )
-      .set(
-        'Authorization',
-        `Bearer ${fixture.owner.accessToken}`,
-      )
+      .post(releasePath(fixture.owner.workspaceId, fixture.desktopApp.id))
+      .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
       .send({
         buildId: failedBuildResponse.body.build.id,
         channel: 'BETA',
@@ -2441,19 +1951,10 @@ describe('Desktop Releases E2E', () => {
     const fixture = await createSuccessfulFixture();
 
     await fixture.owner.agent
-      .post(
-        releasePath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        ),
-      )
-      .set(
-        'Authorization',
-        `Bearer ${fixture.owner.accessToken}`,
-      )
+      .post(releasePath(fixture.owner.workspaceId, fixture.desktopApp.id))
+      .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
       .send({
-        buildId:
-          '11111111-1111-4111-8111-111111111111',
+        buildId: '11111111-1111-4111-8111-111111111111',
         channel: 'BETA',
       })
       .expect(404);
@@ -2506,27 +2007,13 @@ describe('Desktop Releases E2E', () => {
 
     expect(created.status).toBe(201);
 
-    const path =
-      `${releasePath(
-        fixture.owner.workspaceId,
-        fixture.desktopApp.id,
-      )}/${created.body.id}/status`;
+    const path = `${releasePath(fixture.owner.workspaceId, fixture.desktopApp.id)}/${created.body.id}/status`;
 
-    await fixture.owner.agent
-      .patch(path)
-      .set(
-        'Authorization',
-        `Bearer ${fixture.owner.accessToken}`,
-      )
-      .send({ status: 'READY' })
-      .expect(200);
+    await fixture.owner.agent.patch(path).set('Authorization', `Bearer ${fixture.owner.accessToken}`).send({ status: 'READY' }).expect(200);
 
     const published = await fixture.owner.agent
       .patch(path)
-      .set(
-        'Authorization',
-        `Bearer ${fixture.owner.accessToken}`,
-      )
+      .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
       .send({ status: 'PUBLISHED' })
       .expect(200);
 
@@ -2535,17 +2022,12 @@ describe('Desktop Releases E2E', () => {
 
     const rolledBack = await fixture.owner.agent
       .patch(path)
-      .set(
-        'Authorization',
-        `Bearer ${fixture.owner.accessToken}`,
-      )
+      .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
       .send({ status: 'ROLLED_BACK' })
       .expect(200);
 
     expect(rolledBack.body.status).toBe('ROLLED_BACK');
-    expect(rolledBack.body.releasedAt).toBe(
-      published.body.releasedAt,
-    );
+    expect(rolledBack.body.releasedAt).toBe(published.body.releasedAt);
   });
 
   it('rejects invalid lifecycle transitions', async () => {
@@ -2555,16 +2037,8 @@ describe('Desktop Releases E2E', () => {
     expect(created.status).toBe(201);
 
     await fixture.owner.agent
-      .patch(
-        `${releasePath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        )}/${created.body.id}/status`,
-      )
-      .set(
-        'Authorization',
-        `Bearer ${fixture.owner.accessToken}`,
-      )
+      .patch(`${releasePath(fixture.owner.workspaceId, fixture.desktopApp.id)}/${created.body.id}/status`)
+      .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
       .send({ status: 'PUBLISHED' })
       .expect(400);
   });
@@ -2576,16 +2050,8 @@ describe('Desktop Releases E2E', () => {
     expect(created.status).toBe(201);
 
     const response = await fixture.owner.agent
-      .patch(
-        `${releasePath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        )}/${created.body.id}/status`,
-      )
-      .set(
-        'Authorization',
-        `Bearer ${fixture.owner.accessToken}`,
-      )
+      .patch(`${releasePath(fixture.owner.workspaceId, fixture.desktopApp.id)}/${created.body.id}/status`)
+      .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
       .send({ status: 'DRAFT' })
       .expect(200);
 
@@ -2597,16 +2063,8 @@ describe('Desktop Releases E2E', () => {
     const second = await createSuccessfulFixture();
 
     await first.owner.agent
-      .post(
-        releasePath(
-          first.owner.workspaceId,
-          first.desktopApp.id,
-        ),
-      )
-      .set(
-        'Authorization',
-        `Bearer ${first.owner.accessToken}`,
-      )
+      .post(releasePath(first.owner.workspaceId, first.desktopApp.id))
+      .set('Authorization', `Bearer ${first.owner.accessToken}`)
       .send({
         buildId: second.build.id,
         channel: 'STABLE',
@@ -2618,18 +2076,7 @@ describe('Desktop Releases E2E', () => {
     const fixture = await createSuccessfulFixture();
     const outsider = await registerWorkspaceTestUser(app, prisma);
 
-    await outsider.agent
-      .get(
-        releasePath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        ),
-      )
-      .set(
-        'Authorization',
-        `Bearer ${outsider.accessToken}`,
-      )
-      .expect(403);
+    await outsider.agent.get(releasePath(fixture.owner.workspaceId, fixture.desktopApp.id)).set('Authorization', `Bearer ${outsider.accessToken}`).expect(403);
   });
 
   it('rejects cross-workspace release lookup', async () => {
@@ -2640,16 +2087,8 @@ describe('Desktop Releases E2E', () => {
     expect(created.status).toBe(201);
 
     await first.owner.agent
-      .get(
-        `${releasePath(
-          first.owner.workspaceId,
-          first.desktopApp.id,
-        )}/${created.body.id}`,
-      )
-      .set(
-        'Authorization',
-        `Bearer ${first.owner.accessToken}`,
-      )
+      .get(`${releasePath(first.owner.workspaceId, first.desktopApp.id)}/${created.body.id}`)
+      .set('Authorization', `Bearer ${first.owner.accessToken}`)
       .expect(404);
   });
 
@@ -2669,37 +2108,23 @@ describe('Desktop Releases E2E', () => {
     await prisma.desktopRelease.update({
       where: { id: first.body.id },
       data: {
-        createdAt: new Date(
-          '2026-08-23T01:00:00.000Z',
-        ),
+        createdAt: new Date('2026-08-23T01:00:00.000Z'),
       },
     });
 
     await prisma.desktopRelease.update({
       where: { id: second.body.id },
       data: {
-        createdAt: new Date(
-          '2026-08-23T02:00:00.000Z',
-        ),
+        createdAt: new Date('2026-08-23T02:00:00.000Z'),
       },
     });
 
     const list = await fixture.owner.agent
-      .get(
-        releasePath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        ),
-      )
-      .set(
-        'Authorization',
-        `Bearer ${fixture.owner.accessToken}`,
-      )
+      .get(releasePath(fixture.owner.workspaceId, fixture.desktopApp.id))
+      .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
       .expect(200);
 
-    expect(
-      list.body.map((item: { id: string }) => item.id),
-    ).toEqual([second.body.id, first.body.id]);
+    expect(list.body.map((item: { id: string }) => item.id)).toEqual([second.body.id, first.body.id]);
   });
 
   it('filters release history by channel/status/platform/architecture', async () => {
@@ -2713,22 +2138,14 @@ describe('Desktop Releases E2E', () => {
     }).expect(201);
 
     const response = await fixture.owner.agent
-      .get(
-        releasePath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        ),
-      )
+      .get(releasePath(fixture.owner.workspaceId, fixture.desktopApp.id))
       .query({
         channel: 'STABLE',
         status: 'DRAFT',
         platform: 'WINDOWS',
         architecture: 'X64',
       })
-      .set(
-        'Authorization',
-        `Bearer ${fixture.owner.accessToken}`,
-      )
+      .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
       .expect(200);
 
     expect(response.body).toHaveLength(1);
@@ -2744,14 +2161,8 @@ describe('Desktop Releases E2E', () => {
     const fixture = await createSuccessfulFixture();
 
     const archiveResponse = await fixture.owner.agent
-      .delete(
-        `${API}/workspaces/${fixture.owner.workspaceId}` +
-          `/desktop-apps/${fixture.desktopApp.id}`,
-      )
-      .set(
-        'Authorization',
-        `Bearer ${fixture.owner.accessToken}`,
-      );
+      .delete(`${API}/workspaces/${fixture.owner.workspaceId}` + `/desktop-apps/${fixture.desktopApp.id}`)
+      .set('Authorization', `Bearer ${fixture.owner.accessToken}`);
 
     expect([200, 204]).toContain(archiveResponse.status);
 
@@ -2773,20 +2184,9 @@ packages/test-code/web/unit/features/desktop-apps/desktop-releases-api.test.ts
 ```
 
 ```ts
-import {
-  createDesktopRelease,
-  getDesktopRelease,
-  listDesktopReleases,
-  updateDesktopReleaseStatus,
-} from '@/features/desktop-apps/desktop-apps-api';
+import { createDesktopRelease, getDesktopRelease, listDesktopReleases, updateDesktopReleaseStatus } from '@/features/desktop-apps/desktop-apps-api';
 import { apiRequest } from '@/features/lib/api/api-client';
-import {
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/lib/api/api-client', () => ({
   apiRequest: vi.fn(),
@@ -2804,22 +2204,16 @@ describe('desktop release API client', () => {
   });
 
   it('lists releases with filters', async () => {
-    await listDesktopReleases(
-      workspaceId,
-      desktopAppId,
-      {
-        channel: 'STABLE',
-        status: 'PUBLISHED',
-        platform: 'WINDOWS',
-        architecture: 'X64',
-      },
-    );
+    await listDesktopReleases(workspaceId, desktopAppId, {
+      channel: 'STABLE',
+      status: 'PUBLISHED',
+      platform: 'WINDOWS',
+      architecture: 'X64',
+    });
 
     const url = requestMock.mock.calls[0]?.[0] as string;
 
-    expect(url).toContain(
-      `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/releases?`,
-    );
+    expect(url).toContain(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/releases?`);
     expect(url).toContain('channel=STABLE');
     expect(url).toContain('status=PUBLISHED');
     expect(url).toContain('platform=WINDOWS');
@@ -2827,15 +2221,9 @@ describe('desktop release API client', () => {
   });
 
   it('gets one release', async () => {
-    await getDesktopRelease(
-      workspaceId,
-      desktopAppId,
-      releaseId,
-    );
+    await getDesktopRelease(workspaceId, desktopAppId, releaseId);
 
-    expect(requestMock).toHaveBeenCalledWith(
-      `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/releases/${releaseId}`,
-    );
+    expect(requestMock).toHaveBeenCalledWith(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/releases/${releaseId}`);
   });
 
   it('creates a release', async () => {
@@ -2846,38 +2234,23 @@ describe('desktop release API client', () => {
       releaseNotes: 'Beta candidate',
     } as const;
 
-    await createDesktopRelease(
-      workspaceId,
-      desktopAppId,
-      input,
-    );
+    await createDesktopRelease(workspaceId, desktopAppId, input);
 
-    expect(requestMock).toHaveBeenCalledWith(
-      `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/releases`,
-      {
-        method: 'POST',
-        body: JSON.stringify(input),
-      },
-    );
+    expect(requestMock).toHaveBeenCalledWith(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/releases`, {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
   });
 
   it('updates lifecycle status', async () => {
-    await updateDesktopReleaseStatus(
-      workspaceId,
-      desktopAppId,
-      releaseId,
-      'PUBLISHED',
-    );
+    await updateDesktopReleaseStatus(workspaceId, desktopAppId, releaseId, 'PUBLISHED');
 
-    expect(requestMock).toHaveBeenCalledWith(
-      `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/releases/${releaseId}/status`,
-      {
-        method: 'PATCH',
-        body: JSON.stringify({
-          status: 'PUBLISHED',
-        }),
-      },
-    );
+    expect(requestMock).toHaveBeenCalledWith(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/releases/${releaseId}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        status: 'PUBLISHED',
+      }),
+    });
   });
 });
 ```
@@ -2896,26 +2269,10 @@ packages/test-code/web/unit/features/desktop-apps/desktop-releases.test.tsx
 // @vitest-environment jsdom
 
 import { DesktopReleases } from '@/features/desktop-apps/desktop-releases';
-import {
-  createDesktopRelease,
-  listDesktopBuilds,
-  listDesktopReleases,
-  updateDesktopReleaseStatus,
-} from '@/features/desktop-apps/desktop-apps-api';
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react';
+import { createDesktopRelease, listDesktopBuilds, listDesktopReleases, updateDesktopReleaseStatus } from '@/features/desktop-apps/desktop-apps-api';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
   createDesktopRelease: vi.fn(),
@@ -2996,27 +2353,15 @@ describe('DesktopReleases', () => {
   });
 
   it('renders the empty release state', async () => {
-    render(
-      <DesktopReleases
-        workspaceId='workspace-1'
-        desktopAppId='desktop-1'
-      />,
-    );
+    render(<DesktopReleases workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
-    expect(
-      await screen.findByText('No desktop releases yet'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('No desktop releases yet')).toBeInTheDocument();
   });
 
   it('creates a release from a successful build', async () => {
     const user = userEvent.setup();
 
-    render(
-      <DesktopReleases
-        workspaceId='workspace-1'
-        desktopAppId='desktop-1'
-      />,
-    );
+    render(<DesktopReleases workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
     await user.click(
       await screen.findByRole('button', {
@@ -3024,20 +2369,11 @@ describe('DesktopReleases', () => {
       }),
     );
 
-    await user.selectOptions(
-      screen.getByLabelText('Successful build'),
-      'build-1',
-    );
+    await user.selectOptions(screen.getByLabelText('Successful build'), 'build-1');
 
-    await user.selectOptions(
-      screen.getByLabelText('Update channel'),
-      'STABLE',
-    );
+    await user.selectOptions(screen.getByLabelText('Update channel'), 'STABLE');
 
-    await user.type(
-      screen.getByLabelText('Release notes'),
-      'Ship stable build',
-    );
+    await user.type(screen.getByLabelText('Release notes'), 'Ship stable build');
 
     await user.click(
       screen.getByRole('button', {
@@ -3063,35 +2399,19 @@ describe('DesktopReleases', () => {
   it('renders source -> build -> artifact -> release traceability', async () => {
     listReleasesMock.mockResolvedValue([release] as never);
 
-    render(
-      <DesktopReleases
-        workspaceId='workspace-1'
-        desktopAppId='desktop-1'
-      />,
-    );
+    render(<DesktopReleases workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
-    expect(
-      await screen.findByText('2.4.0'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('2.4.0')).toBeInTheDocument();
     expect(screen.getByText('Stable')).toBeInTheDocument();
     expect(screen.getByText('Published')).toBeInTheDocument();
-    expect(
-      screen.getByText('command-center-2.4.0-x64.msi'),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('Source → Build → Artifact → Release'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('command-center-2.4.0-x64.msi')).toBeInTheDocument();
+    expect(screen.getByText('Source → Build → Artifact → Release')).toBeInTheDocument();
   });
 
   it('rolls back a published release', async () => {
     listReleasesMock.mockResolvedValue([release] as never);
 
-    render(
-      <DesktopReleases
-        workspaceId='workspace-1'
-        desktopAppId='desktop-1'
-      />,
-    );
+    render(<DesktopReleases workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
     fireEvent.click(
       await screen.findByRole('button', {
@@ -3100,12 +2420,7 @@ describe('DesktopReleases', () => {
     );
 
     await waitFor(() => {
-      expect(updateStatusMock).toHaveBeenCalledWith(
-        'workspace-1',
-        'desktop-1',
-        'release-1',
-        'ROLLED_BACK',
-      );
+      expect(updateStatusMock).toHaveBeenCalledWith('workspace-1', 'desktop-1', 'release-1', 'ROLLED_BACK');
     });
   });
 });
@@ -3125,12 +2440,7 @@ The final assertions for Phase 11 should include:
 
 ```tsx
 it('renders Phase 5-11 live tabs', () => {
-  render(
-    <DesktopAppSubNav
-      workspaceId='workspace-1'
-      desktopAppId='desktop-1'
-    />,
-  );
+  render(<DesktopAppSubNav workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
   expect(screen.getByText('Overview')).toBeInTheDocument();
   expect(screen.getByText('Code')).toBeInTheDocument();
@@ -3140,30 +2450,17 @@ it('renders Phase 5-11 live tabs', () => {
 });
 
 it('links Releases to the desktop release route', () => {
-  render(
-    <DesktopAppSubNav
-      workspaceId='workspace-1'
-      desktopAppId='desktop-1'
-    />,
-  );
+  render(<DesktopAppSubNav workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
   expect(
     screen.getByRole('link', {
       name: 'Releases',
     }),
-  ).toHaveAttribute(
-    'href',
-    '/workspaces/workspace-1/desktop-apps/desktop-1/releases',
-  );
+  ).toHaveAttribute('href', '/workspaces/workspace-1/desktop-apps/desktop-1/releases');
 });
 
 it('keeps only Phase 12+ tabs disabled', () => {
-  render(
-    <DesktopAppSubNav
-      workspaceId='workspace-1'
-      desktopAppId='desktop-1'
-    />,
-  );
+  render(<DesktopAppSubNav workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
   expect(screen.queryByRole('link', { name: 'Performance' })).not.toBeInTheDocument();
   expect(screen.queryByRole('link', { name: 'Crashes' })).not.toBeInTheDocument();
@@ -3185,21 +2482,9 @@ packages/test-code/web/e2e/full-stack/fullstack-desktop-releases.spec.ts
 ```
 
 ```ts
-import {
-  authorizedApiRequest,
-  loginThroughUi,
-  uniqueValue,
-} from './fixtures/helpers';
-import {
-  readFullStackState,
-  type FullStackState,
-} from './fixtures/state';
-import {
-  expect,
-  test,
-  type APIRequestContext,
-  type Route,
-} from '@playwright/test';
+import { authorizedApiRequest, loginThroughUi, uniqueValue } from './fixtures/helpers';
+import { readFullStackState, type FullStackState } from './fixtures/state';
+import { expect, test, type APIRequestContext, type Route } from '@playwright/test';
 
 let state: FullStackState;
 
@@ -3207,30 +2492,19 @@ test.describe.configure({
   mode: 'serial',
 });
 
-async function createDesktopApp(
-  request: APIRequestContext,
-) {
-  const response = await authorizedApiRequest(
-    request,
-    state,
-    state.owner.accessToken,
-    `/workspaces/${state.owner.workspaceId}/desktop-apps`,
-    {
-      method: 'POST',
-      data: {
-        name: uniqueValue(
-          'Phase 11 Desktop',
-          state.runId,
-        ),
-        platform: 'WINDOWS',
-        framework: 'ELECTRON',
-        architecture: 'X64',
-        packageName: `com.commandcenter.phase11.${Date.now()}`,
-        currentVersion: '2.4.0',
-        currentBuildNumber: '184',
-      },
+async function createDesktopApp(request: APIRequestContext) {
+  const response = await authorizedApiRequest(request, state, state.owner.accessToken, `/workspaces/${state.owner.workspaceId}/desktop-apps`, {
+    method: 'POST',
+    data: {
+      name: uniqueValue('Phase 11 Desktop', state.runId),
+      platform: 'WINDOWS',
+      framework: 'ELECTRON',
+      architecture: 'X64',
+      packageName: `com.commandcenter.phase11.${Date.now()}`,
+      currentVersion: '2.4.0',
+      currentBuildNumber: '184',
     },
-  );
+  });
 
   expect(response.status()).toBe(201);
 
@@ -3239,11 +2513,7 @@ async function createDesktopApp(
   };
 }
 
-function json(
-  route: Route,
-  value: unknown,
-  status = 200,
-) {
+function json(route: Route, value: unknown, status = 200) {
   return route.fulfill({
     status,
     contentType: 'application/json',
@@ -3256,10 +2526,7 @@ test.describe('Desktop Phase 11 releases frontend', () => {
     state = readFullStackState();
   });
 
-  test('creates, publishes, and rolls back a desktop release in the real frontend', async ({
-    page,
-    request,
-  }) => {
+  test('creates, publishes, and rolls back a desktop release in the real frontend', async ({ page, request }) => {
     await loginThroughUi(page, state.owner);
 
     const desktop = await createDesktopApp(request);
@@ -3309,11 +2576,7 @@ test.describe('Desktop Phase 11 releases frontend', () => {
       channel: 'STABLE';
       platform: 'WINDOWS';
       architecture: 'X64';
-      status:
-        | 'DRAFT'
-        | 'READY'
-        | 'PUBLISHED'
-        | 'ROLLED_BACK';
+      status: 'DRAFT' | 'READY' | 'PUBLISHED' | 'ROLLED_BACK';
       releaseNotes: string | null;
       releasedAt: string | null;
       createdAt: string;
@@ -3325,102 +2588,86 @@ test.describe('Desktop Phase 11 releases frontend', () => {
 
     let releases: Release[] = [];
 
-    const apiBase =
-      `/api/v1/workspaces/${state.owner.workspaceId}` +
-      `/desktop-apps/${desktop.id}`;
+    const apiBase = `/api/v1/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktop.id}`;
 
-    await page.route(
-      `**${apiBase}/builds*`,
-      async (route) => {
-        if (route.request().method() === 'GET') {
-          await json(route, [build]);
-          return;
-        }
+    await page.route(`**${apiBase}/builds*`, async (route) => {
+      if (route.request().method() === 'GET') {
+        await json(route, [build]);
+        return;
+      }
 
-        await route.fallback();
-      },
-    );
+      await route.fallback();
+    });
 
-    await page.route(
-      `**${apiBase}/releases*`,
-      async (route) => {
-        const method = route.request().method();
-        const url = new URL(route.request().url());
-        const statusMatch = url.pathname.match(
-          /\/releases\/([^/]+)\/status$/,
+    await page.route(`**${apiBase}/releases*`, async (route) => {
+      const method = route.request().method();
+      const url = new URL(route.request().url());
+      const statusMatch = url.pathname.match(/\/releases\/([^/]+)\/status$/);
+
+      if (method === 'GET') {
+        await json(route, releases);
+        return;
+      }
+
+      if (method === 'POST') {
+        const input = route.request().postDataJSON() as {
+          buildId: string;
+          channel: 'STABLE';
+          version?: string;
+          buildNumber?: string;
+          releaseNotes?: string;
+        };
+
+        const created: Release = {
+          id: '44444444-4444-4444-8444-444444444444',
+          workspaceId: state.owner.workspaceId,
+          desktopAppId: desktop.id,
+          buildId: input.buildId,
+          version: input.version ?? '2.4.0',
+          buildNumber: input.buildNumber ?? '184',
+          channel: input.channel,
+          platform: 'WINDOWS',
+          architecture: 'X64',
+          status: 'DRAFT',
+          releaseNotes: input.releaseNotes ?? null,
+          releasedAt: null,
+          createdAt: '2026-08-23T02:00:00.000Z',
+          updatedAt: '2026-08-23T02:00:00.000Z',
+          build: {
+            ...build,
+            artifacts: [artifact],
+          },
+        };
+
+        releases = [created];
+        await json(route, created, 201);
+        return;
+      }
+
+      if (method === 'PATCH' && statusMatch) {
+        const input = route.request().postDataJSON() as {
+          status: Release['status'];
+        };
+
+        releases = releases.map((release) =>
+          release.id === statusMatch[1]
+            ? {
+                ...release,
+                status: input.status,
+                releasedAt: input.status === 'PUBLISHED' ? '2026-08-23T02:10:00.000Z' : release.releasedAt,
+                updatedAt: '2026-08-23T02:10:00.000Z',
+              }
+            : release,
         );
 
-        if (method === 'GET') {
-          await json(route, releases);
-          return;
-        }
+        await json(route, releases[0]);
+        return;
+      }
 
-        if (method === 'POST') {
-          const input = route.request().postDataJSON() as {
-            buildId: string;
-            channel: 'STABLE';
-            version?: string;
-            buildNumber?: string;
-            releaseNotes?: string;
-          };
+      await route.fallback();
+    });
 
-          const created: Release = {
-            id: '44444444-4444-4444-8444-444444444444',
-            workspaceId: state.owner.workspaceId,
-            desktopAppId: desktop.id,
-            buildId: input.buildId,
-            version: input.version ?? '2.4.0',
-            buildNumber: input.buildNumber ?? '184',
-            channel: input.channel,
-            platform: 'WINDOWS',
-            architecture: 'X64',
-            status: 'DRAFT',
-            releaseNotes: input.releaseNotes ?? null,
-            releasedAt: null,
-            createdAt: '2026-08-23T02:00:00.000Z',
-            updatedAt: '2026-08-23T02:00:00.000Z',
-            build: {
-              ...build,
-              artifacts: [artifact],
-            },
-          };
-
-          releases = [created];
-          await json(route, created, 201);
-          return;
-        }
-
-        if (method === 'PATCH' && statusMatch) {
-          const input = route.request().postDataJSON() as {
-            status: Release['status'];
-          };
-
-          releases = releases.map((release) =>
-            release.id === statusMatch[1]
-              ? {
-                  ...release,
-                  status: input.status,
-                  releasedAt:
-                    input.status === 'PUBLISHED'
-                      ? '2026-08-23T02:10:00.000Z'
-                      : release.releasedAt,
-                  updatedAt: '2026-08-23T02:10:00.000Z',
-                }
-              : release,
-          );
-
-          await json(route, releases[0]);
-          return;
-        }
-
-        await route.fallback();
-      },
-    );
-
-    await page.goto(
-      `/workspaces/${state.owner.workspaceId}` +
-        `/desktop-apps/${desktop.id}/releases`,
-    );
+    await page.goto(`/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktop.id}/releases`);
 
     await expect(
       page.getByRole('heading', {
@@ -3428,52 +2675,52 @@ test.describe('Desktop Phase 11 releases frontend', () => {
       }),
     ).toBeVisible();
 
-    await expect(
-      page.getByText('No desktop releases yet'),
-    ).toBeVisible();
-
-    await page.getByRole('button', {
-      name: 'Create Release',
-    }).click();
+    await expect(page.getByText('No desktop releases yet')).toBeVisible();
 
     await page
-      .getByLabel('Successful build')
-      .selectOption(build.id);
+      .getByRole('button', {
+        name: 'Create Release',
+      })
+      .click();
+
+    await page.getByLabel('Successful build').selectOption(build.id);
+
+    await page.getByLabel('Update channel').selectOption('STABLE');
+
+    await page.getByLabel('Release notes').fill('Phase 11 stable release');
 
     await page
-      .getByLabel('Update channel')
-      .selectOption('STABLE');
-
-    await page
-      .getByLabel('Release notes')
-      .fill('Phase 11 stable release');
-
-    await page.getByRole('button', {
-      name: 'Create Desktop Release',
-    }).click();
+      .getByRole('button', {
+        name: 'Create Desktop Release',
+      })
+      .click();
 
     await expect(page.getByText('2.4.0')).toBeVisible();
     await expect(page.getByText('Draft')).toBeVisible();
-    await expect(
-      page.getByText('command-center-2.4.0-x64.msi'),
-    ).toBeVisible();
+    await expect(page.getByText('command-center-2.4.0-x64.msi')).toBeVisible();
 
     page.once('dialog', (dialog) => dialog.accept());
-    await page.getByRole('button', {
-      name: 'Mark Ready',
-    }).click();
+    await page
+      .getByRole('button', {
+        name: 'Mark Ready',
+      })
+      .click();
     await expect(page.getByText('Ready')).toBeVisible();
 
     page.once('dialog', (dialog) => dialog.accept());
-    await page.getByRole('button', {
-      name: 'Publish',
-    }).click();
+    await page
+      .getByRole('button', {
+        name: 'Publish',
+      })
+      .click();
     await expect(page.getByText('Published')).toBeVisible();
 
     page.once('dialog', (dialog) => dialog.accept());
-    await page.getByRole('button', {
-      name: 'Roll Back',
-    }).click();
+    await page
+      .getByRole('button', {
+        name: 'Roll Back',
+      })
+      .click();
     await expect(page.getByText('Rolled Back')).toBeVisible();
   });
 });

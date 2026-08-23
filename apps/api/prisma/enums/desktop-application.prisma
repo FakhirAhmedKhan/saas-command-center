@@ -1,0 +1,24 @@
+enum DesktopPlatform {
+    WINDOWS
+    MACOS
+    LINUX
+    CROSS_PLATFORM
+}
+
+enum DesktopFramework {
+    ELECTRON
+    TAURI
+    DOTNET
+    QT
+    JAVA
+    NATIVE_WINDOWS
+    NATIVE_MACOS
+    OTHER
+}
+
+enum DesktopArchitecture {
+    X64
+    ARM64
+    X86
+    UNIVERSAL
+}

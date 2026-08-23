@@ -18,8 +18,10 @@ import {
   Radio,
   Settings,
   X,
+  Monitor,
   type LucideIcon,
 } from 'lucide-react';
+
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';

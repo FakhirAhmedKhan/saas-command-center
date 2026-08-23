@@ -23,6 +23,7 @@ model SaasApplication {
   activities              ApplicationActivity[]
   websites                Website[]
   mobileApplication       MobileApplication?
+  desktopApplication      DesktopApplication?
   healthChecks            HealthCheck[]
   applicationEnvironments ApplicationEnvironment[]
   releases                Release[]

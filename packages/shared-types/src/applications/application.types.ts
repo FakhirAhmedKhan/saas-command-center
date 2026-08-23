@@ -144,7 +144,7 @@ export interface CreateApplicationLinkInput {
 
 export type UpdateApplicationLinkInput = Partial<CreateApplicationLinkInput>;
 
-export const APPLICATION_TYPES = ['WEB', 'API', 'MOBILE', 'WORKER', 'OTHER'] as const;
+export const APPLICATION_TYPES = ['WEB', 'API', 'MOBILE', 'WORKER', 'DESKTOP', 'OTHER'] as const;
 
 export type ApplicationType = (typeof APPLICATION_TYPES)[number];
 

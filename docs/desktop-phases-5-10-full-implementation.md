@@ -1,4 +1,5 @@
 # SaaS Command Center — Desktop Application Support
+
 ## Phases 5–10 Full Implementation Bundle
 
 **Assumption:** Phases 1–4 are already implemented and working. In particular:
@@ -134,12 +135,7 @@ export interface DesktopProjectDetectionResponse {
 
 export type DesktopBuildSource = 'GITHUB_ACTIONS';
 
-export type DesktopBuildStatus =
-  | 'QUEUED'
-  | 'BUILDING'
-  | 'SUCCESS'
-  | 'FAILED'
-  | 'CANCELLED';
+export type DesktopBuildStatus = 'QUEUED' | 'BUILDING' | 'SUCCESS' | 'FAILED' | 'CANCELLED';
 
 export interface DesktopBuild {
   id: string;
@@ -192,18 +188,7 @@ export interface DesktopBuildIngestionResult {
   build: DesktopBuild | null;
 }
 
-export type DesktopBuildArtifactType =
-  | 'EXE'
-  | 'MSI'
-  | 'MSIX'
-  | 'DMG'
-  | 'PKG'
-  | 'APP'
-  | 'APPIMAGE'
-  | 'DEB'
-  | 'RPM'
-  | 'ZIP'
-  | 'OTHER';
+export type DesktopBuildArtifactType = 'EXE' | 'MSI' | 'MSIX' | 'DMG' | 'PKG' | 'APP' | 'APPIMAGE' | 'DEB' | 'RPM' | 'ZIP' | 'OTHER';
 
 export interface DesktopBuildArtifact {
   id: string;
@@ -230,21 +215,9 @@ export interface IngestDesktopBuildArtifactInput {
   externalUrl?: string | null;
 }
 
-export type DesktopTestType =
-  | 'UNIT'
-  | 'INTEGRATION'
-  | 'UI'
-  | 'E2E'
-  | 'INSTALLER'
-  | 'OTHER';
+export type DesktopTestType = 'UNIT' | 'INTEGRATION' | 'UI' | 'E2E' | 'INSTALLER' | 'OTHER';
 
-export type DesktopTestStatus =
-  | 'PENDING'
-  | 'RUNNING'
-  | 'PASSED'
-  | 'FAILED'
-  | 'SKIPPED'
-  | 'CANCELLED';
+export type DesktopTestStatus = 'PENDING' | 'RUNNING' | 'PASSED' | 'FAILED' | 'SKIPPED' | 'CANCELLED';
 
 export interface DesktopTestFailure {
   id: string;
@@ -426,9 +399,7 @@ function stringValue(value: unknown): string | null {
 }
 
 function objectValue(value: unknown): Record<string, unknown> | null {
-  return value && typeof value === 'object' && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : null;
+  return value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : null;
 }
 
 function confidence(score: number): 'HIGH' | 'MEDIUM' | 'LOW' {
@@ -445,11 +416,7 @@ function parseRustVersion(cargo: string | null): string | null {
 function parseDotnetVersion(project: string | null): string | null {
   if (!project) return null;
 
-  return (
-    project.match(/<Version>([^<]+)<\/Version>/i)?.[1]?.trim() ??
-    project.match(/<AssemblyVersion>([^<]+)<\/AssemblyVersion>/i)?.[1]?.trim() ??
-    null
-  );
+  return project.match(/<Version>([^<]+)<\/Version>/i)?.[1]?.trim() ?? project.match(/<AssemblyVersion>([^<]+)<\/AssemblyVersion>/i)?.[1]?.trim() ?? null;
 }
 
 function inferArchitectures(text: string): DesktopArchitecture | null {
@@ -483,10 +450,7 @@ function inferPlatforms(text: string): DesktopPlatform {
   return 'CROSS_PLATFORM';
 }
 
-function detectElectron(
-  snapshot: DesktopRepositorySnapshot,
-  packagePath: string,
-): CandidateDraft | null {
+function detectElectron(snapshot: DesktopRepositorySnapshot, packagePath: string): CandidateDraft | null {
   const packageJson = safeJson(getText(snapshot, packagePath));
 
   if (!packageJson) return null;
@@ -501,9 +465,7 @@ function detectElectron(
 
   const hasElectron = typeof dependencies.electron === 'string';
   const hasBuilder = typeof dependencies['electron-builder'] === 'string';
-  const hasForge =
-    typeof dependencies['@electron-forge/cli'] === 'string' ||
-    Object.keys(dependencies).some((key) => key.startsWith('@electron-forge/'));
+  const hasForge = typeof dependencies['@electron-forge/cli'] === 'string' || Object.keys(dependencies).some((key) => key.startsWith('@electron-forge/'));
 
   const main = stringValue(packageJson.main);
   const scriptText = JSON.stringify(scripts ?? {}).toLowerCase();
@@ -526,10 +488,7 @@ function detectElectron(
     platform: inferPlatforms(`${buildText} ${scriptText}`),
     framework: 'ELECTRON',
     architecture: inferArchitectures(`${buildText} ${scriptText}`),
-    packageName:
-      stringValue(packageJson.name) ??
-      stringValue(build?.appId) ??
-      null,
+    packageName: stringValue(packageJson.name) ?? stringValue(build?.appId) ?? null,
     version: stringValue(packageJson.version),
     buildNumber: null,
     minimumOsVersion: null,
@@ -538,20 +497,12 @@ function detectElectron(
   };
 }
 
-function detectTauri(
-  snapshot: DesktopRepositorySnapshot,
-  configPath: string,
-): CandidateDraft | null {
+function detectTauri(snapshot: DesktopRepositorySnapshot, configPath: string): CandidateDraft | null {
   const rootMarker = '/src-tauri/';
   const normalized = normalizePath(configPath);
 
   const markerIndex = normalized.indexOf(rootMarker);
-  const root =
-    markerIndex >= 0
-      ? normalized.slice(0, markerIndex)
-      : normalized.startsWith('src-tauri/')
-        ? ''
-        : dirname(dirname(normalized));
+  const root = markerIndex >= 0 ? normalized.slice(0, markerIndex) : normalized.startsWith('src-tauri/') ? '' : dirname(dirname(normalized));
 
   const tauriRoot = join(root, 'src-tauri');
   const cargoPath = join(tauriRoot, 'Cargo.toml');
@@ -562,14 +513,9 @@ function detectTauri(
   if (!cargo && !config) return null;
 
   const packageNode = objectValue(config?.package);
-  const productName =
-    stringValue(packageNode?.productName) ??
-    stringValue(config?.productName);
+  const productName = stringValue(packageNode?.productName) ?? stringValue(config?.productName);
 
-  const version =
-    stringValue(packageNode?.version) ??
-    stringValue(config?.version) ??
-    parseRustVersion(cargo);
+  const version = stringValue(packageNode?.version) ?? stringValue(config?.version) ?? parseRustVersion(cargo);
 
   const combined = `${getText(snapshot, normalized) ?? ''}\n${cargo ?? ''}`;
 
@@ -587,10 +533,7 @@ function detectTauri(
   };
 }
 
-function detectDotnet(
-  snapshot: DesktopRepositorySnapshot,
-  projectPath: string,
-): CandidateDraft | null {
+function detectDotnet(snapshot: DesktopRepositorySnapshot, projectPath: string): CandidateDraft | null {
   const text = getText(snapshot, projectPath);
   if (!text) return null;
 
@@ -605,11 +548,9 @@ function detectDotnet(
   if (!isDesktop) return null;
 
   const evidence = [projectPath];
-  const targetFramework =
-    text.match(/<TargetFrameworks?>([^<]+)<\/TargetFrameworks?>/i)?.[1] ?? '';
+  const targetFramework = text.match(/<TargetFrameworks?>([^<]+)<\/TargetFrameworks?>/i)?.[1] ?? '';
 
-  const runtimeIdentifiers =
-    text.match(/<RuntimeIdentifiers?>([^<]+)<\/RuntimeIdentifiers?>/i)?.[1] ?? '';
+  const runtimeIdentifiers = text.match(/<RuntimeIdentifiers?>([^<]+)<\/RuntimeIdentifiers?>/i)?.[1] ?? '';
 
   const combined = `${text}\n${targetFramework}\n${runtimeIdentifiers}`;
 
@@ -620,7 +561,10 @@ function detectDotnet(
 
   const packageName =
     text.match(/<AssemblyName>([^<]+)<\/AssemblyName>/i)?.[1]?.trim() ??
-    projectPath.split('/').pop()?.replace(/\.(cs|fs|vb)proj$/i, '') ??
+    projectPath
+      .split('/')
+      .pop()
+      ?.replace(/\.(cs|fs|vb)proj$/i, '') ??
     null;
 
   return {
@@ -631,27 +575,19 @@ function detectDotnet(
     packageName,
     version: parseDotnetVersion(text),
     buildNumber: null,
-    minimumOsVersion:
-      text.match(/<TargetPlatformMinVersion>([^<]+)<\/TargetPlatformMinVersion>/i)?.[1]?.trim() ??
-      null,
+    minimumOsVersion: text.match(/<TargetPlatformMinVersion>([^<]+)<\/TargetPlatformMinVersion>/i)?.[1]?.trim() ?? null,
     score: lower.includes('microsoft.windowsappsdk') || lower.includes('<usewpf>true</usewpf>') ? 96 : 90,
     evidence,
   };
 }
 
-function detectQt(
-  snapshot: DesktopRepositorySnapshot,
-  path: string,
-): CandidateDraft | null {
+function detectQt(snapshot: DesktopRepositorySnapshot, path: string): CandidateDraft | null {
   const text = getText(snapshot, path);
   if (!text) return null;
 
   const lower = text.toLowerCase();
 
-  const qtEvidence =
-    /\bfind_package\s*\(\s*qt[56]/i.test(text) ||
-    /\bqt_add_(executable|qml_module)/i.test(text) ||
-    /\bqt\s*\+=/i.test(text);
+  const qtEvidence = /\bfind_package\s*\(\s*qt[56]/i.test(text) || /\bqt_add_(executable|qml_module)/i.test(text) || /\bqt\s*\+=/i.test(text);
 
   if (!qtEvidence) return null;
 
@@ -676,27 +612,17 @@ function detectQt(
   };
 }
 
-function detectJava(
-  snapshot: DesktopRepositorySnapshot,
-  path: string,
-): CandidateDraft | null {
+function detectJava(snapshot: DesktopRepositorySnapshot, path: string): CandidateDraft | null {
   const text = getText(snapshot, path);
   if (!text) return null;
 
   const lower = text.toLowerCase();
 
-  const javafx =
-    lower.includes('org.openjfx') ||
-    lower.includes('javafx-controls') ||
-    lower.includes('javafx.fxml') ||
-    lower.includes('javafx');
+  const javafx = lower.includes('org.openjfx') || lower.includes('javafx-controls') || lower.includes('javafx.fxml') || lower.includes('javafx');
 
-  const swing =
-    snapshot.paths.some((candidate) =>
-      /\.(java|kt)$/i.test(candidate) &&
-      /\b(src|app)\b/i.test(candidate) &&
-      /swing/i.test(getText(snapshot, candidate) ?? ''),
-    );
+  const swing = snapshot.paths.some(
+    (candidate) => /\.(java|kt)$/i.test(candidate) && /\b(src|app)\b/i.test(candidate) && /swing/i.test(getText(snapshot, candidate) ?? ''),
+  );
 
   if (!javafx && !swing) return null;
 
@@ -707,13 +633,9 @@ function detectJava(
     version = text.match(/<version>([^<]+)<\/version>/i)?.[1]?.trim() ?? null;
     packageName = text.match(/<artifactId>([^<]+)<\/artifactId>/i)?.[1]?.trim() ?? null;
   } else {
-    version =
-      text.match(/\bversion\s*=\s*['"]([^'"]+)['"]/i)?.[1] ??
-      null;
+    version = text.match(/\bversion\s*=\s*['"]([^'"]+)['"]/i)?.[1] ?? null;
 
-    packageName =
-      text.match(/\brootProject\.name\s*=\s*['"]([^'"]+)['"]/i)?.[1] ??
-      null;
+    packageName = text.match(/\brootProject\.name\s*=\s*['"]([^'"]+)['"]/i)?.[1] ?? null;
   }
 
   return {
@@ -730,10 +652,7 @@ function detectJava(
   };
 }
 
-function detectNativeMacos(
-  snapshot: DesktopRepositorySnapshot,
-  path: string,
-): CandidateDraft | null {
+function detectNativeMacos(snapshot: DesktopRepositorySnapshot, path: string): CandidateDraft | null {
   const normalized = normalizePath(path);
 
   if (!/\.(xcodeproj|xcworkspace)\//i.test(`${normalized}/`) && !/\.(xcodeproj|xcworkspace)$/i.test(normalized)) {
@@ -741,11 +660,7 @@ function detectNativeMacos(
   }
 
   const root = dirname(normalized.replace(/\/[^/]+$/, ''));
-  const projectFile = snapshot.paths.find(
-    (candidate) =>
-      candidate.startsWith(root ? `${root}/` : '') &&
-      candidate.endsWith('project.pbxproj'),
-  );
+  const projectFile = snapshot.paths.find((candidate) => candidate.startsWith(root ? `${root}/` : '') && candidate.endsWith('project.pbxproj'));
 
   const pbx = projectFile ? getText(snapshot, projectFile) : null;
 
@@ -754,20 +669,28 @@ function detectNativeMacos(
   }
 
   const packageName =
-    pbx?.match(/\bPRODUCT_BUNDLE_IDENTIFIER\s*=\s*([^;]+);/i)?.[1]?.replace(/["']/g, '').trim() ??
-    null;
+    pbx
+      ?.match(/\bPRODUCT_BUNDLE_IDENTIFIER\s*=\s*([^;]+);/i)?.[1]
+      ?.replace(/["']/g, '')
+      .trim() ?? null;
 
   const version =
-    pbx?.match(/\bMARKETING_VERSION\s*=\s*([^;]+);/i)?.[1]?.replace(/["']/g, '').trim() ??
-    null;
+    pbx
+      ?.match(/\bMARKETING_VERSION\s*=\s*([^;]+);/i)?.[1]
+      ?.replace(/["']/g, '')
+      .trim() ?? null;
 
   const buildNumber =
-    pbx?.match(/\bCURRENT_PROJECT_VERSION\s*=\s*([^;]+);/i)?.[1]?.replace(/["']/g, '').trim() ??
-    null;
+    pbx
+      ?.match(/\bCURRENT_PROJECT_VERSION\s*=\s*([^;]+);/i)?.[1]
+      ?.replace(/["']/g, '')
+      .trim() ?? null;
 
   const minimumOsVersion =
-    pbx?.match(/\bMACOSX_DEPLOYMENT_TARGET\s*=\s*([^;]+);/i)?.[1]?.replace(/["']/g, '').trim() ??
-    null;
+    pbx
+      ?.match(/\bMACOSX_DEPLOYMENT_TARGET\s*=\s*([^;]+);/i)?.[1]
+      ?.replace(/["']/g, '')
+      .trim() ?? null;
 
   return {
     projectRoot: root,
@@ -829,10 +752,7 @@ export class DesktopProjectDetector {
         if (candidate) drafts.push(candidate);
       }
 
-      if (
-        /(^|\/)src-tauri\/tauri\.conf\.(json|json5)$/i.test(path) ||
-        /(^|\/)src-tauri\/tauri\.conf\.json$/i.test(path)
-      ) {
+      if (/(^|\/)src-tauri\/tauri\.conf\.(json|json5)$/i.test(path) || /(^|\/)src-tauri\/tauri\.conf\.json$/i.test(path)) {
         const candidate = detectTauri(snapshot, path);
         if (candidate) drafts.push(candidate);
       }
@@ -862,9 +782,7 @@ export class DesktopProjectDetector {
 
     if (snapshot.truncated) {
       for (const candidate of candidates) {
-        candidate.warnings.push(
-          'Repository metadata was truncated; detection may be incomplete.',
-        );
+        candidate.warnings.push('Repository metadata was truncated; detection may be incomplete.');
       }
     }
 
@@ -890,10 +808,7 @@ apps/api/src/modules/desktop-apps/services/desktop-project-detection.service.ts
 
 ```ts
 import { DesktopRepositoryService } from './desktop-repository.service';
-import {
-  DesktopProjectDetector,
-  type DesktopRepositorySnapshot,
-} from './desktop-project-detector';
+import { DesktopProjectDetector, type DesktopRepositorySnapshot } from './desktop-project-detector';
 import { GithubCodeService } from '../../repositories/services/github-code.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
@@ -910,39 +825,23 @@ export class DesktopProjectDetectionService {
   ) {}
 
   async detect(workspaceId: string, desktopAppId: string) {
-    const repository =
-      await this.desktopRepositories.getLinkedRepository(workspaceId, desktopAppId);
+    const repository = await this.desktopRepositories.getLinkedRepository(workspaceId, desktopAppId);
 
     if (!repository) {
-      throw new BadRequestException(
-        'Connect a repository before running desktop project detection.',
-      );
+      throw new BadRequestException('Connect a repository before running desktop project detection.');
     }
 
     if (repository.archived || !repository.isAvailable) {
-      throw new BadRequestException(
-        'The linked repository is not available for desktop project detection.',
-      );
+      throw new BadRequestException('The linked repository is not available for desktop project detection.');
     }
 
-    const tree = await this.githubCode.getTree(
-      repository.installation.externalInstallationId,
-      repository.owner,
-      repository.name,
-      repository.defaultBranch,
-    );
+    const tree = await this.githubCode.getTree(repository.installation.externalInstallationId, repository.owner, repository.name, repository.defaultBranch);
 
-    const paths = tree.entries
-      .filter((entry) => entry.type === 'file')
-      .map((entry) => entry.path);
+    const paths = tree.entries.filter((entry) => entry.type === 'file').map((entry) => entry.path);
 
     const candidateEntries = tree.entries.filter(
       (entry) =>
-        entry.type === 'file' &&
-        this.isDetectionFile(entry.path) &&
-        (entry.size === null ||
-          entry.size === undefined ||
-          entry.size <= MAX_METADATA_FILE_SIZE),
+        entry.type === 'file' && this.isDetectionFile(entry.path) && (entry.size === null || entry.size === undefined || entry.size <= MAX_METADATA_FILE_SIZE),
     );
 
     const selectedEntries = candidateEntries.slice(0, MAX_METADATA_FILES);
@@ -971,12 +870,7 @@ export class DesktopProjectDetectionService {
 
     // Xcode project metadata is inside *.xcodeproj/project.pbxproj.
     const xcodeProjectFiles = tree.entries
-      .filter(
-        (entry) =>
-          entry.type === 'file' &&
-          /(^|\/)[^/]+\.xcodeproj\/project\.pbxproj$/i.test(entry.path) &&
-          !files[entry.path],
-      )
+      .filter((entry) => entry.type === 'file' && /(^|\/)[^/]+\.xcodeproj\/project\.pbxproj$/i.test(entry.path) && !files[entry.path])
       .slice(0, Math.max(0, MAX_METADATA_FILES - Object.keys(files).length));
 
     for (const entry of xcodeProjectFiles) {
@@ -1006,9 +900,7 @@ export class DesktopProjectDetectionService {
           entry.type === 'file' &&
           /\.(java|kt)$/i.test(entry.path) &&
           !files[entry.path] &&
-          (entry.size === null ||
-            entry.size === undefined ||
-            entry.size <= MAX_METADATA_FILE_SIZE),
+          (entry.size === null || entry.size === undefined || entry.size <= MAX_METADATA_FILE_SIZE),
       )
       .slice(0, 20);
 
@@ -1034,9 +926,7 @@ export class DesktopProjectDetectionService {
       repositoryId: repository.id,
       repositoryFullName: repository.fullName,
       branch: repository.defaultBranch,
-      truncated:
-        tree.truncated ||
-        candidateEntries.length > MAX_METADATA_FILES,
+      truncated: tree.truncated || candidateEntries.length > MAX_METADATA_FILES,
       paths,
       files,
     };
@@ -1071,13 +961,7 @@ apps/api/src/modules/desktop-apps/controllers/desktop-project-detection.controll
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
 import { DesktopProjectDetectionService } from '../services/desktop-project-detection.service';
-import {
-  Controller,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Param, ParseUUIDPipe, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Desktop Project Detection')
@@ -1085,9 +969,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 @Controller('workspaces/:workspaceId/desktop-apps/:desktopAppId')
 @UseGuards(JwtAuthGuard, WorkspaceAccessGuard)
 export class DesktopProjectDetectionController {
-  constructor(
-    private readonly service: DesktopProjectDetectionService,
-  ) {}
+  constructor(private readonly service: DesktopProjectDetectionService) {}
 
   @Post('detect')
   @ApiOperation({
@@ -1114,22 +996,12 @@ apps/web/src/features/desktop-apps/desktop-apps-api.ts
 ```
 
 ```ts
-import type {
-  DesktopApplicationDetails,
-  DesktopProjectDetectionResponse,
-  UpdateDesktopApplicationInput,
-} from '@command-center/shared-types';
+import type { DesktopApplicationDetails, DesktopProjectDetectionResponse, UpdateDesktopApplicationInput } from '@command-center/shared-types';
 
-export function detectDesktopProject(
-  workspaceId: string,
-  desktopAppId: string,
-) {
-  return apiRequest<DesktopProjectDetectionResponse>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/detect`,
-    {
-      method: 'POST',
-    },
-  );
+export function detectDesktopProject(workspaceId: string, desktopAppId: string) {
+  return apiRequest<DesktopProjectDetectionResponse>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/detect`, {
+    method: 'POST',
+  });
 }
 
 /**
@@ -1138,18 +1010,11 @@ export function detectDesktopProject(
  * already-existing PATCH desktop-app endpoint rather than creating another
  * backend mutation.
  */
-export function applyDetectedDesktopConfiguration(
-  workspaceId: string,
-  desktopAppId: string,
-  input: UpdateDesktopApplicationInput,
-) {
-  return apiRequest<DesktopApplicationDetails>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}`,
-    {
-      method: 'PATCH',
-      body: JSON.stringify(input),
-    },
-  );
+export function applyDetectedDesktopConfiguration(workspaceId: string, desktopAppId: string, input: UpdateDesktopApplicationInput) {
+  return apiRequest<DesktopApplicationDetails>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(input),
+  });
 }
 ```
 
@@ -1164,10 +1029,7 @@ apps/web/src/features/desktop-apps/desktop-project-detection-panel.tsx
 ```tsx
 'use client';
 
-import {
-  applyDetectedDesktopConfiguration,
-  detectDesktopProject,
-} from './desktop-apps-api';
+import { applyDetectedDesktopConfiguration, detectDesktopProject } from './desktop-apps-api';
 import { getErrorMessage } from '@/features/lib/api/api-error';
 import type {
   DesktopApplicationDetails,
@@ -1185,16 +1047,11 @@ interface Props {
   onApplied?: (desktopApp: DesktopApplicationDetails) => void;
 }
 
-export function DesktopProjectDetectionPanel({
-  workspaceId,
-  desktopApp,
-  onApplied,
-}: Props) {
+export function DesktopProjectDetectionPanel({ workspaceId, desktopApp, onApplied }: Props) {
   const [running, setRunning] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [candidate, setCandidate] =
-    useState<DesktopProjectDetectionCandidate | null>(null);
+  const [candidate, setCandidate] = useState<DesktopProjectDetectionCandidate | null>(null);
 
   async function detect(): Promise<void> {
     setRunning(true);
@@ -1205,9 +1062,7 @@ export function DesktopProjectDetectionPanel({
       setCandidate(result.primary);
 
       if (!result.primary) {
-        setError(
-          'No supported desktop project was detected. You can keep the current manual configuration.',
-        );
+        setError('No supported desktop project was detected. You can keep the current manual configuration.');
       }
     } catch (caught: unknown) {
       setError(getErrorMessage(caught));
@@ -1223,28 +1078,15 @@ export function DesktopProjectDetectionPanel({
     setError(null);
 
     try {
-      const updated = await applyDetectedDesktopConfiguration(
-        workspaceId,
-        desktopApp.id,
-        {
-          platform: candidate.platform,
-          framework: candidate.framework,
-          architecture:
-            candidate.architecture ?? desktopApp.architecture,
-          packageName:
-            candidate.packageName ?? desktopApp.packageName ?? undefined,
-          currentVersion:
-            candidate.version ?? desktopApp.currentVersion ?? undefined,
-          currentBuildNumber:
-            candidate.buildNumber ??
-            desktopApp.currentBuildNumber ??
-            undefined,
-          minimumOsVersion:
-            candidate.minimumOsVersion ??
-            desktopApp.minimumOsVersion ??
-            undefined,
-        },
-      );
+      const updated = await applyDetectedDesktopConfiguration(workspaceId, desktopApp.id, {
+        platform: candidate.platform,
+        framework: candidate.framework,
+        architecture: candidate.architecture ?? desktopApp.architecture,
+        packageName: candidate.packageName ?? desktopApp.packageName ?? undefined,
+        currentVersion: candidate.version ?? desktopApp.currentVersion ?? undefined,
+        currentBuildNumber: candidate.buildNumber ?? desktopApp.currentBuildNumber ?? undefined,
+        minimumOsVersion: candidate.minimumOsVersion ?? desktopApp.minimumOsVersion ?? undefined,
+      });
 
       onApplied?.(updated);
     } catch (caught: unknown) {
@@ -1254,10 +1096,7 @@ export function DesktopProjectDetectionPanel({
     }
   }
 
-  function updateCandidate<K extends keyof DesktopProjectDetectionCandidate>(
-    key: K,
-    value: DesktopProjectDetectionCandidate[K],
-  ): void {
+  function updateCandidate<K extends keyof DesktopProjectDetectionCandidate>(key: K, value: DesktopProjectDetectionCandidate[K]): void {
     setCandidate((current) =>
       current
         ? {
@@ -1272,12 +1111,9 @@ export function DesktopProjectDetectionPanel({
     <section className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6'>
       <div className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
         <div>
-          <h2 className='text-lg font-semibold text-slate-950'>
-            Project detection
-          </h2>
+          <h2 className='text-lg font-semibold text-slate-950'>Project detection</h2>
           <p className='mt-1 max-w-2xl text-sm leading-6 text-slate-500'>
-            Analyze the linked repository for Electron, Tauri, .NET, Qt,
-            Java desktop, or native macOS project metadata.
+            Analyze the linked repository for Electron, Tauri, .NET, Qt, Java desktop, or native macOS project metadata.
           </p>
         </div>
 
@@ -1287,20 +1123,13 @@ export function DesktopProjectDetectionPanel({
           onClick={() => void detect()}
           className='inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white disabled:opacity-50'
         >
-          {running ? (
-            <Loader2 className='size-4 animate-spin' aria-hidden='true' />
-          ) : (
-            <SearchCode className='size-4' aria-hidden='true' />
-          )}
+          {running ? <Loader2 className='size-4 animate-spin' aria-hidden='true' /> : <SearchCode className='size-4' aria-hidden='true' />}
           {running ? 'Analyzing...' : 'Analyze Repository'}
         </button>
       </div>
 
       {error ? (
-        <div
-          role='alert'
-          className='mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800'
-        >
+        <div role='alert' className='mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800'>
           {error}
         </div>
       ) : null}
@@ -1313,12 +1142,7 @@ export function DesktopProjectDetectionPanel({
               <select
                 aria-label='Detected platform'
                 value={candidate.platform}
-                onChange={(event) =>
-                  updateCandidate(
-                    'platform',
-                    event.target.value as DesktopPlatform,
-                  )
-                }
+                onChange={(event) => updateCandidate('platform', event.target.value as DesktopPlatform)}
                 className='mt-1.5 h-10 w-full rounded-lg border border-slate-300 bg-white px-3'
               >
                 <option value='WINDOWS'>Windows</option>
@@ -1333,12 +1157,7 @@ export function DesktopProjectDetectionPanel({
               <select
                 aria-label='Detected framework'
                 value={candidate.framework}
-                onChange={(event) =>
-                  updateCandidate(
-                    'framework',
-                    event.target.value as DesktopFramework,
-                  )
-                }
+                onChange={(event) => updateCandidate('framework', event.target.value as DesktopFramework)}
                 className='mt-1.5 h-10 w-full rounded-lg border border-slate-300 bg-white px-3'
               >
                 <option value='ELECTRON'>Electron</option>
@@ -1357,12 +1176,7 @@ export function DesktopProjectDetectionPanel({
               <select
                 aria-label='Detected architecture'
                 value={candidate.architecture ?? desktopApp.architecture}
-                onChange={(event) =>
-                  updateCandidate(
-                    'architecture',
-                    event.target.value as DesktopArchitecture,
-                  )
-                }
+                onChange={(event) => updateCandidate('architecture', event.target.value as DesktopArchitecture)}
                 className='mt-1.5 h-10 w-full rounded-lg border border-slate-300 bg-white px-3'
               >
                 <option value='X64'>x64</option>
@@ -1388,9 +1202,7 @@ export function DesktopProjectDetectionPanel({
               <input
                 aria-label='Detected package name'
                 value={candidate.packageName ?? ''}
-                onChange={(event) =>
-                  updateCandidate('packageName', event.target.value || null)
-                }
+                onChange={(event) => updateCandidate('packageName', event.target.value || null)}
                 className='mt-1.5 h-10 w-full rounded-lg border border-slate-300 px-3'
               />
             </label>
@@ -1400,9 +1212,7 @@ export function DesktopProjectDetectionPanel({
               <input
                 aria-label='Detected version'
                 value={candidate.version ?? ''}
-                onChange={(event) =>
-                  updateCandidate('version', event.target.value || null)
-                }
+                onChange={(event) => updateCandidate('version', event.target.value || null)}
                 className='mt-1.5 h-10 w-full rounded-lg border border-slate-300 px-3'
               />
             </label>
@@ -1412,10 +1222,7 @@ export function DesktopProjectDetectionPanel({
             <p className='text-sm font-medium text-slate-700'>Evidence</p>
             <div className='mt-2 flex flex-wrap gap-2'>
               {candidate.evidence.map((item) => (
-                <span
-                  key={item}
-                  className='rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-600'
-                >
+                <span key={item} className='rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-600'>
                   {item}
                 </span>
               ))}
@@ -1437,7 +1244,6 @@ export function DesktopProjectDetectionPanel({
 }
 ```
 
-
 ## 5.6 Backend unit tests: controlled framework fixtures
 
 Create:
@@ -1447,15 +1253,9 @@ packages/test-code/api/unit/desktop-project-detector.spec.ts
 ```
 
 ```ts
-import {
-  DesktopProjectDetector,
-  type DesktopRepositorySnapshot,
-} from '../../../apps/api/src/modules/desktop-apps/services/desktop-project-detector';
+import { DesktopProjectDetector, type DesktopRepositorySnapshot } from '../../../apps/api/src/modules/desktop-apps/services/desktop-project-detector';
 
-function snapshot(
-  paths: string[],
-  files: Record<string, string>,
-): DesktopRepositorySnapshot {
+function snapshot(paths: string[], files: Record<string, string>): DesktopRepositorySnapshot {
   return {
     repositoryId: '11111111-1111-4111-8111-111111111111',
     repositoryFullName: 'command-center/desktop-fixture',
@@ -1471,28 +1271,25 @@ describe('DesktopProjectDetector', () => {
 
   it('detects Electron', () => {
     const result = detector.detect(
-      snapshot(
-        ['package.json'],
-        {
-          'package.json': JSON.stringify({
-            name: 'electron-demo',
-            version: '1.4.0',
-            main: 'dist/main.js',
-            devDependencies: {
-              electron: '^40.0.0',
-              'electron-builder': '^26.0.0',
+      snapshot(['package.json'], {
+        'package.json': JSON.stringify({
+          name: 'electron-demo',
+          version: '1.4.0',
+          main: 'dist/main.js',
+          devDependencies: {
+            electron: '^40.0.0',
+            'electron-builder': '^26.0.0',
+          },
+          build: {
+            win: {
+              target: ['nsis'],
             },
-            build: {
-              win: {
-                target: ['nsis'],
-              },
-              mac: {
-                target: ['dmg'],
-              },
+            mac: {
+              target: ['dmg'],
             },
-          }),
-        },
-      ),
+          },
+        }),
+      }),
     );
 
     expect(result.primary).toMatchObject({
@@ -1506,14 +1303,8 @@ describe('DesktopProjectDetector', () => {
 
   it('detects Tauri', () => {
     const result = detector.detect(
-      snapshot(
-        [
-          'package.json',
-          'src-tauri/Cargo.toml',
-          'src-tauri/tauri.conf.json',
-        ],
-        {
-          'src-tauri/Cargo.toml': `
+      snapshot(['package.json', 'src-tauri/Cargo.toml', 'src-tauri/tauri.conf.json'], {
+        'src-tauri/Cargo.toml': `
 [package]
 name = "tauri-demo"
 version = "2.3.0"
@@ -1521,16 +1312,15 @@ version = "2.3.0"
 [dependencies]
 tauri = "2"
 `,
-          'src-tauri/tauri.conf.json': JSON.stringify({
-            productName: 'Tauri Demo',
-            version: '2.3.0',
-            bundle: {
-              active: true,
-              targets: 'all',
-            },
-          }),
-        },
-      ),
+        'src-tauri/tauri.conf.json': JSON.stringify({
+          productName: 'Tauri Demo',
+          version: '2.3.0',
+          bundle: {
+            active: true,
+            targets: 'all',
+          },
+        }),
+      }),
     );
 
     expect(result.primary).toMatchObject({
@@ -1543,10 +1333,8 @@ tauri = "2"
 
   it('detects WPF .NET', () => {
     const result = detector.detect(
-      snapshot(
-        ['src/Desktop/Desktop.csproj'],
-        {
-          'src/Desktop/Desktop.csproj': `
+      snapshot(['src/Desktop/Desktop.csproj'], {
+        'src/Desktop/Desktop.csproj': `
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -1557,8 +1345,7 @@ tauri = "2"
   </PropertyGroup>
 </Project>
 `,
-        },
-      ),
+      }),
     );
 
     expect(result.primary).toMatchObject({
@@ -1572,10 +1359,8 @@ tauri = "2"
 
   it('detects WinUI .NET', () => {
     const result = detector.detect(
-      snapshot(
-        ['WindowsApp/WindowsApp.csproj'],
-        {
-          'WindowsApp/WindowsApp.csproj': `
+      snapshot(['WindowsApp/WindowsApp.csproj'], {
+        'WindowsApp/WindowsApp.csproj': `
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0-windows10.0.22621.0</TargetFramework>
@@ -1587,8 +1372,7 @@ tauri = "2"
   </ItemGroup>
 </Project>
 `,
-        },
-      ),
+      }),
     );
 
     expect(result.primary).toMatchObject({
@@ -1601,17 +1385,14 @@ tauri = "2"
 
   it('detects Qt with CMake', () => {
     const result = detector.detect(
-      snapshot(
-        ['desktop/CMakeLists.txt'],
-        {
-          'desktop/CMakeLists.txt': `
+      snapshot(['desktop/CMakeLists.txt'], {
+        'desktop/CMakeLists.txt': `
 cmake_minimum_required(VERSION 3.24)
 project(CommandCenterDesktop)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 qt_add_executable(command-center main.cpp)
 `,
-        },
-      ),
+      }),
     );
 
     expect(result.primary).toMatchObject({
@@ -1622,10 +1403,8 @@ qt_add_executable(command-center main.cpp)
 
   it('detects JavaFX', () => {
     const result = detector.detect(
-      snapshot(
-        ['desktop/pom.xml'],
-        {
-          'desktop/pom.xml': `
+      snapshot(['desktop/pom.xml'], {
+        'desktop/pom.xml': `
 <project>
   <artifactId>desktop-javafx</artifactId>
   <version>5.0.0</version>
@@ -1637,8 +1416,7 @@ qt_add_executable(command-center main.cpp)
   </dependencies>
 </project>
 `,
-        },
-      ),
+      }),
     );
 
     expect(result.primary).toMatchObject({
@@ -1653,18 +1431,15 @@ qt_add_executable(command-center main.cpp)
     const path = 'MacApp/MacApp.xcodeproj/project.pbxproj';
 
     const result = detector.detect(
-      snapshot(
-        [path],
-        {
-          [path]: `
+      snapshot([path], {
+        [path]: `
 SDKROOT = macosx;
 MACOSX_DEPLOYMENT_TARGET = 14.0;
 PRODUCT_BUNDLE_IDENTIFIER = com.commandcenter.mac;
 MARKETING_VERSION = 1.7.0;
 CURRENT_PROJECT_VERSION = 170;
 `,
-        },
-      ),
+      }),
     );
 
     expect(result.primary).toMatchObject({
@@ -1679,18 +1454,15 @@ CURRENT_PROJECT_VERSION = 170;
 
   it('does not classify an ordinary Node web repository as desktop', () => {
     const result = detector.detect(
-      snapshot(
-        ['package.json'],
-        {
-          'package.json': JSON.stringify({
-            name: 'website',
-            dependencies: {
-              next: '^16.0.0',
-              react: '^19.0.0',
-            },
-          }),
-        },
-      ),
+      snapshot(['package.json'], {
+        'package.json': JSON.stringify({
+          name: 'website',
+          dependencies: {
+            next: '^16.0.0',
+            react: '^19.0.0',
+          },
+        }),
+      }),
     );
 
     expect(result.primary).toBeNull();
@@ -1699,49 +1471,37 @@ CURRENT_PROJECT_VERSION = 170;
 
   it('returns all desktop projects in a monorepo ordered by confidence', () => {
     const result = detector.detect(
-      snapshot(
-        [
-          'apps/electron/package.json',
-          'apps/tauri/src-tauri/Cargo.toml',
-          'apps/tauri/src-tauri/tauri.conf.json',
-        ],
-        {
-          'apps/electron/package.json': JSON.stringify({
-            name: 'electron-app',
-            devDependencies: {
-              electron: '^40.0.0',
-            },
-          }),
-          'apps/tauri/src-tauri/Cargo.toml': `
-[package]
-name = "tauri-app"
-version = "1.0.0"
-`,
-          'apps/tauri/src-tauri/tauri.conf.json': JSON.stringify({
-            productName: 'Tauri App',
-          }),
-        },
-      ),
-    );
-
-    expect(result.candidates).toHaveLength(2);
-    expect(
-      result.candidates.map((candidate) => candidate.framework),
-    ).toEqual(expect.arrayContaining(['ELECTRON', 'TAURI']));
-  });
-
-  it('adds a warning when repository metadata is truncated', () => {
-    const source = snapshot(
-      ['package.json'],
-      {
-        'package.json': JSON.stringify({
+      snapshot(['apps/electron/package.json', 'apps/tauri/src-tauri/Cargo.toml', 'apps/tauri/src-tauri/tauri.conf.json'], {
+        'apps/electron/package.json': JSON.stringify({
           name: 'electron-app',
           devDependencies: {
             electron: '^40.0.0',
           },
         }),
-      },
+        'apps/tauri/src-tauri/Cargo.toml': `
+[package]
+name = "tauri-app"
+version = "1.0.0"
+`,
+        'apps/tauri/src-tauri/tauri.conf.json': JSON.stringify({
+          productName: 'Tauri App',
+        }),
+      }),
     );
+
+    expect(result.candidates).toHaveLength(2);
+    expect(result.candidates.map((candidate) => candidate.framework)).toEqual(expect.arrayContaining(['ELECTRON', 'TAURI']));
+  });
+
+  it('adds a warning when repository metadata is truncated', () => {
+    const source = snapshot(['package.json'], {
+      'package.json': JSON.stringify({
+        name: 'electron-app',
+        devDependencies: {
+          electron: '^40.0.0',
+        },
+      }),
+    });
 
     source.truncated = true;
 
@@ -1768,16 +1528,11 @@ import { registerWorkspaceTestUser } from '../../helpers/workspace';
 
 export const API = '/api/v1';
 
-export type WorkspaceIdentity = Awaited<
-  ReturnType<typeof registerWorkspaceTestUser>
->;
+export type WorkspaceIdentity = Awaited<ReturnType<typeof registerWorkspaceTestUser>>;
 
 let sequence = 0;
 
-export async function createDesktopApp(
-  owner: WorkspaceIdentity,
-  overrides: Record<string, unknown> = {},
-) {
+export async function createDesktopApp(owner: WorkspaceIdentity, overrides: Record<string, unknown> = {}) {
   sequence += 1;
 
   const response = await owner.agent
@@ -1810,23 +1565,18 @@ export async function createDesktopApp(
   };
 }
 
-export async function createRepository(
-  prisma: PrismaService,
-  workspaceId: string,
-  applicationId: string | null = null,
-) {
+export async function createRepository(prisma: PrismaService, workspaceId: string, applicationId: string | null = null) {
   sequence += 1;
 
-  const installation =
-    await prisma.repositoryInstallation.create({
-      data: {
-        workspaceId,
-        provider: RepositoryProvider.GITHUB,
-        externalInstallationId: `desktop-installation-${Date.now()}-${sequence}`,
-        accountLogin: 'command-center',
-        accountType: 'Organization',
-      },
-    });
+  const installation = await prisma.repositoryInstallation.create({
+    data: {
+      workspaceId,
+      provider: RepositoryProvider.GITHUB,
+      externalInstallationId: `desktop-installation-${Date.now()}-${sequence}`,
+      accountLogin: 'command-center',
+      accountType: 'Organization',
+    },
+  });
 
   const name = `desktop-repository-${Date.now()}-${sequence}`;
 
@@ -1852,17 +1602,10 @@ export async function createRepository(
   });
 }
 
-export async function createLinkedDesktopFixture(
-  app: INestApplication,
-  prisma: PrismaService,
-) {
+export async function createLinkedDesktopFixture(app: INestApplication, prisma: PrismaService) {
   const owner = await registerWorkspaceTestUser(app, prisma);
   const desktopApp = await createDesktopApp(owner);
-  const repository = await createRepository(
-    prisma,
-    owner.workspaceId,
-    desktopApp.applicationId,
-  );
+  const repository = await createRepository(prisma, owner.workspaceId, desktopApp.applicationId);
 
   return {
     owner,
@@ -1871,33 +1614,19 @@ export async function createLinkedDesktopFixture(
   };
 }
 
-export function buildPath(
-  workspaceId: string,
-  desktopAppId: string,
-): string {
+export function buildPath(workspaceId: string, desktopAppId: string): string {
   return `${API}/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds`;
 }
 
-export function overviewPath(
-  workspaceId: string,
-  desktopAppId: string,
-): string {
+export function overviewPath(workspaceId: string, desktopAppId: string): string {
   return `${API}/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/overview`;
 }
 
-export function detectPath(
-  workspaceId: string,
-  desktopAppId: string,
-): string {
+export function detectPath(workspaceId: string, desktopAppId: string): string {
   return `${API}/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/detect`;
 }
 
-export async function ingestSuccessfulBuild(
-  owner: WorkspaceIdentity,
-  desktopAppId: string,
-  repositoryId: string,
-  suffix = `${Date.now()}-${++sequence}`,
-) {
+export async function ingestSuccessfulBuild(owner: WorkspaceIdentity, desktopAppId: string, repositoryId: string, suffix = `${Date.now()}-${++sequence}`) {
   const response = await owner.agent
     .post(`${buildPath(owner.workspaceId, desktopAppId)}/ingest/github`)
     .set('Authorization', `Bearer ${owner.accessToken}`)
@@ -1942,10 +1671,7 @@ import { PrismaService } from 'src/database/prisma.service';
 import { GithubCodeService } from 'src/modules/repositories/services/github-code.service';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
-import {
-  createLinkedDesktopFixture,
-  detectPath,
-} from './helpers/desktop-test-fixtures';
+import { createLinkedDesktopFixture, detectPath } from './helpers/desktop-test-fixtures';
 
 describe('Desktop Project Detection E2E', () => {
   let app: INestApplication;
@@ -1996,16 +1722,8 @@ describe('Desktop Project Detection E2E', () => {
     } as never);
 
     const response = await fixture.owner.agent
-      .post(
-        detectPath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        ),
-      )
-      .set(
-        'Authorization',
-        `Bearer ${fixture.owner.accessToken}`,
-      );
+      .post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id))
+      .set('Authorization', `Bearer ${fixture.owner.accessToken}`);
 
     expect(response.status).toBe(201);
     expect(response.body.primary).toMatchObject({
@@ -2045,16 +1763,8 @@ describe('Desktop Project Detection E2E', () => {
     } as never);
 
     const response = await fixture.owner.agent
-      .post(
-        detectPath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        ),
-      )
-      .set(
-        'Authorization',
-        `Bearer ${fixture.owner.accessToken}`,
-      );
+      .post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id))
+      .set('Authorization', `Bearer ${fixture.owner.accessToken}`);
 
     expect(response.status).toBe(201);
     expect(response.body.primary).toBeNull();
@@ -2100,16 +1810,8 @@ describe('Desktop Project Detection E2E', () => {
       } as never);
 
     const response = await fixture.owner.agent
-      .post(
-        detectPath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        ),
-      )
-      .set(
-        'Authorization',
-        `Bearer ${fixture.owner.accessToken}`,
-      );
+      .post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id))
+      .set('Authorization', `Bearer ${fixture.owner.accessToken}`);
 
     expect(response.status).toBe(201);
     expect(response.body.primary.framework).toBe('ELECTRON');
@@ -2118,33 +1820,18 @@ describe('Desktop Project Detection E2E', () => {
   it('requires authentication', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
 
-    const response = await fixture.owner.agent.post(
-      detectPath(
-        fixture.owner.workspaceId,
-        fixture.desktopApp.id,
-      ),
-    );
+    const response = await fixture.owner.agent.post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id));
 
     expect(response.status).toBe(401);
   });
 
   it('rejects cross-workspace desktop application access', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
-    const attacker = await (
-      await import('../helpers/workspace')
-    ).registerWorkspaceTestUser(app, prisma);
+    const attacker = await (await import('../helpers/workspace')).registerWorkspaceTestUser(app, prisma);
 
     const response = await attacker.agent
-      .post(
-        detectPath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        ),
-      )
-      .set(
-        'Authorization',
-        `Bearer ${attacker.accessToken}`,
-      );
+      .post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id))
+      .set('Authorization', `Bearer ${attacker.accessToken}`);
 
     expect(response.status).toBe(403);
   });
@@ -2180,25 +1867,19 @@ export class DesktopOverviewService {
   ) {}
 
   async get(workspaceId: string, desktopAppId: string) {
-    const desktopApp =
-      await this.desktopApps.findOne(workspaceId, desktopAppId);
+    const desktopApp = await this.desktopApps.findOne(workspaceId, desktopAppId);
 
-    const repository =
-      await this.desktopRepositories.getLinkedRepository(
+    const repository = await this.desktopRepositories.getLinkedRepository(workspaceId, desktopAppId);
+
+    const latestBuild = await this.prisma.desktopBuild.findFirst({
+      where: {
         workspaceId,
         desktopAppId,
-      );
-
-    const latestBuild =
-      await this.prisma.desktopBuild.findFirst({
-        where: {
-          workspaceId,
-          desktopAppId,
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-      });
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
 
     return {
       desktopApp,
@@ -2225,13 +1906,7 @@ apps/api/src/modules/desktop-apps/controllers/desktop-overview.controller.ts
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
 import { DesktopOverviewService } from '../services/desktop-overview.service';
-import {
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Param, ParseUUIDPipe, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Desktop Application Overview')
@@ -2239,9 +1914,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 @Controller('workspaces/:workspaceId/desktop-apps/:desktopAppId')
 @UseGuards(JwtAuthGuard, WorkspaceAccessGuard)
 export class DesktopOverviewController {
-  constructor(
-    private readonly service: DesktopOverviewService,
-  ) {}
+  constructor(private readonly service: DesktopOverviewService) {}
 
   @Get('overview')
   @ApiOperation({
@@ -2266,13 +1939,8 @@ Append to `desktop-apps-api.ts`:
 ```ts
 import type { DesktopAppOverview } from '@command-center/shared-types';
 
-export function getDesktopAppOverview(
-  workspaceId: string,
-  desktopAppId: string,
-) {
-  return apiRequest<DesktopAppOverview>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/overview`,
-  );
+export function getDesktopAppOverview(workspaceId: string, desktopAppId: string) {
+  return apiRequest<DesktopAppOverview>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/overview`);
 }
 ```
 
@@ -2314,34 +1982,18 @@ const LIVE_TABS = [
   },
 ] as const;
 
-const FUTURE_TABS = [
-  'Releases',
-  'Performance',
-  'Crashes',
-  'Dependencies',
-  'Security',
-] as const;
+const FUTURE_TABS = ['Releases', 'Performance', 'Crashes', 'Dependencies', 'Security'] as const;
 
-export function DesktopAppSubNav({
-  workspaceId,
-  desktopAppId,
-}: Props) {
+export function DesktopAppSubNav({ workspaceId, desktopAppId }: Props) {
   const pathname = usePathname();
 
-  const base =
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}`;
+  const base = `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}`;
 
   return (
-    <nav
-      aria-label='Desktop application navigation'
-      className='flex gap-1 overflow-x-auto rounded-xl border border-slate-200 bg-white p-1'
-    >
+    <nav aria-label='Desktop application navigation' className='flex gap-1 overflow-x-auto rounded-xl border border-slate-200 bg-white p-1'>
       {LIVE_TABS.map((tab) => {
         const href = `${base}${tab.path}`;
-        const active =
-          tab.path === ''
-            ? pathname === base
-            : pathname === href || pathname.startsWith(`${href}/`);
+        const active = tab.path === '' ? pathname === base : pathname === href || pathname.startsWith(`${href}/`);
 
         return (
           <Link
@@ -2397,11 +2049,7 @@ function value(value: string | null | undefined): string {
   return value?.trim() || 'Not set';
 }
 
-export function DesktopOverview({
-  workspaceId,
-  desktopAppId,
-  overview,
-}: Props) {
+export function DesktopOverview({ workspaceId, desktopAppId, overview }: Props) {
   const { desktopApp, repository, latestBuild } = overview;
 
   return (
@@ -2414,52 +2062,28 @@ export function DesktopOverview({
 
         <dl className='mt-4 grid gap-4 sm:grid-cols-2'>
           <div>
-            <dt className='text-xs font-semibold uppercase tracking-wide text-slate-400'>
-              Platform
-            </dt>
-            <dd className='mt-1 text-sm font-medium text-slate-800'>
-              {desktopApp.platform}
-            </dd>
+            <dt className='text-xs font-semibold uppercase tracking-wide text-slate-400'>Platform</dt>
+            <dd className='mt-1 text-sm font-medium text-slate-800'>{desktopApp.platform}</dd>
           </div>
           <div>
-            <dt className='text-xs font-semibold uppercase tracking-wide text-slate-400'>
-              Framework
-            </dt>
-            <dd className='mt-1 text-sm font-medium text-slate-800'>
-              {desktopApp.framework}
-            </dd>
+            <dt className='text-xs font-semibold uppercase tracking-wide text-slate-400'>Framework</dt>
+            <dd className='mt-1 text-sm font-medium text-slate-800'>{desktopApp.framework}</dd>
           </div>
           <div>
-            <dt className='text-xs font-semibold uppercase tracking-wide text-slate-400'>
-              Architecture
-            </dt>
-            <dd className='mt-1 text-sm font-medium text-slate-800'>
-              {desktopApp.architecture}
-            </dd>
+            <dt className='text-xs font-semibold uppercase tracking-wide text-slate-400'>Architecture</dt>
+            <dd className='mt-1 text-sm font-medium text-slate-800'>{desktopApp.architecture}</dd>
           </div>
           <div>
-            <dt className='text-xs font-semibold uppercase tracking-wide text-slate-400'>
-              Package
-            </dt>
-            <dd className='mt-1 break-all text-sm font-medium text-slate-800'>
-              {value(desktopApp.packageName)}
-            </dd>
+            <dt className='text-xs font-semibold uppercase tracking-wide text-slate-400'>Package</dt>
+            <dd className='mt-1 break-all text-sm font-medium text-slate-800'>{value(desktopApp.packageName)}</dd>
           </div>
           <div>
-            <dt className='text-xs font-semibold uppercase tracking-wide text-slate-400'>
-              Version
-            </dt>
-            <dd className='mt-1 text-sm font-medium text-slate-800'>
-              {value(desktopApp.currentVersion)}
-            </dd>
+            <dt className='text-xs font-semibold uppercase tracking-wide text-slate-400'>Version</dt>
+            <dd className='mt-1 text-sm font-medium text-slate-800'>{value(desktopApp.currentVersion)}</dd>
           </div>
           <div>
-            <dt className='text-xs font-semibold uppercase tracking-wide text-slate-400'>
-              Build
-            </dt>
-            <dd className='mt-1 text-sm font-medium text-slate-800'>
-              {value(desktopApp.currentBuildNumber)}
-            </dd>
+            <dt className='text-xs font-semibold uppercase tracking-wide text-slate-400'>Build</dt>
+            <dd className='mt-1 text-sm font-medium text-slate-800'>{value(desktopApp.currentBuildNumber)}</dd>
           </div>
         </dl>
       </section>
@@ -2472,23 +2096,14 @@ export function DesktopOverview({
 
         {repository ? (
           <div className='mt-4'>
-            <p className='font-semibold text-slate-900'>
-              {repository.fullName}
-            </p>
-            <p className='mt-1 text-sm text-slate-500'>
-              Default branch: {repository.defaultBranch}
-            </p>
-            <Link
-              href={`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/code`}
-              className='mt-4 inline-flex text-sm font-semibold text-brand-600'
-            >
+            <p className='font-semibold text-slate-900'>{repository.fullName}</p>
+            <p className='mt-1 text-sm text-slate-500'>Default branch: {repository.defaultBranch}</p>
+            <Link href={`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/code`} className='mt-4 inline-flex text-sm font-semibold text-brand-600'>
               Browse code
             </Link>
           </div>
         ) : (
-          <p className='mt-4 text-sm text-slate-500'>
-            No repository is connected.
-          </p>
+          <p className='mt-4 text-sm text-slate-500'>No repository is connected.</p>
         )}
       </section>
 
@@ -2500,16 +2115,11 @@ export function DesktopOverview({
 
         {latestBuild ? (
           <div className='mt-4 flex flex-wrap items-center gap-3 text-sm'>
-            <span className='rounded-full bg-slate-100 px-3 py-1 font-semibold'>
-              {latestBuild.status}
-            </span>
+            <span className='rounded-full bg-slate-100 px-3 py-1 font-semibold'>{latestBuild.status}</span>
             <span>{latestBuild.platform}</span>
             <span>{latestBuild.architecture}</span>
             <span>{latestBuild.branch}</span>
-            <Link
-              href={`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${latestBuild.id}`}
-              className='font-semibold text-brand-600'
-            >
+            <Link href={`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${latestBuild.id}`} className='font-semibold text-brand-600'>
               Build details
             </Link>
           </div>
@@ -2547,8 +2157,7 @@ export default function DesktopAppPage() {
     desktopAppId: string;
   }>();
 
-  const [overview, setOverview] =
-    useState<DesktopAppOverview | null>(null);
+  const [overview, setOverview] = useState<DesktopAppOverview | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -2558,12 +2167,7 @@ export default function DesktopAppPage() {
     setError(null);
 
     try {
-      setOverview(
-        await getDesktopAppOverview(
-          params.workspaceId,
-          params.desktopAppId,
-        ),
-      );
+      setOverview(await getDesktopAppOverview(params.workspaceId, params.desktopAppId));
     } catch (caught: unknown) {
       setError(getErrorMessage(caught));
     } finally {
@@ -2574,10 +2178,7 @@ export default function DesktopAppPage() {
   useEffect(() => {
     let active = true;
 
-    void getDesktopAppOverview(
-      params.workspaceId,
-      params.desktopAppId,
-    )
+    void getDesktopAppOverview(params.workspaceId, params.desktopAppId)
       .then((value) => {
         if (active) setOverview(value);
       })
@@ -2609,27 +2210,14 @@ export default function DesktopAppPage() {
     <main className='space-y-6 p-4 sm:p-6 lg:p-8'>
       <header>
         <p className='text-sm font-medium text-slate-500'>Desktop App</p>
-        <h1 className='mt-1 text-2xl font-bold text-slate-950'>
-          {overview.desktopApp.application.name}
-        </h1>
+        <h1 className='mt-1 text-2xl font-bold text-slate-950'>{overview.desktopApp.application.name}</h1>
       </header>
 
-      <DesktopAppSubNav
-        workspaceId={params.workspaceId}
-        desktopAppId={params.desktopAppId}
-      />
+      <DesktopAppSubNav workspaceId={params.workspaceId} desktopAppId={params.desktopAppId} />
 
-      <DesktopOverview
-        workspaceId={params.workspaceId}
-        desktopAppId={params.desktopAppId}
-        overview={overview}
-      />
+      <DesktopOverview workspaceId={params.workspaceId} desktopAppId={params.desktopAppId} overview={overview} />
 
-      <DesktopProjectDetectionPanel
-        workspaceId={params.workspaceId}
-        desktopApp={overview.desktopApp}
-        onApplied={() => void load()}
-      />
+      <DesktopProjectDetectionPanel workspaceId={params.workspaceId} desktopApp={overview.desktopApp} onApplied={() => void load()} />
 
       {/*
         KEEP the existing Phase-3 settings/edit/archive section here.
@@ -2654,10 +2242,7 @@ import { PrismaService } from 'src/database/prisma.service';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
-import {
-  createLinkedDesktopFixture,
-  overviewPath,
-} from './helpers/desktop-test-fixtures';
+import { createLinkedDesktopFixture, overviewPath } from './helpers/desktop-test-fixtures';
 
 describe('Desktop Overview E2E', () => {
   let app: INestApplication;
@@ -2677,26 +2262,14 @@ describe('Desktop Overview E2E', () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
 
     const response = await fixture.owner.agent
-      .get(
-        overviewPath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        ),
-      )
-      .set(
-        'Authorization',
-        `Bearer ${fixture.owner.accessToken}`,
-      );
+      .get(overviewPath(fixture.owner.workspaceId, fixture.desktopApp.id))
+      .set('Authorization', `Bearer ${fixture.owner.accessToken}`);
 
     expect(response.status).toBe(200);
 
-    expect(response.body.desktopApp.id).toBe(
-      fixture.desktopApp.id,
-    );
+    expect(response.body.desktopApp.id).toBe(fixture.desktopApp.id);
 
-    expect(response.body.repository.id).toBe(
-      fixture.repository.id,
-    );
+    expect(response.body.repository.id).toBe(fixture.repository.id);
 
     expect(response.body.repository.defaultBranch).toBe('main');
   });
@@ -2705,16 +2278,8 @@ describe('Desktop Overview E2E', () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
 
     const response = await fixture.owner.agent
-      .get(
-        overviewPath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        ),
-      )
-      .set(
-        'Authorization',
-        `Bearer ${fixture.owner.accessToken}`,
-      );
+      .get(overviewPath(fixture.owner.workspaceId, fixture.desktopApp.id))
+      .set('Authorization', `Bearer ${fixture.owner.accessToken}`);
 
     expect(response.status).toBe(200);
     expect(response.body.latestRelease).toBeNull();
@@ -2726,16 +2291,8 @@ describe('Desktop Overview E2E', () => {
     const outsider = await registerWorkspaceTestUser(app, prisma);
 
     const response = await outsider.agent
-      .get(
-        overviewPath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        ),
-      )
-      .set(
-        'Authorization',
-        `Bearer ${outsider.accessToken}`,
-      );
+      .get(overviewPath(fixture.owner.workspaceId, fixture.desktopApp.id))
+      .set('Authorization', `Bearer ${outsider.accessToken}`);
 
     expect(response.status).toBe(403);
   });
@@ -2789,8 +2346,7 @@ export default function DesktopCodePage() {
     desktopAppId: string;
   }>();
 
-  const [overview, setOverview] =
-    useState<DesktopAppOverview | null>(null);
+  const [overview, setOverview] = useState<DesktopAppOverview | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -2798,10 +2354,7 @@ export default function DesktopCodePage() {
   useEffect(() => {
     let active = true;
 
-    void getDesktopAppOverview(
-      params.workspaceId,
-      params.desktopAppId,
-    )
+    void getDesktopAppOverview(params.workspaceId, params.desktopAppId)
       .then((result) => {
         if (active) setOverview(result);
       })
@@ -2839,41 +2392,27 @@ export default function DesktopCodePage() {
           Desktop Code
         </div>
 
-        <h1 className='mt-1 text-2xl font-bold text-slate-950'>
-          {overview.desktopApp.application.name}
-        </h1>
+        <h1 className='mt-1 text-2xl font-bold text-slate-950'>{overview.desktopApp.application.name}</h1>
       </header>
 
-      <DesktopAppSubNav
-        workspaceId={params.workspaceId}
-        desktopAppId={params.desktopAppId}
-      />
+      <DesktopAppSubNav workspaceId={params.workspaceId} desktopAppId={params.desktopAppId} />
 
       {!repository ? (
         <section className='flex min-h-80 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 text-center'>
           <GitBranch className='size-10 text-slate-300' aria-hidden='true' />
 
-          <h2 className='mt-4 text-lg font-semibold text-slate-900'>
-            Connect a repository first
-          </h2>
+          <h2 className='mt-4 text-lg font-semibold text-slate-900'>Connect a repository first</h2>
 
           <p className='mt-2 max-w-lg text-sm text-slate-500'>
-            The Desktop Code tab reuses the workspace Code Explorer. Connect
-            a repository to this desktop application before browsing source.
+            The Desktop Code tab reuses the workspace Code Explorer. Connect a repository to this desktop application before browsing source.
           </p>
 
-          <Link
-            href={`/workspaces/${params.workspaceId}/desktop-apps/${params.desktopAppId}`}
-            className='mt-4 font-semibold text-brand-600'
-          >
+          <Link href={`/workspaces/${params.workspaceId}/desktop-apps/${params.desktopAppId}`} className='mt-4 font-semibold text-brand-600'>
             Back to desktop overview
           </Link>
         </section>
       ) : (
-        <CodeExplorer
-          workspaceId={params.workspaceId}
-          repositoryId={repository.id}
-        />
+        <CodeExplorer workspaceId={params.workspaceId} repositoryId={repository.id} />
       )}
     </main>
   );
@@ -2885,7 +2424,6 @@ export default function DesktopCodePage() {
 Do not create another backend Code Explorer test suite. Run the existing repository Code Explorer API E2E suite after adding the desktop route, then add a small frontend route test confirming the desktop page hands the linked repository ID to the existing explorer.
 
 The browser regression command is provided in the final verification section.
-
 
 ---
 
@@ -2988,26 +2526,9 @@ apps/api/src/modules/desktop-apps/dto/desktop-build.dto.ts
 ```
 
 ```ts
-import {
-  DesktopArchitecture,
-  DesktopBuildStatus,
-  DesktopPlatform,
-} from 'src/generated/prisma/enums';
-import {
-  ApiProperty,
-  ApiPropertyOptional,
-} from '@nestjs/swagger';
-import {
-  IsDateString,
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsString,
-  IsUUID,
-  Length,
-  MaxLength,
-  Min,
-} from 'class-validator';
+import { DesktopArchitecture, DesktopBuildStatus, DesktopPlatform } from 'src/generated/prisma/enums';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsDateString, IsEnum, IsInt, IsOptional, IsString, IsUUID, Length, MaxLength, Min } from 'class-validator';
 
 export class DesktopBuildQueryDto {
   @ApiPropertyOptional({
@@ -3106,8 +2627,7 @@ export class IngestGithubDesktopBuildDto {
   status?: DesktopBuildStatus;
 
   @ApiPropertyOptional({
-    description:
-      'Raw GitHub Actions conclusion. Used only when status is not supplied.',
+    description: 'Raw GitHub Actions conclusion. Used only when status is not supplied.',
   })
   @IsOptional()
   @IsString()
@@ -3142,21 +2662,9 @@ apps/api/src/modules/desktop-apps/services/desktop-builds.service.ts
 
 ```ts
 import { PrismaService } from '../../../database/prisma.service';
-import {
-  DesktopArchitecture,
-  DesktopBuildSource,
-  DesktopBuildStatus,
-  DesktopPlatform,
-} from 'src/generated/prisma/enums';
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import type {
-  DesktopBuildQueryDto,
-  IngestGithubDesktopBuildDto,
-} from '../dto/desktop-build.dto';
+import { DesktopArchitecture, DesktopBuildSource, DesktopBuildStatus, DesktopPlatform } from 'src/generated/prisma/enums';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import type { DesktopBuildQueryDto, IngestGithubDesktopBuildDto } from '../dto/desktop-build.dto';
 import { DesktopAppsService } from './desktop-apps.service';
 
 @Injectable()
@@ -3166,11 +2674,7 @@ export class DesktopBuildsService {
     private readonly desktopApps: DesktopAppsService,
   ) {}
 
-  async list(
-    workspaceId: string,
-    desktopAppId: string,
-    query: DesktopBuildQueryDto,
-  ) {
+  async list(workspaceId: string, desktopAppId: string, query: DesktopBuildQueryDto) {
     await this.requireApp(workspaceId, desktopAppId);
 
     return this.prisma.desktopBuild.findMany({
@@ -3209,11 +2713,7 @@ export class DesktopBuildsService {
     });
   }
 
-  async findOne(
-    workspaceId: string,
-    desktopAppId: string,
-    buildId: string,
-  ) {
+  async findOne(workspaceId: string, desktopAppId: string, buildId: string) {
     await this.requireApp(workspaceId, desktopAppId);
 
     const build = await this.prisma.desktopBuild.findFirst({
@@ -3231,10 +2731,7 @@ export class DesktopBuildsService {
     return build;
   }
 
-  async getLatest(
-    workspaceId: string,
-    desktopAppId: string,
-  ) {
+  async getLatest(workspaceId: string, desktopAppId: string) {
     await this.requireApp(workspaceId, desktopAppId);
 
     return this.prisma.desktopBuild.findFirst({
@@ -3248,38 +2745,30 @@ export class DesktopBuildsService {
     });
   }
 
-  async ingestGithubBuild(
-    workspaceId: string,
-    desktopAppId: string,
-    dto: IngestGithubDesktopBuildDto,
-  ) {
+  async ingestGithubBuild(workspaceId: string, desktopAppId: string, dto: IngestGithubDesktopBuildDto) {
     const app = await this.requireApp(workspaceId, desktopAppId);
 
     if (app.application.archivedAt) {
-      throw new BadRequestException(
-        'Archived desktop applications cannot receive build updates.',
-      );
+      throw new BadRequestException('Archived desktop applications cannot receive build updates.');
     }
 
-    const repository =
-      await this.prisma.repositoryConnection.findFirst({
-        where: {
-          id: dto.repositoryId,
-          workspaceId,
-          applicationId: app.applicationId,
-          archived: false,
-          isAvailable: true,
-        },
-        select: {
-          id: true,
-        },
-      });
+    const repository = await this.prisma.repositoryConnection.findFirst({
+      where: {
+        id: dto.repositoryId,
+        workspaceId,
+        applicationId: app.applicationId,
+        archived: false,
+        isAvailable: true,
+      },
+      select: {
+        id: true,
+      },
+    });
 
     if (!repository) {
       return {
         ignored: true,
-        reason:
-          'Repository is not the active repository linked to this desktop application.',
+        reason: 'Repository is not the active repository linked to this desktop application.',
         build: null,
       };
     }
@@ -3289,22 +2778,11 @@ export class DesktopBuildsService {
 
     const status = this.resolveStatus(dto.status, dto.conclusion);
 
-    const startedAt = dto.startedAt
-      ? new Date(dto.startedAt)
-      : null;
+    const startedAt = dto.startedAt ? new Date(dto.startedAt) : null;
 
-    const completedAt = dto.completedAt
-      ? new Date(dto.completedAt)
-      : null;
+    const completedAt = dto.completedAt ? new Date(dto.completedAt) : null;
 
-    const durationMs =
-      dto.durationMs ??
-      (startedAt && completedAt
-        ? Math.max(
-            0,
-            completedAt.getTime() - startedAt.getTime(),
-          )
-        : null);
+    const durationMs = dto.durationMs ?? (startedAt && completedAt ? Math.max(0, completedAt.getTime() - startedAt.getTime()) : null);
 
     const build = await this.prisma.desktopBuild.upsert({
       where: {
@@ -3351,24 +2829,16 @@ export class DesktopBuildsService {
     };
   }
 
-  private async requireApp(
-    workspaceId: string,
-    desktopAppId: string,
-  ) {
+  private async requireApp(workspaceId: string, desktopAppId: string) {
     return this.desktopApps.findOne(workspaceId, desktopAppId);
   }
 
-  private optional(
-    value: string | null | undefined,
-  ): string | null {
+  private optional(value: string | null | undefined): string | null {
     const normalized = value?.trim();
     return normalized ? normalized : null;
   }
 
-  private resolveStatus(
-    explicit: DesktopBuildStatus | undefined,
-    conclusion: string | null | undefined,
-  ): DesktopBuildStatus {
+  private resolveStatus(explicit: DesktopBuildStatus | undefined, conclusion: string | null | undefined): DesktopBuildStatus {
     if (explicit) {
       return explicit;
     }
@@ -3411,42 +2881,18 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { WorkspaceRoles } from '../../workspace/decorators/workspace-roles.decorator';
 import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
 import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
-import {
-  DesktopBuildQueryDto,
-  IngestGithubDesktopBuildDto,
-} from '../dto/desktop-build.dto';
+import { DesktopBuildQueryDto, IngestGithubDesktopBuildDto } from '../dto/desktop-build.dto';
 import { DesktopBuildsService } from '../services/desktop-builds.service';
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { WorkspaceRole } from 'src/generated/prisma/enums';
 
 @ApiTags('Desktop Builds')
 @ApiBearerAuth('access-token')
-@Controller(
-  'workspaces/:workspaceId/desktop-apps/:desktopAppId/builds',
-)
-@UseGuards(
-  JwtAuthGuard,
-  WorkspaceAccessGuard,
-  WorkspaceRolesGuard,
-)
+@Controller('workspaces/:workspaceId/desktop-apps/:desktopAppId/builds')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard, WorkspaceRolesGuard)
 export class DesktopBuildsController {
-  constructor(
-    private readonly service: DesktopBuildsService,
-  ) {}
+  constructor(private readonly service: DesktopBuildsService) {}
 
   @Get()
   list(
@@ -3459,11 +2905,7 @@ export class DesktopBuildsController {
     @Query()
     query: DesktopBuildQueryDto,
   ) {
-    return this.service.list(
-      workspaceId,
-      desktopAppId,
-      query,
-    );
+    return this.service.list(workspaceId, desktopAppId, query);
   }
 
   @Get(':buildId')
@@ -3477,19 +2919,11 @@ export class DesktopBuildsController {
     @Param('buildId', ParseUUIDPipe)
     buildId: string,
   ) {
-    return this.service.findOne(
-      workspaceId,
-      desktopAppId,
-      buildId,
-    );
+    return this.service.findOne(workspaceId, desktopAppId, buildId);
   }
 
   @Post('ingest/github')
-  @WorkspaceRoles(
-    WorkspaceRole.OWNER,
-    WorkspaceRole.ADMIN,
-    WorkspaceRole.DEVELOPER,
-  )
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
   @ApiOperation({
     summary: 'Ingest a normalized GitHub Actions desktop build',
   })
@@ -3503,11 +2937,7 @@ export class DesktopBuildsController {
     @Body()
     dto: IngestGithubDesktopBuildDto,
   ) {
-    return this.service.ingestGithubBuild(
-      workspaceId,
-      desktopAppId,
-      dto,
-    );
+    return this.service.ingestGithubBuild(workspaceId, desktopAppId, dto);
   }
 }
 ```
@@ -3517,18 +2947,9 @@ export class DesktopBuildsController {
 Append to `desktop-apps-api.ts`:
 
 ```ts
-import type {
-  DesktopBuild,
-  DesktopBuildFilters,
-  DesktopBuildIngestionResult,
-  IngestGithubDesktopBuildInput,
-} from '@command-center/shared-types';
+import type { DesktopBuild, DesktopBuildFilters, DesktopBuildIngestionResult, IngestGithubDesktopBuildInput } from '@command-center/shared-types';
 
-export function listDesktopBuilds(
-  workspaceId: string,
-  desktopAppId: string,
-  filters: DesktopBuildFilters = {},
-) {
+export function listDesktopBuilds(workspaceId: string, desktopAppId: string, filters: DesktopBuildFilters = {}) {
   const search = new URLSearchParams();
 
   if (filters.status) search.set('status', filters.status);
@@ -3541,35 +2962,18 @@ export function listDesktopBuilds(
 
   const query = search.toString();
 
-  return apiRequest<DesktopBuild[]>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds${
-      query ? `?${query}` : ''
-    }`,
-  );
+  return apiRequest<DesktopBuild[]>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds${query ? `?${query}` : ''}`);
 }
 
-export function getDesktopBuild(
-  workspaceId: string,
-  desktopAppId: string,
-  buildId: string,
-) {
-  return apiRequest<DesktopBuild>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}`,
-  );
+export function getDesktopBuild(workspaceId: string, desktopAppId: string, buildId: string) {
+  return apiRequest<DesktopBuild>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}`);
 }
 
-export function ingestGithubDesktopBuild(
-  workspaceId: string,
-  desktopAppId: string,
-  input: IngestGithubDesktopBuildInput,
-) {
-  return apiRequest<DesktopBuildIngestionResult>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/ingest/github`,
-    {
-      method: 'POST',
-      body: JSON.stringify(input),
-    },
-  );
+export function ingestGithubDesktopBuild(workspaceId: string, desktopAppId: string, input: IngestGithubDesktopBuildInput) {
+  return apiRequest<DesktopBuildIngestionResult>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/ingest/github`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
 }
 ```
 
@@ -3582,19 +2986,13 @@ apps/web/src/features/desktop-apps/desktop-build-utils.ts
 ```
 
 ```ts
-import type {
-  DesktopBuildArtifactType,
-  DesktopBuildStatus,
-  DesktopTestType,
-} from '@command-center/shared-types';
+import type { DesktopBuildArtifactType, DesktopBuildStatus, DesktopTestType } from '@command-center/shared-types';
 
 export function shortSha(value: string): string {
   return value.slice(0, 8);
 }
 
-export function formatDuration(
-  durationMs: number | null,
-): string {
+export function formatDuration(durationMs: number | null): string {
   if (durationMs === null) return '—';
 
   const seconds = Math.round(durationMs / 1000);
@@ -3609,10 +3007,7 @@ export function formatDuration(
   return `${minutes}m ${remainingSeconds}s`;
 }
 
-export const DESKTOP_BUILD_STATUS_LABELS: Record<
-  DesktopBuildStatus,
-  string
-> = {
+export const DESKTOP_BUILD_STATUS_LABELS: Record<DesktopBuildStatus, string> = {
   QUEUED: 'Queued',
   BUILDING: 'Building',
   SUCCESS: 'Success',
@@ -3620,10 +3015,7 @@ export const DESKTOP_BUILD_STATUS_LABELS: Record<
   CANCELLED: 'Cancelled',
 };
 
-export const DESKTOP_ARTIFACT_TYPE_LABELS: Record<
-  DesktopBuildArtifactType,
-  string
-> = {
+export const DESKTOP_ARTIFACT_TYPE_LABELS: Record<DesktopBuildArtifactType, string> = {
   EXE: 'EXE',
   MSI: 'MSI',
   MSIX: 'MSIX',
@@ -3637,10 +3029,7 @@ export const DESKTOP_ARTIFACT_TYPE_LABELS: Record<
   OTHER: 'Other',
 };
 
-export const DESKTOP_TEST_TYPE_LABELS: Record<
-  DesktopTestType,
-  string
-> = {
+export const DESKTOP_TEST_TYPE_LABELS: Record<DesktopTestType, string> = {
   UNIT: 'Unit',
   INTEGRATION: 'Integration',
   UI: 'UI',
@@ -3661,54 +3050,27 @@ apps/web/src/features/desktop-apps/desktop-builds.tsx
 ```tsx
 'use client';
 
-import {
-  listDesktopBuilds,
-} from './desktop-apps-api';
-import {
-  DESKTOP_BUILD_STATUS_LABELS,
-  formatDuration,
-  shortSha,
-} from './desktop-build-utils';
+import { listDesktopBuilds } from './desktop-apps-api';
+import { DESKTOP_BUILD_STATUS_LABELS, formatDuration, shortSha } from './desktop-build-utils';
 import { getErrorMessage } from '@/features/lib/api/api-error';
-import type {
-  DesktopArchitecture,
-  DesktopBuild,
-  DesktopBuildStatus,
-  DesktopPlatform,
-} from '@command-center/shared-types';
+import type { DesktopArchitecture, DesktopBuild, DesktopBuildStatus, DesktopPlatform } from '@command-center/shared-types';
 import Link from 'next/link';
-import {
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface Props {
   workspaceId: string;
   desktopAppId: string;
 }
 
-export function BuildStatus({
-  status,
-}: {
-  status: DesktopBuildStatus;
-}) {
-  return (
-    <span className='rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700'>
-      {DESKTOP_BUILD_STATUS_LABELS[status]}
-    </span>
-  );
+export function BuildStatus({ status }: { status: DesktopBuildStatus }) {
+  return <span className='rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700'>{DESKTOP_BUILD_STATUS_LABELS[status]}</span>;
 }
 
-export function DesktopBuilds({
-  workspaceId,
-  desktopAppId,
-}: Props) {
+export function DesktopBuilds({ workspaceId, desktopAppId }: Props) {
   const [builds, setBuilds] = useState<DesktopBuild[]>([]);
   const [status, setStatus] = useState<DesktopBuildStatus | ''>('');
   const [platform, setPlatform] = useState<DesktopPlatform | ''>('');
-  const [architecture, setArchitecture] =
-    useState<DesktopArchitecture | ''>('');
+  const [architecture, setArchitecture] = useState<DesktopArchitecture | ''>('');
   const [branch, setBranch] = useState('');
   const [version, setVersion] = useState('');
   const [loading, setLoading] = useState(true);
@@ -3720,32 +3082,20 @@ export function DesktopBuilds({
 
     try {
       setBuilds(
-        await listDesktopBuilds(
-          workspaceId,
-          desktopAppId,
-          {
-            status: status || undefined,
-            platform: platform || undefined,
-            architecture: architecture || undefined,
-            branch: branch.trim() || undefined,
-            version: version.trim() || undefined,
-          },
-        ),
+        await listDesktopBuilds(workspaceId, desktopAppId, {
+          status: status || undefined,
+          platform: platform || undefined,
+          architecture: architecture || undefined,
+          branch: branch.trim() || undefined,
+          version: version.trim() || undefined,
+        }),
       );
     } catch (caught: unknown) {
       setError(getErrorMessage(caught));
     } finally {
       setLoading(false);
     }
-  }, [
-    architecture,
-    branch,
-    desktopAppId,
-    platform,
-    status,
-    version,
-    workspaceId,
-  ]);
+  }, [architecture, branch, desktopAppId, platform, status, version, workspaceId]);
 
   useEffect(() => {
     void load();
@@ -3759,17 +3109,13 @@ export function DesktopBuilds({
           <select
             aria-label='Build status filter'
             value={status}
-            onChange={(event) =>
-              setStatus(event.target.value as DesktopBuildStatus | '')
-            }
+            onChange={(event) => setStatus(event.target.value as DesktopBuildStatus | '')}
             className='mt-1 h-9 w-full rounded-lg border border-slate-300 bg-white px-2 text-sm'
           >
             <option value=''>All</option>
             {Object.keys(DESKTOP_BUILD_STATUS_LABELS).map((value) => (
               <option key={value} value={value}>
-                {DESKTOP_BUILD_STATUS_LABELS[
-                  value as DesktopBuildStatus
-                ]}
+                {DESKTOP_BUILD_STATUS_LABELS[value as DesktopBuildStatus]}
               </option>
             ))}
           </select>
@@ -3780,9 +3126,7 @@ export function DesktopBuilds({
           <select
             aria-label='Build platform filter'
             value={platform}
-            onChange={(event) =>
-              setPlatform(event.target.value as DesktopPlatform | '')
-            }
+            onChange={(event) => setPlatform(event.target.value as DesktopPlatform | '')}
             className='mt-1 h-9 w-full rounded-lg border border-slate-300 bg-white px-2 text-sm'
           >
             <option value=''>All</option>
@@ -3798,11 +3142,7 @@ export function DesktopBuilds({
           <select
             aria-label='Build architecture filter'
             value={architecture}
-            onChange={(event) =>
-              setArchitecture(
-                event.target.value as DesktopArchitecture | '',
-              )
-            }
+            onChange={(event) => setArchitecture(event.target.value as DesktopArchitecture | '')}
             className='mt-1 h-9 w-full rounded-lg border border-slate-300 bg-white px-2 text-sm'
           >
             <option value=''>All</option>
@@ -3841,9 +3181,7 @@ export function DesktopBuilds({
       ) : null}
 
       {loading ? (
-        <div className='rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-500'>
-          Loading builds...
-        </div>
+        <div className='rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-500'>Loading builds...</div>
       ) : builds.length === 0 ? (
         <div className='rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500'>
           No desktop builds match the current filters.
@@ -3872,20 +3210,13 @@ export function DesktopBuilds({
                     <td className='px-4 py-3'>{build.platform}</td>
                     <td className='px-4 py-3'>{build.architecture}</td>
                     <td className='px-4 py-3'>{build.branch}</td>
-                    <td className='px-4 py-3 font-mono'>
-                      {shortSha(build.commitSha)}
-                    </td>
+                    <td className='px-4 py-3 font-mono'>{shortSha(build.commitSha)}</td>
                     <td className='px-4 py-3'>
-                      <Link
-                        href={`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${build.id}`}
-                        className='font-semibold text-brand-600'
-                      >
+                      <Link href={`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${build.id}`} className='font-semibold text-brand-600'>
                         {build.version ?? 'Build details'}
                       </Link>
                     </td>
-                    <td className='px-4 py-3'>
-                      {formatDuration(build.durationMs)}
-                    </td>
+                    <td className='px-4 py-3'>{formatDuration(build.durationMs)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -3923,20 +3254,12 @@ export default function DesktopBuildsPage() {
     <main className='space-y-6 p-4 sm:p-6 lg:p-8'>
       <header>
         <p className='text-sm font-medium text-slate-500'>Desktop App</p>
-        <h1 className='mt-1 text-2xl font-bold text-slate-950'>
-          Builds
-        </h1>
+        <h1 className='mt-1 text-2xl font-bold text-slate-950'>Builds</h1>
       </header>
 
-      <DesktopAppSubNav
-        workspaceId={params.workspaceId}
-        desktopAppId={params.desktopAppId}
-      />
+      <DesktopAppSubNav workspaceId={params.workspaceId} desktopAppId={params.desktopAppId} />
 
-      <DesktopBuilds
-        workspaceId={params.workspaceId}
-        desktopAppId={params.desktopAppId}
-      />
+      <DesktopBuilds workspaceId={params.workspaceId} desktopAppId={params.desktopAppId} />
     </main>
   );
 }
@@ -3956,11 +3279,7 @@ import { PrismaService } from 'src/database/prisma.service';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
-import {
-  buildPath,
-  createLinkedDesktopFixture,
-  createRepository,
-} from './helpers/desktop-test-fixtures';
+import { buildPath, createLinkedDesktopFixture, createRepository } from './helpers/desktop-test-fixtures';
 
 describe('Desktop Builds E2E', () => {
   let app: INestApplication;
@@ -3976,10 +3295,7 @@ describe('Desktop Builds E2E', () => {
     await app.close();
   });
 
-  function payload(
-    repositoryId: string,
-    overrides: Record<string, unknown> = {},
-  ) {
+  function payload(repositoryId: string, overrides: Record<string, unknown> = {}) {
     return {
       repositoryId,
       workflowRunId: '901',
@@ -3997,15 +3313,9 @@ describe('Desktop Builds E2E', () => {
 
   it('tracks queued -> building -> success idempotently', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
-    const path = `${buildPath(
-      fixture.owner.workspaceId,
-      fixture.desktopApp.id,
-    )}/ingest/github`;
+    const path = `${buildPath(fixture.owner.workspaceId, fixture.desktopApp.id)}/ingest/github`;
 
-    const queued = await fixture.owner.agent
-      .post(path)
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
-      .send(payload(fixture.repository.id));
+    const queued = await fixture.owner.agent.post(path).set('Authorization', `Bearer ${fixture.owner.accessToken}`).send(payload(fixture.repository.id));
 
     expect(queued.status).toBe(201);
     expect(queued.body.build.status).toBe('QUEUED');
@@ -4051,12 +3361,7 @@ describe('Desktop Builds E2E', () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
 
     const response = await fixture.owner.agent
-      .post(
-        `${buildPath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        )}/ingest/github`,
-      )
+      .post(`${buildPath(fixture.owner.workspaceId, fixture.desktopApp.id)}/ingest/github`)
       .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
       .send(
         payload(fixture.repository.id, {
@@ -4073,10 +3378,7 @@ describe('Desktop Builds E2E', () => {
 
   it('keeps matrix builds separate by platform and architecture', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
-    const path = `${buildPath(
-      fixture.owner.workspaceId,
-      fixture.desktopApp.id,
-    )}/ingest/github`;
+    const path = `${buildPath(fixture.owner.workspaceId, fixture.desktopApp.id)}/ingest/github`;
 
     await fixture.owner.agent
       .post(path)
@@ -4114,19 +3416,10 @@ describe('Desktop Builds E2E', () => {
   it('ignores an unrelated repository', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
 
-    const unrelated = await createRepository(
-      prisma,
-      fixture.owner.workspaceId,
-      null,
-    );
+    const unrelated = await createRepository(prisma, fixture.owner.workspaceId, null);
 
     const response = await fixture.owner.agent
-      .post(
-        `${buildPath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        )}/ingest/github`,
-      )
+      .post(`${buildPath(fixture.owner.workspaceId, fixture.desktopApp.id)}/ingest/github`)
       .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
       .send(payload(unrelated.id));
 
@@ -4140,10 +3433,7 @@ describe('Desktop Builds E2E', () => {
 
   it('filters builds by platform, architecture and status', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
-    const ingest = `${buildPath(
-      fixture.owner.workspaceId,
-      fixture.desktopApp.id,
-    )}/ingest/github`;
+    const ingest = `${buildPath(fixture.owner.workspaceId, fixture.desktopApp.id)}/ingest/github`;
 
     await fixture.owner.agent
       .post(ingest)
@@ -4172,12 +3462,7 @@ describe('Desktop Builds E2E', () => {
       .expect(201);
 
     const response = await fixture.owner.agent
-      .get(
-        buildPath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        ),
-      )
+      .get(buildPath(fixture.owner.workspaceId, fixture.desktopApp.id))
       .query({
         platform: 'MACOS',
         architecture: 'ARM64',
@@ -4200,19 +3485,13 @@ describe('Desktop Builds E2E', () => {
     const outsider = await registerWorkspaceTestUser(app, prisma);
 
     const response = await outsider.agent
-      .get(
-        buildPath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-        ),
-      )
+      .get(buildPath(fixture.owner.workspaceId, fixture.desktopApp.id))
       .set('Authorization', `Bearer ${outsider.accessToken}`);
 
     expect(response.status).toBe(403);
   });
 });
 ```
-
 
 ---
 
@@ -4287,25 +3566,9 @@ apps/api/src/modules/desktop-apps/dto/desktop-build-artifact.dto.ts
 ```
 
 ```ts
-import {
-  DesktopArchitecture,
-  DesktopBuildArtifactType,
-  DesktopPlatform,
-} from 'src/generated/prisma/enums';
-import {
-  ApiProperty,
-  ApiPropertyOptional,
-} from '@nestjs/swagger';
-import {
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsString,
-  IsUrl,
-  Length,
-  MaxLength,
-  Min,
-} from 'class-validator';
+import { DesktopArchitecture, DesktopBuildArtifactType, DesktopPlatform } from 'src/generated/prisma/enums';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEnum, IsInt, IsOptional, IsString, IsUrl, Length, MaxLength, Min } from 'class-validator';
 
 export class IngestDesktopBuildArtifactDto {
   @ApiProperty({
@@ -4374,10 +3637,7 @@ apps/api/src/modules/desktop-apps/services/desktop-build-artifacts.service.ts
 import { PrismaService } from '../../../database/prisma.service';
 import { DesktopBuildsService } from './desktop-builds.service';
 import { IngestDesktopBuildArtifactDto } from '../dto/desktop-build-artifact.dto';
-import {
-  BadRequestException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class DesktopBuildArtifactsService {
@@ -4386,92 +3646,54 @@ export class DesktopBuildArtifactsService {
     private readonly builds: DesktopBuildsService,
   ) {}
 
-  async list(
-    workspaceId: string,
-    desktopAppId: string,
-    buildId: string,
-  ) {
-    await this.builds.findOne(
-      workspaceId,
-      desktopAppId,
-      buildId,
-    );
+  async list(workspaceId: string, desktopAppId: string, buildId: string) {
+    await this.builds.findOne(workspaceId, desktopAppId, buildId);
 
-    const rows =
-      await this.prisma.desktopBuildArtifact.findMany({
-        where: {
-          buildId,
-        },
-        orderBy: {
-          createdAt: 'asc',
-        },
-      });
+    const rows = await this.prisma.desktopBuildArtifact.findMany({
+      where: {
+        buildId,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
 
     return rows.map((row) => this.serialize(row));
   }
 
-  async ingest(
-    workspaceId: string,
-    desktopAppId: string,
-    buildId: string,
-    dto: IngestDesktopBuildArtifactDto,
-  ) {
-    const build = await this.builds.findOne(
-      workspaceId,
-      desktopAppId,
-      buildId,
-    );
+  async ingest(workspaceId: string, desktopAppId: string, buildId: string, dto: IngestDesktopBuildArtifactDto) {
+    const build = await this.builds.findOne(workspaceId, desktopAppId, buildId);
 
-    if (
-      dto.platform !== build.platform ||
-      dto.architecture !== build.architecture
-    ) {
-      throw new BadRequestException(
-        'Artifact platform and architecture must match the build matrix entry.',
-      );
+    if (dto.platform !== build.platform || dto.architecture !== build.architecture) {
+      throw new BadRequestException('Artifact platform and architecture must match the build matrix entry.');
     }
 
-    const artifact =
-      await this.prisma.desktopBuildArtifact.upsert({
-        where: {
-          buildId_providerArtifactId: {
-            buildId,
-            providerArtifactId:
-              dto.providerArtifactId.trim(),
-          },
-        },
-        create: {
+    const artifact = await this.prisma.desktopBuildArtifact.upsert({
+      where: {
+        buildId_providerArtifactId: {
           buildId,
-          providerArtifactId:
-            dto.providerArtifactId.trim(),
-          platform: dto.platform,
-          architecture: dto.architecture,
-          type: dto.type,
-          fileName: dto.fileName.trim(),
-          sizeBytes:
-            dto.sizeBytes === undefined ||
-            dto.sizeBytes === null
-              ? null
-              : BigInt(dto.sizeBytes),
-          checksum:
-            dto.checksum?.trim() || null,
-          externalUrl:
-            dto.externalUrl?.trim() || null,
+          providerArtifactId: dto.providerArtifactId.trim(),
         },
-        update: {
-          type: dto.type,
-          fileName: dto.fileName.trim(),
-          sizeBytes:
-            dto.sizeBytes === undefined ||
-            dto.sizeBytes === null
-              ? null
-              : BigInt(dto.sizeBytes),
-          checksum:
-            dto.checksum?.trim() || null,
-          externalUrl:
-            dto.externalUrl?.trim() || null,
-        },
-      });
+      },
+      create: {
+        buildId,
+        providerArtifactId: dto.providerArtifactId.trim(),
+        platform: dto.platform,
+        architecture: dto.architecture,
+        type: dto.type,
+        fileName: dto.fileName.trim(),
+        sizeBytes: dto.sizeBytes === undefined || dto.sizeBytes === null ? null : BigInt(dto.sizeBytes),
+        checksum: dto.checksum?.trim() || null,
+        externalUrl: dto.externalUrl?.trim() || null,
+      },
+      update: {
+        type: dto.type,
+        fileName: dto.fileName.trim(),
+        sizeBytes: dto.sizeBytes === undefined || dto.sizeBytes === null ? null : BigInt(dto.sizeBytes),
+        checksum: dto.checksum?.trim() || null,
+        externalUrl: dto.externalUrl?.trim() || null,
+      },
+    });
 
     return this.serialize(artifact);
   }
@@ -4483,10 +3705,7 @@ export class DesktopBuildArtifactsService {
   >(row: T) {
     return {
       ...row,
-      sizeBytes:
-        row.sizeBytes === null
-          ? null
-          : Number(row.sizeBytes),
+      sizeBytes: row.sizeBytes === null ? null : Number(row.sizeBytes),
     };
   }
 }
@@ -4507,32 +3726,16 @@ import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.gu
 import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
 import { IngestDesktopBuildArtifactDto } from '../dto/desktop-build-artifact.dto';
 import { DesktopBuildArtifactsService } from '../services/desktop-build-artifacts.service';
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { WorkspaceRole } from 'src/generated/prisma/enums';
 
 @ApiTags('Desktop Build Artifacts')
 @ApiBearerAuth('access-token')
-@Controller(
-  'workspaces/:workspaceId/desktop-apps/:desktopAppId/builds/:buildId/artifacts',
-)
-@UseGuards(
-  JwtAuthGuard,
-  WorkspaceAccessGuard,
-  WorkspaceRolesGuard,
-)
+@Controller('workspaces/:workspaceId/desktop-apps/:desktopAppId/builds/:buildId/artifacts')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard, WorkspaceRolesGuard)
 export class DesktopBuildArtifactsController {
-  constructor(
-    private readonly service: DesktopBuildArtifactsService,
-  ) {}
+  constructor(private readonly service: DesktopBuildArtifactsService) {}
 
   @Get()
   list(
@@ -4545,19 +3748,11 @@ export class DesktopBuildArtifactsController {
     @Param('buildId', ParseUUIDPipe)
     buildId: string,
   ) {
-    return this.service.list(
-      workspaceId,
-      desktopAppId,
-      buildId,
-    );
+    return this.service.list(workspaceId, desktopAppId, buildId);
   }
 
   @Post()
-  @WorkspaceRoles(
-    WorkspaceRole.OWNER,
-    WorkspaceRole.ADMIN,
-    WorkspaceRole.DEVELOPER,
-  )
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
   ingest(
     @Param('workspaceId', ParseUUIDPipe)
     workspaceId: string,
@@ -4571,12 +3766,7 @@ export class DesktopBuildArtifactsController {
     @Body()
     dto: IngestDesktopBuildArtifactDto,
   ) {
-    return this.service.ingest(
-      workspaceId,
-      desktopAppId,
-      buildId,
-      dto,
-    );
+    return this.service.ingest(workspaceId, desktopAppId, buildId, dto);
   }
 }
 ```
@@ -4586,34 +3776,17 @@ export class DesktopBuildArtifactsController {
 Append to `desktop-apps-api.ts`:
 
 ```ts
-import type {
-  DesktopBuildArtifact,
-  IngestDesktopBuildArtifactInput,
-} from '@command-center/shared-types';
+import type { DesktopBuildArtifact, IngestDesktopBuildArtifactInput } from '@command-center/shared-types';
 
-export function listDesktopBuildArtifacts(
-  workspaceId: string,
-  desktopAppId: string,
-  buildId: string,
-) {
-  return apiRequest<DesktopBuildArtifact[]>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}/artifacts`,
-  );
+export function listDesktopBuildArtifacts(workspaceId: string, desktopAppId: string, buildId: string) {
+  return apiRequest<DesktopBuildArtifact[]>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}/artifacts`);
 }
 
-export function ingestDesktopBuildArtifact(
-  workspaceId: string,
-  desktopAppId: string,
-  buildId: string,
-  input: IngestDesktopBuildArtifactInput,
-) {
-  return apiRequest<DesktopBuildArtifact>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}/artifacts`,
-    {
-      method: 'POST',
-      body: JSON.stringify(input),
-    },
-  );
+export function ingestDesktopBuildArtifact(workspaceId: string, desktopAppId: string, buildId: string, input: IngestDesktopBuildArtifactInput) {
+  return apiRequest<DesktopBuildArtifact>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}/artifacts`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
 }
 ```
 
@@ -4630,10 +3803,7 @@ import type { INestApplication } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
-import {
-  createLinkedDesktopFixture,
-  ingestSuccessfulBuild,
-} from './helpers/desktop-test-fixtures';
+import { createLinkedDesktopFixture, ingestSuccessfulBuild } from './helpers/desktop-test-fixtures';
 
 describe('Desktop Build Artifacts E2E', () => {
   let app: INestApplication;
@@ -4649,28 +3819,16 @@ describe('Desktop Build Artifacts E2E', () => {
     await app.close();
   });
 
-  function path(
-    workspaceId: string,
-    desktopAppId: string,
-    buildId: string,
-  ) {
+  function path(workspaceId: string, desktopAppId: string, buildId: string) {
     return `/api/v1/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}/artifacts`;
   }
 
   it('stores multiple artifact types for a build', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
 
-    const build = await ingestSuccessfulBuild(
-      fixture.owner,
-      fixture.desktopApp.id,
-      fixture.repository.id,
-    );
+    const build = await ingestSuccessfulBuild(fixture.owner, fixture.desktopApp.id, fixture.repository.id);
 
-    const endpoint = path(
-      fixture.owner.workspaceId,
-      fixture.desktopApp.id,
-      build.id,
-    );
+    const endpoint = path(fixture.owner.workspaceId, fixture.desktopApp.id, build.id);
 
     await fixture.owner.agent
       .post(endpoint)
@@ -4683,8 +3841,7 @@ describe('Desktop Build Artifacts E2E', () => {
         fileName: 'CommandCenter-1.0.0-x64.msi',
         sizeBytes: 1000000,
         checksum: 'sha256:abc',
-        externalUrl:
-          'https://github.com/example/actions/artifacts/1',
+        externalUrl: 'https://github.com/example/actions/artifacts/1',
       })
       .expect(201);
 
@@ -4701,31 +3858,19 @@ describe('Desktop Build Artifacts E2E', () => {
       })
       .expect(201);
 
-    const response = await fixture.owner.agent
-      .get(endpoint)
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`);
+    const response = await fixture.owner.agent.get(endpoint).set('Authorization', `Bearer ${fixture.owner.accessToken}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toHaveLength(2);
-    expect(
-      response.body.map((artifact: { type: string }) => artifact.type),
-    ).toEqual(expect.arrayContaining(['MSI', 'ZIP']));
+    expect(response.body.map((artifact: { type: string }) => artifact.type)).toEqual(expect.arrayContaining(['MSI', 'ZIP']));
   });
 
   it('is idempotent for duplicate provider artifact ID', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
 
-    const build = await ingestSuccessfulBuild(
-      fixture.owner,
-      fixture.desktopApp.id,
-      fixture.repository.id,
-    );
+    const build = await ingestSuccessfulBuild(fixture.owner, fixture.desktopApp.id, fixture.repository.id);
 
-    const endpoint = path(
-      fixture.owner.workspaceId,
-      fixture.desktopApp.id,
-      build.id,
-    );
+    const endpoint = path(fixture.owner.workspaceId, fixture.desktopApp.id, build.id);
 
     const payload = {
       providerArtifactId: 'duplicate-1',
@@ -4735,11 +3880,7 @@ describe('Desktop Build Artifacts E2E', () => {
       fileName: 'old.exe',
     };
 
-    await fixture.owner.agent
-      .post(endpoint)
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
-      .send(payload)
-      .expect(201);
+    await fixture.owner.agent.post(endpoint).set('Authorization', `Bearer ${fixture.owner.accessToken}`).send(payload).expect(201);
 
     await fixture.owner.agent
       .post(endpoint)
@@ -4774,20 +3915,10 @@ describe('Desktop Build Artifacts E2E', () => {
   it('rejects artifact matrix metadata that does not match the build', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
 
-    const build = await ingestSuccessfulBuild(
-      fixture.owner,
-      fixture.desktopApp.id,
-      fixture.repository.id,
-    );
+    const build = await ingestSuccessfulBuild(fixture.owner, fixture.desktopApp.id, fixture.repository.id);
 
     const response = await fixture.owner.agent
-      .post(
-        path(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-          build.id,
-        ),
-      )
+      .post(path(fixture.owner.workspaceId, fixture.desktopApp.id, build.id))
       .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
       .send({
         providerArtifactId: 'bad-matrix',
@@ -4805,13 +3936,7 @@ describe('Desktop Build Artifacts E2E', () => {
     const { randomUUID } = await import('node:crypto');
 
     const response = await fixture.owner.agent
-      .post(
-        path(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-          randomUUID(),
-        ),
-      )
+      .post(path(fixture.owner.workspaceId, fixture.desktopApp.id, randomUUID()))
       .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
       .send({
         providerArtifactId: 'missing',
@@ -4827,20 +3952,10 @@ describe('Desktop Build Artifacts E2E', () => {
   it('allows artifact metadata without a remote URL', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
 
-    const build = await ingestSuccessfulBuild(
-      fixture.owner,
-      fixture.desktopApp.id,
-      fixture.repository.id,
-    );
+    const build = await ingestSuccessfulBuild(fixture.owner, fixture.desktopApp.id, fixture.repository.id);
 
     const response = await fixture.owner.agent
-      .post(
-        path(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-          build.id,
-        ),
-      )
+      .post(path(fixture.owner.workspaceId, fixture.desktopApp.id, build.id))
       .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
       .send({
         providerArtifactId: 'expired-provider-artifact',
@@ -4959,26 +4074,10 @@ apps/api/src/modules/desktop-apps/dto/desktop-test.dto.ts
 ```
 
 ```ts
-import {
-  DesktopTestStatus,
-  DesktopTestType,
-} from 'src/generated/prisma/enums';
+import { DesktopTestStatus, DesktopTestType } from 'src/generated/prisma/enums';
 import { Type } from 'class-transformer';
-import {
-  ApiProperty,
-  ApiPropertyOptional,
-} from '@nestjs/swagger';
-import {
-  IsArray,
-  IsDateString,
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsString,
-  MaxLength,
-  Min,
-  ValidateNested,
-} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsArray, IsDateString, IsEnum, IsInt, IsOptional, IsString, MaxLength, Min, ValidateNested } from 'class-validator';
 
 export class DesktopTestFailureDto {
   @ApiPropertyOptional()
@@ -5096,16 +4195,8 @@ export class DesktopTestsService {
     private readonly builds: DesktopBuildsService,
   ) {}
 
-  async listForBuild(
-    workspaceId: string,
-    desktopAppId: string,
-    buildId: string,
-  ) {
-    await this.builds.findOne(
-      workspaceId,
-      desktopAppId,
-      buildId,
-    );
+  async listForBuild(workspaceId: string, desktopAppId: string, buildId: string) {
+    await this.builds.findOne(workspaceId, desktopAppId, buildId);
 
     return this.prisma.desktopTestRun.findMany({
       where: {
@@ -5124,14 +4215,8 @@ export class DesktopTestsService {
     });
   }
 
-  async listForApp(
-    workspaceId: string,
-    desktopAppId: string,
-  ) {
-    await this.builds.getLatest(
-      workspaceId,
-      desktopAppId,
-    );
+  async listForApp(workspaceId: string, desktopAppId: string) {
+    await this.builds.getLatest(workspaceId, desktopAppId);
 
     return this.prisma.desktopTestRun.findMany({
       where: {
@@ -5166,147 +4251,106 @@ export class DesktopTestsService {
     });
   }
 
-  async ingest(
-    workspaceId: string,
-    desktopAppId: string,
-    buildId: string,
-    dto: IngestDesktopTestRunDto,
-  ) {
-    await this.builds.findOne(
-      workspaceId,
-      desktopAppId,
-      buildId,
-    );
+  async ingest(workspaceId: string, desktopAppId: string, buildId: string, dto: IngestDesktopTestRunDto) {
+    await this.builds.findOne(workspaceId, desktopAppId, buildId);
 
     const passed = dto.passed;
     const failed = dto.failed;
     const skipped = dto.skipped;
     const total = passed + failed + skipped;
 
-    return this.prisma.$transaction(
-      async (transaction) => {
-        const testRun =
-          await transaction.desktopTestRun.upsert({
-            where: {
-              buildId_type: {
-                buildId,
-                type: dto.type,
-              },
-            },
-            create: {
-              buildId,
-              type: dto.type,
-              status: dto.status,
-              passed,
-              failed,
-              skipped,
-              total,
-              durationMs: dto.durationMs ?? null,
-              startedAt: dto.startedAt
-                ? new Date(dto.startedAt)
-                : null,
-              completedAt: dto.completedAt
-                ? new Date(dto.completedAt)
-                : null,
-            },
-            update: {
-              status: dto.status,
-              passed,
-              failed,
-              skipped,
-              total,
-              durationMs: dto.durationMs ?? null,
-              startedAt: dto.startedAt
-                ? new Date(dto.startedAt)
-                : null,
-              completedAt: dto.completedAt
-                ? new Date(dto.completedAt)
-                : null,
-            },
-          });
-
-        await transaction.desktopTestFailure.deleteMany({
-          where: {
-            testRunId: testRun.id,
-          },
-        });
-
-        if (dto.failures?.length) {
-          await transaction.desktopTestFailure.createMany({
-            data: dto.failures.map((failure) => ({
-              testRunId: testRun.id,
-              suite: failure.suite?.trim() || null,
-              testName: failure.testName?.trim() || null,
-              message: failure.message?.trim() || null,
-              file: failure.file?.trim() || null,
-              line: failure.line ?? null,
-              stackTrace:
-                failure.stackTrace?.trim() || null,
-            })),
-          });
-        }
-
-        return transaction.desktopTestRun.findUniqueOrThrow({
-          where: {
-            id: testRun.id,
-          },
-          include: {
-            failures: {
-              orderBy: {
-                createdAt: 'asc',
-              },
-            },
-          },
-        });
-      },
-    );
-  }
-
-  async summary(
-    workspaceId: string,
-    desktopAppId: string,
-  ) {
-    await this.builds.getLatest(
-      workspaceId,
-      desktopAppId,
-    );
-
-    const runs =
-      await this.prisma.desktopTestRun.findMany({
+    return this.prisma.$transaction(async (transaction) => {
+      const testRun = await transaction.desktopTestRun.upsert({
         where: {
-          build: {
-            workspaceId,
-            desktopAppId,
+          buildId_type: {
+            buildId,
+            type: dto.type,
           },
         },
-        select: {
-          status: true,
-          passed: true,
-          failed: true,
-          skipped: true,
+        create: {
+          buildId,
+          type: dto.type,
+          status: dto.status,
+          passed,
+          failed,
+          skipped,
+          total,
+          durationMs: dto.durationMs ?? null,
+          startedAt: dto.startedAt ? new Date(dto.startedAt) : null,
+          completedAt: dto.completedAt ? new Date(dto.completedAt) : null,
+        },
+        update: {
+          status: dto.status,
+          passed,
+          failed,
+          skipped,
+          total,
+          durationMs: dto.durationMs ?? null,
+          startedAt: dto.startedAt ? new Date(dto.startedAt) : null,
+          completedAt: dto.completedAt ? new Date(dto.completedAt) : null,
         },
       });
 
+      await transaction.desktopTestFailure.deleteMany({
+        where: {
+          testRunId: testRun.id,
+        },
+      });
+
+      if (dto.failures?.length) {
+        await transaction.desktopTestFailure.createMany({
+          data: dto.failures.map((failure) => ({
+            testRunId: testRun.id,
+            suite: failure.suite?.trim() || null,
+            testName: failure.testName?.trim() || null,
+            message: failure.message?.trim() || null,
+            file: failure.file?.trim() || null,
+            line: failure.line ?? null,
+            stackTrace: failure.stackTrace?.trim() || null,
+          })),
+        });
+      }
+
+      return transaction.desktopTestRun.findUniqueOrThrow({
+        where: {
+          id: testRun.id,
+        },
+        include: {
+          failures: {
+            orderBy: {
+              createdAt: 'asc',
+            },
+          },
+        },
+      });
+    });
+  }
+
+  async summary(workspaceId: string, desktopAppId: string) {
+    await this.builds.getLatest(workspaceId, desktopAppId);
+
+    const runs = await this.prisma.desktopTestRun.findMany({
+      where: {
+        build: {
+          workspaceId,
+          desktopAppId,
+        },
+      },
+      select: {
+        status: true,
+        passed: true,
+        failed: true,
+        skipped: true,
+      },
+    });
+
     return {
       totalRuns: runs.length,
-      passedRuns: runs.filter(
-        (run) => run.status === 'PASSED',
-      ).length,
-      failedRuns: runs.filter(
-        (run) => run.status === 'FAILED',
-      ).length,
-      passedTests: runs.reduce(
-        (total, run) => total + run.passed,
-        0,
-      ),
-      failedTests: runs.reduce(
-        (total, run) => total + run.failed,
-        0,
-      ),
-      skippedTests: runs.reduce(
-        (total, run) => total + run.skipped,
-        0,
-      ),
+      passedRuns: runs.filter((run) => run.status === 'PASSED').length,
+      failedRuns: runs.filter((run) => run.status === 'FAILED').length,
+      passedTests: runs.reduce((total, run) => total + run.passed, 0),
+      failedTests: runs.reduce((total, run) => total + run.failed, 0),
+      skippedTests: runs.reduce((total, run) => total + run.skipped, 0),
     };
   }
 }
@@ -5331,32 +4375,16 @@ import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.gu
 import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
 import { IngestDesktopTestRunDto } from '../dto/desktop-test.dto';
 import { DesktopTestsService } from '../services/desktop-tests.service';
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { WorkspaceRole } from 'src/generated/prisma/enums';
 
 @ApiTags('Desktop Tests')
 @ApiBearerAuth('access-token')
-@Controller(
-  'workspaces/:workspaceId/desktop-apps/:desktopAppId',
-)
-@UseGuards(
-  JwtAuthGuard,
-  WorkspaceAccessGuard,
-  WorkspaceRolesGuard,
-)
+@Controller('workspaces/:workspaceId/desktop-apps/:desktopAppId')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard, WorkspaceRolesGuard)
 export class DesktopTestsController {
-  constructor(
-    private readonly service: DesktopTestsService,
-  ) {}
+  constructor(private readonly service: DesktopTestsService) {}
 
   @Get('tests')
   listForApp(
@@ -5366,10 +4394,7 @@ export class DesktopTestsController {
     @Param('desktopAppId', ParseUUIDPipe)
     desktopAppId: string,
   ) {
-    return this.service.listForApp(
-      workspaceId,
-      desktopAppId,
-    );
+    return this.service.listForApp(workspaceId, desktopAppId);
   }
 
   @Get('tests/summary')
@@ -5380,10 +4405,7 @@ export class DesktopTestsController {
     @Param('desktopAppId', ParseUUIDPipe)
     desktopAppId: string,
   ) {
-    return this.service.summary(
-      workspaceId,
-      desktopAppId,
-    );
+    return this.service.summary(workspaceId, desktopAppId);
   }
 
   @Get('builds/:buildId/tests')
@@ -5397,19 +4419,11 @@ export class DesktopTestsController {
     @Param('buildId', ParseUUIDPipe)
     buildId: string,
   ) {
-    return this.service.listForBuild(
-      workspaceId,
-      desktopAppId,
-      buildId,
-    );
+    return this.service.listForBuild(workspaceId, desktopAppId, buildId);
   }
 
   @Post('builds/:buildId/tests')
-  @WorkspaceRoles(
-    WorkspaceRole.OWNER,
-    WorkspaceRole.ADMIN,
-    WorkspaceRole.DEVELOPER,
-  )
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
   ingest(
     @Param('workspaceId', ParseUUIDPipe)
     workspaceId: string,
@@ -5423,12 +4437,7 @@ export class DesktopTestsController {
     @Body()
     dto: IngestDesktopTestRunDto,
   ) {
-    return this.service.ingest(
-      workspaceId,
-      desktopAppId,
-      buildId,
-      dto,
-    );
+    return this.service.ingest(workspaceId, desktopAppId, buildId, dto);
   }
 }
 ```
@@ -5517,18 +4526,10 @@ async findOne(
 Update the frontend `getDesktopBuild()` return type to the final type:
 
 ```ts
-import type {
-  DesktopBuildDetails,
-} from '@command-center/shared-types';
+import type { DesktopBuildDetails } from '@command-center/shared-types';
 
-export function getDesktopBuild(
-  workspaceId: string,
-  desktopAppId: string,
-  buildId: string,
-) {
-  return apiRequest<DesktopBuildDetails>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}`,
-  );
+export function getDesktopBuild(workspaceId: string, desktopAppId: string, buildId: string) {
+  return apiRequest<DesktopBuildDetails>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}`);
 }
 ```
 
@@ -5537,53 +4538,25 @@ export function getDesktopBuild(
 Append to `desktop-apps-api.ts`:
 
 ```ts
-import type {
-  DesktopTestRun,
-  DesktopTestSummary,
-  IngestDesktopTestRunInput,
-} from '@command-center/shared-types';
+import type { DesktopTestRun, DesktopTestSummary, IngestDesktopTestRunInput } from '@command-center/shared-types';
 
-export function listDesktopBuildTests(
-  workspaceId: string,
-  desktopAppId: string,
-  buildId: string,
-) {
-  return apiRequest<DesktopTestRun[]>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}/tests`,
-  );
+export function listDesktopBuildTests(workspaceId: string, desktopAppId: string, buildId: string) {
+  return apiRequest<DesktopTestRun[]>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}/tests`);
 }
 
-export function listDesktopAppTests(
-  workspaceId: string,
-  desktopAppId: string,
-) {
-  return apiRequest<DesktopTestRun[]>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/tests`,
-  );
+export function listDesktopAppTests(workspaceId: string, desktopAppId: string) {
+  return apiRequest<DesktopTestRun[]>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/tests`);
 }
 
-export function getDesktopTestSummary(
-  workspaceId: string,
-  desktopAppId: string,
-) {
-  return apiRequest<DesktopTestSummary>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/tests/summary`,
-  );
+export function getDesktopTestSummary(workspaceId: string, desktopAppId: string) {
+  return apiRequest<DesktopTestSummary>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/tests/summary`);
 }
 
-export function ingestDesktopTestRun(
-  workspaceId: string,
-  desktopAppId: string,
-  buildId: string,
-  input: IngestDesktopTestRunInput,
-) {
-  return apiRequest<DesktopTestRun>(
-    `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}/tests`,
-    {
-      method: 'POST',
-      body: JSON.stringify(input),
-    },
-  );
+export function ingestDesktopTestRun(workspaceId: string, desktopAppId: string, buildId: string, input: IngestDesktopTestRunInput) {
+  return apiRequest<DesktopTestRun>(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}/tests`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
 }
 ```
 
@@ -5598,58 +4571,30 @@ apps/web/src/features/desktop-apps/desktop-tests.tsx
 ```tsx
 'use client';
 
-import {
-  getDesktopTestSummary,
-  listDesktopAppTests,
-} from './desktop-apps-api';
-import {
-  DESKTOP_TEST_TYPE_LABELS,
-  formatDuration,
-} from './desktop-build-utils';
+import { getDesktopTestSummary, listDesktopAppTests } from './desktop-apps-api';
+import { DESKTOP_TEST_TYPE_LABELS, formatDuration } from './desktop-build-utils';
 import { getErrorMessage } from '@/features/lib/api/api-error';
-import type {
-  DesktopTestRun,
-  DesktopTestSummary,
-} from '@command-center/shared-types';
-import {
-  useEffect,
-  useState,
-} from 'react';
+import type { DesktopTestRun, DesktopTestSummary } from '@command-center/shared-types';
+import { useEffect, useState } from 'react';
 
 interface Props {
   workspaceId: string;
   desktopAppId: string;
 }
 
-export function DesktopTests({
-  workspaceId,
-  desktopAppId,
-}: Props) {
-  const [runs, setRuns] =
-    useState<DesktopTestRun[]>([]);
+export function DesktopTests({ workspaceId, desktopAppId }: Props) {
+  const [runs, setRuns] = useState<DesktopTestRun[]>([]);
 
-  const [summary, setSummary] =
-    useState<DesktopTestSummary | null>(null);
+  const [summary, setSummary] = useState<DesktopTestSummary | null>(null);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
 
-  const [error, setError] =
-    useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
 
-    void Promise.all([
-      listDesktopAppTests(
-        workspaceId,
-        desktopAppId,
-      ),
-      getDesktopTestSummary(
-        workspaceId,
-        desktopAppId,
-      ),
-    ])
+    void Promise.all([listDesktopAppTests(workspaceId, desktopAppId), getDesktopTestSummary(workspaceId, desktopAppId)])
       .then(([runResult, summaryResult]) => {
         if (!active) return;
 
@@ -5671,19 +4616,12 @@ export function DesktopTests({
   }, [workspaceId, desktopAppId]);
 
   if (loading) {
-    return (
-      <div className='rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-500'>
-        Loading test results...
-      </div>
-    );
+    return <div className='rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-500'>Loading test results...</div>;
   }
 
   if (error) {
     return (
-      <div
-        role='alert'
-        className='rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700'
-      >
+      <div role='alert' className='rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700'>
         {error}
       </div>
     );
@@ -5701,16 +4639,9 @@ export function DesktopTests({
             ['Failed tests', summary.failedTests],
             ['Skipped tests', summary.skippedTests],
           ].map(([label, value]) => (
-            <div
-              key={String(label)}
-              className='rounded-xl border border-slate-200 bg-white p-4'
-            >
-              <p className='text-xs font-semibold uppercase tracking-wide text-slate-400'>
-                {label}
-              </p>
-              <p className='mt-2 text-xl font-bold text-slate-950'>
-                {value}
-              </p>
+            <div key={String(label)} className='rounded-xl border border-slate-200 bg-white p-4'>
+              <p className='text-xs font-semibold uppercase tracking-wide text-slate-400'>{label}</p>
+              <p className='mt-2 text-xl font-bold text-slate-950'>{value}</p>
             </div>
           ))}
         </section>
@@ -5723,51 +4654,30 @@ export function DesktopTests({
       ) : (
         <div className='space-y-4'>
           {runs.map((run) => (
-            <article
-              key={run.id}
-              className='rounded-2xl border border-slate-200 bg-white p-5'
-            >
+            <article key={run.id} className='rounded-2xl border border-slate-200 bg-white p-5'>
               <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
                 <div>
-                  <p className='font-semibold text-slate-950'>
-                    {DESKTOP_TEST_TYPE_LABELS[run.type]}
-                  </p>
+                  <p className='font-semibold text-slate-950'>{DESKTOP_TEST_TYPE_LABELS[run.type]}</p>
                   <p className='mt-1 text-sm text-slate-500'>
-                    {run.passed} passed · {run.failed} failed ·{' '}
-                    {run.skipped} skipped · {formatDuration(run.durationMs)}
+                    {run.passed} passed · {run.failed} failed · {run.skipped} skipped · {formatDuration(run.durationMs)}
                   </p>
                 </div>
 
-                <span className='rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700'>
-                  {run.status}
-                </span>
+                <span className='rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700'>{run.status}</span>
               </div>
 
               {run.failures.length > 0 ? (
                 <div className='mt-4 space-y-3 border-t border-slate-100 pt-4'>
                   {run.failures.map((failure) => (
-                    <div
-                      key={failure.id}
-                      className='rounded-xl bg-red-50 p-4'
-                    >
-                      <p className='font-semibold text-red-900'>
-                        {failure.testName ??
-                          failure.suite ??
-                          'Failed test'}
-                      </p>
+                    <div key={failure.id} className='rounded-xl bg-red-50 p-4'>
+                      <p className='font-semibold text-red-900'>{failure.testName ?? failure.suite ?? 'Failed test'}</p>
 
-                      {failure.message ? (
-                        <p className='mt-1 whitespace-pre-wrap text-sm text-red-800'>
-                          {failure.message}
-                        </p>
-                      ) : null}
+                      {failure.message ? <p className='mt-1 whitespace-pre-wrap text-sm text-red-800'>{failure.message}</p> : null}
 
                       {failure.file ? (
                         <p className='mt-2 break-all font-mono text-xs text-red-700'>
                           {failure.file}
-                          {failure.line
-                            ? `:${failure.line}`
-                            : ''}
+                          {failure.line ? `:${failure.line}` : ''}
                         </p>
                       ) : null}
                     </div>
@@ -5807,23 +4717,13 @@ export default function DesktopTestsPage() {
   return (
     <main className='space-y-6 p-4 sm:p-6 lg:p-8'>
       <header>
-        <p className='text-sm font-medium text-slate-500'>
-          Desktop App
-        </p>
-        <h1 className='mt-1 text-2xl font-bold text-slate-950'>
-          Tests
-        </h1>
+        <p className='text-sm font-medium text-slate-500'>Desktop App</p>
+        <h1 className='mt-1 text-2xl font-bold text-slate-950'>Tests</h1>
       </header>
 
-      <DesktopAppSubNav
-        workspaceId={params.workspaceId}
-        desktopAppId={params.desktopAppId}
-      />
+      <DesktopAppSubNav workspaceId={params.workspaceId} desktopAppId={params.desktopAppId} />
 
-      <DesktopTests
-        workspaceId={params.workspaceId}
-        desktopAppId={params.desktopAppId}
-      />
+      <DesktopTests workspaceId={params.workspaceId} desktopAppId={params.desktopAppId} />
     </main>
   );
 }
@@ -5840,27 +4740,15 @@ apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId
 ```tsx
 'use client';
 
-import {
-  getDesktopBuild,
-} from '@/features/desktop-apps/desktop-apps-api';
-import {
-  DESKTOP_ARTIFACT_TYPE_LABELS,
-  DESKTOP_TEST_TYPE_LABELS,
-  formatDuration,
-  shortSha,
-} from '@/features/desktop-apps/desktop-build-utils';
+import { getDesktopBuild } from '@/features/desktop-apps/desktop-apps-api';
+import { DESKTOP_ARTIFACT_TYPE_LABELS, DESKTOP_TEST_TYPE_LABELS, formatDuration, shortSha } from '@/features/desktop-apps/desktop-build-utils';
 import { BuildStatus } from '@/features/desktop-apps/desktop-builds';
 import { getErrorMessage } from '@/features/lib/api/api-error';
-import type {
-  DesktopBuildDetails,
-} from '@command-center/shared-types';
+import type { DesktopBuildDetails } from '@command-center/shared-types';
 import { ArrowLeft, Download } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import {
-  useEffect,
-  useState,
-} from 'react';
+import { useEffect, useState } from 'react';
 
 export default function DesktopBuildDetailsPage() {
   const params = useParams<{
@@ -5869,23 +4757,16 @@ export default function DesktopBuildDetailsPage() {
     buildId: string;
   }>();
 
-  const [build, setBuild] =
-    useState<DesktopBuildDetails | null>(null);
+  const [build, setBuild] = useState<DesktopBuildDetails | null>(null);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
 
-  const [error, setError] =
-    useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
 
-    void getDesktopBuild(
-      params.workspaceId,
-      params.desktopAppId,
-      params.buildId,
-    )
+    void getDesktopBuild(params.workspaceId, params.desktopAppId, params.buildId)
       .then((result) => {
         if (active) setBuild(result);
       })
@@ -5901,15 +4782,9 @@ export default function DesktopBuildDetailsPage() {
     return () => {
       active = false;
     };
-  }, [
-    params.workspaceId,
-    params.desktopAppId,
-    params.buildId,
-  ]);
+  }, [params.workspaceId, params.desktopAppId, params.buildId]);
 
-  const buildsHref =
-    `/workspaces/${params.workspaceId}` +
-    `/desktop-apps/${params.desktopAppId}/builds`;
+  const buildsHref = `/workspaces/${params.workspaceId}` + `/desktop-apps/${params.desktopAppId}/builds`;
 
   if (loading) {
     return <main className='p-8'>Loading build...</main>;
@@ -5918,34 +4793,26 @@ export default function DesktopBuildDetailsPage() {
   if (error || !build) {
     return (
       <main className='p-8'>
-        <div role='alert'>
-          {error ?? 'Desktop build was not found.'}
-        </div>
+        <div role='alert'>{error ?? 'Desktop build was not found.'}</div>
       </main>
     );
   }
 
   return (
     <main className='space-y-6 p-4 sm:p-6 lg:p-8'>
-      <Link
-        href={buildsHref}
-        className='inline-flex items-center gap-2 text-sm font-semibold text-slate-600'
-      >
+      <Link href={buildsHref} className='inline-flex items-center gap-2 text-sm font-semibold text-slate-600'>
         <ArrowLeft className='size-4' aria-hidden='true' />
         Back to builds
       </Link>
 
       <header>
         <div className='flex flex-wrap items-center gap-3'>
-          <h1 className='text-2xl font-bold text-slate-950'>
-            Build {build.version ?? build.buildNumber ?? build.workflowRunId}
-          </h1>
+          <h1 className='text-2xl font-bold text-slate-950'>Build {build.version ?? build.buildNumber ?? build.workflowRunId}</h1>
           <BuildStatus status={build.status} />
         </div>
 
         <p className='mt-2 text-sm text-slate-500'>
-          {build.platform} · {build.architecture} · {build.branch} ·{' '}
-          {shortSha(build.commitSha)} · {formatDuration(build.durationMs)}
+          {build.platform} · {build.architecture} · {build.branch} · {shortSha(build.commitSha)} · {formatDuration(build.durationMs)}
         </p>
       </header>
 
@@ -5953,26 +4820,16 @@ export default function DesktopBuildDetailsPage() {
         <h2 className='font-semibold text-slate-950'>Artifacts</h2>
 
         {build.artifacts.length === 0 ? (
-          <p className='mt-3 text-sm text-slate-500'>
-            No artifact metadata is available for this build.
-          </p>
+          <p className='mt-3 text-sm text-slate-500'>No artifact metadata is available for this build.</p>
         ) : (
           <div className='mt-4 space-y-3'>
             {build.artifacts.map((artifact) => (
-              <div
-                key={artifact.id}
-                className='flex flex-col gap-3 rounded-xl border border-slate-100 p-4 sm:flex-row sm:items-center sm:justify-between'
-              >
+              <div key={artifact.id} className='flex flex-col gap-3 rounded-xl border border-slate-100 p-4 sm:flex-row sm:items-center sm:justify-between'>
                 <div>
-                  <p className='font-semibold text-slate-900'>
-                    {artifact.fileName}
-                  </p>
+                  <p className='font-semibold text-slate-900'>{artifact.fileName}</p>
                   <p className='mt-1 text-xs text-slate-500'>
-                    {DESKTOP_ARTIFACT_TYPE_LABELS[artifact.type]} ·{' '}
-                    {artifact.platform} · {artifact.architecture}
-                    {artifact.sizeBytes !== null
-                      ? ` · ${artifact.sizeBytes.toLocaleString()} bytes`
-                      : ''}
+                    {DESKTOP_ARTIFACT_TYPE_LABELS[artifact.type]} · {artifact.platform} · {artifact.architecture}
+                    {artifact.sizeBytes !== null ? ` · ${artifact.sizeBytes.toLocaleString()} bytes` : ''}
                   </p>
                 </div>
 
@@ -5987,9 +4844,7 @@ export default function DesktopBuildDetailsPage() {
                     Open artifact
                   </a>
                 ) : (
-                  <span className='text-xs text-slate-400'>
-                    Remote artifact unavailable
-                  </span>
+                  <span className='text-xs text-slate-400'>Remote artifact unavailable</span>
                 )}
               </div>
             ))}
@@ -6001,49 +4856,28 @@ export default function DesktopBuildDetailsPage() {
         <h2 className='font-semibold text-slate-950'>Tests</h2>
 
         <p className='mt-2 text-sm text-slate-500'>
-          {build.testSummary.passedTests} passed ·{' '}
-          {build.testSummary.failedTests} failed ·{' '}
-          {build.testSummary.skippedTests} skipped
+          {build.testSummary.passedTests} passed · {build.testSummary.failedTests} failed · {build.testSummary.skippedTests} skipped
         </p>
 
         {build.testRuns.length === 0 ? (
-          <p className='mt-4 text-sm text-slate-500'>
-            No tests are attached to this build.
-          </p>
+          <p className='mt-4 text-sm text-slate-500'>No tests are attached to this build.</p>
         ) : (
           <div className='mt-4 space-y-4'>
             {build.testRuns.map((run) => (
-              <article
-                key={run.id}
-                className='rounded-xl border border-slate-100 p-4'
-              >
+              <article key={run.id} className='rounded-xl border border-slate-100 p-4'>
                 <div className='flex flex-wrap items-center justify-between gap-2'>
-                  <p className='font-semibold text-slate-900'>
-                    {DESKTOP_TEST_TYPE_LABELS[run.type]}
-                  </p>
-                  <span className='text-xs font-semibold text-slate-500'>
-                    {run.status}
-                  </span>
+                  <p className='font-semibold text-slate-900'>{DESKTOP_TEST_TYPE_LABELS[run.type]}</p>
+                  <span className='text-xs font-semibold text-slate-500'>{run.status}</span>
                 </div>
 
                 <p className='mt-1 text-sm text-slate-500'>
-                  {run.passed} passed · {run.failed} failed ·{' '}
-                  {run.skipped} skipped
+                  {run.passed} passed · {run.failed} failed · {run.skipped} skipped
                 </p>
 
                 {run.failures.map((failure) => (
-                  <div
-                    key={failure.id}
-                    className='mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-800'
-                  >
-                    <p className='font-semibold'>
-                      {failure.testName ?? failure.suite ?? 'Failure'}
-                    </p>
-                    {failure.message ? (
-                      <p className='mt-1 whitespace-pre-wrap'>
-                        {failure.message}
-                      </p>
-                    ) : null}
+                  <div key={failure.id} className='mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-800'>
+                    <p className='font-semibold'>{failure.testName ?? failure.suite ?? 'Failure'}</p>
+                    {failure.message ? <p className='mt-1 whitespace-pre-wrap'>{failure.message}</p> : null}
                   </div>
                 ))}
               </article>
@@ -6069,10 +4903,7 @@ import type { INestApplication } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
-import {
-  createLinkedDesktopFixture,
-  ingestSuccessfulBuild,
-} from './helpers/desktop-test-fixtures';
+import { createLinkedDesktopFixture, ingestSuccessfulBuild } from './helpers/desktop-test-fixtures';
 
 describe('Desktop Tests E2E', () => {
   let app: INestApplication;
@@ -6088,31 +4919,17 @@ describe('Desktop Tests E2E', () => {
     await app.close();
   });
 
-  function buildTestsPath(
-    workspaceId: string,
-    desktopAppId: string,
-    buildId: string,
-  ) {
+  function buildTestsPath(workspaceId: string, desktopAppId: string, buildId: string) {
     return `/api/v1/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}/tests`;
   }
 
   it('stores counts and failure details', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
 
-    const build = await ingestSuccessfulBuild(
-      fixture.owner,
-      fixture.desktopApp.id,
-      fixture.repository.id,
-    );
+    const build = await ingestSuccessfulBuild(fixture.owner, fixture.desktopApp.id, fixture.repository.id);
 
     const response = await fixture.owner.agent
-      .post(
-        buildTestsPath(
-          fixture.owner.workspaceId,
-          fixture.desktopApp.id,
-          build.id,
-        ),
-      )
+      .post(buildTestsPath(fixture.owner.workspaceId, fixture.desktopApp.id, build.id))
       .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
       .send({
         type: 'E2E',
@@ -6143,25 +4960,15 @@ describe('Desktop Tests E2E', () => {
     });
 
     expect(response.body.failures).toHaveLength(1);
-    expect(response.body.failures[0].testName).toBe(
-      'installs cleanly',
-    );
+    expect(response.body.failures[0].testName).toBe('installs cleanly');
   });
 
   it('re-ingestion replaces duplicate run/failures instead of duplicating them', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
 
-    const build = await ingestSuccessfulBuild(
-      fixture.owner,
-      fixture.desktopApp.id,
-      fixture.repository.id,
-    );
+    const build = await ingestSuccessfulBuild(fixture.owner, fixture.desktopApp.id, fixture.repository.id);
 
-    const endpoint = buildTestsPath(
-      fixture.owner.workspaceId,
-      fixture.desktopApp.id,
-      build.id,
-    );
+    const endpoint = buildTestsPath(fixture.owner.workspaceId, fixture.desktopApp.id, build.id);
 
     await fixture.owner.agent
       .post(endpoint)
@@ -6202,13 +5009,12 @@ describe('Desktop Tests E2E', () => {
       }),
     ).toBe(1);
 
-    const run =
-      await prisma.desktopTestRun.findFirstOrThrow({
-        where: {
-          buildId: build.id,
-          type: 'UNIT',
-        },
-      });
+    const run = await prisma.desktopTestRun.findFirstOrThrow({
+      where: {
+        buildId: build.id,
+        type: 'UNIT',
+      },
+    });
 
     expect(run.status).toBe('PASSED');
 
@@ -6224,17 +5030,9 @@ describe('Desktop Tests E2E', () => {
   it('returns aggregate app test summary', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
 
-    const build = await ingestSuccessfulBuild(
-      fixture.owner,
-      fixture.desktopApp.id,
-      fixture.repository.id,
-    );
+    const build = await ingestSuccessfulBuild(fixture.owner, fixture.desktopApp.id, fixture.repository.id);
 
-    const endpoint = buildTestsPath(
-      fixture.owner.workspaceId,
-      fixture.desktopApp.id,
-      build.id,
-    );
+    const endpoint = buildTestsPath(fixture.owner.workspaceId, fixture.desktopApp.id, build.id);
 
     await fixture.owner.agent
       .post(endpoint)
@@ -6261,9 +5059,7 @@ describe('Desktop Tests E2E', () => {
       .expect(201);
 
     const response = await fixture.owner.agent
-      .get(
-        `/api/v1/workspaces/${fixture.owner.workspaceId}/desktop-apps/${fixture.desktopApp.id}/tests/summary`,
-      )
+      .get(`/api/v1/workspaces/${fixture.owner.workspaceId}/desktop-apps/${fixture.desktopApp.id}/tests/summary`)
       .set('Authorization', `Bearer ${fixture.owner.accessToken}`);
 
     expect(response.status).toBe(200);
@@ -6281,20 +5077,10 @@ describe('Desktop Tests E2E', () => {
     const fixtureA = await createLinkedDesktopFixture(app, prisma);
     const fixtureB = await createLinkedDesktopFixture(app, prisma);
 
-    const buildA = await ingestSuccessfulBuild(
-      fixtureA.owner,
-      fixtureA.desktopApp.id,
-      fixtureA.repository.id,
-    );
+    const buildA = await ingestSuccessfulBuild(fixtureA.owner, fixtureA.desktopApp.id, fixtureA.repository.id);
 
     const response = await fixtureB.owner.agent
-      .post(
-        buildTestsPath(
-          fixtureB.owner.workspaceId,
-          fixtureB.desktopApp.id,
-          buildA.id,
-        ),
-      )
+      .post(buildTestsPath(fixtureB.owner.workspaceId, fixtureB.desktopApp.id, buildA.id))
       .set('Authorization', `Bearer ${fixtureB.owner.accessToken}`)
       .send({
         type: 'UNIT',
@@ -6308,7 +5094,6 @@ describe('Desktop Tests E2E', () => {
   });
 });
 ```
-
 
 ---
 
@@ -6372,12 +5157,7 @@ The final module registration must contain these additions:
     DesktopTestsService,
   ],
 
-  exports: [
-    DesktopAppsService,
-    DesktopRepositoryService,
-    DesktopBuildsService,
-    DesktopTestsService,
-  ],
+  exports: [DesktopAppsService, DesktopRepositoryService, DesktopBuildsService, DesktopTestsService],
 })
 export class DesktopAppsModule {}
 ```
@@ -6423,17 +5203,8 @@ packages/test-code/web/unit/features/desktop-apps/desktop-app-sub-nav.test.tsx
 // @vitest-environment jsdom
 
 import { DesktopAppSubNav } from '@/features/desktop-apps/desktop-app-sub-nav';
-import {
-  render,
-  screen,
-} from '@testing-library/react';
-import {
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const usePathnameMock = vi.fn();
 
@@ -6443,18 +5214,11 @@ vi.mock('next/navigation', () => ({
 
 describe('DesktopAppSubNav', () => {
   beforeEach(() => {
-    usePathnameMock.mockReturnValue(
-      '/workspaces/workspace-1/desktop-apps/desktop-1',
-    );
+    usePathnameMock.mockReturnValue('/workspaces/workspace-1/desktop-apps/desktop-1');
   });
 
   it('renders Phase 5-10 live tabs', () => {
-    render(
-      <DesktopAppSubNav
-        workspaceId='workspace-1'
-        desktopAppId='desktop-1'
-      />,
-    );
+    render(<DesktopAppSubNav workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
     expect(screen.getByText('Overview')).toBeInTheDocument();
     expect(screen.getByText('Code')).toBeInTheDocument();
@@ -6463,42 +5227,20 @@ describe('DesktopAppSubNav', () => {
   });
 
   it('links Code to the desktop code route', () => {
-    render(
-      <DesktopAppSubNav
-        workspaceId='workspace-1'
-        desktopAppId='desktop-1'
-      />,
-    );
+    render(<DesktopAppSubNav workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
     expect(
       screen.getByRole('link', {
         name: 'Code',
       }),
-    ).toHaveAttribute(
-      'href',
-      '/workspaces/workspace-1/desktop-apps/desktop-1/code',
-    );
+    ).toHaveAttribute('href', '/workspaces/workspace-1/desktop-apps/desktop-1/code');
   });
 
   it('keeps future phases disabled instead of linking to 404 routes', () => {
-    render(
-      <DesktopAppSubNav
-        workspaceId='workspace-1'
-        desktopAppId='desktop-1'
-      />,
-    );
+    render(<DesktopAppSubNav workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
-    for (const label of [
-      'Releases',
-      'Performance',
-      'Crashes',
-      'Dependencies',
-      'Security',
-    ]) {
-      expect(screen.getByText(label)).toHaveAttribute(
-        'aria-disabled',
-        'true',
-      );
+    for (const label of ['Releases', 'Performance', 'Crashes', 'Dependencies', 'Security']) {
+      expect(screen.getByText(label)).toHaveAttribute('aria-disabled', 'true');
     }
   });
 });
@@ -6515,38 +5257,20 @@ packages/test-code/web/unit/features/desktop-apps/desktop-project-detection-pane
 ```tsx
 // @vitest-environment jsdom
 
-import {
-  applyDetectedDesktopConfiguration,
-  detectDesktopProject,
-} from '@/features/desktop-apps/desktop-apps-api';
+import { applyDetectedDesktopConfiguration, detectDesktopProject } from '@/features/desktop-apps/desktop-apps-api';
 import { DesktopProjectDetectionPanel } from '@/features/desktop-apps/desktop-project-detection-panel';
-import {
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock(
-  '@/features/desktop-apps/desktop-apps-api',
-  () => ({
-    detectDesktopProject: vi.fn(),
-    applyDetectedDesktopConfiguration: vi.fn(),
-  }),
-);
+vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
+  detectDesktopProject: vi.fn(),
+  applyDetectedDesktopConfiguration: vi.fn(),
+}));
 
-const detectMock =
-  vi.mocked(detectDesktopProject);
+const detectMock = vi.mocked(detectDesktopProject);
 
-const updateMock =
-  vi.mocked(applyDetectedDesktopConfiguration);
+const updateMock = vi.mocked(applyDetectedDesktopConfiguration);
 
 const desktopApp = {
   id: 'desktop-1',
@@ -6579,8 +5303,7 @@ describe('DesktopProjectDetectionPanel', () => {
 
     detectMock.mockResolvedValue({
       repositoryId: 'repository-1',
-      repositoryFullName:
-        'command-center/desktop',
+      repositoryFullName: 'command-center/desktop',
       branch: 'main',
       truncated: false,
       candidates: [
@@ -6596,10 +5319,7 @@ describe('DesktopProjectDetectionPanel', () => {
           minimumOsVersion: null,
           confidence: 'HIGH',
           score: 96,
-          evidence: [
-            'package.json',
-            'package.json:electron',
-          ],
+          evidence: ['package.json', 'package.json:electron'],
           warnings: [],
         },
       ],
@@ -6615,10 +5335,7 @@ describe('DesktopProjectDetectionPanel', () => {
         minimumOsVersion: null,
         confidence: 'HIGH',
         score: 96,
-        evidence: [
-          'package.json',
-          'package.json:electron',
-        ],
+        evidence: ['package.json', 'package.json:electron'],
         warnings: [],
       },
     });
@@ -6626,8 +5343,7 @@ describe('DesktopProjectDetectionPanel', () => {
     updateMock.mockResolvedValue({
       ...desktopApp,
       framework: 'ELECTRON',
-      packageName:
-        'command-center-desktop',
+      packageName: 'command-center-desktop',
       currentVersion: '1.2.0',
     } as never);
   });
@@ -6635,12 +5351,7 @@ describe('DesktopProjectDetectionPanel', () => {
   it('runs detection and renders normalized result', async () => {
     const user = userEvent.setup();
 
-    render(
-      <DesktopProjectDetectionPanel
-        workspaceId='workspace-1'
-        desktopApp={desktopApp}
-      />,
-    );
+    render(<DesktopProjectDetectionPanel workspaceId='workspace-1' desktopApp={desktopApp} />);
 
     await user.click(
       screen.getByRole('button', {
@@ -6648,30 +5359,17 @@ describe('DesktopProjectDetectionPanel', () => {
       }),
     );
 
-    expect(
-      await screen.findByDisplayValue(
-        'command-center-desktop',
-      ),
-    ).toBeInTheDocument();
+    expect(await screen.findByDisplayValue('command-center-desktop')).toBeInTheDocument();
 
-    expect(
-      screen.getByDisplayValue('1.2.0'),
-    ).toBeInTheDocument();
+    expect(screen.getByDisplayValue('1.2.0')).toBeInTheDocument();
 
-    expect(
-      screen.getByText('HIGH · 96%'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('HIGH · 96%')).toBeInTheDocument();
   });
 
   it('allows manual correction before saving detected config', async () => {
     const user = userEvent.setup();
 
-    render(
-      <DesktopProjectDetectionPanel
-        workspaceId='workspace-1'
-        desktopApp={desktopApp}
-      />,
-    );
+    render(<DesktopProjectDetectionPanel workspaceId='workspace-1' desktopApp={desktopApp} />);
 
     await user.click(
       screen.getByRole('button', {
@@ -6679,12 +5377,7 @@ describe('DesktopProjectDetectionPanel', () => {
       }),
     );
 
-    await user.selectOptions(
-      await screen.findByLabelText(
-        'Detected architecture',
-      ),
-      'ARM64',
-    );
+    await user.selectOptions(await screen.findByLabelText('Detected architecture'), 'ARM64');
 
     await user.click(
       screen.getByRole('button', {
@@ -6699,8 +5392,7 @@ describe('DesktopProjectDetectionPanel', () => {
         expect.objectContaining({
           framework: 'ELECTRON',
           architecture: 'ARM64',
-          packageName:
-            'command-center-desktop',
+          packageName: 'command-center-desktop',
         }),
       );
     });
@@ -6709,8 +5401,7 @@ describe('DesktopProjectDetectionPanel', () => {
   it('renders safe no-match state', async () => {
     detectMock.mockResolvedValue({
       repositoryId: 'repository-1',
-      repositoryFullName:
-        'command-center/web-only',
+      repositoryFullName: 'command-center/web-only',
       branch: 'main',
       truncated: false,
       candidates: [],
@@ -6719,12 +5410,7 @@ describe('DesktopProjectDetectionPanel', () => {
 
     const user = userEvent.setup();
 
-    render(
-      <DesktopProjectDetectionPanel
-        workspaceId='workspace-1'
-        desktopApp={desktopApp}
-      />,
-    );
+    render(<DesktopProjectDetectionPanel workspaceId='workspace-1' desktopApp={desktopApp} />);
 
     await user.click(
       screen.getByRole('button', {
@@ -6732,11 +5418,7 @@ describe('DesktopProjectDetectionPanel', () => {
       }),
     );
 
-    expect(
-      await screen.findByRole('alert'),
-    ).toHaveTextContent(
-      'No supported desktop project was detected',
-    );
+    expect(await screen.findByRole('alert')).toHaveTextContent('No supported desktop project was detected');
   });
 });
 ```
@@ -6752,30 +5434,15 @@ packages/test-code/web/unit/features/desktop-apps/desktop-builds.test.tsx
 ```tsx
 // @vitest-environment jsdom
 
-import {
-  listDesktopBuilds,
-} from '@/features/desktop-apps/desktop-apps-api';
+import { listDesktopBuilds } from '@/features/desktop-apps/desktop-apps-api';
 import { DesktopBuilds } from '@/features/desktop-apps/desktop-builds';
-import {
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock(
-  '@/features/desktop-apps/desktop-apps-api',
-  () => ({
-    listDesktopBuilds: vi.fn(),
-  }),
-);
+vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
+  listDesktopBuilds: vi.fn(),
+}));
 
 const listMock = vi.mocked(listDesktopBuilds);
 
@@ -6786,23 +5453,18 @@ const build = {
   repositoryId: 'repository-1',
   workflowRunId: '901',
   source: 'GITHUB_ACTIONS',
-  commitSha:
-    'a93f14258b51e9b424c4d7cb05f98751feef272d',
+  commitSha: 'a93f14258b51e9b424c4d7cb05f98751feef272d',
   branch: 'main',
   version: '2.0.0',
   buildNumber: '200',
   platform: 'WINDOWS',
   architecture: 'X64',
   status: 'SUCCESS',
-  startedAt:
-    '2026-08-23T01:00:00.000Z',
-  completedAt:
-    '2026-08-23T01:05:00.000Z',
+  startedAt: '2026-08-23T01:00:00.000Z',
+  completedAt: '2026-08-23T01:05:00.000Z',
   durationMs: 300000,
-  createdAt:
-    '2026-08-23T01:00:00.000Z',
-  updatedAt:
-    '2026-08-23T01:05:00.000Z',
+  createdAt: '2026-08-23T01:00:00.000Z',
+  updatedAt: '2026-08-23T01:05:00.000Z',
 } as never;
 
 describe('DesktopBuilds', () => {
@@ -6812,52 +5474,27 @@ describe('DesktopBuilds', () => {
   });
 
   it('renders build lifecycle data', async () => {
-    render(
-      <DesktopBuilds
-        workspaceId='workspace-1'
-        desktopAppId='desktop-1'
-      />,
-    );
+    render(<DesktopBuilds workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
-    expect(
-      await screen.findByText('Success'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('Success')).toBeInTheDocument();
 
-    expect(
-      screen.getByText('WINDOWS'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('WINDOWS')).toBeInTheDocument();
 
-    expect(
-      screen.getByText('X64'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('X64')).toBeInTheDocument();
 
-    expect(
-      screen.getByText('a93f1425'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('a93f1425')).toBeInTheDocument();
 
-    expect(
-      screen.getByText('5m 0s'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('5m 0s')).toBeInTheDocument();
   });
 
   it('passes filters to API', async () => {
     const user = userEvent.setup();
 
-    render(
-      <DesktopBuilds
-        workspaceId='workspace-1'
-        desktopAppId='desktop-1'
-      />,
-    );
+    render(<DesktopBuilds workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
     await screen.findByText('Success');
 
-    await user.selectOptions(
-      screen.getByLabelText(
-        'Build status filter',
-      ),
-      'SUCCESS',
-    );
+    await user.selectOptions(screen.getByLabelText('Build status filter'), 'SUCCESS');
 
     await waitFor(() => {
       expect(listMock).toHaveBeenLastCalledWith(
@@ -6883,36 +5520,19 @@ packages/test-code/web/unit/features/desktop-apps/desktop-tests.test.tsx
 ```tsx
 // @vitest-environment jsdom
 
-import {
-  getDesktopTestSummary,
-  listDesktopAppTests,
-} from '@/features/desktop-apps/desktop-apps-api';
+import { getDesktopTestSummary, listDesktopAppTests } from '@/features/desktop-apps/desktop-apps-api';
 import { DesktopTests } from '@/features/desktop-apps/desktop-tests';
-import {
-  render,
-  screen,
-} from '@testing-library/react';
-import {
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock(
-  '@/features/desktop-apps/desktop-apps-api',
-  () => ({
-    getDesktopTestSummary: vi.fn(),
-    listDesktopAppTests: vi.fn(),
-  }),
-);
+vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
+  getDesktopTestSummary: vi.fn(),
+  listDesktopAppTests: vi.fn(),
+}));
 
-const summaryMock =
-  vi.mocked(getDesktopTestSummary);
+const summaryMock = vi.mocked(getDesktopTestSummary);
 
-const runsMock =
-  vi.mocked(listDesktopAppTests);
+const runsMock = vi.mocked(listDesktopAppTests);
 
 describe('DesktopTests', () => {
   beforeEach(() => {
@@ -6940,24 +5560,19 @@ describe('DesktopTests', () => {
         durationMs: 55000,
         startedAt: null,
         completedAt: null,
-        createdAt:
-          '2026-08-23T00:00:00.000Z',
-        updatedAt:
-          '2026-08-23T00:00:00.000Z',
+        createdAt: '2026-08-23T00:00:00.000Z',
+        updatedAt: '2026-08-23T00:00:00.000Z',
         failures: [
           {
             id: 'failure-1',
             testRunId: 'run-1',
             suite: 'Installer',
             testName: 'installs cleanly',
-            message:
-              'Installer exited with code 1603',
-            file:
-              'tests/installer.spec.ts',
+            message: 'Installer exited with code 1603',
+            file: 'tests/installer.spec.ts',
             line: 42,
             stackTrace: null,
-            createdAt:
-              '2026-08-23T00:00:00.000Z',
+            createdAt: '2026-08-23T00:00:00.000Z',
           },
         ],
       },
@@ -6965,30 +5580,13 @@ describe('DesktopTests', () => {
   });
 
   it('renders aggregate counts and failed test drilldown', async () => {
-    render(
-      <DesktopTests
-        workspaceId='workspace-1'
-        desktopAppId='desktop-1'
-      />,
-    );
+    render(<DesktopTests workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
-    expect(
-      await screen.findByText(
-        'installs cleanly',
-      ),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('installs cleanly')).toBeInTheDocument();
 
-    expect(
-      screen.getByText(
-        'Installer exited with code 1603',
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Installer exited with code 1603')).toBeInTheDocument();
 
-    expect(
-      screen.getByText(
-        'tests/installer.spec.ts:42',
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByText('tests/installer.spec.ts:42')).toBeInTheDocument();
   });
 });
 ```
@@ -7018,20 +5616,11 @@ import {
   listDesktopBuilds,
 } from '@/features/desktop-apps/desktop-apps-api';
 import { apiRequest } from '@/features/lib/api/api-client';
-import {
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock(
-  '@/features/lib/api/api-client',
-  () => ({
-    apiRequest: vi.fn(),
-  }),
-);
+vi.mock('@/features/lib/api/api-client', () => ({
+  apiRequest: vi.fn(),
+}));
 
 const requestMock = vi.mocked(apiRequest);
 
@@ -7046,48 +5635,29 @@ describe('desktop phases 5-10 API client', () => {
   });
 
   it('uses desktop detection endpoint', async () => {
-    await detectDesktopProject(
-      workspaceId,
-      desktopAppId,
-    );
+    await detectDesktopProject(workspaceId, desktopAppId);
 
-    expect(requestMock).toHaveBeenCalledWith(
-      `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/detect`,
-      {
-        method: 'POST',
-      },
-    );
+    expect(requestMock).toHaveBeenCalledWith(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/detect`, {
+      method: 'POST',
+    });
   });
 
   it('uses desktop overview endpoint', async () => {
-    await getDesktopAppOverview(
-      workspaceId,
-      desktopAppId,
-    );
+    await getDesktopAppOverview(workspaceId, desktopAppId);
 
-    expect(requestMock).toHaveBeenCalledWith(
-      `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/overview`,
-    );
+    expect(requestMock).toHaveBeenCalledWith(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/overview`);
   });
 
   it('serializes build filters', async () => {
-    await listDesktopBuilds(
-      workspaceId,
-      desktopAppId,
-      {
-        status: 'FAILED',
-        platform: 'WINDOWS',
-        architecture: 'X64',
-        branch: 'main',
-        version: '2.0.0',
-      },
-    );
+    await listDesktopBuilds(workspaceId, desktopAppId, {
+      status: 'FAILED',
+      platform: 'WINDOWS',
+      architecture: 'X64',
+      branch: 'main',
+      version: '2.0.0',
+    });
 
-    expect(requestMock).toHaveBeenCalledWith(
-      expect.stringContaining(
-        `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds?`,
-      ),
-    );
+    expect(requestMock).toHaveBeenCalledWith(expect.stringContaining(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds?`));
 
     const url = requestMock.mock.calls[0]?.[0] as string;
 
@@ -7099,15 +5669,9 @@ describe('desktop phases 5-10 API client', () => {
   });
 
   it('gets build detail', async () => {
-    await getDesktopBuild(
-      workspaceId,
-      desktopAppId,
-      buildId,
-    );
+    await getDesktopBuild(workspaceId, desktopAppId, buildId);
 
-    expect(requestMock).toHaveBeenCalledWith(
-      `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}`,
-    );
+    expect(requestMock).toHaveBeenCalledWith(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}`);
   });
 
   it('ingests GitHub build', async () => {
@@ -7118,31 +5682,18 @@ describe('desktop phases 5-10 API client', () => {
       branch: 'main',
     } as never;
 
-    await ingestGithubDesktopBuild(
-      workspaceId,
-      desktopAppId,
-      payload,
-    );
+    await ingestGithubDesktopBuild(workspaceId, desktopAppId, payload);
 
-    expect(requestMock).toHaveBeenCalledWith(
-      `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/ingest/github`,
-      {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      },
-    );
+    expect(requestMock).toHaveBeenCalledWith(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/ingest/github`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
   });
 
   it('uses artifact endpoints', async () => {
-    await listDesktopBuildArtifacts(
-      workspaceId,
-      desktopAppId,
-      buildId,
-    );
+    await listDesktopBuildArtifacts(workspaceId, desktopAppId, buildId);
 
-    expect(requestMock).toHaveBeenCalledWith(
-      `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}/artifacts`,
-    );
+    expect(requestMock).toHaveBeenCalledWith(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}/artifacts`);
 
     const input = {
       providerArtifactId: 'artifact-1',
@@ -7152,50 +5703,26 @@ describe('desktop phases 5-10 API client', () => {
       fileName: 'app.msi',
     } as never;
 
-    await ingestDesktopBuildArtifact(
-      workspaceId,
-      desktopAppId,
-      buildId,
-      input,
-    );
+    await ingestDesktopBuildArtifact(workspaceId, desktopAppId, buildId, input);
 
-    expect(requestMock).toHaveBeenLastCalledWith(
-      `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}/artifacts`,
-      {
-        method: 'POST',
-        body: JSON.stringify(input),
-      },
-    );
+    expect(requestMock).toHaveBeenLastCalledWith(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}/artifacts`, {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
   });
 
   it('uses test endpoints', async () => {
-    await listDesktopBuildTests(
-      workspaceId,
-      desktopAppId,
-      buildId,
-    );
+    await listDesktopBuildTests(workspaceId, desktopAppId, buildId);
 
-    expect(requestMock).toHaveBeenCalledWith(
-      `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}/tests`,
-    );
+    expect(requestMock).toHaveBeenCalledWith(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}/tests`);
 
-    await listDesktopAppTests(
-      workspaceId,
-      desktopAppId,
-    );
+    await listDesktopAppTests(workspaceId, desktopAppId);
 
-    expect(requestMock).toHaveBeenCalledWith(
-      `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/tests`,
-    );
+    expect(requestMock).toHaveBeenCalledWith(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/tests`);
 
-    await getDesktopTestSummary(
-      workspaceId,
-      desktopAppId,
-    );
+    await getDesktopTestSummary(workspaceId, desktopAppId);
 
-    expect(requestMock).toHaveBeenCalledWith(
-      `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/tests/summary`,
-    );
+    expect(requestMock).toHaveBeenCalledWith(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/tests/summary`);
 
     const input = {
       type: 'UNIT',
@@ -7205,20 +5732,12 @@ describe('desktop phases 5-10 API client', () => {
       skipped: 0,
     } as never;
 
-    await ingestDesktopTestRun(
-      workspaceId,
-      desktopAppId,
-      buildId,
-      input,
-    );
+    await ingestDesktopTestRun(workspaceId, desktopAppId, buildId, input);
 
-    expect(requestMock).toHaveBeenLastCalledWith(
-      `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}/tests`,
-      {
-        method: 'POST',
-        body: JSON.stringify(input),
-      },
-    );
+    expect(requestMock).toHaveBeenLastCalledWith(`/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/builds/${buildId}/tests`, {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
   });
 });
 ```
@@ -7236,20 +5755,9 @@ packages/test-code/web/e2e/full-stack/fullstack-desktop-phases-5-10.spec.ts
 ```
 
 ```ts
-import {
-  authorizedApiRequest,
-  loginThroughUi,
-  uniqueValue,
-} from './fixtures/helpers';
-import {
-  readFullStackState,
-  type FullStackState,
-} from './fixtures/state';
-import {
-  expect,
-  test,
-  type APIRequestContext,
-} from '@playwright/test';
+import { authorizedApiRequest, loginThroughUi, uniqueValue } from './fixtures/helpers';
+import { readFullStackState, type FullStackState } from './fixtures/state';
+import { expect, test, type APIRequestContext } from '@playwright/test';
 
 let state: FullStackState;
 
@@ -7257,30 +5765,17 @@ test.describe.configure({
   mode: 'serial',
 });
 
-async function createDesktopApplication(
-  request: APIRequestContext,
-) {
-  const response =
-    await authorizedApiRequest(
-      request,
-      state,
-      state.owner.accessToken,
-      `/workspaces/${state.owner.workspaceId}/desktop-apps`,
-      {
-        method: 'POST',
-        data: {
-          name: uniqueValue(
-            'Desktop Phases 5-10',
-            state.runId,
-          ),
-          platform: 'CROSS_PLATFORM',
-          framework: 'OTHER',
-          architecture: 'X64',
-          packageName:
-            `com.commandcenter.desktop.${Date.now()}`,
-        },
-      },
-    );
+async function createDesktopApplication(request: APIRequestContext) {
+  const response = await authorizedApiRequest(request, state, state.owner.accessToken, `/workspaces/${state.owner.workspaceId}/desktop-apps`, {
+    method: 'POST',
+    data: {
+      name: uniqueValue('Desktop Phases 5-10', state.runId),
+      platform: 'CROSS_PLATFORM',
+      framework: 'OTHER',
+      architecture: 'X64',
+      packageName: `com.commandcenter.desktop.${Date.now()}`,
+    },
+  });
 
   expect(response.status()).toBe(201);
 
@@ -7293,389 +5788,258 @@ async function createDesktopApplication(
   };
 }
 
-test.describe(
-  'Desktop phases 5-10 frontend',
-  () => {
-    test.beforeAll(() => {
-      state = readFullStackState();
+test.describe('Desktop phases 5-10 frontend', () => {
+  test.beforeAll(() => {
+    state = readFullStackState();
+  });
+
+  test('renders overview, code empty state, builds and tests', async ({ page, request }) => {
+    await loginThroughUi(page, state.owner);
+
+    const desktopApp = await createDesktopApplication(request);
+
+    const base = `/api/v1/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktopApp.id}`;
+
+    const frontendBase = `/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktopApp.id}`;
+
+    const build = {
+      id: '11111111-1111-4111-8111-111111111111',
+      workspaceId: state.owner.workspaceId,
+      desktopAppId: desktopApp.id,
+      repositoryId: '22222222-2222-4222-8222-222222222222',
+      workflowRunId: '901',
+      source: 'GITHUB_ACTIONS',
+      commitSha: 'a93f14258b51e9b424c4d7cb05f98751feef272d',
+      branch: 'main',
+      version: '2.0.0',
+      buildNumber: '200',
+      platform: 'WINDOWS',
+      architecture: 'X64',
+      status: 'SUCCESS',
+      startedAt: '2026-08-23T01:00:00.000Z',
+      completedAt: '2026-08-23T01:05:00.000Z',
+      durationMs: 300000,
+      createdAt: '2026-08-23T01:00:00.000Z',
+      updatedAt: '2026-08-23T01:05:00.000Z',
+    };
+
+    const desktopDetails = {
+      id: desktopApp.id,
+      applicationId: desktopApp.applicationId,
+      platform: 'CROSS_PLATFORM',
+      framework: 'OTHER',
+      architecture: 'X64',
+      packageName: 'com.commandcenter.desktop',
+      currentVersion: null,
+      currentBuildNumber: null,
+      minimumOsVersion: null,
+      updateChannel: 'stable',
+      createdAt: '2026-08-23T00:00:00.000Z',
+      updatedAt: '2026-08-23T00:00:00.000Z',
+      application: {
+        id: desktopApp.applicationId,
+        workspaceId: state.owner.workspaceId,
+        name: desktopApp.application.name,
+        slug: 'desktop-phases',
+        type: 'DESKTOP',
+        archivedAt: null,
+        createdAt: '2026-08-23T00:00:00.000Z',
+        updatedAt: '2026-08-23T00:00:00.000Z',
+      },
+    };
+
+    await page.route(`**${base}/overview`, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          desktopApp: desktopDetails,
+          repository: null,
+          latestBuild: build,
+          latestRelease: null,
+          latestPerformance: null,
+        }),
+      });
     });
 
-    test(
-      'renders overview, code empty state, builds and tests',
-      async ({
-        page,
-        request,
-      }) => {
-        await loginThroughUi(
-          page,
-          state.owner,
-        );
-
-        const desktopApp =
-          await createDesktopApplication(
-            request,
-          );
-
-        const base =
-          `/api/v1/workspaces/${state.owner.workspaceId}` +
-          `/desktop-apps/${desktopApp.id}`;
-
-        const frontendBase =
-          `/workspaces/${state.owner.workspaceId}` +
-          `/desktop-apps/${desktopApp.id}`;
-
-        const build = {
-          id: '11111111-1111-4111-8111-111111111111',
-          workspaceId:
-            state.owner.workspaceId,
-          desktopAppId:
-            desktopApp.id,
-          repositoryId:
-            '22222222-2222-4222-8222-222222222222',
-          workflowRunId: '901',
-          source: 'GITHUB_ACTIONS',
-          commitSha:
-            'a93f14258b51e9b424c4d7cb05f98751feef272d',
+    await page.route(`**${base}/detect`, async (route) => {
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          repositoryId: '22222222-2222-4222-8222-222222222222',
+          repositoryFullName: 'command-center/desktop',
           branch: 'main',
-          version: '2.0.0',
-          buildNumber: '200',
-          platform: 'WINDOWS',
-          architecture: 'X64',
-          status: 'SUCCESS',
-          startedAt:
-            '2026-08-23T01:00:00.000Z',
-          completedAt:
-            '2026-08-23T01:05:00.000Z',
-          durationMs: 300000,
-          createdAt:
-            '2026-08-23T01:00:00.000Z',
-          updatedAt:
-            '2026-08-23T01:05:00.000Z',
-        };
-
-        const desktopDetails = {
-          id: desktopApp.id,
-          applicationId:
-            desktopApp.applicationId,
-          platform:
-            'CROSS_PLATFORM',
-          framework: 'OTHER',
-          architecture: 'X64',
-          packageName:
-            'com.commandcenter.desktop',
-          currentVersion: null,
-          currentBuildNumber: null,
-          minimumOsVersion: null,
-          updateChannel: 'stable',
-          createdAt:
-            '2026-08-23T00:00:00.000Z',
-          updatedAt:
-            '2026-08-23T00:00:00.000Z',
-          application: {
-            id: desktopApp.applicationId,
-            workspaceId:
-              state.owner.workspaceId,
-            name:
-              desktopApp.application.name,
-            slug: 'desktop-phases',
-            type: 'DESKTOP',
-            archivedAt: null,
-            createdAt:
-              '2026-08-23T00:00:00.000Z',
-            updatedAt:
-              '2026-08-23T00:00:00.000Z',
+          truncated: false,
+          candidates: [],
+          primary: {
+            applicationType: 'DESKTOP',
+            projectRoot: '',
+            platform: 'CROSS_PLATFORM',
+            framework: 'ELECTRON',
+            architecture: 'X64',
+            packageName: 'command-center-desktop',
+            version: '2.0.0',
+            buildNumber: '200',
+            minimumOsVersion: null,
+            confidence: 'HIGH',
+            score: 96,
+            evidence: ['package.json'],
+            warnings: [],
           },
-        };
+        }),
+      });
+    });
 
-        await page.route(
-          `**${base}/overview`,
-          async (route) => {
-            await route.fulfill({
-              status: 200,
-              contentType:
-                'application/json',
-              body: JSON.stringify({
-                desktopApp:
-                  desktopDetails,
-                repository: null,
-                latestBuild: build,
-                latestRelease: null,
-                latestPerformance: null,
-              }),
-            });
-          },
-        );
+    await page.route(`**${base}/builds**`, async (route) => {
+      if (route.request().method() !== 'GET') {
+        await route.continue();
+        return;
+      }
 
-        await page.route(
-          `**${base}/detect`,
-          async (route) => {
-            await route.fulfill({
-              status: 201,
-              contentType:
-                'application/json',
-              body: JSON.stringify({
-                repositoryId:
-                  '22222222-2222-4222-8222-222222222222',
-                repositoryFullName:
-                  'command-center/desktop',
-                branch: 'main',
-                truncated: false,
-                candidates: [],
-                primary: {
-                  applicationType:
-                    'DESKTOP',
-                  projectRoot: '',
-                  platform:
-                    'CROSS_PLATFORM',
-                  framework:
-                    'ELECTRON',
-                  architecture: 'X64',
-                  packageName:
-                    'command-center-desktop',
-                  version: '2.0.0',
-                  buildNumber: '200',
-                  minimumOsVersion:
-                    null,
-                  confidence: 'HIGH',
-                  score: 96,
-                  evidence: [
-                    'package.json',
-                  ],
-                  warnings: [],
-                },
-              }),
-            });
-          },
-        );
+      const url = new URL(route.request().url());
 
-        await page.route(
-          `**${base}/builds**`,
-          async (route) => {
-            if (
-              route.request().method() !==
-              'GET'
-            ) {
-              await route.continue();
-              return;
-            }
-
-            const url =
-              new URL(
-                route.request().url(),
-              );
-
-            if (
-              url.pathname.endsWith(
-                `/builds/${build.id}`,
-              )
-            ) {
-              await route.fulfill({
-                status: 200,
-                contentType:
-                  'application/json',
-                body: JSON.stringify({
-                  ...build,
-                  artifacts: [
-                    {
-                      id: 'artifact-1',
-                      buildId:
-                        build.id,
-                      providerArtifactId:
-                        'github-artifact-1',
-                      platform:
-                        'WINDOWS',
-                      architecture:
-                        'X64',
-                      type: 'MSI',
-                      fileName:
-                        'CommandCenter-2.0.0.msi',
-                      sizeBytes:
-                        1000000,
-                      checksum: null,
-                      externalUrl:
-                        null,
-                      createdAt:
-                        '2026-08-23T01:05:00.000Z',
-                    },
-                  ],
-                  testRuns: [],
-                  testSummary: {
-                    totalRuns: 0,
-                    passedRuns: 0,
-                    failedRuns: 0,
-                    passedTests: 0,
-                    failedTests: 0,
-                    skippedTests: 0,
-                  },
-                }),
-              });
-              return;
-            }
-
-            await route.fulfill({
-              status: 200,
-              contentType:
-                'application/json',
-              body: JSON.stringify([
-                build,
-              ]),
-            });
-          },
-        );
-
-        await page.route(
-          `**${base}/tests`,
-          async (route) => {
-            await route.fulfill({
-              status: 200,
-              contentType:
-                'application/json',
-              body: JSON.stringify([
-                {
-                  id: 'run-1',
-                  buildId:
-                    build.id,
-                  type: 'E2E',
-                  status: 'FAILED',
-                  passed: 18,
-                  failed: 1,
-                  skipped: 0,
-                  total: 19,
-                  durationMs: 45000,
-                  startedAt: null,
-                  completedAt: null,
-                  createdAt:
-                    '2026-08-23T01:05:00.000Z',
-                  updatedAt:
-                    '2026-08-23T01:05:00.000Z',
-                  failures: [
-                    {
-                      id:
-                        'failure-1',
-                      testRunId:
-                        'run-1',
-                      suite:
-                        'Installer',
-                      testName:
-                        'installs cleanly',
-                      message:
-                        'Installer failed',
-                      file:
-                        'installer.spec.ts',
-                      line: 42,
-                      stackTrace:
-                        null,
-                      createdAt:
-                        '2026-08-23T01:05:00.000Z',
-                    },
-                  ],
-                },
-              ]),
-            });
-          },
-        );
-
-        await page.route(
-          `**${base}/tests/summary`,
-          async (route) => {
-            await route.fulfill({
-              status: 200,
-              contentType:
-                'application/json',
-              body: JSON.stringify({
-                totalRuns: 1,
-                passedRuns: 0,
-                failedRuns: 1,
-                passedTests: 18,
-                failedTests: 1,
-                skippedTests: 0,
-              }),
-            });
-          },
-        );
-
-        await page.goto(frontendBase);
-
-        await expect(
-          page.getByRole('heading', {
-            name:
-              desktopApp.application.name,
+      if (url.pathname.endsWith(`/builds/${build.id}`)) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            ...build,
+            artifacts: [
+              {
+                id: 'artifact-1',
+                buildId: build.id,
+                providerArtifactId: 'github-artifact-1',
+                platform: 'WINDOWS',
+                architecture: 'X64',
+                type: 'MSI',
+                fileName: 'CommandCenter-2.0.0.msi',
+                sizeBytes: 1000000,
+                checksum: null,
+                externalUrl: null,
+                createdAt: '2026-08-23T01:05:00.000Z',
+              },
+            ],
+            testRuns: [],
+            testSummary: {
+              totalRuns: 0,
+              passedRuns: 0,
+              failedRuns: 0,
+              passedTests: 0,
+              failedTests: 0,
+              skippedTests: 0,
+            },
           }),
-        ).toBeVisible();
+        });
+        return;
+      }
 
-        await expect(
-          page.getByText('Latest build'),
-        ).toBeVisible();
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([build]),
+      });
+    });
 
-        await page
-          .getByRole('button', {
-            name:
-              'Analyze Repository',
-          })
-          .click();
+    await page.route(`**${base}/tests`, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          {
+            id: 'run-1',
+            buildId: build.id,
+            type: 'E2E',
+            status: 'FAILED',
+            passed: 18,
+            failed: 1,
+            skipped: 0,
+            total: 19,
+            durationMs: 45000,
+            startedAt: null,
+            completedAt: null,
+            createdAt: '2026-08-23T01:05:00.000Z',
+            updatedAt: '2026-08-23T01:05:00.000Z',
+            failures: [
+              {
+                id: 'failure-1',
+                testRunId: 'run-1',
+                suite: 'Installer',
+                testName: 'installs cleanly',
+                message: 'Installer failed',
+                file: 'installer.spec.ts',
+                line: 42,
+                stackTrace: null,
+                createdAt: '2026-08-23T01:05:00.000Z',
+              },
+            ],
+          },
+        ]),
+      });
+    });
 
-        await expect(
-          page.getByDisplayValue(
-            'command-center-desktop',
-          ),
-        ).toBeVisible();
+    await page.route(`**${base}/tests/summary`, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          totalRuns: 1,
+          passedRuns: 0,
+          failedRuns: 1,
+          passedTests: 18,
+          failedTests: 1,
+          skippedTests: 0,
+        }),
+      });
+    });
 
-        await page.goto(
-          `${frontendBase}/code`,
-        );
+    await page.goto(frontendBase);
 
-        await expect(
-          page.getByRole('heading', {
-            name:
-              'Connect a repository first',
-          }),
-        ).toBeVisible();
+    await expect(
+      page.getByRole('heading', {
+        name: desktopApp.application.name,
+      }),
+    ).toBeVisible();
 
-        await page.goto(
-          `${frontendBase}/builds`,
-        );
+    await expect(page.getByText('Latest build')).toBeVisible();
 
-        await expect(
-          page.getByText('Success'),
-        ).toBeVisible();
+    await page
+      .getByRole('button', {
+        name: 'Analyze Repository',
+      })
+      .click();
 
-        await page
-          .getByRole('link', {
-            name: '2.0.0',
-          })
-          .click();
+    await expect(page.getByDisplayValue('command-center-desktop')).toBeVisible();
 
-        await expect(
-          page.getByText(
-            'CommandCenter-2.0.0.msi',
-          ),
-        ).toBeVisible();
+    await page.goto(`${frontendBase}/code`);
 
-        await expect(
-          page.getByText(
-            'Remote artifact unavailable',
-          ),
-        ).toBeVisible();
+    await expect(
+      page.getByRole('heading', {
+        name: 'Connect a repository first',
+      }),
+    ).toBeVisible();
 
-        await page.goto(
-          `${frontendBase}/tests`,
-        );
+    await page.goto(`${frontendBase}/builds`);
 
-        await expect(
-          page.getByText(
-            'installs cleanly',
-          ),
-        ).toBeVisible();
+    await expect(page.getByText('Success')).toBeVisible();
 
-        await expect(
-          page.getByText(
-            'Installer failed',
-          ),
-        ).toBeVisible();
-      },
-    );
-  },
-);
+    await page
+      .getByRole('link', {
+        name: '2.0.0',
+      })
+      .click();
+
+    await expect(page.getByText('CommandCenter-2.0.0.msi')).toBeVisible();
+
+    await expect(page.getByText('Remote artifact unavailable')).toBeVisible();
+
+    await page.goto(`${frontendBase}/tests`);
+
+    await expect(page.getByText('installs cleanly')).toBeVisible();
+
+    await expect(page.getByText('Installer failed')).toBeVisible();
+  });
+});
 ```
 
 ---

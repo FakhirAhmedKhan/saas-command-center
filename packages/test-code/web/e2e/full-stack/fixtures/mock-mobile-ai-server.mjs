@@ -36,10 +36,7 @@ const server = createServer((request, response) => {
 
   request.on('end', () => {
     try {
-      if (
-        request.headers.authorization !==
-        'Bearer fullstack-mobile-ai-key'
-      ) {
+      if (request.headers.authorization !== 'Bearer fullstack-mobile-ai-key') {
         response.writeHead(401, {
           'content-type': 'application/json',
         });
@@ -55,11 +52,7 @@ const server = createServer((request, response) => {
 
       const body = JSON.parse(raw);
 
-      if (
-        body.model !== 'fullstack-mobile-ai' ||
-        typeof body.system !== 'string' ||
-        typeof body.prompt !== 'string'
-      ) {
+      if (body.model !== 'fullstack-mobile-ai' || typeof body.system !== 'string' || typeof body.prompt !== 'string') {
         response.writeHead(400, {
           'content-type': 'application/json',
         });
@@ -79,8 +72,7 @@ const server = createServer((request, response) => {
 
       response.end(
         JSON.stringify({
-          text:
-            'Release health was analyzed using the supplied SaaS Command Center evidence. The available evidence supports a limited assessment. Correlation does not prove causation.',
+          text: 'Release health was analyzed using the supplied SaaS Command Center evidence. The available evidence supports a limited assessment. Correlation does not prove causation.',
         }),
       );
     } catch {
@@ -98,9 +90,7 @@ const server = createServer((request, response) => {
 });
 
 server.listen(port, host, () => {
-  console.log(
-    `Mobile AI full-stack mock listening on http://${host}:${port}`,
-  );
+  console.log(`Mobile AI full-stack mock listening on http://${host}:${port}`);
 });
 
 function shutdown() {

@@ -10,6 +10,7 @@ import { AnalyticsReportsModule } from './modules/analytics-reports/analytics-re
 import { ApplicationsModule } from './modules/applications/applications.module';
 import { AuthSessionsModule } from './modules/auth/module/auth-sessions.module';
 import { AuthModule } from './modules/auth/module/auth.module';
+import { DesktopAppsModule } from './modules/desktop-apps/desktop-apps.module';
 import { DevelopmentModule } from './modules/development/development.module';
 import { HealthModule } from './modules/health/health.module';
 import { MobileAppsModule } from './modules/mobile-apps/mobile-apps.module';
@@ -69,7 +70,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     MonitoringModule,
     TeamOperationsModule,
     WebhooksModule,
-
+    DesktopAppsModule,
     AnalyticsProcessingModule,
   ],
   providers: [
