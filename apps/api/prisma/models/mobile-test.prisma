@@ -1,0 +1,63 @@
+enum MobileTestType {
+  UNIT
+  UI
+  INTEGRATION
+  INSTRUMENTATION
+  SNAPSHOT
+  OTHER
+}
+
+enum MobileTestStatus {
+  PENDING
+  RUNNING
+  PASSED
+  FAILED
+  SKIPPED
+  CANCELLED
+}
+
+model MobileTestRun {
+  id      String           @id @default(uuid()) @db.Uuid
+  buildId String           @map("build_id") @db.Uuid
+  type    MobileTestType
+  status  MobileTestStatus @default(PENDING)
+
+  passed  Int @default(0)
+  failed  Int @default(0)
+  skipped Int @default(0)
+  total   Int @default(0)
+
+  durationMs  Int?      @map("duration_ms")
+  startedAt   DateTime? @map("started_at") @db.Timestamptz(6)
+  completedAt DateTime? @map("completed_at") @db.Timestamptz(6)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  build    MobileBuild         @relation(fields: [buildId], references: [id], onDelete: Cascade)
+  failures MobileTestFailure[]
+
+  @@unique([buildId, type])
+  @@index([buildId])
+  @@index([status])
+  @@map("mobile_test_runs")
+}
+
+model MobileTestFailure {
+  id        String @id @default(uuid()) @db.Uuid
+  testRunId String @map("test_run_id") @db.Uuid
+
+  suite      String? @db.VarChar(500)
+  testName   String? @map("test_name") @db.VarChar(500)
+  message    String? @db.Text
+  file       String? @db.VarChar(2048)
+  line       Int?
+  stackTrace String? @map("stack_trace") @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  testRun MobileTestRun @relation(fields: [testRunId], references: [id], onDelete: Cascade)
+
+  @@index([testRunId])
+  @@map("mobile_test_failures")
+}

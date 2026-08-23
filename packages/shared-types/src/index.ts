@@ -34,3 +34,23 @@ export * from './integrations/index.js';
 export * from './team-operations/index.js';
 export * from './tracking/index.js';
 export * from './mobile-apps';
+
+export type {
+  GithubMobileBuildInput,
+  MobileAnalysisAction,
+  MobileAnalysisEvidenceItem,
+  MobileAnalysisRequest,
+  MobileAnalysisResult,
+  MobileBuildDetails,
+  MobileBuildFilters,
+  MobileBuildIngestionResult,
+  MobileBuildStatus,
+  MobileTelemetryIntegration,
+  MobileTelemetryProvider,
+  MobileTestFailure,
+  MobileTestRun,
+  MobileTestRunInput,
+  MobileTestStatus,
+  MobileTestSummary,
+  MobileTestType,
+} from './mobile-apps/mobile-runtime.types';

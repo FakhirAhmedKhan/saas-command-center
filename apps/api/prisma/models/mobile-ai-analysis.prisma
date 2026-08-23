@@ -1,0 +1,35 @@
+enum MobileAnalysisAction {
+  BUILD_FAILURE
+  PERFORMANCE_REGRESSION
+  RELEASE_HEALTH
+  CUSTOM
+}
+
+enum MobileAnalysisConfidence {
+  LIMITED
+  SUPPORTED
+}
+
+model MobileAiAnalysis {
+  id              String @id @default(uuid()) @db.Uuid
+  workspaceId     String @map("workspace_id") @db.Uuid
+  mobileAppId     String @map("mobile_app_id") @db.Uuid
+  createdByUserId String @map("created_by_user_id") @db.Uuid
+
+  action   MobileAnalysisAction
+  question String?              @db.Text
+
+  answer String @db.Text
+
+  confidence MobileAnalysisConfidence
+
+  evidence Json
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  mobileApp MobileApplication @relation(fields: [mobileAppId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, mobileAppId])
+  @@index([createdAt])
+  @@map("mobile_ai_analyses")
+}

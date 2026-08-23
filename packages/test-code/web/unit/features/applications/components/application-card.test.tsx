@@ -22,6 +22,7 @@ function makeApplication(overrides: Partial<SaasApplication> = {}): SaasApplicat
     workspaceId: 'workspace-1',
     name: 'PriceScout AI',
     slug: 'pricescout-ai',
+    type: 'WEB',
     shortDescription: 'Track competitor prices',
     longDescription: null,
     category: 'AI',

@@ -1,0 +1,76 @@
+enum MobileAlertRuleType {
+  CRASH_RATE
+  ANR_HANG
+  STARTUP
+  API_FAILURE_RATE
+  BUILD_FAILED
+  RELEASE_REGRESSION
+}
+
+enum MobileAlertOperator {
+  GT
+  GTE
+}
+
+enum MobileAlertIncidentStatus {
+  OPEN
+  RESOLVED
+}
+
+model MobileAlertRule {
+  id          String @id @default(uuid()) @db.Uuid
+  workspaceId String @map("workspace_id") @db.Uuid
+  mobileAppId String @map("mobile_app_id") @db.Uuid
+
+  name     String              @db.VarChar(160)
+  type     MobileAlertRuleType
+  operator MobileAlertOperator @default(GT)
+
+  threshold       Float?
+  cooldownMinutes Int     @default(60) @map("cooldown_minutes")
+  enabled         Boolean @default(true)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  mobileApp MobileApplication @relation(fields: [mobileAppId], references: [id], onDelete: Cascade)
+
+  incidents MobileAlertIncident[]
+
+  @@index([workspaceId, mobileAppId])
+  @@index([mobileAppId, enabled])
+  @@map("mobile_alert_rules")
+}
+
+model MobileAlertIncident {
+  id          String @id @default(uuid()) @db.Uuid
+  workspaceId String @map("workspace_id") @db.Uuid
+  mobileAppId String @map("mobile_app_id") @db.Uuid
+  ruleId      String @map("rule_id") @db.Uuid
+
+  status MobileAlertIncidentStatus @default(OPEN)
+
+  title   String @db.VarChar(255)
+  message String @db.Text
+
+  actualValue Float? @map("actual_value")
+  threshold   Float?
+
+  version String? @db.VarChar(64)
+  buildId String? @map("build_id") @db.Uuid
+
+  activeKey String? @unique @map("active_key")
+
+  triggeredAt DateTime  @default(now()) @map("triggered_at")
+  resolvedAt  DateTime? @map("resolved_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  rule MobileAlertRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, mobileAppId])
+  @@index([ruleId, status])
+  @@index([triggeredAt])
+  @@map("mobile_alert_incidents")
+}

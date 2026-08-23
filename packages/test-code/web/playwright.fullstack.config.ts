@@ -46,7 +46,18 @@ export default defineConfig({
 
   webServer: [
     {
-      command: 'pnpm start',
+      command: 'node e2e/full-stack/fixtures/mock-mobile-ai-server.mjs',
+      cwd: __dirname,
+      url: 'http://127.0.0.1:3103/health',
+      reuseExistingServer: false,
+      timeout: 30_000,
+      env: {
+        ...process.env,
+        MOBILE_AI_MOCK_PORT: '3103',
+      },
+    },
+    {
+      command: 'pnpm build && pnpm start:prod',
       cwd: apiRoot,
       url: `${apiUrl}/health`,
       reuseExistingServer: false,
@@ -71,6 +82,9 @@ export default defineConfig({
         REFRESH_TOKEN_TTL: '1d',
         ANALYTICS_ALLOW_ORIGINLESS: 'false',
         ANALYTICS_PROCESSING_SCHEDULER_ENABLED: 'false',
+        MOBILE_AI_ANALYSIS_URL: 'http://127.0.0.1:3103/analyze',
+        MOBILE_AI_ANALYSIS_API_KEY: 'fullstack-mobile-ai-key',
+        MOBILE_AI_ANALYSIS_MODEL: 'fullstack-mobile-ai',
       },
     },
 

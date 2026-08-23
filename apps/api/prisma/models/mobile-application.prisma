@@ -12,7 +12,13 @@ model MobileApplication {
   createdAt          DateTime        @default(now()) @map("created_at")
   updatedAt          DateTime        @updatedAt @map("updated_at")
 
-  application SaasApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  application                SaasApplication             @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  mobileAiAnalyses           MobileAiAnalysis[]
+  mobileAlertRules           MobileAlertRule[]
+  mobileReleases             MobileRelease[]
+  mobileTelemetryIntegration MobileTelemetryIntegration?
+  builds                     MobileBuild[]
+  performanceMetrics         MobilePerformanceMetric[]
 
   @@index([platform])
   @@index([framework])

@@ -1,0 +1,39 @@
+enum MobileTelemetryProvider {
+  FIREBASE
+  SENTRY
+  DATADOG
+  NEW_RELIC
+  CUSTOM
+}
+
+enum MobileTelemetryStatus {
+  CONNECTED
+  ERROR
+  DISCONNECTED
+}
+
+model MobileTelemetryIntegration {
+  id          String @id @default(uuid()) @db.Uuid
+  workspaceId String @map("workspace_id") @db.Uuid
+  mobileAppId String @unique @map("mobile_app_id") @db.Uuid
+
+  provider MobileTelemetryProvider
+  status   MobileTelemetryStatus   @default(CONNECTED)
+
+  externalProjectId String @map("external_project_id") @db.VarChar(255)
+
+  encryptedConfig String? @map("encrypted_config") @db.Text
+
+  configuredAt DateTime  @default(now()) @map("configured_at")
+  lastSyncedAt DateTime? @map("last_synced_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  mobileApp MobileApplication @relation(fields: [mobileAppId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([workspaceId, status])
+  @@index([provider])
+  @@map("mobile_telemetry_integrations")
+}

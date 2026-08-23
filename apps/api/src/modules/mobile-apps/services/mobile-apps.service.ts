@@ -1,8 +1,3 @@
-/* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { ActivityWriterService } from '../../activity/services/activity-writer.service';
 import { CreateMobileAppDto, UpdateMobileAppDto } from '../dto/mobile-app.dto';
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';

@@ -1,5 +1,4 @@
-import { APPLICATION_TYPES } from '@command-center/shared-types';
-import type { ApplicationType, MobileApplication } from '@command-center/shared-types';
+import { APPLICATION_TYPES, type ApplicationType, type MobileApplication } from '@command-center/shared-types';
 
 export { APPLICATION_TYPES };
 export type { ApplicationType, MobileApplication };

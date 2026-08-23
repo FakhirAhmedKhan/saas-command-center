@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString, Length, MaxLength } from 'class-validator';
 import { MobileFramework, MobilePlatform } from 'src/generated/prisma/enums';

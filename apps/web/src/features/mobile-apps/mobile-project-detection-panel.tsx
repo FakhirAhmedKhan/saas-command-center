@@ -1,5 +1,8 @@
 ﻿'use client';
 
+import { MOBILE_FRAMEWORK_LABELS, MOBILE_PLATFORM_LABELS } from './mobile-app.constants';
+import { detectMobileProject, updateMobileApp } from './mobile-apps-api';
+import { getErrorMessage } from '@/features/lib/api/api-error';
 import type {
   MobileApplicationDetails,
   MobileFramework,
@@ -7,16 +10,8 @@ import type {
   MobileProjectDetection,
   MobileProjectDetectionResponse,
 } from '@command-center/shared-types';
-
 import { CheckCircle2, Loader2, ScanSearch } from 'lucide-react';
-
 import { useEffect, useState } from 'react';
-
-import { getErrorMessage } from '@/features/lib/api/api-error';
-
-import { MOBILE_FRAMEWORK_LABELS, MOBILE_PLATFORM_LABELS } from './mobile-app.constants';
-
-import { detectMobileProject, updateMobileApp } from './mobile-apps-api';
 
 interface MobileProjectDetectionPanelProps {
   workspaceId: string;
@@ -46,6 +41,7 @@ export function MobileProjectDetectionPanel({ workspaceId, mobileApp, onApplied 
       return;
     }
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDraft(result.projects[selectedIndex] ?? null);
   }, [result, selectedIndex]);
 

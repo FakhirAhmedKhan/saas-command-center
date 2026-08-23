@@ -1,0 +1,46 @@
+enum MobileReleaseEnvironment {
+  DEVELOPMENT
+  QA
+  INTERNAL
+  BETA
+  PRODUCTION
+}
+
+enum MobileReleaseStatus {
+  DRAFT
+  READY
+  RELEASED
+  FAILED
+  ROLLED_BACK
+}
+
+model MobileRelease {
+  id          String @id @default(uuid()) @db.Uuid
+  workspaceId String @map("workspace_id") @db.Uuid
+  mobileAppId String @map("mobile_app_id") @db.Uuid
+  buildId     String @map("build_id") @db.Uuid
+
+  version     String @db.VarChar(64)
+  buildNumber String @map("build_number") @db.VarChar(64)
+
+  environment MobileReleaseEnvironment
+  status      MobileReleaseStatus      @default(DRAFT)
+
+  commitSha    String    @map("commit_sha") @db.VarChar(64)
+  releaseNotes String?   @map("release_notes") @db.Text
+  releasedAt   DateTime? @map("released_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  mobileApp MobileApplication @relation(fields: [mobileAppId], references: [id], onDelete: Cascade)
+
+  build MobileBuild @relation(fields: [buildId], references: [id], onDelete: Restrict)
+
+  @@unique([buildId, environment])
+  @@index([workspaceId, mobileAppId])
+  @@index([mobileAppId, environment])
+  @@index([mobileAppId, status])
+  @@index([createdAt])
+  @@map("mobile_releases")
+}

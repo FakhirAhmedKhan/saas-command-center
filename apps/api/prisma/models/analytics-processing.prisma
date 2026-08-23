@@ -35,7 +35,7 @@ model AnalyticsProcessingRun {
 
   pendingEventsAtStart Int @default(0) @map("pending_events_at_start")
 
-  // Existing Phase 1â€“10 processing metrics are preserved for compatibility.
+  // Existing Phase 1Ã¢â‚¬â€œ10 processing metrics are preserved for compatibility.
   rawEventsProcessed Int @default(0) @map("raw_events_processed")
   sessionsRebuilt    Int @default(0) @map("sessions_rebuilt")
   hourlyBuckets      Int @default(0) @map("hourly_buckets")

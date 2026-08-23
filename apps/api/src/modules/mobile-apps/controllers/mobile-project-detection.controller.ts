@@ -1,12 +1,8 @@
-import { Controller, Param, ParseUUIDPipe, Post, UseGuards } from '@nestjs/common';
-
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-
 import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
-
 import { MobileProjectDetectionService } from '../services/mobile-project-detection.service';
+import { Controller, Param, ParseUUIDPipe, Post, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Mobile Project Detection')
 @ApiBearerAuth('access-token')

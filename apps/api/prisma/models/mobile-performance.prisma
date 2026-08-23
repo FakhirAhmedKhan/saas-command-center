@@ -1,0 +1,41 @@
+enum MobilePerformanceMetricType {
+  CRASH_FREE_USERS_RATE
+  CRASH_RATE
+  CRASH_COUNT
+  ANR_COUNT
+  HANG_COUNT
+  COLD_STARTUP_MS
+  WARM_STARTUP_MS
+  MEMORY_MB
+  NETWORK_LATENCY_MS
+  API_FAILURE_RATE
+  VERSION_ADOPTION_RATE
+  SLOW_SCREEN_COUNT
+}
+
+model MobilePerformanceMetric {
+  id          String @id @default(uuid()) @db.Uuid
+  workspaceId String @map("workspace_id") @db.Uuid
+  mobileAppId String @map("mobile_app_id") @db.Uuid
+
+  platform MobilePlatform
+
+  version     String  @db.VarChar(64)
+  buildNumber String? @map("build_number") @db.VarChar(64)
+
+  periodStart DateTime? @map("period_start")
+  periodEnd   DateTime? @map("period_end")
+
+  collectedAt DateTime @default(now()) @map("collected_at")
+
+  metric MobilePerformanceMetricType
+  value  Float
+
+  mobileApp MobileApplication @relation(fields: [mobileAppId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, mobileAppId, collectedAt])
+  @@index([mobileAppId, version])
+  @@index([mobileAppId, metric, collectedAt])
+  @@index([platform])
+  @@map("mobile_performance_metrics")
+}

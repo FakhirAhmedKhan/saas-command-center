@@ -1,0 +1,24 @@
+model MobileApplication {
+  id                 String          @id @default(uuid()) @db.Uuid
+  applicationId      String          @unique @map("application_id") @db.Uuid
+  platform           MobilePlatform
+  framework          MobileFramework
+  packageId          String?         @map("package_id") @db.VarChar(255)
+  bundleId           String?         @map("bundle_id") @db.VarChar(255)
+  minOsVersion       String?         @map("min_os_version") @db.VarChar(64)
+  targetOsVersion    String?         @map("target_os_version") @db.VarChar(64)
+  currentVersion     String?         @map("current_version") @db.VarChar(64)
+  currentBuildNumber String?         @map("current_build_number") @db.VarChar(64)
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
+
+  application                SaasApplication             @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  mobileAiAnalyses           MobileAiAnalysis[]
+  mobileAlertRules           MobileAlertRule[]
+  mobileReleases             MobileRelease[]
+  mobileTelemetryIntegration MobileTelemetryIntegration?
+
+  @@index([platform])
+  @@index([framework])
+  @@map("mobile_applications")
+}

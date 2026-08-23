@@ -1,4 +1,4 @@
-import type { MobileFramework, MobilePlatform } from '@command-center/shared-types';
+﻿import type { MobileFramework, MobilePlatform } from '@command-center/shared-types';
 
 export const FRAMEWORKS_BY_PLATFORM: Record<MobilePlatform, MobileFramework[]> = {
   ANDROID: ['ANDROID_NATIVE', 'FLUTTER', 'REACT_NATIVE', 'KMP', 'OTHER'],

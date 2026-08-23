@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 
 config({
   path: resolve(__dirname, '../../../apps/api/.env.test'),
-  override: true,
+  override: false,
   quiet: true,
 });
 

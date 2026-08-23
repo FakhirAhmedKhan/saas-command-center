@@ -1,18 +1,12 @@
 ﻿'use client';
 
-import type { MobileApplicationDetails, RepositoryConnection } from '@command-center/shared-types';
-
-import { ExternalLink, GitBranch, Loader2, Unlink } from 'lucide-react';
-
-import Link from 'next/link';
-
-import { useCallback, useEffect, useMemo, useState } from 'react';
-
-import { getErrorMessage } from '@/features/lib/api/api-error';
-
 import { getMobileRepository, linkMobileRepository, unlinkMobileRepository } from './mobile-apps-api';
-
+import { getErrorMessage } from '@/features/lib/api/api-error';
 import { listRepositories } from '@/features/repositories/repositories-api';
+import type { MobileApplicationDetails, RepositoryConnection } from '@command-center/shared-types';
+import { ExternalLink, GitBranch, Loader2, Unlink } from 'lucide-react';
+import Link from 'next/link';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface MobileRepositoryPanelProps {
   workspaceId: string;
@@ -55,6 +49,7 @@ export function MobileRepositoryPanel({ workspaceId, mobileApp, onRepositoryChan
   }, [mobileApp.id, workspaceId]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void load();
   }, [load]);
 

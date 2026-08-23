@@ -11,6 +11,7 @@ function baseApplication(overrides: Partial<SaasApplication> = {}): SaasApplicat
     workspaceId: 'workspace-1',
     name: 'PriceScout AI',
     slug: 'pricescout-ai',
+    type: 'WEB',
     shortDescription: 'Short desc',
     longDescription: 'Long desc',
     category: 'AI',

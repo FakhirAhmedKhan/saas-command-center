@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { WorkspaceSwitcher } from './workspace-switcher';
 import { useAuth } from '@/features/auth/auth-provider';
@@ -8,7 +8,6 @@ import {
   Activity,
   Boxes,
   Building2,
-  Code2Icon,
   GitBranch,
   Globe2,
   LayoutDashboard,
@@ -306,7 +305,7 @@ export function AppShell({ children }: AppShellProps) {
                   <path d='m21 21-4.3-4.3' />
                 </svg>
 
-                <span className='flex-1 truncate'>Search applications, websites…</span>
+                <span className='flex-1 truncate'>Search applications, websitesâ€¦</span>
 
                 <kbd className='rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold text-slate-400'>Ctrl K</kbd>
               </button>

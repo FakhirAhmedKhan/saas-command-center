@@ -1,10 +1,7 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
-
-import { PrismaService } from 'src/database/prisma.service';
-
-import { RepositoriesService } from '../../repositories/services/repositories.service';
-
 import { MobileAppsService } from './mobile-apps.service';
+import { RepositoriesService } from '../../repositories/services/repositories.service';
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
 
 @Injectable()
 export class MobileRepositoryService {

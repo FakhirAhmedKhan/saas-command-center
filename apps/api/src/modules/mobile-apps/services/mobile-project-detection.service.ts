@@ -1,12 +1,8 @@
-import type { MobileProjectDetectionResponse } from '@command-center/shared-types';
-
-import { BadRequestException, Injectable } from '@nestjs/common';
-
-import { GithubCodeService, type GithubRepositoryContent } from '../../repositories/services/github-code.service';
-
-import { MobileRepositoryService } from './mobile-repository.service';
-
 import { detectMobileProjects, type MobileRepositorySnapshot } from './mobile-project-detector';
+import { MobileRepositoryService } from './mobile-repository.service';
+import { GithubCodeService, type GithubRepositoryContent } from '../../repositories/services/github-code.service';
+import type { MobileProjectDetectionResponse } from '@command-center/shared-types';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 const MAX_METADATA_FILE_SIZE = 300_000;
 

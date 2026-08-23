@@ -1,13 +1,27 @@
 import {
   archiveMobileApp,
+  connectMobileTelemetry,
   createMobileApp,
+  createMobileRelease,
   detectMobileProject,
+  disconnectMobileTelemetry,
   getMobileApp,
+  getMobileAppOverview,
+  getMobileBuild,
   getMobileRepository,
+  getMobileTelemetryIntegration,
+  getMobileTestsDashboard,
+  ingestGithubMobileBuild,
+  ingestMobileTestRun,
   linkMobileRepository,
   listMobileApps,
+  listMobileBuilds,
+  listMobileBuildTests,
+  listMobileReleases,
+  syncMobileTelemetry,
   unlinkMobileRepository,
   updateMobileApp,
+  updateMobileReleaseStatus,
 } from '@/features/mobile-apps/mobile-apps-api';
 
 import { apiRequest } from '@/features/lib/api/api-client';
@@ -104,7 +118,155 @@ describe('mobile-apps-api', () => {
       }),
     });
   });
+  it('gets mobile application overview', async () => {
+    await getMobileAppOverview(WORKSPACE_ID, MOBILE_APP_ID);
 
+    expect(mockedApiRequest).toHaveBeenCalledWith(`/workspaces/${WORKSPACE_ID}/mobile-apps/${MOBILE_APP_ID}/overview`);
+  });
+
+  it('lists mobile builds', async () => {
+    await listMobileBuilds(WORKSPACE_ID, MOBILE_APP_ID);
+
+    expect(mockedApiRequest).toHaveBeenCalledWith(`/workspaces/${WORKSPACE_ID}/mobile-apps/${MOBILE_APP_ID}/builds`);
+  });
+
+  it('gets mobile build detail', async () => {
+    await getMobileBuild(WORKSPACE_ID, MOBILE_APP_ID, 'build-1');
+
+    expect(mockedApiRequest).toHaveBeenCalledWith(`/workspaces/${WORKSPACE_ID}/mobile-apps/${MOBILE_APP_ID}/builds/build-1`);
+  });
+
+  it('ingests GitHub build', async () => {
+    const payload = {
+      repositoryId: 'repo-1',
+
+      workflowRunId: '123',
+
+      commitSha: 'a93f142',
+
+      branch: 'development',
+
+      platform: 'ANDROID' as const,
+
+      status: 'SUCCESS' as const,
+    };
+
+    await ingestGithubMobileBuild(WORKSPACE_ID, MOBILE_APP_ID, payload);
+
+    expect(mockedApiRequest).toHaveBeenCalledWith(`/workspaces/${WORKSPACE_ID}/mobile-apps/${MOBILE_APP_ID}/builds/ingest/github`, {
+      method: 'POST',
+
+      body: JSON.stringify(payload),
+    });
+  });
+
+  it('loads build tests', async () => {
+    await listMobileBuildTests(WORKSPACE_ID, MOBILE_APP_ID, 'build-1');
+
+    expect(mockedApiRequest).toHaveBeenCalledWith(`/workspaces/${WORKSPACE_ID}/mobile-apps/${MOBILE_APP_ID}/builds/build-1/tests`);
+  });
+
+  it('ingests mobile test run', async () => {
+    const payload = {
+      type: 'UNIT' as const,
+
+      status: 'PASSED' as const,
+
+      passed: 10,
+      failed: 0,
+      skipped: 0,
+    };
+
+    await ingestMobileTestRun(WORKSPACE_ID, MOBILE_APP_ID, 'build-1', payload);
+
+    expect(mockedApiRequest).toHaveBeenCalledWith(`/workspaces/${WORKSPACE_ID}/mobile-apps/${MOBILE_APP_ID}/builds/build-1/tests/ingest`, {
+      method: 'POST',
+
+      body: JSON.stringify(payload),
+    });
+  });
+  it('lists mobile releases', async () => {
+    await listMobileReleases(WORKSPACE_ID, MOBILE_APP_ID);
+
+    expect(mockedApiRequest).toHaveBeenCalledWith(`/workspaces/${WORKSPACE_ID}/mobile-apps/${MOBILE_APP_ID}/releases`);
+  });
+
+  it('creates mobile release', async () => {
+    const payload = {
+      buildId: 'build-1',
+
+      environment: 'PRODUCTION' as const,
+
+      releaseNotes: 'Production',
+    };
+
+    await createMobileRelease(WORKSPACE_ID, MOBILE_APP_ID, payload);
+
+    expect(mockedApiRequest).toHaveBeenCalledWith(`/workspaces/${WORKSPACE_ID}/mobile-apps/${MOBILE_APP_ID}/releases`, {
+      method: 'POST',
+
+      body: JSON.stringify(payload),
+    });
+  });
+
+  it('updates release status', async () => {
+    await updateMobileReleaseStatus(WORKSPACE_ID, MOBILE_APP_ID, 'release-1', 'READY');
+
+    expect(mockedApiRequest).toHaveBeenCalledWith(`/workspaces/${WORKSPACE_ID}/mobile-apps/${MOBILE_APP_ID}/releases/release-1/status`, {
+      method: 'PATCH',
+
+      body: JSON.stringify({
+        status: 'READY',
+      }),
+    });
+  });
+
+  it('loads telemetry integration', async () => {
+    await getMobileTelemetryIntegration(WORKSPACE_ID, MOBILE_APP_ID);
+
+    expect(mockedApiRequest).toHaveBeenCalledWith(`/workspaces/${WORKSPACE_ID}/mobile-apps/${MOBILE_APP_ID}/telemetry`);
+  });
+
+  it('connects telemetry provider', async () => {
+    const payload = {
+      provider: 'SENTRY' as const,
+
+      externalProjectId: 'mobile-project',
+
+      config: {
+        authToken: 'secret',
+      },
+    };
+
+    await connectMobileTelemetry(WORKSPACE_ID, MOBILE_APP_ID, payload);
+
+    expect(mockedApiRequest).toHaveBeenCalledWith(`/workspaces/${WORKSPACE_ID}/mobile-apps/${MOBILE_APP_ID}/telemetry/connect`, {
+      method: 'POST',
+
+      body: JSON.stringify(payload),
+    });
+  });
+
+  it('syncs telemetry', async () => {
+    await syncMobileTelemetry(WORKSPACE_ID, MOBILE_APP_ID);
+
+    expect(mockedApiRequest).toHaveBeenCalledWith(`/workspaces/${WORKSPACE_ID}/mobile-apps/${MOBILE_APP_ID}/telemetry/sync`, {
+      method: 'POST',
+    });
+  });
+
+  it('disconnects telemetry', async () => {
+    await disconnectMobileTelemetry(WORKSPACE_ID, MOBILE_APP_ID);
+
+    expect(mockedApiRequest).toHaveBeenCalledWith(`/workspaces/${WORKSPACE_ID}/mobile-apps/${MOBILE_APP_ID}/telemetry`, {
+      method: 'DELETE',
+    });
+  });
+  it('loads mobile tests dashboard', async () => {
+    await getMobileTestsDashboard(WORKSPACE_ID, MOBILE_APP_ID);
+
+    expect(mockedApiRequest).toHaveBeenCalledWith(`/workspaces/${WORKSPACE_ID}/mobile-apps/${MOBILE_APP_ID}/tests`);
+  });
   it('unlinks mobile repository', async () => {
     await unlinkMobileRepository(WORKSPACE_ID, MOBILE_APP_ID);
 

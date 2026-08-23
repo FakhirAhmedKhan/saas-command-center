@@ -1,4 +1,4 @@
-import type { ApplicationType, MobileFramework, MobilePlatform } from '@command-center/shared-types';
+﻿import type { ApplicationType, MobileFramework, MobilePlatform } from '@command-center/shared-types';
 
 export const APPLICATION_TYPE_LABELS: Record<ApplicationType, string> = {
   WEB: 'Web',
