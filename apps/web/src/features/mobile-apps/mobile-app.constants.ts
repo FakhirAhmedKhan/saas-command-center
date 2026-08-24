@@ -4,6 +4,7 @@ export const APPLICATION_TYPE_LABELS: Record<ApplicationType, string> = {
   WEB: 'Web',
   API: 'API',
   MOBILE: 'Mobile',
+  DESKTOP: 'Desktop',
   WORKER: 'Worker',
   OTHER: 'Other',
 };

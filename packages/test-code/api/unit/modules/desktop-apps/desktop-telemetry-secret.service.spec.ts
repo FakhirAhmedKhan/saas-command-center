@@ -7,10 +7,7 @@ function DescribeDesktopTelemetrySecretService() {
     const service = new DesktopTelemetrySecretService();
 
     beforeEach(() => {
-      process.env.DESKTOP_TELEMETRY_ENCRYPTION_KEY = Buffer.alloc(
-        32,
-        11,
-      ).toString('base64');
+      process.env.DESKTOP_TELEMETRY_ENCRYPTION_KEY = Buffer.alloc(32, 11).toString('base64');
     });
 
     afterEach(() => {
@@ -36,16 +33,11 @@ function DescribeDesktopTelemetrySecretService() {
     it('rejects missing encryption key', () => {
       delete process.env.DESKTOP_TELEMETRY_ENCRYPTION_KEY;
 
-      expect(() => service.encrypt('secret-value')).toThrow(
-        /DESKTOP_TELEMETRY_ENCRYPTION_KEY/,
-      );
+      expect(() => service.encrypt('secret-value')).toThrow(/DESKTOP_TELEMETRY_ENCRYPTION_KEY/);
     });
 
     it('rejects a key that is not 32 bytes', () => {
-      process.env.DESKTOP_TELEMETRY_ENCRYPTION_KEY = Buffer.alloc(
-        16,
-        1,
-      ).toString('base64');
+      process.env.DESKTOP_TELEMETRY_ENCRYPTION_KEY = Buffer.alloc(16, 1).toString('base64');
 
       expect(() => service.encrypt('secret-value')).toThrow(/32 bytes/);
     });

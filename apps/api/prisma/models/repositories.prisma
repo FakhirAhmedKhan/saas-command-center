@@ -85,6 +85,8 @@ model RepositoryConnection {
   application  SaasApplication?       @relation(fields: [applicationId], references: [id], onDelete: SetNull)
   mobileBuilds MobileBuild[]
 
+  desktopBuilds DesktopBuild[]
+
   @@unique([workspaceId, provider, externalRepoId])
   @@index([workspaceId, isAvailable])
   @@index([installationId])

@@ -4,10 +4,7 @@ import { GithubCodeService } from 'src/modules/repositories/services/github-code
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
-import {
-  API,
-  createLinkedDesktopFixture,
-} from './helpers/desktop-test-fixtures';
+import { API, createLinkedDesktopFixture } from './helpers/desktop-test-fixtures';
 
 function base(workspaceId: string, desktopAppId: string) {
   return `${API}/workspaces/${workspaceId}/desktop-apps/${desktopAppId}`;
@@ -51,12 +48,7 @@ describe('Desktop Dependency and Security Health E2E', () => {
       ],
     } as never);
 
-    jest.spyOn(githubCode, 'getFile').mockImplementation(async (
-      _installation,
-      _owner,
-      _repo,
-      path,
-    ) => {
+    jest.spyOn(githubCode, 'getFile').mockImplementation(async (_installation, _owner, _repo, path) => {
       if (path === 'package.json') {
         return {
           path,
@@ -117,9 +109,7 @@ afterSign: scripts/notarize.js
     mockRepository();
 
     const response = await fixture.owner.agent
-      .post(
-        `${base(fixture.owner.workspaceId, fixture.desktopApp.id)}/dependencies/scan`,
-      )
+      .post(`${base(fixture.owner.workspaceId, fixture.desktopApp.id)}/dependencies/scan`)
       .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
       .expect(201);
 
@@ -145,9 +135,7 @@ afterSign: scripts/notarize.js
     mockRepository();
 
     const response = await fixture.owner.agent
-      .post(
-        `${base(fixture.owner.workspaceId, fixture.desktopApp.id)}/security/scan`,
-      )
+      .post(`${base(fixture.owner.workspaceId, fixture.desktopApp.id)}/security/scan`)
       .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
       .expect(201);
 
@@ -169,9 +157,7 @@ afterSign: scripts/notarize.js
     jest.spyOn(githubCode, 'getTree').mockResolvedValue({
       sha: 'malformed-tree',
       truncated: false,
-      entries: [
-        { path: 'package.json', type: 'file', sha: '1', size: 50 },
-      ],
+      entries: [{ path: 'package.json', type: 'file', sha: '1', size: 50 }],
     } as never);
 
     jest.spyOn(githubCode, 'getFile').mockResolvedValue({
@@ -183,9 +169,7 @@ afterSign: scripts/notarize.js
     } as never);
 
     const response = await fixture.owner.agent
-      .post(
-        `${base(fixture.owner.workspaceId, fixture.desktopApp.id)}/dependencies/scan`,
-      )
+      .post(`${base(fixture.owner.workspaceId, fixture.desktopApp.id)}/dependencies/scan`)
       .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
       .expect(201);
 

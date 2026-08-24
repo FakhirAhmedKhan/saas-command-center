@@ -2,6 +2,7 @@
 'use client';
 
 import { createDesktopRelease, listDesktopBuilds, listDesktopReleases, updateDesktopReleaseStatus } from './desktop-apps-api';
+import { shortSha } from './desktop-build-utils';
 import {
   DESKTOP_RELEASE_CHANNEL_LABELS,
   DESKTOP_RELEASE_STATUS_LABELS,
@@ -9,7 +10,6 @@ import {
   formatReleaseTarget,
   nextDesktopReleaseActions,
 } from './desktop-release-utils';
-import { shortSha } from './desktop-build-utils';
 import { getErrorMessage } from '@/features/lib/api/api-error';
 import type {
   CreateDesktopReleaseInput,

@@ -1,7 +1,5 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-
 import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
-
 import { DesktopArchitecture, DesktopFramework, DesktopPlatform } from 'src/generated/prisma/enums';
 
 export class DesktopApplicationMetadataDto {

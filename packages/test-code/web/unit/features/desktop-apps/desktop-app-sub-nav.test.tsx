@@ -43,13 +43,16 @@ describe('DesktopAppSubNav', () => {
     ).toHaveAttribute('href', '/workspaces/workspace-1/desktop-apps/desktop-1/releases');
   });
 
-  it('keeps only Phase 12+ tabs disabled', () => {
+  it('links Phase 12-14 tabs to implemented routes', () => {
     render(<DesktopAppSubNav workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
-    expect(screen.queryByRole('link', { name: 'Performance' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Crashes' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Dependencies' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Security' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Performance' })).toHaveAttribute('href', '/workspaces/workspace-1/desktop-apps/desktop-1/performance');
+
+    expect(screen.getByRole('link', { name: 'Crashes' })).toHaveAttribute('href', '/workspaces/workspace-1/desktop-apps/desktop-1/crashes');
+
+    expect(screen.getByRole('link', { name: 'Dependencies' })).toHaveAttribute('href', '/workspaces/workspace-1/desktop-apps/desktop-1/dependencies');
+
+    expect(screen.getByRole('link', { name: 'Security' })).toHaveAttribute('href', '/workspaces/workspace-1/desktop-apps/desktop-1/security');
   });
   it('links Code to the desktop code route', () => {
     render(<DesktopAppSubNav workspaceId='workspace-1' desktopAppId='desktop-1' />);
@@ -61,11 +64,17 @@ describe('DesktopAppSubNav', () => {
     ).toHaveAttribute('href', '/workspaces/workspace-1/desktop-apps/desktop-1/code');
   });
 
-  it('keeps future phases disabled instead of linking to 404 routes', () => {
+  it('links implemented release and security routes', () => {
     render(<DesktopAppSubNav workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
-    for (const label of ['Releases', 'Performance', 'Crashes', 'Dependencies', 'Security']) {
-      expect(screen.getByText(label)).toHaveAttribute('aria-disabled', 'true');
-    }
+    expect(screen.getByRole('link', { name: 'Releases' })).toHaveAttribute('href', '/workspaces/workspace-1/desktop-apps/desktop-1/releases');
+
+    expect(screen.getByRole('link', { name: 'Performance' })).toHaveAttribute('href', '/workspaces/workspace-1/desktop-apps/desktop-1/performance');
+
+    expect(screen.getByRole('link', { name: 'Crashes' })).toHaveAttribute('href', '/workspaces/workspace-1/desktop-apps/desktop-1/crashes');
+
+    expect(screen.getByRole('link', { name: 'Dependencies' })).toHaveAttribute('href', '/workspaces/workspace-1/desktop-apps/desktop-1/dependencies');
+
+    expect(screen.getByRole('link', { name: 'Security' })).toHaveAttribute('href', '/workspaces/workspace-1/desktop-apps/desktop-1/security');
   });
 });

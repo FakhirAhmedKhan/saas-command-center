@@ -1,7 +1,7 @@
-import { PrismaService } from '../../../database/prisma.service';
-import { Injectable, NotFoundException } from '@nestjs/common';
 import { DesktopAppsService } from './desktop-apps.service';
+import { PrismaService } from '../../../database/prisma.service';
 import { DesktopSecretSanitizerService } from '../security/desktop-secret-sanitizer.service';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class DesktopAnalysisContextService {

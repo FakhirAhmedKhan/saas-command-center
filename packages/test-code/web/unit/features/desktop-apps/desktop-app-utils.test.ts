@@ -50,18 +50,19 @@ describe('desktop app foundation', () => {
   });
 
   it('returns package name as the primary identifier', () => {
-    expect(
-      getDesktopPrimaryIdentifier({
-        packageName: 'com.commandcenter.desktop',
-      }),
-    ).toBe('com.commandcenter.desktop');
+    expect(getDesktopPrimaryIdentifier({ packageName: 'com.commandcenter.desktop' } as Parameters<typeof getDesktopPrimaryIdentifier>[0])).toBe(
+      'com.commandcenter.desktop',
+    );
   });
 
-  it('returns fallback when package name is missing', () => {
+  it('returns application slug when package name is missing', () => {
     expect(
       getDesktopPrimaryIdentifier({
         packageName: null,
-      }),
-    ).toBe('No package name');
+        application: {
+          slug: 'command-center-desktop',
+        },
+      } as Parameters<typeof getDesktopPrimaryIdentifier>[0]),
+    ).toBe('command-center-desktop');
   });
 });

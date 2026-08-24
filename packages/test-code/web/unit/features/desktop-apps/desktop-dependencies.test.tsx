@@ -1,10 +1,7 @@
 // @vitest-environment jsdom
 
 import { DesktopDependencies } from '@/features/desktop-apps/desktop-dependencies';
-import {
-  listDesktopDependencies,
-  scanDesktopDependencies,
-} from '@/features/desktop-apps/desktop-apps-api';
+import { listDesktopDependencies, scanDesktopDependencies } from '@/features/desktop-apps/desktop-apps-api';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -44,9 +41,7 @@ describe('DesktopDependencies', () => {
   it('scans and renders dependency inventory', async () => {
     const user = userEvent.setup();
 
-    render(
-      <DesktopDependencies workspaceId='workspace-1' desktopAppId='desktop-1' />,
-    );
+    render(<DesktopDependencies workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
     await screen.findByText('No dependency inventory yet. Run a repository scan.');
     await user.click(screen.getByRole('button', { name: 'Scan Repository' }));

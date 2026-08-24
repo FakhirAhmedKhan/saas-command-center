@@ -27,7 +27,7 @@ model DesktopBuild {
 
   platform     DesktopPlatform
   architecture DesktopArchitecture
-  status       DesktopBuildStatus @default(QUEUED)
+  status       DesktopBuildStatus  @default(QUEUED)
 
   startedAt   DateTime? @map("started_at") @db.Timestamptz(6)
   completedAt DateTime? @map("completed_at") @db.Timestamptz(6)
@@ -36,8 +36,12 @@ model DesktopBuild {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  desktopApp DesktopApplication    @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  desktopApp DesktopApplication   @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
   repository RepositoryConnection @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
+  artifacts DesktopBuildArtifact[]
+  testRuns  DesktopTestRun[]
+  releases  DesktopRelease[]
 
   @@unique([repositoryId, workflowRunId, platform, architecture])
   @@index([workspaceId, desktopAppId])

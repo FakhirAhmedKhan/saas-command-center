@@ -1,5 +1,5 @@
-import { DesktopRepositoryService } from './desktop-repository.service';
 import { DesktopProjectDetector, type DesktopRepositorySnapshot } from './desktop-project-detector';
+import { DesktopRepositoryService } from './desktop-repository.service';
 import { GithubCodeService } from '../../repositories/services/github-code.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
@@ -49,7 +49,7 @@ export class DesktopProjectDetectionService {
           repository.defaultBranch,
         );
 
-        if (file.size > MAX_METADATA_FILE_SIZE) {
+        if (!file || file.content === null || file.size > MAX_METADATA_FILE_SIZE) {
           continue;
         }
 
@@ -74,7 +74,7 @@ export class DesktopProjectDetectionService {
           repository.defaultBranch,
         );
 
-        if (file.size <= MAX_METADATA_FILE_SIZE) {
+        if (file && file.content !== null && file.size <= MAX_METADATA_FILE_SIZE) {
           files[entry.path] = file.content;
         }
       } catch {
@@ -105,7 +105,7 @@ export class DesktopProjectDetectionService {
           repository.defaultBranch,
         );
 
-        if (file.size <= MAX_METADATA_FILE_SIZE) {
+        if (file && file.content !== null && file.size <= MAX_METADATA_FILE_SIZE) {
           files[entry.path] = file.content;
         }
       } catch {

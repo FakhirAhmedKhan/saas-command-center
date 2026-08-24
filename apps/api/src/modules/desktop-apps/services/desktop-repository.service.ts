@@ -1,6 +1,6 @@
+import { DesktopAppsService } from './desktop-apps.service';
 import { PrismaService } from '../../../database/prisma.service';
 import { RepositoriesService } from '../../repositories/services/repositories.service';
-import { DesktopAppsService } from './desktop-apps.service';
 import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 
 @Injectable()

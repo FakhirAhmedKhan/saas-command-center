@@ -1,9 +1,6 @@
 'use client';
 
-import {
-  listDesktopDependencies,
-  scanDesktopDependencies,
-} from './desktop-apps-api';
+import { listDesktopDependencies, scanDesktopDependencies } from './desktop-apps-api';
 import { getErrorMessage } from '@/features/lib/api/api-error';
 import type { DesktopDependency } from '@command-center/shared-types';
 import { Loader2, RefreshCw } from 'lucide-react';
@@ -21,9 +18,6 @@ export function DesktopDependencies({ workspaceId, desktopAppId }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
     try {
       setDependencies(await listDesktopDependencies(workspaceId, desktopAppId));
     } catch (loadError: unknown) {
@@ -34,7 +28,13 @@ export function DesktopDependencies({ workspaceId, desktopAppId }: Props) {
   }, [workspaceId, desktopAppId]);
 
   useEffect(() => {
-    void load();
+    const timeoutId = window.setTimeout(() => {
+      void load();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
   }, [load]);
 
   async function scan() {
@@ -42,9 +42,7 @@ export function DesktopDependencies({ workspaceId, desktopAppId }: Props) {
     setError(null);
 
     try {
-      setDependencies(
-        await scanDesktopDependencies(workspaceId, desktopAppId),
-      );
+      setDependencies(await scanDesktopDependencies(workspaceId, desktopAppId));
     } catch (scanError: unknown) {
       setError(getErrorMessage(scanError));
     } finally {
@@ -57,10 +55,7 @@ export function DesktopDependencies({ workspaceId, desktopAppId }: Props) {
       <div className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
         <div>
           <h2 className='text-lg font-semibold text-slate-950'>Dependencies</h2>
-          <p className='mt-1 text-sm text-slate-500'>
-            Repository manifests normalized across npm, Cargo, NuGet, Maven,
-            Gradle, Conan and vcpkg.
-          </p>
+          <p className='mt-1 text-sm text-slate-500'>Repository manifests normalized across npm, Cargo, NuGet, Maven, Gradle, Conan and vcpkg.</p>
         </div>
         <button
           type='button'
@@ -68,11 +63,7 @@ export function DesktopDependencies({ workspaceId, desktopAppId }: Props) {
           onClick={() => void scan()}
           className='inline-flex h-10 items-center gap-2 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white disabled:opacity-50'
         >
-          {scanning ? (
-            <Loader2 className='size-4 animate-spin' />
-          ) : (
-            <RefreshCw className='size-4' />
-          )}
+          {scanning ? <Loader2 className='size-4 animate-spin' /> : <RefreshCw className='size-4' />}
           Scan Repository
         </button>
       </div>
@@ -107,26 +98,14 @@ export function DesktopDependencies({ workspaceId, desktopAppId }: Props) {
             <tbody>
               {dependencies.map((dependency) => (
                 <tr key={dependency.id} className='border-b border-slate-100'>
-                  <td className='px-3 py-3 font-semibold text-slate-900'>
-                    {dependency.name}
-                  </td>
-                  <td className='px-3 py-3 text-slate-600'>
-                    {dependency.ecosystem}
-                  </td>
-                  <td className='px-3 py-3 text-slate-600'>
-                    {dependency.currentVersion}
-                  </td>
-                  <td className='px-3 py-3 text-slate-600'>
-                    {dependency.latestVersion ?? 'Unknown'}
-                  </td>
+                  <td className='px-3 py-3 font-semibold text-slate-900'>{dependency.name}</td>
+                  <td className='px-3 py-3 text-slate-600'>{dependency.ecosystem}</td>
+                  <td className='px-3 py-3 text-slate-600'>{dependency.currentVersion}</td>
+                  <td className='px-3 py-3 text-slate-600'>{dependency.latestVersion ?? 'Unknown'}</td>
                   <td className='px-3 py-3'>
-                    <span className='rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700'>
-                      {dependency.riskStatus}
-                    </span>
+                    <span className='rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700'>{dependency.riskStatus}</span>
                   </td>
-                  <td className='max-w-xs truncate px-3 py-3 text-slate-500'>
-                    {dependency.manifestPath}
-                  </td>
+                  <td className='max-w-xs truncate px-3 py-3 text-slate-500'>{dependency.manifestPath}</td>
                 </tr>
               ))}
             </tbody>

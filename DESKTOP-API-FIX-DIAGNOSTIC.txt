@@ -1,0 +1,4269 @@
+==================================================
+ DESKTOP API FIX DIAGNOSTIC
+==================================================
+
+==================================================
+1. DESKTOP MODULE FILES
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\analysis\desktop-analysis.provider.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\analysis\desktop-analysis-provider.interface.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-alerts.controller.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-analysis.controller.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-apps.controller.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-build-artifacts.controller.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-builds.controller.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-crashes.controller.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-overview.controller.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-performance.controller.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-project-detection.controller.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-releases.controller.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-repositories.controller.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-security.controller.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-security-health.controller.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-telemetry.controller.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-tests.controller.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\desktop-apps.module.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\desktop-alert.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\desktop-analysis.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\desktop-app.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\desktop-app-foundation.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\desktop-build-artifact.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\desktop-release.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\desktop-repository.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\desktop-runtime.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\desktop-telemetry.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\desktop-test.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\esktop-build.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\security\desktop-resource-scope.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\security\desktop-secret-sanitizer.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-alerts.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-alert-worker.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-analysis.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-analysis-context.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-apps.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-build-artifacts.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-builds.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-crashes.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-dependency-health.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-overview.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-performance.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-permissions.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-project-detection.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-project-detector.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-releases.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-repository.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-repository-metadata.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-runtime.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-security.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-telemetry.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-telemetry-provider-registry.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-telemetry-secret.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-telemetry-url-policy.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-tests.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\telemetry\desktop-telemetry-provider.interface.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\telemetry\normalized-http-desktop-telemetry.provider.ts
+
+==================================================
+2. DESKTOP DTO FILES
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\desktop-alert.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\desktop-analysis.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\desktop-app.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\desktop-app-foundation.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\desktop-build-artifact.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\desktop-release.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\desktop-repository.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\desktop-runtime.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\desktop-telemetry.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\desktop-test.dto.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\dto\esktop-build.dto.ts
+
+==================================================
+3. MOBILE DTO FILES
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\dto\mobile-build.dto.ts
+
+==================================================
+4. DESKTOP BUILD CONTROLLER
+==================================================
+
+--- apps/api/src/modules/desktop-apps/controllers/desktop-builds.controller.ts ---
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { WorkspaceRoles } from '../../workspace/decorators/workspace-roles.decorator';
+import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
+import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
+import { DesktopBuildQueryDto, IngestGithubDesktopBuildDto } from '../dto/desktop-build.dto';
+import { DesktopBuildsService } from '../services/desktop-builds.service';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
+
+@ApiTags('Desktop Builds')
+@ApiBearerAuth('access-token')
+@Controller('workspaces/:workspaceId/desktop-apps/:desktopAppId/builds')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard, WorkspaceRolesGuard)
+export class DesktopBuildsController {
+  constructor(private readonly service: DesktopBuildsService) {}
+
+  @Get()
+  list(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('desktopAppId', ParseUUIDPipe)
+    desktopAppId: string,
+
+    @Query()
+    query: DesktopBuildQueryDto,
+  ) {
+    return this.service.list(workspaceId, desktopAppId, query);
+  }
+
+  @Get(':buildId')
+  findOne(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('desktopAppId', ParseUUIDPipe)
+    desktopAppId: string,
+
+    @Param('buildId', ParseUUIDPipe)
+    buildId: string,
+  ) {
+    return this.service.findOne(workspaceId, desktopAppId, buildId);
+  }
+
+  @Post('ingest/github')
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  @ApiOperation({
+    summary: 'Ingest a normalized GitHub Actions desktop build',
+  })
+  ingestGithub(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('desktopAppId', ParseUUIDPipe)
+    desktopAppId: string,
+
+    @Body()
+    dto: IngestGithubDesktopBuildDto,
+  ) {
+    return this.service.ingestGithubBuild(workspaceId, desktopAppId, dto);
+  }
+}
+
+==================================================
+5. DESKTOP BUILD SERVICE
+==================================================
+
+--- apps/api/src/modules/desktop-apps/services/desktop-builds.service.ts ---
+import { PrismaService } from '../../../database/prisma.service';
+import { DesktopArchitecture, DesktopBuildSource, DesktopBuildStatus, DesktopPlatform } from 'src/generated/prisma/enums';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import type { DesktopBuildQueryDto, IngestGithubDesktopBuildDto } from '../dto/desktop-build.dto';
+import { DesktopAppsService } from './desktop-apps.service';
+
+@Injectable()
+export class DesktopBuildsService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly desktopApps: DesktopAppsService,
+  ) {}
+
+  async list(workspaceId: string, desktopAppId: string, query: DesktopBuildQueryDto) {
+    await this.requireApp(workspaceId, desktopAppId);
+
+    return this.prisma.desktopBuild.findMany({
+      where: {
+        workspaceId,
+        desktopAppId,
+        ...(query.status
+          ? {
+              status: query.status,
+            }
+          : {}),
+        ...(query.platform
+          ? {
+              platform: query.platform,
+            }
+          : {}),
+        ...(query.architecture
+          ? {
+              architecture: query.architecture,
+            }
+          : {}),
+        ...(query.branch
+          ? {
+              branch: query.branch,
+            }
+          : {}),
+        ...(query.version
+          ? {
+              version: query.version,
+            }
+          : {}),
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
+  async findOne(workspaceId: string, desktopAppId: string, buildId: string) {
+    await this.requireApp(workspaceId, desktopAppId);
+
+    const build = await this.prisma.desktopBuild.findFirst({
+      where: {
+        id: buildId,
+        workspaceId,
+        desktopAppId,
+      },
+    });
+
+    if (!build) {
+      throw new NotFoundException('Desktop build not found.');
+    }
+
+    return build;
+  }
+
+  async getLatest(workspaceId: string, desktopAppId: string) {
+    await this.requireApp(workspaceId, desktopAppId);
+
+    return this.prisma.desktopBuild.findFirst({
+      where: {
+        workspaceId,
+        desktopAppId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
+  async ingestGithubBuild(workspaceId: string, desktopAppId: string, dto: IngestGithubDesktopBuildDto) {
+    const app = await this.requireApp(workspaceId, desktopAppId);
+
+    if (app.application.archivedAt) {
+      throw new BadRequestException('Archived desktop applications cannot receive build updates.');
+    }
+
+    const repository = await this.prisma.repositoryConnection.findFirst({
+      where: {
+        id: dto.repositoryId,
+        workspaceId,
+        applicationId: app.applicationId,
+        archived: false,
+        isAvailable: true,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!repository) {
+      return {
+        ignored: true,
+        reason: 'Repository is not the active repository linked to this desktop application.',
+        build: null,
+      };
+    }
+
+    const platform = dto.platform ?? app.platform;
+    const architecture = dto.architecture ?? app.architecture;
+
+    const status = this.resolveStatus(dto.status, dto.conclusion);
+
+    const startedAt = dto.startedAt ? new Date(dto.startedAt) : null;
+
+    const completedAt = dto.completedAt ? new Date(dto.completedAt) : null;
+
+    const durationMs = dto.durationMs ?? (startedAt && completedAt ? Math.max(0, completedAt.getTime() - startedAt.getTime()) : null);
+
+    const build = await this.prisma.desktopBuild.upsert({
+      where: {
+        repositoryId_workflowRunId_platform_architecture: {
+          repositoryId: dto.repositoryId,
+          workflowRunId: dto.workflowRunId.trim(),
+          platform,
+          architecture,
+        },
+      },
+      create: {
+        workspaceId,
+        desktopAppId,
+        repositoryId: dto.repositoryId,
+        workflowRunId: dto.workflowRunId.trim(),
+        source: DesktopBuildSource.GITHUB_ACTIONS,
+        commitSha: dto.commitSha.trim(),
+        branch: dto.branch.trim(),
+        version: this.optional(dto.version),
+        buildNumber: this.optional(dto.buildNumber),
+        platform,
+        architecture,
+        status,
+        startedAt,
+        completedAt,
+        durationMs,
+      },
+      update: {
+        commitSha: dto.commitSha.trim(),
+        branch: dto.branch.trim(),
+        version: this.optional(dto.version),
+        buildNumber: this.optional(dto.buildNumber),
+        status,
+        startedAt,
+        completedAt,
+        durationMs,
+      },
+    });
+
+    return {
+      ignored: false,
+      reason: null,
+      build,
+    };
+  }
+
+  private async requireApp(workspaceId: string, desktopAppId: string) {
+    return this.desktopApps.findOne(workspaceId, desktopAppId);
+  }
+
+  private optional(value: string | null | undefined): string | null {
+    const normalized = value?.trim();
+    return normalized ? normalized : null;
+  }
+
+  private resolveStatus(explicit: DesktopBuildStatus | undefined, conclusion: string | null | undefined): DesktopBuildStatus {
+    if (explicit) {
+      return explicit;
+    }
+
+    switch (conclusion?.trim().toLowerCase()) {
+      case 'success':
+        return DesktopBuildStatus.SUCCESS;
+
+      case 'failure':
+      case 'timed_out':
+      case 'action_required':
+      case 'startup_failure':
+        return DesktopBuildStatus.FAILED;
+
+      case 'cancelled':
+      case 'skipped':
+      case 'stale':
+        return DesktopBuildStatus.CANCELLED;
+
+      case 'in_progress':
+        return DesktopBuildStatus.BUILDING;
+
+      default:
+        return DesktopBuildStatus.QUEUED;
+    }
+  }
+}
+
+==================================================
+6. DESKTOP PERMISSION FILES
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-permissions.service.ts
+
+--- apps/api/src/modules/desktop-apps/services/desktop-permissions.service.ts ---
+import { PrismaService } from '../../../database/prisma.service';
+import type { DesktopPermissions } from '@command-center/shared-types';
+import { ForbiddenException, Injectable } from '@nestjs/common';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
+
+@Injectable()
+export class DesktopPermissionsService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async get(workspaceId: string, userId: string): Promise<DesktopPermissions> {
+    const membership = await this.prisma.workspaceMember.findFirst({
+      where: {
+        workspaceId,
+        userId,
+      },
+      select: {
+        role: true,
+      },
+    });
+
+    if (!membership) {
+      throw new ForbiddenException('Workspace access denied.');
+    }
+
+    const canWrite = membership.role === WorkspaceRole.OWNER || membership.role === WorkspaceRole.ADMIN || membership.role === WorkspaceRole.DEVELOPER;
+
+    const canManage = membership.role === WorkspaceRole.OWNER || membership.role === WorkspaceRole.ADMIN;
+
+    return {
+      role: membership.role,
+      canRead: true,
+      canWrite,
+      canManage,
+      canAnalyze: canWrite,
+      canConfigureSecrets: canManage,
+    };
+  }
+}
+
+--- apps/api/src/modules/desktop-apps/controllers/desktop-security.controller.ts ---
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { WorkspaceRoles } from '../../workspace/decorators/workspace-roles.decorator';
+import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
+import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
+import { DesktopPermissionsService } from '../security/desktop-permissions.service';
+import { Controller, Get, Param, ParseUUIDPipe, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import type { Request } from 'express';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
+
+interface AuthenticatedRequest extends Request {
+  user: { id: string };
+}
+
+@ApiTags('Desktop Security')
+@ApiBearerAuth('access-token')
+@Controller('workspaces/:workspaceId/desktop-apps/:desktopAppId')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard, WorkspaceRolesGuard)
+export class DesktopSecurityController {
+  constructor(private readonly permissions: DesktopPermissionsService) {}
+
+  @Get('permissions')
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER, WorkspaceRole.VIEWER)
+  getPermissions(
+    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
+    @Param('desktopAppId', ParseUUIDPipe) _desktopAppId: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    void _desktopAppId;
+    return this.permissions.get(workspaceId, request.user.id);
+  }
+}
+
+==================================================
+7. DESKTOP SHARED TYPE REFERENCES
+==================================================
+
+### DesktopAnalysisEvidence
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:676: export interface DesktopAnalysisEvidence {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:696: evidence: DesktopAnalysisEvidence[];
+
+### DesktopPermissions
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:701: export interface DesktopPermissions {
+
+### DesktopProjectDetectionCandidate
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:159: export interface DesktopProjectDetectionCandidate {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:180: candidates: DesktopProjectDetectionCandidate[];
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:181: primary: DesktopProjectDetectionCandidate | null;
+
+### DesktopProjectDetectionResponse
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:175: export interface DesktopProjectDetectionResponse {
+
+### DesktopTelemetryProvider
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:396: export type DesktopTelemetryProvider = 'SENTRY' | 'DATADOG' | 'NEW_RELIC' | 'OPENTELEMETRY' | 'CUSTOM';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:404: provider: DesktopTelemetryProvider;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:417: provider: DesktopTelemetryProvider;
+
+### DesktopTelemetrySnapshot
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:466: export interface DesktopTelemetrySnapshot {
+
+### DesktopTelemetryPerformanceSample
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:434: export interface DesktopTelemetryPerformanceSample {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:467: performance: DesktopTelemetryPerformanceSample[];
+
+### DesktopTelemetryCrashSample
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:446: export interface DesktopTelemetryCrashSample {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:468: crashes: DesktopTelemetryCrashSample[];
+
+### DesktopTelemetryVersionSample
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:460: export interface DesktopTelemetryVersionSample {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:469: versions: DesktopTelemetryVersionSample[];
+
+### DesktopReleaseChannel
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:355: export type DesktopReleaseChannel = 'DEV' | 'ALPHA' | 'BETA' | 'STABLE' | 'LTS';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:370: channel: DesktopReleaseChannel;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:382: channel?: DesktopReleaseChannel;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:390: channel: DesktopReleaseChannel;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:443: channel?: DesktopReleaseChannel | null;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:457: channel?: DesktopReleaseChannel | null;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:486: channel?: DesktopReleaseChannel;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:501: channel: DesktopReleaseChannel | null;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\desktop-app.types.ts:540: channel: DesktopReleaseChannel | null;
+
+==================================================
+8. MOBILE ANALOG SHARED TYPES
+==================================================
+
+### MobileAnalysisEvidence
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:231: export type MobileAnalysisEvidence = Record<string, unknown>;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-runtime.types.d.ts:199: export interface MobileAnalysisEvidenceItem {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-runtime.types.d.ts:212: evidence: MobileAnalysisEvidenceItem[];
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\index.d.ts:37: export type { GithubMobileBuildInput, MobileAnalysisAction, MobileAnalysisEvidenceItem, MobileAnalysisRequest, MobileAnalysisResult, MobileBuildDetails, MobileBuildFilters, MobileBuildIngestionResult, MobileBuildStatus, MobileTelemetryIntegration, MobileTelemetryProvider, MobileTestFailure, MobileTestRun, MobileTestRunInput, MobileTestStatus, MobileTestSummary, MobileTestType, } from './mobile-apps/mobile-runtime.types';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:354: export type MobileAnalysisEvidence = Record<string, unknown>;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-runtime.types.ts:228: export interface MobileAnalysisEvidenceItem {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-runtime.types.ts:242: evidence: MobileAnalysisEvidenceItem[];
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\index.ts:41: MobileAnalysisEvidenceItem,
+
+### MobilePermissions
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:205: export interface MobilePermissionSnapshot {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:322: export interface MobilePermissionSnapshot {
+
+### MobileProjectDetection
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:23: export interface MobileProjectDetection {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:39: export interface MobileProjectDetectionResponse {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:46: primaryProject: MobileProjectDetection | null;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:47: projects: MobileProjectDetection[];
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:37: export interface MobileProjectDetection {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:67: export interface MobileProjectDetectionResponse {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:78: primaryProject: MobileProjectDetection | null;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:80: projects: MobileProjectDetection[];
+
+### MobileTelemetry
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:238: export interface NormalizedMobileTelemetryVersion {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:241: export interface MobileTelemetrySnapshot {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:247: versions?: NormalizedMobileTelemetryVersion[];
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-runtime.types.d.ts:216: export type MobileTelemetryProvider = 'FIREBASE' | 'SENTRY' | 'DATADOG' | 'NEW_RELIC' | 'CUSTOM';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-runtime.types.d.ts:217: export interface MobileTelemetryIntegration {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-runtime.types.d.ts:221: provider: MobileTelemetryProvider;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\index.d.ts:37: export type { GithubMobileBuildInput, MobileAnalysisAction, MobileAnalysisEvidenceItem, MobileAnalysisRequest, MobileAnalysisResult, MobileBuildDetails, MobileBuildFilters, MobileBuildIngestionResult, MobileBuildStatus, MobileTelemetryIntegration, MobileTelemetryProvider, MobileTestFailure, MobileTestRun, MobileTestRunInput, MobileTestStatus, MobileTestSummary, MobileTestType, } from './mobile-apps/mobile-runtime.types';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:364: export interface NormalizedMobileTelemetryVersion {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:368: export interface MobileTelemetrySnapshot {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:374: versions?: NormalizedMobileTelemetryVersion[];
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-runtime.types.ts:247: export type MobileTelemetryProvider = 'FIREBASE' | 'SENTRY' | 'DATADOG' | 'NEW_RELIC' | 'CUSTOM';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-runtime.types.ts:249: export interface MobileTelemetryIntegration {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-runtime.types.ts:253: provider: MobileTelemetryProvider;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\index.ts:48: MobileTelemetryIntegration,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\index.ts:49: MobileTelemetryProvider,
+
+### MobileRelease
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:64: latestRelease: MobileRelease | null;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:68: export type MobileReleaseEnvironment = (typeof MOBILE_RELEASE_ENVIRONMENTS)[number];
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:70: export type MobileReleaseStatus = (typeof MOBILE_RELEASE_STATUSES)[number];
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:71: export interface MobileRelease {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:78: environment: MobileReleaseEnvironment;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:79: status: MobileReleaseStatus;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:92: export interface CreateMobileReleaseInput {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:94: environment: MobileReleaseEnvironment;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:99: export interface UpdateMobileReleaseStatusInput {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:100: status: MobileReleaseStatus;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:102: export interface MobileReleaseFilters {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:103: environment?: MobileReleaseEnvironment;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-app.types.d.ts:104: status?: MobileReleaseStatus;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-runtime.types.d.ts:88: export type MobileReleaseStatus = 'DRAFT' | 'READY' | 'RELEASED' | 'FAILED' | 'ROLLED_BACK';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-runtime.types.d.ts:89: export type MobileReleaseEnvironment = 'DEVELOPMENT' | 'QA' | 'INTERNAL' | 'BETA' | 'PRODUCTION';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-runtime.types.d.ts:90: export interface MobileRelease {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-runtime.types.d.ts:97: environment: MobileReleaseEnvironment;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-runtime.types.d.ts:98: status: MobileReleaseStatus;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-runtime.types.d.ts:105: export interface MobileReleaseFilters {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-runtime.types.d.ts:106: status?: MobileReleaseStatus;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-runtime.types.d.ts:107: environment?: MobileReleaseEnvironment;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-runtime.types.d.ts:110: export interface CreateMobileReleaseInput {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\dist\mobile-apps\mobile-runtime.types.d.ts:114: environment: MobileReleaseEnvironment;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:103: latestRelease: MobileRelease | null;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:110: export type MobileReleaseEnvironment = (typeof MOBILE_RELEASE_ENVIRONMENTS)[number];
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:114: export type MobileReleaseStatus = (typeof MOBILE_RELEASE_STATUSES)[number];
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:116: export interface MobileRelease {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:126: environment: MobileReleaseEnvironment;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:127: status: MobileReleaseStatus;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:145: export interface CreateMobileReleaseInput {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:148: environment: MobileReleaseEnvironment;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:156: export interface UpdateMobileReleaseStatusInput {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:157: status: MobileReleaseStatus;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:160: export interface MobileReleaseFilters {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:161: environment?: MobileReleaseEnvironment;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-app.types.ts:162: status?: MobileReleaseStatus;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-runtime.types.ts:101: export type MobileReleaseStatus = 'DRAFT' | 'READY' | 'RELEASED' | 'FAILED' | 'ROLLED_BACK';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-runtime.types.ts:103: export type MobileReleaseEnvironment = 'DEVELOPMENT' | 'QA' | 'INTERNAL' | 'BETA' | 'PRODUCTION';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-runtime.types.ts:105: export interface MobileRelease {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-runtime.types.ts:112: environment: MobileReleaseEnvironment;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-runtime.types.ts:113: status: MobileReleaseStatus;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-runtime.types.ts:121: export interface MobileReleaseFilters {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-runtime.types.ts:122: status?: MobileReleaseStatus;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-runtime.types.ts:123: environment?: MobileReleaseEnvironment;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-runtime.types.ts:127: export interface CreateMobileReleaseInput {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\mobile-runtime.types.ts:131: environment: MobileReleaseEnvironment;
+
+==================================================
+9. SHARED TYPES INDEX FILES
+==================================================
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\index.ts ---
+export interface ApiErrorResponse {
+  statusCode: number;
+  code: string;
+  message: string;
+  path: string;
+  requestId: string;
+  timestamp: string;
+  details?: unknown;
+}
+
+export interface HealthResponse {
+  status: 'ok' | 'error';
+  service: string;
+  version: string;
+  environment: string;
+  timestamp: string;
+  database: {
+    status: 'up' | 'down';
+    responseTimeMs: number;
+  };
+}
+export * from './analytics/index.js';
+export * from './repositories/index.js';
+export * from './common/index.js';
+export * from './auth/index.js';
+export * from './workspaces/index.js';
+export * from './applications/index.js';
+export * from './websites/index.js';
+export * from './activity/index.js';
+export * from './development/index.js';
+export * from './monitoring/index.js';
+export * from './releases/index.js';
+export * from './integrations/index.js';
+export * from './team-operations/index.js';
+export * from './tracking/index.js';
+export * from './mobile-apps';
+export * from './desktop-apps';
+export type {
+  GithubMobileBuildInput,
+  MobileAnalysisAction,
+  MobileAnalysisEvidenceItem,
+  MobileAnalysisRequest,
+  MobileAnalysisResult,
+  MobileBuildDetails,
+  MobileBuildFilters,
+  MobileBuildIngestionResult,
+  MobileBuildStatus,
+  MobileTelemetryIntegration,
+  MobileTelemetryProvider,
+  MobileTestFailure,
+  MobileTestRun,
+  MobileTestRunInput,
+  MobileTestStatus,
+  MobileTestSummary,
+  MobileTestType,
+} from './mobile-apps/mobile-runtime.types';
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\activity\index.ts ---
+export * from './activity.types.js';
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\analytics\index.ts ---
+export * from './analytics.types.js';
+export * from './overview.types.js';
+export * from './processing.types.js';
+export * from './reports.types.js';
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\applications\index.ts ---
+export * from './application.types.js';
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\auth\index.ts ---
+export * from './auth.types.js';
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\common\index.ts ---
+export * from './common.types.js';
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\desktop-apps\index.ts ---
+export * from './desktop-app.types';
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\development\index.ts ---
+export * from './development.types.js';
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\integrations\index.ts ---
+export * from './webhook.types.js';
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\mobile-apps\index.ts ---
+export * from './mobile-app.types';
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\monitoring\index.ts ---
+export * from './monitoring.types.js';
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\releases\index.ts ---
+export * from './release.types.js';
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\repositories\index.ts ---
+export * from './code-explorer.types.js';
+export * from './repository-code.types.js';
+export * from './repository-import.types.js';
+export * from './repository.types.js';
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\team-operations\index.ts ---
+export * from './team-operations.types.js';
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\tracking\index.ts ---
+export * from './tracking.types.js';
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\websites\index.ts ---
+export * from './website.types.js';
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\shared-types\src\workspaces\index.ts ---
+export * from './workspace.types.js';
+
+==================================================
+10. DESKTOP RESOURCE SCOPE
+==================================================
+
+--- apps/api/src/modules/desktop-apps/security/desktop-resource-scope.service.ts ---
+import { PrismaService } from '../../../database/prisma.service';
+import { Injectable, NotFoundException } from '@nestjs/common';
+
+@Injectable()
+export class DesktopResourceScopeService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async application(workspaceId: string, desktopAppId: string) {
+    const value = await this.prisma.desktopApplication.findFirst({
+      where: {
+        id: desktopAppId,
+        application: {
+          workspaceId,
+        },
+      },
+      include: {
+        application: true,
+      },
+    });
+
+    if (!value) {
+      throw new NotFoundException('Desktop application not found.');
+    }
+
+    return value;
+  }
+
+  async build(workspaceId: string, desktopAppId: string, buildId: string) {
+    const value = await this.prisma.desktopBuild.findFirst({
+      where: {
+        id: buildId,
+        workspaceId,
+        desktopAppId,
+      },
+    });
+
+    if (!value) {
+      throw new NotFoundException('Desktop build not found.');
+    }
+
+    return value;
+  }
+
+  async artifact(workspaceId: string, desktopAppId: string, artifactId: string) {
+    const value = await this.prisma.desktopBuildArtifact.findFirst({
+      where: {
+        id: artifactId,
+        build: {
+          workspaceId,
+          desktopAppId,
+        },
+      },
+    });
+
+    if (!value) {
+      throw new NotFoundException('Desktop artifact not found.');
+    }
+
+    return value;
+  }
+
+  async testRun(workspaceId: string, desktopAppId: string, testRunId: string) {
+    const value = await this.prisma.desktopTestRun.findFirst({
+      where: {
+        id: testRunId,
+        workspaceId,
+        desktopAppId,
+      },
+    });
+
+    if (!value) {
+      throw new NotFoundException('Desktop test run not found.');
+    }
+
+    return value;
+  }
+
+  async release(workspaceId: string, desktopAppId: string, releaseId: string) {
+    const value = await this.prisma.desktopRelease.findFirst({
+      where: {
+        id: releaseId,
+        workspaceId,
+        desktopAppId,
+      },
+    });
+
+    if (!value) {
+      throw new NotFoundException('Desktop release not found.');
+    }
+
+    return value;
+  }
+
+  async telemetryIntegration(workspaceId: string, desktopAppId: string, integrationId: string) {
+    const value = await this.prisma.desktopTelemetryIntegration.findFirst({
+      where: {
+        id: integrationId,
+        workspaceId,
+        desktopAppId,
+      },
+    });
+
+    if (!value) {
+      throw new NotFoundException('Desktop telemetry integration not found.');
+    }
+
+    return value;
+  }
+
+  async crash(workspaceId: string, desktopAppId: string, crashId: string) {
+    const value = await this.prisma.desktopCrash.findFirst({
+      where: {
+        id: crashId,
+        workspaceId,
+        desktopAppId,
+      },
+    });
+
+    if (!value) {
+      throw new NotFoundException('Desktop crash not found.');
+    }
+
+    return value;
+  }
+
+  async dependency(workspaceId: string, desktopAppId: string, dependencyId: string) {
+    const value = await this.prisma.desktopDependency.findFirst({
+      where: {
+        id: dependencyId,
+        workspaceId,
+        desktopAppId,
+      },
+    });
+
+    if (!value) {
+      throw new NotFoundException('Desktop dependency not found.');
+    }
+
+    return value;
+  }
+
+  async securityFinding(workspaceId: string, desktopAppId: string, findingId: string) {
+    const value = await this.prisma.desktopSecurityFinding.findFirst({
+      where: {
+        id: findingId,
+        workspaceId,
+        desktopAppId,
+      },
+    });
+
+    if (!value) {
+      throw new NotFoundException('Desktop security finding not found.');
+    }
+
+    return value;
+  }
+
+  async alertRule(workspaceId: string, desktopAppId: string, ruleId: string) {
+    const value = await this.prisma.desktopAlertRule.findFirst({
+      where: {
+        id: ruleId,
+        workspaceId,
+        desktopAppId,
+      },
+    });
+
+    if (!value) {
+      throw new NotFoundException('Desktop alert rule not found.');
+    }
+
+    return value;
+  }
+
+  async alertIncident(workspaceId: string, desktopAppId: string, incidentId: string) {
+    const value = await this.prisma.desktopAlertIncident.findFirst({
+      where: {
+        id: incidentId,
+        workspaceId,
+        desktopAppId,
+      },
+    });
+
+    if (!value) {
+      throw new NotFoundException('Desktop alert incident not found.');
+    }
+
+    return value;
+  }
+
+  async analysis(workspaceId: string, desktopAppId: string, analysisId: string) {
+    const value = await this.prisma.desktopAiAnalysis.findFirst({
+      where: {
+        id: analysisId,
+        workspaceId,
+        desktopAppId,
+      },
+    });
+
+    if (!value) {
+      throw new NotFoundException('Desktop AI analysis not found.');
+    }
+
+    return value;
+  }
+}
+
+==================================================
+11. DESKTOP ALERTS RELEVANT CODE
+==================================================
+  270:     const releases = await this.prisma.desktopRelease.findMany({
+  271:       where: {
+  272:         workspaceId,
+  273:         desktopAppId,
+  274:         status: DesktopReleaseStatus.PUBLISHED,
+  275:       },
+  276:       orderBy: [{ releasedAt: 'desc' }, { createdAt: 'desc' }],
+  277:       take: 2,
+  278:     });
+  279: 
+  280:     if (releases.length < 2) {
+  281:       return {
+  282:         breached: false,
+  283:         actualValue: null,
+  284:         threshold: rule.threshold ?? null,
+  285:         title: 'Release regression',
+  286:         message: 'At least two published releases are required for comparison.',
+  287:         version: releases[0]?.version ?? null,
+  288:         buildId: releases[0]?.buildId ?? null,
+  289:         dimension: 'release:insufficient-data',
+  290:         evidence: {},
+  291:       };
+  292:     }
+  293: 
+  294:     const [current, previous] = releases;
+  295: 
+  296:     const [currentStartup, previousStartup, currentCrashFree, previousCrashFree] = await Promise.all([
+  297:       this.metricAverage(workspaceId, desktopAppId, current.version, DesktopPerformanceMetricType.STARTUP_MS),
+  298:       this.metricAverage(workspaceId, desktopAppId, previous.version, DesktopPerformanceMetricType.STARTUP_MS),
+  299:       this.metricAverage(workspaceId, desktopAppId, current.version, DesktopPerformanceMetricType.CRASH_FREE_USERS_PERCENT),
+  300:       this.metricAverage(workspaceId, desktopAppId, previous.version, DesktopPerformanceMetricType.CRASH_FREE_USERS_PERCENT),
+  301:     ]);
+  302: 
+  303:     const startupDelta = this.percentIncrease(previousStartup, currentStartup);
+  304: 
+  305:     const previousCrashRate = previousCrashFree === null ? null : Math.max(0, 100 - previousCrashFree);
+  306:     const currentCrashRate = currentCrashFree === null ? null : Math.max(0, 100 - currentCrashFree);
+  307:     const crashDelta = this.percentIncrease(previousCrashRate, currentCrashRate);
+  308: 
+  309:     const regression = Math.max(startupDelta ?? 0, crashDelta ?? 0);
+  310:     const threshold = rule.threshold ?? 0;
+  311: 
+  312:     return {
+  313:       breached: this.compare(regression, threshold, rule.operator),
+  314:       actualValue: regression,
+  315:       threshold,
+  316:       title: 'Desktop release regression',
+  317:       message: `${previous.version} → ${current.version}: maximum measured regression ${regression.toFixed(2)}%.`,
+  318:       version: current.version,
+  319:       buildId: current.buildId,
+  320:       dimension: `release:${current.id}`,
+  321:       evidence: {
+  322:         fromReleaseId: previous.id,
+  323:         toReleaseId: current.id,
+  324:         fromVersion: previous.version,
+  325:         toVersion: current.version,
+  326:         startupDeltaPercent: startupDelta,
+  327:         crashRateDeltaPercent: crashDelta,
+  328:       },
+  329:     };
+  330:   }
+  331: 
+  332:   private async signingFailureSignal(workspaceId: string, desktopAppId: string): Promise<AlertSignal> {
+  333:     const security = await this.security.get(workspaceId, desktopAppId);
+  334: 
+  335:     const failed = security.findings.filter(
+
+  530:     });
+  531: 
+  532:     return result.count;
+  533:   }
+  534: 
+  535:   async requireRule(workspaceId: string, desktopAppId: string, ruleId: string) {
+  536:     const rule = await this.prisma.desktopAlertRule.findFirst({
+  537:       where: {
+  538:         id: ruleId,
+  539:         workspaceId,
+  540:         desktopAppId,
+  541:       },
+  542:     });
+  543: 
+  544:     if (!rule) {
+  545:       throw new NotFoundException('Desktop alert rule not found.');
+  546:     }
+  547: 
+  548:     return rule;
+  549:   }
+  550: 
+  551:   private requiresThreshold(type: DesktopAlertRuleType): boolean {
+  552:     return ![DesktopAlertRuleType.BUILD_FAILED, DesktopAlertRuleType.SIGNING_FAILURE, DesktopAlertRuleType.TELEMETRY_UNAVAILABLE].includes(type);
+  553:   }
+  554: 
+  555:   private compare(actual: number, threshold: number, operator: DesktopAlertOperator): boolean {
+  556:     return operator === DesktopAlertOperator.GTE ? actual >= threshold : actual > threshold;
+  557:   }
+  558: 
+  559:   private latestVersion(metrics: Array<{ version: string | null; recordedAt: Date }>): string | null {
+  560:     return metrics.find((metric) => metric.version)?.version ?? null;
+  561:   }
+  562: 
+  563:   private async metricAverage(workspaceId: string, desktopAppId: string, version: string, type: DesktopPerformanceMetricType): Promise<number | null> {
+  564:     const result = await this.prisma.desktopMetric.aggregate({
+  565:       where: {
+
+==================================================
+12. DEPENDENCY HEALTH RELEVANT CODE
+==================================================
+  190:       const line = rawLine.trim();
+  191: 
+  192:       if (/^\[(dependencies|dev-dependencies|build-dependencies)\]$/.test(line)) {
+  193:         inDependencies = true;
+  194:         continue;
+  195:       }
+  196: 
+  197:       if (/^\[.+\]$/.test(line)) {
+  198:         inDependencies = false;
+  199:         continue;
+  200:       }
+  201: 
+  202:       if (!inDependencies || !line || line.startsWith('#')) {
+  203:         continue;
+  204:       }
+  205: 
+  206:       const match = line.match(/^([A-Za-z0-9_-]+)\s*=\s*(.+)$/);
+  207:       if (!match) continue;
+  208: 
+  209:       const name = match[1];
+  210:       const rhs = match[2];
+  211:       const version = rhs.match(/^['\"]([^'\"]+)['\"]/)?.[1] ?? rhs.match(/version\s*=\s*['\"]([^'\"]+)['\"]/)?.[1] ?? 'workspace/git/path';
+  212: 
+  213:       output.push({
+  214:         ecosystem: DesktopDependencyEcosystem.CARGO,
+  215:         manifestPath: path,
+  216:         name,
+  217:         currentVersion: version,
+  218:         direct: true,
+  219:       });
+  220:     }
+  221: 
+  222:     return output;
+  223:   }
+  224: 
+  225:   private parseCsproj(path: string, content: string): ParsedDependency[] {
+  226:     return [
+  227:       ...content.matchAll(
+  228:         /<PackageReference\s+Include=["']([^"']+)["'][^>]*(?:Version=["']([^"']+)["'])?[^>]*>(?:[\s\S]*?<Version>([^<]+)<\/Version>)?[\s\S]*?<\/PackageReference>|<PackageReference\s+Include=["']([^"']+)["'][^>]*Version=["']([^"']+)["'][^>]*\/>/gi,
+  229:       ),
+  230:     ].flatMap((match) => {
+  231:       const name = match[1] ?? match[4];
+  232:       const version = match[2] ?? match[3] ?? match[5];
+  233:       return name && version
+  234:         ? [
+  235:             {
+  236:               ecosystem: DesktopDependencyEcosystem.NUGET,
+  237:               manifestPath: path,
+  238:               name,
+  239:               currentVersion: version.trim(),
+  240:               direct: true,
+  241:             },
+  242:           ]
+  243:         : [];
+  244:     });
+  245:   }
+  246: 
+  247:   private parsePom(path: string, content: string): ParsedDependency[] {
+  248:     return [...content.matchAll(/<dependency>([\s\S]*?)<\/dependency>/gi)].flatMap((match) => {
+  249:       const block = match[1];
+  250:       const group = block.match(/<groupId>([^<]+)<\/groupId>/i)?.[1]?.trim();
+  251:       const artifact = block.match(/<artifactId>([^<]+)<\/artifactId>/i)?.[1]?.trim();
+  252:       const version = block.match(/<version>([^<]+)<\/version>/i)?.[1]?.trim();
+  253: 
+  254:       if (!artifact) return [];
+  255: 
+  256:       return [
+  257:         {
+  258:           ecosystem: DesktopDependencyEcosystem.MAVEN,
+  259:           manifestPath: path,
+  260:           name: group ? `${group}:${artifact}` : artifact,
+  261:           currentVersion: version ?? 'managed',
+  262:           direct: true,
+  263:         },
+  264:       ];
+  265:     });
+  266:   }
+  267: 
+  268:   private parseGradle(path: string, content: string): ParsedDependency[] {
+  269:     const output: ParsedDependency[] = [];
+  270:     const regex = /(?:implementation|api|compileOnly|runtimeOnly|testImplementation)\s*\(?["']([^:"']+):([^:"']+):([^"']+)["']\)?/g;
+  271: 
+  272:     for (const match of content.matchAll(regex)) {
+  273:       output.push({
+  274:         ecosystem: DesktopDependencyEcosystem.GRADLE,
+  275:         manifestPath: path,
+  276:         name: `${match[1]}:${match[2]}`,
+  277:         currentVersion: match[3],
+  278:         direct: true,
+  279:       });
+  280:     }
+  281: 
+  282:     return output;
+  283:   }
+  284: 
+  285:   private parseVcpkg(path: string, content: string): ParsedDependency[] {
+  286:     try {
+  287:       const parsed = JSON.parse(content) as {
+  288:         dependencies?: Array<string | { name?: string; version?: string }>;
+  289:       };
+  290: 
+
+==================================================
+13. PROJECT DETECTION SERVICE
+==================================================
+
+--- apps/api/src/modules/desktop-apps/services/desktop-project-detection.service.ts ---
+import { DesktopRepositoryService } from './desktop-repository.service';
+import { DesktopProjectDetector, type DesktopRepositorySnapshot } from './desktop-project-detector';
+import { GithubCodeService } from '../../repositories/services/github-code.service';
+import { BadRequestException, Injectable } from '@nestjs/common';
+
+const MAX_METADATA_FILES = 80;
+const MAX_METADATA_FILE_SIZE = 300_000;
+
+@Injectable()
+export class DesktopProjectDetectionService {
+  private readonly detector = new DesktopProjectDetector();
+
+  constructor(
+    private readonly desktopRepositories: DesktopRepositoryService,
+    private readonly githubCode: GithubCodeService,
+  ) {}
+
+  async detect(workspaceId: string, desktopAppId: string) {
+    const repository = await this.desktopRepositories.getLinkedRepository(workspaceId, desktopAppId);
+
+    if (!repository) {
+      throw new BadRequestException('Connect a repository before running desktop project detection.');
+    }
+
+    if (repository.archived || !repository.isAvailable) {
+      throw new BadRequestException('The linked repository is not available for desktop project detection.');
+    }
+
+    const tree = await this.githubCode.getTree(repository.installation.externalInstallationId, repository.owner, repository.name, repository.defaultBranch);
+
+    const paths = tree.entries.filter((entry) => entry.type === 'file').map((entry) => entry.path);
+
+    const candidateEntries = tree.entries.filter(
+      (entry) =>
+        entry.type === 'file' && this.isDetectionFile(entry.path) && (entry.size === null || entry.size === undefined || entry.size <= MAX_METADATA_FILE_SIZE),
+    );
+
+    const selectedEntries = candidateEntries.slice(0, MAX_METADATA_FILES);
+
+    const files: Record<string, string> = {};
+
+    for (const entry of selectedEntries) {
+      try {
+        const file = await this.githubCode.getFile(
+          repository.installation.externalInstallationId,
+          repository.owner,
+          repository.name,
+          entry.path,
+          repository.defaultBranch,
+        );
+
+        if (file.size > MAX_METADATA_FILE_SIZE) {
+          continue;
+        }
+
+        files[entry.path] = file.content;
+      } catch {
+        // Missing/deleted/unreadable metadata must not crash the full detection pass.
+      }
+    }
+
+    // Xcode project metadata is inside *.xcodeproj/project.pbxproj.
+    const xcodeProjectFiles = tree.entries
+      .filter((entry) => entry.type === 'file' && /(^|\/)[^/]+\.xcodeproj\/project\.pbxproj$/i.test(entry.path) && !files[entry.path])
+      .slice(0, Math.max(0, MAX_METADATA_FILES - Object.keys(files).length));
+
+    for (const entry of xcodeProjectFiles) {
+      try {
+        const file = await this.githubCode.getFile(
+          repository.installation.externalInstallationId,
+          repository.owner,
+          repository.name,
+          entry.path,
+          repository.defaultBranch,
+        );
+
+        if (file.size <= MAX_METADATA_FILE_SIZE) {
+          files[entry.path] = file.content;
+        }
+      } catch {
+        // Safe degradation.
+      }
+    }
+
+    // Swing does not require a special build dependency, so inspect a small,
+    // bounded source sample as well. This lets the pure detector find imports
+    // such as javax.swing without downloading the entire repository.
+    const javaSourceFiles = tree.entries
+      .filter(
+        (entry) =>
+          entry.type === 'file' &&
+          /\.(java|kt)$/i.test(entry.path) &&
+          !files[entry.path] &&
+          (entry.size === null || entry.size === undefined || entry.size <= MAX_METADATA_FILE_SIZE),
+      )
+      .slice(0, 20);
+
+    for (const entry of javaSourceFiles) {
+      try {
+        const file = await this.githubCode.getFile(
+          repository.installation.externalInstallationId,
+          repository.owner,
+          repository.name,
+          entry.path,
+          repository.defaultBranch,
+        );
+
+        if (file.size <= MAX_METADATA_FILE_SIZE) {
+          files[entry.path] = file.content;
+        }
+      } catch {
+        // Safe degradation.
+      }
+    }
+
+    const snapshot: DesktopRepositorySnapshot = {
+      repositoryId: repository.id,
+      repositoryFullName: repository.fullName,
+      branch: repository.defaultBranch,
+      truncated: tree.truncated || candidateEntries.length > MAX_METADATA_FILES,
+      paths,
+      files,
+    };
+
+    return this.detector.detect(snapshot);
+  }
+
+  private isDetectionFile(path: string): boolean {
+    return (
+      /(^|\/)package\.json$/i.test(path) ||
+      /(^|\/)src-tauri\/tauri\.conf\.(json|json5)$/i.test(path) ||
+      /(^|\/)src-tauri\/Cargo\.toml$/i.test(path) ||
+      /\.(csproj|fsproj|vbproj|sln)$/i.test(path) ||
+      /(^|\/)CMakeLists\.txt$/i.test(path) ||
+      /\.pro$/i.test(path) ||
+      /(^|\/)(pom\.xml|build\.gradle|build\.gradle\.kts)$/i.test(path) ||
+      /(^|\/)[^/]+\.xcodeproj\/project\.pbxproj$/i.test(path)
+    );
+  }
+}
+
+==================================================
+14. PROJECT DETECTOR
+==================================================
+
+--- apps/api/src/modules/desktop-apps/services/desktop-project-detector.ts ---
+import type {
+  DesktopArchitecture,
+  DesktopFramework,
+  DesktopPlatform,
+  DesktopProjectDetectionCandidate,
+  DesktopProjectDetectionResponse,
+} from '@command-center/shared-types';
+
+export interface DesktopRepositorySnapshot {
+  repositoryId: string;
+  repositoryFullName: string;
+  branch: string;
+  truncated: boolean;
+  paths: string[];
+  files: Record<string, string>;
+}
+
+interface CandidateDraft {
+  projectRoot: string;
+  platform: DesktopPlatform;
+  framework: DesktopFramework;
+  architecture?: DesktopArchitecture | null;
+  packageName?: string | null;
+  version?: string | null;
+  buildNumber?: string | null;
+  minimumOsVersion?: string | null;
+  score: number;
+  evidence: string[];
+  warnings?: string[];
+}
+
+function normalizePath(value: string): string {
+  return value.replace(/\\/g, '/').replace(/^\/+/, '');
+}
+
+function dirname(path: string): string {
+  const normalized = normalizePath(path);
+  const index = normalized.lastIndexOf('/');
+  return index < 0 ? '' : normalized.slice(0, index);
+}
+
+function join(root: string, name: string): string {
+  return root ? `${root}/${name}` : name;
+}
+
+function unique(values: string[]): string[] {
+  return [...new Set(values)];
+}
+
+function getText(snapshot: DesktopRepositorySnapshot, path: string): string | null {
+  const normalized = normalizePath(path);
+  return snapshot.files[normalized] ?? null;
+}
+
+function safeJson(text: string | null): Record<string, unknown> | null {
+  if (!text) return null;
+
+  try {
+    const value = JSON.parse(text) as unknown;
+
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return null;
+    }
+
+    return value as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+function stringValue(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+function objectValue(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : null;
+}
+
+function confidence(score: number): 'HIGH' | 'MEDIUM' | 'LOW' {
+  if (score >= 85) return 'HIGH';
+  if (score >= 60) return 'MEDIUM';
+  return 'LOW';
+}
+
+function parseRustVersion(cargo: string | null): string | null {
+  if (!cargo) return null;
+  return cargo.match(/^\s*version\s*=\s*"([^"]+)"/m)?.[1] ?? null;
+}
+
+function parseDotnetVersion(project: string | null): string | null {
+  if (!project) return null;
+
+  return project.match(/<Version>([^<]+)<\/Version>/i)?.[1]?.trim() ?? project.match(/<AssemblyVersion>([^<]+)<\/AssemblyVersion>/i)?.[1]?.trim() ?? null;
+}
+
+function inferArchitectures(text: string): DesktopArchitecture | null {
+  const lower = text.toLowerCase();
+
+  if (/(universal2|universal binary|arm64.*x64|x64.*arm64)/s.test(lower)) {
+    return 'UNIVERSAL';
+  }
+
+  if (/(arm64|aarch64)/.test(lower)) return 'ARM64';
+  if (/(win32|x86\b|i386)/.test(lower)) return 'X86';
+  if (/(x64|amd64|x86_64)/.test(lower)) return 'X64';
+
+  return null;
+}
+
+function inferPlatforms(text: string): DesktopPlatform {
+  const lower = text.toLowerCase();
+
+  const windows = /(windows|win32|msi|msix|wpf|winui|windows forms)/.test(lower);
+  const macos = /(macos|darwin|osx|appkit|mac catalyst)/.test(lower);
+  const linux = /(linux|appimage|deb|rpm)/.test(lower);
+
+  const count = [windows, macos, linux].filter(Boolean).length;
+
+  if (count > 1) return 'CROSS_PLATFORM';
+  if (windows) return 'WINDOWS';
+  if (macos) return 'MACOS';
+  if (linux) return 'LINUX';
+
+  return 'CROSS_PLATFORM';
+}
+
+function detectElectron(snapshot: DesktopRepositorySnapshot, packagePath: string): CandidateDraft | null {
+  const packageJson = safeJson(getText(snapshot, packagePath));
+
+  if (!packageJson) return null;
+
+  const dependencies = {
+    ...objectValue(packageJson.dependencies),
+    ...objectValue(packageJson.devDependencies),
+  };
+
+  const scripts = objectValue(packageJson.scripts);
+  const build = objectValue(packageJson.build);
+
+  const hasElectron = typeof dependencies.electron === 'string';
+  const hasBuilder = typeof dependencies['electron-builder'] === 'string';
+  const hasForge = typeof dependencies['@electron-forge/cli'] === 'string' || Object.keys(dependencies).some((key) => key.startsWith('@electron-forge/'));
+
+  const main = stringValue(packageJson.main);
+  const scriptText = JSON.stringify(scripts ?? {}).toLowerCase();
+
+  if (!hasElectron && !hasBuilder && !hasForge && !scriptText.includes('electron')) {
+    return null;
+  }
+
+  const root = dirname(packagePath);
+  const evidence = [packagePath];
+
+  if (hasElectron) evidence.push('package.json:electron');
+  if (hasBuilder) evidence.push('package.json:electron-builder');
+  if (hasForge) evidence.push('package.json:electron-forge');
+
+  const buildText = JSON.stringify(build ?? {});
+
+  return {
+    projectRoot: root,
+    platform: inferPlatforms(`${buildText} ${scriptText}`),
+    framework: 'ELECTRON',
+    architecture: inferArchitectures(`${buildText} ${scriptText}`),
+    packageName: stringValue(packageJson.name) ?? stringValue(build?.appId) ?? null,
+    version: stringValue(packageJson.version),
+    buildNumber: null,
+    minimumOsVersion: null,
+    score: Math.min(100, 70 + (hasBuilder ? 12 : 0) + (hasForge ? 12 : 0) + (main ? 6 : 0)),
+    evidence,
+  };
+}
+
+function detectTauri(snapshot: DesktopRepositorySnapshot, configPath: string): CandidateDraft | null {
+  const rootMarker = '/src-tauri/';
+  const normalized = normalizePath(configPath);
+
+  const markerIndex = normalized.indexOf(rootMarker);
+  const root = markerIndex >= 0 ? normalized.slice(0, markerIndex) : normalized.startsWith('src-tauri/') ? '' : dirname(dirname(normalized));
+
+  const tauriRoot = join(root, 'src-tauri');
+  const cargoPath = join(tauriRoot, 'Cargo.toml');
+
+  const config = safeJson(getText(snapshot, normalized));
+  const cargo = getText(snapshot, cargoPath);
+
+  if (!cargo && !config) return null;
+
+  const packageNode = objectValue(config?.package);
+  const productName = stringValue(packageNode?.productName) ?? stringValue(config?.productName);
+
+  const version = stringValue(packageNode?.version) ?? stringValue(config?.version) ?? parseRustVersion(cargo);
+
+  const combined = `${getText(snapshot, normalized) ?? ''}\n${cargo ?? ''}`;
+
+  return {
+    projectRoot: root,
+    platform: inferPlatforms(combined),
+    framework: 'TAURI',
+    architecture: inferArchitectures(combined),
+    packageName: productName,
+    version,
+    buildNumber: null,
+    minimumOsVersion: null,
+    score: cargo ? 98 : 88,
+    evidence: unique([normalized, ...(cargo ? [cargoPath] : [])]),
+  };
+}
+
+function detectDotnet(snapshot: DesktopRepositorySnapshot, projectPath: string): CandidateDraft | null {
+  const text = getText(snapshot, projectPath);
+  if (!text) return null;
+
+  const lower = text.toLowerCase();
+
+  const isDesktop =
+    lower.includes('<usewpf>true</usewpf>') ||
+    lower.includes('<usewindowsforms>true</usewindowsforms>') ||
+    lower.includes('microsoft.windowsappsdk') ||
+    lower.includes('avalonia');
+
+  if (!isDesktop) return null;
+
+  const evidence = [projectPath];
+  const targetFramework = text.match(/<TargetFrameworks?>([^<]+)<\/TargetFrameworks?>/i)?.[1] ?? '';
+
+  const runtimeIdentifiers = text.match(/<RuntimeIdentifiers?>([^<]+)<\/RuntimeIdentifiers?>/i)?.[1] ?? '';
+
+  const combined = `${text}\n${targetFramework}\n${runtimeIdentifiers}`;
+
+  const platform: DesktopPlatform =
+    lower.includes('avalonia') && !/windows/i.test(combined)
+      ? 'CROSS_PLATFORM'
+      : inferPlatforms(combined.includes('windows') ? combined : `${combined} windows`);
+
+  const packageName =
+    text.match(/<AssemblyName>([^<]+)<\/AssemblyName>/i)?.[1]?.trim() ??
+    projectPath
+      .split('/')
+      .pop()
+      ?.replace(/\.(cs|fs|vb)proj$/i, '') ??
+    null;
+
+  return {
+    projectRoot: dirname(projectPath),
+    platform,
+    framework: 'DOTNET',
+    architecture: inferArchitectures(combined),
+    packageName,
+    version: parseDotnetVersion(text),
+    buildNumber: null,
+    minimumOsVersion: text.match(/<TargetPlatformMinVersion>([^<]+)<\/TargetPlatformMinVersion>/i)?.[1]?.trim() ?? null,
+    score: lower.includes('microsoft.windowsappsdk') || lower.includes('<usewpf>true</usewpf>') ? 96 : 90,
+    evidence,
+  };
+}
+
+function detectQt(snapshot: DesktopRepositorySnapshot, path: string): CandidateDraft | null {
+  const text = getText(snapshot, path);
+  if (!text) return null;
+
+  const lower = text.toLowerCase();
+
+  const qtEvidence = /\bfind_package\s*\(\s*qt[56]/i.test(text) || /\bqt_add_(executable|qml_module)/i.test(text) || /\bqt\s*\+=/i.test(text);
+
+  if (!qtEvidence) return null;
+
+  const root = dirname(path);
+  const target =
+    text.match(/\bqt_add_executable\s*\(\s*([A-Za-z0-9_.-]+)/i)?.[1] ??
+    text.match(/\badd_executable\s*\(\s*([A-Za-z0-9_.-]+)/i)?.[1] ??
+    text.match(/^\s*TARGET\s*=\s*([^\r\n#]+)/im)?.[1]?.trim() ??
+    null;
+
+  return {
+    projectRoot: root,
+    platform: inferPlatforms(lower),
+    framework: 'QT',
+    architecture: inferArchitectures(lower),
+    packageName: target,
+    version: null,
+    buildNumber: null,
+    minimumOsVersion: null,
+    score: path.toLowerCase().endsWith('.pro') ? 92 : 90,
+    evidence: [path],
+  };
+}
+
+function detectJava(snapshot: DesktopRepositorySnapshot, path: string): CandidateDraft | null {
+  const text = getText(snapshot, path);
+  if (!text) return null;
+
+  const lower = text.toLowerCase();
+
+  const javafx = lower.includes('org.openjfx') || lower.includes('javafx-controls') || lower.includes('javafx.fxml') || lower.includes('javafx');
+
+  const swing = snapshot.paths.some(
+    (candidate) => /\.(java|kt)$/i.test(candidate) && /\b(src|app)\b/i.test(candidate) && /swing/i.test(getText(snapshot, candidate) ?? ''),
+  );
+
+  if (!javafx && !swing) return null;
+
+  let version: string | null = null;
+  let packageName: string | null = null;
+
+  if (path.endsWith('pom.xml')) {
+    version = text.match(/<version>([^<]+)<\/version>/i)?.[1]?.trim() ?? null;
+    packageName = text.match(/<artifactId>([^<]+)<\/artifactId>/i)?.[1]?.trim() ?? null;
+  } else {
+    version = text.match(/\bversion\s*=\s*['"]([^'"]+)['"]/i)?.[1] ?? null;
+
+    packageName = text.match(/\brootProject\.name\s*=\s*['"]([^'"]+)['"]/i)?.[1] ?? null;
+  }
+
+  return {
+    projectRoot: dirname(path),
+    platform: 'CROSS_PLATFORM',
+    framework: 'JAVA',
+    architecture: inferArchitectures(lower),
+    packageName,
+    version,
+    buildNumber: null,
+    minimumOsVersion: null,
+    score: javafx ? 90 : 72,
+    evidence: [path, javafx ? 'JavaFX dependency' : 'Swing source evidence'],
+  };
+}
+
+function detectNativeMacos(snapshot: DesktopRepositorySnapshot, path: string): CandidateDraft | null {
+  const normalized = normalizePath(path);
+
+  if (!/\.(xcodeproj|xcworkspace)\//i.test(`${normalized}/`) && !/\.(xcodeproj|xcworkspace)$/i.test(normalized)) {
+    return null;
+  }
+
+  const root = dirname(normalized.replace(/\/[^/]+$/, ''));
+  const projectFile = snapshot.paths.find((candidate) => candidate.startsWith(root ? `${root}/` : '') && candidate.endsWith('project.pbxproj'));
+
+  const pbx = projectFile ? getText(snapshot, projectFile) : null;
+
+  if (pbx && !/(SDKROOT\s*=\s*macosx|MACOSX_DEPLOYMENT_TARGET|com\.apple\.product-type\.application)/i.test(pbx)) {
+    return null;
+  }
+
+  const packageName =
+    pbx
+      ?.match(/\bPRODUCT_BUNDLE_IDENTIFIER\s*=\s*([^;]+);/i)?.[1]
+      ?.replace(/["']/g, '')
+      .trim() ?? null;
+
+  const version =
+    pbx
+      ?.match(/\bMARKETING_VERSION\s*=\s*([^;]+);/i)?.[1]
+      ?.replace(/["']/g, '')
+      .trim() ?? null;
+
+  const buildNumber =
+    pbx
+      ?.match(/\bCURRENT_PROJECT_VERSION\s*=\s*([^;]+);/i)?.[1]
+      ?.replace(/["']/g, '')
+      .trim() ?? null;
+
+  const minimumOsVersion =
+    pbx
+      ?.match(/\bMACOSX_DEPLOYMENT_TARGET\s*=\s*([^;]+);/i)?.[1]
+      ?.replace(/["']/g, '')
+      .trim() ?? null;
+
+  return {
+    projectRoot: root,
+    platform: 'MACOS',
+    framework: 'NATIVE_MACOS',
+    architecture: pbx ? inferArchitectures(pbx) : null,
+    packageName,
+    version,
+    buildNumber,
+    minimumOsVersion,
+    score: pbx ? 96 : 76,
+    evidence: unique([normalized, ...(projectFile ? [projectFile] : [])]),
+  };
+}
+
+function mergeCandidates(candidates: CandidateDraft[]): DesktopProjectDetectionCandidate[] {
+  const grouped = new Map<string, CandidateDraft>();
+
+  for (const candidate of candidates) {
+    const key = `${candidate.projectRoot}:${candidate.framework}`;
+
+    const existing = grouped.get(key);
+
+    if (!existing || candidate.score > existing.score) {
+      grouped.set(key, candidate);
+      continue;
+    }
+
+    existing.evidence = unique([...existing.evidence, ...candidate.evidence]);
+  }
+
+  return [...grouped.values()]
+    .map((candidate) => ({
+      applicationType: 'DESKTOP' as const,
+      projectRoot: candidate.projectRoot,
+      platform: candidate.platform,
+      framework: candidate.framework,
+      architecture: candidate.architecture ?? null,
+      packageName: candidate.packageName ?? null,
+      version: candidate.version ?? null,
+      buildNumber: candidate.buildNumber ?? null,
+      minimumOsVersion: candidate.minimumOsVersion ?? null,
+      confidence: confidence(candidate.score),
+      score: candidate.score,
+      evidence: unique(candidate.evidence),
+      warnings: unique(candidate.warnings ?? []),
+    }))
+    .sort((a, b) => b.score - a.score || a.projectRoot.localeCompare(b.projectRoot));
+}
+
+export class DesktopProjectDetector {
+  detect(snapshot: DesktopRepositorySnapshot): DesktopProjectDetectionResponse {
+    const paths = snapshot.paths.map(normalizePath);
+    const drafts: CandidateDraft[] = [];
+
+    for (const path of paths) {
+      if (path.endsWith('package.json')) {
+        const candidate = detectElectron(snapshot, path);
+        if (candidate) drafts.push(candidate);
+      }
+
+      if (/(^|\/)src-tauri\/tauri\.conf\.(json|json5)$/i.test(path) || /(^|\/)src-tauri\/tauri\.conf\.json$/i.test(path)) {
+        const candidate = detectTauri(snapshot, path);
+        if (candidate) drafts.push(candidate);
+      }
+
+      if (/\.(csproj|fsproj|vbproj)$/i.test(path)) {
+        const candidate = detectDotnet(snapshot, path);
+        if (candidate) drafts.push(candidate);
+      }
+
+      if (/(^|\/)CMakeLists\.txt$/i.test(path) || /\.pro$/i.test(path)) {
+        const candidate = detectQt(snapshot, path);
+        if (candidate) drafts.push(candidate);
+      }
+
+      if (/(^|\/)(pom\.xml|build\.gradle|build\.gradle\.kts)$/i.test(path)) {
+        const candidate = detectJava(snapshot, path);
+        if (candidate) drafts.push(candidate);
+      }
+
+      if (/\.(xcodeproj|xcworkspace)(\/|$)/i.test(path)) {
+        const candidate = detectNativeMacos(snapshot, path);
+        if (candidate) drafts.push(candidate);
+      }
+    }
+
+    const candidates = mergeCandidates(drafts);
+
+    if (snapshot.truncated) {
+      for (const candidate of candidates) {
+        candidate.warnings.push('Repository metadata was truncated; detection may be incomplete.');
+      }
+    }
+
+    return {
+      repositoryId: snapshot.repositoryId,
+      repositoryFullName: snapshot.repositoryFullName,
+      branch: snapshot.branch,
+      truncated: snapshot.truncated,
+      candidates,
+      primary: candidates[0] ?? null,
+    };
+  }
+}
+
+==================================================
+15. REPOSITORY METADATA SERVICE
+==================================================
+
+--- apps/api/src/modules/desktop-apps/services/desktop-repository-metadata.service.ts ---
+import { GithubCodeService } from '../../repositories/services/github-code.service';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { DesktopRepositoryService } from './desktop-repository.service';
+
+export interface DesktopRepositoryMetadataSnapshot {
+  repositoryId: string;
+  repositoryFullName: string;
+  branch: string;
+  paths: string[];
+  files: Record<string, string>;
+  truncated: boolean;
+}
+
+const MAX_FILES = 120;
+const MAX_FILE_SIZE = 500_000;
+
+@Injectable()
+export class DesktopRepositoryMetadataService {
+  constructor(
+    private readonly desktopRepositories: DesktopRepositoryService,
+    private readonly githubCode: GithubCodeService,
+  ) {}
+
+  async load(workspaceId: string, desktopAppId: string): Promise<DesktopRepositoryMetadataSnapshot> {
+    const repository = await this.desktopRepositories.getLinkedRepository(workspaceId, desktopAppId);
+
+    if (!repository) {
+      throw new BadRequestException('Connect a repository before scanning dependencies or security configuration.');
+    }
+
+    if (repository.archived || !repository.isAvailable) {
+      throw new BadRequestException('The linked repository is not available.');
+    }
+
+    const tree = await this.githubCode.getTree(repository.installation.externalInstallationId, repository.owner, repository.name, repository.defaultBranch);
+
+    const entries = tree.entries
+      .filter(
+        (entry) => entry.type === 'file' && this.isInteresting(entry.path) && (entry.size === null || entry.size === undefined || entry.size <= MAX_FILE_SIZE),
+      )
+      .slice(0, MAX_FILES);
+
+    const files: Record<string, string> = {};
+
+    for (const entry of entries) {
+      try {
+        const file = await this.githubCode.getFile(
+          repository.installation.externalInstallationId,
+          repository.owner,
+          repository.name,
+          entry.path,
+          repository.defaultBranch,
+        );
+
+        if (file.size <= MAX_FILE_SIZE) {
+          files[entry.path] = file.content;
+        }
+      } catch {
+        // A deleted/unreadable manifest is ignored; the scan still returns
+        // the safely available repository evidence.
+      }
+    }
+
+    return {
+      repositoryId: repository.id,
+      repositoryFullName: repository.fullName,
+      branch: repository.defaultBranch,
+      paths: tree.entries.filter((entry) => entry.type === 'file').map((entry) => entry.path),
+      files,
+      truncated: tree.truncated || entries.length >= MAX_FILES,
+    };
+  }
+
+  private isInteresting(path: string): boolean {
+    return (
+      /(^|\/)package\.json$/i.test(path) ||
+      /(^|\/)(package-lock\.json|pnpm-lock\.yaml|yarn\.lock)$/i.test(path) ||
+      /(^|\/)Cargo\.toml$/i.test(path) ||
+      /(^|\/)Cargo\.lock$/i.test(path) ||
+      /\.(csproj|fsproj|vbproj)$/i.test(path) ||
+      /(^|\/)(packages\.lock\.json|Directory\.Packages\.props)$/i.test(path) ||
+      /(^|\/)(pom\.xml|build\.gradle|build\.gradle\.kts)$/i.test(path) ||
+      /(^|\/)(CMakeLists\.txt|conanfile\.(txt|py)|vcpkg\.json)$/i.test(path) ||
+      /(^|\/)src-tauri\/tauri\.conf\.(json|json5)$/i.test(path) ||
+      /(^|\/)(electron-builder\.(yml|yaml|json|json5)|forge\.config\.(js|cjs|mjs|ts))$/i.test(path) ||
+      /(^|\/)[^/]+\.xcodeproj\/project\.pbxproj$/i.test(path) ||
+      /(^|\/)(osv-scanner\.json|npm-audit\.json|pnpm-audit\.json)$/i.test(path)
+    );
+  }
+}
+
+==================================================
+16. DESKTOP TELEMETRY FILES
+==================================================
+
+--- apps/api/src/modules/desktop-apps/telemetry/desktop-telemetry-provider.interface.ts ---
+import type { DesktopTelemetryProvider, DesktopTelemetrySnapshot } from '@command-center/shared-types';
+
+export interface DesktopTelemetryProviderContext {
+  provider: DesktopTelemetryProvider;
+  workspaceId: string;
+  desktopAppId: string;
+  externalProjectId: string;
+  endpointUrl: string;
+  secret: string;
+}
+
+export interface DesktopTelemetryProviderAdapter {
+  getSnapshot(context: DesktopTelemetryProviderContext): Promise<DesktopTelemetrySnapshot>;
+}
+
+--- apps/api/src/modules/desktop-apps/telemetry/normalized-http-desktop-telemetry.provider.ts ---
+import type {
+  DesktopArchitecture,
+  DesktopPlatform,
+  DesktopReleaseChannel,
+  DesktopTelemetryPerformanceSample,
+  DesktopTelemetryCrashSample,
+  DesktopTelemetrySnapshot,
+  DesktopTelemetryVersionSample,
+} from '@command-center/shared-types';
+import { BadGatewayException, Injectable } from '@nestjs/common';
+import type { DesktopTelemetryProviderAdapter, DesktopTelemetryProviderContext } from './desktop-telemetry-provider.interface';
+
+const METRIC_TYPES = new Set([
+  'CRASH_FREE_USERS_PERCENT',
+  'CRASH_FREE_SESSIONS_PERCENT',
+  'STARTUP_MS',
+  'MEMORY_MB',
+  'CPU_PERCENT',
+  'HANG_RATE_PERCENT',
+  'NETWORK_LATENCY_MS',
+  'API_FAILURE_RATE_PERCENT',
+  'VERSION_ADOPTION_PERCENT',
+]);
+
+const PLATFORMS = new Set(['WINDOWS', 'MACOS', 'LINUX', 'CROSS_PLATFORM']);
+
+const ARCHITECTURES = new Set(['X64', 'ARM64', 'X86', 'UNIVERSAL']);
+
+const CHANNELS = new Set(['DEV', 'ALPHA', 'BETA', 'STABLE', 'LTS']);
+
+@Injectable()
+export class NormalizedHttpDesktopTelemetryProvider implements DesktopTelemetryProviderAdapter {
+  async getSnapshot(context: DesktopTelemetryProviderContext): Promise<DesktopTelemetrySnapshot> {
+    const url = new URL(context.endpointUrl);
+
+    if (process.env.NODE_ENV === 'test' && url.protocol === 'mock:') {
+      return this.testSnapshot(url.hostname);
+    }
+
+    url.searchParams.set('externalProjectId', context.externalProjectId);
+    url.searchParams.set('desktopAppId', context.desktopAppId);
+
+    let response: Response;
+
+    try {
+      response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          accept: 'application/json',
+          authorization: `Bearer ${context.secret}`,
+          'x-saas-command-center-provider': context.provider,
+        },
+        signal: AbortSignal.timeout(12_000),
+        redirect: 'error',
+      });
+    } catch {
+      throw new BadGatewayException('Telemetry provider could not be reached.');
+    }
+
+    if (!response.ok) {
+      throw new BadGatewayException(`Telemetry provider returned HTTP ${response.status}.`);
+    }
+
+    let raw: unknown;
+
+    try {
+      raw = await response.json();
+    } catch {
+      throw new BadGatewayException('Telemetry provider returned invalid JSON.');
+    }
+
+    return this.normalize(raw);
+  }
+
+  private normalize(raw: unknown): DesktopTelemetrySnapshot {
+    if (!raw || typeof raw !== 'object') {
+      throw new BadGatewayException('Telemetry provider payload must be an object.');
+    }
+
+    const value = raw as Record<string, unknown>;
+
+    return {
+      performance: this.performance(value.performance),
+      crashes: this.crashes(value.crashes),
+      versions: this.versions(value.versions),
+    };
+  }
+
+  private performance(raw: unknown): DesktopTelemetryPerformanceSample[] {
+    if (!Array.isArray(raw)) {
+      return [];
+    }
+
+    return raw.flatMap((item, index) => {
+      if (!item || typeof item !== 'object') {
+        return [];
+      }
+
+      const value = item as Record<string, unknown>;
+      const type = String(value.type ?? '');
+      const metricValue = Number(value.value);
+      const recordedAt = String(value.recordedAt ?? '');
+
+      if (!METRIC_TYPES.has(type) || !Number.isFinite(metricValue) || Number.isNaN(Date.parse(recordedAt))) {
+        return [];
+      }
+
+      return [
+        {
+          externalId: String(value.externalId ?? `metric-${index}`),
+          type: type as DesktopTelemetryPerformanceSample['type'],
+          value: metricValue,
+          unit: String(value.unit ?? ''),
+          recordedAt,
+          version: this.optionalString(value.version),
+          platform: this.platform(value.platform),
+          architecture: this.architecture(value.architecture),
+          channel: this.channel(value.channel),
+        },
+      ];
+    });
+  }
+
+  private crashes(raw: unknown): DesktopTelemetryCrashSample[] {
+    if (!Array.isArray(raw)) {
+      return [];
+    }
+
+    return raw.flatMap((item, index) => {
+      if (!item || typeof item !== 'object') {
+        return [];
+      }
+
+      const value = item as Record<string, unknown>;
+      const fingerprint = String(value.fingerprint ?? '').trim();
+      const message = String(value.message ?? '').trim();
+      const firstSeenAt = String(value.firstSeenAt ?? '');
+      const lastSeenAt = String(value.lastSeenAt ?? '');
+      const count = Math.max(0, Math.trunc(Number(value.count ?? 0)));
+      const affectedUsers = Math.max(0, Math.trunc(Number(value.affectedUsers ?? 0)));
+
+      if (!fingerprint || !message || Number.isNaN(Date.parse(firstSeenAt)) || Number.isNaN(Date.parse(lastSeenAt))) {
+        return [];
+      }
+
+      return [
+        {
+          externalId: String(value.externalId ?? `crash-${index}`),
+          fingerprint,
+          message,
+          count,
+          affectedUsers,
+          firstSeenAt,
+          lastSeenAt,
+          version: this.optionalString(value.version),
+          platform: this.platform(value.platform),
+          architecture: this.architecture(value.architecture),
+          channel: this.channel(value.channel),
+        },
+      ];
+    });
+  }
+
+  private versions(raw: unknown): DesktopTelemetryVersionSample[] {
+    if (!Array.isArray(raw)) {
+      return [];
+    }
+
+    return raw.flatMap((item) => {
+      if (!item || typeof item !== 'object') {
+        return [];
+      }
+
+      const value = item as Record<string, unknown>;
+      const version = String(value.version ?? '').trim();
+
+      if (!version) {
+        return [];
+      }
+
+      return [
+        {
+          version,
+          users: Math.max(0, Math.trunc(Number(value.users ?? 0))),
+          sessions: Math.max(0, Math.trunc(Number(value.sessions ?? 0))),
+        },
+      ];
+    });
+  }
+
+  private optionalString(value: unknown): string | null {
+    const normalized = String(value ?? '').trim();
+    return normalized || null;
+  }
+
+  private platform(value: unknown): DesktopPlatform | null {
+    const normalized = String(value ?? '').toUpperCase();
+    return PLATFORMS.has(normalized) ? (normalized as DesktopPlatform) : null;
+  }
+
+  private architecture(value: unknown): DesktopArchitecture | null {
+    const normalized = String(value ?? '').toUpperCase();
+    return ARCHITECTURES.has(normalized) ? (normalized as DesktopArchitecture) : null;
+  }
+
+  private channel(value: unknown): DesktopReleaseChannel | null {
+    const normalized = String(value ?? '').toUpperCase();
+    return CHANNELS.has(normalized) ? (normalized as DesktopReleaseChannel) : null;
+  }
+
+  private testSnapshot(mode: string): DesktopTelemetrySnapshot {
+    if (mode === 'failure') {
+      throw new BadGatewayException('Injected telemetry provider failure.');
+    }
+
+    return {
+      performance: [
+        {
+          externalId: 'perf-startup-1',
+          type: 'STARTUP_MS',
+          value: 1800,
+          unit: 'ms',
+          recordedAt: '2026-08-23T00:00:00.000Z',
+          version: '2.4.0',
+          platform: 'WINDOWS',
+          architecture: 'X64',
+          channel: 'STABLE',
+        },
+        {
+          externalId: 'perf-memory-1',
+          type: 'MEMORY_MB',
+          value: 242,
+          unit: 'MB',
+          recordedAt: '2026-08-23T00:00:00.000Z',
+          version: '2.4.0',
+          platform: 'WINDOWS',
+          architecture: 'X64',
+          channel: 'STABLE',
+        },
+        {
+          externalId: 'perf-cpu-1',
+          type: 'CPU_PERCENT',
+          value: 4.8,
+          unit: '%',
+          recordedAt: '2026-08-23T00:00:00.000Z',
+          version: '2.4.0',
+          platform: 'WINDOWS',
+          architecture: 'X64',
+          channel: 'STABLE',
+        },
+        {
+          externalId: 'perf-crashfree-1',
+          type: 'CRASH_FREE_USERS_PERCENT',
+          value: 99.7,
+          unit: '%',
+          recordedAt: '2026-08-23T00:00:00.000Z',
+          version: '2.4.0',
+          platform: 'WINDOWS',
+          architecture: 'X64',
+          channel: 'STABLE',
+        },
+      ],
+      crashes: [
+        {
+          externalId: 'crash-renderer-1',
+          fingerprint: 'renderer-crash',
+          message: 'Renderer process exited unexpectedly',
+          count: 12,
+          affectedUsers: 8,
+          firstSeenAt: '2026-08-22T20:00:00.000Z',
+          lastSeenAt: '2026-08-23T00:00:00.000Z',
+          version: '2.4.0',
+          platform: 'WINDOWS',
+          architecture: 'X64',
+          channel: 'STABLE',
+        },
+      ],
+      versions: [
+        {
+          version: '2.4.0',
+          users: 120,
+          sessions: 440,
+        },
+      ],
+    };
+  }
+}
+
+--- apps/api/src/modules/desktop-apps/services/desktop-runtime.service.ts ---
+import { PrismaService } from '../../../database/prisma.service';
+import { DesktopTelemetryIntegrationStatus } from 'src/generated/prisma/enums';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import type { DesktopTelemetryCrashSample, DesktopTelemetryPerformanceSample } from '@command-center/shared-types';
+import type { IngestDesktopRuntimeDto } from '../dto/desktop-runtime.dto';
+import { DesktopAppsService } from './desktop-apps.service';
+import { DesktopTelemetryService } from './desktop-telemetry.service';
+
+@Injectable()
+export class DesktopRuntimeService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly desktopApps: DesktopAppsService,
+    private readonly telemetry: DesktopTelemetryService,
+  ) {}
+
+  async syncProvider(workspaceId: string, desktopAppId: string, integrationId: string) {
+    const { integration, snapshot } = await this.telemetry.snapshotForSync(workspaceId, desktopAppId, integrationId);
+
+    const result = await this.persist(workspaceId, desktopAppId, integration.id, snapshot.performance, snapshot.crashes);
+
+    const updated = await this.prisma.desktopTelemetryIntegration.update({
+      where: { id: integration.id },
+      data: {
+        status: DesktopTelemetryIntegrationStatus.CONNECTED,
+        lastSyncedAt: new Date(),
+        lastError: null,
+      },
+    });
+
+    return {
+      integration: this.telemetry.publicIntegration(updated),
+      ...result,
+      versionsSeen: snapshot.versions.length,
+    };
+  }
+
+  async ingestNormalized(workspaceId: string, desktopAppId: string, dto: IngestDesktopRuntimeDto) {
+    await this.desktopApps.findOne(workspaceId, desktopAppId);
+
+    const integration = await this.telemetry.requireIntegration(workspaceId, desktopAppId, dto.integrationId);
+
+    if (integration.status === DesktopTelemetryIntegrationStatus.DISCONNECTED) {
+      throw new BadRequestException('Disconnected integrations cannot ingest runtime data.');
+    }
+
+    const result = await this.persist(workspaceId, desktopAppId, integration.id, dto.performance, dto.crashes);
+
+    await this.prisma.desktopTelemetryIntegration.update({
+      where: { id: integration.id },
+      data: {
+        status: DesktopTelemetryIntegrationStatus.CONNECTED,
+        lastSyncedAt: new Date(),
+        lastError: null,
+      },
+    });
+
+    return result;
+  }
+
+  private async persist(
+    workspaceId: string,
+    desktopAppId: string,
+    telemetryIntegrationId: string,
+    performance: DesktopTelemetryPerformanceSample[],
+    crashes: DesktopTelemetryCrashSample[],
+  ) {
+    let performanceInserted = 0;
+    let performanceUpdated = 0;
+    let crashesUpserted = 0;
+
+    await this.prisma.$transaction(async (transaction) => {
+      for (const metric of performance) {
+        const existing = await transaction.desktopMetric.findUnique({
+          where: {
+            telemetryIntegrationId_externalId: {
+              telemetryIntegrationId,
+              externalId: metric.externalId,
+            },
+          },
+          select: { id: true },
+        });
+
+        await transaction.desktopMetric.upsert({
+          where: {
+            telemetryIntegrationId_externalId: {
+              telemetryIntegrationId,
+              externalId: metric.externalId,
+            },
+          },
+          create: {
+            workspaceId,
+            desktopAppId,
+            telemetryIntegrationId,
+            externalId: metric.externalId,
+            type: metric.type,
+            value: metric.value,
+            unit: metric.unit,
+            version: metric.version ?? null,
+            platform: metric.platform ?? null,
+            architecture: metric.architecture ?? null,
+            channel: metric.channel ?? null,
+            recordedAt: new Date(metric.recordedAt),
+          },
+          update: {
+            type: metric.type,
+            value: metric.value,
+            unit: metric.unit,
+            version: metric.version ?? null,
+            platform: metric.platform ?? null,
+            architecture: metric.architecture ?? null,
+            channel: metric.channel ?? null,
+            recordedAt: new Date(metric.recordedAt),
+          },
+        });
+
+        if (existing) {
+          performanceUpdated += 1;
+        } else {
+          performanceInserted += 1;
+        }
+      }
+
+      for (const crash of crashes) {
+        await transaction.desktopCrash.upsert({
+          where: {
+            telemetryIntegrationId_externalId: {
+              telemetryIntegrationId,
+              externalId: crash.externalId,
+            },
+          },
+          create: {
+            workspaceId,
+            desktopAppId,
+            telemetryIntegrationId,
+            externalId: crash.externalId,
+            fingerprint: crash.fingerprint,
+            message: crash.message,
+            count: crash.count,
+            affectedUsers: crash.affectedUsers,
+            version: crash.version ?? null,
+            platform: crash.platform ?? null,
+            architecture: crash.architecture ?? null,
+            channel: crash.channel ?? null,
+            firstSeenAt: new Date(crash.firstSeenAt),
+            lastSeenAt: new Date(crash.lastSeenAt),
+          },
+          update: {
+            fingerprint: crash.fingerprint,
+            message: crash.message,
+            count: crash.count,
+            affectedUsers: crash.affectedUsers,
+            version: crash.version ?? null,
+            platform: crash.platform ?? null,
+            architecture: crash.architecture ?? null,
+            channel: crash.channel ?? null,
+            firstSeenAt: new Date(crash.firstSeenAt),
+            lastSeenAt: new Date(crash.lastSeenAt),
+          },
+        });
+
+        crashesUpserted += 1;
+      }
+    });
+
+    return {
+      performanceInserted,
+      performanceUpdated,
+      crashesUpserted,
+    };
+  }
+}
+
+--- apps/api/src/modules/desktop-apps/services/desktop-telemetry-url-policy.service.ts ---
+import { promises as dns } from 'node:dns';
+import { isIP } from 'node:net';
+import { BadRequestException, Injectable } from '@nestjs/common';
+
+@Injectable()
+export class DesktopTelemetryUrlPolicyService {
+  async assertSafe(urlValue: string): Promise<URL> {
+    let url: URL;
+
+    try {
+      url = new URL(urlValue);
+    } catch {
+      throw new BadRequestException('Telemetry endpoint URL is invalid.');
+    }
+
+    if (process.env.NODE_ENV === 'test' && url.protocol === 'mock:') {
+      return url;
+    }
+
+    if (url.protocol !== 'https:') {
+      throw new BadRequestException('Telemetry endpoint must use HTTPS.');
+    }
+
+    if (url.username || url.password) {
+      throw new BadRequestException('Telemetry endpoint cannot contain URL credentials.');
+    }
+
+    const host = url.hostname.toLowerCase();
+
+    if (host === 'localhost' || host.endsWith('.localhost') || host === '0.0.0.0' || host === '::1') {
+      throw new BadRequestException('Telemetry endpoint cannot target localhost.');
+    }
+
+    const addresses = await this.resolve(host);
+
+    for (const address of addresses) {
+      if (this.isPrivateAddress(address)) {
+        throw new BadRequestException('Telemetry endpoint cannot target a private network address.');
+      }
+    }
+
+    return url;
+  }
+
+  private async resolve(host: string): Promise<string[]> {
+    if (isIP(host)) {
+      return [host];
+    }
+
+    try {
+      const results = await dns.lookup(host, {
+        all: true,
+        verbatim: true,
+      });
+
+      if (results.length === 0) {
+        throw new Error('No DNS records');
+      }
+
+      return results.map((item) => item.address);
+    } catch {
+      throw new BadRequestException('Telemetry endpoint hostname could not be resolved.');
+    }
+  }
+
+  private isPrivateAddress(address: string): boolean {
+    if (address.includes(':')) {
+      const normalized = address.toLowerCase();
+
+      return normalized === '::1' || normalized.startsWith('fc') || normalized.startsWith('fd') || normalized.startsWith('fe80:');
+    }
+
+    const octets = address.split('.').map(Number);
+
+    if (octets.length !== 4 || octets.some(Number.isNaN)) {
+      return true;
+    }
+
+    const [a, b] = octets;
+
+    return a === 0 || a === 10 || a === 127 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || a >= 224;
+  }
+}
+
+==================================================
+17. MOBILE TELEMETRY ANALOG FILES
+==================================================
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\controllers\mobile-telemetry.controller.ts ---
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { WorkspaceRoles } from '../../workspace/decorators/workspace-roles.decorator';
+import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
+import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
+import { ConnectMobileTelemetryDto } from '../dto/mobile-telemetry.dto';
+import { MobileTelemetryService } from '../services/mobile-telemetry.service';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
+
+@ApiTags('Mobile Telemetry')
+@ApiBearerAuth('access-token')
+@Controller('workspaces/:workspaceId/mobile-apps/:mobileAppId/telemetry')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard, WorkspaceRolesGuard)
+export class MobileTelemetryController {
+  constructor(private readonly service: MobileTelemetryService) {}
+
+  @Get()
+  getIntegration(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('mobileAppId', ParseUUIDPipe)
+    mobileAppId: string,
+  ) {
+    return this.service.getIntegration(workspaceId, mobileAppId);
+  }
+
+  @Post('connect')
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  connect(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('mobileAppId', ParseUUIDPipe)
+    mobileAppId: string,
+
+    @Body()
+    dto: ConnectMobileTelemetryDto,
+  ) {
+    return this.service.connect(workspaceId, mobileAppId, dto);
+  }
+
+  @Post('sync')
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  sync(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('mobileAppId', ParseUUIDPipe)
+    mobileAppId: string,
+  ) {
+    return this.service.sync(workspaceId, mobileAppId);
+  }
+
+  @Delete()
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN)
+  disconnect(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('mobileAppId', ParseUUIDPipe)
+    mobileAppId: string,
+  ) {
+    return this.service.disconnect(workspaceId, mobileAppId);
+  }
+}
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\dto\mobile-telemetry.dto.ts ---
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEnum, IsObject, IsString, MaxLength } from 'class-validator';
+import { MobileTelemetryProvider } from 'src/generated/prisma/enums';
+
+export class ConnectMobileTelemetryDto {
+  @ApiProperty({
+    enum: MobileTelemetryProvider,
+  })
+  @IsEnum(MobileTelemetryProvider)
+  provider!: MobileTelemetryProvider;
+
+  @ApiProperty()
+  @IsString()
+  @MaxLength(255)
+  externalProjectId!: string;
+
+  @ApiProperty({
+    type: 'object',
+    additionalProperties: {
+      type: 'string',
+    },
+  })
+  @IsObject()
+  config!: Record<string, string>;
+}
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\services\mobile-telemetry.service.ts ---
+import { MobileAppsService } from './mobile-apps.service';
+import { PrismaService } from '../../../database/prisma.service';
+import { ConnectMobileTelemetryDto } from '../dto/mobile-telemetry.dto';
+import { MobileProviderSecurityService } from '../security/mobile-provider-security.service';
+import { MobileTelemetryProviderRegistry } from '../telemetry/mobile-telemetry-provider.registry';
+import { MobileTelemetrySecretService } from '../telemetry/mobile-telemetry-secret.service';
+import type { MobileTelemetrySnapshot } from '@command-center/shared-types';
+import { BadGatewayException, BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { MobilePerformanceMetricType, MobilePlatform, MobileTelemetryStatus } from 'src/generated/prisma/enums';
+
+@Injectable()
+export class MobileTelemetryService {
+  constructor(
+    private readonly prisma: PrismaService,
+
+    private readonly mobileApps: MobileAppsService,
+
+    private readonly registry: MobileTelemetryProviderRegistry,
+
+    private readonly secrets: MobileTelemetrySecretService,
+
+    private readonly providerSecurity: MobileProviderSecurityService,
+  ) {}
+
+  async getIntegration(workspaceId: string, mobileAppId: string) {
+    await this.mobileApps.findOne(workspaceId, mobileAppId);
+
+    return this.prisma.mobileTelemetryIntegration.findFirst({
+      where: {
+        workspaceId,
+        mobileAppId,
+      },
+
+      select: this.publicSelect(),
+    });
+  }
+
+  async connect(workspaceId: string, mobileAppId: string, dto: ConnectMobileTelemetryDto) {
+    const mobileApp = await this.mobileApps.findOne(workspaceId, mobileAppId);
+
+    if (mobileApp.application.archivedAt) {
+      throw new BadRequestException('Archived mobile applications cannot connect telemetry providers.');
+    }
+
+    const projectId = this.providerSecurity.normalizeExternalProjectId(dto.externalProjectId);
+
+    const normalizedConfig = this.providerSecurity.normalizeConfig(dto.config);
+
+    const adapter = this.registry.get(dto.provider);
+
+    adapter.validateConfig(normalizedConfig);
+
+    const encryptedConfig = this.secrets.encrypt(normalizedConfig);
+
+    return this.prisma.mobileTelemetryIntegration.upsert({
+      where: {
+        mobileAppId,
+      },
+
+      create: {
+        workspaceId,
+        mobileAppId,
+
+        provider: dto.provider,
+
+        status: MobileTelemetryStatus.CONNECTED,
+
+        externalProjectId: projectId,
+
+        encryptedConfig,
+
+        configuredAt: new Date(),
+
+        lastSyncedAt: null,
+      },
+
+      update: {
+        workspaceId,
+
+        provider: dto.provider,
+
+        status: MobileTelemetryStatus.CONNECTED,
+
+        externalProjectId: projectId,
+
+        encryptedConfig,
+
+        configuredAt: new Date(),
+
+        lastSyncedAt: null,
+      },
+
+      select: this.publicSelect(),
+    });
+  }
+
+  async disconnect(workspaceId: string, mobileAppId: string) {
+    const integration = await this.requireIntegration(workspaceId, mobileAppId);
+
+    return this.prisma.mobileTelemetryIntegration.update({
+      where: {
+        id: integration.id,
+      },
+
+      data: {
+        status: MobileTelemetryStatus.DISCONNECTED,
+
+        /*
+         * Remove credentials when disconnected.
+         */
+        encryptedConfig: null,
+
+        lastSyncedAt: null,
+      },
+
+      select: this.publicSelect(),
+    });
+  }
+
+  async sync(workspaceId: string, mobileAppId: string): Promise<MobileTelemetrySnapshot> {
+    const mobileApp = await this.mobileApps.findOne(workspaceId, mobileAppId);
+
+    const integration = await this.requireIntegration(workspaceId, mobileAppId);
+
+    if (integration.status === MobileTelemetryStatus.DISCONNECTED) {
+      throw new BadRequestException('Telemetry integration is disconnected.');
+    }
+
+    if (!integration.encryptedConfig) {
+      throw new BadRequestException('Telemetry credentials are not configured.');
+    }
+
+    const config = this.secrets.decrypt(integration.encryptedConfig);
+
+    const adapter = this.registry.get(integration.provider);
+
+    try {
+      const [crashes, performance, versions] = await this.withRetry(
+        async () =>
+          Promise.all([
+            adapter.getCrashes({
+              externalProjectId: integration.externalProjectId,
+              config,
+            }),
+
+            adapter.getPerformance({
+              externalProjectId: integration.externalProjectId,
+              config,
+            }),
+
+            adapter.getVersions({
+              externalProjectId: integration.externalProjectId,
+              config,
+            }),
+          ]),
+        3,
+      );
+
+      const now = new Date();
+
+      await this.persistPerformanceSnapshot({
+        workspaceId,
+        mobileAppId,
+
+        platform: mobileApp.platform,
+
+        currentVersion: mobileApp.currentVersion,
+        currentBuildNumber: mobileApp.currentBuildNumber,
+
+        crashes,
+        performance,
+        versions,
+
+        collectedAt: now,
+      });
+
+      await this.prisma.mobileTelemetryIntegration.update({
+        where: {
+          id: integration.id,
+        },
+
+        data: {
+          status: MobileTelemetryStatus.CONNECTED,
+
+          lastSyncedAt: now,
+        },
+      });
+
+      return {
+        provider: integration.provider,
+
+        collectedAt: now.toISOString(),
+
+        crashes,
+        performance,
+        versions,
+      };
+    } catch {
+      await this.prisma.mobileTelemetryIntegration.update({
+        where: {
+          id: integration.id,
+        },
+
+        data: {
+          status: MobileTelemetryStatus.ERROR,
+        },
+      });
+
+      throw new BadGatewayException('Telemetry provider synchronization failed.');
+    }
+  }
+
+  private async requireIntegration(workspaceId: string, mobileAppId: string) {
+    await this.mobileApps.findOne(workspaceId, mobileAppId);
+
+    const integration = await this.prisma.mobileTelemetryIntegration.findFirst({
+      where: {
+        workspaceId,
+        mobileAppId,
+      },
+    });
+
+    if (!integration) {
+      throw new NotFoundException('Telemetry integration not found.');
+    }
+
+    return integration;
+  }
+
+  private async persistPerformanceSnapshot(input: {
+    workspaceId: string;
+    mobileAppId: string;
+
+    platform: MobilePlatform;
+
+    currentVersion?: string | null;
+    currentBuildNumber?: string | null;
+
+    crashes: unknown;
+    performance: unknown;
+    versions: unknown[];
+
+    collectedAt: Date;
+  }): Promise<void> {
+    const crashes = this.asRecord(input.crashes);
+
+    const performance = this.asRecord(input.performance);
+
+    const firstVersion = this.asRecord(input.versions[0]);
+
+    const version = this.text(input.currentVersion) ?? this.text(firstVersion.version) ?? 'unknown';
+
+    const buildNumber = this.text(input.currentBuildNumber) ?? this.text(firstVersion.buildNumber);
+
+    const crashFreeUsersRate = this.number(crashes.crashFreeUsersRate);
+
+    const explicitCrashRate = this.number(crashes.crashRate);
+
+    const crashRate = explicitCrashRate ?? (crashFreeUsersRate === null ? null : Math.max(0, Math.min(100, 100 - crashFreeUsersRate)));
+
+    const rows: Array<{
+      metric: MobilePerformanceMetricType;
+      value: number;
+    }> = [];
+
+    const add = (metric: MobilePerformanceMetricType, value: number | null) => {
+      if (value !== null) {
+        rows.push({
+          metric,
+          value,
+        });
+      }
+    };
+
+    add(MobilePerformanceMetricType.CRASH_FREE_USERS_RATE, crashFreeUsersRate);
+
+    add(MobilePerformanceMetricType.CRASH_RATE, crashRate);
+
+    add(MobilePerformanceMetricType.CRASH_COUNT, this.number(crashes.crashCount));
+
+    add(MobilePerformanceMetricType.ANR_COUNT, this.number(crashes.anrCount));
+
+    add(MobilePerformanceMetricType.HANG_COUNT, this.number(crashes.hangCount));
+
+    add(MobilePerformanceMetricType.COLD_STARTUP_MS, this.number(performance.coldStartupMs));
+
+    add(MobilePerformanceMetricType.WARM_STARTUP_MS, this.number(performance.warmStartupMs));
+
+    add(MobilePerformanceMetricType.MEMORY_MB, this.number(performance.memoryMb));
+
+    add(MobilePerformanceMetricType.NETWORK_LATENCY_MS, this.number(performance.networkLatencyMs));
+
+    add(MobilePerformanceMetricType.API_FAILURE_RATE, this.number(performance.apiFailureRate));
+
+    add(MobilePerformanceMetricType.SLOW_SCREEN_COUNT, this.number(performance.slowScreenCount));
+
+    add(MobilePerformanceMetricType.VERSION_ADOPTION_RATE, this.number(firstVersion.adoptionRate) ?? this.number(performance.versionAdoptionRate));
+
+    if (rows.length === 0) {
+      return;
+    }
+
+    await this.prisma.mobilePerformanceMetric.createMany({
+      data: rows.map((row) => ({
+        workspaceId: input.workspaceId,
+        mobileAppId: input.mobileAppId,
+
+        platform: input.platform,
+
+        version,
+        buildNumber,
+
+        collectedAt: input.collectedAt,
+
+        metric: row.metric,
+        value: row.value,
+      })),
+    });
+  }
+
+  private asRecord(value: unknown): Record<string, unknown> {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return {};
+    }
+
+    return value as Record<string, unknown>;
+  }
+
+  private number(value: unknown): number | null {
+    return typeof value === 'number' && Number.isFinite(value) ? value : null;
+  }
+
+  private text(value: unknown): string | null {
+    if (typeof value !== 'string') {
+      return null;
+    }
+
+    const normalized = value.trim();
+
+    return normalized || null;
+  }
+
+  private async withRetry<T>(
+    operation: () => Promise<T>,
+
+    attempts: number,
+  ): Promise<T> {
+    let lastError: unknown;
+
+    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+      try {
+        return await operation();
+      } catch (error) {
+        lastError = error;
+
+        if (attempt < attempts) {
+          await new Promise((resolve) => setTimeout(resolve, 10));
+        }
+      }
+    }
+
+    throw lastError;
+  }
+
+  private publicSelect() {
+    return {
+      id: true,
+      workspaceId: true,
+      mobileAppId: true,
+
+      provider: true,
+      status: true,
+
+      externalProjectId: true,
+
+      configuredAt: true,
+      lastSyncedAt: true,
+
+      createdAt: true,
+      updatedAt: true,
+    } as const;
+  }
+}
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\telemetry\mobile-telemetry-provider.interface.ts ---
+import type { NormalizedMobileCrashTelemetry, NormalizedMobilePerformanceTelemetry, NormalizedMobileTelemetryVersion } from '@command-center/shared-types';
+import type { MobilePlatform, MobileTelemetryProvider } from 'src/generated/prisma/enums';
+
+export interface MobileTelemetryProviderContext {
+  externalProjectId: string;
+  config: Record<string, string>;
+  from?: string | Date;
+  to?: string | Date;
+  version?: string;
+  buildNumber?: string;
+  platform?: MobilePlatform;
+}
+
+export interface MobileTelemetryProviderAdapter {
+  readonly provider: MobileTelemetryProvider;
+
+  validateConfig(config: Record<string, string>): void;
+
+  getCrashes(context: MobileTelemetryProviderContext): Promise<NormalizedMobileCrashTelemetry>;
+
+  getPerformance(context: MobileTelemetryProviderContext): Promise<NormalizedMobilePerformanceTelemetry>;
+
+  getVersions(context: MobileTelemetryProviderContext): Promise<NormalizedMobileTelemetryVersion[]>;
+}
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\telemetry\mobile-telemetry-provider.registry.ts ---
+import type { MobileTelemetryProviderAdapter } from './mobile-telemetry-provider.interface';
+import { CustomMobileTelemetryProvider } from './providers/custom-mobile-telemetry.provider';
+import { DatadogMobileTelemetryProvider } from './providers/datadog-mobile-telemetry.provider';
+import { FirebaseMobileTelemetryProvider } from './providers/firebase-mobile-telemetry.provider';
+import { NewRelicMobileTelemetryProvider } from './providers/new-relic-mobile-telemetry.provider';
+import { SentryMobileTelemetryProvider } from './providers/sentry-mobile-telemetry.provider';
+import { Injectable } from '@nestjs/common';
+import { MobileTelemetryProvider } from 'src/generated/prisma/enums';
+
+@Injectable()
+export class MobileTelemetryProviderRegistry {
+  private readonly providers: Map<MobileTelemetryProvider, MobileTelemetryProviderAdapter>;
+
+  constructor(
+    firebase: FirebaseMobileTelemetryProvider,
+    sentry: SentryMobileTelemetryProvider,
+    datadog: DatadogMobileTelemetryProvider,
+    newRelic: NewRelicMobileTelemetryProvider,
+    custom: CustomMobileTelemetryProvider,
+  ) {
+    this.providers = new Map<MobileTelemetryProvider, MobileTelemetryProviderAdapter>([
+      [MobileTelemetryProvider.FIREBASE, firebase],
+      [MobileTelemetryProvider.SENTRY, sentry],
+      [MobileTelemetryProvider.DATADOG, datadog],
+      [MobileTelemetryProvider.NEW_RELIC, newRelic],
+      [MobileTelemetryProvider.CUSTOM, custom],
+    ]);
+  }
+
+  get(provider: MobileTelemetryProvider): MobileTelemetryProviderAdapter {
+    const adapter = this.providers.get(provider);
+
+    if (!adapter) {
+      throw new Error(`Unsupported mobile telemetry provider: ${provider}`);
+    }
+
+    return adapter;
+  }
+
+  registerForTesting(provider: MobileTelemetryProvider, adapter: MobileTelemetryProviderAdapter): void {
+    if (process.env.NODE_ENV !== 'test') {
+      throw new Error('registerForTesting is only available in test mode');
+    }
+
+    this.providers.set(provider, adapter);
+  }
+}
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\telemetry\mobile-telemetry-secret.service.ts ---
+import { Injectable } from '@nestjs/common';
+import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
+
+interface EncryptedPayload {
+  iv: string;
+  tag: string;
+  data: string;
+}
+
+@Injectable()
+export class MobileTelemetrySecretService {
+  encrypt(config: Record<string, string>): string {
+    const key = this.key();
+    const iv = randomBytes(12);
+
+    const cipher = createCipheriv('aes-256-gcm', key, iv);
+
+    const encrypted = Buffer.concat([cipher.update(JSON.stringify(config), 'utf8'), cipher.final()]);
+
+    const payload: EncryptedPayload = {
+      iv: iv.toString('base64'),
+      tag: cipher.getAuthTag().toString('base64'),
+      data: encrypted.toString('base64'),
+    };
+
+    return Buffer.from(JSON.stringify(payload), 'utf8').toString('base64');
+  }
+
+  decrypt(value: string): Record<string, string> {
+    const payload = JSON.parse(Buffer.from(value, 'base64').toString('utf8')) as EncryptedPayload;
+
+    const decipher = createDecipheriv('aes-256-gcm', this.key(), Buffer.from(payload.iv, 'base64'));
+
+    decipher.setAuthTag(Buffer.from(payload.tag, 'base64'));
+
+    const decrypted = Buffer.concat([decipher.update(Buffer.from(payload.data, 'base64')), decipher.final()]);
+
+    const result = JSON.parse(decrypted.toString('utf8')) as unknown;
+
+    if (!result || typeof result !== 'object' || Array.isArray(result)) {
+      throw new Error('Invalid decrypted telemetry configuration');
+    }
+
+    const normalized: Record<string, string> = {};
+
+    for (const [key, entry] of Object.entries(result)) {
+      if (typeof entry !== 'string') {
+        throw new Error('Telemetry configuration contains a non-string value');
+      }
+
+      normalized[key] = entry;
+    }
+
+    return normalized;
+  }
+
+  private key(): Buffer {
+    const encoded = process.env.MOBILE_TELEMETRY_ENCRYPTION_KEY;
+
+    if (!encoded) {
+      throw new Error('MOBILE_TELEMETRY_ENCRYPTION_KEY is required');
+    }
+
+    const key = Buffer.from(encoded, 'base64');
+
+    if (key.length !== 32) {
+      throw new Error('MOBILE_TELEMETRY_ENCRYPTION_KEY must decode to exactly 32 bytes');
+    }
+
+    return key;
+  }
+}
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\telemetry\providers\custom-mobile-telemetry.provider.ts ---
+import { MobileProviderSecurityService } from '../../security/mobile-provider-security.service';
+import type { MobileTelemetryProviderAdapter, MobileTelemetryProviderContext } from '../mobile-telemetry-provider.interface';
+import { ProviderHttpService } from '../provider-http.service';
+import type { NormalizedMobileCrashTelemetry, NormalizedMobilePerformanceTelemetry, NormalizedMobileTelemetryVersion } from '@command-center/shared-types';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { MobileTelemetryProvider } from 'src/generated/prisma/enums';
+
+@Injectable()
+export class CustomMobileTelemetryProvider implements MobileTelemetryProviderAdapter {
+  readonly provider = MobileTelemetryProvider.CUSTOM;
+
+  constructor(
+    private readonly http: ProviderHttpService,
+
+    private readonly security: MobileProviderSecurityService,
+  ) {}
+
+  validateConfig(config: Record<string, string>) {
+    if (!config.baseUrl || !config.token) {
+      throw new BadRequestException('Custom provider requires baseUrl and token.');
+    }
+
+    this.security.assertCustomBaseUrl(config.baseUrl);
+  }
+
+  async getCrashes(context: MobileTelemetryProviderContext) {
+    return this.get<NormalizedMobileCrashTelemetry>(context, '/v1/mobile/crashes');
+  }
+
+  async getPerformance(context: MobileTelemetryProviderContext) {
+    return this.get<NormalizedMobilePerformanceTelemetry>(context, '/v1/mobile/performance');
+  }
+
+  async getVersions(context: MobileTelemetryProviderContext) {
+    return this.get<NormalizedMobileTelemetryVersion[]>(context, '/v1/mobile/versions');
+  }
+
+  private async get<T>(
+    context: MobileTelemetryProviderContext,
+
+    path: string,
+  ): Promise<T> {
+    const baseUrl = context.config.baseUrl;
+
+    if (!baseUrl) {
+      throw new Error('Custom telemetry baseUrl is required');
+    }
+
+    const base = this.security.assertCustomBaseUrl(baseUrl);
+
+    const url = new URL(path, base);
+
+    url.searchParams.set('projectId', context.externalProjectId);
+
+    return this.http.json<T>(
+      url,
+
+      {
+        headers: {
+          authorization: `Bearer ${context.config.token}`,
+        },
+      },
+    );
+  }
+}
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\telemetry\providers\datadog-mobile-telemetry.provider.ts ---
+import type { MobileTelemetryProviderAdapter, MobileTelemetryProviderContext } from '../mobile-telemetry-provider.interface';
+import { ProviderHttpService } from '../provider-http.service';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { MobileTelemetryProvider } from 'src/generated/prisma/enums';
+
+interface DatadogEvent {
+  attributes?: {
+    attributes?: Record<string, unknown>;
+  };
+}
+
+interface DatadogSearchResponse {
+  data?: DatadogEvent[];
+
+  links?: {
+    next?: string;
+  };
+}
+
+@Injectable()
+export class DatadogMobileTelemetryProvider implements MobileTelemetryProviderAdapter {
+  readonly provider = MobileTelemetryProvider.DATADOG;
+
+  constructor(private readonly http: ProviderHttpService) {}
+
+  validateConfig(config: Record<string, string>) {
+    for (const key of ['apiKey', 'appKey']) {
+      if (!config[key]) {
+        throw new BadRequestException(`Missing telemetry configuration: ${key}`);
+      }
+    }
+
+    this.baseUrl(config.site ?? 'datadoghq.com');
+  }
+
+  async getCrashes(context: MobileTelemetryProviderContext) {
+    const applicationId = context.externalProjectId;
+
+    const [errors, sessions] = await Promise.all([
+      this.search(
+        context.config,
+
+        `@type:error @application.id:${applicationId}`,
+      ),
+
+      this.search(
+        context.config,
+
+        `@type:session @application.id:${applicationId}`,
+      ),
+    ]);
+
+    const affected = new Set<string>();
+
+    for (const event of errors) {
+      const value = this.firstString(event, ['session.id', 'usr.id', 'user.id']);
+
+      if (value) {
+        affected.add(value);
+      }
+    }
+
+    const sessionsIds = new Set<string>();
+
+    for (const event of sessions) {
+      const value = this.firstString(event, ['session.id']);
+
+      if (value) {
+        sessionsIds.add(value);
+      }
+    }
+
+    const crashFree = sessionsIds.size > 0 ? Math.max(0, (1 - affected.size / sessionsIds.size) * 100) : null;
+
+    return {
+      crashCount: errors.length,
+
+      affectedUsers: affected.size || null,
+
+      crashFreeUsersRate: crashFree,
+    };
+  }
+
+  async getPerformance(context: MobileTelemetryProviderContext) {
+    const applicationId = context.externalProjectId;
+
+    const [views, resources] = await Promise.all([
+      this.search(
+        context.config,
+
+        `@type:view @application.id:${applicationId}`,
+      ),
+
+      this.search(
+        context.config,
+
+        `@type:resource @application.id:${applicationId}`,
+      ),
+    ]);
+
+    const scale = Number(context.config.durationScale ?? '1000000');
+
+    const network = resources
+      .map((event) => this.firstNumber(event, ['resource.duration', 'duration']))
+      .filter((item): item is number => item !== null)
+      .map((item) => item / scale);
+
+    const coldPath = context.config.coldStartupAttribute;
+
+    const warmPath = context.config.warmStartupAttribute;
+
+    const memoryPath = context.config.memoryAttribute;
+
+    return {
+      coldStartupMs: coldPath ? this.average(views.map((event) => this.numberAt(event, coldPath)).filter((value): value is number => value !== null)) : null,
+
+      warmStartupMs: warmPath ? this.average(views.map((event) => this.numberAt(event, warmPath)).filter((value): value is number => value !== null)) : null,
+
+      memoryMb: memoryPath ? this.average(views.map((event) => this.numberAt(event, memoryPath)).filter((value): value is number => value !== null)) : null,
+
+      networkLatencyMs: this.average(network),
+    };
+  }
+
+  async getVersions(context: MobileTelemetryProviderContext) {
+    const sessions = await this.search(
+      context.config,
+
+      `@type:session @application.id:${context.externalProjectId}`,
+    );
+
+    const grouped = new Map<
+      string,
+      {
+        buildNumber: string | null;
+
+        users: Set<string>;
+      }
+    >();
+
+    for (const event of sessions) {
+      const version = this.firstString(event, ['version', 'application.version', 'app.version']);
+
+      if (!version) {
+        continue;
+      }
+
+      const item = grouped.get(version) ?? {
+        buildNumber: this.firstString(event, ['application.build', 'app.build']),
+
+        users: new Set<string>(),
+      };
+
+      const user = this.firstString(event, ['usr.id', 'user.id', 'session.id']);
+
+      if (user) {
+        item.users.add(user);
+      }
+
+      grouped.set(version, item);
+    }
+
+    return [...grouped.entries()].map(([version, data]) => ({
+      version,
+
+      buildNumber: data.buildNumber,
+
+      activeUsers: data.users.size || null,
+    }));
+  }
+
+  private async search(
+    config: Record<string, string>,
+
+    query: string,
+  ): Promise<DatadogEvent[]> {
+    const base = this.baseUrl(config.site ?? 'datadoghq.com');
+
+    let url = `${base}/api/v2/rum/events/search`;
+
+    const results: DatadogEvent[] = [];
+
+    for (let page = 0; page < 5; page += 1) {
+      const response = await this.http.json<DatadogSearchResponse>(
+        url,
+
+        {
+          method: 'POST',
+
+          headers: {
+            'DD-API-KEY': config.apiKey!,
+
+            'DD-APPLICATION-KEY': config.appKey!,
+          },
+
+          body: JSON.stringify({
+            filter: {
+              from: 'now-24h',
+
+              to: 'now',
+
+              query,
+            },
+
+            page: {
+              limit: 1000,
+            },
+
+            sort: '-timestamp',
+          }),
+        },
+      );
+
+      results.push(...(response.data ?? []));
+
+      if (!response.links?.next) {
+        break;
+      }
+
+      const next = new URL(response.links.next);
+
+      if (next.origin !== new URL(base).origin) {
+        throw new Error('Invalid Datadog pagination host.');
+      }
+
+      url = next.toString();
+    }
+
+    return results;
+  }
+
+  private baseUrl(site: string) {
+    const allowed = new Set([
+      'datadoghq.com',
+      'datadoghq.eu',
+      'us3.datadoghq.com',
+      'us5.datadoghq.com',
+      'ap1.datadoghq.com',
+      'ap2.datadoghq.com',
+      'uk1.datadoghq.com',
+      'ddog-gov.com',
+      'us2.ddog-gov.com',
+    ]);
+
+    if (!allowed.has(site)) {
+      throw new BadRequestException('Unsupported Datadog site.');
+    }
+
+    return `https://api.${site}`;
+  }
+
+  private attributes(event: DatadogEvent) {
+    return event.attributes?.attributes ?? {};
+  }
+
+  private numberAt(
+    event: DatadogEvent,
+
+    path: string,
+  ): number | null {
+    const value = this.getPath(this.attributes(event), path);
+
+    const number = Number(value);
+
+    return Number.isFinite(number) ? number : null;
+  }
+
+  private firstNumber(
+    event: DatadogEvent,
+
+    paths: string[],
+  ) {
+    for (const path of paths) {
+      const value = this.numberAt(event, path);
+
+      if (value !== null) {
+        return value;
+      }
+    }
+
+    return null;
+  }
+
+  private firstString(
+    event: DatadogEvent,
+
+    paths: string[],
+  ) {
+    for (const path of paths) {
+      const value = this.getPath(this.attributes(event), path);
+
+      if (typeof value === 'string' && value) {
+        return value;
+      }
+    }
+
+    return null;
+  }
+
+  private getPath(input: unknown, path: string): unknown {
+    return path.split('.').reduce<unknown>((value, key) => {
+      if (!value || typeof value !== 'object') {
+        return undefined;
+      }
+
+      return (value as Record<string, unknown>)[key];
+    }, input);
+  }
+
+  private average(values: number[]) {
+    if (values.length === 0) {
+      return null;
+    }
+
+    return values.reduce((total, value) => total + value, 0) / values.length;
+  }
+}
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\telemetry\providers\firebase-mobile-telemetry.provider.ts ---
+import type { MobileTelemetryProviderAdapter, MobileTelemetryProviderContext } from '../mobile-telemetry-provider.interface';
+import { ProviderHttpService } from '../provider-http.service';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { GoogleAuth } from 'google-auth-library';
+import { MobileTelemetryProvider } from 'src/generated/prisma/enums';
+
+interface CloudLogEntry {
+  jsonPayload?: Record<string, unknown>;
+}
+
+interface ListLogEntriesResponse {
+  entries?: CloudLogEntry[];
+
+  nextPageToken?: string;
+}
+
+@Injectable()
+export class FirebaseMobileTelemetryProvider implements MobileTelemetryProviderAdapter {
+  readonly provider = MobileTelemetryProvider.FIREBASE;
+
+  constructor(private readonly http: ProviderHttpService) {}
+
+  validateConfig(config: Record<string, string>) {
+    if (!config.appId) {
+      throw new BadRequestException('Firebase appId is required.');
+    }
+
+    if (config.serviceAccountJson) {
+      try {
+        JSON.parse(config.serviceAccountJson);
+      } catch {
+        throw new BadRequestException('Firebase serviceAccountJson is invalid JSON.');
+      }
+    }
+  }
+
+  async getCrashes(context: MobileTelemetryProviderContext) {
+    const [crashes, sessions] = await Promise.all([
+      this.entries(
+        context,
+
+        `
+logName="projects/${context.externalProjectId}/logs/firebasecrashlytics.googleapis.com%2Fevents"
+jsonPayload.name:"/apps/${context.config.appId}/"
+jsonPayload.issue.errorType="FATAL"
+          `.trim(),
+      ),
+
+      this.entries(
+        context,
+
+        `
+logName="projects/${context.externalProjectId}/logs/firebasecrashlytics.googleapis.com%2Fsession_events"
+jsonPayload.name:"/apps/${context.config.appId}/"
+          `.trim(),
+      ),
+    ]);
+
+    const crashSessions = new Set<string>();
+
+    for (const entry of crashes) {
+      const id = this.stringAt(entry.jsonPayload, 'sessionId');
+
+      if (id) {
+        crashSessions.add(id);
+      }
+    }
+
+    const allSessions = new Set<string>();
+
+    for (const entry of sessions) {
+      const id = this.stringAt(entry.jsonPayload, 'sessionId');
+
+      if (id) {
+        allSessions.add(id);
+      }
+    }
+
+    return {
+      crashCount: crashes.length,
+
+      affectedUsers: crashSessions.size || null,
+
+      crashFreeUsersRate: allSessions.size > 0 ? Math.max(0, (1 - crashSessions.size / allSessions.size) * 100) : null,
+    };
+  }
+
+  async getPerformance(_context: MobileTelemetryProviderContext) {
+    void _context;
+    await Promise.resolve();
+    /*
+     * Firebase Performance Monitoring's public
+     * documentation does not expose a general
+     * read API equivalent to Datadog RUM or
+     * New Relic NRQL.
+     *
+     * Never fabricate values.
+     */
+    return {
+      coldStartupMs: null,
+
+      warmStartupMs: null,
+
+      memoryMb: null,
+
+      networkLatencyMs: null,
+    };
+  }
+
+  async getVersions(context: MobileTelemetryProviderContext) {
+    const entries = await this.entries(
+      context,
+
+      `
+logName="projects/${context.externalProjectId}/logs/firebasecrashlytics.googleapis.com%2Fevents"
+jsonPayload.name:"/apps/${context.config.appId}/"
+        `.trim(),
+    );
+
+    const versions = new Map<
+      string,
+      {
+        build: string | null;
+
+        sessions: Set<string>;
+      }
+    >();
+
+    for (const entry of entries) {
+      const payload = entry.jsonPayload;
+
+      const version = this.stringAt(payload, 'version.displayVersion');
+
+      if (!version) {
+        continue;
+      }
+
+      const current = versions.get(version) ?? {
+        build: this.stringAt(payload, 'version.buildVersion'),
+
+        sessions: new Set<string>(),
+      };
+
+      const session = this.stringAt(payload, 'sessionId');
+
+      if (session) {
+        current.sessions.add(session);
+      }
+
+      versions.set(version, current);
+    }
+
+    return [...versions.entries()].map(([version, data]) => ({
+      version,
+
+      buildNumber: data.build,
+
+      activeUsers: null,
+    }));
+  }
+
+  private async entries(
+    context: MobileTelemetryProviderContext,
+
+    baseFilter: string,
+  ) {
+    const token = await this.token(context.config);
+
+    const after = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+    const filter = `${baseFilter}\ntimestamp>="${after}"`;
+
+    const result: CloudLogEntry[] = [];
+
+    let pageToken: string | undefined;
+
+    for (let page = 0; page < 5; page += 1) {
+      const response = await this.http.json<ListLogEntriesResponse>(
+        'https://logging.googleapis.com/v2/entries:list',
+
+        {
+          method: 'POST',
+
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+
+          body: JSON.stringify({
+            resourceNames: [`projects/${context.externalProjectId}`],
+
+            filter,
+
+            orderBy: 'timestamp desc',
+
+            pageSize: 1000,
+
+            ...(pageToken
+              ? {
+                  pageToken,
+                }
+              : {}),
+          }),
+        },
+      );
+
+      result.push(...(response.entries ?? []));
+
+      pageToken = response.nextPageToken;
+
+      if (!pageToken) {
+        break;
+      }
+    }
+
+    return result;
+  }
+
+  private async token(config: Record<string, string>) {
+    let credentials: Record<string, unknown> | undefined;
+
+    if (config.serviceAccountJson) {
+      credentials = JSON.parse(config.serviceAccountJson) as Record<string, unknown>;
+    }
+
+    const auth = new GoogleAuth({
+      ...(credentials
+        ? {
+            credentials,
+          }
+        : {}),
+
+      scopes: ['https://www.googleapis.com/auth/logging.read'],
+    });
+
+    const client = await auth.getClient();
+
+    const token = await client.getAccessToken();
+
+    if (!token.token) {
+      throw new Error('Unable to obtain Google access token.');
+    }
+
+    return token.token;
+  }
+
+  private stringAt(
+    input: Record<string, unknown> | undefined,
+
+    path: string,
+  ): string | null {
+    let value: unknown = input;
+
+    for (const key of path.split('.')) {
+      if (!value || typeof value !== 'object') {
+        return null;
+      }
+
+      value = (value as Record<string, unknown>)[key];
+    }
+
+    return typeof value === 'string'
+      ? value
+      : value === undefined || value === null
+        ? null
+        : typeof value === 'string'
+          ? value
+          : (JSON.stringify(value) ?? '[unserializable]');
+  }
+}
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\telemetry\providers\foundation-mobile-telemetry.provider.ts ---
+import { InternalServerErrorException, Injectable } from '@nestjs/common';
+import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
+
+@Injectable()
+export class MobileTelemetrySecretService {
+  encrypt(value: Record<string, string>): string {
+    const key = this.getKey();
+
+    const iv = randomBytes(12);
+
+    const cipher = createCipheriv('aes-256-gcm', key, iv);
+
+    const encrypted = Buffer.concat([cipher.update(JSON.stringify(value), 'utf8'), cipher.final()]);
+
+    const tag = cipher.getAuthTag();
+
+    return ['v1', iv.toString('base64'), tag.toString('base64'), encrypted.toString('base64')].join('.');
+  }
+
+  decrypt(value: string): Record<string, string> {
+    const [version, ivEncoded, tagEncoded, encryptedEncoded] = value.split('.');
+
+    if (version !== 'v1' || !ivEncoded || !tagEncoded || !encryptedEncoded) {
+      throw new InternalServerErrorException('Invalid telemetry secret payload.');
+    }
+
+    try {
+      const decipher = createDecipheriv('aes-256-gcm', this.getKey(), Buffer.from(ivEncoded, 'base64'));
+
+      decipher.setAuthTag(Buffer.from(tagEncoded, 'base64'));
+
+      const decrypted = Buffer.concat([decipher.update(Buffer.from(encryptedEncoded, 'base64')), decipher.final()]).toString('utf8');
+
+      return JSON.parse(decrypted) as Record<string, string>;
+    } catch {
+      throw new InternalServerErrorException('Unable to decrypt telemetry configuration.');
+    }
+  }
+
+  private getKey(): Buffer {
+    const encoded = process.env.MOBILE_TELEMETRY_ENCRYPTION_KEY;
+
+    if (!encoded) {
+      throw new InternalServerErrorException('MOBILE_TELEMETRY_ENCRYPTION_KEY is not configured.');
+    }
+
+    const key = Buffer.from(encoded, 'base64');
+
+    if (key.length !== 32) {
+      throw new InternalServerErrorException('MOBILE_TELEMETRY_ENCRYPTION_KEY must decode to exactly 32 bytes.');
+    }
+
+    return key;
+  }
+}
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\telemetry\providers\new-relic-mobile-telemetry.provider.ts ---
+import type { MobileTelemetryProviderAdapter, MobileTelemetryProviderContext } from '../mobile-telemetry-provider.interface';
+import { ProviderHttpService } from '../provider-http.service';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { MobileTelemetryProvider } from 'src/generated/prisma/enums';
+
+interface NerdGraphResponse {
+  data?: {
+    actor?: {
+      account?: {
+        nrql?: {
+          results?: Array<Record<string, unknown>>;
+        };
+      };
+    };
+  };
+
+  errors?: unknown[];
+}
+
+@Injectable()
+export class NewRelicMobileTelemetryProvider implements MobileTelemetryProviderAdapter {
+  readonly provider = MobileTelemetryProvider.NEW_RELIC;
+
+  constructor(private readonly http: ProviderHttpService) {}
+
+  validateConfig(config: Record<string, string>) {
+    if (!config.apiKey) {
+      throw new BadRequestException('Missing telemetry configuration: apiKey');
+    }
+
+    if (!/^\d+$/.test(config.accountId ?? '')) {
+      throw new BadRequestException('New Relic accountId must be numeric.');
+    }
+
+    if (!/^\d+$/.test(config.appId ?? '')) {
+      throw new BadRequestException('New Relic appId must be numeric.');
+    }
+
+    const region = config.region ?? 'US';
+
+    if (!['US', 'EU', 'JP'].includes(region)) {
+      throw new BadRequestException('New Relic region must be US, EU, or JP.');
+    }
+  }
+
+  async getCrashes(context: MobileTelemetryProviderContext) {
+    const { appId } = context.config;
+
+    const crash = await this.nrql(
+      context.config,
+
+      `
+SELECT count(*) AS crashCount,
+       uniqueCount(sessionId) AS affectedUsers
+FROM MobileCrash
+WHERE appId = '${appId}'
+SINCE 1 day ago
+        `.trim(),
+    );
+
+    const rate = await this.nrql(
+      context.config,
+
+      `
+SELECT percentage(
+  uniqueCount(sessionId),
+  WHERE category = 'Crash'
+) AS crashRate
+FROM MobileSession, MobileCrash
+WHERE appId = '${appId}'
+SINCE 1 day ago
+        `.trim(),
+    );
+
+    const crashRate = this.number(rate[0]?.crashRate);
+
+    return {
+      crashCount: this.number(crash[0]?.crashCount) ?? 0,
+
+      affectedUsers: this.number(crash[0]?.affectedUsers),
+
+      crashFreeUsersRate: crashRate === null ? null : Math.max(0, 100 - crashRate),
+    };
+  }
+
+  async getPerformance(context: MobileTelemetryProviderContext) {
+    const appId = context.config.appId!;
+
+    const sessions = await this.nrql(
+      context.config,
+
+      `
+SELECT average(memUsageMb) AS memoryMb
+FROM MobileSession
+WHERE appId = '${appId}'
+SINCE 1 day ago
+        `.trim(),
+    );
+
+    const requests = await this.nrql(
+      context.config,
+
+      `
+SELECT average(duration) AS networkLatencySeconds
+FROM MobileRequest
+WHERE appId = '${appId}'
+SINCE 1 day ago
+        `.trim(),
+    );
+
+    const networkSeconds = this.number(requests[0]?.networkLatencySeconds);
+
+    return {
+      /*
+       * Do not map an unrelated New Relic metric to
+       * startup time. Phase 12/13 can enrich startup
+       * separately if your instrumentation reports it.
+       */
+      coldStartupMs: null,
+
+      warmStartupMs: null,
+
+      memoryMb: this.number(sessions[0]?.memoryMb),
+
+      networkLatencyMs: networkSeconds === null ? null : networkSeconds * 1000,
+    };
+  }
+
+  async getVersions(context: MobileTelemetryProviderContext) {
+    const rows = await this.nrql(
+      context.config,
+
+      `
+SELECT uniqueCount(uuid) AS activeUsers
+FROM MobileSession
+WHERE appId = '${context.config.appId}'
+FACET appVersion, appBuild
+SINCE 7 days ago
+LIMIT MAX
+        `.trim(),
+    );
+
+    return rows
+      .map((row) => {
+        const facet = row.facet;
+
+        const values = Array.isArray(facet) ? facet : [facet];
+
+        const version = typeof values[0] === 'string' ? values[0] : null;
+
+        if (!version) {
+          return null;
+        }
+
+        return {
+          version,
+
+          buildNumber: values[1] === undefined || values[1] === null ? null : String(values[1]),
+
+          activeUsers: this.number(row.activeUsers),
+        };
+      })
+      .filter(
+        (
+          row,
+        ): row is {
+          version: string;
+
+          buildNumber: string | null;
+
+          activeUsers: number | null;
+        } => row !== null,
+      );
+  }
+
+  private async nrql(
+    config: Record<string, string>,
+
+    nrql: string,
+  ) {
+    const accountId = Number(config.accountId);
+
+    const endpoint = this.endpoint(config.region ?? 'US');
+
+    const response = await this.http.json<NerdGraphResponse>(
+      endpoint,
+
+      {
+        method: 'POST',
+
+        headers: {
+          'API-Key': config.apiKey!,
+        },
+
+        body: JSON.stringify({
+          query: `
+query MobileTelemetry($accountId: Int!, $nrql: Nrql!) {
+  actor {
+    account(id: $accountId) {
+      nrql(query: $nrql) {
+        results
+      }
+    }
+  }
+}
+              `.trim(),
+
+          variables: {
+            accountId,
+            nrql,
+          },
+        }),
+      },
+    );
+
+    if (response.errors?.length) {
+      throw new Error('New Relic query failed.');
+    }
+
+    return response.data?.actor?.account?.nrql?.results ?? [];
+  }
+
+  private endpoint(region: string) {
+    if (region === 'EU') {
+      return 'https://api.eu.newrelic.com/graphql';
+    }
+
+    if (region === 'JP') {
+      return 'https://api.jp.newrelic.com/graphql';
+    }
+
+    return 'https://api.newrelic.com/graphql';
+  }
+
+  private number(value: unknown): number | null {
+    const parsed = Number(value);
+
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+}
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\telemetry\providers\sentry-mobile-telemetry.provider.ts ---
+import type { MobileTelemetryProviderAdapter, MobileTelemetryProviderContext } from '../mobile-telemetry-provider.interface';
+import { ProviderHttpService } from '../provider-http.service';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { MobileTelemetryProvider } from 'src/generated/prisma/enums';
+
+interface SentryExploreResponse {
+  data: Array<Record<string, unknown>>;
+}
+
+@Injectable()
+export class SentryMobileTelemetryProvider implements MobileTelemetryProviderAdapter {
+  readonly provider = MobileTelemetryProvider.SENTRY;
+
+  constructor(private readonly http: ProviderHttpService) {}
+
+  validateConfig(config: Record<string, string>): void {
+    this.required(config, 'authToken');
+
+    this.slug(config.organizationSlug, 'organizationSlug');
+
+    this.slug(config.projectSlug, 'projectSlug');
+  }
+
+  async getCrashes(context: MobileTelemetryProviderContext) {
+    const config = context.config;
+
+    const result = await this.explore(
+      config,
+
+      'errors',
+
+      ['count()'],
+
+      'error.unhandled:true',
+    );
+
+    const crashCount = this.number(result.data[0]?.['count()']) ?? 0;
+
+    return {
+      crashCount,
+
+      affectedUsers: null,
+
+      /*
+       * Sentry's generic errors query does not give
+       * us a reliable cross-SDK crash-free-user
+       * denominator here.
+       */
+      crashFreeUsersRate: null,
+    };
+  }
+
+  async getPerformance(_context: MobileTelemetryProviderContext) {
+    void _context;
+    await Promise.resolve();
+    /*
+     * Performance/span semantics depend on
+     * the project's Sentry instrumentation.
+     *
+     * Do not fake mobile startup/memory metrics.
+     */
+    return {
+      coldStartupMs: null,
+
+      warmStartupMs: null,
+
+      memoryMb: null,
+
+      networkLatencyMs: null,
+    };
+  }
+
+  async getVersions(context: MobileTelemetryProviderContext) {
+    const result = await this.explore(
+      context.config,
+
+      'errors',
+
+      ['release', 'count()'],
+
+      '',
+    );
+
+    return result.data
+      .map((row) => {
+        const version = typeof row.release === 'string' ? row.release : null;
+
+        if (!version) {
+          return null;
+        }
+
+        return {
+          version,
+
+          buildNumber: null,
+
+          activeUsers: null,
+        };
+      })
+      .filter(
+        (
+          item,
+        ): item is {
+          version: string;
+
+          buildNumber: null;
+
+          activeUsers: null;
+        } => item !== null,
+      );
+  }
+
+  private async explore(
+    config: Record<string, string>,
+
+    dataset: string,
+
+    fields: string[],
+
+    query: string,
+  ): Promise<SentryExploreResponse> {
+    const url = new URL(`https://sentry.io/api/0/organizations/${encodeURIComponent(config.organizationSlug!)}/events/`);
+
+    url.searchParams.set('dataset', dataset);
+
+    url.searchParams.set('statsPeriod', '24h');
+
+    url.searchParams.set('project', config.projectSlug!);
+
+    url.searchParams.set('per_page', '100');
+
+    if (query) {
+      url.searchParams.set('query', query);
+    }
+
+    for (const field of fields) {
+      url.searchParams.append('field', field);
+    }
+
+    return this.http.json<SentryExploreResponse>(
+      url,
+
+      {
+        headers: {
+          authorization: `Bearer ${config.authToken}`,
+        },
+      },
+    );
+  }
+
+  private required(
+    config: Record<string, string>,
+
+    key: string,
+  ) {
+    if (!config[key]?.trim()) {
+      throw new BadRequestException(`Missing telemetry configuration: ${key}`);
+    }
+  }
+
+  private slug(
+    value: string | undefined,
+
+    key: string,
+  ) {
+    if (!value || !/^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/.test(value)) {
+      throw new BadRequestException(`Invalid Sentry ${key}.`);
+    }
+  }
+
+  private number(value: unknown): number | null {
+    const parsed = Number(value);
+
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+}
+
+==================================================
+18. EXISTING DESKTOP API E2E TESTS
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-ai-analysis.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-alerts.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-apps.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-build-artifacts.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-builds.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-foundation.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-full-flow.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-overview.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-performance.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-project-detection.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-releases.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-repository-linking.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-security-health.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-security.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-telemetry.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-tests.e2e-spec.ts
+
+==================================================
+19. CURRENT API TYPECHECK
+==================================================
+$ tsc -p tsconfig.json --noEmit
+src/modules/desktop-apps/controllers/desktop-builds.controller.ts(5,67): error TS2307: Cannot find module '../dto/desktop-build.dto' or its corresponding type declarations.
+src/modules/desktop-apps/controllers/desktop-security.controller.ts(5,43): error TS2307: Cannot find module '../security/desktop-permissions.service' or its corresponding type declarations.
+src/modules/desktop-apps/security/desktop-resource-scope.service.ts(66,9): error TS2353: Object literal may only specify known properties, and 'workspaceId' does not exist in type 'DesktopTestRunWhereInput'.
+src/modules/desktop-apps/services/desktop-alerts.service.ts(297,53): error TS18048: 'current' is possibly 'undefined'.
+src/modules/desktop-apps/services/desktop-alerts.service.ts(298,53): error TS18048: 'previous' is possibly 'undefined'.
+src/modules/desktop-apps/services/desktop-alerts.service.ts(299,53): error TS18048: 'current' is possibly 'undefined'.
+src/modules/desktop-apps/services/desktop-alerts.service.ts(300,53): error TS18048: 'previous' is possibly 'undefined'.
+src/modules/desktop-apps/services/desktop-alerts.service.ts(317,19): error TS18048: 'previous' is possibly 'undefined'.
+src/modules/desktop-apps/services/desktop-alerts.service.ts(317,41): error TS18048: 'current' is possibly 'undefined'.
+src/modules/desktop-apps/services/desktop-alerts.service.ts(318,16): error TS18048: 'current' is possibly 'undefined'.
+src/modules/desktop-apps/services/desktop-alerts.service.ts(319,16): error TS18048: 'current' is possibly 'undefined'.
+src/modules/desktop-apps/services/desktop-alerts.service.ts(320,29): error TS18048: 'current' is possibly 'undefined'.
+src/modules/desktop-apps/services/desktop-alerts.service.ts(322,24): error TS18048: 'previous' is possibly 'undefined'.
+src/modules/desktop-apps/services/desktop-alerts.service.ts(323,22): error TS18048: 'current' is possibly 'undefined'.
+src/modules/desktop-apps/services/desktop-alerts.service.ts(324,22): error TS18048: 'previous' is possibly 'undefined'.
+src/modules/desktop-apps/services/desktop-alerts.service.ts(325,20): error TS18048: 'current' is possibly 'undefined'.
+src/modules/desktop-apps/services/desktop-alerts.service.ts(552,140): error TS2345: Argument of type 'DesktopAlertRuleType' is not assignable to parameter of type '"BUILD_FAILED" | "SIGNING_FAILURE" | "TELEMETRY_UNAVAILABLE"'.
+  Type '"CRASH_RATE"' is not assignable to type '"BUILD_FAILED" | "SIGNING_FAILURE" | "TELEMETRY_UNAVAILABLE"'.
+src/modules/desktop-apps/services/desktop-analysis.service.ts(1,15): error TS2305: Module '"@command-center/shared-types"' has no exported member 'DesktopAnalysisEvidence'.
+src/modules/desktop-apps/services/desktop-builds.service.ts(4,72): error TS2307: Cannot find module '../dto/desktop-build.dto' or its corresponding type declarations.
+src/modules/desktop-apps/services/desktop-dependency-health.service.ts(211,23): error TS18048: 'rhs' is possibly 'undefined'.
+src/modules/desktop-apps/services/desktop-dependency-health.service.ts(211,65): error TS18048: 'rhs' is possibly 'undefined'.
+src/modules/desktop-apps/services/desktop-dependency-health.service.ts(216,9): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/modules/desktop-apps/services/desktop-dependency-health.service.ts(250,21): error TS18048: 'block' is possibly 'undefined'.
+src/modules/desktop-apps/services/desktop-dependency-health.service.ts(251,24): error TS18048: 'block' is possibly 'undefined'.
+src/modules/desktop-apps/services/desktop-dependency-health.service.ts(252,23): error TS18048: 'block' is possibly 'undefined'.
+src/modules/desktop-apps/services/desktop-dependency-health.service.ts(277,9): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/modules/desktop-apps/services/desktop-permissions.service.ts(2,15): error TS2305: Module '"@command-center/shared-types"' has no exported member 'DesktopPermissions'.
+src/modules/desktop-apps/services/desktop-project-detection.service.ts(52,13): error TS18047: 'file' is possibly 'null'.
+src/modules/desktop-apps/services/desktop-project-detection.service.ts(56,9): error TS2322: Type 'string | null' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'.
+src/modules/desktop-apps/services/desktop-project-detection.service.ts(56,29): error TS18047: 'file' is possibly 'null'.
+src/modules/desktop-apps/services/desktop-project-detection.service.ts(77,13): error TS18047: 'file' is possibly 'null'.
+src/modules/desktop-apps/services/desktop-project-detection.service.ts(78,11): error TS2322: Type 'string | null' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'.
+src/modules/desktop-apps/services/desktop-project-detection.service.ts(78,31): error TS18047: 'file' is possibly 'null'.
+src/modules/desktop-apps/services/desktop-project-detection.service.ts(108,13): error TS18047: 'file' is possibly 'null'.
+src/modules/desktop-apps/services/desktop-project-detection.service.ts(109,11): error TS2322: Type 'string | null' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'.
+src/modules/desktop-apps/services/desktop-project-detection.service.ts(109,31): error TS18047: 'file' is possibly 'null'.
+src/modules/desktop-apps/services/desktop-project-detector.ts(5,3): error TS2305: Module '"@command-center/shared-types"' has no exported member 'DesktopProjectDetectionCandidate'.
+src/modules/desktop-apps/services/desktop-project-detector.ts(6,3): error TS2724: '"@command-center/shared-types"' has no exported member named 'DesktopProjectDetectionResponse'. Did you mean 'MobileProjectDetectionResponse'?
+src/modules/desktop-apps/services/desktop-repository-metadata.service.ts(55,13): error TS18047: 'file' is possibly 'null'.
+src/modules/desktop-apps/services/desktop-repository-metadata.service.ts(56,11): error TS2322: Type 'string | null' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'.
+src/modules/desktop-apps/services/desktop-repository-metadata.service.ts(56,31): error TS18047: 'file' is possibly 'null'.
+src/modules/desktop-apps/services/desktop-runtime.service.ts(4,15): error TS2305: Module '"@command-center/shared-types"' has no exported member 'DesktopTelemetryCrashSample'.
+src/modules/desktop-apps/services/desktop-runtime.service.ts(4,44): error TS2305: Module '"@command-center/shared-types"' has no exported member 'DesktopTelemetryPerformanceSample'.
+src/modules/desktop-apps/services/desktop-telemetry-url-policy.service.ts(81,90): error TS18048: 'b' is possibly 'undefined'.
+src/modules/desktop-apps/services/desktop-telemetry-url-policy.service.ts(81,101): error TS18048: 'b' is possibly 'undefined'.
+src/modules/desktop-apps/services/desktop-telemetry-url-policy.service.ts(81,141): error TS18048: 'a' is possibly 'undefined'.
+src/modules/desktop-apps/telemetry/desktop-telemetry-provider.interface.ts(1,15): error TS2305: Module '"@command-center/shared-types"' has no exported member 'DesktopTelemetryProvider'.
+src/modules/desktop-apps/telemetry/desktop-telemetry-provider.interface.ts(1,41): error TS2305: Module '"@command-center/shared-types"' has no exported member 'DesktopTelemetrySnapshot'.
+src/modules/desktop-apps/telemetry/normalized-http-desktop-telemetry.provider.ts(4,3): error TS2305: Module '"@command-center/shared-types"' has no exported member 'DesktopReleaseChannel'.
+src/modules/desktop-apps/telemetry/normalized-http-desktop-telemetry.provider.ts(5,3): error TS2305: Module '"@command-center/shared-types"' has no exported member 'DesktopTelemetryPerformanceSample'.
+src/modules/desktop-apps/telemetry/normalized-http-desktop-telemetry.provider.ts(6,3): error TS2305: Module '"@command-center/shared-types"' has no exported member 'DesktopTelemetryCrashSample'.
+src/modules/desktop-apps/telemetry/normalized-http-desktop-telemetry.provider.ts(7,3): error TS2305: Module '"@command-center/shared-types"' has no exported member 'DesktopTelemetrySnapshot'.
+src/modules/desktop-apps/telemetry/normalized-http-desktop-telemetry.provider.ts(8,3): error TS2305: Module '"@command-center/shared-types"' has no exported member 'DesktopTelemetryVersionSample'.
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @command-center/api@0.1.0 typecheck: `tsc -p tsconfig.json --noEmit`
+Exit status 2

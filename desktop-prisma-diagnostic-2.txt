@@ -1,0 +1,1547 @@
+==================================================
+ DESKTOP PRISMA DIAGNOSTIC 2 - POWERSHELL ONLY
+==================================================
+
+==================================================
+1. ALL DESKTOP PRISMA FILES
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\desktop-application.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-ai-analysis.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-application.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build-artifact.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-release.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-runtime.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-telemetry.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-test.prisma
+
+==================================================
+2. FULL DESKTOP APPLICATION MODEL
+==================================================
+
+--- apps/api/prisma/models/desktop-application.prisma ---
+   1: model DesktopApplication {
+   2:   id                 String              @id @default(uuid()) @db.Uuid
+   3:   applicationId      String              @unique @map("application_id") @db.Uuid
+   4: 
+   5:   platform           DesktopPlatform
+   6:   framework          DesktopFramework
+   7:   architecture       DesktopArchitecture
+   8: 
+   9:   packageName        String?             @map("package_name") @db.VarChar(255)
+  10: 
+  11:   currentVersion     String?             @map("current_version") @db.VarChar(64)
+  12:   currentBuildNumber String?             @map("current_build_number") @db.VarChar(64)
+  13: 
+  14:   minimumOsVersion   String?             @map("minimum_os_version") @db.VarChar(64)
+  15: 
+  16:   updateChannel      String?             @map("update_channel") @db.VarChar(64)
+  17: 
+  18:   createdAt          DateTime            @default(now()) @map("created_at")
+  19:   updatedAt          DateTime            @updatedAt @map("updated_at")
+  20: 
+  21:   application SaasApplication @relation(
+  22:     fields: [applicationId],
+  23:     references: [id],
+  24:     onDelete: Cascade
+  25:   )
+  26: 
+  27:   @@index([platform])
+  28:   @@index([framework])
+  29:   @@index([architecture])
+  30:   @@index([platform, framework])
+  31:   @@map("desktop_applications")
+  32: }
+
+==================================================
+3. FULL DESKTOP BUILD MODEL
+==================================================
+
+--- apps/api/prisma/models/desktop-build.prisma ---
+   1: enum DesktopBuildSource {
+   2:   GITHUB_ACTIONS
+   3: }
+   4: 
+   5: enum DesktopBuildStatus {
+   6:   QUEUED
+   7:   BUILDING
+   8:   SUCCESS
+   9:   FAILED
+  10:   CANCELLED
+  11: }
+  12: 
+  13: model DesktopBuild {
+  14:   id           String @id @default(uuid()) @db.Uuid
+  15:   workspaceId  String @map("workspace_id") @db.Uuid
+  16:   desktopAppId String @map("desktop_app_id") @db.Uuid
+  17:   repositoryId String @map("repository_id") @db.Uuid
+  18: 
+  19:   workflowRunId String             @map("workflow_run_id") @db.VarChar(128)
+  20:   source        DesktopBuildSource @default(GITHUB_ACTIONS)
+  21: 
+  22:   commitSha String @map("commit_sha") @db.VarChar(64)
+  23:   branch    String @db.VarChar(255)
+  24: 
+  25:   version     String? @db.VarChar(64)
+  26:   buildNumber String? @map("build_number") @db.VarChar(64)
+  27: 
+  28:   platform     DesktopPlatform
+  29:   architecture DesktopArchitecture
+  30:   status       DesktopBuildStatus @default(QUEUED)
+  31: 
+  32:   startedAt   DateTime? @map("started_at") @db.Timestamptz(6)
+  33:   completedAt DateTime? @map("completed_at") @db.Timestamptz(6)
+  34:   durationMs  Int?      @map("duration_ms")
+  35: 
+  36:   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  37:   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  38: 
+  39:   desktopApp DesktopApplication    @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  40:   repository RepositoryConnection @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  41: 
+  42:   @@unique([repositoryId, workflowRunId, platform, architecture])
+  43:   @@index([workspaceId, desktopAppId])
+  44:   @@index([desktopAppId, createdAt(sort: Desc)])
+  45:   @@index([repositoryId, createdAt(sort: Desc)])
+  46:   @@index([status])
+  47:   @@index([platform, architecture])
+  48:   @@map("desktop_builds")
+  49: }
+
+==================================================
+4. FULL DESKTOP BUILD ARTIFACT MODEL
+==================================================
+
+--- apps/api/prisma/models/desktop-build-artifact.prisma ---
+   1: enum DesktopBuildArtifactType {
+   2:     EXE
+   3:     MSI
+   4:     MSIX
+   5:     DMG
+   6:     PKG
+   7:     APP
+   8:     APPIMAGE
+   9:     DEB
+  10:     RPM
+  11:     ZIP
+  12:     OTHER
+  13: }
+  14: 
+  15: model DesktopBuildArtifact {
+  16:     id      String @id @default(uuid()) @db.Uuid
+  17:     buildId String @map("build_id") @db.Uuid
+  18: 
+  19:     providerArtifactId String @map("provider_artifact_id") @db.VarChar(255)
+  20: 
+  21:     platform     DesktopPlatform
+  22:     architecture DesktopArchitecture
+  23:     type         DesktopBuildArtifactType
+  24: 
+  25:     fileName    String  @map("file_name") @db.VarChar(1024)
+  26:     sizeBytes   BigInt? @map("size_bytes")
+  27:     checksum    String? @db.VarChar(255)
+  28:     externalUrl String? @map("external_url") @db.Text
+  29: 
+  30:     createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  31: 
+  32:     build DesktopBuild @relation(fields: [buildId], references: [id], onDelete: Cascade)
+  33: 
+  34:     @@unique([buildId, providerArtifactId])
+  35:     @@index([buildId])
+  36:     @@index([platform, architecture])
+  37:     @@index([type])
+  38:     @@map("desktop_build_artifacts")
+  39: }
+
+==================================================
+5. FULL DESKTOP TEST MODEL
+==================================================
+
+--- apps/api/prisma/models/desktop-test.prisma ---
+   1: enum DesktopTestType {
+   2:     UNIT
+   3:     INTEGRATION
+   4:     UI
+   5:     E2E
+   6:     INSTALLER
+   7:     OTHER
+   8: }
+   9: 
+  10: enum DesktopTestStatus {
+  11:     PENDING
+  12:     RUNNING
+  13:     PASSED
+  14:     FAILED
+  15:     SKIPPED
+  16:     CANCELLED
+  17: }
+  18: 
+  19: model DesktopTestRun {
+  20:     id      String            @id @default(uuid()) @db.Uuid
+  21:     buildId String            @map("build_id") @db.Uuid
+  22:     type    DesktopTestType
+  23:     status  DesktopTestStatus @default(PENDING)
+  24: 
+  25:     passed  Int @default(0)
+  26:     failed  Int @default(0)
+  27:     skipped Int @default(0)
+  28:     total   Int @default(0)
+  29: 
+  30:     durationMs  Int?      @map("duration_ms")
+  31:     startedAt   DateTime? @map("started_at") @db.Timestamptz(6)
+  32:     completedAt DateTime? @map("completed_at") @db.Timestamptz(6)
+  33: 
+  34:     createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  35:     updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  36: 
+  37:     build    DesktopBuild         @relation(fields: [buildId], references: [id], onDelete: Cascade)
+  38:     failures DesktopTestFailure[]
+  39: 
+  40:     @@unique([buildId, type])
+  41:     @@index([buildId])
+  42:     @@index([status])
+  43:     @@map("desktop_test_runs")
+  44: }
+  45: 
+  46: model DesktopTestFailure {
+  47:     id        String @id @default(uuid()) @db.Uuid
+  48:     testRunId String @map("test_run_id") @db.Uuid
+  49: 
+  50:     suite      String? @db.VarChar(500)
+  51:     testName   String? @map("test_name") @db.VarChar(500)
+  52:     message    String? @db.Text
+  53:     file       String? @db.VarChar(2048)
+  54:     line       Int?
+  55:     stackTrace String? @map("stack_trace") @db.Text
+  56: 
+  57:     createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  58: 
+  59:     testRun DesktopTestRun @relation(fields: [testRunId], references: [id], onDelete: Cascade)
+  60: 
+  61:     @@index([testRunId])
+  62:     @@map("desktop_test_failures")
+  63: }
+
+==================================================
+6. FULL DESKTOP RELEASE MODEL
+==================================================
+
+--- apps/api/prisma/models/desktop-release.prisma ---
+   1: enum DesktopReleaseChannel {
+   2:     DEV
+   3:     ALPHA
+   4:     BETA
+   5:     STABLE
+   6:     LTS
+   7: }
+   8: 
+   9: enum DesktopReleaseStatus {
+  10:     DRAFT
+  11:     READY
+  12:     PUBLISHED
+  13:     FAILED
+  14:     ROLLED_BACK
+  15: }
+  16: 
+  17: model DesktopRelease {
+  18:     id           String @id @default(uuid()) @db.Uuid
+  19:     workspaceId  String @map("workspace_id") @db.Uuid
+  20:     desktopAppId String @map("desktop_app_id") @db.Uuid
+  21:     buildId      String @map("build_id") @db.Uuid
+  22: 
+  23:     version     String @db.VarChar(64)
+  24:     buildNumber String @map("build_number") @db.VarChar(64)
+  25: 
+  26:     channel      DesktopReleaseChannel
+  27:     platform     DesktopPlatform
+  28:     architecture DesktopArchitecture
+  29:     status       DesktopReleaseStatus  @default(DRAFT)
+  30: 
+  31:     releaseNotes String?   @map("release_notes") @db.Text
+  32:     releasedAt   DateTime? @map("released_at") @db.Timestamptz(6)
+  33: 
+  34:     createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  35:     updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  36: 
+  37:     desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  38:     build      DesktopBuild       @relation(fields: [buildId], references: [id], onDelete: Restrict)
+  39: 
+  40:     @@unique([buildId, channel])
+  41:     @@index([workspaceId, desktopAppId, createdAt(sort: Desc)])
+  42:     @@index([desktopAppId, channel, createdAt(sort: Desc)])
+  43:     @@index([desktopAppId, status, createdAt(sort: Desc)])
+  44:     @@index([platform, architecture])
+  45:     @@map("desktop_releases")
+  46: }
+
+==================================================
+7. FULL DESKTOP RUNTIME MODEL
+==================================================
+
+--- apps/api/prisma/models/desktop-runtime.prisma ---
+   1: enum DesktopPerformanceMetricType {
+   2:   CRASH_FREE_USERS_PERCENT
+   3:   CRASH_FREE_SESSIONS_PERCENT
+   4:   STARTUP_MS
+   5:   MEMORY_MB
+   6:   CPU_PERCENT
+   7:   HANG_RATE_PERCENT
+   8:   NETWORK_LATENCY_MS
+   9:   API_FAILURE_RATE_PERCENT
+  10:   VERSION_ADOPTION_PERCENT
+  11: }
+  12: 
+  13: model DesktopMetric {
+  14:   id                     String @id @default(uuid()) @db.Uuid
+  15:   workspaceId            String @map("workspace_id") @db.Uuid
+  16:   desktopAppId           String @map("desktop_app_id") @db.Uuid
+  17:   telemetryIntegrationId String @map("telemetry_integration_id") @db.Uuid
+  18: 
+  19:   externalId String @map("external_id") @db.VarChar(255)
+  20:   type       DesktopPerformanceMetricType
+  21:   value      Float
+  22:   unit       String @db.VarChar(32)
+  23: 
+  24:   version      String?               @db.VarChar(64)
+  25:   platform     DesktopPlatform?
+  26:   architecture DesktopArchitecture?
+  27:   channel      DesktopReleaseChannel?
+  28: 
+  29:   recordedAt DateTime @map("recorded_at") @db.Timestamptz(6)
+  30:   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  31:   updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  32: 
+  33:   desktopApp DesktopApplication          @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  34:   integration DesktopTelemetryIntegration @relation(fields: [telemetryIntegrationId], references: [id], onDelete: Cascade)
+  35: 
+  36:   @@unique([telemetryIntegrationId, externalId])
+  37:   @@index([workspaceId, desktopAppId, recordedAt(sort: Desc)])
+  38:   @@index([desktopAppId, type, recordedAt(sort: Desc)])
+  39:   @@index([desktopAppId, version, platform, architecture])
+  40:   @@map("desktop_metrics")
+  41: }
+  42: 
+  43: model DesktopCrash {
+  44:   id                     String @id @default(uuid()) @db.Uuid
+  45:   workspaceId            String @map("workspace_id") @db.Uuid
+  46:   desktopAppId           String @map("desktop_app_id") @db.Uuid
+  47:   telemetryIntegrationId String @map("telemetry_integration_id") @db.Uuid
+  48: 
+  49:   externalId    String @map("external_id") @db.VarChar(255)
+  50:   fingerprint   String @db.VarChar(512)
+  51:   message       String @db.Text
+  52:   count         Int    @default(1)
+  53:   affectedUsers Int    @default(0) @map("affected_users")
+  54: 
+  55:   version      String?               @db.VarChar(64)
+  56:   platform     DesktopPlatform?
+  57:   architecture DesktopArchitecture?
+  58:   channel      DesktopReleaseChannel?
+  59: 
+  60:   firstSeenAt DateTime @map("first_seen_at") @db.Timestamptz(6)
+  61:   lastSeenAt  DateTime @map("last_seen_at") @db.Timestamptz(6)
+  62: 
+  63:   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  64:   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  65: 
+  66:   desktopApp DesktopApplication          @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  67:   integration DesktopTelemetryIntegration @relation(fields: [telemetryIntegrationId], references: [id], onDelete: Cascade)
+  68: 
+  69:   @@unique([telemetryIntegrationId, externalId])
+  70:   @@index([workspaceId, desktopAppId, lastSeenAt(sort: Desc)])
+  71:   @@index([desktopAppId, version, platform, architecture])
+  72:   @@index([desktopAppId, fingerprint])
+  73:   @@map("desktop_crashes")
+  74: }
+
+==================================================
+8. FULL DESKTOP TELEMETRY MODEL
+==================================================
+
+--- apps/api/prisma/models/desktop-telemetry.prisma ---
+   1: enum DesktopTelemetryProvider {
+   2:     SENTRY
+   3:     DATADOG
+   4:     NEW_RELIC
+   5:     OPENTELEMETRY
+   6:     CUSTOM
+   7: }
+   8: 
+   9: enum DesktopTelemetryIntegrationStatus {
+  10:     CONNECTED
+  11:     ERROR
+  12:     DISCONNECTED
+  13: }
+  14: 
+  15: model DesktopTelemetryIntegration {
+  16:     id           String @id @default(uuid()) @db.Uuid
+  17:     workspaceId  String @map("workspace_id") @db.Uuid
+  18:     desktopAppId String @map("desktop_app_id") @db.Uuid
+  19: 
+  20:     provider          DesktopTelemetryProvider
+  21:     status            DesktopTelemetryIntegrationStatus @default(CONNECTED)
+  22:     externalProjectId String                            @map("external_project_id") @db.VarChar(255)
+  23:     endpointUrl       String                            @map("endpoint_url") @db.VarChar(2048)
+  24: 
+  25:     // AES-256-GCM ciphertext. The plaintext provider token is never returned.
+  26:     secretCiphertext String @map("secret_ciphertext") @db.Text
+  27: 
+  28:     configuredAt DateTime  @default(now()) @map("configured_at") @db.Timestamptz(6)
+  29:     lastSyncedAt DateTime? @map("last_synced_at") @db.Timestamptz(6)
+  30:     lastError    String?   @map("last_error") @db.Text
+  31: 
+  32:     createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  33:     updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  34: 
+  35:     desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  36:     metrics    DesktopMetric[]
+  37:     crashes    DesktopCrash[]
+  38: 
+  39:     @@unique([desktopAppId, provider])
+  40:     @@index([workspaceId, desktopAppId])
+  41:     @@index([desktopAppId, status])
+  42:     @@map("desktop_telemetry_integrations")
+  43: }
+
+==================================================
+9. FULL DESKTOP SECURITY MODEL
+==================================================
+
+--- apps/api/prisma/models/desktop-security-health.prisma ---
+   1: enum DesktopDependencyEcosystem {
+   2:     NPM
+   3:     CARGO
+   4:     NUGET
+   5:     MAVEN
+   6:     GRADLE
+   7:     CMAKE
+   8:     CONAN
+   9:     VCPKG
+  10:     OTHER
+  11: }
+  12: 
+  13: enum DesktopDependencyRiskStatus {
+  14:     CURRENT
+  15:     UPDATE_AVAILABLE
+  16:     VULNERABLE
+  17:     UNKNOWN
+  18: }
+  19: 
+  20: enum DesktopSecuritySeverity {
+  21:     INFO
+  22:     LOW
+  23:     MEDIUM
+  24:     HIGH
+  25:     CRITICAL
+  26: }
+  27: 
+  28: enum DesktopSecurityCheckType {
+  29:     WINDOWS_SIGNING
+  30:     MACOS_SIGNING
+  31:     MACOS_NOTARIZATION
+  32:     PACKAGING_CONFIGURATION
+  33:     DEPENDENCY_VULNERABILITY
+  34: }
+  35: 
+  36: enum DesktopSecurityCheckStatus {
+  37:     PASS
+  38:     WARN
+  39:     FAIL
+  40:     UNKNOWN
+  41: }
+  42: 
+  43: model DesktopDependency {
+  44:     id           String @id @default(uuid()) @db.Uuid
+  45:     workspaceId  String @map("workspace_id") @db.Uuid
+  46:     desktopAppId String @map("desktop_app_id") @db.Uuid
+  47: 
+  48:     ecosystem      DesktopDependencyEcosystem
+  49:     manifestPath   String                      @map("manifest_path") @db.VarChar(1024)
+  50:     name           String                      @db.VarChar(255)
+  51:     currentVersion String                      @map("current_version") @db.VarChar(255)
+  52:     latestVersion  String?                     @map("latest_version") @db.VarChar(255)
+  53:     direct         Boolean                     @default(true)
+  54:     riskStatus     DesktopDependencyRiskStatus @default(UNKNOWN) @map("risk_status")
+  55:     severity       DesktopSecuritySeverity?
+  56:     advisoryIds    Json                        @default("[]") @map("advisory_ids")
+  57: 
+  58:     createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  59:     updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  60: 
+  61:     desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  62: 
+  63:     @@unique([desktopAppId, manifestPath, name])
+  64:     @@index([workspaceId, desktopAppId])
+  65:     @@index([desktopAppId, riskStatus])
+  66:     @@index([desktopAppId, ecosystem])
+  67:     @@map("desktop_dependencies")
+  68: }
+  69: 
+  70: model DesktopSecurityFinding {
+  71:     id           String @id @default(uuid()) @db.Uuid
+  72:     workspaceId  String @map("workspace_id") @db.Uuid
+  73:     desktopAppId String @map("desktop_app_id") @db.Uuid
+  74: 
+  75:     findingKey String                     @map("finding_key") @db.VarChar(255)
+  76:     type       DesktopSecurityCheckType
+  77:     status     DesktopSecurityCheckStatus
+  78:     severity   DesktopSecuritySeverity
+  79:     title      String                     @db.VarChar(255)
+  80:     message    String                     @db.Text
+  81:     sourcePath String?                    @map("source_path") @db.VarChar(1024)
+  82:     evidence   Json                       @default("[]")
+  83: 
+  84:     createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  85:     updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  86: 
+  87:     desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  88: 
+  89:     @@unique([desktopAppId, findingKey])
+  90:     @@index([workspaceId, desktopAppId])
+  91:     @@index([desktopAppId, status, severity])
+  92:     @@index([desktopAppId, type])
+  93:     @@map("desktop_security_findings")
+  94: }
+
+==================================================
+10. FULL DESKTOP ALERT MODEL
+==================================================
+
+--- apps/api/prisma/models/desktop-alert.prisma ---
+   1: enum DesktopAlertRuleType {
+   2:   BUILD_FAILED
+   3:   CRASH_RATE
+   4:   STARTUP
+   5:   MEMORY
+   6:   CPU
+   7:   RELEASE_REGRESSION
+   8:   SIGNING_FAILURE
+   9:   TELEMETRY_UNAVAILABLE
+  10: }
+  11: 
+  12: enum DesktopAlertOperator {
+  13:   GT
+  14:   GTE
+  15: }
+  16: 
+  17: enum DesktopAlertIncidentStatus {
+  18:   OPEN
+  19:   RESOLVED
+  20: }
+  21: 
+  22: model DesktopAlertRule {
+  23:   id           String @id @default(uuid()) @db.Uuid
+  24:   workspaceId  String @map("workspace_id") @db.Uuid
+  25:   desktopAppId String @map("desktop_app_id") @db.Uuid
+  26: 
+  27:   name     String               @db.VarChar(160)
+  28:   type     DesktopAlertRuleType
+  29:   operator DesktopAlertOperator @default(GT)
+  30: 
+  31:   threshold       Float?
+  32:   cooldownMinutes Int     @default(60) @map("cooldown_minutes")
+  33:   enabled         Boolean @default(true)
+  34: 
+  35:   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  36:   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  37: 
+  38:   desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  39:   incidents  DesktopAlertIncident[]
+  40: 
+  41:   @@index([workspaceId, desktopAppId])
+  42:   @@index([desktopAppId, enabled])
+  43:   @@index([desktopAppId, type])
+  44:   @@map("desktop_alert_rules")
+  45: }
+  46: 
+  47: model DesktopAlertIncident {
+  48:   id           String @id @default(uuid()) @db.Uuid
+  49:   workspaceId  String @map("workspace_id") @db.Uuid
+  50:   desktopAppId String @map("desktop_app_id") @db.Uuid
+  51:   ruleId       String @map("rule_id") @db.Uuid
+  52: 
+  53:   status DesktopAlertIncidentStatus @default(OPEN)
+  54: 
+  55:   title   String @db.VarChar(255)
+  56:   message String @db.Text
+  57: 
+  58:   actualValue Float? @map("actual_value")
+  59:   threshold   Float?
+  60: 
+  61:   version String? @db.VarChar(64)
+  62:   buildId String? @map("build_id") @db.Uuid
+  63: 
+  64:   // Only OPEN incidents keep an activeKey. On resolution it becomes null.
+  65:   // This gives DB-level protection against duplicate active incidents.
+  66:   activeKey String? @unique @map("active_key") @db.VarChar(255)
+  67: 
+  68:   evidence Json @default("{}")
+  69: 
+  70:   triggeredAt     DateTime  @default(now()) @map("triggered_at") @db.Timestamptz(6)
+  71:   lastTriggeredAt DateTime  @default(now()) @map("last_triggered_at") @db.Timestamptz(6)
+  72:   resolvedAt      DateTime? @map("resolved_at") @db.Timestamptz(6)
+  73: 
+  74:   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  75:   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  76: 
+  77:   rule       DesktopAlertRule   @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  78:   desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  79: 
+  80:   @@index([workspaceId, desktopAppId])
+  81:   @@index([desktopAppId, status, triggeredAt(sort: Desc)])
+  82:   @@index([ruleId, status])
+  83:   @@map("desktop_alert_incidents")
+  84: }
+
+==================================================
+11. FULL DESKTOP AI MODEL
+==================================================
+
+--- apps/api/prisma/models/desktop-ai-analysis.prisma ---
+   1: enum DesktopAnalysisAction {
+   2:   BUILD_FAILURE
+   3:   CRASH_INCREASE
+   4:   PERFORMANCE_REGRESSION
+   5:   RELEASE_HEALTH
+   6:   CUSTOM
+   7: }
+   8: 
+   9: enum DesktopAnalysisConfidence {
+  10:   LIMITED
+  11:   SUPPORTED
+  12: }
+  13: 
+  14: model DesktopAiAnalysis {
+  15:   id              String @id @default(uuid()) @db.Uuid
+  16:   workspaceId     String @map("workspace_id") @db.Uuid
+  17:   desktopAppId    String @map("desktop_app_id") @db.Uuid
+  18:   createdByUserId String @map("created_by_user_id") @db.Uuid
+  19: 
+  20:   action   DesktopAnalysisAction
+  21:   question String?               @db.Text
+  22: 
+  23:   answer     String                    @db.Text
+  24:   confidence DesktopAnalysisConfidence
+  25:   evidence   Json
+  26: 
+  27:   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  28: 
+  29:   desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  30: 
+  31:   @@index([workspaceId, desktopAppId, createdAt(sort: Desc)])
+  32:   @@index([createdByUserId, createdAt(sort: Desc)])
+  33:   @@map("desktop_ai_analyses")
+  34: }
+
+==================================================
+12. DESKTOP ENUMS
+==================================================
+
+--- apps/api/prisma/enums/desktop-application.prisma ---
+   1: enum DesktopPlatform {
+   2:     WINDOWS
+   3:     MACOS
+   4:     LINUX
+   5:     CROSS_PLATFORM
+   6: }
+   7: 
+   8: enum DesktopFramework {
+   9:     ELECTRON
+  10:     TAURI
+  11:     DOTNET
+  12:     QT
+  13:     JAVA
+  14:     NATIVE_WINDOWS
+  15:     NATIVE_MACOS
+  16:     OTHER
+  17: }
+  18: 
+  19: enum DesktopArchitecture {
+  20:     X64
+  21:     ARM64
+  22:     X86
+  23:     UNIVERSAL
+  24: }
+
+==================================================
+13. SAAS APPLICATION DESKTOP REFERENCES
+==================================================
+
+> apps\api\prisma\models\application.prisma:1:model SaasApplication {
+  apps\api\prisma\models\application.prisma:2:  id               String              @id @default(uuid()) @db.Uuid
+  apps\api\prisma\models\application.prisma:3:  workspaceId      String              @map("workspace_id") @db.Uuid
+  apps\api\prisma\models\application.prisma:4:  name             String              @db.VarChar(160)
+  apps\api\prisma\models\application.prisma:5:  slug             String              @db.VarChar(160)
+  apps\api\prisma\models\application.prisma:6:  shortDescription String?             @map("short_description") @db.VarChar(280)
+  apps\api\prisma\models\application.prisma:7:  longDescription  String?             @map("long_description") @db.Text
+  apps\api\prisma\models\application.prisma:8:  category         ApplicationCategory @default(SAAS)
+  apps\api\prisma\models\application.prisma:9:  type             ApplicationType     @default(OTHER)
+  apps\api\prisma\models\application.prisma:23:  activities              ApplicationActivity[]
+  apps\api\prisma\models\application.prisma:24:  websites                Website[]
+  apps\api\prisma\models\application.prisma:25:  mobileApplication       MobileApplication?
+> apps\api\prisma\models\application.prisma:26:  desktopApplication      DesktopApplication?
+  apps\api\prisma\models\application.prisma:27:  healthChecks            HealthCheck[]
+  apps\api\prisma\models\application.prisma:28:  applicationEnvironments ApplicationEnvironment[]
+  apps\api\prisma\models\application.prisma:29:  releases                Release[]
+  apps\api\prisma\models\application.prisma:30:  deployments             Deployment[]
+  apps\api\prisma\models\application.prisma:31:  notifications           Notification[]
+  apps\api\prisma\models\application.prisma:32:
+  apps\api\prisma\models\application.prisma:33:  progressPercent     Int                      @default(0) @map("progress_percent")
+  apps\api\prisma\models\application.prisma:34:  progressUpdatedAt   DateTime?                @map("progress_updated_at")
+  apps\api\prisma\models\desktop-ai-analysis.prisma:26:
+  apps\api\prisma\models\desktop-ai-analysis.prisma:27:  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-ai-analysis.prisma:28:
+> apps\api\prisma\models\desktop-ai-analysis.prisma:29:  desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  apps\api\prisma\models\desktop-ai-analysis.prisma:30:
+  apps\api\prisma\models\desktop-ai-analysis.prisma:31:  @@index([workspaceId, desktopAppId, createdAt(sort: Desc)])
+  apps\api\prisma\models\desktop-ai-analysis.prisma:32:  @@index([createdByUserId, createdAt(sort: Desc)])
+  apps\api\prisma\models\desktop-ai-analysis.prisma:33:  @@map("desktop_ai_analyses")
+  apps\api\prisma\models\desktop-ai-analysis.prisma:34:}
+  apps\api\prisma\models\desktop-alert.prisma:35:  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-alert.prisma:36:  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-alert.prisma:37:
+> apps\api\prisma\models\desktop-alert.prisma:38:  desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  apps\api\prisma\models\desktop-alert.prisma:39:  incidents  DesktopAlertIncident[]
+  apps\api\prisma\models\desktop-alert.prisma:40:
+  apps\api\prisma\models\desktop-alert.prisma:41:  @@index([workspaceId, desktopAppId])
+  apps\api\prisma\models\desktop-alert.prisma:42:  @@index([desktopAppId, enabled])
+  apps\api\prisma\models\desktop-alert.prisma:43:  @@index([desktopAppId, type])
+  apps\api\prisma\models\desktop-alert.prisma:44:  @@map("desktop_alert_rules")
+  apps\api\prisma\models\desktop-alert.prisma:45:}
+  apps\api\prisma\models\desktop-alert.prisma:46:
+  apps\api\prisma\models\desktop-alert.prisma:75:  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-alert.prisma:76:
+  apps\api\prisma\models\desktop-alert.prisma:77:  rule       DesktopAlertRule   @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+> apps\api\prisma\models\desktop-alert.prisma:78:  desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  apps\api\prisma\models\desktop-alert.prisma:79:
+  apps\api\prisma\models\desktop-alert.prisma:80:  @@index([workspaceId, desktopAppId])
+  apps\api\prisma\models\desktop-alert.prisma:81:  @@index([desktopAppId, status, triggeredAt(sort: Desc)])
+  apps\api\prisma\models\desktop-alert.prisma:82:  @@index([ruleId, status])
+  apps\api\prisma\models\desktop-alert.prisma:83:  @@map("desktop_alert_incidents")
+  apps\api\prisma\models\desktop-alert.prisma:84:}
+> apps\api\prisma\models\desktop-application.prisma:1:model DesktopApplication {
+  apps\api\prisma\models\desktop-application.prisma:2:  id                 String              @id @default(uuid()) @db.Uuid
+  apps\api\prisma\models\desktop-application.prisma:3:  applicationId      String              @unique @map("application_id") @db.Uuid
+  apps\api\prisma\models\desktop-application.prisma:4:
+  apps\api\prisma\models\desktop-application.prisma:5:  platform           DesktopPlatform
+  apps\api\prisma\models\desktop-application.prisma:6:  framework          DesktopFramework
+  apps\api\prisma\models\desktop-application.prisma:7:  architecture       DesktopArchitecture
+  apps\api\prisma\models\desktop-application.prisma:8:
+  apps\api\prisma\models\desktop-application.prisma:9:  packageName        String?             @map("package_name") @db.VarChar(255)
+  apps\api\prisma\models\desktop-build.prisma:36:  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-build.prisma:37:  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-build.prisma:38:
+> apps\api\prisma\models\desktop-build.prisma:39:  desktopApp DesktopApplication    @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  apps\api\prisma\models\desktop-build.prisma:40:  repository RepositoryConnection @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  apps\api\prisma\models\desktop-build.prisma:41:
+  apps\api\prisma\models\desktop-build.prisma:42:  @@unique([repositoryId, workflowRunId, platform, architecture])
+  apps\api\prisma\models\desktop-build.prisma:43:  @@index([workspaceId, desktopAppId])
+  apps\api\prisma\models\desktop-build.prisma:44:  @@index([desktopAppId, createdAt(sort: Desc)])
+  apps\api\prisma\models\desktop-build.prisma:45:  @@index([repositoryId, createdAt(sort: Desc)])
+  apps\api\prisma\models\desktop-build.prisma:46:  @@index([status])
+  apps\api\prisma\models\desktop-build.prisma:47:  @@index([platform, architecture])
+  apps\api\prisma\models\desktop-release.prisma:34:    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-release.prisma:35:    updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-release.prisma:36:
+> apps\api\prisma\models\desktop-release.prisma:37:    desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  apps\api\prisma\models\desktop-release.prisma:38:    build      DesktopBuild       @relation(fields: [buildId], references: [id], onDelete: Restrict)
+  apps\api\prisma\models\desktop-release.prisma:39:
+  apps\api\prisma\models\desktop-release.prisma:40:    @@unique([buildId, channel])
+  apps\api\prisma\models\desktop-release.prisma:41:    @@index([workspaceId, desktopAppId, createdAt(sort: Desc)])
+  apps\api\prisma\models\desktop-release.prisma:42:    @@index([desktopAppId, channel, createdAt(sort: Desc)])
+  apps\api\prisma\models\desktop-release.prisma:43:    @@index([desktopAppId, status, createdAt(sort: Desc)])
+  apps\api\prisma\models\desktop-release.prisma:44:    @@index([platform, architecture])
+  apps\api\prisma\models\desktop-release.prisma:45:    @@map("desktop_releases")
+  apps\api\prisma\models\desktop-runtime.prisma:30:  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-runtime.prisma:31:  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-runtime.prisma:32:
+> apps\api\prisma\models\desktop-runtime.prisma:33:  desktopApp DesktopApplication          @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  apps\api\prisma\models\desktop-runtime.prisma:34:  integration DesktopTelemetryIntegration @relation(fields: [telemetryIntegrationId], references: [id], onDelete: Cascade)
+  apps\api\prisma\models\desktop-runtime.prisma:35:
+  apps\api\prisma\models\desktop-runtime.prisma:36:  @@unique([telemetryIntegrationId, externalId])
+  apps\api\prisma\models\desktop-runtime.prisma:37:  @@index([workspaceId, desktopAppId, recordedAt(sort: Desc)])
+  apps\api\prisma\models\desktop-runtime.prisma:38:  @@index([desktopAppId, type, recordedAt(sort: Desc)])
+  apps\api\prisma\models\desktop-runtime.prisma:39:  @@index([desktopAppId, version, platform, architecture])
+  apps\api\prisma\models\desktop-runtime.prisma:40:  @@map("desktop_metrics")
+  apps\api\prisma\models\desktop-runtime.prisma:41:}
+  apps\api\prisma\models\desktop-runtime.prisma:63:  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-runtime.prisma:64:  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-runtime.prisma:65:
+> apps\api\prisma\models\desktop-runtime.prisma:66:  desktopApp DesktopApplication          @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  apps\api\prisma\models\desktop-runtime.prisma:67:  integration DesktopTelemetryIntegration @relation(fields: [telemetryIntegrationId], references: [id], onDelete: Cascade)
+  apps\api\prisma\models\desktop-runtime.prisma:68:
+  apps\api\prisma\models\desktop-runtime.prisma:69:  @@unique([telemetryIntegrationId, externalId])
+  apps\api\prisma\models\desktop-runtime.prisma:70:  @@index([workspaceId, desktopAppId, lastSeenAt(sort: Desc)])
+  apps\api\prisma\models\desktop-runtime.prisma:71:  @@index([desktopAppId, version, platform, architecture])
+  apps\api\prisma\models\desktop-runtime.prisma:72:  @@index([desktopAppId, fingerprint])
+  apps\api\prisma\models\desktop-runtime.prisma:73:  @@map("desktop_crashes")
+  apps\api\prisma\models\desktop-runtime.prisma:74:}
+  apps\api\prisma\models\desktop-security-health.prisma:58:    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-security-health.prisma:59:    updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-security-health.prisma:60:
+> apps\api\prisma\models\desktop-security-health.prisma:61:    desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  apps\api\prisma\models\desktop-security-health.prisma:62:
+  apps\api\prisma\models\desktop-security-health.prisma:63:    @@unique([desktopAppId, manifestPath, name])
+  apps\api\prisma\models\desktop-security-health.prisma:64:    @@index([workspaceId, desktopAppId])
+  apps\api\prisma\models\desktop-security-health.prisma:65:    @@index([desktopAppId, riskStatus])
+  apps\api\prisma\models\desktop-security-health.prisma:66:    @@index([desktopAppId, ecosystem])
+  apps\api\prisma\models\desktop-security-health.prisma:67:    @@map("desktop_dependencies")
+  apps\api\prisma\models\desktop-security-health.prisma:68:}
+  apps\api\prisma\models\desktop-security-health.prisma:69:
+  apps\api\prisma\models\desktop-security-health.prisma:84:    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-security-health.prisma:85:    updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-security-health.prisma:86:
+> apps\api\prisma\models\desktop-security-health.prisma:87:    desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  apps\api\prisma\models\desktop-security-health.prisma:88:
+  apps\api\prisma\models\desktop-security-health.prisma:89:    @@unique([desktopAppId, findingKey])
+  apps\api\prisma\models\desktop-security-health.prisma:90:    @@index([workspaceId, desktopAppId])
+  apps\api\prisma\models\desktop-security-health.prisma:91:    @@index([desktopAppId, status, severity])
+  apps\api\prisma\models\desktop-security-health.prisma:92:    @@index([desktopAppId, type])
+  apps\api\prisma\models\desktop-security-health.prisma:93:    @@map("desktop_security_findings")
+  apps\api\prisma\models\desktop-security-health.prisma:94:}
+  apps\api\prisma\models\desktop-telemetry.prisma:32:    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-telemetry.prisma:33:    updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-telemetry.prisma:34:
+> apps\api\prisma\models\desktop-telemetry.prisma:35:    desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  apps\api\prisma\models\desktop-telemetry.prisma:36:    metrics    DesktopMetric[]
+  apps\api\prisma\models\desktop-telemetry.prisma:37:    crashes    DesktopCrash[]
+  apps\api\prisma\models\desktop-telemetry.prisma:38:
+  apps\api\prisma\models\desktop-telemetry.prisma:39:    @@unique([desktopAppId, provider])
+  apps\api\prisma\models\desktop-telemetry.prisma:40:    @@index([workspaceId, desktopAppId])
+  apps\api\prisma\models\desktop-telemetry.prisma:41:    @@index([desktopAppId, status])
+  apps\api\prisma\models\desktop-telemetry.prisma:42:    @@map("desktop_telemetry_integrations")
+  apps\api\prisma\models\desktop-telemetry.prisma:43:}
+
+
+
+
+==================================================
+14. REPOSITORY DESKTOP REFERENCES
+==================================================
+
+  apps\api\prisma\models\application.prisma:38:  milestones            ApplicationMilestone[]
+  apps\api\prisma\models\application.prisma:39:  blockers              ApplicationBlocker[]
+> apps\api\prisma\models\application.prisma:40:  repositoryConnections RepositoryConnection[]
+  apps\api\prisma\models\application.prisma:41:
+  apps\api\prisma\models\application.prisma:42:  @@unique([workspaceId, slug])
+  apps\api\prisma\models\application.prisma:43:  @@index([workspaceId, archivedAt])
+  apps\api\prisma\models\application.prisma:44:  @@index([workspaceId, status])
+  apps\api\prisma\models\application.prisma:45:  @@index([workspaceId, priority])
+> apps\api\prisma\models\desktop-build-artifact.prisma:1:enum DesktopBuildArtifactType {
+  apps\api\prisma\models\desktop-build-artifact.prisma:2:    EXE
+  apps\api\prisma\models\desktop-build-artifact.prisma:3:    MSI
+  apps\api\prisma\models\desktop-build-artifact.prisma:4:    MSIX
+  apps\api\prisma\models\desktop-build-artifact.prisma:5:    DMG
+  apps\api\prisma\models\desktop-build-artifact.prisma:6:    PKG
+  apps\api\prisma\models\desktop-build-artifact.prisma:13:}
+  apps\api\prisma\models\desktop-build-artifact.prisma:14:
+> apps\api\prisma\models\desktop-build-artifact.prisma:15:model DesktopBuildArtifact {
+  apps\api\prisma\models\desktop-build-artifact.prisma:16:    id      String @id @default(uuid()) @db.Uuid
+  apps\api\prisma\models\desktop-build-artifact.prisma:17:    buildId String @map("build_id") @db.Uuid
+  apps\api\prisma\models\desktop-build-artifact.prisma:18:
+  apps\api\prisma\models\desktop-build-artifact.prisma:19:    providerArtifactId String @map("provider_artifact_id") @db.VarChar(255)
+  apps\api\prisma\models\desktop-build-artifact.prisma:20:
+  apps\api\prisma\models\desktop-build-artifact.prisma:21:    platform     DesktopPlatform
+  apps\api\prisma\models\desktop-build-artifact.prisma:22:    architecture DesktopArchitecture
+> apps\api\prisma\models\desktop-build-artifact.prisma:23:    type         DesktopBuildArtifactType
+  apps\api\prisma\models\desktop-build-artifact.prisma:24:
+  apps\api\prisma\models\desktop-build-artifact.prisma:25:    fileName    String  @map("file_name") @db.VarChar(1024)
+  apps\api\prisma\models\desktop-build-artifact.prisma:26:    sizeBytes   BigInt? @map("size_bytes")
+  apps\api\prisma\models\desktop-build-artifact.prisma:27:    checksum    String? @db.VarChar(255)
+  apps\api\prisma\models\desktop-build-artifact.prisma:28:    externalUrl String? @map("external_url") @db.Text
+  apps\api\prisma\models\desktop-build-artifact.prisma:30:    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-build-artifact.prisma:31:
+> apps\api\prisma\models\desktop-build-artifact.prisma:32:    build DesktopBuild @relation(fields: [buildId], references: [id], onDelete: Cascade)
+  apps\api\prisma\models\desktop-build-artifact.prisma:33:
+  apps\api\prisma\models\desktop-build-artifact.prisma:34:    @@unique([buildId, providerArtifactId])
+  apps\api\prisma\models\desktop-build-artifact.prisma:35:    @@index([buildId])
+  apps\api\prisma\models\desktop-build-artifact.prisma:36:    @@index([platform, architecture])
+  apps\api\prisma\models\desktop-build-artifact.prisma:37:    @@index([type])
+> apps\api\prisma\models\desktop-build.prisma:1:enum DesktopBuildSource {
+  apps\api\prisma\models\desktop-build.prisma:2:  GITHUB_ACTIONS
+  apps\api\prisma\models\desktop-build.prisma:3:}
+  apps\api\prisma\models\desktop-build.prisma:4:
+> apps\api\prisma\models\desktop-build.prisma:5:enum DesktopBuildStatus {
+  apps\api\prisma\models\desktop-build.prisma:6:  QUEUED
+  apps\api\prisma\models\desktop-build.prisma:7:  BUILDING
+  apps\api\prisma\models\desktop-build.prisma:8:  SUCCESS
+  apps\api\prisma\models\desktop-build.prisma:9:  FAILED
+  apps\api\prisma\models\desktop-build.prisma:10:  CANCELLED
+  apps\api\prisma\models\desktop-build.prisma:11:}
+  apps\api\prisma\models\desktop-build.prisma:12:
+> apps\api\prisma\models\desktop-build.prisma:13:model DesktopBuild {
+  apps\api\prisma\models\desktop-build.prisma:14:  id           String @id @default(uuid()) @db.Uuid
+  apps\api\prisma\models\desktop-build.prisma:15:  workspaceId  String @map("workspace_id") @db.Uuid
+  apps\api\prisma\models\desktop-build.prisma:16:  desktopAppId String @map("desktop_app_id") @db.Uuid
+  apps\api\prisma\models\desktop-build.prisma:17:  repositoryId String @map("repository_id") @db.Uuid
+  apps\api\prisma\models\desktop-build.prisma:18:
+  apps\api\prisma\models\desktop-build.prisma:19:  workflowRunId String             @map("workflow_run_id") @db.VarChar(128)
+> apps\api\prisma\models\desktop-build.prisma:20:  source        DesktopBuildSource @default(GITHUB_ACTIONS)
+  apps\api\prisma\models\desktop-build.prisma:21:
+  apps\api\prisma\models\desktop-build.prisma:22:  commitSha String @map("commit_sha") @db.VarChar(64)
+  apps\api\prisma\models\desktop-build.prisma:23:  branch    String @db.VarChar(255)
+  apps\api\prisma\models\desktop-build.prisma:24:
+  apps\api\prisma\models\desktop-build.prisma:25:  version     String? @db.VarChar(64)
+  apps\api\prisma\models\desktop-build.prisma:28:  platform     DesktopPlatform
+  apps\api\prisma\models\desktop-build.prisma:29:  architecture DesktopArchitecture
+> apps\api\prisma\models\desktop-build.prisma:30:  status       DesktopBuildStatus @default(QUEUED)
+  apps\api\prisma\models\desktop-build.prisma:31:
+  apps\api\prisma\models\desktop-build.prisma:32:  startedAt   DateTime? @map("started_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-build.prisma:33:  completedAt DateTime? @map("completed_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-build.prisma:34:  durationMs  Int?      @map("duration_ms")
+  apps\api\prisma\models\desktop-build.prisma:35:
+  apps\api\prisma\models\desktop-build.prisma:38:
+  apps\api\prisma\models\desktop-build.prisma:39:  desktopApp DesktopApplication    @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+> apps\api\prisma\models\desktop-build.prisma:40:  repository RepositoryConnection @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  apps\api\prisma\models\desktop-build.prisma:41:
+  apps\api\prisma\models\desktop-build.prisma:42:  @@unique([repositoryId, workflowRunId, platform, architecture])
+  apps\api\prisma\models\desktop-build.prisma:43:  @@index([workspaceId, desktopAppId])
+  apps\api\prisma\models\desktop-build.prisma:44:  @@index([desktopAppId, createdAt(sort: Desc)])
+  apps\api\prisma\models\desktop-build.prisma:45:  @@index([repositoryId, createdAt(sort: Desc)])
+  apps\api\prisma\models\desktop-release.prisma:36:
+  apps\api\prisma\models\desktop-release.prisma:37:    desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+> apps\api\prisma\models\desktop-release.prisma:38:    build      DesktopBuild       @relation(fields: [buildId], references: [id], onDelete: Restrict)
+  apps\api\prisma\models\desktop-release.prisma:39:
+  apps\api\prisma\models\desktop-release.prisma:40:    @@unique([buildId, channel])
+  apps\api\prisma\models\desktop-release.prisma:41:    @@index([workspaceId, desktopAppId, createdAt(sort: Desc)])
+  apps\api\prisma\models\desktop-release.prisma:42:    @@index([desktopAppId, channel, createdAt(sort: Desc)])
+  apps\api\prisma\models\desktop-release.prisma:43:    @@index([desktopAppId, status, createdAt(sort: Desc)])
+  apps\api\prisma\models\desktop-test.prisma:35:    updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  apps\api\prisma\models\desktop-test.prisma:36:
+> apps\api\prisma\models\desktop-test.prisma:37:    build    DesktopBuild         @relation(fields: [buildId], references: [id], onDelete: Cascade)
+  apps\api\prisma\models\desktop-test.prisma:38:    failures DesktopTestFailure[]
+  apps\api\prisma\models\desktop-test.prisma:39:
+  apps\api\prisma\models\desktop-test.prisma:40:    @@unique([buildId, type])
+  apps\api\prisma\models\desktop-test.prisma:41:    @@index([buildId])
+  apps\api\prisma\models\desktop-test.prisma:42:    @@index([status])
+  apps\api\prisma\models\mobile-build.prisma:38:  releases   MobileRelease[]
+  apps\api\prisma\models\mobile-build.prisma:39:  mobileApp  MobileApplication    @relation(fields: [mobileAppId], references: [id], onDelete: Cascade)
+> apps\api\prisma\models\mobile-build.prisma:40:  repository RepositoryConnection @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  apps\api\prisma\models\mobile-build.prisma:41:  testRuns   MobileTestRun[]
+  apps\api\prisma\models\mobile-build.prisma:42:
+  apps\api\prisma\models\mobile-build.prisma:43:  @@unique([repositoryId, workflowRunId])
+  apps\api\prisma\models\mobile-build.prisma:44:  @@index([workspaceId, mobileAppId])
+  apps\api\prisma\models\mobile-build.prisma:45:  @@index([mobileAppId, createdAt(sort: Desc)])
+  apps\api\prisma\models\repositories.prisma:52:
+  apps\api\prisma\models\repositories.prisma:53:  workspace    Workspace              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+> apps\api\prisma\models\repositories.prisma:54:  repositories RepositoryConnection[]
+  apps\api\prisma\models\repositories.prisma:55:
+  apps\api\prisma\models\repositories.prisma:56:  @@unique([workspaceId, provider, externalInstallationId])
+  apps\api\prisma\models\repositories.prisma:57:  @@index([externalInstallationId])
+  apps\api\prisma\models\repositories.prisma:58:  @@index([workspaceId, provider])
+  apps\api\prisma\models\repositories.prisma:59:  @@map("repository_installations")
+  apps\api\prisma\models\repositories.prisma:60:}
+  apps\api\prisma\models\repositories.prisma:61:
+> apps\api\prisma\models\repositories.prisma:62:model RepositoryConnection {
+  apps\api\prisma\models\repositories.prisma:63:  id             String             @id @default(uuid()) @db.Uuid
+  apps\api\prisma\models\repositories.prisma:64:  workspaceId    String             @map("workspace_id") @db.Uuid
+  apps\api\prisma\models\repositories.prisma:65:  installationId String             @map("installation_id") @db.Uuid
+  apps\api\prisma\models\repositories.prisma:66:  applicationId  String?            @map("application_id") @db.Uuid
+  apps\api\prisma\models\repositories.prisma:67:  provider       RepositoryProvider @default(GITHUB)
+  apps\api\prisma\models\workspace.prisma:34:  repositoryConnectIntents RepositoryConnectIntent[]
+  apps\api\prisma\models\workspace.prisma:35:  repositoryInstallations  RepositoryInstallation[]
+> apps\api\prisma\models\workspace.prisma:36:  repositoryConnections    RepositoryConnection[]
+  apps\api\prisma\models\workspace.prisma:37:
+  apps\api\prisma\models\workspace.prisma:38:  @@index([ownerId])
+  apps\api\prisma\models\workspace.prisma:39:  @@index([deletedAt])
+  apps\api\prisma\models\workspace.prisma:40:  @@map("workspaces")
+  apps\api\prisma\models\workspace.prisma:41:}
+
+
+
+
+==================================================
+15. ALL DESKTOP RELATION LINES
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-aggregates.prisma:21:   website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-aggregates.prisma:49:   website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:13:   website   Website             @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:55:   website   Website             @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:56:   visitor   AnalyticsVisitor    @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:99:   website  Website            @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:100:   visitor  AnalyticsVisitor   @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:101:   session  AnalyticsSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:102:   rawEvent RawAnalyticsEvent? @relation(fields: [rawEventId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:136:   website Website          @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:137:   visitor AnalyticsVisitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:138:   session AnalyticsSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:139:   event   AnalyticsEvent   @relation(fields: [analyticsEventId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-ingestion.prisma:30:   website        Website         @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-processing.prisma:12:   website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-processing.prisma:58:   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-processing.prisma:59:   website     Website   @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-processing.prisma:60:   initiatedBy User?     @relation("AnalyticsProcessingRunInitiatedBy", fields: [initiatedByUserId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-processing.prisma:90:   run        AnalyticsProcessingRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-processing.prisma:91:   workspace  Workspace?             @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-processing.prisma:92:   website    Website                @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-processing.prisma:93:   resolvedBy User?                  @relation("AnalyticsProcessingDeadLetterResolvedBy", fields: [resolvedById], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-activity.prisma:16:   workspace   Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-activity.prisma:17:   application SaasApplication? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-activity.prisma:18:   actor       User?            @relation("ApplicationActivityActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-delivery.prisma:18:   application SaasApplication      @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-delivery.prisma:45:   milestone ApplicationMilestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-delivery.prisma:46:   assignee  User?                @relation("ApplicationTaskAssignee", fields: [assigneeUserId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-delivery.prisma:73:   application SaasApplication       @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-delivery.prisma:74:   milestone   ApplicationMilestone? @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-delivery.prisma:75:   task        ApplicationTask?      @relation(fields: [taskId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-delivery.prisma:77:   createdBy  User? @relation("ApplicationBlockerCreator", fields: [createdByUserId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-delivery.prisma:78:   resolvedBy User? @relation("ApplicationBlockerResolver", fields: [resolvedByUserId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-environments.prisma:18:   workspace   Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-environments.prisma:19:   application SaasApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application.prisma:20:   workspace               Workspace                @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application.prisma:26:   desktopApplication      DesktopApplication?
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application.prisma:61:   application SaasApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application.prisma:77:   application SaasApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\collaboration.prisma:29:   workspace  Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\collaboration.prisma:30:   invitedBy  User      @relation("WorkspaceInvitationInvitedBy", fields: [invitedById], references: [id])
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\collaboration.prisma:31:   acceptedBy User?     @relation("WorkspaceInvitationAcceptedBy", fields: [acceptedById], references: [id])
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\collaboration.prisma:65:   workspace   Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\collaboration.prisma:66:   user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\collaboration.prisma:67:   application SaasApplication? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-ai-analysis.prisma:14: model DesktopAiAnalysis {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-ai-analysis.prisma:29:   desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma:1: enum DesktopAlertRuleType {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma:12: enum DesktopAlertOperator {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma:17: enum DesktopAlertIncidentStatus {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma:22: model DesktopAlertRule {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma:28:   type     DesktopAlertRuleType
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma:29:   operator DesktopAlertOperator @default(GT)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma:38:   desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma:39:   incidents  DesktopAlertIncident[]
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma:47: model DesktopAlertIncident {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma:53:   status DesktopAlertIncidentStatus @default(OPEN)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma:77:   rule       DesktopAlertRule   @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma:78:   desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-application.prisma:1: model DesktopApplication {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-application.prisma:21:   application SaasApplication @relation(
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build-artifact.prisma:1: enum DesktopBuildArtifactType {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build-artifact.prisma:15: model DesktopBuildArtifact {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build-artifact.prisma:23:     type         DesktopBuildArtifactType
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build-artifact.prisma:32:     build DesktopBuild @relation(fields: [buildId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build.prisma:1: enum DesktopBuildSource {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build.prisma:5: enum DesktopBuildStatus {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build.prisma:13: model DesktopBuild {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build.prisma:20:   source        DesktopBuildSource @default(GITHUB_ACTIONS)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build.prisma:30:   status       DesktopBuildStatus @default(QUEUED)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build.prisma:39:   desktopApp DesktopApplication    @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build.prisma:40:   repository RepositoryConnection @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-release.prisma:1: enum DesktopReleaseChannel {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-release.prisma:9: enum DesktopReleaseStatus {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-release.prisma:17: model DesktopRelease {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-release.prisma:26:     channel      DesktopReleaseChannel
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-release.prisma:29:     status       DesktopReleaseStatus  @default(DRAFT)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-release.prisma:37:     desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-release.prisma:38:     build      DesktopBuild       @relation(fields: [buildId], references: [id], onDelete: Restrict)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-runtime.prisma:13: model DesktopMetric {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-runtime.prisma:27:   channel      DesktopReleaseChannel?
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-runtime.prisma:33:   desktopApp DesktopApplication          @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-runtime.prisma:34:   integration DesktopTelemetryIntegration @relation(fields: [telemetryIntegrationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-runtime.prisma:43: model DesktopCrash {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-runtime.prisma:58:   channel      DesktopReleaseChannel?
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-runtime.prisma:66:   desktopApp DesktopApplication          @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-runtime.prisma:67:   integration DesktopTelemetryIntegration @relation(fields: [telemetryIntegrationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma:1: enum DesktopDependencyEcosystem {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma:13: enum DesktopDependencyRiskStatus {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma:20: enum DesktopSecuritySeverity {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma:28: enum DesktopSecurityCheckType {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma:36: enum DesktopSecurityCheckStatus {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma:43: model DesktopDependency {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma:48:     ecosystem      DesktopDependencyEcosystem
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma:54:     riskStatus     DesktopDependencyRiskStatus @default(UNKNOWN) @map("risk_status")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma:55:     severity       DesktopSecuritySeverity?
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma:61:     desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma:70: model DesktopSecurityFinding {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma:76:     type       DesktopSecurityCheckType
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma:77:     status     DesktopSecurityCheckStatus
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma:78:     severity   DesktopSecuritySeverity
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma:87:     desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-telemetry.prisma:1: enum DesktopTelemetryProvider {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-telemetry.prisma:9: enum DesktopTelemetryIntegrationStatus {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-telemetry.prisma:15: model DesktopTelemetryIntegration {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-telemetry.prisma:20:     provider          DesktopTelemetryProvider
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-telemetry.prisma:21:     status            DesktopTelemetryIntegrationStatus @default(CONNECTED)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-telemetry.prisma:35:     desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-telemetry.prisma:36:     metrics    DesktopMetric[]
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-telemetry.prisma:37:     crashes    DesktopCrash[]
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-test.prisma:37:     build    DesktopBuild         @relation(fields: [buildId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-test.prisma:59:     testRun DesktopTestRun @relation(fields: [testRunId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\health-monitoring.prisma:41:   workspace   Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\health-monitoring.prisma:42:   application SaasApplication? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\health-monitoring.prisma:43:   website     Website?         @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\health-monitoring.prisma:45:   createdBy User @relation("HealthCheckCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\health-monitoring.prisma:46:   updatedBy User @relation("HealthCheckUpdatedBy", fields: [updatedById], references: [id], onDelete: Restrict)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\health-monitoring.prisma:71:   healthCheck HealthCheck @relation(fields: [healthCheckId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\health-monitoring.prisma:99:   healthCheck HealthCheck @relation(fields: [healthCheckId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\health-monitoring.prisma:100:   workspace   Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:13:   ownedWorkspaces             Workspace[]           @relation("WorkspaceOwner")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:16:   applicationActivities       ApplicationActivity[] @relation("ApplicationActivityActor")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:17:   assignedApplicationTasks    ApplicationTask[]     @relation("ApplicationTaskAssignee")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:18:   createdApplicationBlockers  ApplicationBlocker[]  @relation("ApplicationBlockerCreator")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:19:   resolvedApplicationBlockers ApplicationBlocker[]  @relation("ApplicationBlockerResolver")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:21:   initiatedAnalyticsProcessingRuns   AnalyticsProcessingRun[]        @relation("AnalyticsProcessingRunInitiatedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:22:   resolvedAnalyticsProcessingLetters AnalyticsProcessingDeadLetter[] @relation("AnalyticsProcessingDeadLetterResolvedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:24:   createdHealthChecks HealthCheck[] @relation("HealthCheckCreatedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:25:   updatedHealthChecks HealthCheck[] @relation("HealthCheckUpdatedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:27:   createdReleases Release[] @relation("ReleaseCreatedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:28:   updatedReleases Release[] @relation("ReleaseUpdatedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:30:   createdDeployments  Deployment[] @relation("DeploymentCreatedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:31:   updatedDeployments  Deployment[] @relation("DeploymentUpdatedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:32:   executedDeployments Deployment[] @relation("DeploymentDeployedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:36:   sentWorkspaceInvitations     WorkspaceInvitation[] @relation("WorkspaceInvitationInvitedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:37:   acceptedWorkspaceInvitations WorkspaceInvitation[] @relation("WorkspaceInvitationAcceptedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:41:   createdWebhookEndpoints WebhookEndpoint[] @relation("WebhookEndpointCreatedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:42:   updatedWebhookEndpoints WebhookEndpoint[] @relation("WebhookEndpointUpdatedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:66:   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:67:   parentSession  AuthSession? @relation("AuthSessionRotation", fields: [parentSessionId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:68:   rotatedSession AuthSession? @relation("AuthSessionRotation")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-ai-analysis.prisma:30:   mobileApp MobileApplication @relation(fields: [mobileAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-alert.prisma:36:   mobileApp MobileApplication @relation(fields: [mobileAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-alert.prisma:70:   rule MobileAlertRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-application.prisma:15:   application                SaasApplication             @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-build.prisma:39:   mobileApp  MobileApplication    @relation(fields: [mobileAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-build.prisma:40:   repository RepositoryConnection @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-performance.prisma:34:   mobileApp MobileApplication @relation(fields: [mobileAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-release.prisma:36:   mobileApp MobileApplication @relation(fields: [mobileAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-release.prisma:38:   build MobileBuild @relation(fields: [buildId], references: [id], onDelete: Restrict)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-telemetry.prisma:33:   mobileApp MobileApplication @relation(fields: [mobileAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-test.prisma:37:   build    MobileBuild         @relation(fields: [buildId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-test.prisma:59:   testRun MobileTestRun @relation(fields: [testRunId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:24:   workspace   Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:25:   application SaasApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:27:   createdBy User @relation("ReleaseCreatedBy", fields: [createdById], references: [id])
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:28:   updatedBy User @relation("ReleaseUpdatedBy", fields: [updatedById], references: [id])
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:76:   workspace   Workspace              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:77:   application SaasApplication        @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:78:   environment ApplicationEnvironment @relation(fields: [environmentId], references: [id], onDelete: Restrict)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:79:   release     Release                @relation(fields: [releaseId], references: [id], onDelete: Restrict)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:81:   deployedBy User? @relation("DeploymentDeployedBy", fields: [deployedById], references: [id])
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:82:   createdBy  User  @relation("DeploymentCreatedBy", fields: [createdById], references: [id])
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:83:   updatedBy  User  @relation("DeploymentUpdatedBy", fields: [updatedById], references: [id])
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:85:   rollbackTo         Deployment?  @relation("DeploymentRollback", fields: [rollbackToDeploymentId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:86:   rollbackReferences Deployment[] @relation("DeploymentRollback")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:88:   healthIncident HealthIncident? @relation(fields: [healthIncidentId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:116:   workspace  Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:117:   deployment Deployment @relation(fields: [deploymentId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:118:   actor      User       @relation(fields: [actorId], references: [id])
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\repositories.prisma:13:   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\repositories.prisma:33:   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\repositories.prisma:53:   workspace    Workspace              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\repositories.prisma:83:   workspace    Workspace              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\repositories.prisma:84:   installation RepositoryInstallation @relation(fields: [installationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\repositories.prisma:85:   application  SaasApplication?       @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma:32:   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma:34:   createdBy User @relation("WebhookEndpointCreatedBy", fields: [createdById], references: [id])
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma:35:   updatedBy User @relation("WebhookEndpointUpdatedBy", fields: [updatedById], references: [id])
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma:59:   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma:95:   workspace Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma:96:   endpoint  WebhookEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma:97:   event     WebhookEvent    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma:126:   delivery WebhookDelivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\website.prisma:18:   workspace                      Workspace                       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\website.prisma:19:   application                    SaasApplication?                @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\workspace.prisma:10:   owner                 User                  @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\workspace.prisma:52:   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\workspace.prisma:53:   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+==================================================
+16. MULTILINE RELATION STARTS
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-aggregates.prisma:21:   website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-aggregates.prisma:49:   website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:13:   website   Website             @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:55:   website   Website             @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:56:   visitor   AnalyticsVisitor    @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:99:   website  Website            @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:100:   visitor  AnalyticsVisitor   @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:101:   session  AnalyticsSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:102:   rawEvent RawAnalyticsEvent? @relation(fields: [rawEventId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:136:   website Website          @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:137:   visitor AnalyticsVisitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:138:   session AnalyticsSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma:139:   event   AnalyticsEvent   @relation(fields: [analyticsEventId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-ingestion.prisma:30:   website        Website         @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-processing.prisma:12:   website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-processing.prisma:58:   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-processing.prisma:59:   website     Website   @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-processing.prisma:60:   initiatedBy User?     @relation("AnalyticsProcessingRunInitiatedBy", fields: [initiatedByUserId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-processing.prisma:90:   run        AnalyticsProcessingRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-processing.prisma:91:   workspace  Workspace?             @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-processing.prisma:92:   website    Website                @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-processing.prisma:93:   resolvedBy User?                  @relation("AnalyticsProcessingDeadLetterResolvedBy", fields: [resolvedById], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-activity.prisma:16:   workspace   Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-activity.prisma:17:   application SaasApplication? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-activity.prisma:18:   actor       User?            @relation("ApplicationActivityActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-delivery.prisma:18:   application SaasApplication      @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-delivery.prisma:45:   milestone ApplicationMilestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-delivery.prisma:46:   assignee  User?                @relation("ApplicationTaskAssignee", fields: [assigneeUserId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-delivery.prisma:73:   application SaasApplication       @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-delivery.prisma:74:   milestone   ApplicationMilestone? @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-delivery.prisma:75:   task        ApplicationTask?      @relation(fields: [taskId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-delivery.prisma:77:   createdBy  User? @relation("ApplicationBlockerCreator", fields: [createdByUserId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-delivery.prisma:78:   resolvedBy User? @relation("ApplicationBlockerResolver", fields: [resolvedByUserId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-environments.prisma:18:   workspace   Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-environments.prisma:19:   application SaasApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application.prisma:20:   workspace               Workspace                @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application.prisma:61:   application SaasApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application.prisma:77:   application SaasApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\collaboration.prisma:29:   workspace  Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\collaboration.prisma:30:   invitedBy  User      @relation("WorkspaceInvitationInvitedBy", fields: [invitedById], references: [id])
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\collaboration.prisma:31:   acceptedBy User?     @relation("WorkspaceInvitationAcceptedBy", fields: [acceptedById], references: [id])
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\collaboration.prisma:65:   workspace   Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\collaboration.prisma:66:   user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\collaboration.prisma:67:   application SaasApplication? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-ai-analysis.prisma:29:   desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma:38:   desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma:77:   rule       DesktopAlertRule   @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma:78:   desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-application.prisma:21:   application SaasApplication @relation(
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build-artifact.prisma:32:     build DesktopBuild @relation(fields: [buildId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build.prisma:39:   desktopApp DesktopApplication    @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build.prisma:40:   repository RepositoryConnection @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-release.prisma:37:     desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-release.prisma:38:     build      DesktopBuild       @relation(fields: [buildId], references: [id], onDelete: Restrict)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-runtime.prisma:33:   desktopApp DesktopApplication          @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-runtime.prisma:34:   integration DesktopTelemetryIntegration @relation(fields: [telemetryIntegrationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-runtime.prisma:66:   desktopApp DesktopApplication          @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-runtime.prisma:67:   integration DesktopTelemetryIntegration @relation(fields: [telemetryIntegrationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma:61:     desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma:87:     desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-telemetry.prisma:35:     desktopApp DesktopApplication @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-test.prisma:37:     build    DesktopBuild         @relation(fields: [buildId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-test.prisma:59:     testRun DesktopTestRun @relation(fields: [testRunId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\health-monitoring.prisma:41:   workspace   Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\health-monitoring.prisma:42:   application SaasApplication? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\health-monitoring.prisma:43:   website     Website?         @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\health-monitoring.prisma:45:   createdBy User @relation("HealthCheckCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\health-monitoring.prisma:46:   updatedBy User @relation("HealthCheckUpdatedBy", fields: [updatedById], references: [id], onDelete: Restrict)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\health-monitoring.prisma:71:   healthCheck HealthCheck @relation(fields: [healthCheckId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\health-monitoring.prisma:99:   healthCheck HealthCheck @relation(fields: [healthCheckId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\health-monitoring.prisma:100:   workspace   Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:13:   ownedWorkspaces             Workspace[]           @relation("WorkspaceOwner")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:16:   applicationActivities       ApplicationActivity[] @relation("ApplicationActivityActor")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:17:   assignedApplicationTasks    ApplicationTask[]     @relation("ApplicationTaskAssignee")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:18:   createdApplicationBlockers  ApplicationBlocker[]  @relation("ApplicationBlockerCreator")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:19:   resolvedApplicationBlockers ApplicationBlocker[]  @relation("ApplicationBlockerResolver")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:21:   initiatedAnalyticsProcessingRuns   AnalyticsProcessingRun[]        @relation("AnalyticsProcessingRunInitiatedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:22:   resolvedAnalyticsProcessingLetters AnalyticsProcessingDeadLetter[] @relation("AnalyticsProcessingDeadLetterResolvedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:24:   createdHealthChecks HealthCheck[] @relation("HealthCheckCreatedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:25:   updatedHealthChecks HealthCheck[] @relation("HealthCheckUpdatedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:27:   createdReleases Release[] @relation("ReleaseCreatedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:28:   updatedReleases Release[] @relation("ReleaseUpdatedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:30:   createdDeployments  Deployment[] @relation("DeploymentCreatedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:31:   updatedDeployments  Deployment[] @relation("DeploymentUpdatedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:32:   executedDeployments Deployment[] @relation("DeploymentDeployedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:36:   sentWorkspaceInvitations     WorkspaceInvitation[] @relation("WorkspaceInvitationInvitedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:37:   acceptedWorkspaceInvitations WorkspaceInvitation[] @relation("WorkspaceInvitationAcceptedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:41:   createdWebhookEndpoints WebhookEndpoint[] @relation("WebhookEndpointCreatedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:42:   updatedWebhookEndpoints WebhookEndpoint[] @relation("WebhookEndpointUpdatedBy")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:66:   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:67:   parentSession  AuthSession? @relation("AuthSessionRotation", fields: [parentSessionId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma:68:   rotatedSession AuthSession? @relation("AuthSessionRotation")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-ai-analysis.prisma:30:   mobileApp MobileApplication @relation(fields: [mobileAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-alert.prisma:36:   mobileApp MobileApplication @relation(fields: [mobileAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-alert.prisma:70:   rule MobileAlertRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-application.prisma:15:   application                SaasApplication             @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-build.prisma:39:   mobileApp  MobileApplication    @relation(fields: [mobileAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-build.prisma:40:   repository RepositoryConnection @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-performance.prisma:34:   mobileApp MobileApplication @relation(fields: [mobileAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-release.prisma:36:   mobileApp MobileApplication @relation(fields: [mobileAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-release.prisma:38:   build MobileBuild @relation(fields: [buildId], references: [id], onDelete: Restrict)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-telemetry.prisma:33:   mobileApp MobileApplication @relation(fields: [mobileAppId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-test.prisma:37:   build    MobileBuild         @relation(fields: [buildId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-test.prisma:59:   testRun MobileTestRun @relation(fields: [testRunId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:24:   workspace   Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:25:   application SaasApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:27:   createdBy User @relation("ReleaseCreatedBy", fields: [createdById], references: [id])
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:28:   updatedBy User @relation("ReleaseUpdatedBy", fields: [updatedById], references: [id])
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:76:   workspace   Workspace              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:77:   application SaasApplication        @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:78:   environment ApplicationEnvironment @relation(fields: [environmentId], references: [id], onDelete: Restrict)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:79:   release     Release                @relation(fields: [releaseId], references: [id], onDelete: Restrict)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:81:   deployedBy User? @relation("DeploymentDeployedBy", fields: [deployedById], references: [id])
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:82:   createdBy  User  @relation("DeploymentCreatedBy", fields: [createdById], references: [id])
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:83:   updatedBy  User  @relation("DeploymentUpdatedBy", fields: [updatedById], references: [id])
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:85:   rollbackTo         Deployment?  @relation("DeploymentRollback", fields: [rollbackToDeploymentId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:86:   rollbackReferences Deployment[] @relation("DeploymentRollback")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:88:   healthIncident HealthIncident? @relation(fields: [healthIncidentId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:116:   workspace  Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:117:   deployment Deployment @relation(fields: [deploymentId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma:118:   actor      User       @relation(fields: [actorId], references: [id])
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\repositories.prisma:13:   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\repositories.prisma:33:   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\repositories.prisma:53:   workspace    Workspace              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\repositories.prisma:83:   workspace    Workspace              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\repositories.prisma:84:   installation RepositoryInstallation @relation(fields: [installationId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\repositories.prisma:85:   application  SaasApplication?       @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma:32:   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma:34:   createdBy User @relation("WebhookEndpointCreatedBy", fields: [createdById], references: [id])
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma:35:   updatedBy User @relation("WebhookEndpointUpdatedBy", fields: [updatedById], references: [id])
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma:59:   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma:95:   workspace Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma:96:   endpoint  WebhookEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma:97:   event     WebhookEvent    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma:126:   delivery WebhookDelivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\website.prisma:18:   workspace                      Workspace                       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\website.prisma:19:   application                    SaasApplication?                @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\workspace.prisma:10:   owner                 User                  @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\workspace.prisma:52:   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\workspace.prisma:53:   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+==================================================
+17. DESKTOP MODEL NAMES
+==================================================
+
+Name                        File                                                                                                             
+----                        ----                                                                                                             
+DesktopAiAnalysis           C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-ai-analysis.prisma    
+DesktopAlertIncident        C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma          
+DesktopAlertRule            C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma          
+DesktopApplication          C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-application.prisma    
+DesktopBuild                C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build.prisma          
+DesktopBuildArtifact        C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build-artifact.prisma 
+DesktopCrash                C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-runtime.prisma        
+DesktopDependency           C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma
+DesktopMetric               C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-runtime.prisma        
+DesktopRelease              C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-release.prisma        
+DesktopSecurityFinding      C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma
+DesktopTelemetryIntegration C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-telemetry.prisma      
+DesktopTestFailure          C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-test.prisma           
+DesktopTestRun              C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-test.prisma           
+
+
+
+
+==================================================
+18. DUPLICATE MODEL NAMES
+==================================================
+
+==================================================
+19. ENUM NAMES
+==================================================
+
+Name                              File                                                                                                             
+----                              ----                                                                                                             
+DesktopAlertIncidentStatus        C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma          
+DesktopAlertOperator              C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma          
+DesktopAlertRuleType              C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma          
+DesktopAnalysisAction             C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-ai-analysis.prisma    
+DesktopAnalysisConfidence         C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-ai-analysis.prisma    
+DesktopArchitecture               C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\desktop-application.prisma     
+DesktopBuildArtifactType          C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build-artifact.prisma 
+DesktopBuildSource                C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build.prisma          
+DesktopBuildStatus                C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build.prisma          
+DesktopDependencyEcosystem        C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma
+DesktopDependencyRiskStatus       C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma
+DesktopFramework                  C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\desktop-application.prisma     
+DesktopPerformanceMetricType      C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-runtime.prisma        
+DesktopPlatform                   C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\desktop-application.prisma     
+DesktopReleaseChannel             C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-release.prisma        
+DesktopReleaseStatus              C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-release.prisma        
+DesktopSecurityCheckStatus        C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma
+DesktopSecurityCheckType          C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma
+DesktopSecuritySeverity           C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma
+DesktopTelemetryIntegrationStatus C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-telemetry.prisma      
+DesktopTelemetryProvider          C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-telemetry.prisma      
+DesktopTestStatus                 C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-test.prisma           
+DesktopTestType                   C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-test.prisma           
+
+
+
+
+==================================================
+20. DUPLICATE ENUM NAMES
+==================================================
+
+==================================================
+21. DESKTOP APPLICATION EXPECTED RELATION NAMES CHECK
+==================================================
+FOUND keyword: application
+NOT FOUND keyword: builds
+NOT FOUND keyword: releases
+NOT FOUND keyword: telemetry
+NOT FOUND keyword: metrics
+NOT FOUND keyword: crashes
+NOT FOUND keyword: dependencies
+NOT FOUND keyword: security
+NOT FOUND keyword: alert
+NOT FOUND keyword: ai
+
+==================================================
+22. DESKTOP BUILD EXPECTED RELATIONS CHECK
+==================================================
+FOUND keyword: desktopApp
+FOUND keyword: repository
+NOT FOUND keyword: artifacts
+NOT FOUND keyword: testRuns
+NOT FOUND keyword: releases
+
+==================================================
+23. APPLICATION TYPE ENUM
+==================================================
+
+  apps\api\prisma\enums\analytics.prisma:1:enum AnalyticsDeviceType {
+> apps\api\prisma\enums\analytics.prisma:2:  DESKTOP
+> apps\api\prisma\enums\analytics.prisma:3:  MOBILE
+  apps\api\prisma\enums\analytics.prisma:4:  TABLET
+  apps\api\prisma\enums\analytics.prisma:5:  BOT
+  apps\api\prisma\enums\analytics.prisma:6:  OTHER
+  apps\api\prisma\enums\analytics.prisma:7:}
+  apps\api\prisma\enums\analytics.prisma:8:
+  apps\api\prisma\enums\analytics.prisma:9:enum AnalyticsSourceType {
+  apps\api\prisma\enums\analytics.prisma:10:  DIRECT
+  apps\api\prisma\enums\analytics.prisma:11:  INTERNAL
+  apps\api\prisma\enums\application.prisma:16:}
+  apps\api\prisma\enums\application.prisma:17:
+> apps\api\prisma\enums\application.prisma:18:enum ApplicationType {
+  apps\api\prisma\enums\application.prisma:19:  WEB
+  apps\api\prisma\enums\application.prisma:20:  API
+> apps\api\prisma\enums\application.prisma:21:  MOBILE
+> apps\api\prisma\enums\application.prisma:22:  DESKTOP
+  apps\api\prisma\enums\application.prisma:23:  WORKER
+  apps\api\prisma\enums\application.prisma:24:  OTHER
+  apps\api\prisma\enums\application.prisma:25:}
+  apps\api\prisma\enums\application.prisma:26:
+  apps\api\prisma\enums\application.prisma:27:enum ApplicationCategory {
+  apps\api\prisma\enums\application.prisma:28:  SAAS
+  apps\api\prisma\enums\application.prisma:29:  AI
+> apps\api\prisma\enums\application.prisma:30:  MOBILE
+  apps\api\prisma\enums\application.prisma:31:  ECOMMERCE
+  apps\api\prisma\enums\application.prisma:32:  API
+  apps\api\prisma\enums\application.prisma:33:  INTERNAL_TOOL
+  apps\api\prisma\enums\application.prisma:34:  OTHER
+  apps\api\prisma\enums\application.prisma:35:}
+  apps\api\prisma\enums\application.prisma:36:
+  apps\api\prisma\enums\application.prisma:37:enum TechnologyType {
+  apps\api\prisma\enums\application.prisma:38:  FRONTEND
+  apps\api\prisma\enums\application.prisma:39:  BACKEND
+  apps\api\prisma\enums\application.prisma:40:  DATABASE
+> apps\api\prisma\enums\application.prisma:41:  MOBILE
+  apps\api\prisma\enums\application.prisma:42:  AI
+  apps\api\prisma\enums\application.prisma:43:  INFRASTRUCTURE
+  apps\api\prisma\enums\application.prisma:44:  OTHER
+  apps\api\prisma\enums\application.prisma:45:}
+  apps\api\prisma\enums\application.prisma:46:
+  apps\api\prisma\enums\application.prisma:47:enum ApplicationLinkType {
+  apps\api\prisma\enums\application.prisma:48:  PRODUCTION
+  apps\api\prisma\enums\application.prisma:49:  STAGING
+  apps\api\prisma\enums\application.prisma:58:  STANDARD_SAAS
+  apps\api\prisma\enums\application.prisma:59:  AI_SAAS
+> apps\api\prisma\enums\application.prisma:60:  MOBILE
+  apps\api\prisma\enums\application.prisma:61:  API
+  apps\api\prisma\enums\application.prisma:62:  ECOMMERCE
+  apps\api\prisma\enums\application.prisma:63:}
+> apps\api\prisma\enums\desktop-application.prisma:1:enum DesktopPlatform {
+  apps\api\prisma\enums\desktop-application.prisma:2:    WINDOWS
+  apps\api\prisma\enums\desktop-application.prisma:3:    MACOS
+  apps\api\prisma\enums\desktop-application.prisma:4:    LINUX
+  apps\api\prisma\enums\desktop-application.prisma:5:    CROSS_PLATFORM
+  apps\api\prisma\enums\desktop-application.prisma:6:}
+  apps\api\prisma\enums\desktop-application.prisma:7:
+> apps\api\prisma\enums\desktop-application.prisma:8:enum DesktopFramework {
+  apps\api\prisma\enums\desktop-application.prisma:9:    ELECTRON
+  apps\api\prisma\enums\desktop-application.prisma:10:    TAURI
+  apps\api\prisma\enums\desktop-application.prisma:11:    DOTNET
+  apps\api\prisma\enums\desktop-application.prisma:12:    QT
+  apps\api\prisma\enums\desktop-application.prisma:13:    JAVA
+  apps\api\prisma\enums\desktop-application.prisma:14:    NATIVE_WINDOWS
+  apps\api\prisma\enums\desktop-application.prisma:15:    NATIVE_MACOS
+  apps\api\prisma\enums\desktop-application.prisma:16:    OTHER
+  apps\api\prisma\enums\desktop-application.prisma:17:}
+  apps\api\prisma\enums\desktop-application.prisma:18:
+> apps\api\prisma\enums\desktop-application.prisma:19:enum DesktopArchitecture {
+  apps\api\prisma\enums\desktop-application.prisma:20:    X64
+  apps\api\prisma\enums\desktop-application.prisma:21:    ARM64
+  apps\api\prisma\enums\desktop-application.prisma:22:    X86
+  apps\api\prisma\enums\desktop-application.prisma:23:    UNIVERSAL
+  apps\api\prisma\enums\desktop-application.prisma:24:}
+> apps\api\prisma\enums\mobile-application.prisma:1:enum MobilePlatform {
+  apps\api\prisma\enums\mobile-application.prisma:2:  ANDROID
+  apps\api\prisma\enums\mobile-application.prisma:3:  IOS
+  apps\api\prisma\enums\mobile-application.prisma:4:  CROSS_PLATFORM
+  apps\api\prisma\enums\mobile-application.prisma:5:}
+  apps\api\prisma\enums\mobile-application.prisma:6:
+> apps\api\prisma\enums\mobile-application.prisma:7:enum MobileFramework {
+  apps\api\prisma\enums\mobile-application.prisma:8:  ANDROID_NATIVE
+  apps\api\prisma\enums\mobile-application.prisma:9:  IOS_NATIVE
+  apps\api\prisma\enums\mobile-application.prisma:10:  FLUTTER
+  apps\api\prisma\enums\mobile-application.prisma:11:  REACT_NATIVE
+  apps\api\prisma\enums\mobile-application.prisma:12:  KMP
+  apps\api\prisma\enums\mobile-application.prisma:13:  OTHER
+  apps\api\prisma\enums\mobile-application.prisma:14:}
+
+
+
+
+==================================================
+24. ALL DESKTOP MIGRATION REFERENCES
+==================================================
+
+--- C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260808231107_initial_schema\migration.sql ---
+2: CREATE TYPE "AnalyticsDeviceType" AS ENUM ('DESKTOP', 'MOBILE', 'TABLET', 'BOT', 'OTHER');
+
+==================================================
+25. PRISMA VALIDATE
+==================================================
+node.exe : Loaded Prisma config from prisma.config.ts.
+At C:\Program Files\nodejs\pnpm.ps1:16 char:5
++     & "$basedir/node$exe"  "$basedir/node_modules/corepack/dist/pnpm. ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Loaded Prisma c...isma.config.ts.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+Prisma schema loaded from prisma.
+
+Error: Prisma schema validation - (validate wasm)
+Error code: P1012
+[1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
+  [1;94m-->[0m  [4mprisma\models\desktop-application.prisma:21[0m
+[1;94m   | [0m
+[1;94m20 | [0m
+[1;94m21 | [0m  [1;91mapplication SaasApplication @relation(
+[0m
+[1;94m22 | [0m    fields: [applicationId],
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
+  [1;94m-->[0m  [4mprisma\models\desktop-application.prisma:22[0m
+[1;94m   | [0m
+[1;94m21 | [0m  application SaasApplication @relation(
+[1;94m22 | [0m    [1;91mfields: [applicationId],
+[0m
+[1;94m23 | [0m    references: [id],
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
+  [1;94m-->[0m  [4mprisma\models\desktop-application.prisma:23[0m
+[1;94m   | [0m
+[1;94m22 | [0m    fields: [applicationId],
+[1;94m23 | [0m    [1;91mreferences: [id],
+[0m
+[1;94m24 | [0m    onDelete: Cascade
+[1;94m   | [0m
+[1;91merror[0m: [1mField declarations don't require a `:`.[0m
+  [1;94m-->[0m  [4mprisma\models\desktop-application.prisma:24[0m
+[1;94m   | [0m
+[1;94m23 | [0m    references: [id],
+[1;94m24 | [0m    onDelete[1;91m:[0m Cascade
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
+  [1;94m-->[0m  [4mprisma\models\desktop-application.prisma:25[0m
+[1;94m   | [0m
+[1;94m24 | [0m    onDelete: Cascade
+[1;94m25 | [0m  [1;91m)
+[0m
+[1;94m26 | [0m
+[1;94m   | [0m
+
+Validation Error Count: 5
+[Context: validate]
+
+Prisma CLI Version : 7.9.1
+
+
+==================================================
+DIAGNOSTIC 2 COMPLETE
+REPORT: desktop-prisma-diagnostic-2.txt
+==================================================

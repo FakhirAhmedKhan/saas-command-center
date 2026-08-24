@@ -78,18 +78,6 @@ export interface DesktopApplicationMetadataInput {
 
 export type UpdateDesktopApplicationMetadataInput = Partial<DesktopApplicationMetadataInput>;
 
-export const DESKTOP_PLATFORMS = ['WINDOWS', 'MACOS', 'LINUX', 'CROSS_PLATFORM'] as const;
-
-export type DesktopPlatform = (typeof DESKTOP_PLATFORMS)[number];
-
-export const DESKTOP_FRAMEWORKS = ['ELECTRON', 'TAURI', 'DOTNET', 'QT', 'JAVA', 'NATIVE_WINDOWS', 'NATIVE_MACOS', 'OTHER'] as const;
-
-export type DesktopFramework = (typeof DESKTOP_FRAMEWORKS)[number];
-
-export const DESKTOP_ARCHITECTURES = ['X64', 'ARM64', 'X86', 'UNIVERSAL'] as const;
-
-export type DesktopArchitecture = (typeof DESKTOP_ARCHITECTURES)[number];
-
 export interface DesktopApplication {
   id: string;
   applicationId: string;
@@ -393,18 +381,9 @@ export interface CreateDesktopReleaseInput {
   releaseNotes?: string | null;
 }
 
+export type DesktopTelemetryProvider = 'SENTRY' | 'DATADOG' | 'NEW_RELIC' | 'OPENTELEMETRY' | 'CUSTOM';
 
-export type DesktopTelemetryProvider =
-  | 'SENTRY'
-  | 'DATADOG'
-  | 'NEW_RELIC'
-  | 'OPENTELEMETRY'
-  | 'CUSTOM';
-
-export type DesktopTelemetryIntegrationStatus =
-  | 'CONNECTED'
-  | 'ERROR'
-  | 'DISCONNECTED';
+export type DesktopTelemetryIntegrationStatus = 'CONNECTED' | 'ERROR' | 'DISCONNECTED';
 
 export interface DesktopTelemetryIntegration {
   id: string;
@@ -553,29 +532,11 @@ export interface DesktopCrash {
   updatedAt: string;
 }
 
-export type DesktopDependencyEcosystem =
-  | 'NPM'
-  | 'CARGO'
-  | 'NUGET'
-  | 'MAVEN'
-  | 'GRADLE'
-  | 'CMAKE'
-  | 'CONAN'
-  | 'VCPKG'
-  | 'OTHER';
+export type DesktopDependencyEcosystem = 'NPM' | 'CARGO' | 'NUGET' | 'MAVEN' | 'GRADLE' | 'CMAKE' | 'CONAN' | 'VCPKG' | 'OTHER';
 
-export type DesktopDependencyRiskStatus =
-  | 'CURRENT'
-  | 'UPDATE_AVAILABLE'
-  | 'VULNERABLE'
-  | 'UNKNOWN';
+export type DesktopDependencyRiskStatus = 'CURRENT' | 'UPDATE_AVAILABLE' | 'VULNERABLE' | 'UNKNOWN';
 
-export type DesktopSecuritySeverity =
-  | 'INFO'
-  | 'LOW'
-  | 'MEDIUM'
-  | 'HIGH'
-  | 'CRITICAL';
+export type DesktopSecuritySeverity = 'INFO' | 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
 export interface DesktopDependency {
   id: string;
@@ -594,18 +555,9 @@ export interface DesktopDependency {
   updatedAt: string;
 }
 
-export type DesktopSecurityCheckType =
-  | 'WINDOWS_SIGNING'
-  | 'MACOS_SIGNING'
-  | 'MACOS_NOTARIZATION'
-  | 'PACKAGING_CONFIGURATION'
-  | 'DEPENDENCY_VULNERABILITY';
+export type DesktopSecurityCheckType = 'WINDOWS_SIGNING' | 'MACOS_SIGNING' | 'MACOS_NOTARIZATION' | 'PACKAGING_CONFIGURATION' | 'DEPENDENCY_VULNERABILITY';
 
-export type DesktopSecurityCheckStatus =
-  | 'PASS'
-  | 'WARN'
-  | 'FAIL'
-  | 'UNKNOWN';
+export type DesktopSecurityCheckStatus = 'PASS' | 'WARN' | 'FAIL' | 'UNKNOWN';
 
 export interface DesktopSecurityFinding {
   id: string;

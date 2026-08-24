@@ -1,9 +1,6 @@
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { promises as dns } from 'node:dns';
 import { isIP } from 'node:net';
-import {
-  BadRequestException,
-  Injectable,
-} from '@nestjs/common';
 
 @Injectable()
 export class DesktopTelemetryUrlPolicyService {
@@ -16,45 +13,29 @@ export class DesktopTelemetryUrlPolicyService {
       throw new BadRequestException('Telemetry endpoint URL is invalid.');
     }
 
-    if (
-      process.env.NODE_ENV === 'test' &&
-      url.protocol === 'mock:'
-    ) {
+    if (process.env.NODE_ENV === 'test' && url.protocol === 'mock:') {
       return url;
     }
 
     if (url.protocol !== 'https:') {
-      throw new BadRequestException(
-        'Telemetry endpoint must use HTTPS.',
-      );
+      throw new BadRequestException('Telemetry endpoint must use HTTPS.');
     }
 
     if (url.username || url.password) {
-      throw new BadRequestException(
-        'Telemetry endpoint cannot contain URL credentials.',
-      );
+      throw new BadRequestException('Telemetry endpoint cannot contain URL credentials.');
     }
 
     const host = url.hostname.toLowerCase();
 
-    if (
-      host === 'localhost' ||
-      host.endsWith('.localhost') ||
-      host === '0.0.0.0' ||
-      host === '::1'
-    ) {
-      throw new BadRequestException(
-        'Telemetry endpoint cannot target localhost.',
-      );
+    if (host === 'localhost' || host.endsWith('.localhost') || host === '0.0.0.0' || host === '::1') {
+      throw new BadRequestException('Telemetry endpoint cannot target localhost.');
     }
 
     const addresses = await this.resolve(host);
 
     for (const address of addresses) {
       if (this.isPrivateAddress(address)) {
-        throw new BadRequestException(
-          'Telemetry endpoint cannot target a private network address.',
-        );
+        throw new BadRequestException('Telemetry endpoint cannot target a private network address.');
       }
     }
 
@@ -78,9 +59,7 @@ export class DesktopTelemetryUrlPolicyService {
 
       return results.map((item) => item.address);
     } catch {
-      throw new BadRequestException(
-        'Telemetry endpoint hostname could not be resolved.',
-      );
+      throw new BadRequestException('Telemetry endpoint hostname could not be resolved.');
     }
   }
 
@@ -88,12 +67,7 @@ export class DesktopTelemetryUrlPolicyService {
     if (address.includes(':')) {
       const normalized = address.toLowerCase();
 
-      return (
-        normalized === '::1' ||
-        normalized.startsWith('fc') ||
-        normalized.startsWith('fd') ||
-        normalized.startsWith('fe80:')
-      );
+      return normalized === '::1' || normalized.startsWith('fc') || normalized.startsWith('fd') || normalized.startsWith('fe80:');
     }
 
     const octets = address.split('.').map(Number);
@@ -102,16 +76,9 @@ export class DesktopTelemetryUrlPolicyService {
       return true;
     }
 
-    const [a, b] = octets;
+    const a = octets[0]!;
+    const b = octets[1]!;
 
-    return (
-      a === 0 ||
-      a === 10 ||
-      a === 127 ||
-      (a === 169 && b === 254) ||
-      (a === 172 && b >= 16 && b <= 31) ||
-      (a === 192 && b === 168) ||
-      a >= 224
-    );
+    return a === 0 || a === 10 || a === 127 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || a >= 224;
   }
 }

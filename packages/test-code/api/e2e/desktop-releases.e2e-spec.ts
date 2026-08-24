@@ -55,7 +55,7 @@ describe('Desktop Releases E2E', () => {
     return `${API}/workspaces/${workspaceId}` + `/desktop-apps/${desktopAppId}/releases`;
   }
 
-  async function createRelease(fixture: Awaited<ReturnType<typeof createSuccessfulFixture>>, overrides: Record<string, unknown> = {}) {
+  function createRelease(fixture: Awaited<ReturnType<typeof createSuccessfulFixture>>, overrides: Record<string, unknown> = {}) {
     return fixture.owner.agent
       .post(releasePath(fixture.owner.workspaceId, fixture.desktopApp.id))
       .set('Authorization', `Bearer ${fixture.owner.accessToken}`)

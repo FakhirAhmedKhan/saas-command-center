@@ -1,16 +1,18 @@
 'use client';
 
-import { getErrorMessage } from '@/features/lib/api/api-error';
+import { DesktopAnalysisPanel } from '@/features/desktop-apps/desktop-analysis-panel';
 import { DesktopAppForm } from '@/features/desktop-apps/desktop-app-form';
 import { DESKTOP_ARCHITECTURE_LABELS, DESKTOP_FRAMEWORK_LABELS, DESKTOP_PLATFORM_LABELS } from '@/features/desktop-apps/desktop-app.constants';
-import { archiveDesktopApp, getDesktopApp, updateDesktopApp } from '@/features/desktop-apps/desktop-apps-api';
-import type { CreateDesktopApplicationInput, DesktopApplicationDetails } from '@command-center/shared-types';
+import { archiveDesktopApp, getDesktopApp, getDesktopAppOverview, updateDesktopApp } from '@/features/desktop-apps/desktop-apps-api';
+import { DesktopOverview } from '@/features/desktop-apps/desktop-overview';
+import { DesktopProjectDetectionPanel } from '@/features/desktop-apps/desktop-project-detection-panel';
+import { DesktopRepositoryPanel } from '@/features/desktop-apps/desktop-repository-panel';
+import { getErrorMessage } from '@/features/lib/api/api-error';
+import type { CreateDesktopApplicationInput, DesktopApplicationDetails, DesktopAppOverview } from '@command-center/shared-types';
 import { Archive, ArrowLeft, Monitor } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { DesktopRepositoryPanel } from '@/features/desktop-apps/desktop-repository-panel';
-import { DesktopAnalysisPanel } from '@/features/desktop-apps/desktop-analysis-panel';
 
 export default function DesktopAppDetailsPage() {
   const params = useParams<{
@@ -28,6 +30,8 @@ export default function DesktopAppDetailsPage() {
 
   const [desktopApp, setDesktopApp] = useState<DesktopApplicationDetails | null>(null);
 
+  const [overview, setOverview] = useState<DesktopAppOverview | null>(null);
+
   const [loading, setLoading] = useState(true);
 
   const [error, setError] = useState<string | null>(null);
@@ -35,29 +39,39 @@ export default function DesktopAppDetailsPage() {
   const [archiving, setArchiving] = useState(false);
 
   const load = useCallback(async (): Promise<void> => {
-    setLoading(true);
-    setError(null);
-
     try {
-      const response = await getDesktopApp(workspaceId, desktopAppId);
+      const [detailsResponse, overviewResponse] = await Promise.all([
+        getDesktopApp(workspaceId, desktopAppId),
+        getDesktopAppOverview(workspaceId, desktopAppId),
+      ]);
 
-      setDesktopApp(response);
+      setDesktopApp(detailsResponse);
+      setOverview(overviewResponse);
     } catch (loadError: unknown) {
-      setError(getErrorMessage(loadError, 'Unable to load desktop application.'));
+      setError(getErrorMessage(loadError));
     } finally {
       setLoading(false);
     }
   }, [workspaceId, desktopAppId]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    void load();
+    const timeoutId = window.setTimeout(() => {
+      void load();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
   }, [load]);
 
   async function handleUpdate(payload: CreateDesktopApplicationInput): Promise<void> {
     const updated = await updateDesktopApp(workspaceId, desktopAppId, payload);
 
     setDesktopApp(updated);
+
+    const overviewResponse = await getDesktopAppOverview(workspaceId, desktopAppId);
+
+    setOverview(overviewResponse);
 
     router.refresh();
   }
@@ -83,7 +97,7 @@ export default function DesktopAppDetailsPage() {
 
       router.refresh();
     } catch (archiveError: unknown) {
-      setError(getErrorMessage(archiveError, 'Unable to archive desktop application.'));
+      setError(getErrorMessage(archiveError));
 
       setArchiving(false);
     }
@@ -169,6 +183,18 @@ export default function DesktopAppDetailsPage() {
         </div>
       ) : null}
 
+      {overview ? <DesktopOverview workspaceId={workspaceId} desktopAppId={desktopAppId} overview={overview} /> : null}
+
+      <DesktopProjectDetectionPanel
+        workspaceId={workspaceId}
+        desktopApp={desktopApp}
+        onApplied={(updatedDesktopApp) => {
+          setDesktopApp(updatedDesktopApp);
+
+          void getDesktopAppOverview(workspaceId, desktopAppId).then(setOverview);
+        }}
+      />
+
       <section className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6'>
         <div>
           <h2 className='text-lg font-semibold text-slate-950'>Application information</h2>
@@ -219,4 +245,3 @@ function OverviewItem({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-F;

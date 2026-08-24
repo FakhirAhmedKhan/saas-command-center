@@ -1,39 +1,39 @@
 enum DesktopBuildArtifactType {
-    EXE
-    MSI
-    MSIX
-    DMG
-    PKG
-    APP
-    APPIMAGE
-    DEB
-    RPM
-    ZIP
-    OTHER
+  EXE
+  MSI
+  MSIX
+  DMG
+  PKG
+  APP
+  APPIMAGE
+  DEB
+  RPM
+  ZIP
+  OTHER
 }
 
 model DesktopBuildArtifact {
-    id      String @id @default(uuid()) @db.Uuid
-    buildId String @map("build_id") @db.Uuid
+  id      String @id @default(uuid()) @db.Uuid
+  buildId String @map("build_id") @db.Uuid
 
-    providerArtifactId String @map("provider_artifact_id") @db.VarChar(255)
+  providerArtifactId String @map("provider_artifact_id") @db.VarChar(255)
 
-    platform     DesktopPlatform
-    architecture DesktopArchitecture
-    type         DesktopBuildArtifactType
+  platform     DesktopPlatform
+  architecture DesktopArchitecture
+  type         DesktopBuildArtifactType
 
-    fileName    String  @map("file_name") @db.VarChar(1024)
-    sizeBytes   BigInt? @map("size_bytes")
-    checksum    String? @db.VarChar(255)
-    externalUrl String? @map("external_url") @db.Text
+  fileName    String  @map("file_name") @db.VarChar(1024)
+  sizeBytes   BigInt? @map("size_bytes")
+  checksum    String? @db.VarChar(255)
+  externalUrl String? @map("external_url") @db.Text
 
-    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
-    build DesktopBuild @relation(fields: [buildId], references: [id], onDelete: Cascade)
+  build DesktopBuild @relation(fields: [buildId], references: [id], onDelete: Cascade)
 
-    @@unique([buildId, providerArtifactId])
-    @@index([buildId])
-    @@index([platform, architecture])
-    @@index([type])
-    @@map("desktop_build_artifacts")
+  @@unique([buildId, providerArtifactId])
+  @@index([buildId])
+  @@index([platform, architecture])
+  @@index([type])
+  @@map("desktop_build_artifacts")
 }

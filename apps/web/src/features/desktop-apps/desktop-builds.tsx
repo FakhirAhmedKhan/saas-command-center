@@ -27,9 +27,6 @@ export function DesktopBuilds({ workspaceId, desktopAppId }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
     try {
       setBuilds(
         await listDesktopBuilds(workspaceId, desktopAppId, {
@@ -48,7 +45,13 @@ export function DesktopBuilds({ workspaceId, desktopAppId }: Props) {
   }, [architecture, branch, desktopAppId, platform, status, version, workspaceId]);
 
   useEffect(() => {
-    void load();
+    const timeoutId = window.setTimeout(() => {
+      void load();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
   }, [load]);
 
   return (

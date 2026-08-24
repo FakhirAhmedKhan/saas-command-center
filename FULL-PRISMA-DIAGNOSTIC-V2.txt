@@ -1,0 +1,1079 @@
+
+============================================================
+1. BASIC ENVIRONMENT
+============================================================
+Current directory: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center
+Prisma root: apps/api/prisma
+Prisma root exists: True
+
+============================================================
+2. PRISMA VERSION
+============================================================
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma.
+prisma               : 7.9.1
+@prisma/client       : 7.9.1
+Operating System     : win32
+Architecture         : x64
+Node.js              : v24.13.1
+TypeScript           : 5.9.3
+Query Compiler       : enabled
+PSL                  : @prisma/prisma-schema-wasm 7.9.0-1.e922089b7d7502aff4249d5da3420f6fa55fc6ad
+Schema Engine        : schema-engine-cli e922089b7d7502aff4249d5da3420f6fa55fc6ad (at ..\..\node_modules\@prisma\engines\schema-engine-windows.exe)
+Default Engines Hash : e922089b7d7502aff4249d5da3420f6fa55fc6ad
+Studio               : 0.33.0
+
+EXIT CODE: 0
+
+============================================================
+3. NODE + PNPM VERSION
+============================================================
+v24.13.1
+11.22.0
+
+EXIT CODE: 0
+
+============================================================
+4. ALL PRISMA FILES
+============================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\analytics.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\application.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\application-activity.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\application-delivery.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\collaboration.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\deployments.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\desktop-application.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\health-monitoring.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\mobile-application.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\repository.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\webhooks.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\workspace.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-aggregates.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-ingestion.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-processing.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-activity.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-delivery.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-environments.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\collaboration.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-ai-analysis.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-application.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build-artifact.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-release.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-runtime.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-telemetry.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-test.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\health-monitoring.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-ai-analysis.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-alert.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-application.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-build.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-performance.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-release.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-telemetry.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-test.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\repositories.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\website.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\workspace.prisma
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\schema.prisma
+
+============================================================
+5. ROOT SCHEMA
+============================================================
+
+--- apps/api/prisma/schema.prisma ---
+    1: generator client {
+    2:   provider     = "prisma-client"
+    3:   output       = "../src/generated/prisma"
+    4:   moduleFormat = "cjs"
+    5: }
+    6: 
+    7: datasource db {
+    8:   provider = "postgresql"
+    9: }
+
+============================================================
+6. ALL MODELS
+============================================================
+AnalyticsDailyAggregate | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-aggregates.prisma
+AnalyticsEvent | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma
+AnalyticsHourlyAggregate | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-aggregates.prisma
+AnalyticsPageView | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma
+AnalyticsProcessingDeadLetter | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-processing.prisma
+AnalyticsProcessingRun | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-processing.prisma
+AnalyticsProcessingState | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-processing.prisma
+AnalyticsSession | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma
+AnalyticsVisitor | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-core.prisma
+ApplicationActivity | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-activity.prisma
+ApplicationBlocker | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-delivery.prisma
+ApplicationEnvironment | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-environments.prisma
+ApplicationLink | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application.prisma
+ApplicationMilestone | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-delivery.prisma
+ApplicationTask | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application-delivery.prisma
+ApplicationTechnology | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application.prisma
+AuthSession | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma
+Deployment | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma
+DeploymentActivity | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma
+DesktopAiAnalysis | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-ai-analysis.prisma
+DesktopAlertIncident | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma
+DesktopAlertRule | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma
+DesktopApplication | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-application.prisma
+DesktopBuild | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build.prisma
+DesktopBuildArtifact | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build-artifact.prisma
+DesktopCrash | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-runtime.prisma
+DesktopDependency | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma
+DesktopMetric | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-runtime.prisma
+DesktopRelease | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-release.prisma
+DesktopSecurityFinding | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma
+DesktopTelemetryIntegration | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-telemetry.prisma
+DesktopTestFailure | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-test.prisma
+DesktopTestRun | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-test.prisma
+HealthCheck | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\health-monitoring.prisma
+HealthCheckHistory | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\health-monitoring.prisma
+HealthIncident | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\health-monitoring.prisma
+MobileAiAnalysis | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-ai-analysis.prisma
+MobileAlertIncident | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-alert.prisma
+MobileAlertRule | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-alert.prisma
+MobileApplication | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-application.prisma
+MobileBuild | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-build.prisma
+MobilePerformanceMetric | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-performance.prisma
+MobileRelease | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-release.prisma
+MobileTelemetryIntegration | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-telemetry.prisma
+MobileTestFailure | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-test.prisma
+MobileTestRun | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-test.prisma
+Notification | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\collaboration.prisma
+PersonalGithubConnectIntent | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\repositories.prisma
+RawAnalyticsEvent | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\analytics-ingestion.prisma
+Release | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\releases-deployments.prisma
+RepositoryConnectIntent | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\repositories.prisma
+RepositoryConnection | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\repositories.prisma
+RepositoryInstallation | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\repositories.prisma
+RepositoryWebhookDelivery | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\repositories.prisma
+SaasApplication | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\application.prisma
+User | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\identity.prisma
+WebhookDelivery | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma
+WebhookDeliveryAttempt | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma
+WebhookEndpoint | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma
+WebhookEvent | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\webhooks.prisma
+Website | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\website.prisma
+Workspace | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\workspace.prisma
+WorkspaceInvitation | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\collaboration.prisma
+WorkspaceMember | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\workspace.prisma
+
+MODEL COUNT: 64
+
+============================================================
+7. ALL ENUMS
+============================================================
+ActivityActorType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\application-activity.prisma
+ActivityEntityType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\application-activity.prisma
+AnalyticsAggregateDimension | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\analytics.prisma
+AnalyticsDeviceType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\analytics.prisma
+AnalyticsProcessingStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\analytics.prisma
+AnalyticsProcessingTrigger | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\analytics.prisma
+AnalyticsSourceType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\analytics.prisma
+ApplicationActivityType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\application-activity.prisma
+ApplicationCategory | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\application.prisma
+ApplicationLinkType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\application.prisma
+ApplicationPriority | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\application.prisma
+ApplicationStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\application.prisma
+ApplicationTaskStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\application-delivery.prisma
+ApplicationType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\application.prisma
+BlockerStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\application-delivery.prisma
+DeploymentActivityAction | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\deployments.prisma
+DeploymentStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\deployments.prisma
+DesktopAlertIncidentStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma
+DesktopAlertOperator | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma
+DesktopAlertRuleType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-alert.prisma
+DesktopAnalysisAction | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-ai-analysis.prisma
+DesktopAnalysisConfidence | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-ai-analysis.prisma
+DesktopArchitecture | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\desktop-application.prisma
+DesktopBuildArtifactType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build-artifact.prisma
+DesktopBuildSource | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build.prisma
+DesktopBuildStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-build.prisma
+DesktopDependencyEcosystem | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma
+DesktopDependencyRiskStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma
+DesktopFramework | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\desktop-application.prisma
+DesktopPerformanceMetricType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-runtime.prisma
+DesktopPlatform | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\desktop-application.prisma
+DesktopReleaseChannel | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-release.prisma
+DesktopReleaseStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-release.prisma
+DesktopSecurityCheckStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma
+DesktopSecurityCheckType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma
+DesktopSecuritySeverity | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-security-health.prisma
+DesktopTelemetryIntegrationStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-telemetry.prisma
+DesktopTelemetryProvider | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-telemetry.prisma
+DesktopTestStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-test.prisma
+DesktopTestType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-test.prisma
+DevelopmentTemplateType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\application.prisma
+HealthCheckStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\health-monitoring.prisma
+HealthIncidentStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\health-monitoring.prisma
+HealthTargetType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\health-monitoring.prisma
+InvitationDeliveryStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\collaboration.prisma
+MilestoneStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\application-delivery.prisma
+MobileAlertIncidentStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-alert.prisma
+MobileAlertOperator | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-alert.prisma
+MobileAlertRuleType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-alert.prisma
+MobileAnalysisAction | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-ai-analysis.prisma
+MobileAnalysisConfidence | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-ai-analysis.prisma
+MobileBuildSource | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-build.prisma
+MobileBuildStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-build.prisma
+MobileFramework | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\mobile-application.prisma
+MobilePerformanceMetricType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-performance.prisma
+MobilePlatform | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\mobile-application.prisma
+MobileReleaseEnvironment | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-release.prisma
+MobileReleaseStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-release.prisma
+MobileTelemetryProvider | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-telemetry.prisma
+MobileTelemetryStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-telemetry.prisma
+MobileTestStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-test.prisma
+MobileTestType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\mobile-test.prisma
+NotificationPriority | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\collaboration.prisma
+NotificationType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\collaboration.prisma
+RawAnalyticsEventType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\analytics.prisma
+ReleaseStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\deployments.prisma
+RepositoryProvider | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\repository.prisma
+TechnologyType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\application.prisma
+WebhookAttemptOutcome | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\webhooks.prisma
+WebhookDeliveryStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\webhooks.prisma
+WebhookEventType | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\webhooks.prisma
+WorkItemPriority | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\application-delivery.prisma
+WorkspaceInvitationStatus | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\collaboration.prisma
+WorkspaceRole | C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\enums\workspace.prisma
+
+ENUM COUNT: 74
+
+============================================================
+8. DUPLICATE MODEL NAMES
+============================================================
+PASS: No duplicate model names.
+
+============================================================
+9. DUPLICATE ENUM NAMES
+============================================================
+PASS: No duplicate enum names.
+
+============================================================
+10. MODEL -> DATABASE TABLE
+============================================================
+AnalyticsDailyAggregate -> analytics_daily_aggregates
+AnalyticsEvent -> analytics_events
+AnalyticsHourlyAggregate -> analytics_hourly_aggregates
+AnalyticsPageView -> analytics_page_views
+AnalyticsProcessingDeadLetter -> analytics_processing_dead_letters
+AnalyticsProcessingRun -> analytics_processing_runs
+AnalyticsProcessingState -> analytics_processing_states
+AnalyticsSession -> analytics_sessions
+AnalyticsVisitor -> analytics_visitors
+ApplicationActivity -> application_activities
+ApplicationBlocker -> application_blockers
+ApplicationEnvironment -> application_environments
+ApplicationLink -> application_links
+ApplicationMilestone -> application_milestones
+ApplicationTask -> application_tasks
+ApplicationTechnology -> application_technologies
+AuthSession -> auth_sessions
+DeploymentActivity -> deployment_activities
+Deployment -> deployments
+DesktopAiAnalysis -> desktop_ai_analyses
+DesktopAlertIncident -> desktop_alert_incidents
+DesktopAlertRule -> desktop_alert_rules
+DesktopApplication -> desktop_applications
+DesktopBuildArtifact -> desktop_build_artifacts
+DesktopBuild -> desktop_builds
+DesktopCrash -> desktop_crashes
+DesktopDependency -> desktop_dependencies
+DesktopMetric -> desktop_metrics
+DesktopRelease -> desktop_releases
+DesktopSecurityFinding -> desktop_security_findings
+DesktopTelemetryIntegration -> desktop_telemetry_integrations
+DesktopTestFailure -> desktop_test_failures
+DesktopTestRun -> desktop_test_runs
+HealthCheckHistory -> health_check_history
+HealthCheck -> health_checks
+HealthIncident -> health_incidents
+MobileAiAnalysis -> mobile_ai_analyses
+MobileAlertIncident -> mobile_alert_incidents
+MobileAlertRule -> mobile_alert_rules
+MobileApplication -> mobile_applications
+MobileBuild -> mobile_builds
+MobilePerformanceMetric -> mobile_performance_metrics
+MobileRelease -> mobile_releases
+MobileTelemetryIntegration -> mobile_telemetry_integrations
+MobileTestFailure -> mobile_test_failures
+MobileTestRun -> mobile_test_runs
+Notification -> notifications
+PersonalGithubConnectIntent -> personal_github_connect_intents
+RawAnalyticsEvent -> raw_analytics_events
+Release -> releases
+RepositoryConnectIntent -> repository_connect_intents
+RepositoryConnection -> repository_connections
+RepositoryInstallation -> repository_installations
+RepositoryWebhookDelivery -> repository_webhook_deliveries
+SaasApplication -> saas_applications
+User -> users
+WebhookDelivery -> webhook_deliveries
+WebhookDeliveryAttempt -> webhook_delivery_attempts
+WebhookEndpoint -> webhook_endpoints
+WebhookEvent -> webhook_events
+Website -> websites
+WorkspaceInvitation -> workspace_invitations
+WorkspaceMember -> workspace_members
+Workspace -> workspaces
+
+============================================================
+11. DUPLICATE DATABASE TABLE MAPPINGS
+============================================================
+PASS: No duplicate table mappings.
+
+============================================================
+12. MALFORMED / MULTILINE RELATION STARTS
+============================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\models\desktop-application.prisma:21
+    application SaasApplication @relation(
+
+SUSPICIOUS RELATION COUNT: 1
+
+============================================================
+13. ALL RELATIONS
+============================================================
+AnalyticsDailyAggregate.website -> Website
+AnalyticsEvent.pageView -> AnalyticsPageView?
+AnalyticsEvent.rawEvent -> RawAnalyticsEvent?
+AnalyticsEvent.session -> AnalyticsSession
+AnalyticsEvent.visitor -> AnalyticsVisitor
+AnalyticsEvent.website -> Website
+AnalyticsHourlyAggregate.website -> Website
+AnalyticsPageView.event -> AnalyticsEvent
+AnalyticsPageView.session -> AnalyticsSession
+AnalyticsPageView.visitor -> AnalyticsVisitor
+AnalyticsPageView.website -> Website
+AnalyticsProcessingDeadLetter.resolvedBy -> User?
+AnalyticsProcessingDeadLetter.run -> AnalyticsProcessingRun
+AnalyticsProcessingDeadLetter.website -> Website
+AnalyticsProcessingDeadLetter.workspace -> Workspace?
+AnalyticsProcessingRun.deadLetter -> AnalyticsProcessingDeadLetter?
+AnalyticsProcessingRun.initiatedBy -> User?
+AnalyticsProcessingRun.website -> Website
+AnalyticsProcessingRun.workspace -> Workspace
+AnalyticsProcessingState.website -> Website
+AnalyticsSession.events -> AnalyticsEvent[]
+AnalyticsSession.pageViews -> AnalyticsPageView[]
+AnalyticsSession.visitor -> AnalyticsVisitor
+AnalyticsSession.website -> Website
+AnalyticsVisitor.events -> AnalyticsEvent[]
+AnalyticsVisitor.pageViews -> AnalyticsPageView[]
+AnalyticsVisitor.sessions -> AnalyticsSession[]
+AnalyticsVisitor.website -> Website
+ApplicationActivity.actor -> User?
+ApplicationActivity.application -> SaasApplication?
+ApplicationActivity.workspace -> Workspace
+ApplicationBlocker.application -> SaasApplication
+ApplicationBlocker.createdBy -> User?
+ApplicationBlocker.milestone -> ApplicationMilestone?
+ApplicationBlocker.resolvedBy -> User?
+ApplicationBlocker.task -> ApplicationTask?
+ApplicationEnvironment.application -> SaasApplication
+ApplicationEnvironment.deployments -> Deployment[]
+ApplicationEnvironment.workspace -> Workspace
+ApplicationLink.application -> SaasApplication
+ApplicationMilestone.application -> SaasApplication
+ApplicationMilestone.blockers -> ApplicationBlocker[]
+ApplicationMilestone.tasks -> ApplicationTask[]
+ApplicationTask.assignee -> User?
+ApplicationTask.blockers -> ApplicationBlocker[]
+ApplicationTask.milestone -> ApplicationMilestone
+ApplicationTechnology.application -> SaasApplication
+AuthSession.parentSession -> AuthSession?
+AuthSession.rotatedSession -> AuthSession?
+AuthSession.user -> User
+Deployment.activities -> DeploymentActivity[]
+Deployment.application -> SaasApplication
+Deployment.createdBy -> User
+Deployment.deployedBy -> User?
+Deployment.environment -> ApplicationEnvironment
+Deployment.healthIncident -> HealthIncident?
+Deployment.release -> Release
+Deployment.rollbackReferences -> Deployment[]
+Deployment.rollbackTo -> Deployment?
+Deployment.updatedBy -> User
+Deployment.workspace -> Workspace
+DeploymentActivity.actor -> User
+DeploymentActivity.deployment -> Deployment
+DeploymentActivity.workspace -> Workspace
+DesktopAiAnalysis.desktopApp -> DesktopApplication
+DesktopAlertIncident.desktopApp -> DesktopApplication
+DesktopAlertIncident.rule -> DesktopAlertRule
+DesktopAlertRule.desktopApp -> DesktopApplication
+DesktopAlertRule.incidents -> DesktopAlertIncident[]
+DesktopApplication.application -> SaasApplication
+DesktopBuild.desktopApp -> DesktopApplication
+DesktopBuild.repository -> RepositoryConnection
+DesktopBuildArtifact.build -> DesktopBuild
+DesktopCrash.desktopApp -> DesktopApplication
+DesktopCrash.integration -> DesktopTelemetryIntegration
+DesktopDependency.desktopApp -> DesktopApplication
+DesktopMetric.desktopApp -> DesktopApplication
+DesktopMetric.integration -> DesktopTelemetryIntegration
+DesktopRelease.build -> DesktopBuild
+DesktopRelease.desktopApp -> DesktopApplication
+DesktopSecurityFinding.desktopApp -> DesktopApplication
+DesktopTelemetryIntegration.crashes -> DesktopCrash[]
+DesktopTelemetryIntegration.desktopApp -> DesktopApplication
+DesktopTelemetryIntegration.metrics -> DesktopMetric[]
+DesktopTestFailure.testRun -> DesktopTestRun
+DesktopTestRun.build -> DesktopBuild
+DesktopTestRun.failures -> DesktopTestFailure[]
+HealthCheck.application -> SaasApplication?
+HealthCheck.createdBy -> User
+HealthCheck.history -> HealthCheckHistory[]
+HealthCheck.incidents -> HealthIncident[]
+HealthCheck.updatedBy -> User
+HealthCheck.website -> Website?
+HealthCheck.workspace -> Workspace
+HealthCheckHistory.healthCheck -> HealthCheck
+HealthIncident.deployments -> Deployment[]
+HealthIncident.healthCheck -> HealthCheck
+HealthIncident.workspace -> Workspace
+MobileAiAnalysis.mobileApp -> MobileApplication
+MobileAlertIncident.rule -> MobileAlertRule
+MobileAlertRule.incidents -> MobileAlertIncident[]
+MobileAlertRule.mobileApp -> MobileApplication
+MobileApplication.application -> SaasApplication
+MobileApplication.builds -> MobileBuild[]
+MobileApplication.mobileAiAnalyses -> MobileAiAnalysis[]
+MobileApplication.mobileAlertRules -> MobileAlertRule[]
+MobileApplication.mobileReleases -> MobileRelease[]
+MobileApplication.mobileTelemetryIntegration -> MobileTelemetryIntegration?
+MobileApplication.performanceMetrics -> MobilePerformanceMetric[]
+MobileBuild.mobileApp -> MobileApplication
+MobileBuild.releases -> MobileRelease[]
+MobileBuild.repository -> RepositoryConnection
+MobileBuild.testRuns -> MobileTestRun[]
+MobilePerformanceMetric.mobileApp -> MobileApplication
+MobileRelease.build -> MobileBuild
+MobileRelease.mobileApp -> MobileApplication
+MobileTelemetryIntegration.mobileApp -> MobileApplication
+MobileTestFailure.testRun -> MobileTestRun
+MobileTestRun.build -> MobileBuild
+MobileTestRun.failures -> MobileTestFailure[]
+Notification.application -> SaasApplication?
+Notification.user -> User
+Notification.workspace -> Workspace
+PersonalGithubConnectIntent.user -> User
+RawAnalyticsEvent.analyticsEvent -> AnalyticsEvent?
+RawAnalyticsEvent.website -> Website
+Release.application -> SaasApplication
+Release.createdBy -> User
+Release.deployments -> Deployment[]
+Release.updatedBy -> User
+Release.workspace -> Workspace
+RepositoryConnectIntent.workspace -> Workspace
+RepositoryConnection.application -> SaasApplication?
+RepositoryConnection.installation -> RepositoryInstallation
+RepositoryConnection.mobileBuilds -> MobileBuild[]
+RepositoryConnection.workspace -> Workspace
+RepositoryInstallation.repositories -> RepositoryConnection[]
+RepositoryInstallation.workspace -> Workspace
+SaasApplication.activities -> ApplicationActivity[]
+SaasApplication.applicationEnvironments -> ApplicationEnvironment[]
+SaasApplication.blockers -> ApplicationBlocker[]
+SaasApplication.deployments -> Deployment[]
+SaasApplication.desktopApplication -> DesktopApplication?
+SaasApplication.healthChecks -> HealthCheck[]
+SaasApplication.links -> ApplicationLink[]
+SaasApplication.milestones -> ApplicationMilestone[]
+SaasApplication.mobileApplication -> MobileApplication?
+SaasApplication.notifications -> Notification[]
+SaasApplication.releases -> Release[]
+SaasApplication.repositoryConnections -> RepositoryConnection[]
+SaasApplication.technologies -> ApplicationTechnology[]
+SaasApplication.websites -> Website[]
+SaasApplication.workspace -> Workspace
+User.acceptedWorkspaceInvitations -> WorkspaceInvitation[]
+User.applicationActivities -> ApplicationActivity[]
+User.assignedApplicationTasks -> ApplicationTask[]
+User.authSessions -> AuthSession[]
+User.createdApplicationBlockers -> ApplicationBlocker[]
+User.createdDeployments -> Deployment[]
+User.createdHealthChecks -> HealthCheck[]
+User.createdReleases -> Release[]
+User.createdWebhookEndpoints -> WebhookEndpoint[]
+User.deploymentActivities -> DeploymentActivity[]
+User.executedDeployments -> Deployment[]
+User.initiatedAnalyticsProcessingRuns -> AnalyticsProcessingRun[]
+User.memberships -> WorkspaceMember[]
+User.notifications -> Notification[]
+User.ownedWorkspaces -> Workspace[]
+User.personalGithubConnectIntents -> PersonalGithubConnectIntent[]
+User.resolvedAnalyticsProcessingLetters -> AnalyticsProcessingDeadLetter[]
+User.resolvedApplicationBlockers -> ApplicationBlocker[]
+User.sentWorkspaceInvitations -> WorkspaceInvitation[]
+User.updatedDeployments -> Deployment[]
+User.updatedHealthChecks -> HealthCheck[]
+User.updatedReleases -> Release[]
+User.updatedWebhookEndpoints -> WebhookEndpoint[]
+WebhookDelivery.attempts -> WebhookDeliveryAttempt[]
+WebhookDelivery.endpoint -> WebhookEndpoint
+WebhookDelivery.event -> WebhookEvent
+WebhookDelivery.workspace -> Workspace
+WebhookDeliveryAttempt.delivery -> WebhookDelivery
+WebhookEndpoint.createdBy -> User
+WebhookEndpoint.deliveries -> WebhookDelivery[]
+WebhookEndpoint.updatedBy -> User
+WebhookEndpoint.workspace -> Workspace
+WebhookEvent.deliveries -> WebhookDelivery[]
+WebhookEvent.workspace -> Workspace
+Website.analyticsEvents -> AnalyticsEvent[]
+Website.analyticsPageViews -> AnalyticsPageView[]
+Website.analyticsProcessingDeadLetters -> AnalyticsProcessingDeadLetter[]
+Website.analyticsProcessingRuns -> AnalyticsProcessingRun[]
+Website.analyticsProcessingState -> AnalyticsProcessingState?
+Website.analyticsSessions -> AnalyticsSession[]
+Website.analyticsVisitors -> AnalyticsVisitor[]
+Website.application -> SaasApplication?
+Website.dailyAggregates -> AnalyticsDailyAggregate[]
+Website.healthChecks -> HealthCheck[]
+Website.hourlyAggregates -> AnalyticsHourlyAggregate[]
+Website.rawEvents -> RawAnalyticsEvent[]
+Website.workspace -> Workspace
+Workspace.analyticsProcessingDeadLetters -> AnalyticsProcessingDeadLetter[]
+Workspace.analyticsProcessingRuns -> AnalyticsProcessingRun[]
+Workspace.applicationActivities -> ApplicationActivity[]
+Workspace.applicationEnvironments -> ApplicationEnvironment[]
+Workspace.deploymentActivities -> DeploymentActivity[]
+Workspace.deployments -> Deployment[]
+Workspace.healthChecks -> HealthCheck[]
+Workspace.healthIncidents -> HealthIncident[]
+Workspace.invitations -> WorkspaceInvitation[]
+Workspace.members -> WorkspaceMember[]
+Workspace.notifications -> Notification[]
+Workspace.owner -> User
+Workspace.releases -> Release[]
+Workspace.repositoryConnectIntents -> RepositoryConnectIntent[]
+Workspace.repositoryConnections -> RepositoryConnection[]
+Workspace.repositoryInstallations -> RepositoryInstallation[]
+Workspace.saasApplications -> SaasApplication[]
+Workspace.webhookDeliveries -> WebhookDelivery[]
+Workspace.webhookEndpoints -> WebhookEndpoint[]
+Workspace.webhookEvents -> WebhookEvent[]
+Workspace.websites -> Website[]
+WorkspaceInvitation.acceptedBy -> User?
+WorkspaceInvitation.invitedBy -> User
+WorkspaceInvitation.workspace -> Workspace
+WorkspaceMember.user -> User
+WorkspaceMember.workspace -> Workspace
+
+RELATION COUNT: 226
+
+============================================================
+14. POSSIBLE MISSING REVERSE RELATIONS
+============================================================
+NOTE: Prisma validate is authoritative.
+
+POSSIBLE MISSING REVERSE: DesktopAiAnalysis.desktopApp -> DesktopApplication
+POSSIBLE MISSING REVERSE: DesktopAlertRule.desktopApp -> DesktopApplication
+POSSIBLE MISSING REVERSE: DesktopAlertIncident.desktopApp -> DesktopApplication
+POSSIBLE MISSING REVERSE: DesktopBuild.desktopApp -> DesktopApplication
+POSSIBLE MISSING REVERSE: DesktopBuild.repository -> RepositoryConnection
+POSSIBLE MISSING REVERSE: DesktopBuildArtifact.build -> DesktopBuild
+POSSIBLE MISSING REVERSE: DesktopRelease.desktopApp -> DesktopApplication
+POSSIBLE MISSING REVERSE: DesktopRelease.build -> DesktopBuild
+POSSIBLE MISSING REVERSE: DesktopMetric.desktopApp -> DesktopApplication
+POSSIBLE MISSING REVERSE: DesktopCrash.desktopApp -> DesktopApplication
+POSSIBLE MISSING REVERSE: DesktopDependency.desktopApp -> DesktopApplication
+POSSIBLE MISSING REVERSE: DesktopSecurityFinding.desktopApp -> DesktopApplication
+POSSIBLE MISSING REVERSE: DesktopTelemetryIntegration.desktopApp -> DesktopApplication
+POSSIBLE MISSING REVERSE: DesktopTestRun.build -> DesktopBuild
+
+POSSIBLE MISSING REVERSE COUNT: 14
+
+============================================================
+15. DESKTOP APPLICATION FULL RELATION CHECK
+============================================================
+FOUND   SaasApplication
+MISSING DesktopBuild
+MISSING DesktopRelease
+MISSING DesktopTelemetryIntegration
+MISSING DesktopMetric
+MISSING DesktopCrash
+MISSING DesktopDependency
+MISSING DesktopSecurityFinding
+MISSING DesktopAlertRule
+MISSING DesktopAlertIncident
+MISSING DesktopAiAnalysis
+
+============================================================
+16. DESKTOP BUILD FULL RELATION CHECK
+============================================================
+FOUND   DesktopApplication
+FOUND   RepositoryConnection
+MISSING DesktopBuildArtifact
+MISSING DesktopTestRun
+MISSING DesktopRelease
+
+============================================================
+17. MOBILE APPLICATION RELATION CHECK
+============================================================
+MobileApplication model exists.
+platform           MobilePlatform
+framework          MobileFramework
+application                SaasApplication             @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+mobileAiAnalyses           MobileAiAnalysis[]
+mobileAlertRules           MobileAlertRule[]
+mobileReleases             MobileRelease[]
+mobileTelemetryIntegration MobileTelemetryIntegration?
+builds                     MobileBuild[]
+performanceMetrics         MobilePerformanceMetric[]
+@@map("mobile_applications")
+
+============================================================
+18. MOBILE BUILD RELATION CHECK
+============================================================
+mobileAppId  String @map("mobile_app_id") @db.Uuid
+source        MobileBuildSource @default(GITHUB_ACTIONS)
+platform MobilePlatform
+status   MobileBuildStatus @default(QUEUED)
+releases   MobileRelease[]
+mobileApp  MobileApplication    @relation(fields: [mobileAppId], references: [id], onDelete: Cascade)
+repository RepositoryConnection @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+testRuns   MobileTestRun[]
+@@index([workspaceId, mobileAppId])
+@@index([mobileAppId, createdAt(sort: Desc)])
+@@map("mobile_builds")
+
+============================================================
+19. SAAS APPLICATION
+============================================================
+SaasApplication FOUND.
+
+id               String              @id @default(uuid()) @db.Uuid
+workspaceId      String              @map("workspace_id") @db.Uuid
+name             String              @db.VarChar(160)
+slug             String              @db.VarChar(160)
+shortDescription String?             @map("short_description") @db.VarChar(280)
+longDescription  String?             @map("long_description") @db.Text
+category         ApplicationCategory @default(SAAS)
+type             ApplicationType     @default(OTHER)
+status           ApplicationStatus   @default(IDEA)
+priority         ApplicationPriority @default(MEDIUM)
+startedAt        DateTime?           @map("started_at")
+targetLaunchAt   DateTime?           @map("target_launch_at")
+launchedAt       DateTime?           @map("launched_at")
+lastActivityAt   DateTime?           @map("last_activity_at")
+archivedAt       DateTime?           @map("archived_at")
+createdAt        DateTime            @default(now()) @map("created_at")
+updatedAt        DateTime            @updatedAt @map("updated_at")
+
+workspace               Workspace                @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+technologies            ApplicationTechnology[]
+links                   ApplicationLink[]
+activities              ApplicationActivity[]
+websites                Website[]
+mobileApplication       MobileApplication?
+desktopApplication      DesktopApplication?
+healthChecks            HealthCheck[]
+applicationEnvironments ApplicationEnvironment[]
+releases                Release[]
+deployments             Deployment[]
+notifications           Notification[]
+
+progressPercent     Int                      @default(0) @map("progress_percent")
+progressUpdatedAt   DateTime?                @map("progress_updated_at")
+developmentTemplate DevelopmentTemplateType? @map("development_template")
+templateAppliedAt   DateTime?                @map("template_applied_at")
+
+milestones            ApplicationMilestone[]
+blockers              ApplicationBlocker[]
+repositoryConnections RepositoryConnection[]
+
+@@unique([workspaceId, slug])
+@@index([workspaceId, archivedAt])
+@@index([workspaceId, status])
+@@index([workspaceId, priority])
+@@index([workspaceId, category])
+@@index([workspaceId, updatedAt])
+@@index([workspaceId, type])
+@@map("saas_applications")
+
+
+============================================================
+20. REPOSITORY CONNECTION
+============================================================
+
+id             String             @id @default(uuid()) @db.Uuid
+workspaceId    String             @map("workspace_id") @db.Uuid
+installationId String             @map("installation_id") @db.Uuid
+applicationId  String?            @map("application_id") @db.Uuid
+provider       RepositoryProvider @default(GITHUB)
+externalRepoId String             @map("external_repo_id") @db.VarChar(32)
+
+owner         String  @db.VarChar(255)
+name          String  @db.VarChar(255)
+fullName      String  @map("full_name") @db.VarChar(512)
+defaultBranch String  @map("default_branch") @db.VarChar(255)
+isPrivate     Boolean @map("is_private")
+htmlUrl       String  @map("html_url") @db.VarChar(2048)
+archived      Boolean @default(false)
+isAvailable   Boolean @default(true) @map("is_available")
+
+lastSyncedAt DateTime? @map("last_synced_at") @db.Timestamptz(6)
+createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+workspace    Workspace              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+installation RepositoryInstallation @relation(fields: [installationId], references: [id], onDelete: Cascade)
+application  SaasApplication?       @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+mobileBuilds MobileBuild[]
+
+@@unique([workspaceId, provider, externalRepoId])
+@@index([workspaceId, isAvailable])
+@@index([installationId])
+@@index([workspaceId, applicationId])
+@@map("repository_connections")
+
+
+============================================================
+21. APPLICATION TYPE ENUM
+============================================================
+
+WEB
+API
+MOBILE
+DESKTOP
+WORKER
+OTHER
+
+
+============================================================
+22. MIGRATIONS
+============================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260808231107_initial_schema\migration.sql
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260812214000_repository_integrations\migration.sql
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260815220213_personal_github_connect_intents\migration.sql
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260817165240_add_raw_analytics_event_processed_index\migration.sql
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260821183511_mobile_application_foundation\migration.sql
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql
+
+MIGRATION COUNT: 6
+
+============================================================
+23. CURRENT TABLES NOT FOUND IN MIGRATION HISTORY
+============================================================
+DesktopAiAnalysis -> desktop_ai_analyses
+DesktopAlertRule -> desktop_alert_rules
+DesktopAlertIncident -> desktop_alert_incidents
+DesktopApplication -> desktop_applications
+DesktopBuild -> desktop_builds
+DesktopBuildArtifact -> desktop_build_artifacts
+DesktopRelease -> desktop_releases
+DesktopMetric -> desktop_metrics
+DesktopCrash -> desktop_crashes
+DesktopDependency -> desktop_dependencies
+DesktopSecurityFinding -> desktop_security_findings
+DesktopTelemetryIntegration -> desktop_telemetry_integrations
+DesktopTestRun -> desktop_test_runs
+DesktopTestFailure -> desktop_test_failures
+
+POTENTIALLY UNMIGRATED TABLE COUNT: 14
+
+============================================================
+24. CURRENT ENUMS NOT FOUND IN MIGRATION HISTORY
+============================================================
+DesktopPlatform
+DesktopFramework
+DesktopArchitecture
+DesktopAnalysisAction
+DesktopAnalysisConfidence
+DesktopAlertRuleType
+DesktopAlertOperator
+DesktopAlertIncidentStatus
+DesktopBuildSource
+DesktopBuildStatus
+DesktopBuildArtifactType
+DesktopReleaseChannel
+DesktopReleaseStatus
+DesktopPerformanceMetricType
+DesktopDependencyEcosystem
+DesktopDependencyRiskStatus
+DesktopSecuritySeverity
+DesktopSecurityCheckType
+DesktopSecurityCheckStatus
+DesktopTelemetryProvider
+DesktopTelemetryIntegrationStatus
+DesktopTestType
+DesktopTestStatus
+
+POTENTIALLY UNMIGRATED ENUM COUNT: 23
+
+============================================================
+25. DESKTOP MIGRATION REFERENCES
+============================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260808231107_initial_schema\migration.sql:2: CREATE TYPE "AnalyticsDeviceType" AS ENUM ('DESKTOP', 'MOBILE', 'TABLET', 'BOT', 'OTHER');
+
+============================================================
+26. MOBILE MIGRATION REFERENCES
+============================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260808231107_initial_schema\migration.sql:2: CREATE TYPE "AnalyticsDeviceType" AS ENUM ('DESKTOP', 'MOBILE', 'TABLET', 'BOT', 'OTHER');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260808231107_initial_schema\migration.sql:47: CREATE TYPE "ApplicationCategory" AS ENUM ('SAAS', 'AI', 'MOBILE', 'ECOMMERCE', 'API', 'INTERNAL_TOOL', 'OTHER');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260808231107_initial_schema\migration.sql:50: CREATE TYPE "TechnologyType" AS ENUM ('FRONTEND', 'BACKEND', 'DATABASE', 'MOBILE', 'AI', 'INFRASTRUCTURE', 'OTHER');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260808231107_initial_schema\migration.sql:56: CREATE TYPE "DevelopmentTemplateType" AS ENUM ('STANDARD_SAAS', 'AI_SAAS', 'MOBILE', 'API', 'ECOMMERCE');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260821183511_mobile_application_foundation\migration.sql:2: CREATE TYPE "ApplicationType" AS ENUM ('WEB', 'API', 'MOBILE', 'WORKER', 'OTHER');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260821183511_mobile_application_foundation\migration.sql:5: CREATE TYPE "MobilePlatform" AS ENUM ('ANDROID', 'IOS', 'CROSS_PLATFORM');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260821183511_mobile_application_foundation\migration.sql:8: CREATE TYPE "MobileFramework" AS ENUM ('ANDROID_NATIVE', 'IOS_NATIVE', 'FLUTTER', 'REACT_NATIVE', 'KMP', 'OTHER');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260821183511_mobile_application_foundation\migration.sql:14: CREATE TABLE "mobile_applications" (
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260821183511_mobile_application_foundation\migration.sql:17: "platform" "MobilePlatform" NOT NULL,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260821183511_mobile_application_foundation\migration.sql:18: "framework" "MobileFramework" NOT NULL,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260821183511_mobile_application_foundation\migration.sql:28: CONSTRAINT "mobile_applications_pkey" PRIMARY KEY ("id")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260821183511_mobile_application_foundation\migration.sql:32: CREATE UNIQUE INDEX "mobile_applications_application_id_key" ON "mobile_applications"("application_id");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260821183511_mobile_application_foundation\migration.sql:35: CREATE INDEX "mobile_applications_platform_idx" ON "mobile_applications"("platform");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260821183511_mobile_application_foundation\migration.sql:38: CREATE INDEX "mobile_applications_framework_idx" ON "mobile_applications"("framework");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260821183511_mobile_application_foundation\migration.sql:44: ALTER TABLE "mobile_applications" ADD CONSTRAINT "mobile_applications_application_id_fkey" FOREIGN KEY ("application_id") REFERENCES "saas_applications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:2: CREATE TYPE "MobileAnalysisAction" AS ENUM ('BUILD_FAILURE', 'PERFORMANCE_REGRESSION', 'RELEASE_HEALTH', 'CUSTOM');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:5: CREATE TYPE "MobileAnalysisConfidence" AS ENUM ('LIMITED', 'SUPPORTED');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:8: CREATE TYPE "MobileAlertRuleType" AS ENUM ('CRASH_RATE', 'ANR_HANG', 'STARTUP', 'API_FAILURE_RATE', 'BUILD_FAILED', 'RELEASE_REGRESSION');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:11: CREATE TYPE "MobileAlertOperator" AS ENUM ('GT', 'GTE');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:14: CREATE TYPE "MobileAlertIncidentStatus" AS ENUM ('OPEN', 'RESOLVED');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:17: CREATE TYPE "MobileBuildSource" AS ENUM ('GITHUB_ACTIONS');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:20: CREATE TYPE "MobileBuildStatus" AS ENUM ('QUEUED', 'BUILDING', 'SUCCESS', 'FAILED', 'CANCELLED');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:23: CREATE TYPE "MobilePerformanceMetricType" AS ENUM ('CRASH_FREE_USERS_RATE', 'CRASH_RATE', 'CRASH_COUNT', 'ANR_COUNT', 'HANG_COUNT', 'COLD_STARTUP_MS', 'WARM_STARTUP_MS', 'MEMORY_MB', 'NETWORK_LATENCY_MS', 'API_FAILURE_RATE', 'VERSION_ADOPTION_RATE', 'SLOW_SCREEN_COUNT');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:26: CREATE TYPE "MobileReleaseEnvironment" AS ENUM ('DEVELOPMENT', 'QA', 'INTERNAL', 'BETA', 'PRODUCTION');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:29: CREATE TYPE "MobileReleaseStatus" AS ENUM ('DRAFT', 'READY', 'RELEASED', 'FAILED', 'ROLLED_BACK');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:32: CREATE TYPE "MobileTelemetryProvider" AS ENUM ('FIREBASE', 'SENTRY', 'DATADOG', 'NEW_RELIC', 'CUSTOM');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:35: CREATE TYPE "MobileTelemetryStatus" AS ENUM ('CONNECTED', 'ERROR', 'DISCONNECTED');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:38: CREATE TYPE "MobileTestType" AS ENUM ('UNIT', 'UI', 'INTEGRATION', 'INSTRUMENTATION', 'SNAPSHOT', 'OTHER');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:41: CREATE TYPE "MobileTestStatus" AS ENUM ('PENDING', 'RUNNING', 'PASSED', 'FAILED', 'SKIPPED', 'CANCELLED');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:44: CREATE TABLE "mobile_ai_analyses" (
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:47: "mobile_app_id" UUID NOT NULL,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:49: "action" "MobileAnalysisAction" NOT NULL,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:52: "confidence" "MobileAnalysisConfidence" NOT NULL,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:56: CONSTRAINT "mobile_ai_analyses_pkey" PRIMARY KEY ("id")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:60: CREATE TABLE "mobile_alert_rules" (
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:63: "mobile_app_id" UUID NOT NULL,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:65: "type" "MobileAlertRuleType" NOT NULL,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:66: "operator" "MobileAlertOperator" NOT NULL DEFAULT 'GT',
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:73: CONSTRAINT "mobile_alert_rules_pkey" PRIMARY KEY ("id")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:77: CREATE TABLE "mobile_alert_incidents" (
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:80: "mobile_app_id" UUID NOT NULL,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:82: "status" "MobileAlertIncidentStatus" NOT NULL DEFAULT 'OPEN',
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:95: CONSTRAINT "mobile_alert_incidents_pkey" PRIMARY KEY ("id")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:99: CREATE TABLE "mobile_builds" (
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:102: "mobile_app_id" UUID NOT NULL,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:105: "source" "MobileBuildSource" NOT NULL DEFAULT 'GITHUB_ACTIONS',
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:110: "platform" "MobilePlatform" NOT NULL,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:111: "status" "MobileBuildStatus" NOT NULL DEFAULT 'QUEUED',
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:118: CONSTRAINT "mobile_builds_pkey" PRIMARY KEY ("id")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:122: CREATE TABLE "mobile_performance_metrics" (
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:125: "mobile_app_id" UUID NOT NULL,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:126: "platform" "MobilePlatform" NOT NULL,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:132: "metric" "MobilePerformanceMetricType" NOT NULL,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:135: CONSTRAINT "mobile_performance_metrics_pkey" PRIMARY KEY ("id")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:139: CREATE TABLE "mobile_releases" (
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:142: "mobile_app_id" UUID NOT NULL,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:146: "environment" "MobileReleaseEnvironment" NOT NULL,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:147: "status" "MobileReleaseStatus" NOT NULL DEFAULT 'DRAFT',
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:154: CONSTRAINT "mobile_releases_pkey" PRIMARY KEY ("id")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:158: CREATE TABLE "mobile_telemetry_integrations" (
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:161: "mobile_app_id" UUID NOT NULL,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:162: "provider" "MobileTelemetryProvider" NOT NULL,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:163: "status" "MobileTelemetryStatus" NOT NULL DEFAULT 'CONNECTED',
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:171: CONSTRAINT "mobile_telemetry_integrations_pkey" PRIMARY KEY ("id")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:175: CREATE TABLE "mobile_test_runs" (
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:178: "type" "MobileTestType" NOT NULL,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:179: "status" "MobileTestStatus" NOT NULL DEFAULT 'PENDING',
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:190: CONSTRAINT "mobile_test_runs_pkey" PRIMARY KEY ("id")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:194: CREATE TABLE "mobile_test_failures" (
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:205: CONSTRAINT "mobile_test_failures_pkey" PRIMARY KEY ("id")
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:209: CREATE INDEX "mobile_ai_analyses_workspace_id_mobile_app_id_idx" ON "mobile_ai_analyses"("workspace_id", "mobile_app_id");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:212: CREATE INDEX "mobile_ai_analyses_created_at_idx" ON "mobile_ai_analyses"("created_at");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:215: CREATE INDEX "mobile_alert_rules_workspace_id_mobile_app_id_idx" ON "mobile_alert_rules"("workspace_id", "mobile_app_id");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:218: CREATE INDEX "mobile_alert_rules_mobile_app_id_enabled_idx" ON "mobile_alert_rules"("mobile_app_id", "enabled");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:221: CREATE UNIQUE INDEX "mobile_alert_incidents_active_key_key" ON "mobile_alert_incidents"("active_key");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:224: CREATE INDEX "mobile_alert_incidents_workspace_id_mobile_app_id_idx" ON "mobile_alert_incidents"("workspace_id", "mobile_app_id");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:227: CREATE INDEX "mobile_alert_incidents_rule_id_status_idx" ON "mobile_alert_incidents"("rule_id", "status");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:230: CREATE INDEX "mobile_alert_incidents_triggered_at_idx" ON "mobile_alert_incidents"("triggered_at");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:233: CREATE INDEX "mobile_builds_workspace_id_mobile_app_id_idx" ON "mobile_builds"("workspace_id", "mobile_app_id");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:236: CREATE INDEX "mobile_builds_mobile_app_id_created_at_idx" ON "mobile_builds"("mobile_app_id", "created_at" DESC);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:239: CREATE INDEX "mobile_builds_repository_id_created_at_idx" ON "mobile_builds"("repository_id", "created_at" DESC);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:242: CREATE INDEX "mobile_builds_status_idx" ON "mobile_builds"("status");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:245: CREATE INDEX "mobile_builds_platform_idx" ON "mobile_builds"("platform");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:248: CREATE UNIQUE INDEX "mobile_builds_repository_id_workflow_run_id_key" ON "mobile_builds"("repository_id", "workflow_run_id");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:251: CREATE INDEX "mobile_performance_metrics_workspace_id_mobile_app_id_colle_idx" ON "mobile_performance_metrics"("workspace_id", "mobile_app_id", "collected_at");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:254: CREATE INDEX "mobile_performance_metrics_mobile_app_id_version_idx" ON "mobile_performance_metrics"("mobile_app_id", "version");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:257: CREATE INDEX "mobile_performance_metrics_mobile_app_id_metric_collected_a_idx" ON "mobile_performance_metrics"("mobile_app_id", "metric", "collected_at");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:260: CREATE INDEX "mobile_performance_metrics_platform_idx" ON "mobile_performance_metrics"("platform");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:263: CREATE INDEX "mobile_releases_workspace_id_mobile_app_id_idx" ON "mobile_releases"("workspace_id", "mobile_app_id");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:266: CREATE INDEX "mobile_releases_mobile_app_id_environment_idx" ON "mobile_releases"("mobile_app_id", "environment");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:269: CREATE INDEX "mobile_releases_mobile_app_id_status_idx" ON "mobile_releases"("mobile_app_id", "status");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:272: CREATE INDEX "mobile_releases_created_at_idx" ON "mobile_releases"("created_at");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:275: CREATE UNIQUE INDEX "mobile_releases_build_id_environment_key" ON "mobile_releases"("build_id", "environment");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:278: CREATE UNIQUE INDEX "mobile_telemetry_integrations_mobile_app_id_key" ON "mobile_telemetry_integrations"("mobile_app_id");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:281: CREATE INDEX "mobile_telemetry_integrations_workspace_id_idx" ON "mobile_telemetry_integrations"("workspace_id");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:284: CREATE INDEX "mobile_telemetry_integrations_workspace_id_status_idx" ON "mobile_telemetry_integrations"("workspace_id", "status");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:287: CREATE INDEX "mobile_telemetry_integrations_provider_idx" ON "mobile_telemetry_integrations"("provider");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:290: CREATE INDEX "mobile_test_runs_build_id_idx" ON "mobile_test_runs"("build_id");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:293: CREATE INDEX "mobile_test_runs_status_idx" ON "mobile_test_runs"("status");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:296: CREATE UNIQUE INDEX "mobile_test_runs_build_id_type_key" ON "mobile_test_runs"("build_id", "type");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:299: CREATE INDEX "mobile_test_failures_test_run_id_idx" ON "mobile_test_failures"("test_run_id");
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:302: ALTER TABLE "mobile_ai_analyses" ADD CONSTRAINT "mobile_ai_analyses_mobile_app_id_fkey" FOREIGN KEY ("mobile_app_id") REFERENCES "mobile_applications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:305: ALTER TABLE "mobile_alert_rules" ADD CONSTRAINT "mobile_alert_rules_mobile_app_id_fkey" FOREIGN KEY ("mobile_app_id") REFERENCES "mobile_applications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:308: ALTER TABLE "mobile_alert_incidents" ADD CONSTRAINT "mobile_alert_incidents_rule_id_fkey" FOREIGN KEY ("rule_id") REFERENCES "mobile_alert_rules"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:311: ALTER TABLE "mobile_builds" ADD CONSTRAINT "mobile_builds_mobile_app_id_fkey" FOREIGN KEY ("mobile_app_id") REFERENCES "mobile_applications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:314: ALTER TABLE "mobile_builds" ADD CONSTRAINT "mobile_builds_repository_id_fkey" FOREIGN KEY ("repository_id") REFERENCES "repository_connections"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:317: ALTER TABLE "mobile_performance_metrics" ADD CONSTRAINT "mobile_performance_metrics_mobile_app_id_fkey" FOREIGN KEY ("mobile_app_id") REFERENCES "mobile_applications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:320: ALTER TABLE "mobile_releases" ADD CONSTRAINT "mobile_releases_mobile_app_id_fkey" FOREIGN KEY ("mobile_app_id") REFERENCES "mobile_applications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:323: ALTER TABLE "mobile_releases" ADD CONSTRAINT "mobile_releases_build_id_fkey" FOREIGN KEY ("build_id") REFERENCES "mobile_builds"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:326: ALTER TABLE "mobile_telemetry_integrations" ADD CONSTRAINT "mobile_telemetry_integrations_mobile_app_id_fkey" FOREIGN KEY ("mobile_app_id") REFERENCES "mobile_applications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:329: ALTER TABLE "mobile_test_runs" ADD CONSTRAINT "mobile_test_runs_build_id_fkey" FOREIGN KEY ("build_id") REFERENCES "mobile_builds"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\prisma\migrations\20260823062811_mobile_feature_completion\migration.sql:332: ALTER TABLE "mobile_test_failures" ADD CONSTRAINT "mobile_test_failures_test_run_id_fkey" FOREIGN KEY ("test_run_id") REFERENCES "mobile_test_runs"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+============================================================
+27. PRISMA VALIDATE
+============================================================
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma.
+
+Error: Prisma schema validation - (validate wasm)
+Error code: P1012
+[1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
+  [1;94m-->[0m  [4mprisma\models\desktop-application.prisma:21[0m
+[1;94m   | [0m
+[1;94m20 | [0m
+[1;94m21 | [0m  [1;91mapplication SaasApplication @relation(
+[0m
+[1;94m22 | [0m    fields: [applicationId],
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
+  [1;94m-->[0m  [4mprisma\models\desktop-application.prisma:22[0m
+[1;94m   | [0m
+[1;94m21 | [0m  application SaasApplication @relation(
+[1;94m22 | [0m    [1;91mfields: [applicationId],
+[0m
+[1;94m23 | [0m    references: [id],
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
+  [1;94m-->[0m  [4mprisma\models\desktop-application.prisma:23[0m
+[1;94m   | [0m
+[1;94m22 | [0m    fields: [applicationId],
+[1;94m23 | [0m    [1;91mreferences: [id],
+[0m
+[1;94m24 | [0m    onDelete: Cascade
+[1;94m   | [0m
+[1;91merror[0m: [1mField declarations don't require a `:`.[0m
+  [1;94m-->[0m  [4mprisma\models\desktop-application.prisma:24[0m
+[1;94m   | [0m
+[1;94m23 | [0m    references: [id],
+[1;94m24 | [0m    onDelete[1;91m:[0m Cascade
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
+  [1;94m-->[0m  [4mprisma\models\desktop-application.prisma:25[0m
+[1;94m   | [0m
+[1;94m24 | [0m    onDelete: Cascade
+[1;94m25 | [0m  [1;91m)
+[0m
+[1;94m26 | [0m
+[1;94m   | [0m
+
+Validation Error Count: 5
+[Context: validate]
+
+Prisma CLI Version : 7.9.1
+
+EXIT CODE: 1
+
+============================================================
+28. PRISMA MIGRATE STATUS
+============================================================
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma.
+Error: Prisma schema validation - (get-config wasm)
+Error code: P1012
+error: Error validating: This line is not a valid field or attribute definition.
+  -->  prisma\models\desktop-application.prisma:21
+   | 
+20 | 
+21 |   application SaasApplication @relation(
+22 |     fields: [applicationId],
+   | 
+
+
+error: Error validating: This line is not a valid field or attribute definition.
+  -->  prisma\models\desktop-application.prisma:22
+   | 
+21 |   application SaasApplication @relation(
+22 |     fields: [applicationId],
+23 |     references: [id],
+   | 
+
+
+error: Error validating: This line is not a valid field or attribute definition.
+  -->  prisma\models\desktop-application.prisma:23
+   | 
+22 |     fields: [applicationId],
+23 |     references: [id],
+24 |     onDelete: Cascade
+   | 
+
+
+error: Field declarations don't require a `:`.
+  -->  prisma\models\desktop-application.prisma:24
+   | 
+23 |     references: [id],
+24 |     onDelete: Cascade
+   | 
+
+
+error: Error validating: This line is not a valid field or attribute definition.
+  -->  prisma\models\desktop-application.prisma:25
+   | 
+24 |     onDelete: Cascade
+25 |   )
+26 | 
+   | 
+
+Validation Error Count: 5
+[Context: getConfig]
+
+Prisma CLI Version : 7.9.1
+
+EXIT CODE: 1
+
+============================================================
+29. SUMMARY
+============================================================
+Prisma files: 47
+Models: 64
+Enums: 74
+Relations parsed: 226
+Migrations: 6
+
+Malformed relation starts: 1
+Possible missing reverse relations: 14
+Potential unmigrated tables: 14
+Potential unmigrated enums: 23
+Desktop migration references: 1
+Mobile migration references: 112
+
+============================================================
+30. SAFETY
+============================================================
+NO CHANGES WERE MADE.
+
+This script did NOT execute:
+  prisma migrate dev
+  prisma migrate deploy
+  prisma migrate reset
+  prisma db push
+  prisma db pull
+  prisma generate
+
+This diagnostic is read-only.

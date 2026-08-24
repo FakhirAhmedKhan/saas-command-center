@@ -33,9 +33,7 @@ describe('DesktopPerformance', () => {
       metrics: [],
     });
 
-    render(
-      <DesktopPerformance workspaceId='workspace-1' desktopAppId='desktop-1' />,
-    );
+    render(<DesktopPerformance workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
     expect(await screen.findByText('99.7%')).toBeInTheDocument();
     expect(screen.getByText('1.80s')).toBeInTheDocument();
@@ -62,12 +60,8 @@ describe('DesktopPerformance', () => {
       metrics: [],
     });
 
-    render(
-      <DesktopPerformance workspaceId='workspace-1' desktopAppId='desktop-1' />,
-    );
+    render(<DesktopPerformance workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
-    expect(
-      await screen.findByText('No performance metrics match the current filters.'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('No performance metrics match the current filters.')).toBeInTheDocument();
   });
 });

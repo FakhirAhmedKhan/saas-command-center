@@ -1,3 +1,5 @@
+import type { DesktopBuild, DesktopBuildArtifact, DesktopPlatform, DesktopArchitecture } from '@command-center/shared-types';
+
 export type DesktopReleaseChannel = 'DEV' | 'ALPHA' | 'BETA' | 'STABLE' | 'LTS';
 
 export type DesktopReleaseStatus = 'DRAFT' | 'READY' | 'PUBLISHED' | 'FAILED' | 'ROLLED_BACK';

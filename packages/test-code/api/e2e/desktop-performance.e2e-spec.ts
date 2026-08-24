@@ -3,10 +3,7 @@ import { PrismaService } from 'src/database/prisma.service';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
-import {
-  API,
-  createDesktopApp,
-} from './helpers/desktop-test-fixtures';
+import { API, createDesktopApp } from './helpers/desktop-test-fixtures';
 
 function base(workspaceId: string, desktopAppId: string) {
   return `${API}/workspaces/${workspaceId}/desktop-apps/${desktopAppId}`;
@@ -17,9 +14,7 @@ describe('Desktop Performance and Crashes E2E', () => {
   let prisma: PrismaService;
 
   beforeEach(async () => {
-    process.env.DESKTOP_TELEMETRY_ENCRYPTION_KEY = Buffer.alloc(32, 9).toString(
-      'base64',
-    );
+    process.env.DESKTOP_TELEMETRY_ENCRYPTION_KEY = Buffer.alloc(32, 9).toString('base64');
     app = await createTestApp();
     prisma = app.get(PrismaService);
   });
@@ -52,9 +47,7 @@ describe('Desktop Performance and Crashes E2E', () => {
     const value = await fixture();
 
     const response = await value.owner.agent
-      .post(
-        `${base(value.owner.workspaceId, value.desktopApp.id)}/telemetry/${value.integrationId}/sync`,
-      )
+      .post(`${base(value.owner.workspaceId, value.desktopApp.id)}/telemetry/${value.integrationId}/sync`)
       .set('Authorization', `Bearer ${value.owner.accessToken}`);
 
     expect(response.status).toBe(201);
@@ -78,15 +71,9 @@ describe('Desktop Performance and Crashes E2E', () => {
     const value = await fixture();
     const path = `${base(value.owner.workspaceId, value.desktopApp.id)}/telemetry/${value.integrationId}/sync`;
 
-    await value.owner.agent
-      .post(path)
-      .set('Authorization', `Bearer ${value.owner.accessToken}`)
-      .expect(201);
+    await value.owner.agent.post(path).set('Authorization', `Bearer ${value.owner.accessToken}`).expect(201);
 
-    const second = await value.owner.agent
-      .post(path)
-      .set('Authorization', `Bearer ${value.owner.accessToken}`)
-      .expect(201);
+    const second = await value.owner.agent.post(path).set('Authorization', `Bearer ${value.owner.accessToken}`).expect(201);
 
     expect(second.body.performanceInserted).toBe(0);
     expect(second.body.performanceUpdated).toBe(4);
@@ -107,9 +94,7 @@ describe('Desktop Performance and Crashes E2E', () => {
     const value = await fixture();
 
     await value.owner.agent
-      .post(
-        `${base(value.owner.workspaceId, value.desktopApp.id)}/telemetry/${value.integrationId}/sync`,
-      )
+      .post(`${base(value.owner.workspaceId, value.desktopApp.id)}/telemetry/${value.integrationId}/sync`)
       .set('Authorization', `Bearer ${value.owner.accessToken}`)
       .expect(201);
 
@@ -131,34 +116,26 @@ describe('Desktop Performance and Crashes E2E', () => {
     const value = await fixture();
 
     await value.owner.agent
-      .post(
-        `${base(value.owner.workspaceId, value.desktopApp.id)}/telemetry/${value.integrationId}/sync`,
-      )
+      .post(`${base(value.owner.workspaceId, value.desktopApp.id)}/telemetry/${value.integrationId}/sync`)
       .set('Authorization', `Bearer ${value.owner.accessToken}`)
       .expect(201);
 
     const performance = await value.owner.agent
-      .get(
-        `${base(value.owner.workspaceId, value.desktopApp.id)}/performance?version=2.4.0&platform=WINDOWS&architecture=X64`,
-      )
+      .get(`${base(value.owner.workspaceId, value.desktopApp.id)}/performance?version=2.4.0&platform=WINDOWS&architecture=X64`)
       .set('Authorization', `Bearer ${value.owner.accessToken}`)
       .expect(200);
 
     expect(performance.body.summary.sampleCount).toBe(4);
 
     const empty = await value.owner.agent
-      .get(
-        `${base(value.owner.workspaceId, value.desktopApp.id)}/performance?version=9.9.9`,
-      )
+      .get(`${base(value.owner.workspaceId, value.desktopApp.id)}/performance?version=9.9.9`)
       .set('Authorization', `Bearer ${value.owner.accessToken}`)
       .expect(200);
 
     expect(empty.body.summary.sampleCount).toBe(0);
 
     const crashes = await value.owner.agent
-      .get(
-        `${base(value.owner.workspaceId, value.desktopApp.id)}/crashes?version=2.4.0&platform=WINDOWS`,
-      )
+      .get(`${base(value.owner.workspaceId, value.desktopApp.id)}/crashes?version=2.4.0&platform=WINDOWS`)
       .set('Authorization', `Bearer ${value.owner.accessToken}`)
       .expect(200);
 
@@ -175,9 +152,7 @@ describe('Desktop Performance and Crashes E2E', () => {
     const attacker = await registerWorkspaceTestUser(app, prisma);
 
     await value.owner.agent
-      .post(
-        `${base(value.owner.workspaceId, value.desktopApp.id)}/telemetry/${value.integrationId}/sync`,
-      )
+      .post(`${base(value.owner.workspaceId, value.desktopApp.id)}/telemetry/${value.integrationId}/sync`)
       .set('Authorization', `Bearer ${value.owner.accessToken}`)
       .expect(201);
 

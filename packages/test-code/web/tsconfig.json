@@ -1,7 +1,11 @@
 {
   "extends": "../../../apps/web/tsconfig.json",
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@command-center/shared-types": ["../../packages/shared-types/dist/index.d.ts"]
+    }
   },
   "include": ["./**/*.ts", "./**/*.tsx", "./**/*.mts", "../../../apps/web/src/**/*.ts", "../../../apps/web/src/**/*.tsx", "../../../apps/web/next-env.d.ts"],
   "exclude": ["node_modules", "playwright-report", "playwright-report-fullstack", "test-results", "coverage"]

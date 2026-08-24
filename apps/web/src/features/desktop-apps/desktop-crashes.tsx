@@ -2,10 +2,7 @@
 
 import { listDesktopCrashes } from './desktop-apps-api';
 import { getErrorMessage } from '@/features/lib/api/api-error';
-import type {
-  DesktopCrash,
-  DesktopRuntimeFilters,
-} from '@command-center/shared-types';
+import type { DesktopCrash, DesktopRuntimeFilters } from '@command-center/shared-types';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -22,14 +19,9 @@ export function DesktopCrashes({ workspaceId, desktopAppId }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
     const filters: DesktopRuntimeFilters = {
       ...(version ? { version } : {}),
-      ...(platform
-        ? { platform: platform as DesktopRuntimeFilters['platform'] }
-        : {}),
+      ...(platform ? { platform: platform as DesktopRuntimeFilters['platform'] } : {}),
     };
 
     try {
@@ -42,7 +34,13 @@ export function DesktopCrashes({ workspaceId, desktopAppId }: Props) {
   }, [workspaceId, desktopAppId, version, platform]);
 
   useEffect(() => {
-    void load();
+    const timeoutId = window.setTimeout(() => {
+      void load();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
   }, [load]);
 
   return (
@@ -50,9 +48,7 @@ export function DesktopCrashes({ workspaceId, desktopAppId }: Props) {
       <div className='flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between'>
         <div>
           <h2 className='text-lg font-semibold text-slate-950'>Crashes</h2>
-          <p className='mt-1 text-sm text-slate-500'>
-            Crash groups ordered by impact and recency.
-          </p>
+          <p className='mt-1 text-sm text-slate-500'>Crash groups ordered by impact and recency.</p>
         </div>
         <div className='flex gap-2'>
           <input
@@ -101,25 +97,13 @@ export function DesktopCrashes({ workspaceId, desktopAppId }: Props) {
                 </div>
                 <div className='min-w-0 flex-1'>
                   <h3 className='font-semibold text-slate-950'>{crash.message}</h3>
-                  <p className='mt-1 break-all text-xs text-slate-400'>
-                    {crash.fingerprint}
-                  </p>
+                  <p className='mt-1 break-all text-xs text-slate-400'>{crash.fingerprint}</p>
                   <div className='mt-3 flex flex-wrap gap-2 text-xs font-medium text-slate-600'>
-                    <span className='rounded-md bg-slate-100 px-2 py-1'>
-                      {crash.platform ?? 'Unknown platform'}
-                    </span>
-                    <span className='rounded-md bg-slate-100 px-2 py-1'>
-                      {crash.architecture ?? 'Unknown arch'}
-                    </span>
-                    <span className='rounded-md bg-slate-100 px-2 py-1'>
-                      {crash.version ?? 'Unknown version'}
-                    </span>
-                    <span className='rounded-md bg-red-50 px-2 py-1 text-red-700'>
-                      {crash.count} events
-                    </span>
-                    <span className='rounded-md bg-amber-50 px-2 py-1 text-amber-700'>
-                      {crash.affectedUsers} users
-                    </span>
+                    <span className='rounded-md bg-slate-100 px-2 py-1'>{crash.platform ?? 'Unknown platform'}</span>
+                    <span className='rounded-md bg-slate-100 px-2 py-1'>{crash.architecture ?? 'Unknown arch'}</span>
+                    <span className='rounded-md bg-slate-100 px-2 py-1'>{crash.version ?? 'Unknown version'}</span>
+                    <span className='rounded-md bg-red-50 px-2 py-1 text-red-700'>{crash.count} events</span>
+                    <span className='rounded-md bg-amber-50 px-2 py-1 text-amber-700'>{crash.affectedUsers} users</span>
                   </div>
                 </div>
               </div>

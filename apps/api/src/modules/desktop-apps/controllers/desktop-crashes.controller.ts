@@ -3,26 +3,13 @@ import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.gu
 import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
 import { DesktopRuntimeQueryDto } from '../dto/desktop-runtime.dto';
 import { DesktopCrashesService } from '../services/desktop-crashes.service';
-import {
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Param, ParseUUIDPipe, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Desktop Crashes')
 @ApiBearerAuth('access-token')
-@Controller(
-  'workspaces/:workspaceId/desktop-apps/:desktopAppId/crashes',
-)
-@UseGuards(
-  JwtAuthGuard,
-  WorkspaceAccessGuard,
-  WorkspaceRolesGuard,
-)
+@Controller('workspaces/:workspaceId/desktop-apps/:desktopAppId/crashes')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard, WorkspaceRolesGuard)
 export class DesktopCrashesController {
   constructor(private readonly service: DesktopCrashesService) {}
 

@@ -1,6 +1,6 @@
-import { DesktopArchitecture, DesktopPlatform, DesktopReleaseChannel, DesktopReleaseStatus } from 'src/generated/prisma/enums';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString, IsUUID, Length, MaxLength } from 'class-validator';
+import { DesktopArchitecture, DesktopPlatform, DesktopReleaseChannel, DesktopReleaseStatus } from 'src/generated/prisma/enums';
 
 export class CreateDesktopReleaseDto {
   @ApiProperty({

@@ -16,12 +16,12 @@ model DesktopMetric {
   desktopAppId           String @map("desktop_app_id") @db.Uuid
   telemetryIntegrationId String @map("telemetry_integration_id") @db.Uuid
 
-  externalId String @map("external_id") @db.VarChar(255)
+  externalId String                       @map("external_id") @db.VarChar(255)
   type       DesktopPerformanceMetricType
   value      Float
-  unit       String @db.VarChar(32)
+  unit       String                       @db.VarChar(32)
 
-  version      String?               @db.VarChar(64)
+  version      String?                @db.VarChar(64)
   platform     DesktopPlatform?
   architecture DesktopArchitecture?
   channel      DesktopReleaseChannel?
@@ -30,7 +30,7 @@ model DesktopMetric {
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  desktopApp DesktopApplication          @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  desktopApp  DesktopApplication          @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
   integration DesktopTelemetryIntegration @relation(fields: [telemetryIntegrationId], references: [id], onDelete: Cascade)
 
   @@unique([telemetryIntegrationId, externalId])
@@ -52,7 +52,7 @@ model DesktopCrash {
   count         Int    @default(1)
   affectedUsers Int    @default(0) @map("affected_users")
 
-  version      String?               @db.VarChar(64)
+  version      String?                @db.VarChar(64)
   platform     DesktopPlatform?
   architecture DesktopArchitecture?
   channel      DesktopReleaseChannel?
@@ -63,7 +63,7 @@ model DesktopCrash {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  desktopApp DesktopApplication          @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
+  desktopApp  DesktopApplication          @relation(fields: [desktopAppId], references: [id], onDelete: Cascade)
   integration DesktopTelemetryIntegration @relation(fields: [telemetryIntegrationId], references: [id], onDelete: Cascade)
 
   @@unique([telemetryIntegrationId, externalId])

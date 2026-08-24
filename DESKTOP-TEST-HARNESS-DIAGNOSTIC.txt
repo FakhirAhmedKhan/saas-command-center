@@ -1,0 +1,3317 @@
+
+==================================================
+package.json
+==================================================
+{
+  "name": "saas-command-center",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.22.0+sha512.1ff870c4c6133dfd88fb2afc46dd13d47f09c9794b438c6fdb47ca98caf3bc16381ee0be93a091b8e3824cf01f889f46d7d9e20910fb0be1ab0fb5baa80dd621",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=11.0.0"
+  },
+  "scripts": {
+    "build:packages": "pnpm --filter @command-center/shared-types build",
+    "build": "pnpm build:packages && pnpm -r --if-present build && pnpm size",
+    "lint": "pnpm -r --if-present lint",
+    "lint:fix": "pnpm -r --if-present lint:fix",
+    "typecheck": "pnpm build:packages && pnpm -r --if-present typecheck",
+    "test": "pnpm run test:all",
+    "test:api": "pnpm run test:api:unit && pnpm run test:api:e2e",
+    "test:tracker": "pnpm --filter @command-center/tracker-tests --fail-if-no-match test",
+    "test:web": "pnpm run test:web:unit && pnpm run test:web:e2e && pnpm run test:web:fullstack",
+    "test:web:fullstack": "pnpm --filter @command-center/web-tests --fail-if-no-match test:fullstack",
+    "test:all": "node packages/test-code/scripts/run-all.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:up": "docker compose -f infrastructure/docker-compose.yml up -d",
+    "db:down": "docker compose -f infrastructure/docker-compose.yml down",
+    "db:logs": "docker compose -f infrastructure/docker-compose.yml logs -f",
+    "db:status": "docker compose -f infrastructure/docker-compose.yml ps",
+    "dev": "concurrently -k --names API,WEB,TRACKER --prefix-colors cyan.bold,magenta.bold,yellow.bold --prefix \"[{name}]\" \"pnpm run dev:api\" \"pnpm run dev:web\" \"pnpm run dev:tracker\"",
+    "dev:api": "pnpm --filter @command-center/api start:dev",
+    "dev:web": "pnpm --filter @command-center/web dev",
+    "dev:tracker": "pnpm --filter @command-center/tracker dev",
+    "style:fix": "pnpm lint:fix && pnpm format",
+    "size": "node scripts/build-size-report.mjs",
+    "analyze:web": "pnpm --filter @command-center/web exec next experimental-analyze",
+    "build:tests": "pnpm --filter @command-center/test-code build",
+    "typecheck:tests": "pnpm --filter @command-center/test-code typecheck",
+    "test:api:unit": "pnpm --filter @command-center/api-tests --fail-if-no-match test:unit",
+    "test:api:e2e": "pnpm --filter @command-center/api-tests --fail-if-no-match test:e2e",
+    "test:web:unit": "pnpm --filter @command-center/web-tests --fail-if-no-match test:unit",
+    "test:web:e2e": "pnpm --filter @command-center/web-tests --fail-if-no-match test:e2e"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2"
+  }
+}
+
+==================================================
+pnpm-workspace.yaml
+==================================================
+packages:
+  - 'apps/*'
+  - 'packages/*'
+  - 'packages/test-code/*'
+
+allowBuilds:
+  '@prisma/engines': true
+  '@scarf/scarf': false
+  argon2: true
+  esbuild: true
+  prisma: true
+  sharp: false
+  unrs-resolver: false
+
+nodeLinker: hoisted
+sharedWorkspaceLockfile: true
+
+overrides:
+  'js-yaml@>=5.0.0 <=5.2.1': '5.2.3'
+  'dompurify@<=3.4.12': '3.4.13'
+
+==================================================
+packages/test-code/package.json
+==================================================
+{
+  "name": "@command-center/test-code",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "pnpm run build:api && pnpm run build:web",
+    "build:api": "pnpm --filter @command-center/api-tests build",
+    "build:web": "pnpm --filter @command-center/web-tests build",
+    "typecheck": "pnpm run typecheck:api && pnpm run typecheck:web",
+    "typecheck:api": "pnpm --filter @command-center/api-tests typecheck",
+    "typecheck:web": "pnpm --filter @command-center/web-tests typecheck",
+    "test": "pnpm run test:api && pnpm run test:web && pnpm run test:tracker",
+    "test:api": "pnpm --filter @command-center/api-tests test",
+    "test:web": "pnpm --filter @command-center/web-tests test",
+    "test:tracker": "pnpm --filter @command-center/tracker-tests test"
+  }
+}
+
+==================================================
+packages/test-code/tsconfig.json
+==================================================
+FILE NOT FOUND: packages/test-code/tsconfig.json
+
+==================================================
+packages/test-code/api/package.json
+==================================================
+{
+  "name": "@command-center/api-tests",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:unit": "jest --config jest.config.cjs --runInBand",
+    "pretest:e2e": "pnpm --dir ../../../apps/api exec node -e \"require(\u0027dotenv\u0027).config({path:\u0027.env.test\u0027,override:true,quiet:true});const{spawnSync}=require(\u0027node:child_process\u0027);const r=spawnSync(\u0027pnpm\u0027,[\u0027exec\u0027,\u0027prisma\u0027,\u0027migrate\u0027,\u0027deploy\u0027],{stdio:\u0027inherit\u0027,env:process.env,shell:true});process.exit(r.status??1)\"",
+    "test:e2e": "node scripts/run-e2e-isolated.mjs",
+    "test": "pnpm run test:unit \u0026\u0026 pnpm run test:e2e",
+    "test:e2e:fast": "pnpm --dir ../../../apps/api exec jest --config ../../packages/test-code/api/jest-e2e.config.cjs --runInBand"
+  }
+}
+
+==================================================
+packages/test-code/api/tsconfig.json
+==================================================
+{
+  "extends": "../../../apps/api/tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": "../../..",
+    "types": ["jest", "node"]
+  },
+  "include": [
+    "./**/*.ts",
+    "../../../apps/api/src/**/*.ts",
+    "../web/e2e/full-stack/fullstack-desktop-phases-12-14.spec.ts",
+    "../web/unit/features/desktop-apps/desktop-project-detector.spec.ts",
+    "../web/unit/features/desktop-apps/desktop-security-parsers.spec.ts",
+    "../web/unit/features/desktop-apps/desktop-telemetry-api.test.ts",
+    "../web/unit/features/desktop-apps/desktop-telemetry-secret.service.spec.ts"
+  ]
+}
+
+==================================================
+packages/test-code/web/package.json
+==================================================
+{
+  "name": "@command-center/web-tests",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test --config=playwright.config.ts",
+    "test:fullstack": "playwright test --config=playwright.fullstack.config.ts"
+  }
+}
+
+==================================================
+packages/test-code/web/tsconfig.json
+==================================================
+{
+  "extends": "../../../apps/web/tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["./**/*.ts", "./**/*.tsx", "./**/*.mts", "../../../apps/web/src/**/*.ts", "../../../apps/web/src/**/*.tsx", "../../../apps/web/next-env.d.ts"],
+  "exclude": ["node_modules", "playwright-report", "playwright-report-fullstack", "test-results", "coverage"]
+}
+
+==================================================
+packages/shared-types/package.json
+==================================================
+{
+  "name": "@command-center/shared-types",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist-cjs/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "dist-cjs"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.cjs.json && node ../../scripts/write-cjs-marker.mjs dist-cjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src --max-warnings=0",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.34.0",
+    "eslint": "^9.34.0",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.67.0"
+  }
+}
+
+==================================================
+packages/shared-types/tsconfig.json
+==================================================
+{
+  "extends": "../tsconfig/base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "declaration": true,
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src/**/*.ts"]
+}
+
+==================================================
+ALL DESKTOP TEST FILES
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-ai-analysis.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-alerts.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-apps.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-build-artifacts.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-builds.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-foundation.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-full-flow.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-overview.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-performance.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-project-detection.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-releases.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-repository-linking.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-security.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-security-health.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-telemetry.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-tests.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\helpers\desktop-test-fixtures.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\node_modules\@command-center\shared-types\dist\desktop-apps\desktop-app.types.d.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\node_modules\@command-center\shared-types\src\desktop-apps\desktop-app.types.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\unit\modules\desktop-apps\desktop-app-foundation.dto.spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\unit\modules\desktop-apps\desktop-apps\desktop-alerts.test.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\unit\modules\desktop-apps\desktop-apps\desktop-analysis-panel.test.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\unit\modules\desktop-apps\desktop-apps-api-phase15-17.test.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\unit\modules\desktop-apps\desktop-permission-gate.test.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\unit\modules\desktop-apps\desktop-secret-sanitizer.service.spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\e2e\full-stack\fullstack-desktop-apps.spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\e2e\full-stack\fullstack-desktop-final.spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\e2e\full-stack\fullstack-desktop-phases-12-14.spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\e2e\full-stack\fullstack-desktop-phases-5-10.spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\e2e\full-stack\fullstack-desktop-releases.spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\e2e\full-stack\fullstack-desktop-repository-ui.spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-app-card.test.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-app-form.test.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-apps-api.phase5-10.test.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-apps-api.test.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-app-sub-nav.test.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-app-utils.test.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-builds.test.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-crashes.test.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-dependencies.test.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-performance.test.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-project-detection-panel.test.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-project-detector.spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-releases.test.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-releases-api.test.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-repository-panel.test.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-security.test.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-security-parsers.spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-telemetry-api.test.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-telemetry-secret.service.spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-telemetry-settings.test.tsx
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\unit\features\desktop-apps\desktop-tests.test.tsx
+
+==================================================
+packages/test-code/api/unit/modules/desktop-apps/desktop-apps-api-phase15-17.test.ts
+==================================================
+import {
+  analyzeDesktopApplication,
+  createDesktopAlertRule,
+  deleteDesktopAlertRule,
+  evaluateDesktopAlerts,
+  getDesktopPermissions,
+  listDesktopAlertIncidents,
+  listDesktopAlertRules,
+  updateDesktopAlertRule,
+} from '@/features/desktop-apps/desktop-apps-api';
+import { apiRequest } from '@/features/lib/api/api-client';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/features/lib/api/api-client', () => ({
+  apiRequest: vi.fn(),
+}));
+
+const mockedApiRequest = vi.mocked(apiRequest);
+const W = '11111111-1111-4111-8111-111111111111';
+const A = '22222222-2222-4222-8222-222222222222';
+const R = '33333333-3333-4333-8333-333333333333';
+
+describe('desktop Phase 15-17 API client', () => {
+  beforeEach(() => {
+    mockedApiRequest.mockReset();
+  });
+
+  it('uses the alert endpoints', async () => {
+    await listDesktopAlertRules(W, A);
+    await listDesktopAlertIncidents(W, A);
+    await evaluateDesktopAlerts(W, A);
+
+    expect(mockedApiRequest).toHaveBeenNthCalledWith(1, `/workspaces/${W}/desktop-apps/${A}/alerts/rules`);
+    expect(mockedApiRequest).toHaveBeenNthCalledWith(2, `/workspaces/${W}/desktop-apps/${A}/alerts/incidents`);
+    expect(mockedApiRequest).toHaveBeenNthCalledWith(3, `/workspaces/${W}/desktop-apps/${A}/alerts/evaluate`, { method: 'POST' });
+  });
+
+  it('creates, updates, and deletes alert rules', async () => {
+    await createDesktopAlertRule(W, A, {
+      name: 'Build failed',
+      type: 'BUILD_FAILED',
+      enabled: true,
+    });
+
+    await updateDesktopAlertRule(W, A, R, { enabled: false });
+    await deleteDesktopAlertRule(W, A, R);
+
+    expect(mockedApiRequest).toHaveBeenNthCalledWith(1, `/workspaces/${W}/desktop-apps/${A}/alerts/rules`, {
+      method: 'POST',
+      body: {
+        name: 'Build failed',
+        type: 'BUILD_FAILED',
+        enabled: true,
+      },
+    });
+
+    expect(mockedApiRequest).toHaveBeenNthCalledWith(2, `/workspaces/${W}/desktop-apps/${A}/alerts/rules/${R}`, { method: 'PATCH', body: { enabled: false } });
+
+    expect(mockedApiRequest).toHaveBeenNthCalledWith(3, `/workspaces/${W}/desktop-apps/${A}/alerts/rules/${R}`, { method: 'DELETE' });
+  });
+
+  it('uses the AI analysis and permissions endpoints', async () => {
+    await analyzeDesktopApplication(W, A, {
+      action: 'RELEASE_HEALTH',
+      question: 'Healthy?',
+    });
+    await getDesktopPermissions(W, A);
+
+    expect(mockedApiRequest).toHaveBeenNthCalledWith(1, `/workspaces/${W}/desktop-apps/${A}/analysis`, {
+      method: 'POST',
+      body: {
+        action: 'RELEASE_HEALTH',
+        question: 'Healthy?',
+      },
+    });
+
+    expect(mockedApiRequest).toHaveBeenNthCalledWith(2, `/workspaces/${W}/desktop-apps/${A}/permissions`);
+  });
+});
+
+==================================================
+packages/test-code/web/unit/features/desktop-apps/desktop-telemetry-api.test.ts
+==================================================
+import {
+  connectDesktopTelemetry,
+  disconnectDesktopTelemetry,
+  getDesktopPerformance,
+  getDesktopSecurity,
+  listDesktopCrashes,
+  listDesktopDependencies,
+  listDesktopTelemetryIntegrations,
+  previewDesktopTelemetry,
+  scanDesktopDependencies,
+  scanDesktopSecurity,
+  syncDesktopTelemetry,
+} from '@/features/desktop-apps/desktop-apps-api';
+import { apiRequest } from '@/features/lib/api/api-client';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/features/lib/api/api-client', () => ({
+  apiRequest: vi.fn(),
+}));
+
+const api = vi.mocked(apiRequest);
+const workspaceId = 'workspace-1';
+const desktopAppId = 'desktop-1';
+const integrationId = 'integration-1';
+const base = `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}`;
+
+describe('desktop runtime/security APIs', () => {
+  beforeEach(() => api.mockReset());
+
+  it('lists telemetry integrations', () => {
+    listDesktopTelemetryIntegrations(workspaceId, desktopAppId);
+    expect(api).toHaveBeenCalledWith(`${base}/telemetry`);
+  });
+
+  it('connects telemetry without changing the caller payload', () => {
+    const input = {
+      provider: 'SENTRY' as const,
+      externalProjectId: 'org/project',
+      endpointUrl: 'https://telemetry.example.com/snapshot',
+      secret: 'provider-secret',
+    };
+
+    connectDesktopTelemetry(workspaceId, desktopAppId, input);
+
+    expect(api).toHaveBeenCalledWith(`${base}/telemetry`, {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+  });
+
+  it('previews and syncs telemetry', () => {
+    previewDesktopTelemetry(workspaceId, desktopAppId, integrationId);
+    syncDesktopTelemetry(workspaceId, desktopAppId, integrationId);
+
+    expect(api).toHaveBeenNthCalledWith(1, `${base}/telemetry/${integrationId}/preview`, { method: 'POST' });
+    expect(api).toHaveBeenNthCalledWith(2, `${base}/telemetry/${integrationId}/sync`, { method: 'POST' });
+  });
+
+  it('disconnects telemetry', () => {
+    disconnectDesktopTelemetry(workspaceId, desktopAppId, integrationId);
+    expect(api).toHaveBeenCalledWith(`${base}/telemetry/${integrationId}`, {
+      method: 'DELETE',
+    });
+  });
+
+  it('passes runtime filters in the query string', () => {
+    getDesktopPerformance(workspaceId, desktopAppId, {
+      version: '2.4.0',
+      platform: 'WINDOWS',
+      architecture: 'X64',
+      channel: 'STABLE',
+    });
+
+    expect(api).toHaveBeenCalledWith(`${base}/performance?version=2.4.0&platform=WINDOWS&architecture=X64&channel=STABLE`);
+  });
+
+  it('lists crashes and dependency/security health', () => {
+    listDesktopCrashes(workspaceId, desktopAppId, { version: '2.4.0' });
+    listDesktopDependencies(workspaceId, desktopAppId);
+    scanDesktopDependencies(workspaceId, desktopAppId);
+    getDesktopSecurity(workspaceId, desktopAppId);
+    scanDesktopSecurity(workspaceId, desktopAppId);
+
+    expect(api).toHaveBeenCalledWith(`${base}/crashes?version=2.4.0`);
+    expect(api).toHaveBeenCalledWith(`${base}/dependencies`);
+    expect(api).toHaveBeenCalledWith(`${base}/dependencies/scan`, {
+      method: 'POST',
+    });
+    expect(api).toHaveBeenCalledWith(`${base}/security`);
+    expect(api).toHaveBeenCalledWith(`${base}/security/scan`, {
+      method: 'POST',
+    });
+  });
+});
+
+==================================================
+packages/test-code/web/unit/features/desktop-apps/desktop-project-detector.spec.ts
+==================================================
+import { DesktopProjectDetector, type DesktopRepositorySnapshot } from '../../../apps/api/src/modules/desktop-apps/services/desktop-project-detector';
+
+function snapshot(paths: string[], files: Record<string, string>): DesktopRepositorySnapshot {
+  return {
+    repositoryId: '11111111-1111-4111-8111-111111111111',
+    repositoryFullName: 'command-center/desktop-fixture',
+    branch: 'main',
+    truncated: false,
+    paths,
+    files,
+  };
+}
+
+describe('DesktopProjectDetector', () => {
+  const detector = new DesktopProjectDetector();
+
+  it('detects Electron', () => {
+    const result = detector.detect(
+      snapshot(['package.json'], {
+        'package.json': JSON.stringify({
+          name: 'electron-demo',
+          version: '1.4.0',
+          main: 'dist/main.js',
+          devDependencies: {
+            electron: '^40.0.0',
+            'electron-builder': '^26.0.0',
+          },
+          build: {
+            win: {
+              target: ['nsis'],
+            },
+            mac: {
+              target: ['dmg'],
+            },
+          },
+        }),
+      }),
+    );
+
+    expect(result.primary).toMatchObject({
+      framework: 'ELECTRON',
+      platform: 'CROSS_PLATFORM',
+      packageName: 'electron-demo',
+      version: '1.4.0',
+      confidence: 'HIGH',
+    });
+  });
+
+  it('detects Tauri', () => {
+    const result = detector.detect(
+      snapshot(['package.json', 'src-tauri/Cargo.toml', 'src-tauri/tauri.conf.json'], {
+        'src-tauri/Cargo.toml': `
+[package]
+name = "tauri-demo"
+version = "2.3.0"
+
+[dependencies]
+tauri = "2"
+`,
+        'src-tauri/tauri.conf.json': JSON.stringify({
+          productName: 'Tauri Demo',
+          version: '2.3.0',
+          bundle: {
+            active: true,
+            targets: 'all',
+          },
+        }),
+      }),
+    );
+
+    expect(result.primary).toMatchObject({
+      framework: 'TAURI',
+      packageName: 'Tauri Demo',
+      version: '2.3.0',
+      confidence: 'HIGH',
+    });
+  });
+
+  it('detects WPF .NET', () => {
+    const result = detector.detect(
+      snapshot(['src/Desktop/Desktop.csproj'], {
+        'src/Desktop/Desktop.csproj': `
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Version>3.0.1</Version>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+  </PropertyGroup>
+</Project>
+`,
+      }),
+    );
+
+    expect(result.primary).toMatchObject({
+      framework: 'DOTNET',
+      platform: 'WINDOWS',
+      architecture: 'X64',
+      packageName: 'Desktop',
+      version: '3.0.1',
+    });
+  });
+
+  it('detects WinUI .NET', () => {
+    const result = detector.detect(
+      snapshot(['WindowsApp/WindowsApp.csproj'], {
+        'WindowsApp/WindowsApp.csproj': `
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.22621.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
+    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.0" />
+  </ItemGroup>
+</Project>
+`,
+      }),
+    );
+
+    expect(result.primary).toMatchObject({
+      framework: 'DOTNET',
+      platform: 'WINDOWS',
+      architecture: 'UNIVERSAL',
+      minimumOsVersion: '10.0.19041.0',
+    });
+  });
+
+  it('detects Qt with CMake', () => {
+    const result = detector.detect(
+      snapshot(['desktop/CMakeLists.txt'], {
+        'desktop/CMakeLists.txt': `
+cmake_minimum_required(VERSION 3.24)
+project(CommandCenterDesktop)
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
+qt_add_executable(command-center main.cpp)
+`,
+      }),
+    );
+
+    expect(result.primary).toMatchObject({
+      framework: 'QT',
+      packageName: 'command-center',
+    });
+  });
+
+  it('detects JavaFX', () => {
+    const result = detector.detect(
+      snapshot(['desktop/pom.xml'], {
+        'desktop/pom.xml': `
+<project>
+  <artifactId>desktop-javafx</artifactId>
+  <version>5.0.0</version>
+  <dependencies>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+    </dependency>
+  </dependencies>
+</project>
+`,
+      }),
+    );
+
+    expect(result.primary).toMatchObject({
+      framework: 'JAVA',
+      platform: 'CROSS_PLATFORM',
+      packageName: 'desktop-javafx',
+      version: '5.0.0',
+    });
+  });
+
+  it('detects native macOS', () => {
+    const path = 'MacApp/MacApp.xcodeproj/project.pbxproj';
+
+    const result = detector.detect(
+      snapshot([path], {
+        [path]: `
+SDKROOT = macosx;
+MACOSX_DEPLOYMENT_TARGET = 14.0;
+PRODUCT_BUNDLE_IDENTIFIER = com.commandcenter.mac;
+MARKETING_VERSION = 1.7.0;
+CURRENT_PROJECT_VERSION = 170;
+`,
+      }),
+    );
+
+    expect(result.primary).toMatchObject({
+      framework: 'NATIVE_MACOS',
+      platform: 'MACOS',
+      packageName: 'com.commandcenter.mac',
+      version: '1.7.0',
+      buildNumber: '170',
+      minimumOsVersion: '14.0',
+    });
+  });
+
+  it('does not classify an ordinary Node web repository as desktop', () => {
+    const result = detector.detect(
+      snapshot(['package.json'], {
+        'package.json': JSON.stringify({
+          name: 'website',
+          dependencies: {
+            next: '^16.0.0',
+            react: '^19.0.0',
+          },
+        }),
+      }),
+    );
+
+    expect(result.primary).toBeNull();
+    expect(result.candidates).toEqual([]);
+  });
+
+  it('returns all desktop projects in a monorepo ordered by confidence', () => {
+    const result = detector.detect(
+      snapshot(['apps/electron/package.json', 'apps/tauri/src-tauri/Cargo.toml', 'apps/tauri/src-tauri/tauri.conf.json'], {
+        'apps/electron/package.json': JSON.stringify({
+          name: 'electron-app',
+          devDependencies: {
+            electron: '^40.0.0',
+          },
+        }),
+        'apps/tauri/src-tauri/Cargo.toml': `
+[package]
+name = "tauri-app"
+version = "1.0.0"
+`,
+        'apps/tauri/src-tauri/tauri.conf.json': JSON.stringify({
+          productName: 'Tauri App',
+        }),
+      }),
+    );
+
+    expect(result.candidates).toHaveLength(2);
+    expect(result.candidates.map((candidate) => candidate.framework)).toEqual(expect.arrayContaining(['ELECTRON', 'TAURI']));
+  });
+
+  it('adds a warning when repository metadata is truncated', () => {
+    const source = snapshot(['package.json'], {
+      'package.json': JSON.stringify({
+        name: 'electron-app',
+        devDependencies: {
+          electron: '^40.0.0',
+        },
+      }),
+    });
+
+    source.truncated = true;
+
+    const result = detector.detect(source);
+
+    expect(result.primary?.warnings.join(' ')).toContain('truncated');
+  });
+});
+
+==================================================
+packages/test-code/web/unit/features/desktop-apps/desktop-security-parsers.spec.ts
+==================================================
+import { DesktopDependencyHealthService } from 'src/modules/desktop-apps/services/desktop-dependency-health.service';
+import { DesktopSecurityService } from 'src/modules/desktop-apps/services/desktop-security.service';
+import type { DesktopRepositoryMetadataSnapshot } from 'src/modules/desktop-apps/services/desktop-repository-metadata.service';
+
+function snapshot(files: Record<string, string>): DesktopRepositoryMetadataSnapshot {
+  return {
+    repositoryId: '11111111-1111-4111-8111-111111111111',
+    repositoryFullName: 'command-center/desktop',
+    branch: 'main',
+    paths: Object.keys(files),
+    files,
+    truncated: false,
+  };
+}
+
+describe('Desktop dependency/security parsers', () => {
+  const dependencies = new DesktopDependencyHealthService({} as never, {} as never, {} as never);
+
+  const security = new DesktopSecurityService({} as never, {} as never, {} as never, dependencies);
+
+  it('parses npm dependencies', () => {
+    const parsed = dependencies.parse(
+      snapshot({
+        'package.json': JSON.stringify({
+          dependencies: {
+            electron: '31.2.0',
+            react: '^19.1.0',
+          },
+        }),
+      }),
+    );
+
+    expect(parsed).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          ecosystem: 'NPM',
+          name: 'electron',
+          currentVersion: '31.2.0',
+        }),
+        expect.objectContaining({
+          ecosystem: 'NPM',
+          name: 'react',
+        }),
+      ]),
+    );
+  });
+
+  it('parses Cargo dependencies', () => {
+    const parsed = dependencies.parse(
+      snapshot({
+        'src-tauri/Cargo.toml': `
+[package]
+name = "desktop"
+
+[dependencies]
+tauri = "2.8.0"
+serde = { version = "1.0", features = ["derive"] }
+`,
+      }),
+    );
+
+    expect(parsed).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          ecosystem: 'CARGO',
+          name: 'tauri',
+          currentVersion: '2.8.0',
+        }),
+        expect.objectContaining({
+          ecosystem: 'CARGO',
+          name: 'serde',
+          currentVersion: '1.0',
+        }),
+      ]),
+    );
+  });
+
+  it('parses NuGet PackageReference entries', () => {
+    const parsed = dependencies.parse(
+      snapshot({
+        'Desktop/Desktop.csproj': `
+<Project>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.0" />
+  </ItemGroup>
+</Project>
+`,
+      }),
+    );
+
+    expect(parsed).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          ecosystem: 'NUGET',
+          name: 'Avalonia',
+          currentVersion: '11.3.0',
+        }),
+      ]),
+    );
+  });
+
+  it('handles malformed package json safely', () => {
+    expect(dependencies.parse(snapshot({ 'package.json': '{bad json' }))).toEqual([]);
+  });
+
+  it('extracts vulnerability metadata from controlled audit JSON', () => {
+    const result = dependencies.vulnerabilities(
+      snapshot({
+        'npm-audit.json': JSON.stringify({
+          vulnerabilities: [
+            {
+              name: 'electron',
+              id: 'GHSA-example',
+              severity: 'critical',
+            },
+          ],
+        }),
+      }),
+    );
+
+    expect(result).toEqual([
+      expect.objectContaining({
+        packageName: 'electron',
+        advisoryIds: ['GHSA-example'],
+        severity: 'CRITICAL',
+      }),
+    ]);
+  });
+
+  it('detects signing and notarization markers', () => {
+    const findings = security.evaluate(
+      snapshot({
+        'electron-builder.yml': `
+win:
+  certificateSubjectName: Command Center LLC
+mac:
+  identity: Developer ID Application
+  hardenedRuntime: true
+afterSign: scripts/notarize.js
+`,
+      }),
+      'ELECTRON',
+    );
+
+    expect(findings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'WINDOWS_SIGNING',
+          status: 'PASS',
+        }),
+        expect.objectContaining({
+          type: 'MACOS_SIGNING',
+          status: 'PASS',
+        }),
+        expect.objectContaining({
+          type: 'MACOS_NOTARIZATION',
+          status: 'PASS',
+        }),
+      ]),
+    );
+  });
+});
+
+==================================================
+packages/test-code/web/unit/features/desktop-apps/desktop-telemetry-secret.service.spec.ts
+==================================================
+import { DesktopTelemetrySecretService } from 'src/modules/desktop-apps/services/desktop-telemetry-secret.service';
+
+DescribeDesktopTelemetrySecretService();
+
+function DescribeDesktopTelemetrySecretService() {
+  describe('DesktopTelemetrySecretService', () => {
+    const service = new DesktopTelemetrySecretService();
+
+    beforeEach(() => {
+      process.env.DESKTOP_TELEMETRY_ENCRYPTION_KEY = Buffer.alloc(32, 11).toString('base64');
+    });
+
+    afterEach(() => {
+      delete process.env.DESKTOP_TELEMETRY_ENCRYPTION_KEY;
+    });
+
+    it('encrypts and decrypts a secret', () => {
+      const encrypted = service.encrypt('provider-token-123');
+
+      expect(encrypted).not.toContain('provider-token-123');
+      expect(service.decrypt(encrypted)).toBe('provider-token-123');
+    });
+
+    it('uses a random IV so the same plaintext produces different ciphertext', () => {
+      const first = service.encrypt('same-secret');
+      const second = service.encrypt('same-secret');
+
+      expect(first).not.toBe(second);
+      expect(service.decrypt(first)).toBe('same-secret');
+      expect(service.decrypt(second)).toBe('same-secret');
+    });
+
+    it('rejects missing encryption key', () => {
+      delete process.env.DESKTOP_TELEMETRY_ENCRYPTION_KEY;
+
+      expect(() => service.encrypt('secret-value')).toThrow(/DESKTOP_TELEMETRY_ENCRYPTION_KEY/);
+    });
+
+    it('rejects a key that is not 32 bytes', () => {
+      process.env.DESKTOP_TELEMETRY_ENCRYPTION_KEY = Buffer.alloc(16, 1).toString('base64');
+
+      expect(() => service.encrypt('secret-value')).toThrow(/32 bytes/);
+    });
+  });
+}
+
+==================================================
+packages/test-code/web/unit/features/desktop-apps/desktop-app-card.test.tsx
+==================================================
+// @vitest-environment jsdom
+
+import { DesktopAppCard } from '@/features/desktop-apps/desktop-app-card';
+import type { DesktopApplicationDetails } from '@command-center/shared-types';
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+
+const desktopApp: DesktopApplicationDetails = {
+  id: 'desktop-1',
+
+  applicationId: 'application-1',
+
+  platform: 'CROSS_PLATFORM',
+
+  framework: 'ELECTRON',
+
+  architecture: 'X64',
+
+  packageName: 'com.commandcenter.desktop',
+
+  currentVersion: '2.4.0',
+
+  currentBuildNumber: '184',
+
+  minimumOsVersion: 'Windows 10',
+
+  updateChannel: 'stable',
+
+  createdAt: '2026-08-23T00:00:00.000Z',
+
+  updatedAt: '2026-08-23T00:00:00.000Z',
+
+  application: {
+    id: 'application-1',
+
+    workspaceId: 'workspace-1',
+
+    name: 'Command Center Desktop',
+
+    slug: 'command-center-desktop',
+
+    type: 'DESKTOP',
+
+    archivedAt: null,
+
+    createdAt: '2026-08-23T00:00:00.000Z',
+
+    updatedAt: '2026-08-23T00:00:00.000Z',
+  },
+};
+
+describe('DesktopAppCard', () => {
+  it('renders desktop metadata', () => {
+    render(<DesktopAppCard workspaceId='workspace-1' desktopApp={desktopApp} />);
+
+    expect(screen.getByText('Command Center Desktop')).toBeInTheDocument();
+
+    expect(screen.getByText('Cross-platform')).toBeInTheDocument();
+
+    expect(screen.getByText('Electron')).toBeInTheDocument();
+
+    expect(screen.getByText('x64')).toBeInTheDocument();
+
+    expect(screen.getByText('2.4.0')).toBeInTheDocument();
+
+    expect(screen.getByText('184')).toBeInTheDocument();
+  });
+
+  it('links to open and edit routes', () => {
+    render(<DesktopAppCard workspaceId='workspace-1' desktopApp={desktopApp} />);
+
+    expect(
+      screen.getByRole('link', {
+        name: /open/i,
+      }),
+    ).toHaveAttribute('href', '/workspaces/workspace-1/desktop-apps/desktop-1');
+
+    expect(
+      screen.getByRole('link', {
+        name: /edit/i,
+      }),
+    ).toHaveAttribute('href', '/workspaces/workspace-1/desktop-apps/desktop-1#edit');
+  });
+});
+
+==================================================
+packages/test-code/web/unit/features/desktop-apps/desktop-app-utils.test.ts
+==================================================
+import { describe, expect, it } from 'vitest';
+
+import { DESKTOP_ARCHITECTURE_LABELS, DESKTOP_FRAMEWORK_LABELS, DESKTOP_PLATFORM_LABELS } from '@/features/desktop-apps/desktop-app.constants';
+
+import { getDesktopFrameworksForPlatform, getDesktopPrimaryIdentifier, isDesktopFrameworkAllowed } from '@/features/desktop-apps/desktop-app-utils';
+
+describe('desktop app foundation', () => {
+  it('provides readable platform labels', () => {
+    expect(DESKTOP_PLATFORM_LABELS.WINDOWS).toBe('Windows');
+
+    expect(DESKTOP_PLATFORM_LABELS.MACOS).toBe('macOS');
+
+    expect(DESKTOP_PLATFORM_LABELS.LINUX).toBe('Linux');
+
+    expect(DESKTOP_PLATFORM_LABELS.CROSS_PLATFORM).toBe('Cross-platform');
+  });
+
+  it('provides readable framework labels', () => {
+    expect(DESKTOP_FRAMEWORK_LABELS.ELECTRON).toBe('Electron');
+
+    expect(DESKTOP_FRAMEWORK_LABELS.TAURI).toBe('Tauri');
+
+    expect(DESKTOP_FRAMEWORK_LABELS.DOTNET).toBe('.NET');
+
+    expect(DESKTOP_FRAMEWORK_LABELS.NATIVE_MACOS).toBe('Native macOS');
+  });
+
+  it('provides architecture labels', () => {
+    expect(DESKTOP_ARCHITECTURE_LABELS.X64).toBe('x64');
+
+    expect(DESKTOP_ARCHITECTURE_LABELS.ARM64).toBe('ARM64');
+
+    expect(DESKTOP_ARCHITECTURE_LABELS.UNIVERSAL).toBe('Universal');
+  });
+
+  it('allows native Windows only for Windows', () => {
+    expect(isDesktopFrameworkAllowed('WINDOWS', 'NATIVE_WINDOWS')).toBe(true);
+
+    expect(isDesktopFrameworkAllowed('MACOS', 'NATIVE_WINDOWS')).toBe(false);
+  });
+
+  it('allows native macOS only for macOS', () => {
+    expect(isDesktopFrameworkAllowed('MACOS', 'NATIVE_MACOS')).toBe(true);
+
+    expect(isDesktopFrameworkAllowed('WINDOWS', 'NATIVE_MACOS')).toBe(false);
+  });
+
+  it('supports Electron for cross-platform applications', () => {
+    expect(getDesktopFrameworksForPlatform('CROSS_PLATFORM')).toContain('ELECTRON');
+  });
+
+  it('returns package name as the primary identifier', () => {
+    expect(
+      getDesktopPrimaryIdentifier({
+        packageName: 'com.commandcenter.desktop',
+      }),
+    ).toBe('com.commandcenter.desktop');
+  });
+
+  it('returns fallback when package name is missing', () => {
+    expect(
+      getDesktopPrimaryIdentifier({
+        packageName: null,
+      }),
+    ).toBe('No package name');
+  });
+});
+
+==================================================
+packages/test-code/web/unit/features/desktop-apps/desktop-apps-api.test.ts
+==================================================
+import { archiveDesktopApp, createDesktopApp, getDesktopApp, listDesktopApps, updateDesktopApp } from '@/features/desktop-apps/desktop-apps-api';
+
+import { apiRequest } from '@/features/lib/api/api-client';
+
+import type { CreateDesktopApplicationInput, UpdateDesktopApplicationInput } from '@command-center/shared-types';
+
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/features/lib/api/api-client', () => ({
+  apiRequest: vi.fn(),
+}));
+
+const apiRequestMock = vi.mocked(apiRequest);
+
+describe('desktop-apps-api', () => {
+  beforeEach(() => {
+    apiRequestMock.mockReset();
+  });
+
+  it('creates a desktop application', () => {
+    const payload: CreateDesktopApplicationInput = {
+      name: 'Command Center Desktop',
+
+      platform: 'CROSS_PLATFORM',
+
+      framework: 'ELECTRON',
+
+      architecture: 'X64',
+
+      packageName: 'com.commandcenter.desktop',
+    };
+
+    createDesktopApp('workspace-1', payload);
+
+    expect(apiRequestMock).toHaveBeenCalledWith('/workspaces/workspace-1/desktop-apps', {
+      method: 'POST',
+
+      body: JSON.stringify(payload),
+    });
+  });
+
+  it('lists desktop applications', () => {
+    const controller = new AbortController();
+
+    listDesktopApps('workspace-1', controller.signal);
+
+    expect(apiRequestMock).toHaveBeenCalledWith('/workspaces/workspace-1/desktop-apps', {
+      signal: controller.signal,
+    });
+  });
+
+  it('gets desktop application details', () => {
+    getDesktopApp('workspace-1', 'desktop-1');
+
+    expect(apiRequestMock).toHaveBeenCalledWith('/workspaces/workspace-1/desktop-apps/desktop-1');
+  });
+
+  it('updates a desktop application', () => {
+    const payload: UpdateDesktopApplicationInput = {
+      currentVersion: '2.5.0',
+
+      currentBuildNumber: '200',
+
+      architecture: 'ARM64',
+    };
+
+    updateDesktopApp('workspace-1', 'desktop-1', payload);
+
+    expect(apiRequestMock).toHaveBeenCalledWith('/workspaces/workspace-1/desktop-apps/desktop-1', {
+      method: 'PATCH',
+
+      body: JSON.stringify(payload),
+    });
+  });
+
+  it('archives a desktop application', () => {
+    archiveDesktopApp('workspace-1', 'desktop-1');
+
+    expect(apiRequestMock).toHaveBeenCalledWith('/workspaces/workspace-1/desktop-apps/desktop-1', {
+      method: 'DELETE',
+    });
+  });
+});
+
+==================================================
+packages/test-code/web/unit/features/desktop-apps/desktop-project-detection-panel.test.tsx
+==================================================
+// @vitest-environment jsdom
+
+import { applyDetectedDesktopConfiguration, detectDesktopProject } from '@/features/desktop-apps/desktop-apps-api';
+import { DesktopProjectDetectionPanel } from '@/features/desktop-apps/desktop-project-detection-panel';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
+  detectDesktopProject: vi.fn(),
+  applyDetectedDesktopConfiguration: vi.fn(),
+}));
+
+const detectMock = vi.mocked(detectDesktopProject);
+
+const updateMock = vi.mocked(applyDetectedDesktopConfiguration);
+
+const desktopApp = {
+  id: 'desktop-1',
+  applicationId: 'application-1',
+  platform: 'CROSS_PLATFORM',
+  framework: 'OTHER',
+  architecture: 'X64',
+  packageName: null,
+  currentVersion: null,
+  currentBuildNumber: null,
+  minimumOsVersion: null,
+  updateChannel: 'stable',
+  createdAt: '2026-08-23T00:00:00.000Z',
+  updatedAt: '2026-08-23T00:00:00.000Z',
+  application: {
+    id: 'application-1',
+    workspaceId: 'workspace-1',
+    name: 'Desktop Test',
+    slug: 'desktop-test',
+    type: 'DESKTOP',
+    archivedAt: null,
+    createdAt: '2026-08-23T00:00:00.000Z',
+    updatedAt: '2026-08-23T00:00:00.000Z',
+  },
+} as never;
+
+describe('DesktopProjectDetectionPanel', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    detectMock.mockResolvedValue({
+      repositoryId: 'repository-1',
+      repositoryFullName: 'command-center/desktop',
+      branch: 'main',
+      truncated: false,
+      candidates: [
+        {
+          applicationType: 'DESKTOP',
+          projectRoot: '',
+          platform: 'CROSS_PLATFORM',
+          framework: 'ELECTRON',
+          architecture: 'X64',
+          packageName: 'command-center-desktop',
+          version: '1.2.0',
+          buildNumber: null,
+          minimumOsVersion: null,
+          confidence: 'HIGH',
+          score: 96,
+          evidence: ['package.json', 'package.json:electron'],
+          warnings: [],
+        },
+      ],
+      primary: {
+        applicationType: 'DESKTOP',
+        projectRoot: '',
+        platform: 'CROSS_PLATFORM',
+        framework: 'ELECTRON',
+        architecture: 'X64',
+        packageName: 'command-center-desktop',
+        version: '1.2.0',
+        buildNumber: null,
+        minimumOsVersion: null,
+        confidence: 'HIGH',
+        score: 96,
+        evidence: ['package.json', 'package.json:electron'],
+        warnings: [],
+      },
+    });
+
+    updateMock.mockResolvedValue({
+      ...desktopApp,
+      framework: 'ELECTRON',
+      packageName: 'command-center-desktop',
+      currentVersion: '1.2.0',
+    } as never);
+  });
+
+  it('runs detection and renders normalized result', async () => {
+    const user = userEvent.setup();
+
+    render(<DesktopProjectDetectionPanel workspaceId='workspace-1' desktopApp={desktopApp} />);
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Analyze Repository',
+      }),
+    );
+
+    expect(await screen.findByDisplayValue('command-center-desktop')).toBeInTheDocument();
+
+    expect(screen.getByDisplayValue('1.2.0')).toBeInTheDocument();
+
+    expect(screen.getByText('HIGH · 96%')).toBeInTheDocument();
+  });
+
+  it('allows manual correction before saving detected config', async () => {
+    const user = userEvent.setup();
+
+    render(<DesktopProjectDetectionPanel workspaceId='workspace-1' desktopApp={desktopApp} />);
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Analyze Repository',
+      }),
+    );
+
+    await user.selectOptions(await screen.findByLabelText('Detected architecture'), 'ARM64');
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Use Detected Configuration',
+      }),
+    );
+
+    await waitFor(() => {
+      expect(updateMock).toHaveBeenCalledWith(
+        'workspace-1',
+        'desktop-1',
+        expect.objectContaining({
+          framework: 'ELECTRON',
+          architecture: 'ARM64',
+          packageName: 'command-center-desktop',
+        }),
+      );
+    });
+  });
+
+  it('renders safe no-match state', async () => {
+    detectMock.mockResolvedValue({
+      repositoryId: 'repository-1',
+      repositoryFullName: 'command-center/web-only',
+      branch: 'main',
+      truncated: false,
+      candidates: [],
+      primary: null,
+    });
+
+    const user = userEvent.setup();
+
+    render(<DesktopProjectDetectionPanel workspaceId='workspace-1' desktopApp={desktopApp} />);
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Analyze Repository',
+      }),
+    );
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('No supported desktop project was detected');
+  });
+});
+
+==================================================
+packages/test-code/web/unit/features/desktop-apps/desktop-repository-panel.test.tsx
+==================================================
+// @vitest-environment jsdom
+
+import { getDesktopRepository, linkDesktopRepository, unlinkDesktopRepository } from '@/features/desktop-apps/desktop-apps-api';
+import { DesktopRepositoryPanel } from '@/features/desktop-apps/desktop-repository-panel';
+import { listRepositories } from '@/features/repositories/repositories-api';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
+  getDesktopRepository: vi.fn(),
+
+  linkDesktopRepository: vi.fn(),
+
+  unlinkDesktopRepository: vi.fn(),
+}));
+
+vi.mock('@/features/repositories/repositories-api', () => ({
+  listRepositories: vi.fn(),
+}));
+
+const mockedGetDesktopRepository = vi.mocked(getDesktopRepository);
+
+const mockedLinkDesktopRepository = vi.mocked(linkDesktopRepository);
+
+const mockedUnlinkDesktopRepository = vi.mocked(unlinkDesktopRepository);
+
+const mockedListRepositories = vi.mocked(listRepositories);
+
+const now = '2026-08-23T00:00:00.000Z';
+
+const desktopApp = {
+  id: 'desktop-1',
+
+  applicationId: 'application-1',
+
+  platform: 'CROSS_PLATFORM',
+
+  framework: 'ELECTRON',
+
+  architecture: 'X64',
+
+  packageName: 'com.example.desktop',
+
+  currentVersion: '1.0.0',
+
+  currentBuildNumber: '100',
+
+  minimumOsVersion: 'Windows 10',
+
+  updateChannel: 'stable',
+
+  createdAt: now,
+
+  updatedAt: now,
+
+  application: {
+    id: 'application-1',
+
+    workspaceId: 'workspace-1',
+
+    name: 'Desktop Test App',
+
+    slug: 'desktop-test-app',
+
+    type: 'DESKTOP',
+
+    archivedAt: null,
+
+    createdAt: now,
+
+    updatedAt: now,
+  },
+} as const;
+
+const repositoryA = {
+  id: 'repository-1',
+
+  workspaceId: 'workspace-1',
+
+  installationId: 'installation-1',
+
+  applicationId: null,
+
+  provider: 'GITHUB',
+
+  externalRepoId: '1001',
+
+  owner: 'command-center',
+
+  name: 'desktop-app',
+
+  fullName: 'command-center/desktop-app',
+
+  defaultBranch: 'main',
+
+  isPrivate: false,
+
+  htmlUrl: 'https://github.com/command-center/desktop-app',
+
+  archived: false,
+
+  isAvailable: true,
+
+  lastSyncedAt: null,
+
+  createdAt: now,
+
+  updatedAt: now,
+
+  application: null,
+
+  installation: {
+    id: 'installation-1',
+
+    externalInstallationId: '9001',
+
+    accountLogin: 'command-center',
+
+    accountType: 'Organization',
+
+    connectedAt: now,
+
+    lastSyncedAt: null,
+  },
+} as never;
+
+const repositoryB = {
+  ...repositoryA,
+
+  id: 'repository-2',
+
+  externalRepoId: '1002',
+
+  name: 'desktop-next',
+
+  fullName: 'command-center/desktop-next',
+
+  htmlUrl: 'https://github.com/command-center/desktop-next',
+} as never;
+
+describe('DesktopRepositoryPanel', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    mockedGetDesktopRepository.mockResolvedValue(null);
+
+    mockedListRepositories.mockResolvedValue({
+      installations: [],
+
+      repositories: [repositoryA, repositoryB],
+    } as never);
+
+    mockedLinkDesktopRepository.mockImplementation(
+      async (_workspaceId, _desktopAppId, repositoryId) =>
+        ({
+          ...(repositoryId === 'repository-2' ? repositoryB : repositoryA),
+
+          applicationId: 'application-1',
+        }) as never,
+    );
+
+    mockedUnlinkDesktopRepository.mockResolvedValue({
+      success: true,
+    });
+  });
+
+  it('loads available repositories', async () => {
+    render(<DesktopRepositoryPanel workspaceId='workspace-1' desktopApp={desktopApp} />);
+
+    expect(
+      await screen.findByRole('option', {
+        name: 'command-center/desktop-app (main)',
+      }),
+    ).toBeInTheDocument();
+
+    expect(mockedGetDesktopRepository).toHaveBeenCalledWith('workspace-1', 'desktop-1');
+
+    expect(mockedListRepositories).toHaveBeenCalledWith('workspace-1');
+  });
+
+  it('links selected repository', async () => {
+    const user = userEvent.setup();
+
+    const changed = vi.fn();
+
+    render(<DesktopRepositoryPanel workspaceId='workspace-1' desktopApp={desktopApp} onRepositoryChanged={changed} />);
+
+    await screen.findByRole('option', {
+      name: 'command-center/desktop-app (main)',
+    });
+
+    await user.selectOptions(screen.getByLabelText('Desktop repository'), 'repository-1');
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Connect Repository',
+      }),
+    );
+
+    await waitFor(() => {
+      expect(mockedLinkDesktopRepository).toHaveBeenCalledWith('workspace-1', 'desktop-1', 'repository-1');
+    });
+
+    expect(changed).toHaveBeenCalledTimes(1);
+
+    expect(
+      screen.getByText('command-center/desktop-app', {
+        exact: true,
+      }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByText('main')).toBeInTheDocument();
+  });
+
+  it('changes repository', async () => {
+    mockedGetDesktopRepository.mockResolvedValue({
+      ...repositoryA,
+
+      applicationId: 'application-1',
+    } as never);
+
+    const user = userEvent.setup();
+
+    render(<DesktopRepositoryPanel workspaceId='workspace-1' desktopApp={desktopApp} />);
+
+    expect(
+      await screen.findByText('command-center/desktop-app', {
+        exact: true,
+      }),
+    ).toBeInTheDocument();
+
+    await user.selectOptions(screen.getByLabelText('Desktop repository'), 'repository-2');
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Change Repository',
+      }),
+    );
+
+    await waitFor(() => {
+      expect(mockedLinkDesktopRepository).toHaveBeenCalledWith('workspace-1', 'desktop-1', 'repository-2');
+    });
+
+    expect(
+      await screen.findByText('command-center/desktop-next', {
+        exact: true,
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it('unlinks repository', async () => {
+    mockedGetDesktopRepository.mockResolvedValue({
+      ...repositoryA,
+
+      applicationId: 'application-1',
+    } as never);
+
+    const user = userEvent.setup();
+
+    render(<DesktopRepositoryPanel workspaceId='workspace-1' desktopApp={desktopApp} />);
+
+    await screen.findByRole('button', {
+      name: 'Unlink',
+    });
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Unlink',
+      }),
+    );
+
+    await waitFor(() => {
+      expect(mockedUnlinkDesktopRepository).toHaveBeenCalledWith('workspace-1', 'desktop-1');
+    });
+
+    expect(screen.getByText('Not connected')).toBeInTheDocument();
+  });
+
+  it('shows repository loading failures', async () => {
+    mockedGetDesktopRepository.mockRejectedValue(new Error('Repository API failed'));
+
+    render(<DesktopRepositoryPanel workspaceId='workspace-1' desktopApp={desktopApp} />);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Repository API failed');
+  });
+
+  it('does not show archived repositories as selectable', async () => {
+    mockedListRepositories.mockResolvedValue({
+      installations: [],
+
+      repositories: [
+        {
+          ...repositoryA,
+
+          archived: true,
+        },
+      ],
+    } as never);
+
+    render(<DesktopRepositoryPanel workspaceId='workspace-1' desktopApp={desktopApp} />);
+
+    expect(await screen.findByText(/No available repositories/)).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('option', {
+        name: /command-center\/desktop-app/,
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('does not allow repository assigned to another application', async () => {
+    mockedListRepositories.mockResolvedValue({
+      installations: [],
+
+      repositories: [
+        {
+          ...repositoryA,
+
+          applicationId: 'different-application',
+        },
+      ],
+    } as never);
+
+    render(<DesktopRepositoryPanel workspaceId='workspace-1' desktopApp={desktopApp} />);
+
+    expect(await screen.findByText(/No available repositories/)).toBeInTheDocument();
+  });
+});
+
+==================================================
+packages/test-code/web/e2e/full-stack/fullstack-desktop-phases-5-10.spec.ts
+==================================================
+import { authorizedApiRequest, loginThroughUi, uniqueValue } from './fixtures/helpers';
+import { readFullStackState, type FullStackState } from './fixtures/state';
+import { expect, test, type APIRequestContext } from '@playwright/test';
+
+let state: FullStackState;
+
+test.describe.configure({
+  mode: 'serial',
+});
+
+async function createDesktopApplication(request: APIRequestContext) {
+  const response = await authorizedApiRequest(request, state, state.owner.accessToken, `/workspaces/${state.owner.workspaceId}/desktop-apps`, {
+    method: 'POST',
+    data: {
+      name: uniqueValue('Desktop Phases 5-10', state.runId),
+      platform: 'CROSS_PLATFORM',
+      framework: 'OTHER',
+      architecture: 'X64',
+      packageName: `com.commandcenter.desktop.${Date.now()}`,
+    },
+  });
+
+  expect(response.status()).toBe(201);
+
+  return (await response.json()) as {
+    id: string;
+    applicationId: string;
+    application: {
+      name: string;
+    };
+  };
+}
+
+test.describe('Desktop phases 5-10 frontend', () => {
+  test.beforeAll(() => {
+    state = readFullStackState();
+  });
+
+  test('renders overview, code empty state, builds and tests', async ({ page, request }) => {
+    await loginThroughUi(page, state.owner);
+
+    const desktopApp = await createDesktopApplication(request);
+
+    const base = `/api/v1/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktopApp.id}`;
+
+    const frontendBase = `/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktopApp.id}`;
+
+    const build = {
+      id: '11111111-1111-4111-8111-111111111111',
+      workspaceId: state.owner.workspaceId,
+      desktopAppId: desktopApp.id,
+      repositoryId: '22222222-2222-4222-8222-222222222222',
+      workflowRunId: '901',
+      source: 'GITHUB_ACTIONS',
+      commitSha: 'a93f14258b51e9b424c4d7cb05f98751feef272d',
+      branch: 'main',
+      version: '2.0.0',
+      buildNumber: '200',
+      platform: 'WINDOWS',
+      architecture: 'X64',
+      status: 'SUCCESS',
+      startedAt: '2026-08-23T01:00:00.000Z',
+      completedAt: '2026-08-23T01:05:00.000Z',
+      durationMs: 300000,
+      createdAt: '2026-08-23T01:00:00.000Z',
+      updatedAt: '2026-08-23T01:05:00.000Z',
+    };
+
+    const desktopDetails = {
+      id: desktopApp.id,
+      applicationId: desktopApp.applicationId,
+      platform: 'CROSS_PLATFORM',
+      framework: 'OTHER',
+      architecture: 'X64',
+      packageName: 'com.commandcenter.desktop',
+      currentVersion: null,
+      currentBuildNumber: null,
+      minimumOsVersion: null,
+      updateChannel: 'stable',
+      createdAt: '2026-08-23T00:00:00.000Z',
+      updatedAt: '2026-08-23T00:00:00.000Z',
+      application: {
+        id: desktopApp.applicationId,
+        workspaceId: state.owner.workspaceId,
+        name: desktopApp.application.name,
+        slug: 'desktop-phases',
+        type: 'DESKTOP',
+        archivedAt: null,
+        createdAt: '2026-08-23T00:00:00.000Z',
+        updatedAt: '2026-08-23T00:00:00.000Z',
+      },
+    };
+
+    await page.route(`**${base}/overview`, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          desktopApp: desktopDetails,
+          repository: null,
+          latestBuild: build,
+          latestRelease: null,
+          latestPerformance: null,
+        }),
+      });
+    });
+
+    await page.route(`**${base}/detect`, async (route) => {
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          repositoryId: '22222222-2222-4222-8222-222222222222',
+          repositoryFullName: 'command-center/desktop',
+          branch: 'main',
+          truncated: false,
+          candidates: [],
+          primary: {
+            applicationType: 'DESKTOP',
+            projectRoot: '',
+            platform: 'CROSS_PLATFORM',
+            framework: 'ELECTRON',
+            architecture: 'X64',
+            packageName: 'command-center-desktop',
+            version: '2.0.0',
+            buildNumber: '200',
+            minimumOsVersion: null,
+            confidence: 'HIGH',
+            score: 96,
+            evidence: ['package.json'],
+            warnings: [],
+          },
+        }),
+      });
+    });
+
+    await page.route(`**${base}/builds**`, async (route) => {
+      if (route.request().method() !== 'GET') {
+        await route.continue();
+        return;
+      }
+
+      const url = new URL(route.request().url());
+
+      if (url.pathname.endsWith(`/builds/${build.id}`)) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            ...build,
+            artifacts: [
+              {
+                id: 'artifact-1',
+                buildId: build.id,
+                providerArtifactId: 'github-artifact-1',
+                platform: 'WINDOWS',
+                architecture: 'X64',
+                type: 'MSI',
+                fileName: 'CommandCenter-2.0.0.msi',
+                sizeBytes: 1000000,
+                checksum: null,
+                externalUrl: null,
+                createdAt: '2026-08-23T01:05:00.000Z',
+              },
+            ],
+            testRuns: [],
+            testSummary: {
+              totalRuns: 0,
+              passedRuns: 0,
+              failedRuns: 0,
+              passedTests: 0,
+              failedTests: 0,
+              skippedTests: 0,
+            },
+          }),
+        });
+        return;
+      }
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([build]),
+      });
+    });
+
+    await page.route(`**${base}/tests`, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          {
+            id: 'run-1',
+            buildId: build.id,
+            type: 'E2E',
+            status: 'FAILED',
+            passed: 18,
+            failed: 1,
+            skipped: 0,
+            total: 19,
+            durationMs: 45000,
+            startedAt: null,
+            completedAt: null,
+            createdAt: '2026-08-23T01:05:00.000Z',
+            updatedAt: '2026-08-23T01:05:00.000Z',
+            failures: [
+              {
+                id: 'failure-1',
+                testRunId: 'run-1',
+                suite: 'Installer',
+                testName: 'installs cleanly',
+                message: 'Installer failed',
+                file: 'installer.spec.ts',
+                line: 42,
+                stackTrace: null,
+                createdAt: '2026-08-23T01:05:00.000Z',
+              },
+            ],
+          },
+        ]),
+      });
+    });
+
+    await page.route(`**${base}/tests/summary`, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          totalRuns: 1,
+          passedRuns: 0,
+          failedRuns: 1,
+          passedTests: 18,
+          failedTests: 1,
+          skippedTests: 0,
+        }),
+      });
+    });
+
+    await page.goto(frontendBase);
+
+    await expect(
+      page.getByRole('heading', {
+        name: desktopApp.application.name,
+      }),
+    ).toBeVisible();
+
+    await expect(page.getByText('Latest build')).toBeVisible();
+
+    await page
+      .getByRole('button', {
+        name: 'Analyze Repository',
+      })
+      .click();
+
+    await expect(page.getByDisplayValue('command-center-desktop')).toBeVisible();
+
+    await page.goto(`${frontendBase}/code`);
+
+    await expect(
+      page.getByRole('heading', {
+        name: 'Connect a repository first',
+      }),
+    ).toBeVisible();
+
+    await page.goto(`${frontendBase}/builds`);
+
+    await expect(page.getByText('Success')).toBeVisible();
+
+    await page
+      .getByRole('link', {
+        name: '2.0.0',
+      })
+      .click();
+
+    await expect(page.getByText('CommandCenter-2.0.0.msi')).toBeVisible();
+
+    await expect(page.getByText('Remote artifact unavailable')).toBeVisible();
+
+    await page.goto(`${frontendBase}/tests`);
+
+    await expect(page.getByText('installs cleanly')).toBeVisible();
+
+    await expect(page.getByText('Installer failed')).toBeVisible();
+  });
+});
+
+==================================================
+packages/test-code/web/e2e/full-stack/fullstack-desktop-repository-ui.spec.ts
+==================================================
+import { authorizedApiRequest, loginThroughUi, uniqueValue } from './fixtures/helpers';
+import { readFullStackState, type FullStackState } from './fixtures/state';
+import { expect, test, type APIRequestContext } from '@playwright/test';
+
+let state: FullStackState;
+
+test.describe.configure({
+  mode: 'serial',
+});
+
+async function createDesktopApplication(request: APIRequestContext) {
+  const response = await authorizedApiRequest(request, state, state.owner.accessToken, `/workspaces/${state.owner.workspaceId}/desktop-apps`, {
+    method: 'POST',
+
+    data: {
+      name: uniqueValue('Phase 4 Desktop', state.runId),
+
+      platform: 'CROSS_PLATFORM',
+
+      framework: 'ELECTRON',
+
+      architecture: 'X64',
+
+      packageName: `com.commandcenter.phase4.${Date.now()}`,
+    },
+  });
+
+  expect(response.status()).toBe(201);
+
+  return (await response.json()) as {
+    id: string;
+    applicationId: string;
+    application: {
+      name: string;
+    };
+  };
+}
+
+test.describe('Desktop repository frontend', () => {
+  test.beforeAll(() => {
+    state = readFullStackState();
+  });
+
+  test('connects changes persists and unlinks repository through UI', async ({ page, request }) => {
+    await loginThroughUi(page, state.owner);
+
+    const desktopApp = await createDesktopApplication(request);
+
+    const repositoryA = {
+      id: '11111111-1111-4111-8111-111111111111',
+
+      workspaceId: state.owner.workspaceId,
+
+      installationId: '33333333-3333-4333-8333-333333333333',
+
+      applicationId: null,
+
+      provider: 'GITHUB',
+
+      externalRepoId: '4001',
+
+      owner: 'command-center',
+
+      name: 'desktop-electron',
+
+      fullName: 'command-center/desktop-electron',
+
+      defaultBranch: 'main',
+
+      isPrivate: false,
+
+      htmlUrl: 'https://github.com/command-center/desktop-electron',
+
+      archived: false,
+
+      isAvailable: true,
+
+      lastSyncedAt: null,
+
+      createdAt: '2026-08-23T00:00:00.000Z',
+
+      updatedAt: '2026-08-23T00:00:00.000Z',
+
+      application: null,
+
+      installation: {
+        id: '33333333-3333-4333-8333-333333333333',
+
+        externalInstallationId: '9001',
+
+        accountLogin: 'command-center',
+
+        accountType: 'Organization',
+
+        connectedAt: '2026-08-23T00:00:00.000Z',
+
+        lastSyncedAt: null,
+      },
+    };
+
+    const repositoryB = {
+      ...repositoryA,
+
+      id: '22222222-2222-4222-8222-222222222222',
+
+      externalRepoId: '4002',
+
+      name: 'desktop-tauri',
+
+      fullName: 'command-center/desktop-tauri',
+
+      defaultBranch: 'development',
+
+      htmlUrl: 'https://github.com/command-center/desktop-tauri',
+    };
+
+    let linkedRepository: typeof repositoryA | typeof repositoryB | null = null;
+
+    const repositoriesPath = `/api/v1/workspaces/${state.owner.workspaceId}/repositories`;
+
+    const desktopRepositoryPath = `/api/v1/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktopApp.id}` + '/repository';
+
+    await page.route(`**${repositoriesPath}`, async (route) => {
+      if (route.request().method() !== 'GET') {
+        await route.continue();
+
+        return;
+      }
+
+      await route.fulfill({
+        status: 200,
+
+        contentType: 'application/json',
+
+        body: JSON.stringify({
+          installations: [],
+
+          repositories: [repositoryA, repositoryB],
+        }),
+      });
+    });
+
+    await page.route(`**${desktopRepositoryPath}`, async (route) => {
+      const method = route.request().method();
+
+      if (method === 'GET') {
+        await route.fulfill({
+          status: 200,
+
+          contentType: 'application/json',
+
+          body: JSON.stringify(linkedRepository),
+        });
+
+        return;
+      }
+
+      if (method === 'POST') {
+        const body = route.request().postDataJSON() as {
+          repositoryId: string;
+        };
+
+        const selected = [repositoryA, repositoryB].find((repository) => repository.id === body.repositoryId);
+
+        if (!selected) {
+          await route.fulfill({
+            status: 404,
+
+            contentType: 'application/json',
+
+            body: JSON.stringify({
+              message: 'Repository not found.',
+            }),
+          });
+
+          return;
+        }
+
+        linkedRepository = {
+          ...selected,
+
+          applicationId: desktopApp.applicationId,
+        };
+
+        await route.fulfill({
+          status: 201,
+
+          contentType: 'application/json',
+
+          body: JSON.stringify(linkedRepository),
+        });
+
+        return;
+      }
+
+      if (method === 'DELETE') {
+        linkedRepository = null;
+
+        await route.fulfill({
+          status: 200,
+
+          contentType: 'application/json',
+
+          body: JSON.stringify({
+            success: true,
+          }),
+        });
+
+        return;
+      }
+
+      await route.continue();
+    });
+
+    await page.goto(`/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktopApp.id}`);
+
+    await expect(
+      page.getByRole('heading', {
+        name: desktopApp.application.name,
+      }),
+    ).toBeVisible();
+
+    await expect(page.getByText('Not connected')).toBeVisible();
+
+    /*
+     * Connect repository A.
+     */
+    await page.getByLabel('Desktop repository').selectOption(repositoryA.id);
+
+    await page
+      .getByRole('button', {
+        name: 'Connect Repository',
+      })
+      .click();
+
+    await expect(
+      page.getByText(repositoryA.fullName, {
+        exact: true,
+      }),
+    ).toBeVisible();
+
+    await expect(
+      page.getByText('main', {
+        exact: true,
+      }),
+    ).toBeVisible();
+
+    /*
+     * Reload and ensure the UI asks
+     * the repository endpoint again.
+     */
+    await page.reload();
+
+    await expect(
+      page.getByText(repositoryA.fullName, {
+        exact: true,
+      }),
+    ).toBeVisible();
+
+    /*
+     * Change to repository B.
+     */
+    await page.getByLabel('Desktop repository').selectOption(repositoryB.id);
+
+    await page
+      .getByRole('button', {
+        name: 'Change Repository',
+      })
+      .click();
+
+    await expect(
+      page.getByText(repositoryB.fullName, {
+        exact: true,
+      }),
+    ).toBeVisible();
+
+    await expect(
+      page.getByText('development', {
+        exact: true,
+      }),
+    ).toBeVisible();
+
+    /*
+     * Unlink.
+     */
+    await page
+      .getByRole('button', {
+        name: 'Unlink',
+      })
+      .click();
+
+    await expect(page.getByText('Not connected')).toBeVisible();
+  });
+});
+
+==================================================
+API TESTS - TSC SHOWCONFIG
+==================================================
+{
+    "compilerOptions": {
+        "strict": true,
+        "noUncheckedIndexedAccess": true,
+        "forceConsistentCasingInFileNames": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "target": "es2023",
+        "module": "commonjs",
+        "moduleResolution": "node10",
+        "declaration": true,
+        "sourceMap": true,
+        "outDir": "../../../apps/api/dist",
+        "baseUrl": "../../../apps/api",
+        "rootDir": "../../..",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "incremental": true,
+        "tsBuildInfoFile": "../../../apps/api/dist/.tsbuildinfo",
+        "noEmitOnError": true,
+        "preserveWatchOutput": true,
+        "strictPropertyInitialization": false,
+        "inlineSources": true,
+        "types": [
+            "jest",
+            "node"
+        ],
+        "noEmit": true,
+        "allowSyntheticDefaultImports": true,
+        "preserveConstEnums": true,
+        "useDefineForClassFields": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "strictBindCallApply": true,
+        "strictBuiltinIteratorReturn": true,
+        "alwaysStrict": true,
+        "useUnknownInCatchVariables": true
+    },
+    "files": [
+        "./setup-env.ts",
+        "./e2e/activity.e2e-spec.ts",
+        "./e2e/analytics-aggregates.e2e-spec.ts",
+        "./e2e/analytics-engine-processing.e2e-spec.ts",
+        "./e2e/analytics-engine-status.e2e-spec.ts",
+        "./e2e/analytics-ingestion-rate-limit.e2e-spec.ts",
+        "./e2e/analytics-ingestion-security.e2e-spec.ts",
+        "./e2e/analytics-ingestion.e2e-spec.ts",
+        "./e2e/analytics-late-events.e2e-spec.ts",
+        "./e2e/analytics-pageviews.e2e-spec.ts",
+        "./e2e/analytics-reprocessing.e2e-spec.ts",
+        "./e2e/analytics-retention.e2e-spec.ts",
+        "./e2e/analytics-sessions.e2e-spec.ts",
+        "./e2e/analytics-timezones.e2e-spec.ts",
+        "./e2e/analytics-visitors.e2e-spec.ts",
+        "./e2e/application-links.e2e-spec.ts",
+        "./e2e/application-roles.e2e-spec.ts",
+        "./e2e/application-technologies.e2e-spec.ts",
+        "./e2e/applications.e2e-spec.ts",
+        "./e2e/auth-rate-limit.e2e-spec.ts",
+        "./e2e/auth.e2e-spec.ts",
+        "./e2e/desktop-ai-analysis.e2e-spec.ts",
+        "./e2e/desktop-alerts.e2e-spec.ts",
+        "./e2e/desktop-apps.e2e-spec.ts",
+        "./e2e/desktop-build-artifacts.e2e-spec.ts",
+        "./e2e/desktop-builds.e2e-spec.ts",
+        "./e2e/desktop-foundation.e2e-spec.ts",
+        "./e2e/desktop-full-flow.e2e-spec.ts",
+        "./e2e/desktop-overview.e2e-spec.ts",
+        "./e2e/desktop-performance.e2e-spec.ts",
+        "./e2e/desktop-project-detection.e2e-spec.ts",
+        "./e2e/desktop-releases.e2e-spec.ts",
+        "./e2e/desktop-repository-linking.e2e-spec.ts",
+        "./e2e/desktop-security-health.e2e-spec.ts",
+        "./e2e/desktop-security.e2e-spec.ts",
+        "./e2e/desktop-telemetry.e2e-spec.ts",
+        "./e2e/desktop-tests.e2e-spec.ts",
+        "./e2e/development-activity.e2e-spec.ts",
+        "./e2e/development-progress.e2e-spec.ts",
+        "./e2e/development-roles.e2e-spec.ts",
+        "./e2e/development.e2e-spec.ts",
+        "./e2e/github-connect-intent-cleanup.e2e-spec.ts",
+        "./e2e/infrastructure.e2e-spec.ts",
+        "./e2e/mobile-ai-analysis.e2e-spec.ts",
+        "./e2e/mobile-alerts.e2e-spec.ts",
+        "./e2e/mobile-apps.e2e-spec.ts",
+        "./e2e/mobile-builds.e2e-spec.ts",
+        "./e2e/mobile-foundation.e2e-spec.ts",
+        "./e2e/mobile-full-flow.e2e-spec.ts",
+        "./e2e/mobile-ios-performance.e2e-spec.ts",
+        "./e2e/mobile-overview.e2e-spec.ts",
+        "./e2e/mobile-performance.e2e-spec.ts",
+        "./e2e/mobile-project-detection.e2e-spec.ts",
+        "./e2e/mobile-releases.e2e-spec.ts",
+        "./e2e/mobile-repository-linking.e2e-spec.ts",
+        "./e2e/mobile-security.e2e-spec.ts",
+        "./e2e/mobile-telemetry.e2e-spec.ts",
+        "./e2e/mobile-tests.e2e-spec.ts",
+        "./e2e/mobile-unified-performance.e2e-spec.ts",
+        "./e2e/phase13-analytics-reports.e2e-spec.ts",
+        "./e2e/phase14-analytics-processing.e2e-spec.ts",
+        "./e2e/phase15-monitoring.e2e-spec.ts",
+        "./e2e/phase16-releases-deployments.e2e-spec.ts",
+        "./e2e/phase17-team-operations.e2e-spec.ts",
+        "./e2e/phase18-webhook-integrations.e2e-spec.ts",
+        "./e2e/phase19-repository-integrations.e2e-spec.ts",
+        "./e2e/phase20-code-explorer.e2e-spec.ts",
+        "./e2e/phase21-github-workspace-import.e2e-spec.ts",
+        "./e2e/raw-events.e2e-spec.ts",
+        "./e2e/tracker-analytics-processing.e2e-spec.ts",
+        "./e2e/tracker-bundle-integration.e2e-spec.ts",
+        "./e2e/tracker-production-bootstrap.e2e-spec.ts",
+        "./e2e/tracker-transport.e2e-spec.ts",
+        "./e2e/tracking-admin.e2e-spec.ts",
+        "./e2e/webhook-delivery-worker.e2e-spec.ts",
+        "./e2e/website-activity.e2e-spec.ts",
+        "./e2e/website-environments.e2e-spec.ts",
+        "./e2e/website-roles.e2e-spec.ts",
+        "./e2e/websites.e2e-spec.ts",
+        "./e2e/workspace-members.e2e-spec.ts",
+        "./e2e/workspace-roles.e2e-spec.ts",
+        "./e2e/workspaces.e2e-spec.ts",
+        "./e2e/helpers/desktop-test-fixtures.ts",
+        "./helpers/analytics-engine-old.ts",
+        "./helpers/analytics-engine.ts",
+        "./helpers/analytics-ingestion.ts",
+        "./helpers/application.ts",
+        "./helpers/auth.ts",
+        "./helpers/contracts.ts",
+        "./helpers/cookie.ts",
+        "./helpers/create-test-app.ts",
+        "./helpers/create-test-application.ts",
+        "./helpers/database.ts",
+        "./helpers/development.ts",
+        "./helpers/redis.ts",
+        "./helpers/response.ts",
+        "./helpers/website.ts",
+        "./helpers/workspace.ts",
+        "./unit/bootstrap/startup-checks.spec.ts",
+        "./unit/common/filters/all-exceptions.filter.spec.ts",
+        "./unit/common/middleware/request-id.middleware.spec.ts",
+        "./unit/common/rate-limit/shared-rate-limit.guard.spec.ts",
+        "./unit/config/env.validation.spec.ts",
+        "./unit/config/runtime-config.spec.ts",
+        "./unit/infrastructure/database/postgres-advisory-lock.service.spec.ts",
+        "./unit/modules/analytics-engine/utils/analytics-metrics.spec.ts",
+        "./unit/modules/analytics-ingestion/utils/ingestion-sanitizer.spec.ts",
+        "./unit/modules/analytics-overview/utils/analytics-date-range.spec.ts",
+        "./unit/modules/analytics-processing/services/safe-http-client.service.spec.ts",
+        "./unit/modules/analytics-reports/utils/analytics-csv.spec.ts",
+        "./unit/modules/auth/services/password.service.spec.ts",
+        "./unit/modules/desktop-apps/desktop-app-foundation.dto.spec.ts",
+        "./unit/modules/desktop-apps/desktop-apps-api-phase15-17.test.ts",
+        "./unit/modules/desktop-apps/desktop-secret-sanitizer.service.spec.ts",
+        "./unit/modules/health/health.controller.spec.ts",
+        "./unit/modules/mobile-apps/mobile-project-detector.spec.ts",
+        "./unit/modules/mobile-apps/mobile-provider-security.service.spec.ts",
+        "./unit/modules/mobile-apps/mobile-secret-sanitizer.service.spec.ts",
+        "./unit/modules/releases/services/deployment-transition.service.spec.ts",
+        "./unit/modules/repositories/services/github-app.service.spec.ts",
+        "./unit/modules/repositories/services/analyzer/application-detector.spec.ts",
+        "./unit/modules/repositories/services/analyzer/command-detector.spec.ts",
+        "./unit/modules/repositories/services/analyzer/framework-detector.spec.ts",
+        "./unit/modules/repositories/services/analyzer/package-manager-detector.spec.ts",
+        "./unit/modules/repositories/services/analyzer/repository-tree-analyzer.spec.ts",
+        "./unit/modules/repositories/services/analyzer/technology-detector.spec.ts",
+        "./unit/modules/repositories/services/analyzer/workspace-manifest-parser.spec.ts",
+        "./unit/modules/team-operations/services/invitation-token.service.spec.ts",
+        "./unit/modules/webhooks/services/webhook-outbound-client.service.spec.ts",
+        "./unit/modules/webhooks/services/webhook-secret-crypto.service.spec.ts",
+        "./unit/modules/webhooks/services/webhook-signature.service.spec.ts",
+        "../../../apps/api/src/app.module.ts",
+        "../../../apps/api/src/main.ts",
+        "../../../apps/api/src/bootstrap/configure-application.ts",
+        "../../../apps/api/src/bootstrap/startup-checks.ts",
+        "../../../apps/api/src/common/filters/all-exceptions.filter.ts",
+        "../../../apps/api/src/common/middleware/request-id.middleware.ts",
+        "../../../apps/api/src/common/rate-limit/shared-rate-limit.decorator.ts",
+        "../../../apps/api/src/common/rate-limit/shared-rate-limit.guard.ts",
+        "../../../apps/api/src/common/rate-limit/shared-rate-limit.module.ts",
+        "../../../apps/api/src/common/rate-limit/shared-rate-limit.service.ts",
+        "../../../apps/api/src/config/env.validation.ts",
+        "../../../apps/api/src/config/runtime-config.ts",
+        "../../../apps/api/src/database/database-health.service.ts",
+        "../../../apps/api/src/database/database.module.ts",
+        "../../../apps/api/src/database/prisma.service.ts",
+        "../../../apps/api/src/generated/prisma/browser.ts",
+        "../../../apps/api/src/generated/prisma/client.ts",
+        "../../../apps/api/src/generated/prisma/commonInputTypes.ts",
+        "../../../apps/api/src/generated/prisma/enums.ts",
+        "../../../apps/api/src/generated/prisma/models.ts",
+        "../../../apps/api/src/generated/prisma/internal/class.ts",
+        "../../../apps/api/src/generated/prisma/internal/prismaNamespace.ts",
+        "../../../apps/api/src/generated/prisma/internal/prismaNamespaceBrowser.ts",
+        "../../../apps/api/src/generated/prisma/models/AnalyticsDailyAggregate.ts",
+        "../../../apps/api/src/generated/prisma/models/AnalyticsEvent.ts",
+        "../../../apps/api/src/generated/prisma/models/AnalyticsHourlyAggregate.ts",
+        "../../../apps/api/src/generated/prisma/models/AnalyticsPageView.ts",
+        "../../../apps/api/src/generated/prisma/models/AnalyticsProcessingDeadLetter.ts",
+        "../../../apps/api/src/generated/prisma/models/AnalyticsProcessingRun.ts",
+        "../../../apps/api/src/generated/prisma/models/AnalyticsProcessingState.ts",
+        "../../../apps/api/src/generated/prisma/models/AnalyticsSession.ts",
+        "../../../apps/api/src/generated/prisma/models/AnalyticsVisitor.ts",
+        "../../../apps/api/src/generated/prisma/models/ApplicationActivity.ts",
+        "../../../apps/api/src/generated/prisma/models/ApplicationBlocker.ts",
+        "../../../apps/api/src/generated/prisma/models/ApplicationEnvironment.ts",
+        "../../../apps/api/src/generated/prisma/models/ApplicationLink.ts",
+        "../../../apps/api/src/generated/prisma/models/ApplicationMilestone.ts",
+        "../../../apps/api/src/generated/prisma/models/ApplicationTask.ts",
+        "../../../apps/api/src/generated/prisma/models/ApplicationTechnology.ts",
+        "../../../apps/api/src/generated/prisma/models/AuthSession.ts",
+        "../../../apps/api/src/generated/prisma/models/Deployment.ts",
+        "../../../apps/api/src/generated/prisma/models/DeploymentActivity.ts",
+        "../../../apps/api/src/generated/prisma/models/DesktopAiAnalysis.ts",
+        "../../../apps/api/src/generated/prisma/models/DesktopAlertIncident.ts",
+        "../../../apps/api/src/generated/prisma/models/DesktopAlertRule.ts",
+        "../../../apps/api/src/generated/prisma/models/DesktopApplication.ts",
+        "../../../apps/api/src/generated/prisma/models/DesktopBuild.ts",
+        "../../../apps/api/src/generated/prisma/models/DesktopBuildArtifact.ts",
+        "../../../apps/api/src/generated/prisma/models/DesktopCrash.ts",
+        "../../../apps/api/src/generated/prisma/models/DesktopDependency.ts",
+        "../../../apps/api/src/generated/prisma/models/DesktopMetric.ts",
+        "../../../apps/api/src/generated/prisma/models/DesktopRelease.ts",
+        "../../../apps/api/src/generated/prisma/models/DesktopSecurityFinding.ts",
+        "../../../apps/api/src/generated/prisma/models/DesktopTelemetryIntegration.ts",
+        "../../../apps/api/src/generated/prisma/models/DesktopTestFailure.ts",
+        "../../../apps/api/src/generated/prisma/models/DesktopTestRun.ts",
+        "../../../apps/api/src/generated/prisma/models/HealthCheck.ts",
+        "../../../apps/api/src/generated/prisma/models/HealthCheckHistory.ts",
+        "../../../apps/api/src/generated/prisma/models/HealthIncident.ts",
+        "../../../apps/api/src/generated/prisma/models/MobileAiAnalysis.ts",
+        "../../../apps/api/src/generated/prisma/models/MobileAlertIncident.ts",
+        "../../../apps/api/src/generated/prisma/models/MobileAlertRule.ts",
+        "../../../apps/api/src/generated/prisma/models/MobileApplication.ts",
+        "../../../apps/api/src/generated/prisma/models/MobileBuild.ts",
+        "../../../apps/api/src/generated/prisma/models/MobilePerformanceMetric.ts",
+        "../../../apps/api/src/generated/prisma/models/MobileRelease.ts",
+        "../../../apps/api/src/generated/prisma/models/MobileTelemetryIntegration.ts",
+        "../../../apps/api/src/generated/prisma/models/MobileTestFailure.ts",
+        "../../../apps/api/src/generated/prisma/models/MobileTestRun.ts",
+        "../../../apps/api/src/generated/prisma/models/Notification.ts",
+        "../../../apps/api/src/generated/prisma/models/PersonalGithubConnectIntent.ts",
+        "../../../apps/api/src/generated/prisma/models/RawAnalyticsEvent.ts",
+        "../../../apps/api/src/generated/prisma/models/Release.ts",
+        "../../../apps/api/src/generated/prisma/models/RepositoryConnectIntent.ts",
+        "../../../apps/api/src/generated/prisma/models/RepositoryConnection.ts",
+        "../../../apps/api/src/generated/prisma/models/RepositoryInstallation.ts",
+        "../../../apps/api/src/generated/prisma/models/RepositoryWebhookDelivery.ts",
+        "../../../apps/api/src/generated/prisma/models/SaasApplication.ts",
+        "../../../apps/api/src/generated/prisma/models/User.ts",
+        "../../../apps/api/src/generated/prisma/models/WebhookDelivery.ts",
+        "../../../apps/api/src/generated/prisma/models/WebhookDeliveryAttempt.ts",
+        "../../../apps/api/src/generated/prisma/models/WebhookEndpoint.ts",
+        "../../../apps/api/src/generated/prisma/models/WebhookEvent.ts",
+        "../../../apps/api/src/generated/prisma/models/Website.ts",
+        "../../../apps/api/src/generated/prisma/models/Workspace.ts",
+        "../../../apps/api/src/generated/prisma/models/WorkspaceInvitation.ts",
+        "../../../apps/api/src/generated/prisma/models/WorkspaceMember.ts",
+        "../../../apps/api/src/infrastructure/database/postgres-advisory-lock.service.ts",
+        "../../../apps/api/src/infrastructure/redis/redis.module.ts",
+        "../../../apps/api/src/infrastructure/redis/redis.service.ts",
+        "../../../apps/api/src/modules/activity/activity.module.ts",
+        "../../../apps/api/src/modules/activity/controllers/activity.controller.ts",
+        "../../../apps/api/src/modules/activity/dto/activity-query.dto.ts",
+        "../../../apps/api/src/modules/activity/interfaces/activity-writer.interface.ts",
+        "../../../apps/api/src/modules/activity/services/activity-query.service.ts",
+        "../../../apps/api/src/modules/activity/services/activity-writer.service.ts",
+        "../../../apps/api/src/modules/activity/utils/activity-metadata-sanitizer.ts",
+        "../../../apps/api/src/modules/analytics-engine/analytics-engine.module.ts",
+        "../../../apps/api/src/modules/analytics-engine/controllers/analytics-engine.controller.ts",
+        "../../../apps/api/src/modules/analytics-engine/dto/analytics-engine.dto.ts",
+        "../../../apps/api/src/modules/analytics-engine/services/analytics-aggregation.service.ts",
+        "../../../apps/api/src/modules/analytics-engine/services/analytics-engine-query.service.ts",
+        "../../../apps/api/src/modules/analytics-engine/services/analytics-processing-scheduler.service.ts",
+        "../../../apps/api/src/modules/analytics-engine/services/analytics-processing.service.ts",
+        "../../../apps/api/src/modules/analytics-engine/services/page-view-rebuilder.service.ts",
+        "../../../apps/api/src/modules/analytics-engine/services/raw-event-processing.service.ts",
+        "../../../apps/api/src/modules/analytics-engine/services/session-rebuilder.service.ts",
+        "../../../apps/api/src/modules/analytics-engine/services/visitor-rebuilder.service.ts",
+        "../../../apps/api/src/modules/analytics-engine/utils/analytics-metrics.ts",
+        "../../../apps/api/src/modules/analytics-engine/utils/analytics-normalization.ts",
+        "../../../apps/api/src/modules/analytics-engine/utils/analytics-time.ts",
+        "../../../apps/api/src/modules/analytics-ingestion/analytics-ingestion.module.ts",
+        "../../../apps/api/src/modules/analytics-ingestion/controllers/analytics-ingestion.controller.ts",
+        "../../../apps/api/src/modules/analytics-ingestion/controllers/tracking-admin.controller.ts",
+        "../../../apps/api/src/modules/analytics-ingestion/dto/collect-events.dto.ts",
+        "../../../apps/api/src/modules/analytics-ingestion/dto/raw-event-query.dto.ts",
+        "../../../apps/api/src/modules/analytics-ingestion/services/analytics-ingestion.service.ts",
+        "../../../apps/api/src/modules/analytics-ingestion/services/ingestion-rate-limit.service.ts",
+        "../../../apps/api/src/modules/analytics-ingestion/services/tracking-admin.service.ts",
+        "../../../apps/api/src/modules/analytics-ingestion/utils/ingestion-sanitizer.ts",
+        "../../../apps/api/src/modules/analytics-overview/analytics-overview.module.ts",
+        "../../../apps/api/src/modules/analytics-overview/dto/analytics-overview-query.dto.ts",
+        "../../../apps/api/src/modules/analytics-overview/dto/analytics-overview-response.dto.ts",
+        "../../../apps/api/src/modules/analytics-overview/services/analytics-overview.service.ts",
+        "../../../apps/api/src/modules/analytics-overview/services/controllers/analytics-overview.controller.ts",
+        "../../../apps/api/src/modules/analytics-overview/utils/analytics-date-range.ts",
+        "../../../apps/api/src/modules/analytics-overview/utils/analytics-overview-metrics.ts",
+        "../../../apps/api/src/modules/analytics-processing/analytics-processing.module.ts",
+        "../../../apps/api/src/modules/analytics-processing/controllers/analytics-processing.controller.ts",
+        "../../../apps/api/src/modules/analytics-processing/dto/analytics-processing-response.dto.ts",
+        "../../../apps/api/src/modules/analytics-processing/dto/reprocess-analytics.dto.ts",
+        "../../../apps/api/src/modules/analytics-processing/services/analytics-processing-access.service.ts",
+        "../../../apps/api/src/modules/analytics-processing/services/analytics-processing-queue.service.ts",
+        "../../../apps/api/src/modules/analytics-processing/services/analytics-processing-scheduler.service.ts",
+        "../../../apps/api/src/modules/analytics-processing/services/analytics-processing-status.service.ts",
+        "../../../apps/api/src/modules/analytics-processing/services/analytics-processing-worker.service.ts",
+        "../../../apps/api/src/modules/analytics-processing/services/analytics-range-processor.service.ts",
+        "../../../apps/api/src/modules/analytics-reports/analytics-reports.constants.ts",
+        "../../../apps/api/src/modules/analytics-reports/analytics-reports.module.ts",
+        "../../../apps/api/src/modules/analytics-reports/controllers/analytics-reports.controller.ts",
+        "../../../apps/api/src/modules/analytics-reports/dto/analytics-report-query.dto.ts",
+        "../../../apps/api/src/modules/analytics-reports/dto/analytics-report-response.dto.ts",
+        "../../../apps/api/src/modules/analytics-reports/services/analytics-reports.service.ts",
+        "../../../apps/api/src/modules/analytics-reports/utils/analytics-csv.ts",
+        "../../../apps/api/src/modules/applications/applications.module.ts",
+        "../../../apps/api/src/modules/applications/controllers/applications.controller.ts",
+        "../../../apps/api/src/modules/applications/dto/application-link.dto.ts",
+        "../../../apps/api/src/modules/applications/dto/application-technology.dto.ts",
+        "../../../apps/api/src/modules/applications/dto/application.dto.ts",
+        "../../../apps/api/src/modules/applications/services/applications.service.ts",
+        "../../../apps/api/src/modules/auth/auth.constants.ts",
+        "../../../apps/api/src/modules/auth/controllers/auth.controller.ts",
+        "../../../apps/api/src/modules/auth/decorators/current-user.decorator.ts",
+        "../../../apps/api/src/modules/auth/decorators/public.decorator.ts",
+        "../../../apps/api/src/modules/auth/dto/login.dto.ts",
+        "../../../apps/api/src/modules/auth/dto/refresh-token.dto.ts",
+        "../../../apps/api/src/modules/auth/dto/register.dto.ts",
+        "../../../apps/api/src/modules/auth/guards/jwt-auth.guard.ts",
+        "../../../apps/api/src/modules/auth/interfaces/authenticated-user.interface.ts",
+        "../../../apps/api/src/modules/auth/interfaces/jwt-payload.interface.ts",
+        "../../../apps/api/src/modules/auth/interfaces/request-with-user.interface.ts",
+        "../../../apps/api/src/modules/auth/module/auth-sessions.module.ts",
+        "../../../apps/api/src/modules/auth/module/auth.module.ts",
+        "../../../apps/api/src/modules/auth/services/auth-cookie.service.ts",
+        "../../../apps/api/src/modules/auth/services/auth-sessions.service.ts",
+        "../../../apps/api/src/modules/auth/services/auth.service.ts",
+        "../../../apps/api/src/modules/auth/services/password.service.ts",
+        "../../../apps/api/src/modules/auth/services/token.service.ts",
+        "../../../apps/api/src/modules/auth/strategies/jwt.strategy.ts",
+        "../../../apps/api/src/modules/desktop-apps/desktop-apps.module.ts",
+        "../../../apps/api/src/modules/desktop-apps/analysis/desktop-analysis-provider.interface.ts",
+        "../../../apps/api/src/modules/desktop-apps/analysis/desktop-analysis.provider.ts",
+        "../../../apps/api/src/modules/desktop-apps/controllers/desktop-alerts.controller.ts",
+        "../../../apps/api/src/modules/desktop-apps/controllers/desktop-analysis.controller.ts",
+        "../../../apps/api/src/modules/desktop-apps/controllers/desktop-apps.controller.ts",
+        "../../../apps/api/src/modules/desktop-apps/controllers/desktop-build-artifacts.controller.ts",
+        "../../../apps/api/src/modules/desktop-apps/controllers/desktop-builds.controller.ts",
+        "../../../apps/api/src/modules/desktop-apps/controllers/desktop-crashes.controller.ts",
+        "../../../apps/api/src/modules/desktop-apps/controllers/desktop-overview.controller.ts",
+        "../../../apps/api/src/modules/desktop-apps/controllers/desktop-performance.controller.ts",
+        "../../../apps/api/src/modules/desktop-apps/controllers/desktop-project-detection.controller.ts",
+        "../../../apps/api/src/modules/desktop-apps/controllers/desktop-releases.controller.ts",
+        "../../../apps/api/src/modules/desktop-apps/controllers/desktop-repositories.controller.ts",
+        "../../../apps/api/src/modules/desktop-apps/controllers/desktop-security-health.controller.ts",
+        "../../../apps/api/src/modules/desktop-apps/controllers/desktop-security.controller.ts",
+        "../../../apps/api/src/modules/desktop-apps/controllers/desktop-telemetry.controller.ts",
+        "../../../apps/api/src/modules/desktop-apps/controllers/desktop-tests.controller.ts",
+        "../../../apps/api/src/modules/desktop-apps/dto/desktop-alert.dto.ts",
+        "../../../apps/api/src/modules/desktop-apps/dto/desktop-analysis.dto.ts",
+        "../../../apps/api/src/modules/desktop-apps/dto/desktop-app-foundation.dto.ts",
+        "../../../apps/api/src/modules/desktop-apps/dto/desktop-app.dto.ts",
+        "../../../apps/api/src/modules/desktop-apps/dto/desktop-build-artifact.dto.ts",
+        "../../../apps/api/src/modules/desktop-apps/dto/desktop-build.dto.ts",
+        "../../../apps/api/src/modules/desktop-apps/dto/desktop-release.dto.ts",
+        "../../../apps/api/src/modules/desktop-apps/dto/desktop-repository.dto.ts",
+        "../../../apps/api/src/modules/desktop-apps/dto/desktop-runtime.dto.ts",
+        "../../../apps/api/src/modules/desktop-apps/dto/desktop-telemetry.dto.ts",
+        "../../../apps/api/src/modules/desktop-apps/dto/desktop-test.dto.ts",
+        "../../../apps/api/src/modules/desktop-apps/security/desktop-resource-scope.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/security/desktop-secret-sanitizer.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-alert-worker.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-alerts.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-analysis-context.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-analysis.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-apps.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-build-artifacts.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-builds.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-crashes.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-dependency-health.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-overview.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-performance.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-permissions.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-project-detection.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-project-detector.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-releases.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-repository-metadata.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-repository.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-runtime.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-security.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-telemetry-provider-registry.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-telemetry-secret.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-telemetry-url-policy.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-telemetry.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/services/desktop-tests.service.ts",
+        "../../../apps/api/src/modules/desktop-apps/telemetry/desktop-telemetry-provider.interface.ts",
+        "../../../apps/api/src/modules/desktop-apps/telemetry/normalized-http-desktop-telemetry.provider.ts",
+        "../../../apps/api/src/modules/development/development.constants.ts",
+        "../../../apps/api/src/modules/development/development.module.ts",
+        "../../../apps/api/src/modules/development/controllers/development.controller.ts",
+        "../../../apps/api/src/modules/development/dto/development.dto.ts",
+        "../../../apps/api/src/modules/development/services/blockers.service.ts",
+        "../../../apps/api/src/modules/development/services/development-shared.service.ts",
+        "../../../apps/api/src/modules/development/services/development-summary.service.ts",
+        "../../../apps/api/src/modules/development/services/development-templates.service.ts",
+        "../../../apps/api/src/modules/development/services/milestones.service.ts",
+        "../../../apps/api/src/modules/development/services/progress-calculator.service.ts",
+        "../../../apps/api/src/modules/development/services/tasks.service.ts",
+        "../../../apps/api/src/modules/development/templates/development-templates.ts",
+        "../../../apps/api/src/modules/health/health.controller.ts",
+        "../../../apps/api/src/modules/health/health.module.ts",
+        "../../../apps/api/src/modules/health/health.service.ts",
+        "../../../apps/api/src/modules/health/dto/health-response.dto.ts",
+        "../../../apps/api/src/modules/mobile-apps/mobile-apps.module.ts",
+        "../../../apps/api/src/modules/mobile-apps/analysis/mobile-analysis-provider.interface.ts",
+        "../../../apps/api/src/modules/mobile-apps/analysis/mobile-analysis.provider.ts",
+        "../../../apps/api/src/modules/mobile-apps/controllers/mobile-alerts.controller.ts",
+        "../../../apps/api/src/modules/mobile-apps/controllers/mobile-analysis.controller.ts",
+        "../../../apps/api/src/modules/mobile-apps/controllers/mobile-apps.controller.ts",
+        "../../../apps/api/src/modules/mobile-apps/controllers/mobile-builds.controller.ts",
+        "../../../apps/api/src/modules/mobile-apps/controllers/mobile-overview.controller.ts",
+        "../../../apps/api/src/modules/mobile-apps/controllers/mobile-performance-dashboard.controller.ts",
+        "../../../apps/api/src/modules/mobile-apps/controllers/mobile-project-detection.controller.ts",
+        "../../../apps/api/src/modules/mobile-apps/controllers/mobile-releases.controller.ts",
+        "../../../apps/api/src/modules/mobile-apps/controllers/mobile-repositories.controller.ts",
+        "../../../apps/api/src/modules/mobile-apps/controllers/mobile-security.controller.ts",
+        "../../../apps/api/src/modules/mobile-apps/controllers/mobile-telemetry.controller.ts",
+        "../../../apps/api/src/modules/mobile-apps/controllers/mobile-tests.controller.ts",
+        "../../../apps/api/src/modules/mobile-apps/dto/mobile-alert.dto.ts",
+        "../../../apps/api/src/modules/mobile-apps/dto/mobile-analysis.dto.ts",
+        "../../../apps/api/src/modules/mobile-apps/dto/mobile-app.dto.ts",
+        "../../../apps/api/src/modules/mobile-apps/dto/mobile-build.dto.ts",
+        "../../../apps/api/src/modules/mobile-apps/dto/mobile-performance-dashboard.dto.ts",
+        "../../../apps/api/src/modules/mobile-apps/dto/mobile-release.dto.ts",
+        "../../../apps/api/src/modules/mobile-apps/dto/mobile-repository.dto.ts",
+        "../../../apps/api/src/modules/mobile-apps/dto/mobile-telemetry.dto.ts",
+        "../../../apps/api/src/modules/mobile-apps/dto/mobile-test.dto.ts",
+        "../../../apps/api/src/modules/mobile-apps/security/mobile-permissions.service.ts",
+        "../../../apps/api/src/modules/mobile-apps/security/mobile-provider-security.service.ts",
+        "../../../apps/api/src/modules/mobile-apps/security/mobile-secret-sanitizer.service.ts",
+        "../../../apps/api/src/modules/mobile-apps/services/mobile-alert-worker.service.ts",
+        "../../../apps/api/src/modules/mobile-apps/services/mobile-alerts.service.ts",
+        "../../../apps/api/src/modules/mobile-apps/services/mobile-analysis-context.service.ts",
+        "../../../apps/api/src/modules/mobile-apps/services/mobile-analysis.service.ts",
+        "../../../apps/api/src/modules/mobile-apps/services/mobile-apps.service.ts",
+        "../../../apps/api/src/modules/mobile-apps/services/mobile-builds.service.ts",
+        "../../../apps/api/src/modules/mobile-apps/services/mobile-github-build.mapper.ts",
+        "../../../apps/api/src/modules/mobile-apps/services/mobile-overview.service.ts",
+        "../../../apps/api/src/modules/mobile-apps/services/mobile-performance-dashboard.service.ts",
+        "../../../apps/api/src/modules/mobile-apps/services/mobile-performance-query.repository.ts",
+        "../../../apps/api/src/modules/mobile-apps/services/mobile-project-detection.service.ts",
+        "../../../apps/api/src/modules/mobile-apps/services/mobile-project-detector.ts",
+        "../../../apps/api/src/modules/mobile-apps/services/mobile-releases.service.ts",
+        "../../../apps/api/src/modules/mobile-apps/services/mobile-repository.service.ts",
+        "../../../apps/api/src/modules/mobile-apps/services/mobile-resource-scope.service.ts",
+        "../../../apps/api/src/modules/mobile-apps/services/mobile-telemetry.service.ts",
+        "../../../apps/api/src/modules/mobile-apps/services/mobile-tests.service.ts",
+        "../../../apps/api/src/modules/mobile-apps/telemetry/mobile-telemetry-provider.interface.ts",
+        "../../../apps/api/src/modules/mobile-apps/telemetry/mobile-telemetry-provider.registry.ts",
+        "../../../apps/api/src/modules/mobile-apps/telemetry/mobile-telemetry-secret.service.ts",
+        "../../../apps/api/src/modules/mobile-apps/telemetry/provider-http.service.ts",
+        "../../../apps/api/src/modules/mobile-apps/telemetry/providers/custom-mobile-telemetry.provider.ts",
+        "../../../apps/api/src/modules/mobile-apps/telemetry/providers/datadog-mobile-telemetry.provider.ts",
+        "../../../apps/api/src/modules/mobile-apps/telemetry/providers/firebase-mobile-telemetry.provider.ts",
+        "../../../apps/api/src/modules/mobile-apps/telemetry/providers/foundation-mobile-telemetry.provider.ts",
+        "../../../apps/api/src/modules/mobile-apps/telemetry/providers/new-relic-mobile-telemetry.provider.ts",
+        "../../../apps/api/src/modules/mobile-apps/telemetry/providers/sentry-mobile-telemetry.provider.ts",
+        "../../../apps/api/src/modules/monitoring/monitoring.module.ts",
+        "../../../apps/api/src/modules/monitoring/controllers/monitoring.controller.ts",
+        "../../../apps/api/src/modules/monitoring/dto/health-check.dto.ts",
+        "../../../apps/api/src/modules/monitoring/dto/monitoring-response.dto.ts",
+        "../../../apps/api/src/modules/monitoring/services/health-check-runner.service.ts",
+        "../../../apps/api/src/modules/monitoring/services/health-monitoring-scheduler.service.ts",
+        "../../../apps/api/src/modules/monitoring/services/monitoring-access.service.ts",
+        "../../../apps/api/src/modules/monitoring/services/monitoring.service.ts",
+        "../../../apps/api/src/modules/monitoring/services/safe-http-client.service.ts",
+        "../../../apps/api/src/modules/releases/releases.module.ts",
+        "../../../apps/api/src/modules/releases/controllers/deployments.controller.ts",
+        "../../../apps/api/src/modules/releases/controllers/releases.controller.ts",
+        "../../../apps/api/src/modules/releases/dto/release-deployment.dto.ts",
+        "../../../apps/api/src/modules/releases/services/deployment-transition.service.ts",
+        "../../../apps/api/src/modules/releases/services/release-access.service.ts",
+        "../../../apps/api/src/modules/releases/services/release-deployment.service.ts",
+        "../../../apps/api/src/modules/repositories/repositories.module.ts",
+        "../../../apps/api/src/modules/repositories/controllers/code-explorer.controller.ts",
+        "../../../apps/api/src/modules/repositories/controllers/github-connect.controller.ts",
+        "../../../apps/api/src/modules/repositories/controllers/github-webhook.controller.ts",
+        "../../../apps/api/src/modules/repositories/controllers/repositories.controller.ts",
+        "../../../apps/api/src/modules/repositories/controllers/repository-import.controller.ts",
+        "../../../apps/api/src/modules/repositories/dto/code-explorer.dto.ts",
+        "../../../apps/api/src/modules/repositories/dto/repository-import.dto.ts",
+        "../../../apps/api/src/modules/repositories/dto/repository.dto.ts",
+        "../../../apps/api/src/modules/repositories/services/code-explorer.service.ts",
+        "../../../apps/api/src/modules/repositories/services/github-app.service.ts",
+        "../../../apps/api/src/modules/repositories/services/github-code.service.ts",
+        "../../../apps/api/src/modules/repositories/services/github-connect-intent-cleanup.service.ts",
+        "../../../apps/api/src/modules/repositories/services/github-webhook.service.ts",
+        "../../../apps/api/src/modules/repositories/services/personal-github-connect.service.ts",
+        "../../../apps/api/src/modules/repositories/services/personal-repositories.service.ts",
+        "../../../apps/api/src/modules/repositories/services/repositories.service.ts",
+        "../../../apps/api/src/modules/repositories/services/repository-analyzer.service.ts",
+        "../../../apps/api/src/modules/repositories/services/repository-connect.service.ts",
+        "../../../apps/api/src/modules/repositories/services/repository-import.service.ts",
+        "../../../apps/api/src/modules/repositories/services/analyzer/application-detector.ts",
+        "../../../apps/api/src/modules/repositories/services/analyzer/command-detector.ts",
+        "../../../apps/api/src/modules/repositories/services/analyzer/framework-detector.ts",
+        "../../../apps/api/src/modules/repositories/services/analyzer/package-json.types.ts",
+        "../../../apps/api/src/modules/repositories/services/analyzer/package-manager-detector.ts",
+        "../../../apps/api/src/modules/repositories/services/analyzer/repository-tree-analyzer.ts",
+        "../../../apps/api/src/modules/repositories/services/analyzer/technology-detector.ts",
+        "../../../apps/api/src/modules/repositories/services/analyzer/workspace-manifest-parser.ts",
+        "../../../apps/api/src/modules/repositories/services/analyzer/workspace-suggestion.ts",
+        "../../../apps/api/src/modules/team-operations/team-operations.module.ts",
+        "../../../apps/api/src/modules/team-operations/controllers/invitation-response.controller.ts",
+        "../../../apps/api/src/modules/team-operations/controllers/notifications.controller.ts",
+        "../../../apps/api/src/modules/team-operations/controllers/workspace-invitations.controller.ts",
+        "../../../apps/api/src/modules/team-operations/dto/notification.dto.ts",
+        "../../../apps/api/src/modules/team-operations/dto/workspace-invitation.dto.ts",
+        "../../../apps/api/src/modules/team-operations/services/invitation-mailer.service.ts",
+        "../../../apps/api/src/modules/team-operations/services/invitation-token.service.ts",
+        "../../../apps/api/src/modules/team-operations/services/notification.service.ts",
+        "../../../apps/api/src/modules/team-operations/services/team-operations-cleanup.service.ts",
+        "../../../apps/api/src/modules/team-operations/services/workspace-invitation.service.ts",
+        "../../../apps/api/src/modules/users/users.module.ts",
+        "../../../apps/api/src/modules/users/users.service.ts",
+        "../../../apps/api/src/modules/webhooks/webhooks.constants.ts",
+        "../../../apps/api/src/modules/webhooks/webhooks.module.ts",
+        "../../../apps/api/src/modules/webhooks/controllers/webhooks.controller.ts",
+        "../../../apps/api/src/modules/webhooks/dto/webhook.dto.ts",
+        "../../../apps/api/src/modules/webhooks/services/webhook-access.service.ts",
+        "../../../apps/api/src/modules/webhooks/services/webhook-cleanup.service.ts",
+        "../../../apps/api/src/modules/webhooks/services/webhook-delivery-worker.service.ts",
+        "../../../apps/api/src/modules/webhooks/services/webhook-event-publisher.service.ts",
+        "../../../apps/api/src/modules/webhooks/services/webhook-management.service.ts",
+        "../../../apps/api/src/modules/webhooks/services/webhook-outbound-client.service.ts",
+        "../../../apps/api/src/modules/webhooks/services/webhook-secret-crypto.service.ts",
+        "../../../apps/api/src/modules/webhooks/services/webhook-signature.service.ts",
+        "../../../apps/api/src/modules/websites/websites.module.ts",
+        "../../../apps/api/src/modules/websites/controllers/websites.controller.ts",
+        "../../../apps/api/src/modules/websites/dto/website.dto.ts",
+        "../../../apps/api/src/modules/websites/services/websites.service.ts",
+        "../../../apps/api/src/modules/workspace/controllers/workspace-creation.controller.ts",
+        "../../../apps/api/src/modules/workspace/controllers/workspace-members.controller.ts",
+        "../../../apps/api/src/modules/workspace/controllers/workspaces.controller.ts",
+        "../../../apps/api/src/modules/workspace/decorators/workspace-roles.decorator.ts",
+        "../../../apps/api/src/modules/workspace/dto/add-workspace-member.dto.ts",
+        "../../../apps/api/src/modules/workspace/dto/create-workspace.dto.ts",
+        "../../../apps/api/src/modules/workspace/dto/transfer-ownership.dto.ts",
+        "../../../apps/api/src/modules/workspace/dto/update-workspace-member-role.dto.ts",
+        "../../../apps/api/src/modules/workspace/dto/update-workspace.dto.ts",
+        "../../../apps/api/src/modules/workspace/guards/workspace-access.guard.ts",
+        "../../../apps/api/src/modules/workspace/guards/workspace-roles.guard.ts",
+        "../../../apps/api/src/modules/workspace/interfaces/workspace-request.interface.ts",
+        "../../../apps/api/src/modules/workspace/modules/workspace-members.module.ts",
+        "../../../apps/api/src/modules/workspace/modules/workspaces.module.ts",
+        "../../../apps/api/src/modules/workspace/service/workspace-creation.service.ts",
+        "../../../apps/api/src/modules/workspace/service/workspace-members.service.ts",
+        "../../../apps/api/src/modules/workspace/service/workspaces.service.ts",
+        "../../../apps/api/src/version/version.controller.ts",
+        "../../../apps/api/src/version/version.module.ts",
+        "../web/e2e/full-stack/fullstack-desktop-phases-12-14.spec.ts",
+        "../web/unit/features/desktop-apps/desktop-project-detector.spec.ts",
+        "../web/unit/features/desktop-apps/desktop-security-parsers.spec.ts",
+        "../web/unit/features/desktop-apps/desktop-telemetry-api.test.ts",
+        "../web/unit/features/desktop-apps/desktop-telemetry-secret.service.spec.ts"
+    ],
+    "include": [
+        "./**/*.ts",
+        "../../../apps/api/src/**/*.ts",
+        "../web/e2e/full-stack/fullstack-desktop-phases-12-14.spec.ts",
+        "../web/unit/features/desktop-apps/desktop-project-detector.spec.ts",
+        "../web/unit/features/desktop-apps/desktop-security-parsers.spec.ts",
+        "../web/unit/features/desktop-apps/desktop-telemetry-api.test.ts",
+        "../web/unit/features/desktop-apps/desktop-telemetry-secret.service.spec.ts"
+    ],
+    "exclude": [
+        "../../../apps/api/node_modules",
+        "../../../apps/api/dist",
+        "../../../apps/api/coverage",
+        "../../../apps/api/test",
+        "../../../apps/api/**/*.spec.ts",
+        "../../../apps/api/**/*.e2e-spec.ts"
+    ]
+}
+
+
+==================================================
+WEB TESTS - TSC SHOWCONFIG
+==================================================
+{
+    "compilerOptions": {
+        "strict": true,
+        "noUncheckedIndexedAccess": true,
+        "forceConsistentCasingInFileNames": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "target": "es2022",
+        "lib": [
+            "dom",
+            "dom.iterable",
+            "esnext"
+        ],
+        "allowJs": false,
+        "noEmit": true,
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "jsx": "preserve",
+        "incremental": true,
+        "plugins": [
+            {
+                "name": "next"
+            }
+        ],
+        "baseUrl": "../../../apps/web",
+        "paths": {
+            "@/*": [
+                "./src/*"
+            ]
+        },
+        "allowSyntheticDefaultImports": true,
+        "resolvePackageJsonExports": true,
+        "resolvePackageJsonImports": true,
+        "preserveConstEnums": true,
+        "useDefineForClassFields": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "strictBindCallApply": true,
+        "strictPropertyInitialization": true,
+        "strictBuiltinIteratorReturn": true,
+        "alwaysStrict": true,
+        "useUnknownInCatchVariables": true
+    },
+    "files": [
+        "./playwright.config.ts",
+        "./playwright.fullstack.config.ts",
+        "./vitest.setup.ts",
+        "./e2e/auth-workspace.spec.ts",
+        "./e2e/batch10/applications.spec.ts",
+        "./e2e/batch10/auth.spec.ts",
+        "./e2e/batch10/dashboard-workspaces.spec.ts",
+        "./e2e/batch10/navigation-accessibility.spec.ts",
+        "./e2e/batch10/role-authorization.spec.ts",
+        "./e2e/batch10/websites.spec.ts",
+        "./e2e/batch10/fixtures/mock-api.ts",
+        "./e2e/full-stack/fullstack-analytics.spec.ts",
+        "./e2e/full-stack/fullstack-applications.spec.ts",
+        "./e2e/full-stack/fullstack-auth.spec.ts",
+        "./e2e/full-stack/fullstack-authorization.spec.ts",
+        "./e2e/full-stack/fullstack-desktop-apps.spec.ts",
+        "./e2e/full-stack/fullstack-desktop-final.spec.ts",
+        "./e2e/full-stack/fullstack-desktop-phases-12-14.spec.ts",
+        "./e2e/full-stack/fullstack-desktop-phases-5-10.spec.ts",
+        "./e2e/full-stack/fullstack-desktop-releases.spec.ts",
+        "./e2e/full-stack/fullstack-desktop-repository-ui.spec.ts",
+        "./e2e/full-stack/fullstack-mobile-apps.spec.ts",
+        "./e2e/full-stack/fullstack-mobile-final.spec.ts",
+        "./e2e/full-stack/fullstack-tracker-browser.spec.ts",
+        "./e2e/full-stack/fullstack-websites.spec.ts",
+        "./e2e/full-stack/fullstack-workspaces.spec.ts",
+        "./e2e/full-stack/global-setup.ts",
+        "./e2e/full-stack/global-teardown.ts",
+        "./e2e/full-stack/fixtures/database.ts",
+        "./e2e/full-stack/fixtures/helpers.ts",
+        "./e2e/full-stack/fixtures/state.ts",
+        "./e2e/phace12/analytics-overview.spec.ts",
+        "./e2e/phase13/analytics-reports.spec.ts",
+        "./e2e/phase14/analytics-processing.spec.ts",
+        "./e2e/phase15/monitoring.spec.ts",
+        "./e2e/phase16/releases-deployments.spec.ts",
+        "./e2e/phase17/team-operations.spec.ts",
+        "./e2e/phase18/webhook-integrations.spec.ts",
+        "./unit/features/activity/activity-api.test.ts",
+        "./unit/features/activity/activity-utils.test.ts",
+        "./unit/features/activity/workspace-activity-api.test.ts",
+        "./unit/features/analytics-engine/analytics-engine-api.test.ts",
+        "./unit/features/analytics-engine/analytics-engine-utils.test.ts",
+        "./unit/features/analytics-overview/analytics-overview-api.test.ts",
+        "./unit/features/analytics-processing/analytics-processing-api.test.ts",
+        "./unit/features/analytics-reports/analytics-reports-api.test.ts",
+        "./unit/features/applications/application-api.test.ts",
+        "./unit/features/applications/application-utils.test.ts",
+        "./unit/features/desktop-apps/desktop-app-utils.test.ts",
+        "./unit/features/desktop-apps/desktop-apps-api.phase5-10.test.ts",
+        "./unit/features/desktop-apps/desktop-apps-api.test.ts",
+        "./unit/features/desktop-apps/desktop-project-detector.spec.ts",
+        "./unit/features/desktop-apps/desktop-releases-api.test.ts",
+        "./unit/features/desktop-apps/desktop-security-parsers.spec.ts",
+        "./unit/features/desktop-apps/desktop-telemetry-api.test.ts",
+        "./unit/features/desktop-apps/desktop-telemetry-secret.service.spec.ts",
+        "./unit/features/desktop-apps/esktop-repository-api.test.ts",
+        "./unit/features/development/development-api.test.ts",
+        "./unit/features/development/development-utils.test.ts",
+        "./unit/features/integrations/integrations-api.test.ts",
+        "./unit/features/lib/api/api-client.test.ts",
+        "./unit/features/lib/api/api-download.test.ts",
+        "./unit/features/lib/api/api-error.test.ts",
+        "./unit/features/lib/github/github-url.test.ts",
+        "./unit/features/mobile-apps/mobile-apps-api.test.ts",
+        "./unit/features/mobile-apps/mobile-permissions.test.ts",
+        "./unit/features/monitoring/monitoring-api.test.ts",
+        "./unit/features/releases/release-management-api.test.ts",
+        "./unit/features/repositories/code-explorer-api.test.ts",
+        "./unit/features/repositories/repositories-api.test.ts",
+        "./unit/features/team-operations/team-operations-api.test.ts",
+        "./unit/features/tracking/tracking-api.test.ts",
+        "./unit/features/tracking/tracking-utils.test.ts",
+        "./unit/features/websites/website-api.test.ts",
+        "./unit/features/websites/website-utils.test.ts",
+        "./unit/features/workspaces/workspace-api.test.ts",
+        "./unit/features/workspaces/github-import/github-import-api.test.ts",
+        "./unit/hooks/use-page-visibility.test.ts",
+        "./unit/app/global-error.test.tsx",
+        "./unit/app/(auth)/error.test.tsx",
+        "./unit/app/(auth)/login/page.test.tsx",
+        "./unit/app/(auth)/register/page.test.tsx",
+        "./unit/app/(dashboard)/error.test.tsx",
+        "./unit/app/(dashboard)/github/callback/github-callback-client.test.tsx",
+        "./unit/app/(dashboard)/github/setup/github-setup-client.test.tsx",
+        "./unit/app/(dashboard)/workspaces/new/new-workspace-client.test.tsx",
+        "./unit/components/layout/breadcrumbs.test.tsx",
+        "./unit/components/layout/workspace-switcher.test.tsx",
+        "./unit/components/states/page-error.test.tsx",
+        "./unit/components/states/page-loading.test.tsx",
+        "./unit/features/activity/components/activity-filters.test.tsx",
+        "./unit/features/activity/components/activity-item.test.tsx",
+        "./unit/features/analytics-engine/components/analytics-engine-panel.test.tsx",
+        "./unit/features/analytics-overview/analytics-overview-dashboard.test.tsx",
+        "./unit/features/analytics-processing/analytics-processing-panel.test.tsx",
+        "./unit/features/analytics-reports/analytics-reports-dashboard.test.tsx",
+        "./unit/features/applications/components/active-filter-chips.test.tsx",
+        "./unit/features/applications/components/application-card.test.tsx",
+        "./unit/features/applications/components/application-filters.test.tsx",
+        "./unit/features/applications/components/application-form.test.tsx",
+        "./unit/features/applications/components/application-sub-nav.test.tsx",
+        "./unit/features/applications/components/applications-empty-state.test.tsx",
+        "./unit/features/applications/components/applications-error-state.test.tsx",
+        "./unit/features/applications/components/link-manager.test.tsx",
+        "./unit/features/applications/components/technology-manager.test.tsx",
+        "./unit/features/auth/auth-gates.test.tsx",
+        "./unit/features/auth/auth-provider-refresh-integration.test.tsx",
+        "./unit/features/auth/auth-provider.test.tsx",
+        "./unit/features/auth/protected-route-content.test.tsx",
+        "./unit/features/auth/protected-route.test.tsx",
+        "./unit/features/desktop-apps/desktop-app-card.test.tsx",
+        "./unit/features/desktop-apps/desktop-app-form.test.tsx",
+        "./unit/features/desktop-apps/desktop-app-sub-nav.test.tsx",
+        "./unit/features/desktop-apps/desktop-builds.test.tsx",
+        "./unit/features/desktop-apps/desktop-crashes.test.tsx",
+        "./unit/features/desktop-apps/desktop-dependencies.test.tsx",
+        "./unit/features/desktop-apps/desktop-performance.test.tsx",
+        "./unit/features/desktop-apps/desktop-project-detection-panel.test.tsx",
+        "./unit/features/desktop-apps/desktop-releases.test.tsx",
+        "./unit/features/desktop-apps/desktop-repository-panel.test.tsx",
+        "./unit/features/desktop-apps/desktop-security.test.tsx",
+        "./unit/features/desktop-apps/desktop-telemetry-settings.test.tsx",
+        "./unit/features/desktop-apps/desktop-tests.test.tsx",
+        "./unit/features/development/components/blocker-panel.test.tsx",
+        "./unit/features/development/components/development-timeline.test.tsx",
+        "./unit/features/development/components/task-kanban.test.tsx",
+        "./unit/features/integrations/webhook-integrations-dashboard.test.tsx",
+        "./unit/features/mobile-apps/mobile-ai-analysis.test.tsx",
+        "./unit/features/mobile-apps/mobile-alerts.test.tsx",
+        "./unit/features/mobile-apps/mobile-app-form.test.tsx",
+        "./unit/features/mobile-apps/mobile-app-sub-nav.test.tsx",
+        "./unit/features/mobile-apps/mobile-builds.test.tsx",
+        "./unit/features/mobile-apps/mobile-performance-dashboard.test.tsx",
+        "./unit/features/mobile-apps/mobile-permission-gate.test.tsx",
+        "./unit/features/mobile-apps/mobile-project-detection-panel.test.tsx",
+        "./unit/features/mobile-apps/mobile-releases.test.tsx",
+        "./unit/features/mobile-apps/mobile-repository-panel.test.tsx",
+        "./unit/features/mobile-apps/mobile-telemetry-settings.test.tsx",
+        "./unit/features/monitoring/application-health-badge.test.tsx",
+        "./unit/features/monitoring/health-status-badge.test.tsx",
+        "./unit/features/monitoring/monitoring-dashboard.test.tsx",
+        "./unit/features/releases/deployment-status-badge.test.tsx",
+        "./unit/features/releases/release-deployment-dashboard.test.tsx",
+        "./unit/features/repositories/code-diff-viewer.test.tsx",
+        "./unit/features/repositories/code-explorer.test.tsx",
+        "./unit/features/repositories/code-tree.test.tsx",
+        "./unit/features/repositories/code-viewer.test.tsx",
+        "./unit/features/team-operations/notification-bell.test.tsx",
+        "./unit/features/team-operations/workspace-invitations-panel.test.tsx",
+        "./unit/features/tracking/components/tracking-status-panel.test.tsx",
+        "./unit/features/websites/components/website-form.test.tsx",
+        "./unit/features/websites/components/website-sub-nav.test.tsx",
+        "./unit/features/workspaces/components/workspace-creation-method.test.tsx",
+        "./unit/features/workspaces/components/workspace-settings-nav.test.tsx",
+        "./unit/features/workspaces/github-import/components/connect-github-step.test.tsx",
+        "./unit/features/workspaces/github-import/components/repository-picker.test.tsx",
+        "./unit/features/workspaces/github-import/components/review-configuration.test.tsx",
+        "./vitest.config.mts",
+        "../../../apps/web/src/features/activity/activity-api.ts",
+        "../../../apps/web/src/features/activity/activity-constants.ts",
+        "../../../apps/web/src/features/activity/activity-types.ts",
+        "../../../apps/web/src/features/activity/activity-utils.ts",
+        "../../../apps/web/src/features/activity/workspace-activity-api.ts",
+        "../../../apps/web/src/features/analytics-engine/analytics-engine-api.ts",
+        "../../../apps/web/src/features/analytics-engine/analytics-engine-types.ts",
+        "../../../apps/web/src/features/analytics-engine/analytics-engine-utils.ts",
+        "../../../apps/web/src/features/analytics-overview/analytics-overview-api.ts",
+        "../../../apps/web/src/features/analytics-overview/analytics-overview.types.ts",
+        "../../../apps/web/src/features/analytics-overview/use-analytics-overview.ts",
+        "../../../apps/web/src/features/analytics-processing/analytics-processing-api.ts",
+        "../../../apps/web/src/features/analytics-processing/analytics-processing.types.ts",
+        "../../../apps/web/src/features/analytics-processing/use-analytics-processing.ts",
+        "../../../apps/web/src/features/analytics-reports/analytics-reports-api.ts",
+        "../../../apps/web/src/features/analytics-reports/analytics-reports.types.ts",
+        "../../../apps/web/src/features/applications/application-api.ts",
+        "../../../apps/web/src/features/applications/application-constants.ts",
+        "../../../apps/web/src/features/applications/application-types.ts",
+        "../../../apps/web/src/features/applications/application-utils.ts",
+        "../../../apps/web/src/features/auth/auth.types.ts",
+        "../../../apps/web/src/features/auth/use-session.ts",
+        "../../../apps/web/src/features/desktop-apps/desktop-app-utils.ts",
+        "../../../apps/web/src/features/desktop-apps/desktop-app.constants.ts",
+        "../../../apps/web/src/features/desktop-apps/desktop-app.types.ts",
+        "../../../apps/web/src/features/desktop-apps/desktop-apps-api.ts",
+        "../../../apps/web/src/features/desktop-apps/desktop-build-utils.ts",
+        "../../../apps/web/src/features/desktop-apps/desktop-release-utils.ts",
+        "../../../apps/web/src/features/desktop-apps/index.ts",
+        "../../../apps/web/src/features/development/development-api.ts",
+        "../../../apps/web/src/features/development/development-constants.ts",
+        "../../../apps/web/src/features/development/development-types.ts",
+        "../../../apps/web/src/features/development/development-utils.ts",
+        "../../../apps/web/src/features/integrations/integrations-api.ts",
+        "../../../apps/web/src/features/integrations/integrations.types.ts",
+        "../../../apps/web/src/features/lib/api/api-client.ts",
+        "../../../apps/web/src/features/lib/api/api-error.ts",
+        "../../../apps/web/src/features/lib/github/github-url.ts",
+        "../../../apps/web/src/features/mobile-apps/index.ts",
+        "../../../apps/web/src/features/mobile-apps/mobile-app-utils.ts",
+        "../../../apps/web/src/features/mobile-apps/mobile-app.constants.ts",
+        "../../../apps/web/src/features/mobile-apps/mobile-apps-api.ts",
+        "../../../apps/web/src/features/mobile-apps/mobile-build-utils.ts",
+        "../../../apps/web/src/features/mobile-apps/mobile-permissions.ts",
+        "../../../apps/web/src/features/monitoring/monitoring-api.ts",
+        "../../../apps/web/src/features/monitoring/monitoring.types.ts",
+        "../../../apps/web/src/features/releases/release-management-api.ts",
+        "../../../apps/web/src/features/releases/release-management.types.ts",
+        "../../../apps/web/src/features/repositories/code-explorer-api.ts",
+        "../../../apps/web/src/features/repositories/code-explorer.types.ts",
+        "../../../apps/web/src/features/repositories/repositories-api.ts",
+        "../../../apps/web/src/features/repositories/repository.types.ts",
+        "../../../apps/web/src/features/team-operations/team-operations-api.ts",
+        "../../../apps/web/src/features/team-operations/team-operations.types.ts",
+        "../../../apps/web/src/features/tracking/tracking-api.ts",
+        "../../../apps/web/src/features/tracking/tracking-types.ts",
+        "../../../apps/web/src/features/tracking/tracking-utils.ts",
+        "../../../apps/web/src/features/websites/website-api.ts",
+        "../../../apps/web/src/features/websites/website-types.ts",
+        "../../../apps/web/src/features/websites/website-utils.ts",
+        "../../../apps/web/src/features/workspaces/workspace-api.ts",
+        "../../../apps/web/src/features/workspaces/workspace-types.ts",
+        "../../../apps/web/src/features/workspaces/github-import/github-import-api.ts",
+        "../../../apps/web/src/features/workspaces/github-import/github-import-flow-marker.ts",
+        "../../../apps/web/src/features/workspaces/github-import/github-import-types.ts",
+        "../../../apps/web/src/hooks/use-page-visibility.ts",
+        "../../../apps/web/src/app/global-error.tsx",
+        "../../../apps/web/src/app/layout.tsx",
+        "../../../apps/web/src/app/page.tsx",
+        "../../../apps/web/src/app/providers.tsx",
+        "../../../apps/web/src/app/(auth)/error.tsx",
+        "../../../apps/web/src/app/(auth)/layout.tsx",
+        "../../../apps/web/src/app/(auth)/login/page.tsx",
+        "../../../apps/web/src/app/(auth)/register/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/error.tsx",
+        "../../../apps/web/src/app/(dashboard)/layout.tsx",
+        "../../../apps/web/src/app/(dashboard)/dashboard/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/github/callback/github-callback-client.tsx",
+        "../../../apps/web/src/app/(dashboard)/github/callback/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/github/setup/github-setup-client.tsx",
+        "../../../apps/web/src/app/(dashboard)/github/setup/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/notifications/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/activities/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/activity/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/applications/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/applications/[applicationId]/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/applications/[applicationId]/development/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/applications/[applicationId]/releases/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/applications/[applicationId]/settings/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/applications/new/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/alerts/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/builds/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/builds/[buildId]/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/crashes/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/dependencies/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/performance/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/releases/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/security/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/settings/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/tests/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/code/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/new/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/alerts/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/builds/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/builds/[buildId]/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/code/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/performance/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/tests/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/new/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/monitoring/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/repositories/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/repositories/[repositoryId]/code/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/settings/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/settings/integrations/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/settings/members/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/analytics/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/analytics/processing/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/analytics/reports/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/analytics-engine/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/edit/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/events/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/installation/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/settings/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/new/page.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/new/loading.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/new/new-workspace-client.tsx",
+        "../../../apps/web/src/app/(dashboard)/workspaces/new/page.tsx",
+        "../../../apps/web/src/app/invitations/[token]/page.tsx",
+        "../../../apps/web/src/components/api-health-card.tsx",
+        "../../../apps/web/src/components/layout/app-shell.tsx",
+        "../../../apps/web/src/components/layout/breadcrumbs.tsx",
+        "../../../apps/web/src/components/layout/workspace-switcher.tsx",
+        "../../../apps/web/src/components/states/page-error.tsx",
+        "../../../apps/web/src/components/states/page-loading.tsx",
+        "../../../apps/web/src/features/landingpage.tsx",
+        "../../../apps/web/src/features/activity/components/activity-feed.tsx",
+        "../../../apps/web/src/features/activity/components/activity-filters.tsx",
+        "../../../apps/web/src/features/activity/components/activity-item.tsx",
+        "../../../apps/web/src/features/analytics-engine/components/analytics-engine-panel.tsx",
+        "../../../apps/web/src/features/analytics-overview/analytics-overview-dashboard.tsx",
+        "../../../apps/web/src/features/analytics-processing/analytics-processing-panel.tsx",
+        "../../../apps/web/src/features/analytics-reports/analytics-reports-dashboard.tsx",
+        "../../../apps/web/src/features/applications/components/active-filter-chips.tsx",
+        "../../../apps/web/src/features/applications/components/application-card.tsx",
+        "../../../apps/web/src/features/applications/components/application-filters.tsx",
+        "../../../apps/web/src/features/applications/components/application-form.tsx",
+        "../../../apps/web/src/features/applications/components/application-sub-nav.tsx",
+        "../../../apps/web/src/features/applications/components/applications-empty-state.tsx",
+        "../../../apps/web/src/features/applications/components/applications-error-state.tsx",
+        "../../../apps/web/src/features/applications/components/applications-grid.tsx",
+        "../../../apps/web/src/features/applications/components/applications-header.tsx",
+        "../../../apps/web/src/features/applications/components/applications-result-summary.tsx",
+        "../../../apps/web/src/features/applications/components/applications-skeleton.tsx",
+        "../../../apps/web/src/features/applications/components/link-manager.tsx",
+        "../../../apps/web/src/features/applications/components/technology-manager.tsx",
+        "../../../apps/web/src/features/auth/auth-gates.tsx",
+        "../../../apps/web/src/features/auth/auth-provider.tsx",
+        "../../../apps/web/src/features/auth/protected-route-content.tsx",
+        "../../../apps/web/src/features/auth/protected-route.tsx",
+        "../../../apps/web/src/features/desktop-apps/desktop-alerts.tsx",
+        "../../../apps/web/src/features/desktop-apps/desktop-analysis-panel.tsx",
+        "../../../apps/web/src/features/desktop-apps/desktop-app-card.tsx",
+        "../../../apps/web/src/features/desktop-apps/desktop-app-form.tsx",
+        "../../../apps/web/src/features/desktop-apps/desktop-app-icon.tsx",
+        "../../../apps/web/src/features/desktop-apps/desktop-app-sub-nav.tsx",
+        "../../../apps/web/src/features/desktop-apps/desktop-builds.tsx",
+        "../../../apps/web/src/features/desktop-apps/desktop-crashes.tsx",
+        "../../../apps/web/src/features/desktop-apps/desktop-dependencies.tsx",
+        "../../../apps/web/src/features/desktop-apps/desktop-overview.tsx",
+        "../../../apps/web/src/features/desktop-apps/desktop-performance.tsx",
+        "../../../apps/web/src/features/desktop-apps/desktop-permission-gate.tsx",
+        "../../../apps/web/src/features/desktop-apps/desktop-project-detection-panel.tsx",
+        "../../../apps/web/src/features/desktop-apps/desktop-releases.tsx",
+        "../../../apps/web/src/features/desktop-apps/desktop-repository-panel.tsx",
+        "../../../apps/web/src/features/desktop-apps/desktop-security.tsx",
+        "../../../apps/web/src/features/desktop-apps/desktop-telemetry-settings.tsx",
+        "../../../apps/web/src/features/desktop-apps/desktop-tests.tsx",
+        "../../../apps/web/src/features/development/components/blocker-panel.tsx",
+        "../../../apps/web/src/features/development/components/development-board.tsx",
+        "../../../apps/web/src/features/development/components/development-timeline.tsx",
+        "../../../apps/web/src/features/development/components/milestone-card.tsx",
+        "../../../apps/web/src/features/development/components/task-kanban.tsx",
+        "../../../apps/web/src/features/integrations/webhook-integrations-dashboard.tsx",
+        "../../../apps/web/src/features/mobile-apps/mobile-ai-analysis.tsx",
+        "../../../apps/web/src/features/mobile-apps/mobile-alerts.tsx",
+        "../../../apps/web/src/features/mobile-apps/mobile-app-card.tsx",
+        "../../../apps/web/src/features/mobile-apps/mobile-app-form.tsx",
+        "../../../apps/web/src/features/mobile-apps/mobile-app-sub-nav.tsx",
+        "../../../apps/web/src/features/mobile-apps/mobile-builds.tsx",
+        "../../../apps/web/src/features/mobile-apps/mobile-performance-dashboard.tsx",
+        "../../../apps/web/src/features/mobile-apps/mobile-permission-gate.tsx",
+        "../../../apps/web/src/features/mobile-apps/mobile-project-detection-panel.tsx",
+        "../../../apps/web/src/features/mobile-apps/mobile-releases.tsx",
+        "../../../apps/web/src/features/mobile-apps/mobile-repository-panel.tsx",
+        "../../../apps/web/src/features/mobile-apps/mobile-telemetry-settings.tsx",
+        "../../../apps/web/src/features/mobile-apps/mobile-tests.tsx",
+        "../../../apps/web/src/features/monitoring/application-health-badge.tsx",
+        "../../../apps/web/src/features/monitoring/health-status-badge.tsx",
+        "../../../apps/web/src/features/monitoring/monitoring-dashboard.tsx",
+        "../../../apps/web/src/features/releases/deployment-status-badge.tsx",
+        "../../../apps/web/src/features/releases/release-deployment-dashboard.tsx",
+        "../../../apps/web/src/features/repositories/code-diff-viewer.tsx",
+        "../../../apps/web/src/features/repositories/code-explorer.tsx",
+        "../../../apps/web/src/features/repositories/code-tree.tsx",
+        "../../../apps/web/src/features/repositories/code-viewer.tsx",
+        "../../../apps/web/src/features/repositories/repositories-dashboard.tsx",
+        "../../../apps/web/src/features/team-operations/notification-bell.tsx",
+        "../../../apps/web/src/features/team-operations/workspace-invitations-panel.tsx",
+        "../../../apps/web/src/features/tracking/components/tracking-status-panel.tsx",
+        "../../../apps/web/src/features/websites/components/website-card.tsx",
+        "../../../apps/web/src/features/websites/components/website-form.tsx",
+        "../../../apps/web/src/features/websites/components/website-sub-nav.tsx",
+        "../../../apps/web/src/features/workspaces/components/manual-workspace-form.tsx",
+        "../../../apps/web/src/features/workspaces/components/workspace-creation-method.tsx",
+        "../../../apps/web/src/features/workspaces/components/workspace-settings-nav.tsx",
+        "../../../apps/web/src/features/workspaces/github-import/github-import-wizard.tsx",
+        "../../../apps/web/src/features/workspaces/github-import/components/analysis-progress.tsx",
+        "../../../apps/web/src/features/workspaces/github-import/components/connect-github-step.tsx",
+        "../../../apps/web/src/features/workspaces/github-import/components/repository-picker.tsx",
+        "../../../apps/web/src/features/workspaces/github-import/components/review-configuration.tsx",
+        "../../../apps/web/next-env.d.ts"
+    ],
+    "include": [
+        "./**/*.ts",
+        "./**/*.tsx",
+        "./**/*.mts",
+        "../../../apps/web/src/**/*.ts",
+        "../../../apps/web/src/**/*.tsx",
+        "../../../apps/web/next-env.d.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "playwright-report",
+        "playwright-report-fullstack",
+        "test-results",
+        "coverage"
+    ]
+}
+

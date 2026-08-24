@@ -1,6 +1,6 @@
+import { DesktopRepositoryService } from './desktop-repository.service';
 import { GithubCodeService } from '../../repositories/services/github-code.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { DesktopRepositoryService } from './desktop-repository.service';
 
 export interface DesktopRepositoryMetadataSnapshot {
   repositoryId: string;
@@ -21,43 +21,22 @@ export class DesktopRepositoryMetadataService {
     private readonly githubCode: GithubCodeService,
   ) {}
 
-  async load(
-    workspaceId: string,
-    desktopAppId: string,
-  ): Promise<DesktopRepositoryMetadataSnapshot> {
-    const repository =
-      await this.desktopRepositories.getLinkedRepository(
-        workspaceId,
-        desktopAppId,
-      );
+  async load(workspaceId: string, desktopAppId: string): Promise<DesktopRepositoryMetadataSnapshot> {
+    const repository = await this.desktopRepositories.getLinkedRepository(workspaceId, desktopAppId);
 
     if (!repository) {
-      throw new BadRequestException(
-        'Connect a repository before scanning dependencies or security configuration.',
-      );
+      throw new BadRequestException('Connect a repository before scanning dependencies or security configuration.');
     }
 
     if (repository.archived || !repository.isAvailable) {
-      throw new BadRequestException(
-        'The linked repository is not available.',
-      );
+      throw new BadRequestException('The linked repository is not available.');
     }
 
-    const tree = await this.githubCode.getTree(
-      repository.installation.externalInstallationId,
-      repository.owner,
-      repository.name,
-      repository.defaultBranch,
-    );
+    const tree = await this.githubCode.getTree(repository.installation.externalInstallationId, repository.owner, repository.name, repository.defaultBranch);
 
     const entries = tree.entries
       .filter(
-        (entry) =>
-          entry.type === 'file' &&
-          this.isInteresting(entry.path) &&
-          (entry.size === null ||
-            entry.size === undefined ||
-            entry.size <= MAX_FILE_SIZE),
+        (entry) => entry.type === 'file' && this.isInteresting(entry.path) && (entry.size === null || entry.size === undefined || entry.size <= MAX_FILE_SIZE),
       )
       .slice(0, MAX_FILES);
 
@@ -73,7 +52,7 @@ export class DesktopRepositoryMetadataService {
           repository.defaultBranch,
         );
 
-        if (file.size <= MAX_FILE_SIZE) {
+        if (file && file.content !== null && file.size <= MAX_FILE_SIZE) {
           files[entry.path] = file.content;
         }
       } catch {
@@ -86,9 +65,7 @@ export class DesktopRepositoryMetadataService {
       repositoryId: repository.id,
       repositoryFullName: repository.fullName,
       branch: repository.defaultBranch,
-      paths: tree.entries
-        .filter((entry) => entry.type === 'file')
-        .map((entry) => entry.path),
+      paths: tree.entries.filter((entry) => entry.type === 'file').map((entry) => entry.path),
       files,
       truncated: tree.truncated || entries.length >= MAX_FILES,
     };

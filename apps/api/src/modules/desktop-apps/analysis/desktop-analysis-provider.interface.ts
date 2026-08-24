@@ -1,8 +1,8 @@
 export interface DesktopAnalysisProviderInput {
-    system: string;
-    prompt: string;
+  system: string;
+  prompt: string;
 }
 
 export interface DesktopAnalysisProvider {
-    analyze(input: DesktopAnalysisProviderInput): Promise<string>;
+  analyze(input: DesktopAnalysisProviderInput): Promise<string>;
 }

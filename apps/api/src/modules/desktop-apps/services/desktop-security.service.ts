@@ -1,16 +1,9 @@
-import { PrismaService } from '../../../database/prisma.service';
-import {
-  DesktopSecurityCheckStatus,
-  DesktopSecurityCheckType,
-  DesktopSecuritySeverity,
-} from 'src/generated/prisma/enums';
-import { Injectable } from '@nestjs/common';
 import { DesktopAppsService } from './desktop-apps.service';
 import { DesktopDependencyHealthService } from './desktop-dependency-health.service';
-import {
-  DesktopRepositoryMetadataService,
-  type DesktopRepositoryMetadataSnapshot,
-} from './desktop-repository-metadata.service';
+import { DesktopRepositoryMetadataService, type DesktopRepositoryMetadataSnapshot } from './desktop-repository-metadata.service';
+import { PrismaService } from '../../../database/prisma.service';
+import { Injectable } from '@nestjs/common';
+import { DesktopSecurityCheckStatus, DesktopSecurityCheckType, DesktopSecuritySeverity } from 'src/generated/prisma/enums';
 
 interface FindingDraft {
   findingKey: string;
@@ -37,10 +30,7 @@ export class DesktopSecurityService {
 
     const findings = await this.prisma.desktopSecurityFinding.findMany({
       where: { workspaceId, desktopAppId },
-      orderBy: [
-        { severity: 'desc' },
-        { type: 'asc' },
-      ],
+      orderBy: [{ severity: 'desc' }, { type: 'asc' }],
     });
 
     const normalized = findings.map((finding) => ({
@@ -48,26 +38,15 @@ export class DesktopSecurityService {
       evidence: this.stringArray(finding.evidence),
     }));
 
-    const statusFor = (type: DesktopSecurityCheckType) =>
-      normalized.find((finding) => finding.type === type)?.status ??
-      DesktopSecurityCheckStatus.UNKNOWN;
+    const statusFor = (type: DesktopSecurityCheckType) => normalized.find((finding) => finding.type === type)?.status ?? DesktopSecurityCheckStatus.UNKNOWN;
 
     return {
       windowsSigning: statusFor(DesktopSecurityCheckType.WINDOWS_SIGNING),
       macosSigning: statusFor(DesktopSecurityCheckType.MACOS_SIGNING),
-      notarization: statusFor(
-        DesktopSecurityCheckType.MACOS_NOTARIZATION,
-      ),
-      criticalRisks: normalized.filter(
-        (finding) =>
-          finding.severity === DesktopSecuritySeverity.CRITICAL &&
-          finding.status !== DesktopSecurityCheckStatus.PASS,
-      ).length,
-      highRisks: normalized.filter(
-        (finding) =>
-          finding.severity === DesktopSecuritySeverity.HIGH &&
-          finding.status !== DesktopSecurityCheckStatus.PASS,
-      ).length,
+      notarization: statusFor(DesktopSecurityCheckType.MACOS_NOTARIZATION),
+      criticalRisks: normalized.filter((finding) => finding.severity === DesktopSecuritySeverity.CRITICAL && finding.status !== DesktopSecurityCheckStatus.PASS)
+        .length,
+      highRisks: normalized.filter((finding) => finding.severity === DesktopSecuritySeverity.HIGH && finding.status !== DesktopSecurityCheckStatus.PASS).length,
       findings: normalized,
     };
   }
@@ -77,10 +56,7 @@ export class DesktopSecurityService {
     const snapshot = await this.metadata.load(workspaceId, desktopAppId);
 
     // Keep dependency inventory and vulnerability-derived findings aligned.
-    const dependencies = await this.dependencies.scan(
-      workspaceId,
-      desktopAppId,
-    );
+    const dependencies = await this.dependencies.scan(workspaceId, desktopAppId);
 
     const findings = this.evaluate(snapshot, app.framework);
 
@@ -91,11 +67,9 @@ export class DesktopSecurityService {
         findingKey: `dependency:${dependency.manifestPath}:${dependency.name}`,
         type: DesktopSecurityCheckType.DEPENDENCY_VULNERABILITY,
         status: DesktopSecurityCheckStatus.FAIL,
-        severity:
-          dependency.severity ?? DesktopSecuritySeverity.HIGH,
+        severity: dependency.severity ?? DesktopSecuritySeverity.HIGH,
         title: `Vulnerable dependency: ${dependency.name}`,
-        message:
-          'A repository-provided vulnerability report contains this dependency.',
+        message: 'A repository-provided vulnerability report contains this dependency.',
         sourcePath: dependency.manifestPath,
         evidence: dependency.advisoryIds,
       });
@@ -121,10 +95,7 @@ export class DesktopSecurityService {
     return this.get(workspaceId, desktopAppId);
   }
 
-  evaluate(
-    snapshot: DesktopRepositoryMetadataSnapshot,
-    framework: string,
-  ): FindingDraft[] {
+  evaluate(snapshot: DesktopRepositoryMetadataSnapshot, framework: string): FindingDraft[] {
     const findings: FindingDraft[] = [];
     const all = Object.entries(snapshot.files);
     const combined = all.map(([, content]) => content).join('\n');
@@ -134,27 +105,15 @@ export class DesktopSecurityService {
     const notarizationEvidence: string[] = [];
 
     for (const [path, content] of all) {
-      if (
-        /certificate(File|SubjectName|Sha1)|certificateThumbprint|signtool|SignAssembly\s*>\s*true/i.test(
-          content,
-        )
-      ) {
+      if (/certificate(File|SubjectName|Sha1)|certificateThumbprint|signtool|SignAssembly\s*>\s*true/i.test(content)) {
         windowsEvidence.push(path);
       }
 
-      if (
-        /CODE_SIGN_STYLE|DEVELOPMENT_TEAM|signingIdentity|hardenedRuntime\s*[:=]\s*true/i.test(
-          content,
-        )
-      ) {
+      if (/CODE_SIGN_STYLE|DEVELOPMENT_TEAM|signingIdentity|hardenedRuntime\s*[:=]\s*true/i.test(content)) {
         macEvidence.push(path);
       }
 
-      if (
-        /notarize|notarytool|APPLE_ID|APPLE_TEAM_ID|APPLE_APP_SPECIFIC_PASSWORD/i.test(
-          content,
-        )
-      ) {
+      if (/notarize|notarytool|APPLE_ID|APPLE_TEAM_ID|APPLE_APP_SPECIFIC_PASSWORD/i.test(content)) {
         notarizationEvidence.push(path);
       }
     }
@@ -198,10 +157,7 @@ export class DesktopSecurityService {
       ),
     );
 
-    if (
-      framework === 'ELECTRON' &&
-      /nodeIntegration\s*[:=]\s*true/i.test(combined)
-    ) {
+    if (framework === 'ELECTRON' && /nodeIntegration\s*[:=]\s*true/i.test(combined)) {
       findings.push({
         findingKey: 'packaging:electron-node-integration',
         type: DesktopSecurityCheckType.PACKAGING_CONFIGURATION,
@@ -215,18 +171,14 @@ export class DesktopSecurityService {
       });
     }
 
-    if (
-      framework === 'ELECTRON' &&
-      !/asar\s*[:=]\s*(true|['\"]?[^false])/i.test(combined)
-    ) {
+    if (framework === 'ELECTRON' && !/asar\s*[:=]\s*(true|['"]?[^false])/i.test(combined)) {
       findings.push({
         findingKey: 'packaging:electron-asar',
         type: DesktopSecurityCheckType.PACKAGING_CONFIGURATION,
         status: DesktopSecurityCheckStatus.WARN,
         severity: DesktopSecuritySeverity.MEDIUM,
         title: 'Electron package hardening is not explicit',
-        message:
-          'No explicit ASAR packaging configuration was detected. Verify the release packaging configuration before publication.',
+        message: 'No explicit ASAR packaging configuration was detected. Verify the release packaging configuration before publication.',
         sourcePath: null,
         evidence: [],
       });
@@ -246,12 +198,8 @@ export class DesktopSecurityService {
     return {
       findingKey,
       type,
-      status: configured
-        ? DesktopSecurityCheckStatus.PASS
-        : DesktopSecurityCheckStatus.UNKNOWN,
-      severity: configured
-        ? DesktopSecuritySeverity.INFO
-        : DesktopSecuritySeverity.MEDIUM,
+      status: configured ? DesktopSecurityCheckStatus.PASS : DesktopSecurityCheckStatus.UNKNOWN,
+      severity: configured ? DesktopSecuritySeverity.INFO : DesktopSecuritySeverity.MEDIUM,
       title,
       message,
       sourcePath: evidence[0] ?? null,
@@ -260,8 +208,6 @@ export class DesktopSecurityService {
   }
 
   private stringArray(value: unknown): string[] {
-    return Array.isArray(value)
-      ? value.filter((item): item is string => typeof item === 'string')
-      : [];
+    return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
   }
 }

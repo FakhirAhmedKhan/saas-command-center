@@ -53,7 +53,7 @@ test.describe('Desktop repository frontend', () => {
 
       installationId: '33333333-3333-4333-8333-333333333333',
 
-      applicationId: null,
+      applicationId: null as string | null,
 
       provider: 'GITHUB',
 

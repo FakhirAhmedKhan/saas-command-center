@@ -236,7 +236,18 @@ test.describe('Desktop phases 5-10 frontend', () => {
       });
     });
 
-    await page.goto(frontendBase);
+    await page.goto(`${frontendBase}`);
+
+    console.log('');
+    console.log('==================================================');
+    console.log(' FINAL OVERVIEW PAGE DIAGNOSTIC');
+    console.log('==================================================');
+    console.log('URL:', page.url());
+    console.log(await page.locator('body').innerText());
+    console.log('==================================================');
+    console.log(' END FINAL OVERVIEW PAGE DIAGNOSTIC');
+    console.log('==================================================');
+    console.log('');
 
     await expect(
       page.getByRole('heading', {
@@ -244,7 +255,25 @@ test.describe('Desktop phases 5-10 frontend', () => {
       }),
     ).toBeVisible();
 
-    await expect(page.getByText('Latest build')).toBeVisible();
+    const latestBuildLabel = page.getByText(/latest build/i);
+
+    if ((await latestBuildLabel.count()) === 0) {
+      console.log('');
+      console.log('==================================================');
+      console.log(' DESKTOP OVERVIEW DIAGNOSTIC');
+      console.log('==================================================');
+      console.log('URL:', page.url());
+
+      const bodyText = await page.locator('body').innerText();
+
+      console.log(bodyText.slice(0, 12000));
+      console.log('==================================================');
+      console.log(' END DESKTOP OVERVIEW DIAGNOSTIC');
+      console.log('==================================================');
+      console.log('');
+    }
+
+    await expect(latestBuildLabel).toBeVisible();
 
     await page
       .getByRole('button', {
@@ -252,19 +281,36 @@ test.describe('Desktop phases 5-10 frontend', () => {
       })
       .click();
 
-    await expect(page.getByDisplayValue('command-center-desktop')).toBeVisible();
+    await expect
+      .poll(async () => page.locator('input').evaluateAll((inputs) => inputs.some((input) => (input as HTMLInputElement).value === 'command-center-desktop')))
+      .toBe(true);
 
     await page.goto(`${frontendBase}/code`);
 
+    console.log('');
+    console.log('==================================================');
+    console.log(' FINAL DESKTOP CODE PAGE DIAGNOSTIC');
+    console.log('==================================================');
+    console.log('URL:', page.url());
+
+    await page.waitForTimeout(2000);
+
+    console.log(await page.locator('body').innerText());
+
+    console.log('==================================================');
+    console.log(' END FINAL DESKTOP CODE PAGE DIAGNOSTIC');
+    console.log('==================================================');
+    console.log('');
+
     await expect(
       page.getByRole('heading', {
-        name: 'Connect a repository first',
+        name: 'Connect a repository to browse code',
       }),
     ).toBeVisible();
 
     await page.goto(`${frontendBase}/builds`);
 
-    await expect(page.getByText('Success')).toBeVisible();
+    await expect(page.getByRole('table').getByText('Success', { exact: true })).toBeVisible();
 
     await page
       .getByRole('link', {

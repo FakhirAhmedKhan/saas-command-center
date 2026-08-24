@@ -1,0 +1,242 @@
+import { authorizedApiRequest, loginThroughUi, uniqueValue } from './fixtures/helpers';
+import { readFullStackState, type FullStackState } from './fixtures/state';
+import { expect, test, type APIRequestContext, type Route } from '@playwright/test';
+
+let state: FullStackState;
+
+test.describe.configure({
+  mode: 'serial',
+});
+
+async function createDesktopApp(request: APIRequestContext) {
+  const response = await authorizedApiRequest(request, state, state.owner.accessToken, `/workspaces/${state.owner.workspaceId}/desktop-apps`, {
+    method: 'POST',
+    data: {
+      name: uniqueValue('Phase 11 Desktop', state.runId),
+      platform: 'WINDOWS',
+      framework: 'ELECTRON',
+      architecture: 'X64',
+      packageName: `com.commandcenter.phase11.${Date.now()}`,
+      currentVersion: '2.4.0',
+      currentBuildNumber: '184',
+    },
+  });
+
+  expect(response.status()).toBe(201);
+
+  return (await response.json()) as {
+    id: string;
+  };
+}
+
+function json(route: Route, value: unknown, status = 200) {
+  return route.fulfill({
+    status,
+    contentType: 'application/json',
+    body: JSON.stringify(value),
+  });
+}
+
+test.describe('Desktop Phase 11 releases frontend', () => {
+  test.beforeAll(() => {
+    state = readFullStackState();
+  });
+
+  test('creates, publishes, and rolls back a desktop release in the real frontend', async ({ page, request }) => {
+    await loginThroughUi(page, state.owner);
+
+    const desktop = await createDesktopApp(request);
+
+    const build = {
+      id: '11111111-1111-4111-8111-111111111111',
+      workspaceId: state.owner.workspaceId,
+      desktopAppId: desktop.id,
+      repositoryId: '22222222-2222-4222-8222-222222222222',
+      workflowRunId: '184',
+      source: 'GITHUB_ACTIONS',
+      commitSha: 'abcdef1234567890abcdef1234567890abcdef12',
+      branch: 'main',
+      version: '2.4.0',
+      buildNumber: '184',
+      platform: 'WINDOWS',
+      architecture: 'X64',
+      status: 'SUCCESS',
+      startedAt: '2026-08-23T01:00:00.000Z',
+      completedAt: '2026-08-23T01:04:00.000Z',
+      durationMs: 240000,
+      createdAt: '2026-08-23T01:00:00.000Z',
+      updatedAt: '2026-08-23T01:04:00.000Z',
+    };
+
+    const artifact = {
+      id: '33333333-3333-4333-8333-333333333333',
+      buildId: build.id,
+      providerArtifactId: 'artifact-184',
+      platform: 'WINDOWS',
+      architecture: 'X64',
+      type: 'MSI',
+      fileName: 'command-center-2.4.0-x64.msi',
+      sizeBytes: 88_000_000,
+      checksum: 'sha256:phase11',
+      externalUrl: 'https://example.test/command-center.msi',
+      createdAt: '2026-08-23T01:05:00.000Z',
+    };
+
+    type Release = {
+      id: string;
+      workspaceId: string;
+      desktopAppId: string;
+      buildId: string;
+      version: string;
+      buildNumber: string;
+      channel: 'STABLE';
+      platform: 'WINDOWS';
+      architecture: 'X64';
+      status: 'DRAFT' | 'READY' | 'PUBLISHED' | 'ROLLED_BACK';
+      releaseNotes: string | null;
+      releasedAt: string | null;
+      createdAt: string;
+      updatedAt: string;
+      build: typeof build & {
+        artifacts: Array<typeof artifact>;
+      };
+    };
+
+    let releases: Release[] = [];
+
+    const apiBase = `/api/v1/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktop.id}`;
+
+    await page.route(`**${apiBase}/builds*`, async (route) => {
+      if (route.request().method() === 'GET') {
+        await json(route, [build]);
+        return;
+      }
+
+      await route.fallback();
+    });
+
+    await page.route(`**${apiBase}/releases*`, async (route) => {
+      const method = route.request().method();
+      const url = new URL(route.request().url());
+      const statusMatch = url.pathname.match(/\/releases\/([^/]+)\/status$/);
+
+      if (method === 'GET') {
+        await json(route, releases);
+        return;
+      }
+
+      if (method === 'POST') {
+        const input = route.request().postDataJSON() as {
+          buildId: string;
+          channel: 'STABLE';
+          version?: string;
+          buildNumber?: string;
+          releaseNotes?: string;
+        };
+
+        const created: Release = {
+          id: '44444444-4444-4444-8444-444444444444',
+          workspaceId: state.owner.workspaceId,
+          desktopAppId: desktop.id,
+          buildId: input.buildId,
+          version: input.version ?? '2.4.0',
+          buildNumber: input.buildNumber ?? '184',
+          channel: input.channel,
+          platform: 'WINDOWS',
+          architecture: 'X64',
+          status: 'DRAFT',
+          releaseNotes: input.releaseNotes ?? null,
+          releasedAt: null,
+          createdAt: '2026-08-23T02:00:00.000Z',
+          updatedAt: '2026-08-23T02:00:00.000Z',
+          build: {
+            ...build,
+            artifacts: [artifact],
+          },
+        };
+
+        releases = [created];
+        await json(route, created, 201);
+        return;
+      }
+
+      if (method === 'PATCH' && statusMatch) {
+        const input = route.request().postDataJSON() as {
+          status: Release['status'];
+        };
+
+        releases = releases.map((release) =>
+          release.id === statusMatch[1]
+            ? {
+                ...release,
+                status: input.status,
+                releasedAt: input.status === 'PUBLISHED' ? '2026-08-23T02:10:00.000Z' : release.releasedAt,
+                updatedAt: '2026-08-23T02:10:00.000Z',
+              }
+            : release,
+        );
+
+        await json(route, releases[0]);
+        return;
+      }
+
+      await route.fallback();
+    });
+
+    await page.goto(`/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktop.id}/releases`);
+
+    await expect(
+      page.getByRole('heading', {
+        name: 'Releases & Update Channels',
+      }),
+    ).toBeVisible();
+
+    await expect(page.getByText('No desktop releases yet')).toBeVisible();
+
+    await page
+      .getByRole('button', {
+        name: 'Create Release',
+      })
+      .click();
+
+    await page.getByLabel('Successful build').selectOption(build.id);
+
+    await page.getByLabel('Update channel').selectOption('STABLE');
+
+    await page.getByLabel('Release notes').fill('Phase 11 stable release');
+
+    await page
+      .getByRole('button', {
+        name: 'Create Desktop Release',
+      })
+      .click();
+
+    await expect(page.getByRole('heading', { name: '2.4.0' })).toBeVisible();
+    await expect(page.getByText('Draft')).toBeVisible();
+    await expect(page.getByText('command-center-2.4.0-x64.msi')).toBeVisible();
+
+    page.once('dialog', (dialog) => dialog.accept());
+    await page
+      .getByRole('button', {
+        name: 'Mark Ready',
+      })
+      .click();
+    await expect(page.getByText('Ready')).toBeVisible();
+
+    page.once('dialog', (dialog) => dialog.accept());
+    await page
+      .getByRole('button', {
+        name: 'Publish',
+      })
+      .click();
+    await expect(page.getByText('Published')).toBeVisible();
+
+    page.once('dialog', (dialog) => dialog.accept());
+    await page
+      .getByRole('button', {
+        name: 'Roll Back',
+      })
+      .click();
+    await expect(page.getByText('Rolled Back')).toBeVisible();
+  });
+});

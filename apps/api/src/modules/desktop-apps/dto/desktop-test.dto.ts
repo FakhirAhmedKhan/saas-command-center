@@ -1,7 +1,7 @@
-import { DesktopTestStatus, DesktopTestType } from 'src/generated/prisma/enums';
-import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { IsArray, IsDateString, IsEnum, IsInt, IsOptional, IsString, MaxLength, Min, ValidateNested } from 'class-validator';
+import { DesktopTestStatus, DesktopTestType } from 'src/generated/prisma/enums';
 
 export class DesktopTestFailureDto {
   @ApiPropertyOptional()

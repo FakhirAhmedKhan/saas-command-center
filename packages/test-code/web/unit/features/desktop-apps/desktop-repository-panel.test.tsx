@@ -27,6 +27,8 @@ const mockedUnlinkDesktopRepository = vi.mocked(unlinkDesktopRepository);
 
 const mockedListRepositories = vi.mocked(listRepositories);
 
+type DesktopRepositoryFixture = NonNullable<Awaited<ReturnType<typeof getDesktopRepository>>>;
+
 const now = '2026-08-23T00:00:00.000Z';
 
 const desktopApp = {
@@ -73,7 +75,7 @@ const desktopApp = {
   },
 } as const;
 
-const repositoryA = {
+const repositoryA: DesktopRepositoryFixture = {
   id: 'repository-1',
 
   workspaceId: 'workspace-1',
@@ -123,9 +125,9 @@ const repositoryA = {
 
     lastSyncedAt: null,
   },
-} as never;
+} as DesktopRepositoryFixture;
 
-const repositoryB = {
+const repositoryB: DesktopRepositoryFixture = {
   ...repositoryA,
 
   id: 'repository-2',
@@ -137,7 +139,7 @@ const repositoryB = {
   fullName: 'command-center/desktop-next',
 
   htmlUrl: 'https://github.com/command-center/desktop-next',
-} as never;
+} as DesktopRepositoryFixture;
 
 describe('DesktopRepositoryPanel', () => {
   beforeEach(() => {

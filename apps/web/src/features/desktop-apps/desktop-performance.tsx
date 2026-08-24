@@ -2,11 +2,8 @@
 
 import { getDesktopPerformance } from './desktop-apps-api';
 import { getErrorMessage } from '@/features/lib/api/api-error';
-import type {
-  DesktopPerformanceResponse,
-  DesktopRuntimeFilters,
-} from '@command-center/shared-types';
-import { Loader2, RefreshCw } from 'lucide-react';
+import type { DesktopPerformanceResponse, DesktopRuntimeFilters } from '@command-center/shared-types';
+import { Loader2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
 interface Props {
@@ -23,18 +20,12 @@ export function DesktopPerformance({ workspaceId, desktopAppId }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
     const filters: DesktopRuntimeFilters = {
       ...(version ? { version } : {}),
-      ...(platform
-        ? { platform: platform as DesktopRuntimeFilters['platform'] }
-        : {}),
+      ...(platform ? { platform: platform as DesktopRuntimeFilters['platform'] } : {}),
       ...(architecture
         ? {
-            architecture:
-              architecture as DesktopRuntimeFilters['architecture'],
+            architecture: architecture as DesktopRuntimeFilters['architecture'],
           }
         : {}),
     };
@@ -49,7 +40,13 @@ export function DesktopPerformance({ workspaceId, desktopAppId }: Props) {
   }, [workspaceId, desktopAppId, version, platform, architecture]);
 
   useEffect(() => {
-    void load();
+    const timeoutId = window.setTimeout(() => {
+      void load();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
   }, [load]);
 
   return (
@@ -57,12 +54,8 @@ export function DesktopPerformance({ workspaceId, desktopAppId }: Props) {
       <div className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6'>
         <div className='flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between'>
           <div>
-            <h2 className='text-lg font-semibold text-slate-950'>
-              Runtime Performance
-            </h2>
-            <p className='mt-1 text-sm text-slate-500'>
-              Normalized runtime health by version, platform and architecture.
-            </p>
+            <h2 className='text-lg font-semibold text-slate-950'>Runtime Performance</h2>
+            <p className='mt-1 text-sm text-slate-500'>Normalized runtime health by version, platform and architecture.</p>
           </div>
 
           <div className='grid gap-2 sm:grid-cols-3'>
@@ -103,11 +96,7 @@ export function DesktopPerformance({ workspaceId, desktopAppId }: Props) {
         {error ? (
           <div role='alert' className='mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700'>
             {error}
-            <button
-              type='button'
-              onClick={() => void load()}
-              className='ml-3 font-semibold underline'
-            >
+            <button type='button' onClick={() => void load()} className='ml-3 font-semibold underline'>
               Retry
             </button>
           </div>
@@ -119,38 +108,14 @@ export function DesktopPerformance({ workspaceId, desktopAppId }: Props) {
           </div>
         ) : data && data.summary.sampleCount > 0 ? (
           <div className='mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
-            <MetricCard
-              label='Crash-free users'
-              value={formatPercent(data.summary.crashFreeUsersPercent)}
-            />
-            <MetricCard
-              label='Startup'
-              value={formatMs(data.summary.startupMs)}
-            />
-            <MetricCard
-              label='Memory'
-              value={formatNumber(data.summary.memoryMb, ' MB')}
-            />
-            <MetricCard
-              label='CPU'
-              value={formatPercent(data.summary.cpuPercent)}
-            />
-            <MetricCard
-              label='Hang rate'
-              value={formatPercent(data.summary.hangRatePercent)}
-            />
-            <MetricCard
-              label='Network latency'
-              value={formatMs(data.summary.networkLatencyMs)}
-            />
-            <MetricCard
-              label='API failure rate'
-              value={formatPercent(data.summary.apiFailureRatePercent)}
-            />
-            <MetricCard
-              label='Version adoption'
-              value={formatPercent(data.summary.versionAdoptionPercent)}
-            />
+            <MetricCard label='Crash-free users' value={formatPercent(data.summary.crashFreeUsersPercent)} />
+            <MetricCard label='Startup' value={formatMs(data.summary.startupMs)} />
+            <MetricCard label='Memory' value={formatNumber(data.summary.memoryMb, ' MB')} />
+            <MetricCard label='CPU' value={formatPercent(data.summary.cpuPercent)} />
+            <MetricCard label='Hang rate' value={formatPercent(data.summary.hangRatePercent)} />
+            <MetricCard label='Network latency' value={formatMs(data.summary.networkLatencyMs)} />
+            <MetricCard label='API failure rate' value={formatPercent(data.summary.apiFailureRatePercent)} />
+            <MetricCard label='Version adoption' value={formatPercent(data.summary.versionAdoptionPercent)} />
           </div>
         ) : !loading && !error ? (
           <div className='mt-6 rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500'>
@@ -165,9 +130,7 @@ export function DesktopPerformance({ workspaceId, desktopAppId }: Props) {
 function MetricCard({ label, value }: { label: string; value: string }) {
   return (
     <div className='rounded-xl bg-slate-50 p-4'>
-      <p className='text-xs font-medium uppercase tracking-wide text-slate-400'>
-        {label}
-      </p>
+      <p className='text-xs font-medium uppercase tracking-wide text-slate-400'>{label}</p>
       <p className='mt-1 text-xl font-bold text-slate-950'>{value}</p>
     </div>
   );

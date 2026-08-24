@@ -13,52 +13,52 @@ import { WorkspaceRole } from 'src/generated/prisma/enums';
 @Controller('workspaces/:workspaceId/desktop-apps/:desktopAppId/alerts')
 @UseGuards(JwtAuthGuard, WorkspaceAccessGuard, WorkspaceRolesGuard)
 export class DesktopAlertsController {
-    constructor(private readonly service: DesktopAlertsService) { }
+  constructor(private readonly service: DesktopAlertsService) {}
 
-    @Get('rules')
-    rules(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string) {
-        return this.service.listRules(workspaceId, desktopAppId);
-    }
+  @Get('rules')
+  rules(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string) {
+    return this.service.listRules(workspaceId, desktopAppId);
+  }
 
-    @Post('rules')
-    @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
-    createRule(
-        @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-        @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-        @Body() dto: CreateDesktopAlertRuleDto,
-    ) {
-        return this.service.createRule(workspaceId, desktopAppId, dto);
-    }
+  @Post('rules')
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  createRule(
+    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
+    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
+    @Body() dto: CreateDesktopAlertRuleDto,
+  ) {
+    return this.service.createRule(workspaceId, desktopAppId, dto);
+  }
 
-    @Patch('rules/:ruleId')
-    @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
-    updateRule(
-        @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-        @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-        @Param('ruleId', ParseUUIDPipe) ruleId: string,
-        @Body() dto: UpdateDesktopAlertRuleDto,
-    ) {
-        return this.service.updateRule(workspaceId, desktopAppId, ruleId, dto);
-    }
+  @Patch('rules/:ruleId')
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  updateRule(
+    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
+    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
+    @Param('ruleId', ParseUUIDPipe) ruleId: string,
+    @Body() dto: UpdateDesktopAlertRuleDto,
+  ) {
+    return this.service.updateRule(workspaceId, desktopAppId, ruleId, dto);
+  }
 
-    @Delete('rules/:ruleId')
-    @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN)
-    deleteRule(
-        @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-        @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-        @Param('ruleId', ParseUUIDPipe) ruleId: string,
-    ) {
-        return this.service.deleteRule(workspaceId, desktopAppId, ruleId);
-    }
+  @Delete('rules/:ruleId')
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN)
+  deleteRule(
+    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
+    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
+    @Param('ruleId', ParseUUIDPipe) ruleId: string,
+  ) {
+    return this.service.deleteRule(workspaceId, desktopAppId, ruleId);
+  }
 
-    @Get('incidents')
-    incidents(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string) {
-        return this.service.listIncidents(workspaceId, desktopAppId);
-    }
+  @Get('incidents')
+  incidents(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string) {
+    return this.service.listIncidents(workspaceId, desktopAppId);
+  }
 
-    @Post('evaluate')
-    @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
-    evaluate(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string) {
-        return this.service.evaluateApp(workspaceId, desktopAppId);
-    }
+  @Post('evaluate')
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  evaluate(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string) {
+    return this.service.evaluateApp(workspaceId, desktopAppId);
+  }
 }

@@ -1,5 +1,5 @@
-import { PrismaService } from '../../../database/prisma.service';
 import { DesktopBuildsService } from './desktop-builds.service';
+import { PrismaService } from '../../../database/prisma.service';
 import { IngestDesktopBuildArtifactDto } from '../dto/desktop-build-artifact.dto';
 import { BadRequestException, Injectable } from '@nestjs/common';
 

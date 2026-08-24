@@ -15,7 +15,9 @@ const detectMock = vi.mocked(detectDesktopProject);
 
 const updateMock = vi.mocked(applyDetectedDesktopConfiguration);
 
-const desktopApp = {
+type DesktopAppFixture = Awaited<ReturnType<typeof applyDetectedDesktopConfiguration>>;
+
+const desktopApp: DesktopAppFixture = {
   id: 'desktop-1',
   applicationId: 'application-1',
   platform: 'CROSS_PLATFORM',
@@ -38,7 +40,7 @@ const desktopApp = {
     createdAt: '2026-08-23T00:00:00.000Z',
     updatedAt: '2026-08-23T00:00:00.000Z',
   },
-} as never;
+} as DesktopAppFixture;
 
 describe('DesktopProjectDetectionPanel', () => {
   beforeEach(() => {

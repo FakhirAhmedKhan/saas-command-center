@@ -1,9 +1,6 @@
 'use client';
 
-import {
-  getDesktopSecurity,
-  scanDesktopSecurity,
-} from './desktop-apps-api';
+import { getDesktopSecurity, scanDesktopSecurity } from './desktop-apps-api';
 import { getErrorMessage } from '@/features/lib/api/api-error';
 import type { DesktopSecuritySummary } from '@command-center/shared-types';
 import { Loader2, RefreshCw, ShieldCheck } from 'lucide-react';
@@ -21,9 +18,6 @@ export function DesktopSecurity({ workspaceId, desktopAppId }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
     try {
       setData(await getDesktopSecurity(workspaceId, desktopAppId));
     } catch (loadError: unknown) {
@@ -34,7 +28,13 @@ export function DesktopSecurity({ workspaceId, desktopAppId }: Props) {
   }, [workspaceId, desktopAppId]);
 
   useEffect(() => {
-    void load();
+    const timeoutId = window.setTimeout(() => {
+      void load();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
   }, [load]);
 
   async function scan() {
@@ -60,10 +60,7 @@ export function DesktopSecurity({ workspaceId, desktopAppId }: Props) {
             </div>
             <div>
               <h2 className='text-lg font-semibold text-slate-950'>Security Health</h2>
-              <p className='mt-1 text-sm text-slate-500'>
-                Signing, notarization, packaging and dependency risk metadata.
-                Secret values are never rendered.
-              </p>
+              <p className='mt-1 text-sm text-slate-500'>Signing, notarization, packaging and dependency risk metadata. Secret values are never rendered.</p>
             </div>
           </div>
           <button
@@ -72,11 +69,7 @@ export function DesktopSecurity({ workspaceId, desktopAppId }: Props) {
             onClick={() => void scan()}
             className='inline-flex h-10 items-center gap-2 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white disabled:opacity-50'
           >
-            {scanning ? (
-              <Loader2 className='size-4 animate-spin' />
-            ) : (
-              <RefreshCw className='size-4' />
-            )}
+            {scanning ? <Loader2 className='size-4 animate-spin' /> : <RefreshCw className='size-4' />}
             Run Security Scan
           </button>
         </div>
@@ -102,28 +95,18 @@ export function DesktopSecurity({ workspaceId, desktopAppId }: Props) {
             </div>
 
             {data.findings.length === 0 ? (
-              <div className='mt-6 rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500'>
-                No security scan results yet.
-              </div>
+              <div className='mt-6 rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500'>No security scan results yet.</div>
             ) : (
               <div className='mt-6 space-y-3'>
                 {data.findings.map((finding) => (
                   <article key={finding.id} className='rounded-xl border border-slate-200 p-4'>
                     <div className='flex flex-wrap items-center gap-2'>
                       <h3 className='font-semibold text-slate-950'>{finding.title}</h3>
-                      <span className='rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700'>
-                        {finding.status}
-                      </span>
-                      <span className='rounded-md bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-700'>
-                        {finding.severity}
-                      </span>
+                      <span className='rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700'>{finding.status}</span>
+                      <span className='rounded-md bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-700'>{finding.severity}</span>
                     </div>
                     <p className='mt-2 text-sm leading-6 text-slate-600'>{finding.message}</p>
-                    {finding.sourcePath ? (
-                      <p className='mt-2 break-all text-xs text-slate-400'>
-                        Source: {finding.sourcePath}
-                      </p>
-                    ) : null}
+                    {finding.sourcePath ? <p className='mt-2 break-all text-xs text-slate-400'>Source: {finding.sourcePath}</p> : null}
                   </article>
                 ))}
               </div>
@@ -138,9 +121,7 @@ export function DesktopSecurity({ workspaceId, desktopAppId }: Props) {
 function SecurityCard({ label, value }: { label: string; value: string }) {
   return (
     <div className='rounded-xl bg-slate-50 p-4'>
-      <p className='text-xs font-medium uppercase tracking-wide text-slate-400'>
-        {label}
-      </p>
+      <p className='text-xs font-medium uppercase tracking-wide text-slate-400'>{label}</p>
       <p className='mt-1 text-lg font-bold text-slate-950'>{value}</p>
     </div>
   );

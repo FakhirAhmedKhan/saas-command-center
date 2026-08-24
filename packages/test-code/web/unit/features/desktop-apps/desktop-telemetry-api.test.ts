@@ -52,16 +52,8 @@ describe('desktop runtime/security APIs', () => {
     previewDesktopTelemetry(workspaceId, desktopAppId, integrationId);
     syncDesktopTelemetry(workspaceId, desktopAppId, integrationId);
 
-    expect(api).toHaveBeenNthCalledWith(
-      1,
-      `${base}/telemetry/${integrationId}/preview`,
-      { method: 'POST' },
-    );
-    expect(api).toHaveBeenNthCalledWith(
-      2,
-      `${base}/telemetry/${integrationId}/sync`,
-      { method: 'POST' },
-    );
+    expect(api).toHaveBeenNthCalledWith(1, `${base}/telemetry/${integrationId}/preview`, { method: 'POST' });
+    expect(api).toHaveBeenNthCalledWith(2, `${base}/telemetry/${integrationId}/sync`, { method: 'POST' });
   });
 
   it('disconnects telemetry', () => {
@@ -79,9 +71,7 @@ describe('desktop runtime/security APIs', () => {
       channel: 'STABLE',
     });
 
-    expect(api).toHaveBeenCalledWith(
-      `${base}/performance?version=2.4.0&platform=WINDOWS&architecture=X64&channel=STABLE`,
-    );
+    expect(api).toHaveBeenCalledWith(`${base}/performance?version=2.4.0&platform=WINDOWS&architecture=X64&channel=STABLE`);
   });
 
   it('lists crashes and dependency/security health', () => {

@@ -1,8 +1,8 @@
-import { PrismaService } from '../../../database/prisma.service';
-import { DesktopArchitecture, DesktopBuildSource, DesktopBuildStatus, DesktopPlatform } from 'src/generated/prisma/enums';
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import type { DesktopBuildQueryDto, IngestGithubDesktopBuildDto } from '../dto/desktop-build.dto';
 import { DesktopAppsService } from './desktop-apps.service';
+import { PrismaService } from '../../../database/prisma.service';
+import type { DesktopBuildQueryDto, IngestGithubDesktopBuildDto } from '../dto/desktop-build.dto';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { DesktopBuildSource, DesktopBuildStatus } from 'src/generated/prisma/enums';
 
 @Injectable()
 export class DesktopBuildsService {

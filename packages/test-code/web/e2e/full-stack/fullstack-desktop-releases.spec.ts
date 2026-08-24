@@ -115,7 +115,7 @@ test.describe('Desktop Phase 11 releases frontend', () => {
       await route.fallback();
     });
 
-    await page.route(`**${apiBase}/releases*`, async (route) => {
+    await page.route(`**${apiBase}/releases**`, async (route) => {
       const method = route.request().method();
       const url = new URL(route.request().url());
       const statusMatch = url.pathname.match(/\/releases\/([^/]+)\/status$/);
@@ -211,8 +211,13 @@ test.describe('Desktop Phase 11 releases frontend', () => {
       })
       .click();
 
-    await expect(page.getByText('2.4.0')).toBeVisible();
-    await expect(page.getByText('Draft')).toBeVisible();
+    await expect(page.getByRole('heading', { name: '2.4.0' })).toBeVisible();
+    await expect(
+      page
+        .getByRole('article')
+        .filter({ has: page.getByRole('heading', { name: '2.4.0' }) })
+        .getByText('Draft', { exact: true }),
+    ).toBeVisible();
     await expect(page.getByText('command-center-2.4.0-x64.msi')).toBeVisible();
 
     page.once('dialog', (dialog) => dialog.accept());
@@ -221,7 +226,23 @@ test.describe('Desktop Phase 11 releases frontend', () => {
         name: 'Mark Ready',
       })
       .click();
-    await expect(page.getByText('Ready')).toBeVisible();
+    console.log('');
+    console.log('==================================================');
+    console.log(' FINAL RELEASE READY DIAGNOSTIC');
+    console.log('==================================================');
+    console.log('URL:', page.url());
+    console.log(await page.locator('body').innerText());
+    console.log('==================================================');
+    console.log(' END FINAL RELEASE READY DIAGNOSTIC');
+    console.log('==================================================');
+    console.log('');
+
+    await expect(
+      page
+        .getByRole('article')
+        .filter({ has: page.getByRole('heading', { name: '2.4.0' }) })
+        .getByText('Ready', { exact: true }),
+    ).toBeVisible();
 
     page.once('dialog', (dialog) => dialog.accept());
     await page
@@ -229,7 +250,12 @@ test.describe('Desktop Phase 11 releases frontend', () => {
         name: 'Publish',
       })
       .click();
-    await expect(page.getByText('Published')).toBeVisible();
+    await expect(
+      page
+        .getByRole('article')
+        .filter({ has: page.getByRole('heading', { name: '2.4.0' }) })
+        .getByText('Published', { exact: true }),
+    ).toBeVisible();
 
     page.once('dialog', (dialog) => dialog.accept());
     await page
@@ -237,6 +263,11 @@ test.describe('Desktop Phase 11 releases frontend', () => {
         name: 'Roll Back',
       })
       .click();
-    await expect(page.getByText('Rolled Back')).toBeVisible();
+    await expect(
+      page
+        .getByRole('article')
+        .filter({ has: page.getByRole('heading', { name: '2.4.0' }) })
+        .getByText('Rolled Back', { exact: true }),
+    ).toBeVisible();
   });
 });

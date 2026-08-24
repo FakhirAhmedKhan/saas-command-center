@@ -37,13 +37,9 @@ describe('DesktopCrashes', () => {
       },
     ]);
 
-    render(
-      <DesktopCrashes workspaceId='workspace-1' desktopAppId='desktop-1' />,
-    );
+    render(<DesktopCrashes workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
-    expect(
-      await screen.findByText('Renderer process exited unexpectedly'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('Renderer process exited unexpectedly')).toBeInTheDocument();
     expect(screen.getByText('12 events')).toBeInTheDocument();
     expect(screen.getByText('8 users')).toBeInTheDocument();
     expect(screen.getByText('2.4.0')).toBeInTheDocument();

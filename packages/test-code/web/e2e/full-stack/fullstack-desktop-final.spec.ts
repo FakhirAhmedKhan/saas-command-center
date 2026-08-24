@@ -145,7 +145,7 @@ test.describe('Desktop Phase 18 final frontend', () => {
     await page.getByLabel('Alert type').selectOption('BUILD_FAILED');
     await page.getByRole('button', { name: 'Create alert' }).click();
 
-    await expect(page.getByText('Build failed').first()).toBeVisible();
+    await expect(page.getByText('Build failed', { exact: true }).last()).toBeVisible();
 
     await page.getByRole('button', { name: 'Evaluate now' }).click();
     await expect(page.getByText('Desktop build failed')).toBeVisible();
@@ -224,7 +224,7 @@ test.describe('Desktop Phase 18 final frontend', () => {
     await expect(page.getByTestId('desktop-ai-panel')).toBeVisible();
     await page.getByRole('button', { name: 'Analyze' }).click();
 
-    await expect(page.getByText('SUPPORTED')).toBeVisible();
+    await expect(page.getByText('SUPPORTED', { exact: true })).toBeVisible();
     await expect(page.getByText(/Correlation:/)).toBeVisible();
     await expect(page.getByText('Release 3.0.0')).toBeVisible();
     await expect(page.getByText(/SUPER_SECRET|secretCiphertext/i)).toHaveCount(0);

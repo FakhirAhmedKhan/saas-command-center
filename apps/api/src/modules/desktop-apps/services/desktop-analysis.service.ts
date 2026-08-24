@@ -1,9 +1,9 @@
-import type { DesktopAnalysisEvidence } from '@command-center/shared-types';
+import { DesktopAnalysisContextService } from './desktop-analysis-context.service';
 import { PrismaService } from '../../../database/prisma.service';
 import type { DesktopAnalysisProvider } from '../analysis/desktop-analysis-provider.interface';
 import { ConfiguredDesktopAnalysisProvider } from '../analysis/desktop-analysis.provider';
 import { AnalyzeDesktopAppDto } from '../dto/desktop-analysis.dto';
-import { DesktopAnalysisContextService } from './desktop-analysis-context.service';
+import type { DesktopAnalysisEvidence } from '@command-center/shared-types';
 import { BadGatewayException, Injectable } from '@nestjs/common';
 import { DesktopAnalysisConfidence, Prisma } from 'src/generated/prisma/client';
 

@@ -1,9 +1,9 @@
-import { PrismaService } from '../../../database/prisma.service';
-import { DesktopBuildStatus, DesktopReleaseStatus } from 'src/generated/prisma/enums';
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import type { CreateDesktopReleaseDto, DesktopReleaseQueryDto, UpdateDesktopReleaseStatusDto } from '../dto/desktop-release.dto';
 import { DesktopAppsService } from './desktop-apps.service';
 import { DesktopBuildsService } from './desktop-builds.service';
+import { PrismaService } from '../../../database/prisma.service';
+import type { CreateDesktopReleaseDto, DesktopReleaseQueryDto, UpdateDesktopReleaseStatusDto } from '../dto/desktop-release.dto';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { DesktopBuildStatus, DesktopReleaseStatus } from 'src/generated/prisma/enums';
 
 @Injectable()
 export class DesktopReleasesService {

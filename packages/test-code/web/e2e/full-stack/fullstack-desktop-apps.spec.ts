@@ -77,7 +77,7 @@ test.describe('Desktop application frontend', () => {
       }),
     ).toBeVisible();
 
-    await expect(page.getByText('com.commandcenter.phase3.desktop')).toBeVisible();
+    await expect(page.getByRole('definition').filter({ hasText: 'com.commandcenter.phase3.desktop' })).toBeVisible();
 
     /*
      * Verify card appears in
@@ -91,7 +91,7 @@ test.describe('Desktop application frontend', () => {
 
     await expect(card).toBeVisible();
 
-    await expect(card.getByText('Electron')).toBeVisible();
+    await expect(card.getByText('Electron', { exact: true })).toBeVisible();
 
     await expect(card.getByText('Cross-platform')).toBeVisible();
 

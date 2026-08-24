@@ -134,10 +134,10 @@ describe('DesktopReleases', () => {
     render(<DesktopReleases workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
     expect(await screen.findByText('2.4.0')).toBeInTheDocument();
-    expect(screen.getByText('Stable')).toBeInTheDocument();
-    expect(screen.getByText('Published')).toBeInTheDocument();
+    expect(screen.getByText('Stable', { selector: 'span' })).toBeInTheDocument();
+    expect(screen.getByText('Published', { selector: 'span' })).toBeInTheDocument();
     expect(screen.getByText('command-center-2.4.0-x64.msi')).toBeInTheDocument();
-    expect(screen.getByText('Source → Build → Artifact → Release')).toBeInTheDocument();
+    expect(screen.getByText('Source \u2192 Build \u2192 Artifact \u2192 Release')).toBeInTheDocument();
   });
 
   it('rolls back a published release', async () => {

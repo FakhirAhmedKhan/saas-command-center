@@ -1,0 +1,366 @@
+
+==================================================
+1. ENV DATABASE TARGETS
+==================================================
+
+--- apps/api/.env ---
+TEST_DATABASE_URL host=ep-empty-mouse-athlraz4-pooler.c-9.us-east-1.aws.neon.tech db=neondb
+DATABASE_URL host=ep-patient-field-acxz87sx-pooler.sa-east-1.aws.neon.tech db=neondb_test
+DIRECT_URL host=ep-patient-field-acxz87sx-pooler.sa-east-1.aws.neon.tech db=neondb_test
+
+--- apps/api/.env.test ---
+DATABASE_URL host=127.0.0.1 db=command_center_test
+TEST_DATABASE_URL host=127.0.0.1 db=command_center_test
+
+--- .env ---
+TEST_DATABASE_URL host=ep-patient-field-acxz87sx-pooler.sa-east-1.aws.neon.tech db=neondb
+DATABASE_URL host=ep-patient-field-acxz87sx-pooler.sa-east-1.aws.neon.tech db=neondb_test
+DIRECT_URL host=ep-patient-field-acxz87sx-pooler.sa-east-1.aws.neon.tech db=neondb_test
+
+--- .env.test ---
+NOT FOUND
+
+==================================================
+2. JEST CONFIG
+==================================================
+const path = require('node:path');
+
+const repoRoot = path.resolve(__dirname, '../../..');
+
+module.exports = {
+  moduleFileExtensions: ['js', 'json', 'ts'],
+
+  rootDir: repoRoot,
+
+  testEnvironment: 'node',
+
+  roots: ['<rootDir>/apps/api/src', '<rootDir>/packages/test-code/api'],
+
+  testRegex: 'packages/test-code/api/e2e/.*\\.e2e-spec\\.ts$',
+
+  transform: {
+    '^.+\\.(t|j)s$': [
+      require.resolve('ts-jest'),
+      {
+        tsconfig: path.join(__dirname, 'tsconfig.json'),
+      },
+    ],
+  },
+
+  moduleNameMapper: {
+    '^src/(.*)$': '<rootDir>/apps/api/src/$1',
+  },
+
+  setupFiles: [path.join(__dirname, 'setup-env.ts')],
+
+  collectCoverageFrom: ['apps/api/src/**/*.ts', '!apps/api/src/generated/**', '!apps/api/src/**/*.spec.ts', '!apps/api/src/**/*.test.ts'],
+
+  coveragePathIgnorePatterns: ['/node_modules/', '/dist/', '/apps/api/src/generated/', '\\.spec\\.ts$', '\\.test\\.ts$'],
+
+  coverageDirectory: '<rootDir>/apps/api/coverage/e2e',
+
+  testTimeout: 30000,
+
+  maxWorkers: 1,
+
+  detectOpenHandles: true,
+
+  forceExit: false,
+};
+
+==================================================
+3. DATABASE HELPERS
+==================================================
+import { PrismaService } from 'src/database/prisma.service';
+
+interface PostgreSqlTable {
+  tablename: string;
+}
+
+function assertTestDatabase(): void {
+  const databaseUrl = process.env.DATABASE_URL;
+
+  if (!databaseUrl) {
+    throw new Error('DATABASE_URL is missing');
+  }
+
+  const parsed = new URL(databaseUrl);
+
+  const databaseName = parsed.pathname.replace(/^\//, '').toLowerCase();
+
+  const safe = databaseName.includes('test');
+
+  if (!safe) {
+    throw new Error(`Refusing to reset non-test database "${databaseName}"`);
+  }
+}
+
+function quoteIdentifier(value: string): string {
+  return `"${value.replace(/"/g, '""')}"`;
+}
+
+export async function resetDatabase(prisma: PrismaService): Promise<void> {
+  assertTestDatabase();
+
+  const tables = await prisma.$queryRaw<PostgreSqlTable[]>`
+        SELECT tablename
+        FROM pg_tables
+        WHERE schemaname = 'public'
+          AND tablename <> '_prisma_migrations'
+      `;
+
+  if (tables.length === 0) {
+    return;
+  }
+
+  const tableNames = tables.map(({ tablename }) => `public.${quoteIdentifier(tablename)}`).join(', ');
+
+  await prisma.$executeRawUnsafe(`TRUNCATE TABLE ${tableNames} RESTART IDENTITY CASCADE`);
+}
+
+--- create-test-app.ts ---
+import { AppModule } from 'src/app.module';
+import { configureApplication } from 'src/bootstrap/configure-application';
+import { type INestApplication } from '@nestjs/common';
+import { type NestExpressApplication } from '@nestjs/platform-express';
+import { Test } from '@nestjs/testing';
+
+export async function createTestApp(): Promise<INestApplication> {
+  const testingModule = await Test.createTestingModule({
+    imports: [AppModule],
+  }).compile();
+
+  const app = testingModule.createNestApplication<NestExpressApplication>();
+
+  /*
+   * Boot the same way production does so E2E exercises the real filters,
+   * request-id middleware, helmet, CORS and body limits.
+   *
+   * Swagger defaults to enabled outside production; skip the document build
+   * so each suite does not pay for it.
+   */
+  configureApplication(app, {
+    enableSwagger: false,
+  });
+
+  await app.init();
+
+  return app;
+}
+
+==================================================
+4. DATABASE URL REFERENCES IN TEST CODE
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\activity.e2e-spec.ts:14: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\activity.e2e-spec.ts:31: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-aggregates.e2e-spec.ts:10: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-aggregates.e2e-spec.ts:53: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-engine-processing.e2e-spec.ts:11: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-engine-processing.e2e-spec.ts:35: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-engine-status.e2e-spec.ts:5: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-engine-status.e2e-spec.ts:28: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-ingestion-rate-limit.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-ingestion-rate-limit.e2e-spec.ts:30: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-ingestion-security.e2e-spec.ts:10: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-ingestion-security.e2e-spec.ts:34: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-ingestion.e2e-spec.ts:11: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-ingestion.e2e-spec.ts:29: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-late-events.e2e-spec.ts:4: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-late-events.e2e-spec.ts:27: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-pageviews.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-pageviews.e2e-spec.ts:26: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-reprocessing.e2e-spec.ts:4: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-reprocessing.e2e-spec.ts:30: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-retention.e2e-spec.ts:4: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-retention.e2e-spec.ts:43: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-sessions.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-sessions.e2e-spec.ts:26: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-timezones.e2e-spec.ts:4: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-timezones.e2e-spec.ts:27: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-visitors.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-visitors.e2e-spec.ts:26: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\application-links.e2e-spec.ts:15: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\application-links.e2e-spec.ts:33: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\application-roles.e2e-spec.ts:13: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\application-roles.e2e-spec.ts:39: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\application-technologies.e2e-spec.ts:14: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\application-technologies.e2e-spec.ts:32: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\applications.e2e-spec.ts:18: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\applications.e2e-spec.ts:36: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\auth-rate-limit.e2e-spec.ts:4: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\auth-rate-limit.e2e-spec.ts:43: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\auth.e2e-spec.ts:5: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\auth.e2e-spec.ts:62: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\auth.e2e-spec.ts:636: expect(serializedBody).not.toContain('database_url');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-ai-analysis.e2e-spec.ts:6: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-ai-analysis.e2e-spec.ts:52: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-alerts.e2e-spec.ts:16: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-alerts.e2e-spec.ts:51: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-apps.e2e-spec.ts:13: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-apps.e2e-spec.ts:57: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-build-artifacts.e2e-spec.ts:4: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-build-artifacts.e2e-spec.ts:17: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-builds.e2e-spec.ts:4: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-builds.e2e-spec.ts:18: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-foundation.e2e-spec.ts:11: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-foundation.e2e-spec.ts:25: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-full-flow.e2e-spec.ts:21: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-full-flow.e2e-spec.ts:59: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-overview.e2e-spec.ts:4: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-overview.e2e-spec.ts:18: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-performance.e2e-spec.ts:4: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-performance.e2e-spec.ts:23: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-project-detection.e2e-spec.ts:5: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-project-detection.e2e-spec.ts:21: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-releases.e2e-spec.ts:4: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-releases.e2e-spec.ts:20: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-repository-linking.e2e-spec.ts:2: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-repository-linking.e2e-spec.ts:25: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-security-health.e2e-spec.ts:5: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-security-health.e2e-spec.ts:26: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-security.e2e-spec.ts:4: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-security.e2e-spec.ts:23: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-telemetry.e2e-spec.ts:4: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-telemetry.e2e-spec.ts:25: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-tests.e2e-spec.ts:4: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-tests.e2e-spec.ts:17: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\development-activity.e2e-spec.ts:4: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\development-activity.e2e-spec.ts:22: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\development-progress.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\development-progress.e2e-spec.ts:37: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\development-roles.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\development-roles.e2e-spec.ts:41: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\development.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\development.e2e-spec.ts:46: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\github-connect-intent-cleanup.e2e-spec.ts:2: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\github-connect-intent-cleanup.e2e-spec.ts:33: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\infrastructure.e2e-spec.ts:4: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\infrastructure.e2e-spec.ts:33: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-ai-analysis.e2e-spec.ts:12: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-ai-analysis.e2e-spec.ts:54: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-alerts.e2e-spec.ts:8: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-alerts.e2e-spec.ts:30: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-apps.e2e-spec.ts:13: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-apps.e2e-spec.ts:48: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-builds.e2e-spec.ts:9: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-builds.e2e-spec.ts:23: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-foundation.e2e-spec.ts:5: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-foundation.e2e-spec.ts:15: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-ios-performance.e2e-spec.ts:12: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-ios-performance.e2e-spec.ts:86: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-overview.e2e-spec.ts:11: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-overview.e2e-spec.ts:27: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-performance.e2e-spec.ts:8: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-performance.e2e-spec.ts:29: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-project-detection.e2e-spec.ts:13: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-project-detection.e2e-spec.ts:33: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-releases.e2e-spec.ts:8: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-releases.e2e-spec.ts:24: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-repository-linking.e2e-spec.ts:11: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-repository-linking.e2e-spec.ts:27: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-security.e2e-spec.ts:13: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-security.e2e-spec.ts:33: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-telemetry.e2e-spec.ts:12: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-telemetry.e2e-spec.ts:84: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-tests.e2e-spec.ts:9: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-tests.e2e-spec.ts:23: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-unified-performance.e2e-spec.ts:8: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-unified-performance.e2e-spec.ts:28: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase13-analytics-reports.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase13-analytics-reports.e2e-spec.ts:675: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase14-analytics-processing.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase14-analytics-processing.e2e-spec.ts:173: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase15-monitoring.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase15-monitoring.e2e-spec.ts:240: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase15-monitoring.e2e-spec.ts:950: expect(raw).not.toContain('DATABASE_URL');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase16-releases-deployments.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase16-releases-deployments.e2e-spec.ts:157: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase17-team-operations.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase17-team-operations.e2e-spec.ts:182: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase18-webhook-integrations.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase18-webhook-integrations.e2e-spec.ts:164: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase19-repository-integrations.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase19-repository-integrations.e2e-spec.ts:413: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase20-code-explorer.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase20-code-explorer.e2e-spec.ts:507: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase21-github-workspace-import.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase21-github-workspace-import.e2e-spec.ts:242: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\raw-events.e2e-spec.ts:13: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\raw-events.e2e-spec.ts:31: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\tracker-analytics-processing.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\tracker-analytics-processing.e2e-spec.ts:31: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\tracker-bundle-integration.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\tracker-bundle-integration.e2e-spec.ts:61: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\tracker-production-bootstrap.e2e-spec.ts:2: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\tracker-production-bootstrap.e2e-spec.ts:29: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\tracker-transport.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\tracker-transport.e2e-spec.ts:19: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\tracking-admin.e2e-spec.ts:12: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\tracking-admin.e2e-spec.ts:31: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\webhook-delivery-worker.e2e-spec.ts:4: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\webhook-delivery-worker.e2e-spec.ts:127: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\website-activity.e2e-spec.ts:4: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\website-activity.e2e-spec.ts:34: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\website-environments.e2e-spec.ts:4: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\website-environments.e2e-spec.ts:38: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\website-roles.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\website-roles.e2e-spec.ts:42: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\websites.e2e-spec.ts:4: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\websites.e2e-spec.ts:21: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\workspace-members.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\workspace-members.e2e-spec.ts:29: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\workspace-roles.e2e-spec.ts:3: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\workspace-roles.e2e-spec.ts:28: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\workspaces.e2e-spec.ts:4: import { resetDatabase } from '../helpers/database';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\workspaces.e2e-spec.ts:26: await resetDatabase(prisma);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\helpers\database.ts:8: const databaseUrl = process.env.DATABASE_URL;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\helpers\database.ts:11: throw new Error('DATABASE_URL is missing');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\helpers\database.ts:29: export async function resetDatabase(prisma: PrismaService): Promise<void> {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\unit\config\env.validation.spec.ts:16: DATABASE_URL: 'postgresql://user:pass@localhost:5432/db',
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\unit\config\env.validation.spec.ts:104: TEST_DATABASE_URL: 'postgresql://user:pass@localhost:5432/db_test',
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\unit\infrastructure\database\postgres-advisory-lock.service.spec.ts:10: * e2e suite's setup-env.ts uses so DATABASE_URL points at the test database
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\unit\infrastructure\database\postgres-advisory-lock.service.spec.ts:40: DATABASE_URL: process.env.DATABASE_URL,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\unit\infrastructure\database\postgres-advisory-lock.service.spec.ts:50: if (!process.env.DATABASE_URL) {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\unit\infrastructure\database\postgres-advisory-lock.service.spec.ts:51: throw new Error('DATABASE_URL is required for PostgresAdvisoryLockService tests');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\setup-env.ts:12: const testDatabaseUrl = process.env.TEST_DATABASE_URL;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\setup-env.ts:15: throw new Error('TEST_DATABASE_URL is required for E2E tests');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\setup-env.ts:23: throw new Error('TEST_DATABASE_URL must be a valid PostgreSQL URL');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\setup-env.ts:34: 'TEST_DATABASE_URL does not look like a test database.',
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\setup-env.ts:41: process.env.DATABASE_URL = testDatabaseUrl;
+
+==================================================
+5. DESKTOP FIXTURE HELPER
+==================================================
+MISSING: packages/test-code/api/e2e/helpers/desktop-test-fixtures.ts
+
+Searching entire repo for similarly named helper...
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\helpers\desktop-test-fixtures.ts
+
+==================================================
+6. DESKTOP FIXTURE IMPORT REQUIREMENTS
+==================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-ai-analysis.e2e-spec.ts:8: import { API, createDesktopApp, createRepository } from './helpers/desktop-test-fixtures';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-alerts.e2e-spec.ts:17: import { API, createDesktopApp, createRepository } from './helpers/desktop-test-fixtures';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-build-artifacts.e2e-spec.ts:5: import { createLinkedDesktopFixture, ingestSuccessfulBuild } from './helpers/desktop-test-fixtures';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-builds.e2e-spec.ts:6: import { buildPath, createLinkedDesktopFixture, createRepository } from './helpers/desktop-test-fixtures';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-full-flow.e2e-spec.ts:23: import { API, createDesktopApp, createRepository, ingestSuccessfulBuild } from './helpers/desktop-test-fixtures';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-overview.e2e-spec.ts:6: import { createLinkedDesktopFixture, overviewPath } from './helpers/desktop-test-fixtures';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-performance.e2e-spec.ts:6: import { API, createDesktopApp } from './helpers/desktop-test-fixtures';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-project-detection.e2e-spec.ts:6: import { createLinkedDesktopFixture, detectPath } from './helpers/desktop-test-fixtures';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-releases.e2e-spec.ts:6: import { buildPath, createLinkedDesktopFixture, ingestSuccessfulBuild } from './helpers/desktop-test-fixtures';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-security-health.e2e-spec.ts:7: import { API, createLinkedDesktopFixture } from './helpers/desktop-test-fixtures';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-security.e2e-spec.ts:6: import { API, createDesktopApp } from './helpers/desktop-test-fixtures';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-telemetry.e2e-spec.ts:7: import { API, createDesktopApp } from './helpers/desktop-test-fixtures';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-tests.e2e-spec.ts:5: import { createLinkedDesktopFixture, ingestSuccessfulBuild } from './helpers/desktop-test-fixtures';
+
+==================================================
+7. CURRENT TEST ENV FROM NODE
+==================================================
+apps/api/.env TEST_DATABASE_URL host=ep-empty-mouse-athlraz4-pooler.c-9.us-east-1.aws.neon.tech db=neondb
+apps/api/.env DATABASE_URL host=ep-patient-field-acxz87sx-pooler.sa-east-1.aws.neon.tech db=neondb_test
+apps/api/.env DIRECT_URL host=ep-patient-field-acxz87sx-pooler.sa-east-1.aws.neon.tech db=neondb_test
+apps/api/.env.test DATABASE_URL host=127.0.0.1 db=command_center_test
+apps/api/.env.test TEST_DATABASE_URL host=127.0.0.1 db=command_center_test
+.env TEST_DATABASE_URL host=ep-patient-field-acxz87sx-pooler.sa-east-1.aws.neon.tech db=neondb
+.env DATABASE_URL host=ep-patient-field-acxz87sx-pooler.sa-east-1.aws.neon.tech db=neondb_test
+.env DIRECT_URL host=ep-patient-field-acxz87sx-pooler.sa-east-1.aws.neon.tech db=neondb_test

@@ -1,21 +1,12 @@
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-
 import { WorkspaceRoles } from '../../workspace/decorators/workspace-roles.decorator';
-
 import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
-
 import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
-
 import { CreateDesktopAppDto, UpdateDesktopAppDto } from '../dto/desktop-app.dto';
-
 import { DesktopAppsService } from '../services/desktop-apps.service';
-
 import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
-
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-
 import type { Request } from 'express';
-
 import { WorkspaceRole } from 'src/generated/prisma/enums';
 
 interface AuthenticatedRequest extends Request {

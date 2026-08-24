@@ -215,4 +215,3 @@ describe('Desktop Builds E2E', () => {
     expect(response.status).toBe(403);
   });
 });
-F;

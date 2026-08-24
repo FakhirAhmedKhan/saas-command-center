@@ -1,14 +1,9 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-
-import { PrismaService } from 'src/database/prisma.service';
-
-import { Prisma } from 'src/generated/prisma/client';
-
-import { ActivityActorType, ActivityEntityType, ApplicationActivityType, ApplicationType } from 'src/generated/prisma/enums';
-
 import { ActivityWriterService } from '../../activity/services/activity-writer.service';
-
 import { CreateDesktopAppDto, UpdateDesktopAppDto } from '../dto/desktop-app.dto';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { Prisma } from 'src/generated/prisma/client';
+import { ActivityActorType, ActivityEntityType, ApplicationActivityType, ApplicationType } from 'src/generated/prisma/enums';
 
 const desktopApplicationInclude = {
   application: true,

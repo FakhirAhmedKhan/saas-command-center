@@ -1,5 +1,5 @@
-import { PrismaService } from '../../../database/prisma.service';
 import { DesktopBuildsService } from './desktop-builds.service';
+import { PrismaService } from '../../../database/prisma.service';
 import { IngestDesktopTestRunDto } from '../dto/desktop-test.dto';
 import { Injectable } from '@nestjs/common';
 

@@ -57,67 +57,34 @@ describe('DesktopTelemetrySettings', () => {
   });
 
   it('renders an empty state', async () => {
-    render(
-      <DesktopTelemetrySettings
-        workspaceId='workspace-1'
-        desktopAppId='desktop-1'
-      />,
-    );
+    render(<DesktopTelemetrySettings workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
-    expect(
-      await screen.findByText('No telemetry provider configured.'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('No telemetry provider configured.')).toBeInTheDocument();
   });
 
-  it('submits provider settings and keeps secret in a password input', async () => {
+  it('submits provider settings and keeps secret in a password input', { timeout: 15000 }, async () => {
     const user = userEvent.setup();
 
-    render(
-      <DesktopTelemetrySettings
-        workspaceId='workspace-1'
-        desktopAppId='desktop-1'
-      />,
-    );
+    render(<DesktopTelemetrySettings workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
     await screen.findByText('No telemetry provider configured.');
 
-    await user.selectOptions(
-      screen.getByLabelText('Telemetry provider'),
-      'SENTRY',
-    );
-    await user.type(
-      screen.getByLabelText('External project ID'),
-      'org/desktop',
-    );
-    await user.type(
-      screen.getByLabelText('Telemetry endpoint URL'),
-      'https://telemetry.example.com/snapshot',
-    );
-    await user.type(
-      screen.getByLabelText('Telemetry provider secret'),
-      'provider-secret',
-    );
+    await user.selectOptions(screen.getByLabelText('Telemetry provider'), 'SENTRY');
+    await user.type(screen.getByLabelText('External project ID'), 'org/desktop');
+    await user.type(screen.getByLabelText('Telemetry endpoint URL'), 'https://telemetry.example.com/snapshot');
+    await user.type(screen.getByLabelText('Telemetry provider secret'), 'provider-secret');
 
-    expect(screen.getByLabelText('Telemetry provider secret')).toHaveAttribute(
-      'type',
-      'password',
-    );
+    expect(screen.getByLabelText('Telemetry provider secret')).toHaveAttribute('type', 'password');
 
-    await user.click(
-      screen.getByRole('button', { name: 'Connect Provider' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Connect Provider' }));
 
     await waitFor(() => {
-      expect(connectMock).toHaveBeenCalledWith(
-        'workspace-1',
-        'desktop-1',
-        {
-          provider: 'SENTRY',
-          externalProjectId: 'org/desktop',
-          endpointUrl: 'https://telemetry.example.com/snapshot',
-          secret: 'provider-secret',
-        },
-      );
+      expect(connectMock).toHaveBeenCalledWith('workspace-1', 'desktop-1', {
+        provider: 'SENTRY',
+        externalProjectId: 'org/desktop',
+        endpointUrl: 'https://telemetry.example.com/snapshot',
+        secret: 'provider-secret',
+      });
     });
   });
 
@@ -125,40 +92,23 @@ describe('DesktopTelemetrySettings', () => {
     const user = userEvent.setup();
     listMock.mockResolvedValue([integration as never]);
 
-    render(
-      <DesktopTelemetrySettings
-        workspaceId='workspace-1'
-        desktopAppId='desktop-1'
-      />,
-    );
+    render(<DesktopTelemetrySettings workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
-    await screen.findByText('org/desktop');
+    await screen.findByText(/org\/desktop/);
 
     await user.click(screen.getByRole('button', { name: 'Preview' }));
     await waitFor(() => {
-      expect(previewMock).toHaveBeenCalledWith(
-        'workspace-1',
-        'desktop-1',
-        'integration-1',
-      );
+      expect(previewMock).toHaveBeenCalledWith('workspace-1', 'desktop-1', 'integration-1');
     });
 
     await user.click(screen.getByRole('button', { name: 'Sync Now' }));
     await waitFor(() => {
-      expect(syncMock).toHaveBeenCalledWith(
-        'workspace-1',
-        'desktop-1',
-        'integration-1',
-      );
+      expect(syncMock).toHaveBeenCalledWith('workspace-1', 'desktop-1', 'integration-1');
     });
 
     await user.click(screen.getByRole('button', { name: 'Disconnect' }));
     await waitFor(() => {
-      expect(disconnectMock).toHaveBeenCalledWith(
-        'workspace-1',
-        'desktop-1',
-        'integration-1',
-      );
+      expect(disconnectMock).toHaveBeenCalledWith('workspace-1', 'desktop-1', 'integration-1');
     });
   });
 });

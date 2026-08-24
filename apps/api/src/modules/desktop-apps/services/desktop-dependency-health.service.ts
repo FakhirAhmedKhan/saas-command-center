@@ -1,15 +1,10 @@
-import { PrismaService } from '../../../database/prisma.service';
-import {
-  DesktopDependencyEcosystem,
-  DesktopDependencyRiskStatus,
-  DesktopSecuritySeverity,
-} from 'src/generated/prisma/enums';
-import { Injectable } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-base-to-string */
+
 import { DesktopAppsService } from './desktop-apps.service';
-import {
-  DesktopRepositoryMetadataService,
-  type DesktopRepositoryMetadataSnapshot,
-} from './desktop-repository-metadata.service';
+import { DesktopRepositoryMetadataService, type DesktopRepositoryMetadataSnapshot } from './desktop-repository-metadata.service';
+import { PrismaService } from '../../../database/prisma.service';
+import { Injectable } from '@nestjs/common';
+import { DesktopDependencyEcosystem, DesktopDependencyRiskStatus, DesktopSecuritySeverity } from 'src/generated/prisma/enums';
 
 interface ParsedDependency {
   ecosystem: DesktopDependencyEcosystem;
@@ -38,11 +33,7 @@ export class DesktopDependencyHealthService {
 
     const rows = await this.prisma.desktopDependency.findMany({
       where: { workspaceId, desktopAppId },
-      orderBy: [
-        { riskStatus: 'asc' },
-        { ecosystem: 'asc' },
-        { name: 'asc' },
-      ],
+      orderBy: [{ riskStatus: 'asc' }, { ecosystem: 'asc' }, { name: 'asc' }],
     });
 
     return rows.map((row) => ({
@@ -57,9 +48,7 @@ export class DesktopDependencyHealthService {
     const parsed = this.parse(snapshot);
     const vulnerabilities = this.vulnerabilities(snapshot);
 
-    const vulnerabilityByName = new Map(
-      vulnerabilities.map((item) => [item.packageName.toLowerCase(), item]),
-    );
+    const vulnerabilityByName = new Map(vulnerabilities.map((item) => [item.packageName.toLowerCase(), item]));
 
     await this.prisma.$transaction(async (transaction) => {
       await transaction.desktopDependency.deleteMany({
@@ -67,9 +56,7 @@ export class DesktopDependencyHealthService {
       });
 
       for (const dependency of parsed) {
-        const vulnerability = vulnerabilityByName.get(
-          dependency.name.toLowerCase(),
-        );
+        const vulnerability = vulnerabilityByName.get(dependency.name.toLowerCase());
 
         await transaction.desktopDependency.create({
           data: {
@@ -81,9 +68,7 @@ export class DesktopDependencyHealthService {
             currentVersion: dependency.currentVersion,
             latestVersion: null,
             direct: dependency.direct,
-            riskStatus: vulnerability
-              ? DesktopDependencyRiskStatus.VULNERABLE
-              : DesktopDependencyRiskStatus.UNKNOWN,
+            riskStatus: vulnerability ? DesktopDependencyRiskStatus.VULNERABLE : DesktopDependencyRiskStatus.UNKNOWN,
             severity: vulnerability?.severity ?? null,
             advisoryIds: vulnerability?.advisoryIds ?? [],
           },
@@ -98,11 +83,7 @@ export class DesktopDependencyHealthService {
     const output = new Map<string, ParsedDependency>();
 
     const add = (dependency: ParsedDependency) => {
-      const key = [
-        dependency.ecosystem,
-        dependency.manifestPath,
-        dependency.name,
-      ].join('|');
+      const key = [dependency.ecosystem, dependency.manifestPath, dependency.name].join('|');
       output.set(key, dependency);
     };
 
@@ -145,9 +126,7 @@ export class DesktopDependencyHealthService {
     return [...output.values()];
   }
 
-  vulnerabilities(
-    snapshot: DesktopRepositoryMetadataSnapshot,
-  ): VulnerabilityHint[] {
+  vulnerabilities(snapshot: DesktopRepositoryMetadataSnapshot): VulnerabilityHint[] {
     const output: VulnerabilityHint[] = [];
 
     for (const [path, content] of Object.entries(snapshot.files)) {
@@ -229,12 +208,9 @@ export class DesktopDependencyHealthService {
       const match = line.match(/^([A-Za-z0-9_-]+)\s*=\s*(.+)$/);
       if (!match) continue;
 
-      const name = match[1];
-      const rhs = match[2];
-      const version =
-        rhs.match(/^['\"]([^'\"]+)['\"]/)?.[1] ??
-        rhs.match(/version\s*=\s*['\"]([^'\"]+)['\"]/)?.[1] ??
-        'workspace/git/path';
+      const name = match[1]!;
+      const rhs = match[2]!;
+      const version = rhs.match(/^['"]([^'"]+)['"]/)?.[1] ?? rhs.match(/version\s*=\s*['"]([^'"]+)['"]/)?.[1] ?? 'workspace/git/path';
 
       output.push({
         ecosystem: DesktopDependencyEcosystem.CARGO,
@@ -249,41 +225,46 @@ export class DesktopDependencyHealthService {
   }
 
   private parseCsproj(path: string, content: string): ParsedDependency[] {
-    return [...content.matchAll(
-      /<PackageReference\s+Include=["']([^"']+)["'][^>]*(?:Version=["']([^"']+)["'])?[^>]*>(?:[\s\S]*?<Version>([^<]+)<\/Version>)?[\s\S]*?<\/PackageReference>|<PackageReference\s+Include=["']([^"']+)["'][^>]*Version=["']([^"']+)["'][^>]*\/>/gi,
-    )].flatMap((match) => {
+    return [
+      ...content.matchAll(
+        /<PackageReference\s+Include=["']([^"']+)["'][^>]*(?:Version=["']([^"']+)["'])?[^>]*>(?:[\s\S]*?<Version>([^<]+)<\/Version>)?[\s\S]*?<\/PackageReference>|<PackageReference\s+Include=["']([^"']+)["'][^>]*Version=["']([^"']+)["'][^>]*\/>/gi,
+      ),
+    ].flatMap((match) => {
       const name = match[1] ?? match[4];
       const version = match[2] ?? match[3] ?? match[5];
       return name && version
-        ? [{
-            ecosystem: DesktopDependencyEcosystem.NUGET,
-            manifestPath: path,
-            name,
-            currentVersion: version.trim(),
-            direct: true,
-          }]
+        ? [
+            {
+              ecosystem: DesktopDependencyEcosystem.NUGET,
+              manifestPath: path,
+              name,
+              currentVersion: version.trim(),
+              direct: true,
+            },
+          ]
         : [];
     });
   }
 
   private parsePom(path: string, content: string): ParsedDependency[] {
-    return [...content.matchAll(/<dependency>([\s\S]*?)<\/dependency>/gi)]
-      .flatMap((match) => {
-        const block = match[1];
-        const group = block.match(/<groupId>([^<]+)<\/groupId>/i)?.[1]?.trim();
-        const artifact = block.match(/<artifactId>([^<]+)<\/artifactId>/i)?.[1]?.trim();
-        const version = block.match(/<version>([^<]+)<\/version>/i)?.[1]?.trim();
+    return [...content.matchAll(/<dependency>([\s\S]*?)<\/dependency>/gi)].flatMap((match) => {
+      const block = match[1]!;
+      const group = block.match(/<groupId>([^<]+)<\/groupId>/i)?.[1]?.trim();
+      const artifact = block.match(/<artifactId>([^<]+)<\/artifactId>/i)?.[1]?.trim();
+      const version = block.match(/<version>([^<]+)<\/version>/i)?.[1]?.trim();
 
-        if (!artifact) return [];
+      if (!artifact) return [];
 
-        return [{
+      return [
+        {
           ecosystem: DesktopDependencyEcosystem.MAVEN,
           manifestPath: path,
           name: group ? `${group}:${artifact}` : artifact,
           currentVersion: version ?? 'managed',
           direct: true,
-        }];
-      });
+        },
+      ];
+    });
   }
 
   private parseGradle(path: string, content: string): ParsedDependency[] {
@@ -295,7 +276,7 @@ export class DesktopDependencyHealthService {
         ecosystem: DesktopDependencyEcosystem.GRADLE,
         manifestPath: path,
         name: `${match[1]}:${match[2]}`,
-        currentVersion: match[3],
+        currentVersion: match[3]!,
         direct: true,
       });
     }
@@ -311,24 +292,28 @@ export class DesktopDependencyHealthService {
 
       return (parsed.dependencies ?? []).flatMap((item) => {
         if (typeof item === 'string') {
-          return [{
-            ecosystem: DesktopDependencyEcosystem.VCPKG,
-            manifestPath: path,
-            name: item,
-            currentVersion: 'manifest',
-            direct: true,
-          }];
+          return [
+            {
+              ecosystem: DesktopDependencyEcosystem.VCPKG,
+              manifestPath: path,
+              name: item,
+              currentVersion: 'manifest',
+              direct: true,
+            },
+          ];
         }
 
         if (!item.name) return [];
 
-        return [{
-          ecosystem: DesktopDependencyEcosystem.VCPKG,
-          manifestPath: path,
-          name: item.name,
-          currentVersion: item.version ?? 'manifest',
-          direct: true,
-        }];
+        return [
+          {
+            ecosystem: DesktopDependencyEcosystem.VCPKG,
+            manifestPath: path,
+            name: item.name,
+            currentVersion: item.version ?? 'manifest',
+            direct: true,
+          },
+        ];
       });
     } catch {
       return [];
@@ -369,10 +354,7 @@ export class DesktopDependencyHealthService {
     return output;
   }
 
-  private collectVulnerabilities(
-    value: unknown,
-    output: VulnerabilityHint[],
-  ): void {
+  private collectVulnerabilities(value: unknown, output: VulnerabilityHint[]): void {
     if (Array.isArray(value)) {
       value.forEach((item) => this.collectVulnerabilities(item, output));
       return;
@@ -381,18 +363,9 @@ export class DesktopDependencyHealthService {
     if (!value || typeof value !== 'object') return;
 
     const record = value as Record<string, unknown>;
-    const packageName =
-      typeof record.package === 'string'
-        ? record.package
-        : typeof record.name === 'string'
-          ? record.name
-          : null;
+    const packageName = typeof record.package === 'string' ? record.package : typeof record.name === 'string' ? record.name : null;
 
-    const ids = [
-      record.id,
-      record.advisory,
-      record.cve,
-    ]
+    const ids = [record.id, record.advisory, record.cve]
       .filter((item): item is string => typeof item === 'string')
       .map((item) => item.trim())
       .filter(Boolean);
@@ -417,14 +390,10 @@ export class DesktopDependencyHealthService {
       });
     }
 
-    Object.values(record).forEach((child) =>
-      this.collectVulnerabilities(child, output),
-    );
+    Object.values(record).forEach((child) => this.collectVulnerabilities(child, output));
   }
 
   private stringArray(value: unknown): string[] {
-    return Array.isArray(value)
-      ? value.filter((item): item is string => typeof item === 'string')
-      : [];
+    return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
   }
 }

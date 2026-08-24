@@ -2,9 +2,7 @@ import { DesktopDependencyHealthService } from 'src/modules/desktop-apps/service
 import { DesktopSecurityService } from 'src/modules/desktop-apps/services/desktop-security.service';
 import type { DesktopRepositoryMetadataSnapshot } from 'src/modules/desktop-apps/services/desktop-repository-metadata.service';
 
-function snapshot(
-  files: Record<string, string>,
-): DesktopRepositoryMetadataSnapshot {
+function snapshot(files: Record<string, string>): DesktopRepositoryMetadataSnapshot {
   return {
     repositoryId: '11111111-1111-4111-8111-111111111111',
     repositoryFullName: 'command-center/desktop',
@@ -16,18 +14,9 @@ function snapshot(
 }
 
 describe('Desktop dependency/security parsers', () => {
-  const dependencies = new DesktopDependencyHealthService(
-    {} as never,
-    {} as never,
-    {} as never,
-  );
+  const dependencies = new DesktopDependencyHealthService({} as never, {} as never, {} as never);
 
-  const security = new DesktopSecurityService(
-    {} as never,
-    {} as never,
-    {} as never,
-    dependencies,
-  );
+  const security = new DesktopSecurityService({} as never, {} as never, {} as never, dependencies);
 
   it('parses npm dependencies', () => {
     const parsed = dependencies.parse(
@@ -111,9 +100,7 @@ serde = { version = "1.0", features = ["derive"] }
   });
 
   it('handles malformed package json safely', () => {
-    expect(
-      dependencies.parse(snapshot({ 'package.json': '{bad json' })),
-    ).toEqual([]);
+    expect(dependencies.parse(snapshot({ 'package.json': '{bad json' }))).toEqual([]);
   });
 
   it('extracts vulnerability metadata from controlled audit JSON', () => {

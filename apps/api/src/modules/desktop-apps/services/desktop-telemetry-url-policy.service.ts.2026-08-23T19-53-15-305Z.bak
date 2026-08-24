@@ -1,0 +1,83 @@
+import { promises as dns } from 'node:dns';
+import { isIP } from 'node:net';
+import { BadRequestException, Injectable } from '@nestjs/common';
+
+@Injectable()
+export class DesktopTelemetryUrlPolicyService {
+  async assertSafe(urlValue: string): Promise<URL> {
+    let url: URL;
+
+    try {
+      url = new URL(urlValue);
+    } catch {
+      throw new BadRequestException('Telemetry endpoint URL is invalid.');
+    }
+
+    if (process.env.NODE_ENV === 'test' && url.protocol === 'mock:') {
+      return url;
+    }
+
+    if (url.protocol !== 'https:') {
+      throw new BadRequestException('Telemetry endpoint must use HTTPS.');
+    }
+
+    if (url.username || url.password) {
+      throw new BadRequestException('Telemetry endpoint cannot contain URL credentials.');
+    }
+
+    const host = url.hostname.toLowerCase();
+
+    if (host === 'localhost' || host.endsWith('.localhost') || host === '0.0.0.0' || host === '::1') {
+      throw new BadRequestException('Telemetry endpoint cannot target localhost.');
+    }
+
+    const addresses = await this.resolve(host);
+
+    for (const address of addresses) {
+      if (this.isPrivateAddress(address)) {
+        throw new BadRequestException('Telemetry endpoint cannot target a private network address.');
+      }
+    }
+
+    return url;
+  }
+
+  private async resolve(host: string): Promise<string[]> {
+    if (isIP(host)) {
+      return [host];
+    }
+
+    try {
+      const results = await dns.lookup(host, {
+        all: true,
+        verbatim: true,
+      });
+
+      if (results.length === 0) {
+        throw new Error('No DNS records');
+      }
+
+      return results.map((item) => item.address);
+    } catch {
+      throw new BadRequestException('Telemetry endpoint hostname could not be resolved.');
+    }
+  }
+
+  private isPrivateAddress(address: string): boolean {
+    if (address.includes(':')) {
+      const normalized = address.toLowerCase();
+
+      return normalized === '::1' || normalized.startsWith('fc') || normalized.startsWith('fd') || normalized.startsWith('fe80:');
+    }
+
+    const octets = address.split('.').map(Number);
+
+    if (octets.length !== 4 || octets.some(Number.isNaN)) {
+      return true;
+    }
+
+    const [a, b] = octets;
+
+    return a === 0 || a === 10 || a === 127 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || a >= 224;
+  }
+}

@@ -21,7 +21,6 @@ import {
   Monitor,
   type LucideIcon,
 } from 'lucide-react';
-
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -57,6 +56,12 @@ const NAV_GROUPS: NavGroup[] = [
         href: '/applications',
         icon: Boxes,
         match: (pathname, workspaceId) => pathname.startsWith(`/workspaces/${workspaceId}/applications`),
+      },
+      {
+        label: 'Desktop Apps',
+        href: '/desktop-apps',
+        icon: Monitor,
+        match: (pathname, workspaceId) => pathname.startsWith(`/workspaces/${workspaceId}/desktop-apps`),
       },
       {
         label: 'Websites',

@@ -1,0 +1,110 @@
+'use client';
+
+import { listDesktopCrashes } from './desktop-apps-api';
+import { getErrorMessage } from '@/features/lib/api/api-error';
+import type { DesktopCrash, DesktopRuntimeFilters } from '@command-center/shared-types';
+import { AlertTriangle, Loader2 } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+
+interface Props {
+  workspaceId: string;
+  desktopAppId: string;
+}
+
+export function DesktopCrashes({ workspaceId, desktopAppId }: Props) {
+  const [crashes, setCrashes] = useState<DesktopCrash[]>([]);
+  const [version, setVersion] = useState('');
+  const [platform, setPlatform] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    const filters: DesktopRuntimeFilters = {
+      ...(version ? { version } : {}),
+      ...(platform ? { platform: platform as DesktopRuntimeFilters['platform'] } : {}),
+    };
+
+    try {
+      setCrashes(await listDesktopCrashes(workspaceId, desktopAppId, filters));
+    } catch (loadError: unknown) {
+      setError(getErrorMessage(loadError));
+    } finally {
+      setLoading(false);
+    }
+  }, [workspaceId, desktopAppId, version, platform]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return (
+    <section className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6'>
+      <div className='flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between'>
+        <div>
+          <h2 className='text-lg font-semibold text-slate-950'>Crashes</h2>
+          <p className='mt-1 text-sm text-slate-500'>Crash groups ordered by impact and recency.</p>
+        </div>
+        <div className='flex gap-2'>
+          <input
+            aria-label='Crash version filter'
+            value={version}
+            onChange={(event) => setVersion(event.target.value)}
+            placeholder='Version'
+            className='h-9 w-32 rounded-lg border border-slate-300 px-3 text-sm'
+          />
+          <select
+            aria-label='Crash platform filter'
+            value={platform}
+            onChange={(event) => setPlatform(event.target.value)}
+            className='h-9 rounded-lg border border-slate-300 px-3 text-sm'
+          >
+            <option value=''>All platforms</option>
+            <option value='WINDOWS'>Windows</option>
+            <option value='MACOS'>macOS</option>
+            <option value='LINUX'>Linux</option>
+            <option value='CROSS_PLATFORM'>Cross-platform</option>
+          </select>
+        </div>
+      </div>
+
+      {error ? (
+        <div role='alert' className='mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700'>
+          {error}
+        </div>
+      ) : null}
+
+      {loading ? (
+        <div className='mt-6 flex items-center gap-2 text-sm text-slate-500'>
+          <Loader2 className='size-4 animate-spin' /> Loading crashes...
+        </div>
+      ) : crashes.length === 0 ? (
+        <div className='mt-6 rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500'>
+          No crashes match the current filters.
+        </div>
+      ) : (
+        <div className='mt-6 space-y-3'>
+          {crashes.map((crash) => (
+            <article key={crash.id} className='rounded-xl border border-slate-200 p-4'>
+              <div className='flex items-start gap-3'>
+                <div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600'>
+                  <AlertTriangle className='size-4' />
+                </div>
+                <div className='min-w-0 flex-1'>
+                  <h3 className='font-semibold text-slate-950'>{crash.message}</h3>
+                  <p className='mt-1 break-all text-xs text-slate-400'>{crash.fingerprint}</p>
+                  <div className='mt-3 flex flex-wrap gap-2 text-xs font-medium text-slate-600'>
+                    <span className='rounded-md bg-slate-100 px-2 py-1'>{crash.platform ?? 'Unknown platform'}</span>
+                    <span className='rounded-md bg-slate-100 px-2 py-1'>{crash.architecture ?? 'Unknown arch'}</span>
+                    <span className='rounded-md bg-slate-100 px-2 py-1'>{crash.version ?? 'Unknown version'}</span>
+                    <span className='rounded-md bg-red-50 px-2 py-1 text-red-700'>{crash.count} events</span>
+                    <span className='rounded-md bg-amber-50 px-2 py-1 text-amber-700'>{crash.affectedUsers} users</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}

@@ -28,7 +28,7 @@ export default function DesktopBuildDetailsPage() {
 
     void getDesktopBuild(params.workspaceId, params.desktopAppId, params.buildId)
       .then((result) => {
-        if (active) setBuild(result);
+        if (active) setBuild(result as DesktopBuildDetails);
       })
       .catch((caught: unknown) => {
         if (active) {

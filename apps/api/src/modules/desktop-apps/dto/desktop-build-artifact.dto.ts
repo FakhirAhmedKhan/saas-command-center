@@ -1,6 +1,6 @@
-import { DesktopArchitecture, DesktopBuildArtifactType, DesktopPlatform } from 'src/generated/prisma/enums';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsInt, IsOptional, IsString, IsUrl, Length, MaxLength, Min } from 'class-validator';
+import { DesktopArchitecture, DesktopBuildArtifactType, DesktopPlatform } from 'src/generated/prisma/enums';
 
 export class IngestDesktopBuildArtifactDto {
   @ApiProperty({

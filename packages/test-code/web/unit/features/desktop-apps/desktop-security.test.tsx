@@ -1,10 +1,7 @@
 // @vitest-environment jsdom
 
 import { DesktopSecurity } from '@/features/desktop-apps/desktop-security';
-import {
-  getDesktopSecurity,
-  scanDesktopSecurity,
-} from '@/features/desktop-apps/desktop-apps-api';
+import { getDesktopSecurity, scanDesktopSecurity } from '@/features/desktop-apps/desktop-apps-api';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -50,9 +47,7 @@ describe('DesktopSecurity', () => {
   });
 
   it('renders signing/notarization and risk summary', async () => {
-    render(
-      <DesktopSecurity workspaceId='workspace-1' desktopAppId='desktop-1' />,
-    );
+    render(<DesktopSecurity workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
     expect(await screen.findByText('Vulnerable dependency: electron')).toBeInTheDocument();
     expect(screen.getAllByText('PASS').length).toBeGreaterThanOrEqual(3);
@@ -62,9 +57,7 @@ describe('DesktopSecurity', () => {
   it('runs a security scan', async () => {
     const user = userEvent.setup();
 
-    render(
-      <DesktopSecurity workspaceId='workspace-1' desktopAppId='desktop-1' />,
-    );
+    render(<DesktopSecurity workspaceId='workspace-1' desktopAppId='desktop-1' />);
 
     await screen.findByText('Vulnerable dependency: electron');
     await user.click(screen.getByRole('button', { name: 'Run Security Scan' }));
