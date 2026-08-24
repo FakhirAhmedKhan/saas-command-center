@@ -226,16 +226,6 @@ test.describe('Desktop Phase 11 releases frontend', () => {
         name: 'Mark Ready',
       })
       .click();
-    console.log('');
-    console.log('==================================================');
-    console.log(' FINAL RELEASE READY DIAGNOSTIC');
-    console.log('==================================================');
-    console.log('URL:', page.url());
-    console.log(await page.locator('body').innerText());
-    console.log('==================================================');
-    console.log(' END FINAL RELEASE READY DIAGNOSTIC');
-    console.log('==================================================');
-    console.log('');
 
     await expect(
       page

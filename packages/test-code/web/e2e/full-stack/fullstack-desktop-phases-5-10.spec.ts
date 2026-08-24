@@ -238,17 +238,6 @@ test.describe('Desktop phases 5-10 frontend', () => {
 
     await page.goto(`${frontendBase}`);
 
-    console.log('');
-    console.log('==================================================');
-    console.log(' FINAL OVERVIEW PAGE DIAGNOSTIC');
-    console.log('==================================================');
-    console.log('URL:', page.url());
-    console.log(await page.locator('body').innerText());
-    console.log('==================================================');
-    console.log(' END FINAL OVERVIEW PAGE DIAGNOSTIC');
-    console.log('==================================================');
-    console.log('');
-
     await expect(
       page.getByRole('heading', {
         name: desktopApp.application.name,
@@ -286,21 +275,6 @@ test.describe('Desktop phases 5-10 frontend', () => {
       .toBe(true);
 
     await page.goto(`${frontendBase}/code`);
-
-    console.log('');
-    console.log('==================================================');
-    console.log(' FINAL DESKTOP CODE PAGE DIAGNOSTIC');
-    console.log('==================================================');
-    console.log('URL:', page.url());
-
-    await page.waitForTimeout(2000);
-
-    console.log(await page.locator('body').innerText());
-
-    console.log('==================================================');
-    console.log(' END FINAL DESKTOP CODE PAGE DIAGNOSTIC');
-    console.log('==================================================');
-    console.log('');
 
     await expect(
       page.getByRole('heading', {

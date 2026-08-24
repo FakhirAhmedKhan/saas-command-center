@@ -10,10 +10,19 @@ export default tseslint.config(
   },
 
   // Production API source: strict type-aware linting
+  //
+  // Only extending the last entry of recommendedTypeChecked, not the whole
+  // array: its first two entries (typescript-eslint/base,
+  // typescript-eslint/eslint-recommended) are already provided by baseConfig
+  // via tseslint.configs.recommended above, and re-including
+  // typescript-eslint/base here registers the @typescript-eslint plugin a
+  // second time, which newer ESLint flat-config resolution rejects
+  // ("Cannot redefine plugin"). The type-checked rules still apply because
+  // flat-config arrays merge/override by file match, in order.
   {
     files: ['src/**/*.ts'],
 
-    extends: [...tseslint.configs.recommendedTypeChecked],
+    extends: [tseslint.configs.recommendedTypeChecked.at(-1)],
 
     languageOptions: {
       parserOptions: {
