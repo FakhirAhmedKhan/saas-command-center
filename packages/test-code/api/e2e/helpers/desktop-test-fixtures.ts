@@ -1,7 +1,7 @@
+import { registerWorkspaceTestUser } from '../../helpers/workspace';
 import type { INestApplication } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { RepositoryProvider } from 'src/generated/prisma/enums';
-import { registerWorkspaceTestUser } from '../../helpers/workspace';
 
 export const API = '/api/v1';
 
@@ -54,7 +54,6 @@ export async function createRepository(prisma: PrismaService, workspaceId: strin
       accountType: 'Organization',
     },
   });
-
   const name = `desktop-repository-${Date.now()}-${sequence}`;
 
   return prisma.repositoryConnection.create({

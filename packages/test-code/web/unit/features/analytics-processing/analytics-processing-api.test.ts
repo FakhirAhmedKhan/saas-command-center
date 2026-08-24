@@ -1,9 +1,5 @@
-import {
-  getAnalyticsProcessingStatus,
-  queueAnalyticsReprocessing,
-  retryAnalyticsProcessingRun,
-} from '@/features/analytics-processing/analytics-processing-api';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getAnalyticsProcessingStatus, queueAnalyticsReprocessing, retryAnalyticsProcessingRun } from '@/features/analytics-processing/analytics-processing-api';
 
 const { apiRequestMock } = vi.hoisted(() => ({
   apiRequestMock: vi.fn(),

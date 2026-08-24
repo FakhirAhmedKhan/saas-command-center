@@ -1,5 +1,5 @@
-import { ApiError, getErrorMessage } from '@/features/lib/api/api-error';
 import { describe, expect, it } from 'vitest';
+import { ApiError, getErrorMessage } from '@/features/lib/api/api-error';
 
 describe('ApiError', () => {
   it('retains status, details and requestId', () => {
@@ -16,7 +16,6 @@ describe('ApiError', () => {
   describe('fromResponse', () => {
     it('builds an error from the response status', () => {
       const response = new Response(null, { status: 404 });
-
       const error = ApiError.fromResponse(response);
 
       expect(error.status).toBe(404);

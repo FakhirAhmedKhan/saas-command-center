@@ -55,7 +55,6 @@ const PRESETS: Array<{
     label: 'Last 90 days',
   },
 ];
-
 const numberFormatter = new Intl.NumberFormat('en-US');
 
 function formatNumber(value: number): string {
@@ -68,7 +67,6 @@ function formatDuration(totalSeconds: number): string {
   }
 
   const minutes = Math.floor(totalSeconds / 60);
-
   const seconds = Math.round(totalSeconds % 60);
 
   return `${minutes}m ${seconds}s`;
@@ -184,7 +182,6 @@ function buildChartPoints(values: number[], width: number, height: number, paddi
   return values
     .map((value, index) => {
       const x = values.length === 1 ? width / 2 : padding + (index / (values.length - 1)) * (width - padding * 2);
-
       const y = height - padding - (value / maximum) * (height - padding * 2);
 
       return `${x},${y}`;
@@ -226,11 +223,8 @@ function TrafficChart({
   granularity: 'hour' | 'day';
 }) {
   const width = 900;
-
   const height = 260;
-
   const padding = 28;
-
   const pageViewPoints = useMemo(
     () =>
       buildChartPoints(
@@ -244,9 +238,7 @@ function TrafficChart({
       ),
     [points],
   );
-
   const maximumValue = Math.max(...points.map((point) => point.pageViews), 0);
-
   const labelIndexes = points.length <= 3 ? points.map((_point, index) => index) : [0, Math.floor((points.length - 1) / 2), points.length - 1];
 
   return (
@@ -272,27 +264,10 @@ function TrafficChart({
           <div className='mt-6 overflow-hidden'>
             <svg viewBox={`0 0 ${width} ${height}`} className='h-64 w-full' role='img' aria-label='Page views trend chart' preserveAspectRatio='none'>
               {[0.25, 0.5, 0.75].map((ratio) => (
-                <line
-                  key={ratio}
-                  x1={padding}
-                  x2={width - padding}
-                  y1={height * ratio}
-                  y2={height * ratio}
-                  stroke='currentColor'
-                  className='text-slate-100'
-                  strokeWidth='1'
-                />
+                <line key={ratio} x1={padding} x2={width - padding} y1={height * ratio} y2={height * ratio} stroke='currentColor' className='text-slate-100' strokeWidth='1' />
               ))}
 
-              <polyline
-                fill='none'
-                stroke='currentColor'
-                className='text-slate-950'
-                strokeWidth='4'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                points={pageViewPoints}
-              />
+              <polyline fill='none' stroke='currentColor' className='text-slate-950' strokeWidth='4' strokeLinecap='round' strokeLinejoin='round' points={pageViewPoints} />
             </svg>
           </div>
 
@@ -335,33 +310,13 @@ function AnalyticsContent({ data }: { data: AnalyticsOverviewResponse }) {
   return (
     <>
       <div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-5'>
-        <MetricCard
-          title='Visitors'
-          metric={data.metrics.visitors}
-          formattedValue={formatNumber(data.metrics.visitors.value)}
-          description='Unique visitors with activity during this period.'
-        />
+        <MetricCard title='Visitors' metric={data.metrics.visitors} formattedValue={formatNumber(data.metrics.visitors.value)} description='Unique visitors with activity during this period.' />
 
-        <MetricCard
-          title='Sessions'
-          metric={data.metrics.sessions}
-          formattedValue={formatNumber(data.metrics.sessions.value)}
-          description='Distinct active sessions during this period.'
-        />
+        <MetricCard title='Sessions' metric={data.metrics.sessions} formattedValue={formatNumber(data.metrics.sessions.value)} description='Distinct active sessions during this period.' />
 
-        <MetricCard
-          title='Page views'
-          metric={data.metrics.pageViews}
-          formattedValue={formatNumber(data.metrics.pageViews.value)}
-          description='Processed page-view events during this period.'
-        />
+        <MetricCard title='Page views' metric={data.metrics.pageViews} formattedValue={formatNumber(data.metrics.pageViews.value)} description='Processed page-view events during this period.' />
 
-        <MetricCard
-          title='Bounce rate'
-          metric={data.metrics.bounceRate}
-          formattedValue={`${data.metrics.bounceRate.value}%`}
-          description='Percentage of measured sessions that bounced.'
-        />
+        <MetricCard title='Bounce rate' metric={data.metrics.bounceRate} formattedValue={`${data.metrics.bounceRate.value}%`} description='Percentage of measured sessions that bounced.' />
 
         <MetricCard
           title='Avg. duration'
@@ -394,15 +349,10 @@ function AnalyticsContent({ data }: { data: AnalyticsOverviewResponse }) {
 
 export function AnalyticsOverviewDashboard({ workspaceId, websiteId }: AnalyticsOverviewDashboardProps) {
   const router = useRouter();
-
   const pathname = usePathname();
-
   const searchParams = useSearchParams();
-
   const rawPreset = searchParams.get('range');
-
   const preset: AnalyticsPreset = rawPreset === 'today' || rawPreset === '30d' || rawPreset === '90d' ? rawPreset : '7d';
-
   const { data, loading, error, reload } = useAnalyticsOverview({
     workspaceId,
 
@@ -426,14 +376,7 @@ export function AnalyticsOverviewDashboard({ workspaceId, websiteId }: Analytics
   }
 
   if (error) {
-    return (
-      <PageError
-        title='Analytics unavailable'
-        message={getErrorMessage(error)}
-        requestId={error instanceof ApiError ? error.requestId : undefined}
-        onRetry={reload}
-      />
-    );
+    return <PageError title='Analytics unavailable' message={getErrorMessage(error)} requestId={error instanceof ApiError ? error.requestId : undefined} onRetry={reload} />;
   }
 
   if (!data) {
@@ -485,11 +428,7 @@ export function AnalyticsOverviewDashboard({ workspaceId, websiteId }: Analytics
       </header>
 
       {data.empty ? (
-        <EmptyState
-          title='No analytics yet'
-          description='Tracking is connected, but no processed visitor sessions or page views were found for this date range.'
-          icon={undefined}
-        />
+        <EmptyState title='No analytics yet' description='Tracking is connected, but no processed visitor sessions or page views were found for this date range.' icon={undefined} />
       ) : (
         <AnalyticsContent data={data} />
       )}

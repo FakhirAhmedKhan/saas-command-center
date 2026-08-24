@@ -15,17 +15,14 @@ interface ProcessingState {
 
 export function useAnalyticsProcessing(workspaceId: string, websiteId: string) {
   const [reloadKey, setReloadKey] = useState(0);
-
   const [state, setState] = useState<ProcessingState>({
     data: null,
     loading: true,
     error: null,
   });
-
   const reload = useCallback(() => {
     setReloadKey((current) => current + 1);
   }, []);
-
   const visible = usePageVisibility();
 
   useEffect(() => {
@@ -34,7 +31,6 @@ export function useAnalyticsProcessing(workspaceId: string, websiteId: string) {
     }
 
     const controller = new AbortController();
-
     let timer: number | undefined;
 
     async function load(): Promise<void> {

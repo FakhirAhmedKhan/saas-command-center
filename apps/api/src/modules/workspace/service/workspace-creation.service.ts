@@ -26,7 +26,6 @@ export class WorkspaceCreationService {
     }
 
     const name = this.normalizeName(dto.name);
-
     const baseSlug = this.normalizeSlug(dto.slug ?? name);
 
     /*

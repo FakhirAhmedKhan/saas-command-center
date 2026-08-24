@@ -34,7 +34,6 @@ export interface SafeHealthRequestResult {
 }
 
 const BLOCKED_HOSTNAMES = new Set(['localhost', 'localhost.localdomain', 'metadata.google.internal', 'metadata', 'host.docker.internal']);
-
 const BLOCKED_SUFFIXES = ['.localhost', '.local', '.internal', '.home', '.lan'];
 
 function isBlockedHostname(hostname: string): boolean {
@@ -69,14 +68,11 @@ export class SafeHttpClientService {
 
   async execute(input: SafeHealthRequestInput): Promise<SafeHealthRequestResult> {
     let dispatcher: Agent | undefined;
-
     const startedAt = performance.now();
 
     try {
       const url = this.parseUrl(input.url);
-
       const addresses = await this.resolvePublicAddresses(url.hostname);
-
       const selectedAddress = addresses.find((item) => item.family === 4) ?? addresses[0];
 
       if (!selectedAddress) {
@@ -110,7 +106,6 @@ export class SafeHttpClientService {
       await response.body.dump();
 
       const responseTimeMs = Math.max(0, Math.round(performance.now() - startedAt));
-
       const statusCode = response.statusCode;
 
       if (statusCode < input.expectedStatusMin || statusCode > input.expectedStatusMax) {

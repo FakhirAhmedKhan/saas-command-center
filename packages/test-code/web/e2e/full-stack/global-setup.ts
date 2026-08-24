@@ -27,11 +27,8 @@ interface WebsiteResponse {
 
 async function globalSetup(): Promise<void> {
   const apiUrl = process.env.FULLSTACK_API_URL ?? 'http://127.0.0.1:4100/api/v1';
-
   const webUrl = process.env.FULLSTACK_WEB_URL ?? 'http://127.0.0.1:3100';
-
   const runId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-
   const stateDirectory = fullStackStateDirectory();
 
   mkdirSync(stateDirectory, {
@@ -41,7 +38,6 @@ async function globalSetup(): Promise<void> {
   const healthContext = await request.newContext({
     baseURL: apiUrl,
   });
-
   const healthResponse = await healthContext.get(`${apiUrl}/health`);
 
   if (!healthResponse.ok()) {
@@ -54,14 +50,12 @@ async function globalSetup(): Promise<void> {
     const email = `batch11-${roleName}-${runId}@example.test`;
     const password = 'StrongBatch11Password123!';
     const displayName = `Batch 11 ${roleName}`;
-
     const context = await request.newContext({
       baseURL: apiUrl,
       extraHTTPHeaders: {
         'Content-Type': 'application/json',
       },
     });
-
     const response = await context.post(`${apiUrl}/auth/register`, {
       data: {
         email,
@@ -75,7 +69,6 @@ async function globalSetup(): Promise<void> {
     }
 
     const body = (await response.json()) as AuthResponse;
-
     const workspaceResponse = await context.post(`${apiUrl}/workspaces`, {
       headers: {
         Authorization: `Bearer ${body.accessToken}`,
@@ -117,13 +110,9 @@ async function globalSetup(): Promise<void> {
     };
   }
   const owner = await register('Owner');
-
   const admin = await register('Admin');
-
   const developer = await register('Developer');
-
   const viewer = await register('Viewer');
-
   const ownerApi = await request.newContext({
     baseURL: apiUrl,
     extraHTTPHeaders: {
@@ -174,9 +163,7 @@ async function globalSetup(): Promise<void> {
   }
 
   const baselineApplication = (await applicationResponse.json()) as ApplicationResponse;
-
   const trackingOrigin = `https://batch11-${runId}.example.test`;
-
   const websiteResponse = await ownerApi.post(`${apiUrl}/workspaces/${owner.workspaceId}/websites`, {
     data: {
       name: 'Batch 11 Baseline Website',

@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
-import { TechnologyManager } from '@/features/applications/components/technology-manager';
-import { addApplicationTechnology, removeApplicationTechnology, updateApplicationTechnology } from '@/features/applications/application-api';
 import type { ApplicationTechnology } from '@/features/applications/application-types';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { addApplicationTechnology, removeApplicationTechnology, updateApplicationTechnology } from '@/features/applications/application-api';
+import { TechnologyManager } from '@/features/applications/components/technology-manager';
 
 vi.mock('@/features/applications/application-api', () => ({
   addApplicationTechnology: vi.fn(),
@@ -15,7 +15,6 @@ vi.mock('@/features/applications/application-api', () => ({
 const mockedAdd = vi.mocked(addApplicationTechnology);
 const mockedUpdate = vi.mocked(updateApplicationTechnology);
 const mockedRemove = vi.mocked(removeApplicationTechnology);
-
 const WORKSPACE_ID = 'workspace-1';
 const APPLICATION_ID = 'application-1';
 

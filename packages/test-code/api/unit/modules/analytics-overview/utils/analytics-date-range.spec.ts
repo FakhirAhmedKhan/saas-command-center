@@ -1,5 +1,5 @@
-import { resolveAnalyticsDateRange } from 'src/modules/analytics-overview/utils/analytics-date-range';
 import { AnalyticsDatePreset } from 'src/modules/analytics-overview/dto/analytics-overview-query.dto';
+import { resolveAnalyticsDateRange } from 'src/modules/analytics-overview/utils/analytics-date-range';
 
 describe('resolveAnalyticsDateRange', () => {
   it('resolves seven days in the website timezone', () => {

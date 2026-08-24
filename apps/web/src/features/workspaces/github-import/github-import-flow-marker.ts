@@ -6,7 +6,6 @@
  * pages branch to the right backend endpoints on return.
  */
 const GITHUB_IMPORT_FLOW_KEY = 'command-center:github-import-flow';
-
 const GITHUB_IMPORT_RETURN_KEY = 'command-center:github-import-return-to';
 
 export function markGithubImportFlow(returnTo: string): void {

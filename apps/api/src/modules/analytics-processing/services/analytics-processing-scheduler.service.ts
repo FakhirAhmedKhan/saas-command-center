@@ -91,7 +91,6 @@ export class AnalyticsProcessingSchedulerService {
     }
 
     const websiteIds = groups.map((group) => group.websiteId);
-
     const websites = await this.prisma.website.findMany({
       where: {
         id: {
@@ -104,7 +103,6 @@ export class AnalyticsProcessingSchedulerService {
         workspaceId: true,
       },
     });
-
     const workspaceByWebsiteId = new Map(websites.map((website) => [website.id, website.workspaceId]));
 
     return groups.flatMap((group) => {

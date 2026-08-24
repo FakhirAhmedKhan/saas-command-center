@@ -409,15 +409,7 @@ export interface ConnectDesktopTelemetryInput {
 }
 
 export type DesktopPerformanceMetricType =
-  | 'CRASH_FREE_USERS_PERCENT'
-  | 'CRASH_FREE_SESSIONS_PERCENT'
-  | 'STARTUP_MS'
-  | 'MEMORY_MB'
-  | 'CPU_PERCENT'
-  | 'HANG_RATE_PERCENT'
-  | 'NETWORK_LATENCY_MS'
-  | 'API_FAILURE_RATE_PERCENT'
-  | 'VERSION_ADOPTION_PERCENT';
+  'CRASH_FREE_USERS_PERCENT' | 'CRASH_FREE_SESSIONS_PERCENT' | 'STARTUP_MS' | 'MEMORY_MB' | 'CPU_PERCENT' | 'HANG_RATE_PERCENT' | 'NETWORK_LATENCY_MS' | 'API_FAILURE_RATE_PERCENT' | 'VERSION_ADOPTION_PERCENT';
 
 export interface DesktopTelemetryPerformanceSample {
   externalId: string;
@@ -584,16 +576,7 @@ export interface DesktopSecuritySummary {
   findings: DesktopSecurityFinding[];
 }
 
-export const DESKTOP_ALERT_RULE_TYPES = [
-  'BUILD_FAILED',
-  'CRASH_RATE',
-  'STARTUP',
-  'MEMORY',
-  'CPU',
-  'RELEASE_REGRESSION',
-  'SIGNING_FAILURE',
-  'TELEMETRY_UNAVAILABLE',
-] as const;
+export const DESKTOP_ALERT_RULE_TYPES = ['BUILD_FAILED', 'CRASH_RATE', 'STARTUP', 'MEMORY', 'CPU', 'RELEASE_REGRESSION', 'SIGNING_FAILURE', 'TELEMETRY_UNAVAILABLE'] as const;
 
 export type DesktopAlertRuleType = (typeof DESKTOP_ALERT_RULE_TYPES)[number];
 
@@ -658,8 +641,7 @@ export type DesktopAnalysisAction = (typeof DESKTOP_ANALYSIS_ACTIONS)[number];
 
 export type DesktopAnalysisConfidence = 'LIMITED' | 'SUPPORTED';
 
-export type DesktopAnalysisEvidenceType =
-  'REPOSITORY' | 'BUILD' | 'ARTIFACT' | 'TEST' | 'RELEASE' | 'CRASH' | 'PERFORMANCE' | 'DEPENDENCY' | 'SECURITY' | 'ALERT';
+export type DesktopAnalysisEvidenceType = 'REPOSITORY' | 'BUILD' | 'ARTIFACT' | 'TEST' | 'RELEASE' | 'CRASH' | 'PERFORMANCE' | 'DEPENDENCY' | 'SECURITY' | 'ALERT';
 
 export interface DesktopAnalysisEvidence {
   type: DesktopAnalysisEvidenceType;

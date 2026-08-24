@@ -22,32 +22,19 @@ export class DesktopAlertsController {
 
   @Post('rules')
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
-  createRule(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Body() dto: CreateDesktopAlertRuleDto,
-  ) {
+  createRule(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Body() dto: CreateDesktopAlertRuleDto) {
     return this.service.createRule(workspaceId, desktopAppId, dto);
   }
 
   @Patch('rules/:ruleId')
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
-  updateRule(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Param('ruleId', ParseUUIDPipe) ruleId: string,
-    @Body() dto: UpdateDesktopAlertRuleDto,
-  ) {
+  updateRule(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Param('ruleId', ParseUUIDPipe) ruleId: string, @Body() dto: UpdateDesktopAlertRuleDto) {
     return this.service.updateRule(workspaceId, desktopAppId, ruleId, dto);
   }
 
   @Delete('rules/:ruleId')
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN)
-  deleteRule(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Param('ruleId', ParseUUIDPipe) ruleId: string,
-  ) {
+  deleteRule(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Param('ruleId', ParseUUIDPipe) ruleId: string) {
     return this.service.deleteRule(workspaceId, desktopAppId, ruleId);
   }
 

@@ -67,9 +67,7 @@ test.describe('Batch 10 application flows', () => {
       }),
     ).toBeVisible();
 
-    const latestListRequest = state.requests
-      .filter((request) => request.method === 'GET' && request.path === `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`)
-      .at(-1);
+    const latestListRequest = state.requests.filter((request) => request.method === 'GET' && request.path === `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`).at(-1);
 
     expect(latestListRequest?.search).toContain('search=PriceScout');
     expect(latestListRequest?.search).toContain('status=IN_DEVELOPMENT');

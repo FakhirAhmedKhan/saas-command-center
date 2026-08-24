@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { apiRequest } from '@/features/lib/api/api-client';
 import {
   acceptInvitation,
   createWorkspaceInvitation,
@@ -11,15 +13,12 @@ import {
   resendWorkspaceInvitation,
   revokeWorkspaceInvitation,
 } from '@/features/team-operations/team-operations-api';
-import { apiRequest } from '@/features/lib/api/api-client';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/lib/api/api-client', () => ({
   apiRequest: vi.fn(),
 }));
 
 const apiRequestMock = vi.mocked(apiRequest);
-
 const WORKSPACE = 'workspace-1';
 
 beforeEach(() => {

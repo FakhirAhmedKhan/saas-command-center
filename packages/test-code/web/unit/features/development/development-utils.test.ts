@@ -1,5 +1,5 @@
-import { formatDevelopmentDate, getDevelopmentError, toApiDate, toDateInput } from '@/features/development/development-utils';
 import { describe, expect, it } from 'vitest';
+import { formatDevelopmentDate, getDevelopmentError, toApiDate, toDateInput } from '@/features/development/development-utils';
 
 describe('formatDevelopmentDate', () => {
   it.each([[null], [undefined], ['']])('returns "Not set" for %s', (value) => {

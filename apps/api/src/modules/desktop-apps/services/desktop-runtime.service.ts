@@ -16,9 +16,7 @@ export class DesktopRuntimeService {
 
   async syncProvider(workspaceId: string, desktopAppId: string, integrationId: string) {
     const { integration, snapshot } = await this.telemetry.snapshotForSync(workspaceId, desktopAppId, integrationId);
-
     const result = await this.persist(workspaceId, desktopAppId, integration.id, snapshot.performance, snapshot.crashes);
-
     const updated = await this.prisma.desktopTelemetryIntegration.update({
       where: { id: integration.id },
       data: {
@@ -58,13 +56,7 @@ export class DesktopRuntimeService {
     return result;
   }
 
-  private async persist(
-    workspaceId: string,
-    desktopAppId: string,
-    telemetryIntegrationId: string,
-    performance: DesktopTelemetryPerformanceSample[],
-    crashes: DesktopTelemetryCrashSample[],
-  ) {
+  private async persist(workspaceId: string, desktopAppId: string, telemetryIntegrationId: string, performance: DesktopTelemetryPerformanceSample[], crashes: DesktopTelemetryCrashSample[]) {
     let performanceInserted = 0;
     let performanceUpdated = 0;
     let crashesUpserted = 0;

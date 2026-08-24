@@ -13,11 +13,8 @@ interface Props {
 
 export function MobileAiAnalysis({ workspaceId, mobileAppId }: Props) {
   const [question, setQuestion] = useState('');
-
   const [result, setResult] = useState<MobileAnalysisResult | null>(null);
-
   const [loading, setLoading] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
 
   async function analyze(action: MobileAnalysisAction) {

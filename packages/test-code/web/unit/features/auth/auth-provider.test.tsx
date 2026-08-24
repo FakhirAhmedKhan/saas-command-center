@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
-import { AuthProvider, useAuth } from '@/features/auth/auth-provider';
 import type { AuthResponse, CurrentUserResponse, Workspace } from '@/features/auth/auth.types';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import { useEffect } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { AuthProvider, useAuth } from '@/features/auth/auth-provider';
 
 const { apiRequestMock, refreshSessionMock, setAccessTokenMock, setUnauthorizedHandlerMock } = vi.hoisted(() => ({
   apiRequestMock: vi.fn(),

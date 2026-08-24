@@ -44,9 +44,7 @@ export class SharedRateLimitService {
 
   async consume(scope: string, identity: string, limit: number, windowSeconds: number): Promise<RateLimitResult> {
     const windowMs = windowSeconds * 1_000;
-
     const key = ['rate-limit', scope, identity].join(':');
-
     const result = await this.redis.getClient().eval(FIXED_WINDOW_SCRIPT, 1, key, String(windowMs));
 
     if (!Array.isArray(result)) {
@@ -54,9 +52,7 @@ export class SharedRateLimitService {
     }
 
     const count = Number(result[0]);
-
     const ttlMs = Math.max(Number(result[1]), 0);
-
     const resetAfterSeconds = Math.max(1, Math.ceil(ttlMs / 1_000));
 
     return {

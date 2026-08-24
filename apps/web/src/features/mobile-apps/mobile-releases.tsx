@@ -15,21 +15,13 @@ interface Props {
 
 export function MobileReleases({ workspaceId, mobileAppId }: Props) {
   const [releases, setReleases] = useState<MobileRelease[]>([]);
-
   const [builds, setBuilds] = useState<MobileBuild[]>([]);
-
   const [buildId, setBuildId] = useState('');
-
   const [environment, setEnvironment] = useState<MobileReleaseEnvironment>('INTERNAL');
-
   const [releaseNotes, setReleaseNotes] = useState('');
-
   const [loading, setLoading] = useState(true);
-
   const [saving, setSaving] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
-
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -123,12 +115,7 @@ export function MobileReleases({ workspaceId, mobileAppId }: Props) {
           <label>
             <span className='mb-2 block text-sm font-medium'>Build</span>
 
-            <select
-              aria-label='Release build'
-              value={buildId}
-              onChange={(event) => setBuildId(event.target.value)}
-              className='h-10 w-full rounded-lg border border-slate-300 px-3'
-            >
+            <select aria-label='Release build' value={buildId} onChange={(event) => setBuildId(event.target.value)} className='h-10 w-full rounded-lg border border-slate-300 px-3'>
               <option value=''>Select successful build</option>
 
               {builds.map((build) => (
@@ -160,12 +147,7 @@ export function MobileReleases({ workspaceId, mobileAppId }: Props) {
         <label className='mt-4 block'>
           <span className='mb-2 block text-sm font-medium'>Release Notes</span>
 
-          <textarea
-            aria-label='Release notes'
-            value={releaseNotes}
-            onChange={(event) => setReleaseNotes(event.target.value)}
-            className='min-h-28 w-full rounded-lg border border-slate-300 p-3 text-sm'
-          />
+          <textarea aria-label='Release notes' value={releaseNotes} onChange={(event) => setReleaseNotes(event.target.value)} className='min-h-28 w-full rounded-lg border border-slate-300 p-3 text-sm' />
         </label>
 
         <button
@@ -246,18 +228,11 @@ function ReleaseCard({
             {formatEnum(release.environment)}
           </p>
 
-          <p className='mt-1 text-xs text-slate-400'>
-            {release.releasedAt ? `Released ${new Date(release.releasedAt).toLocaleDateString()}` : 'Not released yet'}
-          </p>
+          <p className='mt-1 text-xs text-slate-400'>{release.releasedAt ? `Released ${new Date(release.releasedAt).toLocaleDateString()}` : 'Not released yet'}</p>
         </div>
 
         {next ? (
-          <button
-            type='button'
-            disabled={disabled}
-            onClick={() => void onTransition(release, next)}
-            className='h-9 rounded-lg border border-slate-300 px-3 text-sm font-semibold'
-          >
+          <button type='button' disabled={disabled} onClick={() => void onTransition(release, next)} className='h-9 rounded-lg border border-slate-300 px-3 text-sm font-semibold'>
             {transitionLabel(next)}
           </button>
         ) : null}

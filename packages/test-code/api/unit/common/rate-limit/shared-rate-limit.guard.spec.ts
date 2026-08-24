@@ -1,5 +1,5 @@
-import { getIdentity } from 'src/common/rate-limit/shared-rate-limit.guard';
 import type { Request } from 'express';
+import { getIdentity } from 'src/common/rate-limit/shared-rate-limit.guard';
 
 function buildRequest(overrides: { userId?: string; workspaceId?: string; headers?: Record<string, string>; ip?: string }): Request {
   const headers = overrides.headers ?? {};
@@ -28,7 +28,6 @@ describe('getIdentity (SharedRateLimitGuard)', () => {
 
     it('cannot be reset by rotating X-Tracking-Key between calls', () => {
       const first = getIdentity(buildRequest({ userId: 'user-1', headers: { 'x-tracking-key': 'key-a' } }));
-
       const second = getIdentity(buildRequest({ userId: 'user-1', headers: { 'x-tracking-key': 'key-b' } }));
 
       expect(first).toBe(second);
@@ -36,7 +35,6 @@ describe('getIdentity (SharedRateLimitGuard)', () => {
 
     it('cannot be reset by rotating X-Api-Key between calls', () => {
       const first = getIdentity(buildRequest({ userId: 'user-1', headers: { 'x-api-key': 'key-a' } }));
-
       const second = getIdentity(buildRequest({ userId: 'user-1', headers: { 'x-api-key': 'key-b' } }));
 
       expect(first).toBe(second);
@@ -44,7 +42,6 @@ describe('getIdentity (SharedRateLimitGuard)', () => {
 
     it('gives different authenticated users independent identities', () => {
       const first = getIdentity(buildRequest({ userId: 'user-1' }));
-
       const second = getIdentity(buildRequest({ userId: 'user-2' }));
 
       expect(first).not.toBe(second);
@@ -52,9 +49,7 @@ describe('getIdentity (SharedRateLimitGuard)', () => {
 
     it('includes the workspace route param so the same user is isolated per workspace', () => {
       const workspaceA = getIdentity(buildRequest({ userId: 'user-1', workspaceId: 'workspace-a' }));
-
       const workspaceB = getIdentity(buildRequest({ userId: 'user-1', workspaceId: 'workspace-b' }));
-
       const noWorkspace = getIdentity(buildRequest({ userId: 'user-1' }));
 
       expect(workspaceA).not.toBe(workspaceB);
@@ -66,7 +61,6 @@ describe('getIdentity (SharedRateLimitGuard)', () => {
 
     it('gives the same user in the same workspace the same identity across calls', () => {
       const first = getIdentity(buildRequest({ userId: 'user-1', workspaceId: 'workspace-a' }));
-
       const second = getIdentity(buildRequest({ userId: 'user-1', workspaceId: 'workspace-a' }));
 
       expect(first).toBe(second);

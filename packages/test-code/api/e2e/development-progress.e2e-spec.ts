@@ -24,7 +24,6 @@ import { PrismaService } from 'src/database/prisma.service';
 
 describe('Development Progress E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
 
   beforeAll(async () => {
@@ -57,7 +56,6 @@ describe('Development Progress E2E', () => {
 
   it('starts at zero progress', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
 
     expect(await readProgress(owner, application.id)).toBe(0);
@@ -65,19 +63,15 @@ describe('Development Progress E2E', () => {
 
   it('calculates weighted task and milestone progress', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const heavyMilestone = await createMilestone(owner, application.id, {
       title: 'Heavy Milestone',
       weight: 2,
     });
-
     const lightMilestone = await createMilestone(owner, application.id, {
       title: 'Light Milestone',
       weight: 1,
     });
-
     const heavyTask = await createTask(owner, application.id, heavyMilestone.id, {
       weight: 1,
     });
@@ -93,13 +87,10 @@ describe('Development Progress E2E', () => {
 
   it('calculates milestone progress from weighted tasks', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const milestone = await createMilestone(owner, application.id, {
       weight: 1,
     });
-
     const heavyTask = await createTask(owner, application.id, milestone.id, {
       title: 'Heavy Task',
       weight: 3,
@@ -117,15 +108,11 @@ describe('Development Progress E2E', () => {
 
   it('excludes skipped tasks from applicable task weight', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const milestone = await createMilestone(owner, application.id);
-
     const completed = await createTask(owner, application.id, milestone.id, {
       weight: 1,
     });
-
     const skipped = await createTask(owner, application.id, milestone.id, {
       weight: 3,
     });
@@ -139,13 +126,10 @@ describe('Development Progress E2E', () => {
 
   it('excludes skipped milestones from application progress', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const completedMilestone = await createMilestone(owner, application.id, {
       weight: 1,
     });
-
     const skippedMilestone = await createMilestone(owner, application.id, {
       weight: 9,
     });
@@ -159,11 +143,8 @@ describe('Development Progress E2E', () => {
 
   it('recalculates progress after task reopen', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const milestone = await createMilestone(owner, application.id);
-
     const task = await createTask(owner, application.id, milestone.id);
 
     expectDevelopmentSuccess(await completeTask(owner, application.id, task.id));
@@ -177,9 +158,7 @@ describe('Development Progress E2E', () => {
 
   it('supports manual milestone complete and reopen when it has no tasks', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const milestone = await createMilestone(owner, application.id);
 
     expectDevelopmentSuccess(await completeMilestone(owner, application.id, milestone.id));
@@ -193,19 +172,14 @@ describe('Development Progress E2E', () => {
 
   it('derives milestone status from task progress', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const milestone = await createMilestone(owner, application.id);
-
     const firstTask = await createTask(owner, application.id, milestone.id);
-
     const secondTask = await createTask(owner, application.id, milestone.id);
 
     expectDevelopmentSuccess(await completeTask(owner, application.id, firstTask.id));
 
     let milestones = readDevelopmentItems(await listMilestones(owner, application.id), ['milestones']);
-
     let stored = findRecordById(milestones, milestone.id);
 
     expect(findStringDeep(stored, ['status'])).toBe('IN_PROGRESS');

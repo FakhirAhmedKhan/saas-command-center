@@ -15,13 +15,11 @@ export interface ConfigureApplicationOptions {
 
 function configureCors(app: INestApplication, config: TypedConfigService): void {
   const allowedOrigins = getAllowedOrigins(config);
-
   const commonOptions = {
     methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Authorization', 'Content-Type', 'X-Request-Id', 'X-Workspace-Id'],
     exposedHeaders: ['X-Request-Id'],
   };
-
   const corsOptionsDelegate: CorsOptionsDelegate<Request> = (request, callback) => {
     const requestPath = (request.originalUrl ?? request.url ?? '').split('?')[0];
 
@@ -71,7 +69,6 @@ function configureSwagger(app: INestApplication): void {
     .addBearerAuth()
     .addCookieAuth('command_center_refresh_token')
     .build();
-
   const document = SwaggerModule.createDocument(app, swaggerConfig);
 
   SwaggerModule.setup('api/v1/docs', app, document, {
@@ -83,9 +80,7 @@ function configureSwagger(app: INestApplication): void {
 
 export function configureApplication(app: INestApplication, options: ConfigureApplicationOptions = {}): void {
   const logger = new Logger('ApplicationBootstrap');
-
   const config = app.get<TypedConfigService>(ConfigService);
-
   const expressApplication = app.getHttpAdapter().getInstance() as Express;
 
   expressApplication.set(

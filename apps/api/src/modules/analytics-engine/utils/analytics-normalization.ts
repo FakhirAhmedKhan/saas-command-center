@@ -1,7 +1,6 @@
 import { AnalyticsDeviceType, AnalyticsSourceType } from 'src/generated/prisma/enums';
 
 const TRACKING_PARAMETER = /^(utm_.+|gclid|dclid|fbclid|msclkid|yclid|mc_cid|mc_eid)$/i;
-
 const SEARCH_ENGINES: Array<{
   pattern: RegExp;
   name: string;
@@ -31,7 +30,6 @@ const SEARCH_ENGINES: Array<{
     name: 'Yandex',
   },
 ];
-
 const SOCIAL_NETWORKS: Array<{
   pattern: RegExp;
   name: string;
@@ -121,7 +119,6 @@ export function normalizeAnalyticsPage(value: string): NormalizedPage {
   url.pathname = pathname;
 
   const search = url.searchParams.toString();
-
   const normalizedPath = `${pathname}${search ? `?${search}` : ''}`;
 
   return {
@@ -203,14 +200,8 @@ export function parseUserAgent(userAgent: string | null): ParsedUserAgent {
     };
   }
 
-  const deviceType = /ipad|tablet|kindle|silk/i.test(value)
-    ? AnalyticsDeviceType.TABLET
-    : /mobile|iphone|ipod|android.+mobile/i.test(value)
-      ? AnalyticsDeviceType.MOBILE
-      : AnalyticsDeviceType.DESKTOP;
-
+  const deviceType = /ipad|tablet|kindle|silk/i.test(value) ? AnalyticsDeviceType.TABLET : /mobile|iphone|ipod|android.+mobile/i.test(value) ? AnalyticsDeviceType.MOBILE : AnalyticsDeviceType.DESKTOP;
   const browser = parseBrowser(value);
-
   const operatingSystem = parseOperatingSystem(value);
 
   return {

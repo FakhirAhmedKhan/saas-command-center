@@ -28,19 +28,12 @@ export default function ApplicationSettingsPage() {
     workspaceId: string;
     applicationId: string;
   }>();
-
   const router = useRouter();
-
   const { workspaceId, applicationId } = params;
-
   const [application, setApplication] = useState<SaasApplication | null>(null);
-
   const [me, setMe] = useState<AuthMeResponse | null>(null);
-
   const [loading, setLoading] = useState(true);
-
   const [actionLoading, setActionLoading] = useState<'archive' | 'restore' | 'delete' | null>(null);
-
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -81,9 +74,7 @@ export default function ApplicationSettingsPage() {
 
     return workspace?.role ?? 'VIEWER';
   }, [me, workspaceId]);
-
   const canArchive = currentRole === 'OWNER' || currentRole === 'ADMIN';
-
   const canDelete = currentRole === 'OWNER';
 
   async function handleArchive(): Promise<void> {

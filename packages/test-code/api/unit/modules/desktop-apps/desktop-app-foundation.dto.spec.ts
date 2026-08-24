@@ -1,6 +1,5 @@
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-
 import { DesktopApplicationMetadataDto } from 'src/modules/desktop-apps/dto/desktop-app-foundation.dto';
 
 describe('DesktopApplicationMetadataDto', () => {
@@ -15,7 +14,6 @@ describe('DesktopApplicationMetadataDto', () => {
       minimumOsVersion: 'Windows 10',
       updateChannel: 'stable',
     });
-
     const errors = await validate(dto);
 
     expect(errors).toHaveLength(0);
@@ -27,7 +25,6 @@ describe('DesktopApplicationMetadataDto', () => {
       framework: 'ELECTRON',
       architecture: 'X64',
     });
-
     const errors = await validate(dto);
 
     expect(errors.some((error) => error.property === 'platform')).toBe(true);
@@ -39,7 +36,6 @@ describe('DesktopApplicationMetadataDto', () => {
       framework: 'FLUTTER',
       architecture: 'X64',
     });
-
     const errors = await validate(dto);
 
     expect(errors.some((error) => error.property === 'framework')).toBe(true);
@@ -51,7 +47,6 @@ describe('DesktopApplicationMetadataDto', () => {
       framework: 'DOTNET',
       architecture: 'POWERPC',
     });
-
     const errors = await validate(dto);
 
     expect(errors.some((error) => error.property === 'architecture')).toBe(true);
@@ -64,7 +59,6 @@ describe('DesktopApplicationMetadataDto', () => {
       architecture: 'X64',
       packageName: 'x'.repeat(256),
     });
-
     const errors = await validate(dto);
 
     expect(errors.some((error) => error.property === 'packageName')).toBe(true);

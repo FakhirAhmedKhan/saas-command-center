@@ -99,7 +99,6 @@ export function uniqueOrigin(prefix = 'analytics'): string {
 
 export function buildTrackerEvent(origin: string, overrides: Partial<TrackerEventPayload> = {}): TrackerEventPayload {
   const type = overrides.type ?? RawAnalyticsEventType.PAGE_VIEW;
-
   const event: TrackerEventPayload = {
     eventId: uniqueTrackerId('event'),
 
@@ -128,11 +127,7 @@ export function buildTrackerEvent(origin: string, overrides: Partial<TrackerEven
   return event;
 }
 
-export function buildCollectPayload(
-  trackedWebsite: TrackedWebsite,
-  events: TrackerEventPayload[],
-  overrides: Partial<Omit<CollectEventsPayload, 'events'>> = {},
-): CollectEventsPayload {
+export function buildCollectPayload(trackedWebsite: TrackedWebsite, events: TrackerEventPayload[], overrides: Partial<Omit<CollectEventsPayload, 'events'>> = {}): CollectEventsPayload {
   return {
     websiteId: trackedWebsite.id,
     trackingKey: trackedWebsite.trackingKey,
@@ -154,17 +149,13 @@ export async function createTrackedWebsite(
   } = {},
 ): Promise<TrackedWebsite> {
   const origin = options.origin ?? uniqueOrigin();
-
   const parsedOrigin = new URL(origin);
-
   const website = await createWebsite(actor, {
     domain: parsedOrigin.host,
     allowedOrigins: options.allowedOrigins ?? [origin],
     enabled: options.enabled ?? true,
   });
-
   const responseBody = asRecord(website.response.body);
-
   const trackingKey = recordString(responseBody ?? {}, 'trackingKey');
 
   if (!trackingKey || !trackingKey.startsWith('cc_live_')) {
@@ -201,11 +192,9 @@ export async function collectEvents(
     sdkVersion: options.sdkVersion ?? '1.0.0-e2e',
     sentAt: options.sentAt ?? new Date().toISOString(),
   });
-
   let testRequest = request(app.getHttpServer())
     .post(analyticsIngestionRoutes.collect())
     .set('User-Agent', options.userAgent ?? 'CommandCenter-E2E/1.0');
-
   const origin = options.origin === undefined ? trackedWebsite.origin : options.origin;
 
   if (origin !== null) {
@@ -243,14 +232,9 @@ export async function listRawEvents(actor: WorkspaceTestUser, websiteId: string,
 
 export function readTrackingStatus(response: Response): TrackingStatusBody {
   const body = asRecord(response.body);
-
   const website = asRecord(body?.website);
-
   const counts = asRecord(body?.counts);
-
-  const recentEvents = Array.isArray(body?.recentEvents)
-    ? body.recentEvents.map(asRecord).filter((item): item is Record<string, unknown> => item !== undefined)
-    : [];
+  const recentEvents = Array.isArray(body?.recentEvents) ? body.recentEvents.map(asRecord).filter((item): item is Record<string, unknown> => item !== undefined) : [];
 
   if (!body || !website || !counts || typeof body.connected !== 'boolean' || typeof body.totalEvents !== 'number') {
     throw new Error(['Unexpected tracking status response.', `Received: ${JSON.stringify(response.body)}`].join(' '));
@@ -277,9 +261,7 @@ export function readTrackingStatus(response: Response): TrackingStatusBody {
 
 export function readRawEventList(response: Response): RawEventListBody {
   const body = asRecord(response.body);
-
   const meta = asRecord(body?.meta);
-
   const data = Array.isArray(body?.data) ? body.data.map(asRecord).filter((item): item is Record<string, unknown> => item !== undefined) : [];
 
   if (

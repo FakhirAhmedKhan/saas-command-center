@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { ApplicationHealthBadge } from '@/features/monitoring/application-health-badge';
-import { apiRequest } from '@/features/lib/api/api-client';
 import { act, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { apiRequest } from '@/features/lib/api/api-client';
+import { ApplicationHealthBadge } from '@/features/monitoring/application-health-badge';
 
 vi.mock('@/features/lib/api/api-client', () => ({
   apiRequest: vi.fn(),

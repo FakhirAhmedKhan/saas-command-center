@@ -1,9 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 const workspaceId = '11111111-1111-4111-8111-111111111111';
-
 const websiteId = '22222222-2222-4222-8222-222222222222';
-
 const analyticsResponse = {
   website: {
     id: websiteId,

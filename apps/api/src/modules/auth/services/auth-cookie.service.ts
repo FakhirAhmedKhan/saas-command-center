@@ -12,7 +12,6 @@ export class AuthCookieService {
 
   getRefreshToken(request: Request): string | undefined {
     const cookies = request.cookies as Record<string, unknown> | undefined;
-
     const token = cookies?.[this.getCookieName()];
 
     return typeof token === 'string' && token.length > 0 ? token : undefined;

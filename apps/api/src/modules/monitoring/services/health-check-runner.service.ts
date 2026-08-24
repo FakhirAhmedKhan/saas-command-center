@@ -41,13 +41,9 @@ export class HealthCheckRunnerService {
       expectedStatusMax: healthCheck.expectedStatusMax,
       degradedAfterMs: healthCheck.degradedAfterMs,
     });
-
     const now = new Date();
-
     const isFailure = result.status === HealthCheckStatus.DOWN;
-
     const consecutiveFailures = isFailure ? healthCheck.consecutiveFailures + 1 : 0;
-
     const nextRunAt = new Date(now.getTime() + healthCheck.intervalSeconds * 1_000);
 
     await this.prisma.$transaction(async (transaction) => {
@@ -83,15 +79,7 @@ export class HealthCheckRunnerService {
       });
 
       if (isFailure && consecutiveFailures >= healthCheck.failureThreshold) {
-        await this.openOrUpdateIncident(
-          transaction,
-          healthCheck.id,
-          healthCheck.workspaceId,
-          healthCheck.name,
-          result.failureReason ?? 'Health check failed.',
-          consecutiveFailures,
-          now,
-        );
+        await this.openOrUpdateIncident(transaction, healthCheck.id, healthCheck.workspaceId, healthCheck.name, result.failureReason ?? 'Health check failed.', consecutiveFailures, now);
       } else if (!isFailure) {
         await transaction.healthIncident.updateMany({
           where: {
@@ -148,7 +136,6 @@ export class HealthCheckRunnerService {
         status: HealthIncidentStatus.OPEN,
       },
     });
-
     const summary = `${healthCheckName}: ${reason}`.slice(0, 500);
 
     if (existing) {

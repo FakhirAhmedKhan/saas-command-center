@@ -1,7 +1,7 @@
-import { DesktopAlerts } from '@/features/desktop-apps/desktop-alerts';
-import * as api from '@/features/desktop-apps/desktop-apps-api';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { DesktopAlerts } from '@/features/desktop-apps/desktop-alerts';
+import * as api from '@/features/desktop-apps/desktop-apps-api';
 
 vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
   createDesktopAlertRule: vi.fn(),

@@ -1,12 +1,4 @@
-import type {
-  AnalyticsBreakdownItem,
-  AnalyticsMetric,
-  AnalyticsMetrics,
-  AnalyticsOverviewRange,
-  AnalyticsOverviewResponse,
-  AnalyticsTrendPoint,
-  AnalyticsWebsite,
-} from '@command-center/shared-types';
+import type { AnalyticsBreakdownItem, AnalyticsMetric, AnalyticsMetrics, AnalyticsOverviewRange, AnalyticsOverviewResponse, AnalyticsTrendPoint, AnalyticsWebsite } from '@command-center/shared-types';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AnalyticsWebsiteDto implements AnalyticsWebsite {

@@ -1,11 +1,11 @@
 // @vitest-environment jsdom
 
-import { getDesktopRepository, linkDesktopRepository, unlinkDesktopRepository } from '@/features/desktop-apps/desktop-apps-api';
-import { DesktopRepositoryPanel } from '@/features/desktop-apps/desktop-repository-panel';
-import { listRepositories } from '@/features/repositories/repositories-api';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getDesktopRepository, linkDesktopRepository, unlinkDesktopRepository } from '@/features/desktop-apps/desktop-apps-api';
+import { DesktopRepositoryPanel } from '@/features/desktop-apps/desktop-repository-panel';
+import { listRepositories } from '@/features/repositories/repositories-api';
 
 vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
   getDesktopRepository: vi.fn(),
@@ -20,17 +20,13 @@ vi.mock('@/features/repositories/repositories-api', () => ({
 }));
 
 const mockedGetDesktopRepository = vi.mocked(getDesktopRepository);
-
 const mockedLinkDesktopRepository = vi.mocked(linkDesktopRepository);
-
 const mockedUnlinkDesktopRepository = vi.mocked(unlinkDesktopRepository);
-
 const mockedListRepositories = vi.mocked(listRepositories);
 
 type DesktopRepositoryFixture = NonNullable<Awaited<ReturnType<typeof getDesktopRepository>>>;
 
 const now = '2026-08-23T00:00:00.000Z';
-
 const desktopApp = {
   id: 'desktop-1',
 
@@ -74,7 +70,6 @@ const desktopApp = {
     updatedAt: now,
   },
 } as const;
-
 const repositoryA: DesktopRepositoryFixture = {
   id: 'repository-1',
 
@@ -126,7 +121,6 @@ const repositoryA: DesktopRepositoryFixture = {
     lastSyncedAt: null,
   },
 } as DesktopRepositoryFixture;
-
 const repositoryB: DesktopRepositoryFixture = {
   ...repositoryA,
 
@@ -183,7 +177,6 @@ describe('DesktopRepositoryPanel', () => {
 
   it('links selected repository', async () => {
     const user = userEvent.setup();
-
     const changed = vi.fn();
 
     render(<DesktopRepositoryPanel workspaceId='workspace-1' desktopApp={desktopApp} onRepositoryChanged={changed} />);

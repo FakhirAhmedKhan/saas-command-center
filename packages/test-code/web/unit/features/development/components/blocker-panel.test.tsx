@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
-import { BlockerPanel } from '@/features/development/components/blocker-panel';
-import { createBlocker, deleteBlocker, reopenBlocker, resolveBlocker } from '@/features/development/development-api';
 import type { ApplicationBlocker, ApplicationMilestone, ApplicationTask } from '@/features/development/development-types';
 import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { BlockerPanel } from '@/features/development/components/blocker-panel';
+import { createBlocker, deleteBlocker, reopenBlocker, resolveBlocker } from '@/features/development/development-api';
 
 vi.mock('@/features/development/development-api', () => ({
   createBlocker: vi.fn(),
@@ -103,10 +103,7 @@ describe('BlockerPanel empty and rendering', () => {
         workspaceId='workspace-1'
         applicationId='app-1'
         milestones={[]}
-        blockers={[
-          blocker({ id: 'b-1', title: 'Open one', status: 'OPEN' }),
-          blocker({ id: 'b-2', title: 'Resolved one', status: 'RESOLVED', resolution: 'Fixed it' }),
-        ]}
+        blockers={[blocker({ id: 'b-1', title: 'Open one', status: 'OPEN' }), blocker({ id: 'b-2', title: 'Resolved one', status: 'RESOLVED', resolution: 'Fixed it' })]}
         onChanged={vi.fn()}
       />,
     );
@@ -117,9 +114,7 @@ describe('BlockerPanel empty and rendering', () => {
   });
 
   it('shows a Resolve button for an open blocker and a Reopen button for a resolved one', () => {
-    render(
-      <BlockerPanel workspaceId='workspace-1' applicationId='app-1' milestones={[]} blockers={[blocker({ id: 'b-1', status: 'OPEN' })]} onChanged={vi.fn()} />,
-    );
+    render(<BlockerPanel workspaceId='workspace-1' applicationId='app-1' milestones={[]} blockers={[blocker({ id: 'b-1', status: 'OPEN' })]} onChanged={vi.fn()} />);
 
     expect(screen.getByRole('button', { name: /Resolve/ })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Reopen/ })).not.toBeInTheDocument();
@@ -128,10 +123,7 @@ describe('BlockerPanel empty and rendering', () => {
 
 describe('BlockerPanel task scoping in the create form', () => {
   it('offers all tasks across milestones when no milestone is selected', () => {
-    const milestones = [
-      milestone({ id: 'm-1', title: 'Milestone A', tasks: [task({ id: 't-1', title: 'Task A1' })] }),
-      milestone({ id: 'm-2', title: 'Milestone B', tasks: [task({ id: 't-2', title: 'Task B1' })] }),
-    ];
+    const milestones = [milestone({ id: 'm-1', title: 'Milestone A', tasks: [task({ id: 't-1', title: 'Task A1' })] }), milestone({ id: 'm-2', title: 'Milestone B', tasks: [task({ id: 't-2', title: 'Task B1' })] })];
 
     render(<BlockerPanel workspaceId='workspace-1' applicationId='app-1' milestones={milestones} blockers={[]} onChanged={vi.fn()} />);
 
@@ -142,11 +134,7 @@ describe('BlockerPanel task scoping in the create form', () => {
   });
 
   it('narrows the task options to only the selected milestone', async () => {
-    const milestones = [
-      milestone({ id: 'm-1', title: 'Milestone A', tasks: [task({ id: 't-1', title: 'Task A1' })] }),
-      milestone({ id: 'm-2', title: 'Milestone B', tasks: [task({ id: 't-2', title: 'Task B1' })] }),
-    ];
-
+    const milestones = [milestone({ id: 'm-1', title: 'Milestone A', tasks: [task({ id: 't-1', title: 'Task A1' })] }), milestone({ id: 'm-2', title: 'Milestone B', tasks: [task({ id: 't-2', title: 'Task B1' })] })];
     const user = userEvent.setup();
 
     render(<BlockerPanel workspaceId='workspace-1' applicationId='app-1' milestones={milestones} blockers={[]} onChanged={vi.fn()} />);
@@ -205,9 +193,7 @@ describe('BlockerPanel resolve/reopen/delete via prompts and confirms', () => {
     vi.spyOn(window, 'prompt').mockReturnValue('Patched the API');
     const user = userEvent.setup();
 
-    render(
-      <BlockerPanel workspaceId='workspace-1' applicationId='app-1' milestones={[]} blockers={[blocker({ id: 'b-1', status: 'OPEN' })]} onChanged={vi.fn()} />,
-    );
+    render(<BlockerPanel workspaceId='workspace-1' applicationId='app-1' milestones={[]} blockers={[blocker({ id: 'b-1', status: 'OPEN' })]} onChanged={vi.fn()} />);
 
     await act(async () => {
       await user.click(screen.getByRole('button', { name: /Resolve/ }));
@@ -220,9 +206,7 @@ describe('BlockerPanel resolve/reopen/delete via prompts and confirms', () => {
     vi.spyOn(window, 'prompt').mockReturnValue(null);
     const user = userEvent.setup();
 
-    render(
-      <BlockerPanel workspaceId='workspace-1' applicationId='app-1' milestones={[]} blockers={[blocker({ id: 'b-1', status: 'OPEN' })]} onChanged={vi.fn()} />,
-    );
+    render(<BlockerPanel workspaceId='workspace-1' applicationId='app-1' milestones={[]} blockers={[blocker({ id: 'b-1', status: 'OPEN' })]} onChanged={vi.fn()} />);
 
     await user.click(screen.getByRole('button', { name: /Resolve/ }));
 
@@ -233,15 +217,7 @@ describe('BlockerPanel resolve/reopen/delete via prompts and confirms', () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
     const user = userEvent.setup();
 
-    render(
-      <BlockerPanel
-        workspaceId='workspace-1'
-        applicationId='app-1'
-        milestones={[]}
-        blockers={[blocker({ id: 'b-1', title: 'Delete me' })]}
-        onChanged={vi.fn()}
-      />,
-    );
+    render(<BlockerPanel workspaceId='workspace-1' applicationId='app-1' milestones={[]} blockers={[blocker({ id: 'b-1', title: 'Delete me' })]} onChanged={vi.fn()} />);
 
     const deleteButton = screen.getAllByRole('button').at(-1)!;
 
@@ -256,15 +232,7 @@ describe('BlockerPanel resolve/reopen/delete via prompts and confirms', () => {
     vi.spyOn(window, 'confirm').mockReturnValue(false);
     const user = userEvent.setup();
 
-    render(
-      <BlockerPanel
-        workspaceId='workspace-1'
-        applicationId='app-1'
-        milestones={[]}
-        blockers={[blocker({ id: 'b-1', title: 'Keep me' })]}
-        onChanged={vi.fn()}
-      />,
-    );
+    render(<BlockerPanel workspaceId='workspace-1' applicationId='app-1' milestones={[]} blockers={[blocker({ id: 'b-1', title: 'Keep me' })]} onChanged={vi.fn()} />);
 
     const deleteButton = screen.getAllByRole('button').at(-1)!;
 
@@ -276,15 +244,7 @@ describe('BlockerPanel resolve/reopen/delete via prompts and confirms', () => {
   it('reopens a resolved blocker directly, without a prompt', async () => {
     const user = userEvent.setup();
 
-    render(
-      <BlockerPanel
-        workspaceId='workspace-1'
-        applicationId='app-1'
-        milestones={[]}
-        blockers={[blocker({ id: 'b-1', status: 'RESOLVED' })]}
-        onChanged={vi.fn()}
-      />,
-    );
+    render(<BlockerPanel workspaceId='workspace-1' applicationId='app-1' milestones={[]} blockers={[blocker({ id: 'b-1', status: 'RESOLVED' })]} onChanged={vi.fn()} />);
 
     await act(async () => {
       await user.click(screen.getByRole('button', { name: /Reopen/ }));

@@ -23,31 +23,19 @@ export class DesktopTelemetryController {
   @Post()
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
   @ApiOperation({ summary: 'Configure a desktop telemetry provider' })
-  connect(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Body() dto: ConnectDesktopTelemetryDto,
-  ) {
+  connect(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Body() dto: ConnectDesktopTelemetryDto) {
     return this.service.connect(workspaceId, desktopAppId, dto);
   }
 
   @Post(':integrationId/preview')
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
-  preview(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Param('integrationId', ParseUUIDPipe) integrationId: string,
-  ) {
+  preview(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Param('integrationId', ParseUUIDPipe) integrationId: string) {
     return this.service.preview(workspaceId, desktopAppId, integrationId);
   }
 
   @Delete(':integrationId')
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN)
-  disconnect(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Param('integrationId', ParseUUIDPipe) integrationId: string,
-  ) {
+  disconnect(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Param('integrationId', ParseUUIDPipe) integrationId: string) {
     return this.service.disconnect(workspaceId, desktopAppId, integrationId);
   }
 }

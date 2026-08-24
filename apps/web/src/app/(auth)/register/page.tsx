@@ -9,17 +9,11 @@ import { useState, type FormEvent } from 'react';
 
 export default function RegisterPage() {
   const router = useRouter();
-
   const { register } = useSession();
-
   const [name, setName] = useState('');
-
   const [email, setEmail] = useState('');
-
   const [password, setPassword] = useState('');
-
   const [error, setError] = useState<string | null>(null);
-
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -54,17 +48,7 @@ export default function RegisterPage() {
 
         <Input id='email' type='email' label='Email' autoComplete='email' required value={email} onChange={(event) => setEmail(event.target.value)} />
 
-        <Input
-          id='password'
-          type='password'
-          label='Password'
-          hint='At least 8 characters.'
-          autoComplete='new-password'
-          required
-          minLength={8}
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-        />
+        <Input id='password' type='password' label='Password' hint='At least 8 characters.' autoComplete='new-password' required minLength={8} value={password} onChange={(event) => setPassword(event.target.value)} />
 
         {error ? (
           <div role='alert' className='rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800'>

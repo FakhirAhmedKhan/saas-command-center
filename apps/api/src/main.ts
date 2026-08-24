@@ -17,7 +17,6 @@ async function bootstrap(): Promise<void> {
   await assertStartupRequirements(app);
 
   const config = app.get<TypedConfigService>(ConfigService);
-
   const port = config.get('PORT', {
     infer: true,
   });

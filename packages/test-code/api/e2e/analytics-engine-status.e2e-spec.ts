@@ -11,9 +11,7 @@ import { AnalyticsProcessingService } from 'src/modules/analytics-engine/service
 
 describe('Analytics Engine Status E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
-
   let processingService: AnalyticsProcessingService;
 
   beforeAll(async () => {
@@ -34,9 +32,7 @@ describe('Analytics Engine Status E2E', () => {
 
   it('returns an empty status before analytics processing', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const response = await getAnalyticsEngineStatus(owner, owner.workspaceId, trackedWebsite.id);
 
     expect(response.status).toBe(200);
@@ -65,11 +61,8 @@ describe('Analytics Engine Status E2E', () => {
 
   it('returns processed counts, latest run, and recent sessions', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const visitorId = uniqueTrackerId('visitor');
-
     const sessionId = uniqueTrackerId('session');
 
     expectCollectionAccepted(
@@ -112,9 +105,7 @@ describe('Analytics Engine Status E2E', () => {
 
   it('allows a VIEWER to read analytics-engine status', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const viewer = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
 
     expect([200, 201]).toContain((await addWorkspaceMember(owner, viewer, WorkspaceRole.VIEWER)).status);
@@ -126,9 +117,7 @@ describe('Analytics Engine Status E2E', () => {
 
   it('prevents outsider and anonymous access', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const outsider = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
 
     expectAccessDenied(await getAnalyticsEngineStatus(outsider, owner.workspaceId, trackedWebsite.id));
@@ -138,14 +127,10 @@ describe('Analytics Engine Status E2E', () => {
 
   it('rejects malformed IDs and hides a foreign website', async () => {
     const alpha = await registerWorkspaceTestUser(app, prisma);
-
     const beta = await registerWorkspaceTestUser(app, prisma);
-
     const betaWebsite = await createTrackedWebsite(beta);
 
-    expect((await alpha.agent.get(analyticsEngineRoutes.status('not-a-uuid', betaWebsite.id)).set('Authorization', `Bearer ${alpha.accessToken}`)).status).toBe(
-      400,
-    );
+    expect((await alpha.agent.get(analyticsEngineRoutes.status('not-a-uuid', betaWebsite.id)).set('Authorization', `Bearer ${alpha.accessToken}`)).status).toBe(400);
 
     const foreignResponse = await getAnalyticsEngineStatus(alpha, alpha.workspaceId, betaWebsite.id);
 

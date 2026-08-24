@@ -36,13 +36,10 @@ test.describe('Desktop phases 12-14 UI', () => {
   test('configures telemetry and renders runtime/security health', async ({ page, request }) => {
     await loginThroughUi(page, state.owner);
     const desktopApp = await createDesktopApp(request);
-
     const workspaceId = state.owner.workspaceId;
     const root = `/workspaces/${workspaceId}/desktop-apps/${desktopApp.id}`;
     const apiRoot = `/api/v1${root}`;
-
     let integrations: Array<Record<string, unknown>> = [];
-
     const snapshot = {
       performance: [
         {
@@ -227,7 +224,6 @@ test.describe('Desktop phases 12-14 UI', () => {
       createdAt: '2026-08-23T00:00:00.000Z',
       updatedAt: '2026-08-23T00:00:00.000Z',
     };
-
     let dependencies: Array<typeof dependency> = [];
 
     await page.route(`**${apiRoot}/dependencies`, async (route) => {

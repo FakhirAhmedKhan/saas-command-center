@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { CodeDiffViewer } from '@/features/repositories/code-diff-viewer';
 import type { RepositoryDiffResponse } from '@/features/repositories/code-explorer.types';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { CodeDiffViewer } from '@/features/repositories/code-diff-viewer';
 
 vi.mock('@monaco-editor/react', () => ({
   DiffEditor: ({ original, modified, language }: { original: string; modified: string; language: string }) => (

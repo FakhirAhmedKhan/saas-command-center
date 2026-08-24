@@ -30,10 +30,5 @@ module.exports = {
 
   clearMocks: true,
 
-  collectCoverageFrom: [
-    '<rootDir>/apps/api/src/**/*.ts',
-    '!<rootDir>/apps/api/src/generated/**',
-    '!<rootDir>/apps/api/src/**/*.spec.ts',
-    '!<rootDir>/apps/api/src/main.ts',
-  ],
+  collectCoverageFrom: ['<rootDir>/apps/api/src/**/*.ts', '!<rootDir>/apps/api/src/generated/**', '!<rootDir>/apps/api/src/**/*.spec.ts', '!<rootDir>/apps/api/src/main.ts'],
 };

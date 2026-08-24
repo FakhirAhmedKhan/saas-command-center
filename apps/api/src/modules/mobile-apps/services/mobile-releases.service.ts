@@ -35,7 +35,6 @@ export class MobileReleasesService {
     }
 
     const version = dto.version?.trim() || build.version?.trim();
-
     const buildNumber = dto.buildNumber?.trim() || build.buildNumber?.trim();
 
     if (!version) {

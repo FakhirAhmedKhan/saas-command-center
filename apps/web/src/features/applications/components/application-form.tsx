@@ -26,27 +26,16 @@ interface ApplicationFormProps {
 
 export function ApplicationForm({ application, cancelHref, submitLabel, onSubmit }: ApplicationFormProps) {
   const [name, setName] = useState(application?.name ?? '');
-
   const [slug, setSlug] = useState(application?.slug ?? '');
-
   const [shortDescription, setShortDescription] = useState(application?.shortDescription ?? '');
-
   const [longDescription, setLongDescription] = useState(application?.longDescription ?? '');
-
   const [category, setCategory] = useState<ApplicationCategory>(application?.category ?? 'SAAS');
-
   const [status, setStatus] = useState<ApplicationStatus>(application?.status ?? 'IDEA');
-
   const [priority, setPriority] = useState<ApplicationPriority>(application?.priority ?? 'MEDIUM');
-
   const [startedAt, setStartedAt] = useState(toDateInputValue(application?.startedAt));
-
   const [targetLaunchAt, setTargetLaunchAt] = useState(toDateInputValue(application?.targetLaunchAt));
-
   const [launchedAt, setLaunchedAt] = useState(toDateInputValue(application?.launchedAt));
-
   const [submitting, setSubmitting] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -101,14 +90,7 @@ export function ApplicationForm({ application, cancelHref, submitLabel, onSubmit
           <div className='grid gap-5 md:grid-cols-2'>
             <Input name='name' label='Application name' placeholder='PriceScout AI' value={name} required onChange={(event) => setName(event.target.value)} />
 
-            <Input
-              name='slug'
-              label='Slug'
-              placeholder='pricescout-ai'
-              hint='Leave blank to generate it automatically.'
-              value={slug}
-              onChange={(event) => setSlug(event.target.value)}
-            />
+            <Input name='slug' label='Slug' placeholder='pricescout-ai' hint='Leave blank to generate it automatically.' value={slug} onChange={(event) => setSlug(event.target.value)} />
           </div>
 
           <Textarea
@@ -159,23 +141,14 @@ export function ApplicationForm({ application, cancelHref, submitLabel, onSubmit
           <div className='grid gap-5 md:grid-cols-3'>
             <Input name='startedAt' type='date' label='Start date' value={startedAt} onChange={(event) => setStartedAt(event.target.value)} />
 
-            <Input
-              name='targetLaunchAt'
-              type='date'
-              label='Target launch date'
-              value={targetLaunchAt}
-              onChange={(event) => setTargetLaunchAt(event.target.value)}
-            />
+            <Input name='targetLaunchAt' type='date' label='Target launch date' value={targetLaunchAt} onChange={(event) => setTargetLaunchAt(event.target.value)} />
 
             <Input name='launchedAt' type='date' label='Actual launch date' value={launchedAt} onChange={(event) => setLaunchedAt(event.target.value)} />
           </div>
         </CardContent>
 
         <CardFooter className='flex flex-wrap justify-end gap-3'>
-          <Link
-            href={cancelHref}
-            className='inline-flex h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50'
-          >
+          <Link href={cancelHref} className='inline-flex h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50'>
             Cancel
           </Link>
 

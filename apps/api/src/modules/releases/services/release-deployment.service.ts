@@ -2,14 +2,7 @@ import { DeploymentTransitionService } from './deployment-transition.service';
 import { ReleaseAccessService } from './release-access.service';
 import { PrismaService } from '../../../database/prisma.service';
 import { DeploymentActivityAction, DeploymentStatus, HealthIncidentStatus, Prisma, ReleaseStatus } from '../../../generated/prisma/client';
-import type {
-  CreateDeploymentDto,
-  CreateReleaseDto,
-  DeploymentListQueryDto,
-  ReleaseListQueryDto,
-  TransitionDeploymentDto,
-  UpdateReleaseDto,
-} from '../dto/release-deployment.dto';
+import type { CreateDeploymentDto, CreateReleaseDto, DeploymentListQueryDto, ReleaseListQueryDto, TransitionDeploymentDto, UpdateReleaseDto } from '../dto/release-deployment.dto';
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
@@ -205,7 +198,6 @@ export class ReleaseDeploymentService {
           ]
         : undefined,
     };
-
     const [total, releases] = await Promise.all([
       this.prisma.release.count({
         where,
@@ -252,11 +244,7 @@ export class ReleaseDeploymentService {
   async createDeployment(workspaceId: string, applicationId: string, userId: string, input: CreateDeploymentDto) {
     await this.access.assertCanManage(workspaceId, userId);
 
-    const [release, environment] = await Promise.all([
-      this.requireRelease(workspaceId, applicationId, input.releaseId),
-
-      this.requireEnvironment(workspaceId, applicationId, input.environmentId),
-    ]);
+    const [release, environment] = await Promise.all([this.requireRelease(workspaceId, applicationId, input.releaseId), this.requireEnvironment(workspaceId, applicationId, input.environmentId)]);
 
     if (input.healthIncidentId) {
       await this.requireHealthIncident(workspaceId, applicationId, input.healthIncidentId);
@@ -274,9 +262,7 @@ export class ReleaseDeploymentService {
             attempt: true,
           },
         });
-
         const attempt = (maximumAttempt._max.attempt ?? 0) + 1;
-
         const deployment = await transaction.deployment.create({
           data: {
             workspaceId,
@@ -371,13 +357,9 @@ export class ReleaseDeploymentService {
     }
 
     const now = new Date();
-
     const terminal = input.status === DeploymentStatus.SUCCESSFUL || input.status === DeploymentStatus.FAILED || input.status === DeploymentStatus.ROLLED_BACK;
-
     const startedAt = input.status === DeploymentStatus.IN_PROGRESS ? (deployment.startedAt ?? now) : deployment.startedAt;
-
     const finishedAt = terminal ? now : input.status === DeploymentStatus.DRAFT || input.status === DeploymentStatus.SCHEDULED ? null : deployment.finishedAt;
-
     const durationMs = terminal && startedAt ? Math.max(0, now.getTime() - startedAt.getTime()) : null;
 
     return this.prisma.$transaction(async (transaction) => {
@@ -466,7 +448,6 @@ export class ReleaseDeploymentService {
       releaseId: query.releaseId,
       status: query.status,
     };
-
     const [total, deployments] = await Promise.all([
       this.prisma.deployment.count({
         where,

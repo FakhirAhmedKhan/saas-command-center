@@ -5,7 +5,6 @@ import type { MobileProjectDetectionResponse } from '@command-center/shared-type
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 const MAX_METADATA_FILE_SIZE = 300_000;
-
 const MAX_METADATA_FILES = 80;
 
 @Injectable()
@@ -36,13 +35,9 @@ export class MobileProjectDetectionService {
 
       repository.defaultBranch,
     );
-
     const paths = tree.entries.filter((entry) => entry.type === 'file').map((entry) => entry.path);
-
     const candidateEntries = tree.entries.filter((entry) => entry.type === 'file' && this.isDetectionFile(entry.path));
-
     const warnings: string[] = [];
-
     const selectedEntries = candidateEntries.slice(0, MAX_METADATA_FILES);
 
     if (candidateEntries.length > MAX_METADATA_FILES) {
@@ -98,16 +93,13 @@ export class MobileProjectDetectionService {
 
       truncated: tree.truncated || candidateEntries.length > MAX_METADATA_FILES,
     };
-
     const projects = detectMobileProjects(snapshot);
-
     const sorted = [...projects].sort((a, b) => {
       const confidenceScore = {
         HIGH: 3,
         MEDIUM: 2,
         LOW: 1,
       };
-
       const difference = confidenceScore[b.confidence] - confidenceScore[a.confidence];
 
       if (difference !== 0) {

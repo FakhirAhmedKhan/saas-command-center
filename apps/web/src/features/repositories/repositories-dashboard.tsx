@@ -39,17 +39,11 @@ function formatDate(value: string | null): string {
 
 export function RepositoriesDashboard({ workspaceId }: RepositoriesDashboardProps) {
   const [repositories, setRepositories] = useState<RepositoryConnection[]>([]);
-
   const [installations, setInstallations] = useState<RepositoryInstallationSummary[]>([]);
-
   const [loading, setLoading] = useState(true);
-
   const [busyKey, setBusyKey] = useState<string | null>(null);
-
   const [error, setError] = useState<string | null>(null);
-
   const privateRepositoryCount = useMemo(() => repositories.filter((repository) => repository.isPrivate).length, [repositories]);
-
   const load = useCallback(async () => {
     setError(null);
 
@@ -286,9 +280,7 @@ export function RepositoriesDashboard({ workspaceId }: RepositoriesDashboardProp
 
             <h3 className='mt-4 font-semibold text-slate-950'>No repositories connected</h3>
 
-            <p className='mx-auto mt-2 max-w-md text-sm text-slate-500'>
-              Connect the Command Center GitHub App and choose the repositories this workspace should be allowed to access.
-            </p>
+            <p className='mx-auto mt-2 max-w-md text-sm text-slate-500'>Connect the Command Center GitHub App and choose the repositories this workspace should be allowed to access.</p>
 
             <button
               type='button'
@@ -305,13 +297,7 @@ export function RepositoriesDashboard({ workspaceId }: RepositoriesDashboardProp
         ) : (
           <div className='grid gap-4 xl:grid-cols-2'>
             {repositories.map((repository) => (
-              <RepositoryCard
-                key={repository.id}
-                workspaceId={workspaceId}
-                repository={repository}
-                busy={busyKey === `repo:${repository.id}`}
-                onSync={() => handleSyncRepository(repository.id)}
-              />
+              <RepositoryCard key={repository.id} workspaceId={workspaceId} repository={repository} busy={busyKey === `repo:${repository.id}`} onSync={() => handleSyncRepository(repository.id)} />
             ))}
           </div>
         )}

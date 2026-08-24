@@ -36,7 +36,6 @@ export class PostgresAdvisoryLockService implements OnModuleDestroy {
 
   async withLock<T>(lockKey: string, callback: (client: PoolClient) => Promise<T>): Promise<DistributedLockResult<T>> {
     const client = await this.pool.connect();
-
     let acquired = false;
 
     try {

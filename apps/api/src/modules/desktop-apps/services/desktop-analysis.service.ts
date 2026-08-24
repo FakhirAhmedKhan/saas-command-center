@@ -33,11 +33,8 @@ export class DesktopAnalysisService {
       releaseId: dto.releaseId,
       crashId: dto.crashId,
     });
-
     const evidence = this.evidence(context, workspaceId, desktopAppId);
-
     const confidence = evidence.length >= 2 ? DesktopAnalysisConfidence.SUPPORTED : DesktopAnalysisConfidence.LIMITED;
-
     const system = `
 You analyze desktop engineering data from SaaS Command Center.
 
@@ -63,7 +60,6 @@ Rules:
 - Prefer evidence IDs that can be opened in SaaS Command Center.
 - Be concise and actionable.
 `.trim();
-
     const prompt = JSON.stringify(
       {
         action: dto.action,
@@ -73,7 +69,6 @@ Rules:
       null,
       2,
     ).slice(0, 60_000);
-
     let answer: string;
 
     try {

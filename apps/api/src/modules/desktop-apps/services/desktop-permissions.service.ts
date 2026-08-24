@@ -23,7 +23,6 @@ export class DesktopPermissionsService {
     }
 
     const canWrite = membership.role === WorkspaceRole.OWNER || membership.role === WorkspaceRole.ADMIN || membership.role === WorkspaceRole.DEVELOPER;
-
     const canManage = membership.role === WorkspaceRole.OWNER || membership.role === WorkspaceRole.ADMIN;
 
     return {

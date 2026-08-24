@@ -99,16 +99,6 @@ import { Module } from '@nestjs/common';
     CustomMobileTelemetryProvider,
   ],
 
-  exports: [
-    MobileAppsService,
-    MobileOverviewService,
-    MobileRepositoryService,
-    MobileProjectDetectionService,
-    MobileBuildsService,
-    MobileTestsService,
-
-    MobileReleasesService,
-    MobileTelemetryService,
-  ],
+  exports: [MobileAppsService, MobileOverviewService, MobileRepositoryService, MobileProjectDetectionService, MobileBuildsService, MobileTestsService, MobileReleasesService, MobileTelemetryService],
 })
 export class MobileAppsModule {}

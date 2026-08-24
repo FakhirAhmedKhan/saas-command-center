@@ -31,7 +31,6 @@ interface RoleMatrix {
 
 describe('Website Roles E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
 
   beforeEach(async () => {
@@ -48,11 +47,8 @@ describe('Website Roles E2E', () => {
 
   async function createRoleMatrix(): Promise<RoleMatrix> {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const rawAdmin = await registerWorkspaceTestUser(app, prisma);
-
     const rawDeveloper = await registerWorkspaceTestUser(app, prisma);
-
     const rawViewer = await registerWorkspaceTestUser(app, prisma);
 
     expectWebsiteSuccess(await addWorkspaceMember(owner, rawAdmin, WorkspaceRole.ADMIN));
@@ -75,7 +71,6 @@ describe('Website Roles E2E', () => {
 
     for (const actor of [matrix.owner, matrix.admin, matrix.developer]) {
       const website = await createWebsite(actor);
-
       const updateResponse = await updateWebsite(actor, website.id, {
         name: `Updated by ${actor.userId}`,
       });
@@ -93,7 +88,6 @@ describe('Website Roles E2E', () => {
 
     for (const actor of [matrix.owner, matrix.admin, matrix.developer]) {
       const application = await createApplication(actor);
-
       const website = await createWebsite(actor);
 
       expectWebsiteSuccess(await connectWebsite(actor, website.id, application.id));
@@ -104,20 +98,16 @@ describe('Website Roles E2E', () => {
 
   it('allows VIEWER to read but prevents website mutations', async () => {
     const matrix = await createRoleMatrix();
-
     const website = await createWebsite(matrix.owner);
 
     expect((await listWebsites(matrix.viewer)).status).toBe(200);
 
     expect((await getWebsite(matrix.viewer, website.id)).status).toBe(200);
 
-    const createResponse = await matrix.viewer.agent
-      .post(websiteRoutes.root(matrix.viewer.workspaceId))
-      .set('Authorization', `Bearer ${matrix.viewer.accessToken}`)
-      .send({
-        name: 'Viewer Website',
-        domain: 'viewer.example.test',
-      });
+    const createResponse = await matrix.viewer.agent.post(websiteRoutes.root(matrix.viewer.workspaceId)).set('Authorization', `Bearer ${matrix.viewer.accessToken}`).send({
+      name: 'Viewer Website',
+      domain: 'viewer.example.test',
+    });
 
     expect(createResponse.status).toBe(403);
 
@@ -152,7 +142,6 @@ describe('Website Roles E2E', () => {
 
   it('prevents DEVELOPER from archive, restore, and key rotation', async () => {
     const matrix = await createRoleMatrix();
-
     const website = await createWebsite(matrix.developer);
 
     expect((await archiveWebsite(matrix.developer, website.id)).status).toBe(403);
@@ -164,14 +153,9 @@ describe('Website Roles E2E', () => {
 
   it('prevents outsider and anonymous access', async () => {
     const matrix = await createRoleMatrix();
-
     const website = await createWebsite(matrix.owner);
-
     const outsider = await registerWorkspaceTestUser(app, prisma);
-
-    const outsiderResponse = await outsider.agent
-      .get(websiteRoutes.details(matrix.owner.workspaceId, website.id))
-      .set('Authorization', `Bearer ${outsider.accessToken}`);
+    const outsiderResponse = await outsider.agent.get(websiteRoutes.details(matrix.owner.workspaceId, website.id)).set('Authorization', `Bearer ${outsider.accessToken}`);
 
     expectAccessDenied(outsiderResponse);
 

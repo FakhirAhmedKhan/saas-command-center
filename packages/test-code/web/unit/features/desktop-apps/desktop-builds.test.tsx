@@ -1,17 +1,16 @@
 // @vitest-environment jsdom
 
-import { listDesktopBuilds } from '@/features/desktop-apps/desktop-apps-api';
-import { DesktopBuilds } from '@/features/desktop-apps/desktop-builds';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { listDesktopBuilds } from '@/features/desktop-apps/desktop-apps-api';
+import { DesktopBuilds } from '@/features/desktop-apps/desktop-builds';
 
 vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
   listDesktopBuilds: vi.fn(),
 }));
 
 const listMock = vi.mocked(listDesktopBuilds);
-
 const build = {
   id: 'build-1',
   workspaceId: 'workspace-1',

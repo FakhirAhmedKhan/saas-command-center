@@ -123,15 +123,7 @@ describe('WebsiteForm submission payload', () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined);
     const application = makeApplication();
 
-    render(
-      <WebsiteForm
-        applications={[application]}
-        initialApplicationId={application.id}
-        cancelHref='/workspaces/workspace-1/websites'
-        submitLabel='Create website'
-        onSubmit={onSubmit}
-      />,
-    );
+    render(<WebsiteForm applications={[application]} initialApplicationId={application.id} cancelHref='/workspaces/workspace-1/websites' submitLabel='Create website' onSubmit={onSubmit} />);
 
     expect(screen.getByLabelText('SaaS application')).toHaveValue(application.id);
 

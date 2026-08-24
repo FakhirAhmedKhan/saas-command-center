@@ -15,13 +15,9 @@ interface Props {
 
 export function MobileBuilds({ workspaceId, mobileAppId }: Props) {
   const [builds, setBuilds] = useState<MobileBuild[]>([]);
-
   const [filters, setFilters] = useState<MobileBuildFilters>({});
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
-
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);

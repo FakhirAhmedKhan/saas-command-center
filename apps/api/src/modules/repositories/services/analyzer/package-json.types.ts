@@ -15,9 +15,5 @@ export interface ParsedPackageJson {
 }
 
 export function collectDependencyNames(packageJson: ParsedPackageJson): Set<string> {
-  return new Set([
-    ...Object.keys(packageJson.dependencies ?? {}),
-    ...Object.keys(packageJson.devDependencies ?? {}),
-    ...Object.keys(packageJson.peerDependencies ?? {}),
-  ]);
+  return new Set([...Object.keys(packageJson.dependencies ?? {}), ...Object.keys(packageJson.devDependencies ?? {}), ...Object.keys(packageJson.peerDependencies ?? {})]);
 }

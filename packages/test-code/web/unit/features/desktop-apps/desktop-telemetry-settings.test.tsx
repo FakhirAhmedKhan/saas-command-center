@@ -1,16 +1,10 @@
 // @vitest-environment jsdom
 
-import { DesktopTelemetrySettings } from '@/features/desktop-apps/desktop-telemetry-settings';
-import {
-  connectDesktopTelemetry,
-  disconnectDesktopTelemetry,
-  listDesktopTelemetryIntegrations,
-  previewDesktopTelemetry,
-  syncDesktopTelemetry,
-} from '@/features/desktop-apps/desktop-apps-api';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { connectDesktopTelemetry, disconnectDesktopTelemetry, listDesktopTelemetryIntegrations, previewDesktopTelemetry, syncDesktopTelemetry } from '@/features/desktop-apps/desktop-apps-api';
+import { DesktopTelemetrySettings } from '@/features/desktop-apps/desktop-telemetry-settings';
 
 vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
   connectDesktopTelemetry: vi.fn(),
@@ -25,7 +19,6 @@ const connectMock = vi.mocked(connectDesktopTelemetry);
 const previewMock = vi.mocked(previewDesktopTelemetry);
 const syncMock = vi.mocked(syncDesktopTelemetry);
 const disconnectMock = vi.mocked(disconnectDesktopTelemetry);
-
 const integration = {
   id: 'integration-1',
   workspaceId: 'workspace-1',

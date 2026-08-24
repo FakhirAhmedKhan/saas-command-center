@@ -1,18 +1,11 @@
-import type { INestApplication } from '@nestjs/common';
-
-import request from 'supertest';
-
-import { PrismaService } from 'src/database/prisma.service';
-
-import { WorkspaceRole } from 'src/generated/prisma/enums';
-
 import { withBearer } from '../helpers/auth';
-
 import { createTestApp } from '../helpers/create-test-app';
-
 import { resetDatabase } from '../helpers/database';
-
 import { addWorkspaceMember, expectAccessDenied, registerWorkspaceTestUser } from '../helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
+import request from 'supertest';
 
 const API = '/api/v1';
 
@@ -46,7 +39,6 @@ const createPayload = {
 
 describe('Desktop Applications E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
 
   beforeEach(async () => {
@@ -63,7 +55,6 @@ describe('Desktop Applications E2E', () => {
 
   it('allows an owner to create a desktop application', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const response = await owner.agent.post(desktopAppsUrl(owner.workspaceId)).set(withBearer(owner.accessToken)).send(createPayload);
 
     expect(response.status).toBe(201);
@@ -103,9 +94,7 @@ describe('Desktop Applications E2E', () => {
 
   it('persists parent SaasApplication as DESKTOP', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const response = await owner.agent.post(desktopAppsUrl(owner.workspaceId)).set(withBearer(owner.accessToken)).send(createPayload).expect(201);
-
     const stored = await prisma.saasApplication.findUniqueOrThrow({
       where: {
         id: response.body.applicationId,
@@ -121,9 +110,7 @@ describe('Desktop Applications E2E', () => {
 
   it('allows an admin to create a desktop application', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const admin = await registerWorkspaceTestUser(app, prisma);
-
     const membership = await addWorkspaceMember(owner, admin, WorkspaceRole.ADMIN);
 
     expect([200, 201]).toContain(membership.status);
@@ -208,9 +195,7 @@ describe('Desktop Applications E2E', () => {
 
   it('lists only active desktop applications from the current workspace', async () => {
     const workspaceA = await registerWorkspaceTestUser(app, prisma);
-
     const workspaceB = await registerWorkspaceTestUser(app, prisma);
-
     const active = await workspaceA.agent
       .post(desktopAppsUrl(workspaceA.workspaceId))
       .set(withBearer(workspaceA.accessToken))
@@ -222,7 +207,6 @@ describe('Desktop Applications E2E', () => {
         packageName: 'com.example.active',
       })
       .expect(201);
-
     const archived = await workspaceA.agent
       .post(desktopAppsUrl(workspaceA.workspaceId))
       .set(withBearer(workspaceA.accessToken))
@@ -262,9 +246,7 @@ describe('Desktop Applications E2E', () => {
 
   it('returns desktop application details', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const created = await owner.agent.post(desktopAppsUrl(owner.workspaceId)).set(withBearer(owner.accessToken)).send(createPayload).expect(201);
-
     const response = await owner.agent.get(desktopAppUrl(owner.workspaceId, created.body.id)).set(withBearer(owner.accessToken)).expect(200);
 
     expect(response.body).toMatchObject({
@@ -298,9 +280,7 @@ describe('Desktop Applications E2E', () => {
 
   it('updates desktop application metadata', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const created = await owner.agent.post(desktopAppsUrl(owner.workspaceId)).set(withBearer(owner.accessToken)).send(createPayload).expect(201);
-
     const response = await owner.agent
       .patch(desktopAppUrl(owner.workspaceId, created.body.id))
       .set(withBearer(owner.accessToken))
@@ -344,9 +324,7 @@ describe('Desktop Applications E2E', () => {
 
   it('allows optional metadata to be cleared', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const created = await owner.agent.post(desktopAppsUrl(owner.workspaceId)).set(withBearer(owner.accessToken)).send(createPayload).expect(201);
-
     const response = await owner.agent
       .patch(desktopAppUrl(owner.workspaceId, created.body.id))
       .set(withBearer(owner.accessToken))
@@ -378,9 +356,7 @@ describe('Desktop Applications E2E', () => {
 
   it('archives desktop application and removes it from active list', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const created = await owner.agent.post(desktopAppsUrl(owner.workspaceId)).set(withBearer(owner.accessToken)).send(createPayload).expect(201);
-
     const archiveResponse = await owner.agent.delete(desktopAppUrl(owner.workspaceId, created.body.id)).set(withBearer(owner.accessToken)).expect(200);
 
     expect(archiveResponse.body.application.archivedAt).not.toBeNull();
@@ -408,7 +384,6 @@ describe('Desktop Applications E2E', () => {
 
   it('does not destructively delete desktop metadata when archived', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const created = await owner.agent.post(desktopAppsUrl(owner.workspaceId)).set(withBearer(owner.accessToken)).send(createPayload).expect(201);
 
     await owner.agent.delete(desktopAppUrl(owner.workspaceId, created.body.id)).set(withBearer(owner.accessToken)).expect(200);
@@ -424,9 +399,7 @@ describe('Desktop Applications E2E', () => {
 
   it('prevents one workspace from reading another workspace desktop application', async () => {
     const workspaceA = await registerWorkspaceTestUser(app, prisma);
-
     const workspaceB = await registerWorkspaceTestUser(app, prisma);
-
     const desktopB = await workspaceB.agent
       .post(desktopAppsUrl(workspaceB.workspaceId))
       .set(withBearer(workspaceB.accessToken))
@@ -436,7 +409,6 @@ describe('Desktop Applications E2E', () => {
         name: 'Workspace B Private Desktop',
       })
       .expect(201);
-
     const response = await workspaceA.agent.get(desktopAppUrl(workspaceA.workspaceId, desktopB.body.id)).set(withBearer(workspaceA.accessToken));
 
     expect(response.status).toBe(404);
@@ -444,9 +416,7 @@ describe('Desktop Applications E2E', () => {
 
   it('prevents a non-member from using another workspace route', async () => {
     const workspaceA = await registerWorkspaceTestUser(app, prisma);
-
     const workspaceB = await registerWorkspaceTestUser(app, prisma);
-
     const response = await workspaceB.agent.get(desktopAppsUrl(workspaceA.workspaceId)).set(withBearer(workspaceB.accessToken));
 
     expectAccessDenied(response);
@@ -454,9 +424,7 @@ describe('Desktop Applications E2E', () => {
 
   it('allows a viewer to read desktop applications', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const viewer = await registerWorkspaceTestUser(app, prisma);
-
     const membership = await addWorkspaceMember(owner, viewer, WorkspaceRole.VIEWER);
 
     expect([200, 201]).toContain(membership.status);
@@ -470,9 +438,7 @@ describe('Desktop Applications E2E', () => {
 
   it('prevents viewer from creating desktop applications', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const viewer = await registerWorkspaceTestUser(app, prisma);
-
     const membership = await addWorkspaceMember(owner, viewer, WorkspaceRole.VIEWER);
 
     expect([200, 201]).toContain(membership.status);
@@ -484,13 +450,11 @@ describe('Desktop Applications E2E', () => {
 
   it('prevents viewer from updating desktop applications', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const viewer = await registerWorkspaceTestUser(app, prisma);
 
     await addWorkspaceMember(owner, viewer, WorkspaceRole.VIEWER);
 
     const created = await owner.agent.post(desktopAppsUrl(owner.workspaceId)).set(withBearer(owner.accessToken)).send(createPayload).expect(201);
-
     const response = await viewer.agent.patch(desktopAppUrl(owner.workspaceId, created.body.id)).set(withBearer(viewer.accessToken)).send({
       currentVersion: '999.0.0',
     });
@@ -500,13 +464,11 @@ describe('Desktop Applications E2E', () => {
 
   it('prevents viewer from archiving desktop applications', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const viewer = await registerWorkspaceTestUser(app, prisma);
 
     await addWorkspaceMember(owner, viewer, WorkspaceRole.VIEWER);
 
     const created = await owner.agent.post(desktopAppsUrl(owner.workspaceId)).set(withBearer(owner.accessToken)).send(createPayload).expect(201);
-
     const response = await viewer.agent.delete(desktopAppUrl(owner.workspaceId, created.body.id)).set(withBearer(viewer.accessToken));
 
     expectAccessDenied(response);
@@ -514,7 +476,6 @@ describe('Desktop Applications E2E', () => {
 
   it('prevents updating an archived desktop application', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const created = await owner.agent.post(desktopAppsUrl(owner.workspaceId)).set(withBearer(owner.accessToken)).send(createPayload).expect(201);
 
     await owner.agent.delete(desktopAppUrl(owner.workspaceId, created.body.id)).set(withBearer(owner.accessToken)).expect(200);

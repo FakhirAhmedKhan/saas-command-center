@@ -135,15 +135,7 @@ export interface ConnectDesktopTelemetryInput {
 }
 
 export type DesktopPerformanceMetricType =
-  | 'CRASH_FREE_USERS_PERCENT'
-  | 'CRASH_FREE_SESSIONS_PERCENT'
-  | 'STARTUP_MS'
-  | 'MEMORY_MB'
-  | 'CPU_PERCENT'
-  | 'HANG_RATE_PERCENT'
-  | 'NETWORK_LATENCY_MS'
-  | 'API_FAILURE_RATE_PERCENT'
-  | 'VERSION_ADOPTION_PERCENT';
+  'CRASH_FREE_USERS_PERCENT' | 'CRASH_FREE_SESSIONS_PERCENT' | 'STARTUP_MS' | 'MEMORY_MB' | 'CPU_PERCENT' | 'HANG_RATE_PERCENT' | 'NETWORK_LATENCY_MS' | 'API_FAILURE_RATE_PERCENT' | 'VERSION_ADOPTION_PERCENT';
 
 export interface DesktopTelemetryPerformanceSample {
   externalId: string;
@@ -1405,31 +1397,19 @@ export class DesktopTelemetryController {
   @Post()
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
   @ApiOperation({ summary: 'Configure a desktop telemetry provider' })
-  connect(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Body() dto: ConnectDesktopTelemetryDto,
-  ) {
+  connect(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Body() dto: ConnectDesktopTelemetryDto) {
     return this.service.connect(workspaceId, desktopAppId, dto);
   }
 
   @Post(':integrationId/preview')
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
-  preview(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Param('integrationId', ParseUUIDPipe) integrationId: string,
-  ) {
+  preview(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Param('integrationId', ParseUUIDPipe) integrationId: string) {
     return this.service.preview(workspaceId, desktopAppId, integrationId);
   }
 
   @Delete(':integrationId')
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN)
-  disconnect(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Param('integrationId', ParseUUIDPipe) integrationId: string,
-  ) {
+  disconnect(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Param('integrationId', ParseUUIDPipe) integrationId: string) {
     return this.service.disconnect(workspaceId, desktopAppId, integrationId);
   }
 }
@@ -1449,21 +1429,7 @@ apps/api/src/modules/desktop-apps/dto/desktop-runtime.dto.ts
 
 ```ts
 import { DesktopArchitecture, DesktopPerformanceMetricType, DesktopPlatform, DesktopReleaseChannel } from 'src/generated/prisma/enums';
-import {
-  ArrayMaxSize,
-  IsArray,
-  IsDateString,
-  IsEnum,
-  IsInt,
-  IsNumber,
-  IsOptional,
-  IsString,
-  IsUUID,
-  Max,
-  MaxLength,
-  Min,
-  ValidateNested,
-} from 'class-validator';
+import { ArrayMaxSize, IsArray, IsDateString, IsEnum, IsInt, IsNumber, IsOptional, IsString, IsUUID, Max, MaxLength, Min, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -1668,13 +1634,7 @@ export class DesktopRuntimeService {
     return result;
   }
 
-  private async persist(
-    workspaceId: string,
-    desktopAppId: string,
-    telemetryIntegrationId: string,
-    performance: DesktopTelemetryPerformanceSample[],
-    crashes: DesktopTelemetryCrashSample[],
-  ) {
+  private async persist(workspaceId: string, desktopAppId: string, telemetryIntegrationId: string, performance: DesktopTelemetryPerformanceSample[], crashes: DesktopTelemetryCrashSample[]) {
     let performanceInserted = 0;
     let performanceUpdated = 0;
     let crashesUpserted = 0;
@@ -1964,31 +1924,19 @@ export class DesktopPerformanceController {
   ) {}
 
   @Get('performance')
-  get(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Query() query: DesktopRuntimeQueryDto,
-  ) {
+  get(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Query() query: DesktopRuntimeQueryDto) {
     return this.performance.get(workspaceId, desktopAppId, query);
   }
 
   @Post('telemetry/:integrationId/sync')
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
-  sync(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Param('integrationId', ParseUUIDPipe) integrationId: string,
-  ) {
+  sync(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Param('integrationId', ParseUUIDPipe) integrationId: string) {
     return this.runtime.syncProvider(workspaceId, desktopAppId, integrationId);
   }
 
   @Post('runtime/ingest')
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
-  ingest(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Body() dto: IngestDesktopRuntimeDto,
-  ) {
+  ingest(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Body() dto: IngestDesktopRuntimeDto) {
     return this.runtime.ingestNormalized(workspaceId, desktopAppId, dto);
   }
 }
@@ -2019,20 +1967,12 @@ export class DesktopCrashesController {
   constructor(private readonly service: DesktopCrashesService) {}
 
   @Get()
-  list(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Query() query: DesktopRuntimeQueryDto,
-  ) {
+  list(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Query() query: DesktopRuntimeQueryDto) {
     return this.service.list(workspaceId, desktopAppId, query);
   }
 
   @Get(':crashId')
-  findOne(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Param('crashId', ParseUUIDPipe) crashId: string,
-  ) {
+  findOne(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Param('crashId', ParseUUIDPipe) crashId: string) {
     return this.service.findOne(workspaceId, desktopAppId, crashId);
   }
 }
@@ -2128,23 +2068,13 @@ export class DesktopRepositoryMetadataService {
 
     const tree = await this.githubCode.getTree(repository.installation.externalInstallationId, repository.owner, repository.name, repository.defaultBranch);
 
-    const entries = tree.entries
-      .filter(
-        (entry) => entry.type === 'file' && this.isInteresting(entry.path) && (entry.size === null || entry.size === undefined || entry.size <= MAX_FILE_SIZE),
-      )
-      .slice(0, MAX_FILES);
+    const entries = tree.entries.filter((entry) => entry.type === 'file' && this.isInteresting(entry.path) && (entry.size === null || entry.size === undefined || entry.size <= MAX_FILE_SIZE)).slice(0, MAX_FILES);
 
     const files: Record<string, string> = {};
 
     for (const entry of entries) {
       try {
-        const file = await this.githubCode.getFile(
-          repository.installation.externalInstallationId,
-          repository.owner,
-          repository.name,
-          entry.path,
-          repository.defaultBranch,
-        );
+        const file = await this.githubCode.getFile(repository.installation.externalInstallationId, repository.owner, repository.name, entry.path, repository.defaultBranch);
 
         if (file.size <= MAX_FILE_SIZE) {
           files[entry.path] = file.content;
@@ -2647,8 +2577,7 @@ export class DesktopSecurityService {
       windowsSigning: statusFor(DesktopSecurityCheckType.WINDOWS_SIGNING),
       macosSigning: statusFor(DesktopSecurityCheckType.MACOS_SIGNING),
       notarization: statusFor(DesktopSecurityCheckType.MACOS_NOTARIZATION),
-      criticalRisks: normalized.filter((finding) => finding.severity === DesktopSecuritySeverity.CRITICAL && finding.status !== DesktopSecurityCheckStatus.PASS)
-        .length,
+      criticalRisks: normalized.filter((finding) => finding.severity === DesktopSecuritySeverity.CRITICAL && finding.status !== DesktopSecurityCheckStatus.PASS).length,
       highRisks: normalized.filter((finding) => finding.severity === DesktopSecuritySeverity.HIGH && finding.status !== DesktopSecurityCheckStatus.PASS).length,
       findings: normalized,
     };
@@ -2727,9 +2656,7 @@ export class DesktopSecurityService {
         DesktopSecurityCheckType.WINDOWS_SIGNING,
         windowsEvidence.length > 0,
         'Windows signing configuration',
-        windowsEvidence.length > 0
-          ? 'Repository metadata contains Windows signing configuration markers.'
-          : 'No Windows signing configuration marker was detected in scanned metadata.',
+        windowsEvidence.length > 0 ? 'Repository metadata contains Windows signing configuration markers.' : 'No Windows signing configuration marker was detected in scanned metadata.',
         windowsEvidence,
       ),
     );
@@ -2740,9 +2667,7 @@ export class DesktopSecurityService {
         DesktopSecurityCheckType.MACOS_SIGNING,
         macEvidence.length > 0,
         'macOS signing configuration',
-        macEvidence.length > 0
-          ? 'Repository metadata contains macOS code-signing configuration markers.'
-          : 'No macOS code-signing configuration marker was detected in scanned metadata.',
+        macEvidence.length > 0 ? 'Repository metadata contains macOS code-signing configuration markers.' : 'No macOS code-signing configuration marker was detected in scanned metadata.',
         macEvidence,
       ),
     );
@@ -2753,9 +2678,7 @@ export class DesktopSecurityService {
         DesktopSecurityCheckType.MACOS_NOTARIZATION,
         notarizationEvidence.length > 0,
         'macOS notarization configuration',
-        notarizationEvidence.length > 0
-          ? 'Repository metadata contains notarization workflow markers.'
-          : 'No notarization workflow marker was detected in scanned metadata.',
+        notarizationEvidence.length > 0 ? 'Repository metadata contains notarization workflow markers.' : 'No notarization workflow marker was detected in scanned metadata.',
         notarizationEvidence,
       ),
     );
@@ -2767,8 +2690,7 @@ export class DesktopSecurityService {
         status: DesktopSecurityCheckStatus.WARN,
         severity: DesktopSecuritySeverity.HIGH,
         title: 'Electron nodeIntegration appears enabled',
-        message:
-          'Enabling Node.js integration in renderer content increases the impact of renderer compromise. Review the BrowserWindow security configuration.',
+        message: 'Enabling Node.js integration in renderer content increases the impact of renderer compromise. Review the BrowserWindow security configuration.',
         sourcePath: null,
         evidence: ['nodeIntegration=true'],
       });
@@ -2790,14 +2712,7 @@ export class DesktopSecurityService {
     return findings;
   }
 
-  private binaryFinding(
-    findingKey: string,
-    type: DesktopSecurityCheckType,
-    configured: boolean,
-    title: string,
-    message: string,
-    evidence: string[],
-  ): FindingDraft {
+  private binaryFinding(findingKey: string, type: DesktopSecurityCheckType, configured: boolean, title: string, message: string, evidence: string[]): FindingDraft {
     return {
       findingKey,
       type,
@@ -3076,13 +2991,7 @@ apps/web/src/features/desktop-apps/desktop-telemetry-settings.tsx
 ```tsx
 'use client';
 
-import {
-  connectDesktopTelemetry,
-  disconnectDesktopTelemetry,
-  listDesktopTelemetryIntegrations,
-  previewDesktopTelemetry,
-  syncDesktopTelemetry,
-} from './desktop-apps-api';
+import { connectDesktopTelemetry, disconnectDesktopTelemetry, listDesktopTelemetryIntegrations, previewDesktopTelemetry, syncDesktopTelemetry } from './desktop-apps-api';
 import { getErrorMessage } from '@/features/lib/api/api-error';
 import type { DesktopTelemetryIntegration, DesktopTelemetryProvider, DesktopTelemetrySnapshot } from '@command-center/shared-types';
 import { Activity, CheckCircle2, Loader2, RefreshCw, Trash2 } from 'lucide-react';
@@ -3207,9 +3116,7 @@ export function DesktopTelemetrySettings({ workspaceId, desktopAppId }: Props) {
 
           <div>
             <h2 className='text-lg font-semibold text-slate-950'>Runtime Monitoring</h2>
-            <p className='mt-1 text-sm leading-6 text-slate-500'>
-              Connect a provider through the normalized telemetry adapter. Provider tokens are encrypted by the API and never returned to the browser.
-            </p>
+            <p className='mt-1 text-sm leading-6 text-slate-500'>Connect a provider through the normalized telemetry adapter. Provider tokens are encrypted by the API and never returned to the browser.</p>
           </div>
         </div>
 
@@ -3278,11 +3185,7 @@ export function DesktopTelemetrySettings({ workspaceId, desktopAppId }: Props) {
           </label>
 
           <div className='md:col-span-2 flex justify-end'>
-            <button
-              type='submit'
-              disabled={saving}
-              className='inline-flex h-10 items-center gap-2 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white disabled:opacity-50'
-            >
+            <button type='submit' disabled={saving} className='inline-flex h-10 items-center gap-2 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white disabled:opacity-50'>
               {saving ? <Loader2 className='size-4 animate-spin' /> : null}
               Connect Provider
             </button>
@@ -3320,9 +3223,7 @@ export function DesktopTelemetrySettings({ workspaceId, desktopAppId }: Props) {
                     </div>
                     <p className='mt-2 text-sm text-slate-500'>Project: {integration.externalProjectId}</p>
                     <p className='mt-1 text-sm text-slate-500'>Secret: {integration.hasSecret ? 'Configured' : 'Removed'}</p>
-                    <p className='mt-1 text-sm text-slate-500'>
-                      Last sync: {integration.lastSyncedAt ? new Date(integration.lastSyncedAt).toLocaleString() : 'Never'}
-                    </p>
+                    <p className='mt-1 text-sm text-slate-500'>Last sync: {integration.lastSyncedAt ? new Date(integration.lastSyncedAt).toLocaleString() : 'Never'}</p>
                     {integration.lastError ? <p className='mt-2 text-sm text-red-600'>{integration.lastError}</p> : null}
                   </div>
 
@@ -3452,31 +3353,15 @@ export function DesktopPerformance({ workspaceId, desktopAppId }: Props) {
           </div>
 
           <div className='grid gap-2 sm:grid-cols-3'>
-            <input
-              aria-label='Performance version filter'
-              value={version}
-              onChange={(event) => setVersion(event.target.value)}
-              placeholder='Version'
-              className='h-9 rounded-lg border border-slate-300 px-3 text-sm'
-            />
-            <select
-              aria-label='Performance platform filter'
-              value={platform}
-              onChange={(event) => setPlatform(event.target.value)}
-              className='h-9 rounded-lg border border-slate-300 px-3 text-sm'
-            >
+            <input aria-label='Performance version filter' value={version} onChange={(event) => setVersion(event.target.value)} placeholder='Version' className='h-9 rounded-lg border border-slate-300 px-3 text-sm' />
+            <select aria-label='Performance platform filter' value={platform} onChange={(event) => setPlatform(event.target.value)} className='h-9 rounded-lg border border-slate-300 px-3 text-sm'>
               <option value=''>All platforms</option>
               <option value='WINDOWS'>Windows</option>
               <option value='MACOS'>macOS</option>
               <option value='LINUX'>Linux</option>
               <option value='CROSS_PLATFORM'>Cross-platform</option>
             </select>
-            <select
-              aria-label='Performance architecture filter'
-              value={architecture}
-              onChange={(event) => setArchitecture(event.target.value)}
-              className='h-9 rounded-lg border border-slate-300 px-3 text-sm'
-            >
+            <select aria-label='Performance architecture filter' value={architecture} onChange={(event) => setArchitecture(event.target.value)} className='h-9 rounded-lg border border-slate-300 px-3 text-sm'>
               <option value=''>All architectures</option>
               <option value='X64'>x64</option>
               <option value='ARM64'>ARM64</option>
@@ -3511,9 +3396,7 @@ export function DesktopPerformance({ workspaceId, desktopAppId }: Props) {
             <MetricCard label='Version adoption' value={formatPercent(data.summary.versionAdoptionPercent)} />
           </div>
         ) : !loading && !error ? (
-          <div className='mt-6 rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500'>
-            No performance metrics match the current filters.
-          </div>
+          <div className='mt-6 rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500'>No performance metrics match the current filters.</div>
         ) : null}
       </div>
     </section>
@@ -3604,19 +3487,8 @@ export function DesktopCrashes({ workspaceId, desktopAppId }: Props) {
           <p className='mt-1 text-sm text-slate-500'>Crash groups ordered by impact and recency.</p>
         </div>
         <div className='flex gap-2'>
-          <input
-            aria-label='Crash version filter'
-            value={version}
-            onChange={(event) => setVersion(event.target.value)}
-            placeholder='Version'
-            className='h-9 w-32 rounded-lg border border-slate-300 px-3 text-sm'
-          />
-          <select
-            aria-label='Crash platform filter'
-            value={platform}
-            onChange={(event) => setPlatform(event.target.value)}
-            className='h-9 rounded-lg border border-slate-300 px-3 text-sm'
-          >
+          <input aria-label='Crash version filter' value={version} onChange={(event) => setVersion(event.target.value)} placeholder='Version' className='h-9 w-32 rounded-lg border border-slate-300 px-3 text-sm' />
+          <select aria-label='Crash platform filter' value={platform} onChange={(event) => setPlatform(event.target.value)} className='h-9 rounded-lg border border-slate-300 px-3 text-sm'>
             <option value=''>All platforms</option>
             <option value='WINDOWS'>Windows</option>
             <option value='MACOS'>macOS</option>
@@ -3637,9 +3509,7 @@ export function DesktopCrashes({ workspaceId, desktopAppId }: Props) {
           <Loader2 className='size-4 animate-spin' /> Loading crashes...
         </div>
       ) : crashes.length === 0 ? (
-        <div className='mt-6 rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500'>
-          No crashes match the current filters.
-        </div>
+        <div className='mt-6 rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500'>No crashes match the current filters.</div>
       ) : (
         <div className='mt-6 space-y-3'>
           {crashes.map((crash) => (
@@ -3736,12 +3606,7 @@ export function DesktopDependencies({ workspaceId, desktopAppId }: Props) {
           <h2 className='text-lg font-semibold text-slate-950'>Dependencies</h2>
           <p className='mt-1 text-sm text-slate-500'>Repository manifests normalized across npm, Cargo, NuGet, Maven, Gradle, Conan and vcpkg.</p>
         </div>
-        <button
-          type='button'
-          disabled={scanning}
-          onClick={() => void scan()}
-          className='inline-flex h-10 items-center gap-2 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white disabled:opacity-50'
-        >
+        <button type='button' disabled={scanning} onClick={() => void scan()} className='inline-flex h-10 items-center gap-2 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white disabled:opacity-50'>
           {scanning ? <Loader2 className='size-4 animate-spin' /> : <RefreshCw className='size-4' />}
           Scan Repository
         </button>
@@ -3758,9 +3623,7 @@ export function DesktopDependencies({ workspaceId, desktopAppId }: Props) {
           <Loader2 className='size-4 animate-spin' /> Loading dependencies...
         </div>
       ) : dependencies.length === 0 ? (
-        <div className='mt-6 rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500'>
-          No dependency inventory yet. Run a repository scan.
-        </div>
+        <div className='mt-6 rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500'>No dependency inventory yet. Run a repository scan.</div>
       ) : (
         <div className='mt-6 overflow-x-auto'>
           <table className='min-w-full text-left text-sm'>
@@ -3869,12 +3732,7 @@ export function DesktopSecurity({ workspaceId, desktopAppId }: Props) {
               <p className='mt-1 text-sm text-slate-500'>Signing, notarization, packaging and dependency risk metadata. Secret values are never rendered.</p>
             </div>
           </div>
-          <button
-            type='button'
-            disabled={scanning}
-            onClick={() => void scan()}
-            className='inline-flex h-10 items-center gap-2 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white disabled:opacity-50'
-          >
+          <button type='button' disabled={scanning} onClick={() => void scan()} className='inline-flex h-10 items-center gap-2 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white disabled:opacity-50'>
             {scanning ? <Loader2 className='size-4 animate-spin' /> : <RefreshCw className='size-4' />}
             Run Security Scan
           </button>
@@ -4186,9 +4044,7 @@ describe('Desktop Telemetry E2E', () => {
       })
       .expect(201);
 
-    const response = await owner.agent
-      .post(`${telemetryPath(owner.workspaceId, desktopApp.id)}/${connected.body.id}/preview`)
-      .set('Authorization', `Bearer ${owner.accessToken}`);
+    const response = await owner.agent.post(`${telemetryPath(owner.workspaceId, desktopApp.id)}/${connected.body.id}/preview`).set('Authorization', `Bearer ${owner.accessToken}`);
 
     expect(response.status).toBe(201);
     expect(response.body.performance).toEqual(expect.arrayContaining([expect.objectContaining({ type: 'STARTUP_MS', value: 1800 })]));
@@ -4213,9 +4069,7 @@ describe('Desktop Telemetry E2E', () => {
       })
       .expect(201);
 
-    const response = await owner.agent
-      .post(`${telemetryPath(owner.workspaceId, desktopApp.id)}/${connected.body.id}/preview`)
-      .set('Authorization', `Bearer ${owner.accessToken}`);
+    const response = await owner.agent.post(`${telemetryPath(owner.workspaceId, desktopApp.id)}/${connected.body.id}/preview`).set('Authorization', `Bearer ${owner.accessToken}`);
 
     expect(response.status).toBe(502);
 
@@ -4364,9 +4218,7 @@ describe('Desktop Performance and Crashes E2E', () => {
   it('syncs provider metrics and crash groups', async () => {
     const value = await fixture();
 
-    const response = await value.owner.agent
-      .post(`${base(value.owner.workspaceId, value.desktopApp.id)}/telemetry/${value.integrationId}/sync`)
-      .set('Authorization', `Bearer ${value.owner.accessToken}`);
+    const response = await value.owner.agent.post(`${base(value.owner.workspaceId, value.desktopApp.id)}/telemetry/${value.integrationId}/sync`).set('Authorization', `Bearer ${value.owner.accessToken}`);
 
     expect(response.status).toBe(201);
     expect(response.body.performanceInserted).toBe(4);
@@ -4474,9 +4326,7 @@ describe('Desktop Performance and Crashes E2E', () => {
       .set('Authorization', `Bearer ${value.owner.accessToken}`)
       .expect(201);
 
-    const response = await attacker.agent
-      .get(`${base(value.owner.workspaceId, value.desktopApp.id)}/performance`)
-      .set('Authorization', `Bearer ${attacker.accessToken}`);
+    const response = await attacker.agent.get(`${base(value.owner.workspaceId, value.desktopApp.id)}/performance`).set('Authorization', `Bearer ${attacker.accessToken}`);
 
     expect(response.status).toBe(403);
   });
@@ -4676,9 +4526,7 @@ afterSign: scripts/notarize.js
     const fixture = await createLinkedDesktopFixture(app, prisma);
     const attacker = await registerWorkspaceTestUser(app, prisma);
 
-    const response = await attacker.agent
-      .get(`${base(fixture.owner.workspaceId, fixture.desktopApp.id)}/security`)
-      .set('Authorization', `Bearer ${attacker.accessToken}`);
+    const response = await attacker.agent.get(`${base(fixture.owner.workspaceId, fixture.desktopApp.id)}/security`).set('Authorization', `Bearer ${attacker.accessToken}`);
 
     expect(response.status).toBe(403);
   });
@@ -5041,13 +4889,7 @@ packages/test-code/web/unit/features/desktop-apps/desktop-telemetry-settings.tes
 // @vitest-environment jsdom
 
 import { DesktopTelemetrySettings } from '@/features/desktop-apps/desktop-telemetry-settings';
-import {
-  connectDesktopTelemetry,
-  disconnectDesktopTelemetry,
-  listDesktopTelemetryIntegrations,
-  previewDesktopTelemetry,
-  syncDesktopTelemetry,
-} from '@/features/desktop-apps/desktop-apps-api';
+import { connectDesktopTelemetry, disconnectDesktopTelemetry, listDesktopTelemetryIntegrations, previewDesktopTelemetry, syncDesktopTelemetry } from '@/features/desktop-apps/desktop-apps-api';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';

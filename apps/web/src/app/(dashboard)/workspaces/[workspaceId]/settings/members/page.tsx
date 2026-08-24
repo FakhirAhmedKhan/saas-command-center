@@ -8,7 +8,6 @@ export default function WorkspaceMembersSettingsPage() {
   const params = useParams<{
     workspaceId: string;
   }>();
-
   /*
    * Replace this with the existing workspace
    * membership/permission value returned by your

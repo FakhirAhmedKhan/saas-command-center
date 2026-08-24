@@ -52,27 +52,16 @@ const DIMENSIONS: Array<{
 
 export function AnalyticsEnginePanel({ workspaceId, websiteId }: AnalyticsEnginePanelProps) {
   const [status, setStatus] = useState<AnalyticsEngineStatus | null>(null);
-
   const [aggregates, setAggregates] = useState<AnalyticsAggregateResponse | null>(null);
-
   const [period, setPeriod] = useState<AnalyticsAggregatePeriod>('DAILY');
-
   const [dimension, setDimension] = useState<AnalyticsAggregateDimension>('OVERVIEW');
-
   const [dateFrom, setDateFrom] = useState('');
-
   const [dateTo, setDateTo] = useState('');
-
   const [reprocessFrom, setReprocessFrom] = useState('');
-
   const [reprocessTo, setReprocessTo] = useState('');
-
   const [loading, setLoading] = useState(true);
-
   const [action, setAction] = useState<string | null>(null);
-
   const [error, setError] = useState<string | null>(null);
-
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
@@ -255,11 +244,7 @@ export function AnalyticsEnginePanel({ workspaceId, websiteId }: AnalyticsEngine
 
           <Detail label='Latest run buckets' value={`${status.latestRun?.hourlyBuckets ?? 0} hourly / ${status.latestRun?.dailyBuckets ?? 0} daily`} />
 
-          {status.processingState?.lastError ? (
-            <div className='md:col-span-2 xl:col-span-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700'>
-              {status.processingState.lastError}
-            </div>
-          ) : null}
+          {status.processingState?.lastError ? <div className='md:col-span-2 xl:col-span-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700'>{status.processingState.lastError}</div> : null}
         </CardContent>
       </Card>
 
@@ -357,9 +342,7 @@ export function AnalyticsEnginePanel({ workspaceId, websiteId }: AnalyticsEngine
               <Spinner />
             </div>
           ) : !aggregates || aggregates.data.length === 0 ? (
-            <div className='rounded-xl border border-dashed border-slate-300 p-10 text-center text-sm text-slate-500'>
-              No aggregate rows found for this selection.
-            </div>
+            <div className='rounded-xl border border-dashed border-slate-300 p-10 text-center text-sm text-slate-500'>No aggregate rows found for this selection.</div>
           ) : (
             <div className='overflow-x-auto'>
               <table className='w-full min-w-[1050px] border-collapse text-left text-sm'>

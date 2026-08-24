@@ -1,14 +1,4 @@
-﻿import {
-  addLink,
-  addTechnology,
-  applicationRoutes,
-  archiveApplication,
-  createApplication,
-  readApiItems,
-  recordString,
-  restoreApplication,
-  updateApplication,
-} from '../helpers/application';
+﻿import { addLink, addTechnology, applicationRoutes, archiveApplication, createApplication, readApiItems, recordString, restoreApplication, updateApplication } from '../helpers/application';
 import { withBearer } from '../helpers/auth';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
@@ -18,7 +8,6 @@ import { PrismaService } from 'src/database/prisma.service';
 
 describe('Application Activity E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
 
   beforeAll(async () => {
@@ -45,11 +34,9 @@ describe('Application Activity E2E', () => {
 
   it('writes application create and update activities', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner, {
       name: 'Activity Test Application',
     });
-
     const createActivityResponse = await listApplicationActivity(owner, application.id);
 
     expect(createActivityResponse.status).toBe(200);
@@ -67,7 +54,6 @@ describe('Application Activity E2E', () => {
     ).toBe(200);
 
     const updateActivityResponse = await listApplicationActivity(owner, application.id);
-
     const afterUpdate = readApiItems(updateActivityResponse, ['activities']);
 
     expect(afterUpdate.length).toBeGreaterThan(beforeUpdate.length);
@@ -77,11 +63,8 @@ describe('Application Activity E2E', () => {
 
   it('writes technology, link, archive, and restore activities', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const initialResponse = await listApplicationActivity(owner, application.id);
-
     const initialCount = readApiItems(initialResponse, ['activities']).length;
 
     expect([200, 201]).toContain((await addTechnology(owner, application.id)).status);
@@ -93,7 +76,6 @@ describe('Application Activity E2E', () => {
     expect((await restoreApplication(owner, application.id)).status).toBe(200);
 
     const finalResponse = await listApplicationActivity(owner, application.id);
-
     const finalItems = readApiItems(finalResponse, ['activities']);
 
     expect(finalItems.length).toBeGreaterThanOrEqual(initialCount + 4);
@@ -101,13 +83,9 @@ describe('Application Activity E2E', () => {
 
   it('does not create activity for rejected operation', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const beforeResponse = await listApplicationActivity(owner, application.id);
-
     const beforeCount = readApiItems(beforeResponse, ['activities']).length;
-
     const invalidResponse = await updateApplication(owner, application.id, {
       name: '',
     });
@@ -115,7 +93,6 @@ describe('Application Activity E2E', () => {
     expect(invalidResponse.status).toBe(400);
 
     const afterResponse = await listApplicationActivity(owner, application.id);
-
     const afterCount = readApiItems(afterResponse, ['activities']).length;
 
     expect(afterCount).toBe(beforeCount);
@@ -123,7 +100,6 @@ describe('Application Activity E2E', () => {
 
   it('supports filters and pagination', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
 
     expect(
@@ -137,26 +113,19 @@ describe('Application Activity E2E', () => {
     const allResponse = await listApplicationActivity(owner, application.id, {
       limit: 100,
     });
-
     const allItems = readApiItems(allResponse, ['activities']);
 
     expect(allItems.length).toBeGreaterThanOrEqual(2);
 
     const first = allItems[0];
-
     const query: Record<string, string | number> = {
       page: 1,
       limit: 1,
     };
-
     const activityType = recordString(first!, 'activityType', 'type');
-
     const actorType = recordString(first!, 'actorType');
-
     const entityType = recordString(first!, 'entityType');
-
     const actorUserId = recordString(first!, 'actorUserId');
-
     const createdAt = recordString(first!, 'createdAt');
 
     if (activityType) {
@@ -208,17 +177,11 @@ describe('Application Activity E2E', () => {
 
   it('keeps workspace activity isolated', async () => {
     const alphaOwner = await registerWorkspaceTestUser(app, prisma);
-
     const betaOwner = await registerWorkspaceTestUser(app, prisma);
-
     const alphaApp = await createApplication(alphaOwner);
-
     const betaApp = await createApplication(betaOwner);
-
     const alphaActivityResponse = await listWorkspaceActivity(alphaOwner);
-
     const alphaActivities = readApiItems(alphaActivityResponse, ['activities']);
-
     const serialized = JSON.stringify(alphaActivities);
 
     expect(serialized).toContain(alphaApp.id);
@@ -229,18 +192,14 @@ describe('Application Activity E2E', () => {
 
     expectAccessDenied(foreignResponse);
 
-    const wrongApplicationResponse = await alphaOwner.agent
-      .get(applicationRoutes.applicationActivities(alphaOwner.workspaceId, betaApp.id))
-      .set(withBearer(alphaOwner.accessToken));
+    const wrongApplicationResponse = await alphaOwner.agent.get(applicationRoutes.applicationActivities(alphaOwner.workspaceId, betaApp.id)).set(withBearer(alphaOwner.accessToken));
 
     expect(wrongApplicationResponse.status).toBe(404);
   });
 
   it('does not expose authentication secrets', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const response = await listApplicationActivity(owner, application.id);
 
     expect(response.status).toBe(200);

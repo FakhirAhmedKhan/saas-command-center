@@ -95,7 +95,6 @@ export class ActivityQueryService {
 
   private buildWhere(workspaceId: string, applicationId: string | undefined, query: ActivityQueryDto): Prisma.ApplicationActivityWhereInput {
     const from = query.from ? new Date(query.from) : undefined;
-
     const to = query.to ? new Date(query.to) : undefined;
 
     if (from && to && to < from) {

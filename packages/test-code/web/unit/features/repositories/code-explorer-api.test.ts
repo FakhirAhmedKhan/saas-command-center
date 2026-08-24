@@ -1,19 +1,12 @@
-import {
-  getRepositoryBranches,
-  getRepositoryCodeFile,
-  getRepositoryFileDiff,
-  getRepositoryTree,
-  searchRepositoryFiles,
-} from '@/features/repositories/code-explorer-api';
-import { apiRequest } from '@/features/lib/api/api-client';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { apiRequest } from '@/features/lib/api/api-client';
+import { getRepositoryBranches, getRepositoryCodeFile, getRepositoryFileDiff, getRepositoryTree, searchRepositoryFiles } from '@/features/repositories/code-explorer-api';
 
 vi.mock('@/features/lib/api/api-client', () => ({
   apiRequest: vi.fn(),
 }));
 
 const mockedApiRequest = vi.mocked(apiRequest);
-
 const WORKSPACE = 'workspace-1';
 const REPO = 'repo-1';
 const CODE_BASE = `/workspaces/${WORKSPACE}/repositories/${REPO}/code`;

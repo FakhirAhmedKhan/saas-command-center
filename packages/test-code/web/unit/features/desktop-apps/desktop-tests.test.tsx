@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 
-import { getDesktopTestSummary, listDesktopAppTests } from '@/features/desktop-apps/desktop-apps-api';
-import { DesktopTests } from '@/features/desktop-apps/desktop-tests';
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getDesktopTestSummary, listDesktopAppTests } from '@/features/desktop-apps/desktop-apps-api';
+import { DesktopTests } from '@/features/desktop-apps/desktop-tests';
 
 vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
   getDesktopTestSummary: vi.fn(),
@@ -11,7 +11,6 @@ vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
 }));
 
 const summaryMock = vi.mocked(getDesktopTestSummary);
-
 const runsMock = vi.mocked(listDesktopAppTests);
 
 describe('DesktopTests', () => {

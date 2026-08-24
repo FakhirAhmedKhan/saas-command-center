@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { AnalyticsEnginePanel } from '@/features/analytics-engine/components/analytics-engine-panel';
 import type { AnalyticsEngineStatus } from '@/features/analytics-engine/analytics-engine-types';
 import { render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { AnalyticsEnginePanel } from '@/features/analytics-engine/components/analytics-engine-panel';
 
 const { getAnalyticsEngineStatusMock, getAnalyticsAggregatesMock } = vi.hoisted(() => ({
   getAnalyticsEngineStatusMock: vi.fn(),

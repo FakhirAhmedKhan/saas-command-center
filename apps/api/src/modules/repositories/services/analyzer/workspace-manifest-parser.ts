@@ -8,9 +8,7 @@ import type { ParsedPackageJson } from './package-json.types';
  */
 export function parsePnpmWorkspaceGlobs(yamlContent: string): string[] {
   const lines = yamlContent.split(/\r?\n/);
-
   const globs: string[] = [];
-
   let inPackagesList = false;
 
   for (const rawLine of lines) {

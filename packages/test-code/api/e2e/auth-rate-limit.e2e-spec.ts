@@ -8,13 +8,9 @@ import { PrismaService } from 'src/database/prisma.service';
 
 describe('Auth Endpoint Rate Limiting E2E (SEC-01)', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
-
   let originalRegisterLimit: string | undefined;
-
   let originalLoginLimit: string | undefined;
-
   let originalRefreshLimit: string | undefined;
 
   beforeEach(async () => {
@@ -67,7 +63,6 @@ describe('Auth Endpoint Rate Limiting E2E (SEC-01)', () => {
 
   it('allows login up to the configured limit and throttles the next attempt', async () => {
     const user = createTestUser();
-
     const registration = await registerUser(createAgent(app), user);
 
     expectSuccessfulStatus(registration);
@@ -99,7 +94,6 @@ describe('Auth Endpoint Rate Limiting E2E (SEC-01)', () => {
 
   it('allows refresh up to the configured limit, without breaking legitimate rotation, then throttles', async () => {
     const agent = createAgent(app);
-
     const registration = await registerUser(agent, createTestUser());
 
     expectSuccessfulStatus(registration);

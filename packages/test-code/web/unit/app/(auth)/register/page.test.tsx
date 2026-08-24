@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
-import RegisterPage from '@/app/(auth)/register/page';
-import { ApiError } from '@/features/lib/api/api-error';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import RegisterPage from '@/app/(auth)/register/page';
+import { ApiError } from '@/features/lib/api/api-error';
 
 const { registerMock, replaceMock } = vi.hoisted(() => ({
   registerMock: vi.fn(),

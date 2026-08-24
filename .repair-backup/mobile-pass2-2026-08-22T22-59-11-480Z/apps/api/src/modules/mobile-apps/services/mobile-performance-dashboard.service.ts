@@ -51,18 +51,11 @@ export class MobilePerformanceDashboardService {
 
     const filters = this.filters(query);
 
-    const [rows, providerAvailable] = await Promise.all([
-      this.repository.find(workspaceId, mobileAppId, filters),
-
-      this.repository.providerAvailable(workspaceId, mobileAppId),
-    ]);
+    const [rows, providerAvailable] = await Promise.all([this.repository.find(workspaceId, mobileAppId, filters), this.repository.providerAvailable(workspaceId, mobileAppId)]);
 
     const grouped = this.groupMetrics(rows);
 
-    const metrics = Object.fromEntries(ALL_METRICS.map((metric) => [metric, this.aggregate(metric, grouped.get(metric) ?? [])])) as Record<
-      MobilePerformanceMetricName,
-      MobilePerformanceValue
-    >;
+    const metrics = Object.fromEntries(ALL_METRICS.map((metric) => [metric, this.aggregate(metric, grouped.get(metric) ?? [])])) as Record<MobilePerformanceMetricName, MobilePerformanceValue>;
 
     const latest = rows.at(-1);
 
@@ -198,13 +191,7 @@ export class MobilePerformanceDashboardService {
     };
   }
 
-  private filters(query: {
-    from?: string;
-    to?: string;
-    version?: string;
-    buildNumber?: string;
-    platform?: 'ANDROID' | 'IOS' | 'CROSS_PLATFORM';
-  }): PerformanceRowFilters {
+  private filters(query: { from?: string; to?: string; version?: string; buildNumber?: string; platform?: 'ANDROID' | 'IOS' | 'CROSS_PLATFORM' }): PerformanceRowFilters {
     const from = query.from ? new Date(query.from) : undefined;
 
     const to = query.to ? new Date(query.to) : undefined;

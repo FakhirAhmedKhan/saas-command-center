@@ -57,14 +57,7 @@ describe('ApplicationCard technology overflow', () => {
 
   it('caps visible technologies at 4 and shows a "+N" badge for the remainder', () => {
     const application = makeApplication({
-      technologies: [
-        makeTechnology('t1', 'Next.js'),
-        makeTechnology('t2', 'Prisma'),
-        makeTechnology('t3', 'Postgres'),
-        makeTechnology('t4', 'Redis'),
-        makeTechnology('t5', 'Docker'),
-        makeTechnology('t6', 'Kubernetes'),
-      ],
+      technologies: [makeTechnology('t1', 'Next.js'), makeTechnology('t2', 'Prisma'), makeTechnology('t3', 'Postgres'), makeTechnology('t4', 'Redis'), makeTechnology('t5', 'Docker'), makeTechnology('t6', 'Kubernetes')],
     });
 
     render(<ApplicationCard workspaceId='workspace-1' application={application} />);

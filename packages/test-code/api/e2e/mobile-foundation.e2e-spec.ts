@@ -1,8 +1,8 @@
+import { createTestApp } from '../helpers/create-test-app';
+import { resetDatabase } from '../helpers/database';
 import type { INestApplication } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { ApplicationType, MobileFramework, MobilePlatform, WorkspaceRole } from 'src/generated/prisma/enums';
-import { createTestApp } from '../helpers/create-test-app';
-import { resetDatabase } from '../helpers/database';
 
 describe('Mobile Application Foundation E2E', () => {
   let app: INestApplication;
@@ -27,7 +27,6 @@ describe('Mobile Application Foundation E2E', () => {
         displayName: 'Mobile Foundation User',
       },
     });
-
     const workspace = await prisma.workspace.create({
       data: {
         name: 'Mobile Foundation Workspace',
@@ -51,7 +50,6 @@ describe('Mobile Application Foundation E2E', () => {
 
   it('keeps existing applications valid using OTHER as the default type', async () => {
     const { workspace } = await createFixture();
-
     const application = await prisma.saasApplication.create({
       data: {
         workspaceId: workspace.id,
@@ -65,7 +63,6 @@ describe('Mobile Application Foundation E2E', () => {
 
   it('stores a MOBILE application with mobile metadata', async () => {
     const { workspace } = await createFixture();
-
     const application = await prisma.saasApplication.create({
       data: {
         workspaceId: workspace.id,
@@ -109,7 +106,6 @@ describe('Mobile Application Foundation E2E', () => {
 
   it('allows only one mobile metadata record per parent application', async () => {
     const { workspace } = await createFixture();
-
     const application = await prisma.saasApplication.create({
       data: {
         workspaceId: workspace.id,
@@ -145,7 +141,6 @@ describe('Mobile Application Foundation E2E', () => {
 
   it('deletes mobile metadata when the parent application is deleted', async () => {
     const { workspace } = await createFixture();
-
     const application = await prisma.saasApplication.create({
       data: {
         workspaceId: workspace.id,
@@ -181,7 +176,6 @@ describe('Mobile Application Foundation E2E', () => {
 
   it('preserves workspace ownership through the parent application', async () => {
     const { workspace } = await createFixture();
-
     const application = await prisma.saasApplication.create({
       data: {
         workspaceId: workspace.id,
@@ -200,7 +194,6 @@ describe('Mobile Application Foundation E2E', () => {
         },
       },
     });
-
     const mobileApplication = await prisma.mobileApplication.findFirst({
       where: {
         applicationId: application.id,

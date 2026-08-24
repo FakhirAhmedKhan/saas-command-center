@@ -1,14 +1,6 @@
 'use client';
 
-import {
-  createDesktopAlertRule,
-  deleteDesktopAlertRule,
-  evaluateDesktopAlerts,
-  getDesktopPermissions,
-  listDesktopAlertIncidents,
-  listDesktopAlertRules,
-  updateDesktopAlertRule,
-} from './desktop-apps-api';
+import { createDesktopAlertRule, deleteDesktopAlertRule, evaluateDesktopAlerts, getDesktopPermissions, listDesktopAlertIncidents, listDesktopAlertRules, updateDesktopAlertRule } from './desktop-apps-api';
 import { DesktopPermissionGate } from './desktop-permission-gate';
 import { getErrorMessage } from '@/features/lib/api/api-error';
 import type { DesktopAlertIncident, DesktopAlertRule, DesktopAlertRuleType, DesktopPermissions } from '@command-center/shared-types';
@@ -92,9 +84,7 @@ export function DesktopAlerts({ workspaceId, desktopAppId }: Props) {
   const [type, setType] = useState<DesktopAlertRuleType>('CRASH_RATE');
   const [threshold, setThreshold] = useState('2');
   const [cooldownMinutes, setCooldownMinutes] = useState('60');
-
   const selected = useMemo(() => TYPES.find((candidate) => candidate.value === type) ?? TYPES[0]!, [type]);
-
   const load = useCallback(async () => {
     try {
       const [ruleData, incidentData, permissionData] = await Promise.all([
@@ -214,12 +204,7 @@ export function DesktopAlerts({ workspaceId, desktopAppId }: Props) {
         </div>
 
         <DesktopPermissionGate permissions={permissions} require='write'>
-          <button
-            type='button'
-            onClick={() => void evaluate()}
-            disabled={evaluating}
-            className='inline-flex h-10 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-medium disabled:opacity-50'
-          >
+          <button type='button' onClick={() => void evaluate()} disabled={evaluating} className='inline-flex h-10 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-medium disabled:opacity-50'>
             <RefreshCcw className='size-4' aria-hidden='true' />
             {evaluating ? 'Evaluating…' : 'Evaluate now'}
           </button>
@@ -278,24 +263,11 @@ export function DesktopAlerts({ workspaceId, desktopAppId }: Props) {
 
             <label className='space-y-1 text-sm'>
               <span>Cooldown (minutes)</span>
-              <input
-                aria-label='Cooldown minutes'
-                type='number'
-                min='1'
-                max='10080'
-                value={cooldownMinutes}
-                onChange={(event) => setCooldownMinutes(event.target.value)}
-                className='h-10 w-full rounded-lg border px-3'
-              />
+              <input aria-label='Cooldown minutes' type='number' min='1' max='10080' value={cooldownMinutes} onChange={(event) => setCooldownMinutes(event.target.value)} className='h-10 w-full rounded-lg border px-3' />
             </label>
           </div>
 
-          <button
-            type='button'
-            onClick={() => void createRule()}
-            disabled={saving}
-            className='mt-4 h-10 rounded-lg bg-slate-950 px-4 text-sm font-medium text-white disabled:opacity-50'
-          >
+          <button type='button' onClick={() => void createRule()} disabled={saving} className='mt-4 h-10 rounded-lg bg-slate-950 px-4 text-sm font-medium text-white disabled:opacity-50'>
             {saving ? 'Saving…' : 'Create alert'}
           </button>
         </section>
@@ -323,22 +295,12 @@ export function DesktopAlerts({ workspaceId, desktopAppId }: Props) {
 
                 <DesktopPermissionGate permissions={permissions} require='write'>
                   <div className='flex items-center gap-2'>
-                    <button
-                      type='button'
-                      aria-label={`${rule.enabled ? 'Disable' : 'Enable'} ${rule.name}`}
-                      onClick={() => void setEnabled(rule, !rule.enabled)}
-                      className='h-9 rounded-lg border px-3 text-sm'
-                    >
+                    <button type='button' aria-label={`${rule.enabled ? 'Disable' : 'Enable'} ${rule.name}`} onClick={() => void setEnabled(rule, !rule.enabled)} className='h-9 rounded-lg border px-3 text-sm'>
                       {rule.enabled ? 'Disable' : 'Enable'}
                     </button>
 
                     <DesktopPermissionGate permissions={permissions} require='manage'>
-                      <button
-                        type='button'
-                        aria-label={`Delete ${rule.name}`}
-                        onClick={() => void remove(rule.id)}
-                        className='inline-flex size-9 items-center justify-center rounded-lg border'
-                      >
+                      <button type='button' aria-label={`Delete ${rule.name}`} onClick={() => void remove(rule.id)} className='inline-flex size-9 items-center justify-center rounded-lg border'>
                         <Trash2 className='size-4' aria-hidden='true' />
                       </button>
                     </DesktopPermissionGate>

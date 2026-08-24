@@ -36,13 +36,11 @@ export class MilestonesService {
       this.shared.ensureApplicationActive(application);
 
       const startsAt = this.shared.toNullableDate(dto.startsAt);
-
       const dueAt = this.shared.toNullableDate(dto.dueAt);
 
       this.shared.validateDateRange(startsAt, dueAt);
 
       const position = await this.nextMilestonePosition(transaction, applicationId);
-
       const milestone = await transaction.applicationMilestone.create({
         data: {
           applicationId,
@@ -92,7 +90,6 @@ export class MilestonesService {
       }
 
       const startsAt = dto.startsAt !== undefined ? this.shared.toNullableDate(dto.startsAt) : milestone.startsAt;
-
       const dueAt = dto.dueAt !== undefined ? this.shared.toNullableDate(dto.dueAt) : milestone.dueAt;
 
       this.shared.validateDateRange(startsAt, dueAt);
@@ -166,7 +163,6 @@ export class MilestonesService {
       this.shared.ensureApplicationActive(application);
 
       const milestone = await this.requireMilestone(transaction, applicationId, milestoneId);
-
       const openBlockers = await transaction.applicationBlocker.count({
         where: {
           applicationId,

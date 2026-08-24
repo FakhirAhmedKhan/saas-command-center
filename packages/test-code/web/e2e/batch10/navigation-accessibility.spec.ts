@@ -102,9 +102,7 @@ test.describe('Batch 10 navigation, responsiveness, and accessibility', () => {
       }),
     ).toBeVisible();
 
-    const latestRequest = state.requests
-      .filter((request) => request.method === 'GET' && request.path === `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`)
-      .at(-1);
+    const latestRequest = state.requests.filter((request) => request.method === 'GET' && request.path === `/workspaces/${PRIMARY_WORKSPACE_ID}/applications`).at(-1);
 
     expect(latestRequest?.search).toContain('search=PriceScout');
   });

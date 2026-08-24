@@ -12,17 +12,11 @@ export default function InvitationPage() {
   const params = useParams<{
     token: string;
   }>();
-
   const router = useRouter();
-
   const { status, user } = useSession();
-
   const [invitation, setInvitation] = useState<InvitationPreview | null>(null);
-
   const [loading, setLoading] = useState(true);
-
   const [submitting, setSubmitting] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -119,10 +113,7 @@ export default function InvitationPage() {
           <div className='mt-6'>
             <p className='text-sm text-slate-600'>Sign in using {invitation.email} before accepting.</p>
 
-            <Link
-              href={`/login?next=${encodeURIComponent(`/invitations/${params.token}`)}`}
-              className='mt-4 inline-block rounded-lg bg-slate-950 px-4 py-2.5 font-medium text-white'
-            >
+            <Link href={`/login?next=${encodeURIComponent(`/invitations/${params.token}`)}`} className='mt-4 inline-block rounded-lg bg-slate-950 px-4 py-2.5 font-medium text-white'>
               Sign in
             </Link>
           </div>

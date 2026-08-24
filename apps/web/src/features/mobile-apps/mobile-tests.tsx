@@ -14,11 +14,8 @@ interface Props {
 
 export function MobileTests({ workspaceId, mobileAppId }: Props) {
   const [builds, setBuilds] = useState<MobileBuildDetails[]>([]);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
-
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);

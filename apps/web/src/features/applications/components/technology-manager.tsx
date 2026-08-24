@@ -18,15 +18,11 @@ interface TechnologyManagerProps {
 
 export function TechnologyManager({ workspaceId, applicationId, technologies, disabled = false, onChanged }: TechnologyManagerProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
-
   const [name, setName] = useState('');
   const [type, setType] = useState<TechnologyType>('FRONTEND');
   const [version, setVersion] = useState('');
-
   const [saving, setSaving] = useState(false);
-
   const [busyId, setBusyId] = useState<string | null>(null);
-
   const [error, setError] = useState<string | null>(null);
 
   function resetForm(): void {
@@ -109,9 +105,7 @@ export function TechnologyManager({ workspaceId, applicationId, technologies, di
 
       <CardContent className='space-y-6'>
         {disabled ? (
-          <div className='rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800'>
-            Restore this application before modifying its technology stack.
-          </div>
+          <div className='rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800'>Restore this application before modifying its technology stack.</div>
         ) : (
           <form onSubmit={handleSubmit} className='grid gap-4 rounded-2xl bg-slate-50 p-4 lg:grid-cols-[minmax(0,1fr)_180px_160px_auto]'>
             <Input aria-label='Technology name' placeholder='Next.js' value={name} disabled={saving} onChange={(event) => setName(event.target.value)} />
@@ -124,13 +118,7 @@ export function TechnologyManager({ workspaceId, applicationId, technologies, di
               ))}
             </Select>
 
-            <Input
-              aria-label='Technology version'
-              placeholder='Version'
-              value={version}
-              disabled={saving}
-              onChange={(event) => setVersion(event.target.value)}
-            />
+            <Input aria-label='Technology version' placeholder='Version' value={version} disabled={saving} onChange={(event) => setVersion(event.target.value)} />
 
             <div className='flex gap-2'>
               <Button type='submit' loading={saving} className='flex-1'>

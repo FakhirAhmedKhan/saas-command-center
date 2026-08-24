@@ -25,7 +25,6 @@ export function DesktopBuilds({ workspaceId, desktopAppId }: Props) {
   const [version, setVersion] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const load = useCallback(async () => {
     try {
       setBuilds(
@@ -108,22 +107,12 @@ export function DesktopBuilds({ workspaceId, desktopAppId }: Props) {
 
         <label className='text-xs font-semibold text-slate-500'>
           Branch
-          <input
-            aria-label='Build branch filter'
-            value={branch}
-            onChange={(event) => setBranch(event.target.value)}
-            className='mt-1 h-9 w-full rounded-lg border border-slate-300 px-2 text-sm'
-          />
+          <input aria-label='Build branch filter' value={branch} onChange={(event) => setBranch(event.target.value)} className='mt-1 h-9 w-full rounded-lg border border-slate-300 px-2 text-sm' />
         </label>
 
         <label className='text-xs font-semibold text-slate-500'>
           Version
-          <input
-            aria-label='Build version filter'
-            value={version}
-            onChange={(event) => setVersion(event.target.value)}
-            className='mt-1 h-9 w-full rounded-lg border border-slate-300 px-2 text-sm'
-          />
+          <input aria-label='Build version filter' value={version} onChange={(event) => setVersion(event.target.value)} className='mt-1 h-9 w-full rounded-lg border border-slate-300 px-2 text-sm' />
         </label>
       </div>
 
@@ -136,9 +125,7 @@ export function DesktopBuilds({ workspaceId, desktopAppId }: Props) {
       {loading ? (
         <div className='rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-500'>Loading builds...</div>
       ) : builds.length === 0 ? (
-        <div className='rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500'>
-          No desktop builds match the current filters.
-        </div>
+        <div className='rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500'>No desktop builds match the current filters.</div>
       ) : (
         <div className='overflow-hidden rounded-2xl border border-slate-200 bg-white'>
           <div className='overflow-x-auto'>

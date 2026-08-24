@@ -1,6 +1,6 @@
-import { downloadAnalyticsReport, getAnalyticsReport } from '@/features/analytics-reports/analytics-reports-api';
 import type { AnalyticsReportRequest } from '@/features/analytics-reports/analytics-reports.types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { downloadAnalyticsReport, getAnalyticsReport } from '@/features/analytics-reports/analytics-reports-api';
 
 const { apiRequestMock, apiDownloadMock } = vi.hoisted(() => ({
   apiRequestMock: vi.fn(),

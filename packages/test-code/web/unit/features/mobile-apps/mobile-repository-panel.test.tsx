@@ -1,15 +1,11 @@
 // @vitest-environment jsdom
-import { MobileRepositoryPanel } from '@/features/mobile-apps/mobile-repository-panel';
-
-import { getMobileRepository, linkMobileRepository, unlinkMobileRepository } from '@/features/mobile-apps/mobile-apps-api';
-
-import { listRepositories } from '@/features/repositories/repositories-api';
 
 import { render, screen, waitFor } from '@testing-library/react';
-
 import userEvent from '@testing-library/user-event';
-
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getMobileRepository, linkMobileRepository, unlinkMobileRepository } from '@/features/mobile-apps/mobile-apps-api';
+import { MobileRepositoryPanel } from '@/features/mobile-apps/mobile-repository-panel';
+import { listRepositories } from '@/features/repositories/repositories-api';
 
 vi.mock('@/features/mobile-apps/mobile-apps-api', () => ({
   getMobileRepository: vi.fn(),
@@ -24,13 +20,9 @@ vi.mock('@/features/repositories/repositories-api', () => ({
 }));
 
 const mockedGetMobileRepository = vi.mocked(getMobileRepository);
-
 const mockedLinkMobileRepository = vi.mocked(linkMobileRepository);
-
 const mockedUnlinkMobileRepository = vi.mocked(unlinkMobileRepository);
-
 const mockedListRepositories = vi.mocked(listRepositories);
-
 const mobileApp = {
   id: 'mobile-1',
 
@@ -74,7 +66,6 @@ const mobileApp = {
     updatedAt: new Date().toISOString(),
   },
 } as const;
-
 const repository = {
   id: 'repository-1',
 
@@ -128,7 +119,6 @@ describe('MobileRepositoryPanel', () => {
 
   it('links selected repository', async () => {
     const user = userEvent.setup();
-
     const changed = vi.fn();
 
     render(<MobileRepositoryPanel workspaceId='workspace-1' mobileApp={mobileApp} onRepositoryChanged={changed} />);

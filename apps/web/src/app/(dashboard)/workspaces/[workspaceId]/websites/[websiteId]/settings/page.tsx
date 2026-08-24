@@ -4,16 +4,7 @@ import { PageLoading } from '@/components/states/page-loading';
 import { getApplications } from '@/features/applications/application-api';
 import type { SaasApplication } from '@/features/applications/application-types';
 import { WebsiteSubNav } from '@/features/websites/components/website-sub-nav';
-import {
-  archiveWebsite,
-  connectWebsite,
-  disableWebsite,
-  disconnectWebsite,
-  enableWebsite,
-  getWebsite,
-  restoreWebsite,
-  rotateWebsiteKey,
-} from '@/features/websites/website-api';
+import { archiveWebsite, connectWebsite, disableWebsite, disconnectWebsite, enableWebsite, getWebsite, restoreWebsite, rotateWebsiteKey } from '@/features/websites/website-api';
 import type { Website } from '@/features/websites/website-types';
 import { getWebsiteError, websiteKeyStorageName } from '@/features/websites/website-utils';
 import { Select, Card, CardContent, CardHeader, Button } from '@command-center/ui';
@@ -26,23 +17,14 @@ export default function WebsiteSettingsPage() {
     workspaceId: string;
     websiteId: string;
   }>();
-
   const { workspaceId, websiteId } = params;
-
   const [website, setWebsite] = useState<Website | null>(null);
-
   const [applications, setApplications] = useState<SaasApplication[]>([]);
-
   const [selectedApplicationId, setSelectedApplicationId] = useState('');
-
   const [generatedKey, setGeneratedKey] = useState<string | null>(null);
-
   const [copied, setCopied] = useState(false);
-
   const [loading, setLoading] = useState(true);
-
   const [action, setAction] = useState<string | null>(null);
-
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -194,12 +176,7 @@ export default function WebsiteSettingsPage() {
           </CardHeader>
 
           <CardContent className='space-y-4'>
-            <Select
-              label='Application'
-              value={selectedApplicationId}
-              disabled={Boolean(website.archivedAt)}
-              onChange={(event) => setSelectedApplicationId(event.target.value)}
-            >
+            <Select label='Application' value={selectedApplicationId} disabled={Boolean(website.archivedAt)} onChange={(event) => setSelectedApplicationId(event.target.value)}>
               <option value=''>Not connected</option>
 
               {applications.map((application) => (
@@ -211,23 +188,14 @@ export default function WebsiteSettingsPage() {
 
             <div className='flex flex-wrap gap-3'>
               {selectedApplicationId ? (
-                <Button
-                  loading={action === 'connect'}
-                  disabled={Boolean(website.archivedAt)}
-                  onClick={() => void run('connect', () => connectWebsite(workspaceId, websiteId, selectedApplicationId))}
-                >
+                <Button loading={action === 'connect'} disabled={Boolean(website.archivedAt)} onClick={() => void run('connect', () => connectWebsite(workspaceId, websiteId, selectedApplicationId))}>
                   <Link2 className='size-4' />
                   Connect application
                 </Button>
               ) : null}
 
               {website.applicationId ? (
-                <Button
-                  variant='outline'
-                  loading={action === 'disconnect'}
-                  disabled={Boolean(website.archivedAt)}
-                  onClick={() => void run('disconnect', () => disconnectWebsite(workspaceId, websiteId))}
-                >
+                <Button variant='outline' loading={action === 'disconnect'} disabled={Boolean(website.archivedAt)} onClick={() => void run('disconnect', () => disconnectWebsite(workspaceId, websiteId))}>
                   <Unlink className='size-4' />
                   Disconnect
                 </Button>
@@ -248,11 +216,7 @@ export default function WebsiteSettingsPage() {
                 Disable tracking
               </Button>
             ) : (
-              <Button
-                loading={action === 'enable'}
-                disabled={Boolean(website.archivedAt)}
-                onClick={() => void run('enable', () => enableWebsite(workspaceId, websiteId))}
-              >
+              <Button loading={action === 'enable'} disabled={Boolean(website.archivedAt)} onClick={() => void run('enable', () => enableWebsite(workspaceId, websiteId))}>
                 <PlayCircle className='size-4' />
                 Enable tracking
               </Button>

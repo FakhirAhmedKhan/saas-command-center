@@ -20,31 +20,19 @@ export class DesktopPerformanceController {
   ) {}
 
   @Get('performance')
-  get(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Query() query: DesktopRuntimeQueryDto,
-  ) {
+  get(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Query() query: DesktopRuntimeQueryDto) {
     return this.performance.get(workspaceId, desktopAppId, query);
   }
 
   @Post('telemetry/:integrationId/sync')
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
-  sync(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Param('integrationId', ParseUUIDPipe) integrationId: string,
-  ) {
+  sync(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Param('integrationId', ParseUUIDPipe) integrationId: string) {
     return this.runtime.syncProvider(workspaceId, desktopAppId, integrationId);
   }
 
   @Post('runtime/ingest')
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
-  ingest(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Body() dto: IngestDesktopRuntimeDto,
-  ) {
+  ingest(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Body() dto: IngestDesktopRuntimeDto) {
     return this.runtime.ingestNormalized(workspaceId, desktopAppId, dto);
   }
 }

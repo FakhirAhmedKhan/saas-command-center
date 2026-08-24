@@ -5,14 +5,16 @@
   "type": "module",
   "exports": {
     "./base": "./base.mjs",
-    "./import-rules": "./import-rules.mjs"
+    "./import-rules": "./import-rules.mjs",
+    "./style": "./style.mjs"
   },
   "peerDependencies": {
     "@eslint/js": "^9.0.0",
     "eslint": "^9.0.0",
     "typescript-eslint": "^8.67.0"
   },
-  "devDependencies": {
+  "dependencies": {
+    "@stylistic/eslint-plugin": "^5.10.0",
     "eslint-plugin-import": "^2.32.0"
   }
 }

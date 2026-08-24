@@ -18,7 +18,6 @@ import { WorkspaceRole } from 'src/generated/prisma/enums';
 
 describe('Workspace Members E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
 
   beforeEach(async () => {
@@ -37,9 +36,7 @@ describe('Workspace Members E2E', () => {
     const owner = await registerWorkspaceTestUser(app, prisma, {
       workspaceName: 'Members List Workspace',
     });
-
     const developer = await registerWorkspaceTestUser(app, prisma);
-
     const addResponse = await addWorkspaceMember(owner, developer, WorkspaceRole.DEVELOPER);
 
     expect([200, 201]).toContain(addResponse.status);
@@ -67,9 +64,7 @@ describe('Workspace Members E2E', () => {
 
   it('uses VIEWER as the default role when role is omitted', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const member = await registerWorkspaceTestUser(app, prisma);
-
     const addResponse = await addWorkspaceMember(owner, member);
 
     expect([200, 201]).toContain(addResponse.status);
@@ -83,7 +78,6 @@ describe('Workspace Members E2E', () => {
 
   it('returns 404 when adding an unregistered email', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const response = await owner.agent.post(workspaceRoutes.members(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
       email: 'missing-user@example.test',
       role: WorkspaceRole.VIEWER,
@@ -96,9 +90,7 @@ describe('Workspace Members E2E', () => {
 
   it('rejects duplicate workspace membership', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const member = await registerWorkspaceTestUser(app, prisma);
-
     const firstResponse = await addWorkspaceMember(owner, member, WorkspaceRole.DEVELOPER);
 
     expect([200, 201]).toContain(firstResponse.status);
@@ -119,9 +111,7 @@ describe('Workspace Members E2E', () => {
 
   it('allows the owner to update a member role', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const member = await registerWorkspaceTestUser(app, prisma);
-
     const addResponse = await addWorkspaceMember(owner, member, WorkspaceRole.VIEWER);
 
     expect([200, 201]).toContain(addResponse.status);
@@ -137,9 +127,7 @@ describe('Workspace Members E2E', () => {
 
   it('allows the owner to remove a member and immediately revokes access', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const member = await registerWorkspaceTestUser(app, prisma);
-
     const addResponse = await addWorkspaceMember(owner, member, WorkspaceRole.DEVELOPER);
 
     expect([200, 201]).toContain(addResponse.status);
@@ -169,13 +157,10 @@ describe('Workspace Members E2E', () => {
     const alphaOwner = await registerWorkspaceTestUser(app, prisma, {
       workspaceName: 'Alpha Workspace',
     });
-
     const alphaMember = await registerWorkspaceTestUser(app, prisma);
-
     const betaOwner = await registerWorkspaceTestUser(app, prisma, {
       workspaceName: 'Beta Workspace',
     });
-
     const addResponse = await addWorkspaceMember(alphaOwner, alphaMember, WorkspaceRole.VIEWER);
 
     expect([200, 201]).toContain(addResponse.status);
@@ -195,9 +180,7 @@ describe('Workspace Members E2E', () => {
 
   it('rejects malformed member role values', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const member = await registerWorkspaceTestUser(app, prisma);
-
     const response = await owner.agent.post(workspaceRoutes.members(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
       email: member.input.email,
       role: 'SUPER_ADMIN',

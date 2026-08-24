@@ -16,7 +16,6 @@ export function DesktopSecurity({ workspaceId, desktopAppId }: Props) {
   const [loading, setLoading] = useState(true);
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const load = useCallback(async () => {
     try {
       setData(await getDesktopSecurity(workspaceId, desktopAppId));
@@ -63,12 +62,7 @@ export function DesktopSecurity({ workspaceId, desktopAppId }: Props) {
               <p className='mt-1 text-sm text-slate-500'>Signing, notarization, packaging and dependency risk metadata. Secret values are never rendered.</p>
             </div>
           </div>
-          <button
-            type='button'
-            disabled={scanning}
-            onClick={() => void scan()}
-            className='inline-flex h-10 items-center gap-2 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white disabled:opacity-50'
-          >
+          <button type='button' disabled={scanning} onClick={() => void scan()} className='inline-flex h-10 items-center gap-2 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white disabled:opacity-50'>
             {scanning ? <Loader2 className='size-4 animate-spin' /> : <RefreshCw className='size-4' />}
             Run Security Scan
           </button>

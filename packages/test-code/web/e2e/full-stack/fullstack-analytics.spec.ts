@@ -11,7 +11,6 @@ test.describe.configure({
 test.describe('Batch 11 real analytics pipeline', () => {
   let context: BrowserContext;
   let page: Page;
-
   let visitorId = '';
   let sessionId = '';
 
@@ -33,7 +32,6 @@ test.describe('Batch 11 real analytics pipeline', () => {
 
   test('accepts real tracker events through the public collect endpoint', async ({ request }) => {
     const timestamp = new Date().toISOString();
-
     const response = await request.post(`${state.apiUrl}/collect`, {
       headers: {
         Origin: state.trackingOrigin,
@@ -124,9 +122,7 @@ test.describe('Batch 11 real analytics pipeline', () => {
 
     await expectMetric(page, 'Pending', 3);
 
-    const processingResponse = page.waitForResponse(
-      (response) => response.url().endsWith('/analytics-engine/process') && response.request().method() === 'POST',
-    );
+    const processingResponse = page.waitForResponse((response) => response.url().endsWith('/analytics-engine/process') && response.request().method() === 'POST');
 
     await page
       .getByRole('button', {

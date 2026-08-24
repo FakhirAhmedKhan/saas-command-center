@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { TrackingStatusPanel } from '@/features/tracking/components/tracking-status-panel';
 import type { TrackingStatus } from '@/features/tracking/tracking-types';
 import { render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { TrackingStatusPanel } from '@/features/tracking/components/tracking-status-panel';
 
 const { getTrackingStatusMock } = vi.hoisted(() => ({
   getTrackingStatusMock: vi.fn(),

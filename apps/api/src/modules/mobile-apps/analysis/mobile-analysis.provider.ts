@@ -5,9 +5,7 @@ import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 export class ConfiguredMobileAnalysisProvider implements MobileAnalysisProvider {
   async analyze(input: MobileAnalysisProviderInput): Promise<string> {
     const endpoint = process.env.MOBILE_AI_ANALYSIS_URL;
-
     const apiKey = process.env.MOBILE_AI_ANALYSIS_API_KEY;
-
     const model = process.env.MOBILE_AI_ANALYSIS_MODEL;
 
     if (!endpoint || !apiKey || !model) {
@@ -15,7 +13,6 @@ export class ConfiguredMobileAnalysisProvider implements MobileAnalysisProvider 
     }
 
     const controller = new AbortController();
-
     const timer = setTimeout(() => controller.abort(), 20_000);
 
     try {

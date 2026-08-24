@@ -1,15 +1,15 @@
-import { AppModule } from 'src/app.module';
 import { createAgent, createTestUser, registerUser, withBearer } from '../helpers/auth';
 import { resetDatabase } from '../helpers/database';
 import { readAccessToken } from '../helpers/response';
-import { PrismaService } from 'src/database/prisma.service';
-import { GithubAppService, type GithubImportableRepository, type GithubInstallation } from 'src/modules/repositories/services/github-app.service';
-import { GithubCodeService, type GithubRepositoryContent, type GithubRepositoryTree } from 'src/modules/repositories/services/github-code.service';
 import { ValidationPipe, type INestApplication } from '@nestjs/common';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import cookieParser from 'cookie-parser';
 import { json, urlencoded } from 'express';
+import { AppModule } from 'src/app.module';
+import { PrismaService } from 'src/database/prisma.service';
+import { GithubAppService, type GithubImportableRepository, type GithubInstallation } from 'src/modules/repositories/services/github-app.service';
+import { GithubCodeService, type GithubRepositoryContent, type GithubRepositoryTree } from 'src/modules/repositories/services/github-code.service';
 import request, { type Response } from 'supertest';
 
 const API_PREFIX = '/api/v1';
@@ -21,7 +21,6 @@ interface Identity {
 }
 
 const DEFAULT_INSTALLATION_ID = '930001';
-
 const DEFAULT_OWNER = 'phase21-org';
 
 function githubAppMockFactory() {
@@ -124,7 +123,6 @@ async function createTestApp(): Promise<{
 }> {
   const githubAppMock = githubAppMockFactory();
   const githubCodeMock = githubCodeMockFactory();
-
   const testingModule = await Test.createTestingModule({
     imports: [AppModule],
   })
@@ -133,11 +131,9 @@ async function createTestApp(): Promise<{
     .overrideProvider(GithubCodeService)
     .useValue(githubCodeMock)
     .compile();
-
   const app = testingModule.createNestApplication<NestExpressApplication>({
     bodyParser: false,
   });
-
   const expressInstance = app.getHttpAdapter().getInstance();
   expressInstance.set('trust proxy', 1);
 
@@ -168,15 +164,12 @@ async function registerIdentity(app: INestApplication, label: string): Promise<I
     name: `${label} User`,
     workspaceName: `${label} Workspace`,
   });
-
   const response = await registerUser(createAgent(app), userInput);
 
   expect(response.status).toBe(201);
 
   const token = readAccessToken(response);
-
   const prisma = app.get(PrismaService);
-
   const user = await prisma.user.findUnique({
     where: { email: userInput.email },
     select: { id: true },
@@ -196,21 +189,13 @@ async function connectPersonalGithub(app: INestApplication, identity: Identity, 
 
   const installationUrl = requireString(responseRecord(beginResponse), 'installationUrl');
   const installState = queryParameter(installationUrl, 'state');
-
-  const setupResponse = await request(app.getHttpServer())
-    .post(`${API_PREFIX}/repositories/github/personal/setup`)
-    .set(withBearer(identity.token))
-    .send({ installState, installationId });
+  const setupResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/setup`).set(withBearer(identity.token)).send({ installState, installationId });
 
   expect(setupResponse.status).toBe(201);
 
   const authorizationUrl = requireString(responseRecord(setupResponse), 'authorizationUrl');
   const oauthState = queryParameter(authorizationUrl, 'state');
-
-  const callbackResponse = await request(app.getHttpServer())
-    .post(`${API_PREFIX}/repositories/github/personal/callback`)
-    .set(withBearer(identity.token))
-    .send({ code: 'phase21-oauth-code', state: oauthState });
+  const callbackResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/callback`).set(withBearer(identity.token)).send({ code: 'phase21-oauth-code', state: oauthState });
 
   expect(callbackResponse.status).toBe(201);
 }
@@ -255,7 +240,6 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
 
     it('allows any authenticated user to begin a personal connect without an existing workspace', async () => {
       const identity = await registerIdentity(app, 'Personal Connect');
-
       const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/connect`).set(withBearer(identity.token));
 
       expect(response.status).toBe(201);
@@ -269,24 +253,14 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
 
     it('rejects the callback when the GitHub user cannot access the installation', async () => {
       const identity = await registerIdentity(app, 'Denied Personal Connect');
-
       const beginResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/connect`).set(withBearer(identity.token));
-
       const installState = queryParameter(requireString(responseRecord(beginResponse), 'installationUrl'), 'state');
-
-      const setupResponse = await request(app.getHttpServer())
-        .post(`${API_PREFIX}/repositories/github/personal/setup`)
-        .set(withBearer(identity.token))
-        .send({ installState, installationId: DEFAULT_INSTALLATION_ID });
-
+      const setupResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/setup`).set(withBearer(identity.token)).send({ installState, installationId: DEFAULT_INSTALLATION_ID });
       const oauthState = queryParameter(requireString(responseRecord(setupResponse), 'authorizationUrl'), 'state');
 
       githubAppMock.userCanAccessInstallation.mockResolvedValueOnce(false);
 
-      const callbackResponse = await request(app.getHttpServer())
-        .post(`${API_PREFIX}/repositories/github/personal/callback`)
-        .set(withBearer(identity.token))
-        .send({ code: 'denied-code', state: oauthState });
+      const callbackResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/callback`).set(withBearer(identity.token)).send({ code: 'denied-code', state: oauthState });
 
       expect(callbackResponse.status).toBe(403);
     });
@@ -307,7 +281,6 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
   describe('Repository listing', () => {
     it('rejects listing repositories before GitHub is connected', async () => {
       const identity = await registerIdentity(app, 'No Repos Yet');
-
       const response = await request(app.getHttpServer()).get(`${API_PREFIX}/repositories/github/personal`).set(withBearer(identity.token));
 
       expect(response.status).toBe(200);
@@ -339,11 +312,7 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
   describe('Repository analysis', () => {
     it('rejects analyzing a repository the user has not connected', async () => {
       const identity = await registerIdentity(app, 'Unauthorized Analyze');
-
-      const response = await request(app.getHttpServer())
-        .post(`${API_PREFIX}/repositories/github/personal/analyze`)
-        .set(withBearer(identity.token))
-        .send({ repositoryId: 940001 });
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/analyze`).set(withBearer(identity.token)).send({ repositoryId: 940001 });
 
       expect(response.status).toBe(403);
     });
@@ -352,10 +321,7 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
       const identity = await registerIdentity(app, 'Cross Repo Analyze');
       await connectPersonalGithub(app, identity);
 
-      const response = await request(app.getHttpServer())
-        .post(`${API_PREFIX}/repositories/github/personal/analyze`)
-        .set(withBearer(identity.token))
-        .send({ repositoryId: 999999 });
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/analyze`).set(withBearer(identity.token)).send({ repositoryId: 999999 });
 
       expect(response.status).toBe(403);
     });
@@ -394,10 +360,7 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
         return null;
       });
 
-      const response = await request(app.getHttpServer())
-        .post(`${API_PREFIX}/repositories/github/personal/analyze`)
-        .set(withBearer(identity.token))
-        .send({ repositoryId: 940001 });
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/analyze`).set(withBearer(identity.token)).send({ repositoryId: 940001 });
 
       expect(response.status).toBe(201);
 
@@ -455,7 +418,6 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
             }),
           },
         };
-
         const match = files[path];
 
         if (!match) {
@@ -472,10 +434,7 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
         };
       });
 
-      const response = await request(app.getHttpServer())
-        .post(`${API_PREFIX}/repositories/github/personal/analyze`)
-        .set(withBearer(identity.token))
-        .send({ repositoryId: 940001 });
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/analyze`).set(withBearer(identity.token)).send({ repositoryId: 940001 });
 
       expect(response.status).toBe(201);
 
@@ -485,7 +444,6 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
       expect(body.packageManager).toBe('pnpm');
 
       const applications = body.applications as Array<Record<string, unknown>>;
-
       const api = applications.find((application) => application.rootDirectory === 'apps/api');
       const sharedTypes = applications.find((application) => application.rootDirectory === 'packages/shared-types');
 
@@ -504,10 +462,7 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
         entries: [{ path: 'README.md', type: 'file', sha: 'r1', size: 10 }],
       });
 
-      const response = await request(app.getHttpServer())
-        .post(`${API_PREFIX}/repositories/github/personal/analyze`)
-        .set(withBearer(identity.token))
-        .send({ repositoryId: 940001 });
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/analyze`).set(withBearer(identity.token)).send({ repositoryId: 940001 });
 
       expect(response.status).toBe(422);
     });
@@ -555,10 +510,7 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
         return null;
       });
 
-      const response = await request(app.getHttpServer())
-        .post(`${API_PREFIX}/repositories/github/personal/analyze`)
-        .set(withBearer(identity.token))
-        .send({ repositoryId: 940001 });
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/analyze`).set(withBearer(identity.token)).send({ repositoryId: 940001 });
 
       expect(response.status).toBe(201);
 
@@ -591,17 +543,13 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
         }),
       });
 
-      const response = await request(app_.getHttpServer())
-        .post(`${API_PREFIX}/repositories/github/personal/analyze`)
-        .set(withBearer(identity.token))
-        .send({ repositoryId: 940001 });
+      const response = await request(app_.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/analyze`).set(withBearer(identity.token)).send({ repositoryId: 940001 });
 
       return responseRecord(response);
     }
 
     it('rejects importing a repository through an installation the user never connected', async () => {
       const identity = await registerIdentity(app, 'Unauthorized Import');
-
       const response = await request(app.getHttpServer())
         .post(`${API_PREFIX}/workspaces/import/github`)
         .set(withBearer(identity.token))
@@ -620,7 +568,6 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
       await connectPersonalGithub(app, identity);
 
       const analysis = await analyzedApplications(app, identity);
-
       const response = await request(app.getHttpServer())
         .post(`${API_PREFIX}/workspaces/import/github`)
         .set(withBearer(identity.token))
@@ -646,7 +593,6 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
 
       const body = responseRecord(response);
       const workspaceId = requireString(body, 'workspaceId');
-
       const workspace = await prisma.workspace.findUnique({ where: { id: workspaceId } });
       expect(workspace).not.toBeNull();
 
@@ -673,7 +619,6 @@ describe('Phase 21 - GitHub Workspace Import E2E', () => {
         workspace: { name: 'Duplicate Workspace' },
         applications: [{ name: 'Duplicate App', rootDirectory: '.' }],
       };
-
       const first = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces/import/github`).set(withBearer(identity.token)).send(importPayload);
 
       expect(first.status).toBe(201);

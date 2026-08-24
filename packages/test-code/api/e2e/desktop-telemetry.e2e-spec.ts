@@ -1,10 +1,10 @@
-import type { INestApplication } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { addWorkspaceMember, registerWorkspaceTestUser } from '../helpers/workspace';
-import { WorkspaceRole } from 'src/generated/prisma/enums';
 import { API, createDesktopApp } from './helpers/desktop-test-fixtures';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
 
 function telemetryPath(workspaceId: string, desktopAppId: string) {
   return `${API}/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/telemetry`;
@@ -30,7 +30,6 @@ describe('Desktop Telemetry E2E', () => {
   it('connects provider and never returns the secret', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
     const desktopApp = await createDesktopApp(owner);
-
     const response = await owner.agent.post(telemetryPath(owner.workspaceId, desktopApp.id)).set('Authorization', `Bearer ${owner.accessToken}`).send({
       provider: 'SENTRY',
       externalProjectId: 'command-center/desktop',
@@ -60,7 +59,6 @@ describe('Desktop Telemetry E2E', () => {
   it('previews normalized provider output', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
     const desktopApp = await createDesktopApp(owner);
-
     const connected = await owner.agent
       .post(telemetryPath(owner.workspaceId, desktopApp.id))
       .set('Authorization', `Bearer ${owner.accessToken}`)
@@ -71,10 +69,7 @@ describe('Desktop Telemetry E2E', () => {
         secret: 'preview-secret',
       })
       .expect(201);
-
-    const response = await owner.agent
-      .post(`${telemetryPath(owner.workspaceId, desktopApp.id)}/${connected.body.id}/preview`)
-      .set('Authorization', `Bearer ${owner.accessToken}`);
+    const response = await owner.agent.post(`${telemetryPath(owner.workspaceId, desktopApp.id)}/${connected.body.id}/preview`).set('Authorization', `Bearer ${owner.accessToken}`);
 
     expect(response.status).toBe(201);
     expect(response.body.performance).toEqual(expect.arrayContaining([expect.objectContaining({ type: 'STARTUP_MS', value: 1800 })]));
@@ -87,7 +82,6 @@ describe('Desktop Telemetry E2E', () => {
   it('records provider failure without breaking the desktop app', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
     const desktopApp = await createDesktopApp(owner);
-
     const connected = await owner.agent
       .post(telemetryPath(owner.workspaceId, desktopApp.id))
       .set('Authorization', `Bearer ${owner.accessToken}`)
@@ -98,10 +92,7 @@ describe('Desktop Telemetry E2E', () => {
         secret: 'failure-secret',
       })
       .expect(201);
-
-    const response = await owner.agent
-      .post(`${telemetryPath(owner.workspaceId, desktopApp.id)}/${connected.body.id}/preview`)
-      .set('Authorization', `Bearer ${owner.accessToken}`);
+    const response = await owner.agent.post(`${telemetryPath(owner.workspaceId, desktopApp.id)}/${connected.body.id}/preview`).set('Authorization', `Bearer ${owner.accessToken}`);
 
     expect(response.status).toBe(502);
 
@@ -121,7 +112,6 @@ describe('Desktop Telemetry E2E', () => {
   it('disconnects and removes stored secret material', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
     const desktopApp = await createDesktopApp(owner);
-
     const connected = await owner.agent
       .post(telemetryPath(owner.workspaceId, desktopApp.id))
       .set('Authorization', `Bearer ${owner.accessToken}`)
@@ -149,7 +139,6 @@ describe('Desktop Telemetry E2E', () => {
   it('rejects unsafe localhost endpoint outside test mock protocol', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
     const desktopApp = await createDesktopApp(owner);
-
     const response = await owner.agent.post(telemetryPath(owner.workspaceId, desktopApp.id)).set('Authorization', `Bearer ${owner.accessToken}`).send({
       provider: 'CUSTOM',
       externalProjectId: 'desktop',
@@ -183,7 +172,6 @@ describe('Desktop Telemetry E2E', () => {
     const workspaceA = await registerWorkspaceTestUser(app, prisma);
     const workspaceB = await registerWorkspaceTestUser(app, prisma);
     const desktopApp = await createDesktopApp(workspaceA);
-
     const response = await workspaceB.agent.get(telemetryPath(workspaceA.workspaceId, desktopApp.id)).set('Authorization', `Bearer ${workspaceB.accessToken}`);
 
     expect(response.status).toBe(403);

@@ -197,9 +197,7 @@ export function getMobilePerformanceSummary(workspaceId: string, mobileAppId: st
 }
 
 export function getMobilePerformanceVersions(workspaceId: string, mobileAppId: string, filters: MobilePerformanceFilters = {}) {
-  return apiRequest<MobilePerformanceVersionSummary[]>(
-    `/workspaces/${workspaceId}/mobile-apps/${mobileAppId}/performance/versions${performanceParams(filters)}`,
-  );
+  return apiRequest<MobilePerformanceVersionSummary[]>(`/workspaces/${workspaceId}/mobile-apps/${mobileAppId}/performance/versions${performanceParams(filters)}`);
 }
 
 export function getMobilePerformanceIssues(workspaceId: string, mobileAppId: string, filters: MobilePerformanceFilters = {}) {

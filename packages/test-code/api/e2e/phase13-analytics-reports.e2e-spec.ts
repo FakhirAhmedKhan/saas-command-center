@@ -2,10 +2,10 @@ import { createAgent, createTestUser, registerUser, withBearer } from '../helper
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { readAccessToken } from '../helpers/response';
-import { PrismaService } from 'src/database/prisma.service';
-import { AnalyticsAggregateDimension, AnalyticsDeviceType, AnalyticsSourceType, RawAnalyticsEventType, WorkspaceRole } from 'src/generated/prisma/enums';
 import type { INestApplication } from '@nestjs/common';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
+import { PrismaService } from 'src/database/prisma.service';
+import { AnalyticsAggregateDimension, AnalyticsDeviceType, AnalyticsSourceType, RawAnalyticsEventType, WorkspaceRole } from 'src/generated/prisma/enums';
 import request, { type Response } from 'supertest';
 
 /**
@@ -50,11 +50,9 @@ import request, { type Response } from 'supertest';
  */
 
 const API_PREFIX = '/api/v1';
-
 // Date keys (YYYY-MM-DD) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â the only format the DTO accepts for from/to.
 const FROM = '2026-08-01';
 const TO = '2026-08-04';
-
 // startOfDateInTimeZone('2026-08-01', 'UTC') .. before startOfDateInTimeZone('2026-08-05', 'UTC')
 // Bucket inside the resolved range. Range is 4 days (Aug 1-4 inclusive) => granularity 'day',
 // so the pages/events report and the dimension report (read from AnalyticsDailyAggregate) must
@@ -62,11 +60,8 @@ const TO = '2026-08-04';
 const BUCKET_START = new Date('2026-08-02T00:00:00.000Z');
 const DAILY_BUCKET_END = new Date('2026-08-03T00:00:00.000Z');
 const HOURLY_BUCKET_END = new Date('2026-08-02T01:00:00.000Z');
-
 const SENSITIVE_IP_HASH = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
-
 const PRIVATE_PROPERTY_VALUE = 'phase13-private-event-property-must-never-be-exported';
-
 const DANGEROUS_CSV_PATH = '=SUM(A1:A2)';
 
 type JsonRecord = Record<string, unknown>;
@@ -127,7 +122,6 @@ function readResponseText(response: Response): string {
 
 function parseCsv(csv: string): string[][] {
   const rows: string[][] = [];
-
   let row: string[] = [];
   let field = '';
   let quoted = false;
@@ -430,18 +424,15 @@ async function seedNormalizedAnalytics(prisma: PrismaService, websiteId: string)
   }
 
   const pageViewCounts = [4, 4, 4, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 1];
-
   const sources = [
     { type: AnalyticsSourceType.DIRECT, name: 'Direct', domain: null },
     { type: AnalyticsSourceType.SEARCH, name: 'Google', domain: 'google.com' },
     { type: AnalyticsSourceType.REFERRAL, name: 'Newsletter', domain: 'newsletter.example.test' },
   ] as const;
-
   const countries = ['US', 'AE'] as const;
   const devices = [AnalyticsDeviceType.DESKTOP, AnalyticsDeviceType.MOBILE] as const;
   const browsers = ['Chrome', 'Safari'] as const;
   const operatingSystems = ['Windows', 'macOS'] as const;
-
   const sessions: SessionFixture[] = [];
 
   for (let index = 0; index < pageViewCounts.length; index += 1) {
@@ -452,10 +443,8 @@ async function seedNormalizedAnalytics(prisma: PrismaService, websiteId: string)
     const browserName = mustGet(browsers, index % browsers.length);
     const operatingSystem = mustGet(operatingSystems, index % operatingSystems.length);
     const pageViewCount = mustGet(pageViewCounts, index);
-
     const startedAt = new Date(BUCKET_START.getTime() + index * 5 * 60_000);
     const endedAt = new Date(startedAt.getTime() + (30_000 + index * 1_000));
-
     const session = await prisma.analyticsSession.create({
       data: {
         websiteId,
@@ -520,9 +509,7 @@ async function seedNormalizedAnalytics(prisma: PrismaService, websiteId: string)
       pageIndex += 1;
 
       const occurredAt = new Date(BUCKET_START.getTime() + (180 + pageIndex) * 60_000);
-
       const pageUrl = page.path.startsWith('/') ? `https://phase13.example.test${page.path}` : 'https://phase13.example.test/formula';
-
       const analyticsEvent = await prisma.analyticsEvent.create({
         data: {
           websiteId,
@@ -587,7 +574,6 @@ async function seedNormalizedAnalytics(prisma: PrismaService, websiteId: string)
   for (let index = 0; index < customEvents.length; index += 1) {
     const custom = mustGet(customEvents, index);
     const session = mustGet(sessions, custom.sessionIndex);
-
     const occurredAt = new Date(BUCKET_START.getTime() + (300 + index) * 60_000);
 
     await prisma.analyticsEvent.create({
@@ -623,14 +609,11 @@ async function seedNormalizedAnalytics(prisma: PrismaService, websiteId: string)
 describe('Phase 13 Analytics Reports E2E', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-
   let workspaceId: string;
   let websiteId: string;
-
   let ownerAccessToken: string;
   let viewerAccessToken: string;
   let outsiderAccessToken: string;
-
   let trackingKeyPrefix: string;
   let trackingKeyHash: string;
   let rawTrackingKey: string;
@@ -678,7 +661,6 @@ describe('Phase 13 Analytics Reports E2E', () => {
       name: 'Phase 13 Owner',
       workspaceName: 'Phase 13 Workspace',
     });
-
     const ownerRegistration = await registerUser(createAgent(app), owner);
 
     expect(ownerRegistration.status).toBe(201);
@@ -695,9 +677,7 @@ describe('Phase 13 Analytics Reports E2E', () => {
       where: { email: owner.email.toLowerCase() },
       select: { id: true },
     });
-
     const ownerId = requireValue(ownerRecord?.id, 'Phase 13 owner was not persisted');
-
     const ownerMembership = await prisma.workspaceMember.findFirst({
       where: { userId: ownerId, role: WorkspaceRole.OWNER },
       select: { workspaceId: true },
@@ -709,7 +689,6 @@ describe('Phase 13 Analytics Reports E2E', () => {
       name: 'Phase 13 Viewer',
       workspaceName: 'Phase 13 Viewer Workspace',
     });
-
     const viewerRegistration = await registerUser(createAgent(app), viewer);
 
     expect(viewerRegistration.status).toBe(201);
@@ -720,7 +699,6 @@ describe('Phase 13 Analytics Reports E2E', () => {
       where: { email: viewer.email.toLowerCase() },
       select: { id: true },
     });
-
     const viewerId = requireValue(viewerRecord?.id, 'Phase 13 viewer was not persisted');
 
     await prisma.workspaceMember.create({
@@ -731,7 +709,6 @@ describe('Phase 13 Analytics Reports E2E', () => {
       name: 'Phase 13 Outsider',
       workspaceName: 'Phase 13 Outsider Workspace',
     });
-
     const outsiderRegistration = await registerUser(createAgent(app), outsider);
 
     expect(outsiderRegistration.status).toBe(201);
@@ -839,7 +816,6 @@ describe('Phase 13 Analytics Reports E2E', () => {
     expect(response.status).toBe(200);
 
     const rows = items(response);
-
     const paths = rows.map((row) => row.path);
 
     expect(paths).toEqual(expect.arrayContaining(['/pricing', '/docs', '/blog', DANGEROUS_CSV_PATH]));
@@ -920,7 +896,6 @@ describe('Phase 13 Analytics Reports E2E', () => {
 
   it('paginates the page report without duplicate or skipped rows', async () => {
     const common = { from: FROM, to: TO, sortBy: 'views', sortDirection: 'desc', limit: 2 };
-
     const firstResponse = await get(pagesUrl(), ownerAccessToken, { ...common, page: 1 });
     const secondResponse = await get(pagesUrl(), ownerAccessToken, { ...common, page: 2 });
 
@@ -1063,7 +1038,6 @@ describe('Phase 13 Analytics Reports E2E', () => {
     expect(response.status).toBe(200);
 
     const rows = items(response);
-
     const sessions = rows.map((row) => Number(row.sessions));
 
     expect(sessions).toEqual([...sessions].sort((left, right) => right - left));
@@ -1071,7 +1045,6 @@ describe('Phase 13 Analytics Reports E2E', () => {
 
   it('paginates the sources dimension report without duplicate or skipped rows (DB-02)', async () => {
     const common = { from: FROM, to: TO, sortBy: 'sessions', sortDirection: 'desc', limit: 2 };
-
     const firstResponse = await get(dimensionUrl('sources'), ownerAccessToken, { ...common, page: 1 });
     const secondResponse = await get(dimensionUrl('sources'), ownerAccessToken, { ...common, page: 2 });
 
@@ -1110,10 +1083,8 @@ describe('Phase 13 Analytics Reports E2E', () => {
 
   it('reports the same total sessions percentage baseline across dimension report pages (DB-02)', async () => {
     const common = { from: FROM, to: TO, sortBy: 'sessions', sortDirection: 'desc', limit: 2 };
-
     const firstResponse = await get(dimensionUrl('sources'), ownerAccessToken, { ...common, page: 1 });
     const secondResponse = await get(dimensionUrl('sources'), ownerAccessToken, { ...common, page: 2 });
-
     const percentages = [...items(firstResponse), ...items(secondResponse)].map((row) => Number(row.percentage));
 
     // 7 + 5 + 3 = 15 total sessions across all three sources; percentages reconcile to 100.
@@ -1301,7 +1272,6 @@ describe('Phase 13 Analytics Reports E2E', () => {
     expect(apiResponse.status).toBe(200);
 
     const apiRows = items(apiResponse);
-
     const csvResponse = await get(exportPagesUrl(), ownerAccessToken, { from: FROM, to: TO });
 
     expect(csvResponse.status).toBe(200);
@@ -1351,9 +1321,7 @@ describe('Phase 13 Analytics Reports E2E', () => {
     expect(response.status).toBe(200);
 
     const csvRows = parseCsv(readResponseText(response));
-
     const dangerousRow = csvRows.find((row) => row[0]?.includes('SUM(A1:A2)'));
-
     const pathCell = requireValue(dangerousRow?.[0], 'Formula-injection fixture row was not exported');
 
     expect(pathCell.startsWith('=')).toBe(false);

@@ -8,11 +8,11 @@
  * -- only global fetch -- so the real single-flight de-duplication inside
  * refreshSession()/performRefresh() is actually exercised, not mocked away.
  */
-import { AuthProvider, useAuth } from '@/features/auth/auth-provider';
-import { getAccessToken, setAccessToken, setUnauthorizedHandler } from '@/features/lib/api/api-client';
 import { render, screen, waitFor } from '@testing-library/react';
 import { StrictMode, useEffect } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { AuthProvider, useAuth } from '@/features/auth/auth-provider';
+import { getAccessToken, setAccessToken, setUnauthorizedHandler } from '@/features/lib/api/api-client';
 
 function AuthProbe() {
   const auth = useAuth();

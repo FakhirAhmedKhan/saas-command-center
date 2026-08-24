@@ -2,10 +2,10 @@ import { processAnalytics } from '../helpers/analytics-engine-old';
 import { buildCollectPayload, buildTrackerEvent, createTrackedWebsite, uniqueTrackerId } from '../helpers/analytics-ingestion';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
-import { AppModule } from 'src/app.module';
-import { configureApplication } from 'src/bootstrap/configure-application';
 import type { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { AppModule } from 'src/app.module';
+import { configureApplication } from 'src/bootstrap/configure-application';
 import { PrismaService } from 'src/database/prisma.service';
 import { AnalyticsProcessingStatus, RawAnalyticsEventType } from 'src/generated/prisma/enums';
 import request from 'supertest';
@@ -37,16 +37,12 @@ describe('Tracker -> Analytics Processing E2E', () => {
 
   it('processes a Tracker-compatible PAGE_VIEW, HEARTBEAT, and CUSTOM batch into analytics records', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const visitorId = uniqueTrackerId('tracker_visitor');
     const sessionId = uniqueTrackerId('tracker_session');
-
     const startedAt = new Date(Date.now() - 60_000);
     const heartbeatAt = new Date(startedAt.getTime() + 15_000);
     const customEventAt = new Date(startedAt.getTime() + 20_000);
-
     const pageView = buildTrackerEvent(trackedWebsite.origin, {
       type: RawAnalyticsEventType.PAGE_VIEW,
       visitorId,
@@ -55,7 +51,6 @@ describe('Tracker -> Analytics Processing E2E', () => {
       url: `${trackedWebsite.origin}/tracker-integration?z=9&utm_source=test&a=1#section`,
       title: 'Tracker Integration',
     });
-
     const heartbeat = buildTrackerEvent(trackedWebsite.origin, {
       type: RawAnalyticsEventType.HEARTBEAT,
       visitorId,
@@ -64,7 +59,6 @@ describe('Tracker -> Analytics Processing E2E', () => {
       url: `${trackedWebsite.origin}/tracker-integration`,
       durationMs: 15_000,
     });
-
     const customEvent = buildTrackerEvent(trackedWebsite.origin, {
       type: RawAnalyticsEventType.CUSTOM,
       visitorId,
@@ -77,11 +71,9 @@ describe('Tracker -> Analytics Processing E2E', () => {
         source: 'tracker-e2e',
       },
     });
-
     const payload = buildCollectPayload(trackedWebsite, [pageView, heartbeat, customEvent], {
       sdkVersion: '1.0.0',
     });
-
     const collectResponse = await request(app.getHttpServer())
       .post('/api/v1/collect')
       .set('Origin', trackedWebsite.origin)
@@ -106,9 +98,7 @@ describe('Tracker -> Analytics Processing E2E', () => {
 
     expect(rawBeforeProcessing.every((event) => event.processedAt === null)).toBe(true);
 
-    expect(new Set(rawBeforeProcessing.map((event) => event.type))).toEqual(
-      new Set([RawAnalyticsEventType.PAGE_VIEW, RawAnalyticsEventType.HEARTBEAT, RawAnalyticsEventType.CUSTOM]),
-    );
+    expect(new Set(rawBeforeProcessing.map((event) => event.type))).toEqual(new Set([RawAnalyticsEventType.PAGE_VIEW, RawAnalyticsEventType.HEARTBEAT, RawAnalyticsEventType.CUSTOM]));
 
     expect(rawBeforeProcessing.every((event) => event.visitorId === visitorId && event.sessionId === sessionId && event.sdkVersion === '1.0.0')).toBe(true);
 

@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import AuthError from '@/app/(auth)/error';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import AuthError from '@/app/(auth)/error';
 
 describe('AuthError boundary', () => {
   it('renders a friendly fallback message with a retry action', async () => {

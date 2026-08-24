@@ -324,13 +324,7 @@ apps/api/src/modules/desktop-apps/services/desktop-project-detector.ts
 ```
 
 ```ts
-import type {
-  DesktopArchitecture,
-  DesktopFramework,
-  DesktopPlatform,
-  DesktopProjectDetectionCandidate,
-  DesktopProjectDetectionResponse,
-} from '@command-center/shared-types';
+import type { DesktopArchitecture, DesktopFramework, DesktopPlatform, DesktopProjectDetectionCandidate, DesktopProjectDetectionResponse } from '@command-center/shared-types';
 
 export interface DesktopRepositorySnapshot {
   repositoryId: string;
@@ -539,11 +533,7 @@ function detectDotnet(snapshot: DesktopRepositorySnapshot, projectPath: string):
 
   const lower = text.toLowerCase();
 
-  const isDesktop =
-    lower.includes('<usewpf>true</usewpf>') ||
-    lower.includes('<usewindowsforms>true</usewindowsforms>') ||
-    lower.includes('microsoft.windowsappsdk') ||
-    lower.includes('avalonia');
+  const isDesktop = lower.includes('<usewpf>true</usewpf>') || lower.includes('<usewindowsforms>true</usewindowsforms>') || lower.includes('microsoft.windowsappsdk') || lower.includes('avalonia');
 
   if (!isDesktop) return null;
 
@@ -554,10 +544,7 @@ function detectDotnet(snapshot: DesktopRepositorySnapshot, projectPath: string):
 
   const combined = `${text}\n${targetFramework}\n${runtimeIdentifiers}`;
 
-  const platform: DesktopPlatform =
-    lower.includes('avalonia') && !/windows/i.test(combined)
-      ? 'CROSS_PLATFORM'
-      : inferPlatforms(combined.includes('windows') ? combined : `${combined} windows`);
+  const platform: DesktopPlatform = lower.includes('avalonia') && !/windows/i.test(combined) ? 'CROSS_PLATFORM' : inferPlatforms(combined.includes('windows') ? combined : `${combined} windows`);
 
   const packageName =
     text.match(/<AssemblyName>([^<]+)<\/AssemblyName>/i)?.[1]?.trim() ??
@@ -592,11 +579,7 @@ function detectQt(snapshot: DesktopRepositorySnapshot, path: string): CandidateD
   if (!qtEvidence) return null;
 
   const root = dirname(path);
-  const target =
-    text.match(/\bqt_add_executable\s*\(\s*([A-Za-z0-9_.-]+)/i)?.[1] ??
-    text.match(/\badd_executable\s*\(\s*([A-Za-z0-9_.-]+)/i)?.[1] ??
-    text.match(/^\s*TARGET\s*=\s*([^\r\n#]+)/im)?.[1]?.trim() ??
-    null;
+  const target = text.match(/\bqt_add_executable\s*\(\s*([A-Za-z0-9_.-]+)/i)?.[1] ?? text.match(/\badd_executable\s*\(\s*([A-Za-z0-9_.-]+)/i)?.[1] ?? text.match(/^\s*TARGET\s*=\s*([^\r\n#]+)/im)?.[1]?.trim() ?? null;
 
   return {
     projectRoot: root,
@@ -620,9 +603,7 @@ function detectJava(snapshot: DesktopRepositorySnapshot, path: string): Candidat
 
   const javafx = lower.includes('org.openjfx') || lower.includes('javafx-controls') || lower.includes('javafx.fxml') || lower.includes('javafx');
 
-  const swing = snapshot.paths.some(
-    (candidate) => /\.(java|kt)$/i.test(candidate) && /\b(src|app)\b/i.test(candidate) && /swing/i.test(getText(snapshot, candidate) ?? ''),
-  );
+  const swing = snapshot.paths.some((candidate) => /\.(java|kt)$/i.test(candidate) && /\b(src|app)\b/i.test(candidate) && /swing/i.test(getText(snapshot, candidate) ?? ''));
 
   if (!javafx && !swing) return null;
 
@@ -839,10 +820,7 @@ export class DesktopProjectDetectionService {
 
     const paths = tree.entries.filter((entry) => entry.type === 'file').map((entry) => entry.path);
 
-    const candidateEntries = tree.entries.filter(
-      (entry) =>
-        entry.type === 'file' && this.isDetectionFile(entry.path) && (entry.size === null || entry.size === undefined || entry.size <= MAX_METADATA_FILE_SIZE),
-    );
+    const candidateEntries = tree.entries.filter((entry) => entry.type === 'file' && this.isDetectionFile(entry.path) && (entry.size === null || entry.size === undefined || entry.size <= MAX_METADATA_FILE_SIZE));
 
     const selectedEntries = candidateEntries.slice(0, MAX_METADATA_FILES);
 
@@ -850,13 +828,7 @@ export class DesktopProjectDetectionService {
 
     for (const entry of selectedEntries) {
       try {
-        const file = await this.githubCode.getFile(
-          repository.installation.externalInstallationId,
-          repository.owner,
-          repository.name,
-          entry.path,
-          repository.defaultBranch,
-        );
+        const file = await this.githubCode.getFile(repository.installation.externalInstallationId, repository.owner, repository.name, entry.path, repository.defaultBranch);
 
         if (file.size > MAX_METADATA_FILE_SIZE) {
           continue;
@@ -875,13 +847,7 @@ export class DesktopProjectDetectionService {
 
     for (const entry of xcodeProjectFiles) {
       try {
-        const file = await this.githubCode.getFile(
-          repository.installation.externalInstallationId,
-          repository.owner,
-          repository.name,
-          entry.path,
-          repository.defaultBranch,
-        );
+        const file = await this.githubCode.getFile(repository.installation.externalInstallationId, repository.owner, repository.name, entry.path, repository.defaultBranch);
 
         if (file.size <= MAX_METADATA_FILE_SIZE) {
           files[entry.path] = file.content;
@@ -895,24 +861,12 @@ export class DesktopProjectDetectionService {
     // bounded source sample as well. This lets the pure detector find imports
     // such as javax.swing without downloading the entire repository.
     const javaSourceFiles = tree.entries
-      .filter(
-        (entry) =>
-          entry.type === 'file' &&
-          /\.(java|kt)$/i.test(entry.path) &&
-          !files[entry.path] &&
-          (entry.size === null || entry.size === undefined || entry.size <= MAX_METADATA_FILE_SIZE),
-      )
+      .filter((entry) => entry.type === 'file' && /\.(java|kt)$/i.test(entry.path) && !files[entry.path] && (entry.size === null || entry.size === undefined || entry.size <= MAX_METADATA_FILE_SIZE))
       .slice(0, 20);
 
     for (const entry of javaSourceFiles) {
       try {
-        const file = await this.githubCode.getFile(
-          repository.installation.externalInstallationId,
-          repository.owner,
-          repository.name,
-          entry.path,
-          repository.defaultBranch,
-        );
+        const file = await this.githubCode.getFile(repository.installation.externalInstallationId, repository.owner, repository.name, entry.path, repository.defaultBranch);
 
         if (file.size <= MAX_METADATA_FILE_SIZE) {
           files[entry.path] = file.content;
@@ -1031,13 +985,7 @@ apps/web/src/features/desktop-apps/desktop-project-detection-panel.tsx
 
 import { applyDetectedDesktopConfiguration, detectDesktopProject } from './desktop-apps-api';
 import { getErrorMessage } from '@/features/lib/api/api-error';
-import type {
-  DesktopApplicationDetails,
-  DesktopArchitecture,
-  DesktopFramework,
-  DesktopPlatform,
-  DesktopProjectDetectionCandidate,
-} from '@command-center/shared-types';
+import type { DesktopApplicationDetails, DesktopArchitecture, DesktopFramework, DesktopPlatform, DesktopProjectDetectionCandidate } from '@command-center/shared-types';
 import { Loader2, SearchCode } from 'lucide-react';
 import { useState } from 'react';
 
@@ -1112,9 +1060,7 @@ export function DesktopProjectDetectionPanel({ workspaceId, desktopApp, onApplie
       <div className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
         <div>
           <h2 className='text-lg font-semibold text-slate-950'>Project detection</h2>
-          <p className='mt-1 max-w-2xl text-sm leading-6 text-slate-500'>
-            Analyze the linked repository for Electron, Tauri, .NET, Qt, Java desktop, or native macOS project metadata.
-          </p>
+          <p className='mt-1 max-w-2xl text-sm leading-6 text-slate-500'>Analyze the linked repository for Electron, Tauri, .NET, Qt, Java desktop, or native macOS project metadata.</p>
         </div>
 
         <button
@@ -1229,12 +1175,7 @@ export function DesktopProjectDetectionPanel({ workspaceId, desktopApp, onApplie
             </div>
           </div>
 
-          <button
-            type='button'
-            disabled={saving}
-            onClick={() => void apply()}
-            className='inline-flex h-10 items-center justify-center rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white disabled:opacity-50'
-          >
+          <button type='button' disabled={saving} onClick={() => void apply()} className='inline-flex h-10 items-center justify-center rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white disabled:opacity-50'>
             {saving ? 'Saving...' : 'Use Detected Configuration'}
           </button>
         </div>
@@ -1721,9 +1662,7 @@ describe('Desktop Project Detection E2E', () => {
       encoding: 'base64',
     } as never);
 
-    const response = await fixture.owner.agent
-      .post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id))
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`);
+    const response = await fixture.owner.agent.post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id)).set('Authorization', `Bearer ${fixture.owner.accessToken}`);
 
     expect(response.status).toBe(201);
     expect(response.body.primary).toMatchObject({
@@ -1762,9 +1701,7 @@ describe('Desktop Project Detection E2E', () => {
       encoding: 'base64',
     } as never);
 
-    const response = await fixture.owner.agent
-      .post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id))
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`);
+    const response = await fixture.owner.agent.post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id)).set('Authorization', `Bearer ${fixture.owner.accessToken}`);
 
     expect(response.status).toBe(201);
     expect(response.body.primary).toBeNull();
@@ -1809,9 +1746,7 @@ describe('Desktop Project Detection E2E', () => {
         encoding: 'base64',
       } as never);
 
-    const response = await fixture.owner.agent
-      .post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id))
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`);
+    const response = await fixture.owner.agent.post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id)).set('Authorization', `Bearer ${fixture.owner.accessToken}`);
 
     expect(response.status).toBe(201);
     expect(response.body.primary.framework).toBe('ELECTRON');
@@ -1829,9 +1764,7 @@ describe('Desktop Project Detection E2E', () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
     const attacker = await (await import('../helpers/workspace')).registerWorkspaceTestUser(app, prisma);
 
-    const response = await attacker.agent
-      .post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id))
-      .set('Authorization', `Bearer ${attacker.accessToken}`);
+    const response = await attacker.agent.post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id)).set('Authorization', `Bearer ${attacker.accessToken}`);
 
     expect(response.status).toBe(403);
   });
@@ -2000,11 +1933,7 @@ export function DesktopAppSubNav({ workspaceId, desktopAppId }: Props) {
             key={tab.label}
             href={href}
             aria-current={active ? 'page' : undefined}
-            className={
-              active
-                ? 'whitespace-nowrap rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white'
-                : 'whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100'
-            }
+            className={active ? 'whitespace-nowrap rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white' : 'whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100'}
           >
             {tab.label}
           </Link>
@@ -2012,12 +1941,7 @@ export function DesktopAppSubNav({ workspaceId, desktopAppId }: Props) {
       })}
 
       {FUTURE_TABS.map((tab) => (
-        <span
-          key={tab}
-          aria-disabled='true'
-          title='Available in a later desktop support phase'
-          className='cursor-not-allowed whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-300'
-        >
+        <span key={tab} aria-disabled='true' title='Available in a later desktop support phase' className='cursor-not-allowed whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-300'>
           {tab}
         </span>
       ))}
@@ -2261,9 +2185,7 @@ describe('Desktop Overview E2E', () => {
   it('returns desktop metadata and linked repository', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
 
-    const response = await fixture.owner.agent
-      .get(overviewPath(fixture.owner.workspaceId, fixture.desktopApp.id))
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`);
+    const response = await fixture.owner.agent.get(overviewPath(fixture.owner.workspaceId, fixture.desktopApp.id)).set('Authorization', `Bearer ${fixture.owner.accessToken}`);
 
     expect(response.status).toBe(200);
 
@@ -2277,9 +2199,7 @@ describe('Desktop Overview E2E', () => {
   it('returns null optional overview sections safely', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
 
-    const response = await fixture.owner.agent
-      .get(overviewPath(fixture.owner.workspaceId, fixture.desktopApp.id))
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`);
+    const response = await fixture.owner.agent.get(overviewPath(fixture.owner.workspaceId, fixture.desktopApp.id)).set('Authorization', `Bearer ${fixture.owner.accessToken}`);
 
     expect(response.status).toBe(200);
     expect(response.body.latestRelease).toBeNull();
@@ -2290,9 +2210,7 @@ describe('Desktop Overview E2E', () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
     const outsider = await registerWorkspaceTestUser(app, prisma);
 
-    const response = await outsider.agent
-      .get(overviewPath(fixture.owner.workspaceId, fixture.desktopApp.id))
-      .set('Authorization', `Bearer ${outsider.accessToken}`);
+    const response = await outsider.agent.get(overviewPath(fixture.owner.workspaceId, fixture.desktopApp.id)).set('Authorization', `Bearer ${outsider.accessToken}`);
 
     expect(response.status).toBe(403);
   });
@@ -2403,9 +2321,7 @@ export default function DesktopCodePage() {
 
           <h2 className='mt-4 text-lg font-semibold text-slate-900'>Connect a repository first</h2>
 
-          <p className='mt-2 max-w-lg text-sm text-slate-500'>
-            The Desktop Code tab reuses the workspace Code Explorer. Connect a repository to this desktop application before browsing source.
-          </p>
+          <p className='mt-2 max-w-lg text-sm text-slate-500'>The Desktop Code tab reuses the workspace Code Explorer. Connect a repository to this desktop application before browsing source.</p>
 
           <Link href={`/workspaces/${params.workspaceId}/desktop-apps/${params.desktopAppId}`} className='mt-4 font-semibold text-brand-600'>
             Back to desktop overview
@@ -3155,22 +3071,12 @@ export function DesktopBuilds({ workspaceId, desktopAppId }: Props) {
 
         <label className='text-xs font-semibold text-slate-500'>
           Branch
-          <input
-            aria-label='Build branch filter'
-            value={branch}
-            onChange={(event) => setBranch(event.target.value)}
-            className='mt-1 h-9 w-full rounded-lg border border-slate-300 px-2 text-sm'
-          />
+          <input aria-label='Build branch filter' value={branch} onChange={(event) => setBranch(event.target.value)} className='mt-1 h-9 w-full rounded-lg border border-slate-300 px-2 text-sm' />
         </label>
 
         <label className='text-xs font-semibold text-slate-500'>
           Version
-          <input
-            aria-label='Build version filter'
-            value={version}
-            onChange={(event) => setVersion(event.target.value)}
-            className='mt-1 h-9 w-full rounded-lg border border-slate-300 px-2 text-sm'
-          />
+          <input aria-label='Build version filter' value={version} onChange={(event) => setVersion(event.target.value)} className='mt-1 h-9 w-full rounded-lg border border-slate-300 px-2 text-sm' />
         </label>
       </div>
 
@@ -3183,9 +3089,7 @@ export function DesktopBuilds({ workspaceId, desktopAppId }: Props) {
       {loading ? (
         <div className='rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-500'>Loading builds...</div>
       ) : builds.length === 0 ? (
-        <div className='rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500'>
-          No desktop builds match the current filters.
-        </div>
+        <div className='rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500'>No desktop builds match the current filters.</div>
       ) : (
         <div className='overflow-hidden rounded-2xl border border-slate-200 bg-white'>
           <div className='overflow-x-auto'>
@@ -3484,9 +3388,7 @@ describe('Desktop Builds E2E', () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
     const outsider = await registerWorkspaceTestUser(app, prisma);
 
-    const response = await outsider.agent
-      .get(buildPath(fixture.owner.workspaceId, fixture.desktopApp.id))
-      .set('Authorization', `Bearer ${outsider.accessToken}`);
+    const response = await outsider.agent.get(buildPath(fixture.owner.workspaceId, fixture.desktopApp.id)).set('Authorization', `Bearer ${outsider.accessToken}`);
 
     expect(response.status).toBe(403);
   });
@@ -4648,9 +4550,7 @@ export function DesktopTests({ workspaceId, desktopAppId }: Props) {
       ) : null}
 
       {runs.length === 0 ? (
-        <div className='rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500'>
-          No desktop test results have been recorded yet.
-        </div>
+        <div className='rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500'>No desktop test results have been recorded yet.</div>
       ) : (
         <div className='space-y-4'>
           {runs.map((run) => (
@@ -4834,12 +4734,7 @@ export default function DesktopBuildDetailsPage() {
                 </div>
 
                 {artifact.externalUrl ? (
-                  <a
-                    href={artifact.externalUrl}
-                    target='_blank'
-                    rel='noreferrer'
-                    className='inline-flex items-center gap-2 text-sm font-semibold text-brand-600'
-                  >
+                  <a href={artifact.externalUrl} target='_blank' rel='noreferrer' className='inline-flex items-center gap-2 text-sm font-semibold text-brand-600'>
                     <Download className='size-4' aria-hidden='true' />
                     Open artifact
                   </a>
@@ -5058,9 +4953,7 @@ describe('Desktop Tests E2E', () => {
       })
       .expect(201);
 
-    const response = await fixture.owner.agent
-      .get(`/api/v1/workspaces/${fixture.owner.workspaceId}/desktop-apps/${fixture.desktopApp.id}/tests/summary`)
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`);
+    const response = await fixture.owner.agent.get(`/api/v1/workspaces/${fixture.owner.workspaceId}/desktop-apps/${fixture.desktopApp.id}/tests/summary`).set('Authorization', `Bearer ${fixture.owner.accessToken}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({

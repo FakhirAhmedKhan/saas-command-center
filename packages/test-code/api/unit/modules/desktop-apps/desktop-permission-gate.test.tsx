@@ -1,6 +1,6 @@
-import { DesktopPermissionGate } from '@/features/desktop-apps/desktop-permission-gate';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { DesktopPermissionGate } from '@/features/desktop-apps/desktop-permission-gate';
 
 const viewer = {
   role: 'VIEWER' as const,
@@ -10,7 +10,6 @@ const viewer = {
   canAnalyze: false,
   canConfigureSecrets: false,
 };
-
 const admin = {
   role: 'ADMIN' as const,
   canRead: true as const,

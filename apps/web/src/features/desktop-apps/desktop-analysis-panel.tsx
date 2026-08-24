@@ -94,20 +94,11 @@ export function DesktopAnalysisPanel({ workspaceId, desktopAppId, buildId, relea
         </div>
       ) : null}
 
-      <DesktopPermissionGate
-        permissions={permissions}
-        require='analyze'
-        fallback={permissions ? <p className='mt-4 text-sm text-slate-500'>Your workspace role has read-only access to AI analysis.</p> : null}
-      >
+      <DesktopPermissionGate permissions={permissions} require='analyze' fallback={permissions ? <p className='mt-4 text-sm text-slate-500'>Your workspace role has read-only access to AI analysis.</p> : null}>
         <div className='mt-4 grid gap-3 md:grid-cols-[280px_1fr]'>
           <label className='space-y-1 text-sm'>
             <span>Analysis</span>
-            <select
-              aria-label='Analysis action'
-              value={action}
-              onChange={(event) => setAction(event.target.value as DesktopAnalysisAction)}
-              className='h-10 w-full rounded-lg border px-3'
-            >
+            <select aria-label='Analysis action' value={action} onChange={(event) => setAction(event.target.value as DesktopAnalysisAction)} className='h-10 w-full rounded-lg border px-3'>
               {ACTIONS.map((item) => (
                 <option key={item.value} value={item.value}>
                   {item.label}
@@ -128,12 +119,7 @@ export function DesktopAnalysisPanel({ workspaceId, desktopAppId, buildId, relea
           </label>
         </div>
 
-        <button
-          type='button'
-          onClick={() => void run()}
-          disabled={running}
-          className='mt-3 h-10 rounded-lg bg-slate-950 px-4 text-sm font-medium text-white disabled:opacity-50'
-        >
+        <button type='button' onClick={() => void run()} disabled={running} className='mt-3 h-10 rounded-lg bg-slate-950 px-4 text-sm font-medium text-white disabled:opacity-50'>
           {running ? 'Analyzing…' : 'Analyze'}
         </button>
       </DesktopPermissionGate>

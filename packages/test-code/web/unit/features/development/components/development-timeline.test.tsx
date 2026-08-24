@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { DevelopmentTimeline } from '@/features/development/components/development-timeline';
 import type { ApplicationMilestone, ApplicationTask } from '@/features/development/development-types';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { DevelopmentTimeline } from '@/features/development/components/development-timeline';
 
 function task(overrides: Partial<ApplicationTask> = {}): ApplicationTask {
   return {
@@ -57,14 +57,7 @@ describe('DevelopmentTimeline', () => {
   });
 
   it('excludes a milestone without a due date but includes one that has one', () => {
-    render(
-      <DevelopmentTimeline
-        milestones={[
-          milestone({ id: 'm-1', title: 'No date milestone', dueAt: null }),
-          milestone({ id: 'm-2', title: 'Dated milestone', dueAt: '2026-03-01T00:00:00.000Z' }),
-        ]}
-      />,
-    );
+    render(<DevelopmentTimeline milestones={[milestone({ id: 'm-1', title: 'No date milestone', dueAt: null }), milestone({ id: 'm-2', title: 'Dated milestone', dueAt: '2026-03-01T00:00:00.000Z' })]} />);
 
     expect(screen.queryByText('No date milestone')).not.toBeInTheDocument();
     expect(screen.getByText('Dated milestone')).toBeInTheDocument();
@@ -89,10 +82,7 @@ describe('DevelopmentTimeline', () => {
   it('sorts timeline items chronologically regardless of input order', () => {
     render(
       <DevelopmentTimeline
-        milestones={[
-          milestone({ id: 'm-late', title: 'Later milestone', dueAt: '2026-06-01T00:00:00.000Z' }),
-          milestone({ id: 'm-early', title: 'Earlier milestone', dueAt: '2026-01-01T00:00:00.000Z' }),
-        ]}
+        milestones={[milestone({ id: 'm-late', title: 'Later milestone', dueAt: '2026-06-01T00:00:00.000Z' }), milestone({ id: 'm-early', title: 'Earlier milestone', dueAt: '2026-01-01T00:00:00.000Z' })]}
       />,
     );
 

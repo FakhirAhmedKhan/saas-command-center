@@ -13,15 +13,10 @@ export default function DesktopAppsPage() {
   const params = useParams<{
     workspaceId: string;
   }>();
-
   const workspaceId = params.workspaceId;
-
   const [desktopApps, setDesktopApps] = useState<DesktopApplicationDetails[]>([]);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
-
   const loadDesktopApps = useCallback(async (): Promise<void> => {
     setLoading(true);
     setError(null);
@@ -53,9 +48,7 @@ export default function DesktopAppsPage() {
 
           <h1 className='mt-2 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl'>Desktop Apps</h1>
 
-          <p className='mt-2 max-w-2xl text-sm leading-6 text-slate-500'>
-            Manage Windows, macOS, Linux and cross-platform desktop applications in this workspace.
-          </p>
+          <p className='mt-2 max-w-2xl text-sm leading-6 text-slate-500'>Manage Windows, macOS, Linux and cross-platform desktop applications in this workspace.</p>
         </div>
 
         <Link
@@ -83,11 +76,7 @@ export default function DesktopAppsPage() {
 
           <p className='mt-1 text-sm text-red-700'>{error}</p>
 
-          <button
-            type='button'
-            onClick={() => void loadDesktopApps()}
-            className='mt-4 inline-flex items-center gap-2 text-sm font-semibold text-red-700 hover:text-red-900'
-          >
+          <button type='button' onClick={() => void loadDesktopApps()} className='mt-4 inline-flex items-center gap-2 text-sm font-semibold text-red-700 hover:text-red-900'>
             <RefreshCw className='size-4' />
             Try again
           </button>
@@ -102,14 +91,9 @@ export default function DesktopAppsPage() {
 
           <h2 className='mt-4 text-lg font-semibold text-slate-950'>No desktop applications yet</h2>
 
-          <p className='mt-2 max-w-md text-sm leading-6 text-slate-500'>
-            Add your first Windows, macOS, Linux, Electron, Tauri, .NET, Qt or Java desktop application.
-          </p>
+          <p className='mt-2 max-w-md text-sm leading-6 text-slate-500'>Add your first Windows, macOS, Linux, Electron, Tauri, .NET, Qt or Java desktop application.</p>
 
-          <Link
-            href={`/workspaces/${workspaceId}/desktop-apps/new`}
-            className='mt-5 inline-flex h-10 items-center gap-2 rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700'
-          >
+          <Link href={`/workspaces/${workspaceId}/desktop-apps/new`} className='mt-5 inline-flex h-10 items-center gap-2 rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700'>
             <Plus className='size-4' />
             Add Desktop App
           </Link>

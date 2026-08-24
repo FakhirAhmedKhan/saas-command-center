@@ -10,7 +10,6 @@ type CreationMethod = 'select' | 'manual' | 'github';
 
 export default function NewWorkspacePage() {
   const searchParams = useSearchParams();
-
   const [method, setMethod] = useState<CreationMethod>(() => (searchParams.get('method') === 'github' ? 'github' : 'select'));
 
   if (method === 'manual') {

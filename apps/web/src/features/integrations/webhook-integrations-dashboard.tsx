@@ -1,15 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
-import {
-  createWebhookEndpoint,
-  disableWebhookEndpoint,
-  getWebhookDeliveries,
-  getWebhookEndpoints,
-  rotateWebhookSecret,
-  sendWebhookTest,
-  updateWebhookEndpoint,
-} from './integrations-api';
+import { createWebhookEndpoint, disableWebhookEndpoint, getWebhookDeliveries, getWebhookEndpoints, rotateWebhookSecret, sendWebhookTest, updateWebhookEndpoint } from './integrations-api';
 import type { SaveWebhookInput, WebhookDelivery, WebhookEndpoint, WebhookEventCatalogItem, WebhookEventType, WebhookListResponse } from './integrations.types';
 import { getErrorMessage } from '../applications/application-utils';
 import { PageError } from '@/components/states/page-error';
@@ -265,11 +257,7 @@ function WebhookForm({
         Enable webhook
       </label>
 
-      <button
-        type='submit'
-        disabled={submitting || form.eventTypes.length === 0}
-        className='mt-5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50'
-      >
+      <button type='submit' disabled={submitting || form.eventTypes.length === 0} className='mt-5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50'>
         {submitting ? 'Savingâ€¦' : editing ? 'Save changes' : 'Create webhook'}
       </button>
     </form>
@@ -278,29 +266,17 @@ function WebhookForm({
 
 export function WebhookIntegrationsDashboard({ workspaceId }: WebhookIntegrationsDashboardProps) {
   const [data, setData] = useState<WebhookListResponse | null>(null);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<unknown>(null);
-
   const [actionError, setActionError] = useState<string | null>(null);
-
   const [secret, setSecret] = useState<string | null>(null);
-
   const [showForm, setShowForm] = useState(false);
-
   const [editing, setEditing] = useState<WebhookEndpoint | null>(null);
-
   const [submitting, setSubmitting] = useState(false);
-
   const [selectedEndpoint, setSelectedEndpoint] = useState<WebhookEndpoint | null>(null);
-
   const [deliveries, setDeliveries] = useState<WebhookDelivery[]>([]);
-
   const [deliveriesLoading, setDeliveriesLoading] = useState(false);
-
   const controllerRef = useRef<AbortController | null>(null);
-
   const load = useCallback(async () => {
     controllerRef.current?.abort();
 
@@ -558,11 +534,7 @@ const expected = "v1=" + digest;`}
       </section>
 
       {data.items.length === 0 ? (
-        <EmptyState
-          title='No integrations configured'
-          description='Create a webhook to deliver selected Command Center events to another system.'
-          icon={undefined}
-        />
+        <EmptyState title='No integrations configured' description='Create a webhook to deliver selected Command Center events to another system.' icon={undefined} />
       ) : (
         <section className='grid gap-4 lg:grid-cols-2'>
           {data.items.map((endpoint) => (
@@ -572,13 +544,7 @@ const expected = "v1=" + digest;`}
                   <div className='flex items-center gap-2'>
                     <h2 className='truncate text-lg font-semibold text-slate-950'>{endpoint.name}</h2>
 
-                    <span
-                      className={
-                        endpoint.enabled
-                          ? 'rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700'
-                          : 'rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600'
-                      }
-                    >
+                    <span className={endpoint.enabled ? 'rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700' : 'rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600'}>
                       {endpoint.enabled ? 'Enabled' : 'Disabled'}
                     </span>
                   </div>
@@ -589,9 +555,7 @@ const expected = "v1=" + digest;`}
                 </div>
 
                 {endpoint.latestDelivery ? (
-                  <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${deliveryStatusClasses(endpoint.latestDelivery.status)}`}>
-                    {endpoint.latestDelivery.status}
-                  </span>
+                  <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${deliveryStatusClasses(endpoint.latestDelivery.status)}`}>{endpoint.latestDelivery.status}</span>
                 ) : null}
               </div>
 
@@ -737,9 +701,7 @@ const expected = "v1=" + digest;`}
                       <td className='px-4 py-4 font-medium'>{delivery.event.type}</td>
 
                       <td className='px-4 py-4'>
-                        <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${deliveryStatusClasses(delivery.status)}`}>
-                          {delivery.status}
-                        </span>
+                        <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${deliveryStatusClasses(delivery.status)}`}>{delivery.status}</span>
                       </td>
 
                       <td className='px-4 py-4 text-right'>

@@ -1,6 +1,9 @@
-import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
+import baseConfig from '@command-center/eslint-config/base';
 
-export default tseslint.config(eslint.configs.recommended, ...tseslint.configs.recommended, {
-  ignores: ['dist/**'],
-});
+export default [
+  ...baseConfig,
+
+  {
+    ignores: ['dist/**', 'dist-cjs/**'],
+  },
+];

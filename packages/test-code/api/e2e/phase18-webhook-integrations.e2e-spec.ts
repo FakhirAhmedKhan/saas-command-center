@@ -3,13 +3,13 @@ import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { resetTestRedis } from '../helpers/redis';
 import { readAccessToken } from '../helpers/response';
+import type { INestApplication } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
 import { PrismaService } from 'src/database/prisma.service';
 import { WebhookAttemptOutcome, WebhookDeliveryStatus, WebhookEventType, WorkspaceRole } from 'src/generated/prisma/enums';
 import { RedisService } from 'src/infrastructure/redis/redis.service';
 import { WebhookSecretCryptoService } from 'src/modules/webhooks/services/webhook-secret-crypto.service';
 import { WebhookSignatureService } from 'src/modules/webhooks/services/webhook-signature.service';
-import type { INestApplication } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
 import request, { type Response } from 'supertest';
 
 /**
@@ -111,9 +111,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
   let prisma: PrismaService;
   let signatureService: WebhookSignatureService;
   let cryptoService: WebhookSecretCryptoService;
-
   let workspaceId: string;
-
   let ownerAccessToken: string;
   let developerAccessToken: string;
   let viewerAccessToken: string;
@@ -143,11 +141,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     return `${endpointUrl(endpointId)}/deliveries`;
   }
 
-  async function createEndpoint(
-    token: string,
-    overrides: Record<string, unknown> = {},
-    rateLimitIdentity = `phase18-create-${randomUUID()}`,
-  ): Promise<Response> {
+  async function createEndpoint(token: string, overrides: Record<string, unknown> = {}, rateLimitIdentity = `phase18-create-${randomUUID()}`): Promise<Response> {
     return request(app.getHttpServer()).post(webhooksUrl()).set(withBearer(token)).set('x-tracking-key', rateLimitIdentity).send(validCreatePayload(overrides));
   }
 
@@ -167,7 +161,6 @@ describe('Phase 18 Webhook Integrations E2E', () => {
       name: 'Phase 18 Owner',
       workspaceName: 'Phase 18 Workspace',
     });
-
     const ownerRegistration = await registerUser(createAgent(app), owner);
 
     expect(ownerRegistration.status).toBe(201);
@@ -184,9 +177,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
       where: { email: owner.email.toLowerCase() },
       select: { id: true },
     });
-
     const ownerId = requireValue(ownerRecord?.id, 'Phase 18 owner was not persisted');
-
     const ownerMembership = await prisma.workspaceMember.findFirst({
       where: { userId: ownerId, role: WorkspaceRole.OWNER },
       select: { workspaceId: true },
@@ -198,7 +189,6 @@ describe('Phase 18 Webhook Integrations E2E', () => {
       name: 'Phase 18 Developer',
       workspaceName: 'Phase 18 Developer Workspace',
     });
-
     const developerRegistration = await registerUser(createAgent(app), developer);
 
     expect(developerRegistration.status).toBe(201);
@@ -222,7 +212,6 @@ describe('Phase 18 Webhook Integrations E2E', () => {
       name: 'Phase 18 Viewer',
       workspaceName: 'Phase 18 Viewer Workspace',
     });
-
     const viewerRegistration = await registerUser(createAgent(app), viewer);
 
     expect(viewerRegistration.status).toBe(201);
@@ -246,7 +235,6 @@ describe('Phase 18 Webhook Integrations E2E', () => {
       name: 'Phase 18 Outsider',
       workspaceName: 'Phase 18 Outsider Workspace',
     });
-
     const outsiderRegistration = await registerUser(createAgent(app), outsider);
 
     expect(outsiderRegistration.status).toBe(201);
@@ -323,9 +311,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     const createResponse = await createEndpoint(ownerAccessToken, {
       name: 'Phase 18 Update Target',
     });
-
     const endpointId = (body(createResponse).endpoint as JsonRecord).id as string;
-
     const response = await request(app.getHttpServer())
       .patch(endpointUrl(endpointId))
       .set(withBearer(ownerAccessToken))
@@ -345,9 +331,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     const createResponse = await createEndpoint(ownerAccessToken, {
       name: 'Phase 18 Disable Target',
     });
-
     const endpointId = (body(createResponse).endpoint as JsonRecord).id as string;
-
     // Seed a pending delivery directly to verify the cascade-cancel behavior of disabling.
     const event = await prisma.webhookEvent.create({
       data: {
@@ -358,7 +342,6 @@ describe('Phase 18 Webhook Integrations E2E', () => {
         payload: { phase: 18 },
       },
     });
-
     const pendingDelivery = await prisma.webhookDelivery.create({
       data: {
         workspaceId,
@@ -368,7 +351,6 @@ describe('Phase 18 Webhook Integrations E2E', () => {
         maxAttempts: 5,
       },
     });
-
     const response = await request(app.getHttpServer()).post(disableUrl(endpointId)).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(201);
@@ -428,13 +410,8 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     const createResponse = await createEndpoint(ownerAccessToken, {
       name: 'Phase 18 URL Update Target',
     });
-
     const endpointId = (body(createResponse).endpoint as JsonRecord).id as string;
-
-    const response = await request(app.getHttpServer())
-      .patch(endpointUrl(endpointId))
-      .set(withBearer(ownerAccessToken))
-      .send({ url: 'http://127.0.0.1:9999/hook' });
+    const response = await request(app.getHttpServer()).patch(endpointUrl(endpointId)).set(withBearer(ownerAccessToken)).send({ url: 'http://127.0.0.1:9999/hook' });
 
     expect(response.status).toBe(400);
   });
@@ -501,12 +478,9 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     const createResponse = await createEndpoint(ownerAccessToken, {
       name: 'Phase 18 Secret Leak Check',
     });
-
     const secret = body(createResponse).secret as string;
     const endpointId = (body(createResponse).endpoint as JsonRecord).id as string;
-
     const listResponse = await request(app.getHttpServer()).get(webhooksUrl()).set(withBearer(ownerAccessToken));
-
     const raw = JSON.stringify(listResponse.body);
 
     expect(raw).not.toContain(secret);
@@ -514,11 +488,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     expect(raw).not.toContain('secretIv');
     expect(raw).not.toContain('secretAuthTag');
 
-    const detailAfterUpdate = await request(app.getHttpServer())
-      .patch(endpointUrl(endpointId))
-      .set(withBearer(ownerAccessToken))
-      .send({ name: 'Phase 18 Secret Leak Check Renamed' });
-
+    const detailAfterUpdate = await request(app.getHttpServer()).patch(endpointUrl(endpointId)).set(withBearer(ownerAccessToken)).send({ name: 'Phase 18 Secret Leak Check Renamed' });
     const updateRaw = JSON.stringify(detailAfterUpdate.body);
 
     expect(updateRaw).not.toContain(secret);
@@ -529,14 +499,11 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     const createResponse = await createEndpoint(ownerAccessToken, {
       name: 'Phase 18 Rotation Target',
     });
-
     const originalSecret = body(createResponse).secret as string;
     const endpointId = (body(createResponse).endpoint as JsonRecord).id as string;
-
     const originalPersisted = await prisma.webhookEndpoint.findUniqueOrThrow({
       where: { id: endpointId },
     });
-
     const response = await request(app.getHttpServer()).post(rotateUrl(endpointId)).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(201);
@@ -587,10 +554,8 @@ describe('Phase 18 Webhook Integrations E2E', () => {
 
   it('produces a deterministic canonical signature for the same secret/timestamp/body', () => {
     const secret = cryptoService.generateSecret();
-
     const timestamp = '1700000000';
     const rawBody = JSON.stringify({ type: 'DEPLOYMENT_FAILED', id: 'evt_1' });
-
     const first = signatureService.sign(secret, timestamp, rawBody);
     const second = signatureService.sign(secret, timestamp, rawBody);
 
@@ -600,10 +565,8 @@ describe('Phase 18 Webhook Integrations E2E', () => {
 
   it('accepts a valid signature and rejects a tampered payload', () => {
     const secret = cryptoService.generateSecret();
-
     const timestamp = '1700000000';
     const rawBody = JSON.stringify({ type: 'DEPLOYMENT_FAILED', id: 'evt_2' });
-
     const signature = signatureService.sign(secret, timestamp, rawBody);
 
     expect(signatureService.verify(secret, timestamp, rawBody, signature)).toBe(true);
@@ -616,10 +579,8 @@ describe('Phase 18 Webhook Integrations E2E', () => {
   it('rejects a signature verified with the wrong secret', () => {
     const secretA = cryptoService.generateSecret();
     const secretB = cryptoService.generateSecret();
-
     const timestamp = '1700000000';
     const rawBody = JSON.stringify({ type: 'DEPLOYMENT_FAILED', id: 'evt_3' });
-
     const signature = signatureService.sign(secretA, timestamp, rawBody);
 
     expect(signatureService.verify(secretB, timestamp, rawBody, signature)).toBe(false);
@@ -627,9 +588,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
 
   it('rejects a signature computed against a different timestamp (replay protection input)', () => {
     const secret = cryptoService.generateSecret();
-
     const rawBody = JSON.stringify({ type: 'DEPLOYMENT_FAILED', id: 'evt_4' });
-
     const signature = signatureService.sign(secret, '1700000000', rawBody);
 
     expect(signatureService.verify(secret, '1700000999', rawBody, signature)).toBe(false);
@@ -643,16 +602,13 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     const createResponse = await createEndpoint(ownerAccessToken, {
       name: 'Phase 18 Test Delivery Target',
     });
-
     const endpointId = (body(createResponse).endpoint as JsonRecord).id as string;
-
     const response = await request(app.getHttpServer()).post(testDeliveryUrl(endpointId)).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(201);
     expect(body(response)).toMatchObject({ status: WebhookDeliveryStatus.PENDING });
 
     const deliveryId = body(response).deliveryId as string;
-
     const persisted = await prisma.webhookDelivery.findUniqueOrThrow({
       where: { id: deliveryId },
       include: { event: true },
@@ -667,9 +623,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
       name: 'Phase 18 Disabled Test Target',
       enabled: false,
     });
-
     const endpointId = (body(createResponse).endpoint as JsonRecord).id as string;
-
     const response = await request(app.getHttpServer()).post(testDeliveryUrl(endpointId)).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(400);
@@ -679,9 +633,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     const createResponse = await createEndpoint(ownerAccessToken, {
       name: 'Phase 18 Delivery History Target',
     });
-
     const endpointId = (body(createResponse).endpoint as JsonRecord).id as string;
-
     const event = await prisma.webhookEvent.create({
       data: {
         workspaceId,
@@ -691,10 +643,8 @@ describe('Phase 18 Webhook Integrations E2E', () => {
         payload: { phase: 18, scenario: 'delivery-history' },
       },
     });
-
     const startedAt = new Date();
     const finishedAt = new Date(startedAt.getTime() + 342);
-
     const delivery = await prisma.webhookDelivery.create({
       data: {
         workspaceId,
@@ -731,7 +681,6 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     expect(response.status).toBe(200);
 
     const items = body(response).items as JsonRecord[];
-
     const found = items.find((item) => item.id === delivery.id);
 
     expect(found).toMatchObject({
@@ -751,9 +700,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     const createResponse = await createEndpoint(ownerAccessToken, {
       name: 'Phase 18 Delivery Filter Target',
     });
-
     const endpointId = (body(createResponse).endpoint as JsonRecord).id as string;
-
     const event = await prisma.webhookEvent.create({
       data: {
         workspaceId,
@@ -792,7 +739,6 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     const createResponse = await createEndpoint(ownerAccessToken, {
       name: 'Phase 18 Delivery Pagination Target',
     });
-
     const endpointId = (body(createResponse).endpoint as JsonRecord).id as string;
 
     for (let index = 0; index < 3; index += 1) {
@@ -834,9 +780,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     const createResponse = await createEndpoint(ownerAccessToken, {
       name: 'Phase 18 Idempotency Target',
     });
-
     const endpointId = (body(createResponse).endpoint as JsonRecord).id as string;
-
     const event = await prisma.webhookEvent.create({
       data: {
         workspaceId,
@@ -880,9 +824,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     const createResponse = await createEndpoint(ownerAccessToken, {
       name: 'Phase 18 Isolation Target',
     });
-
     const endpointId = (body(createResponse).endpoint as JsonRecord).id as string;
-
     const response = await request(app.getHttpServer()).get(deliveriesUrl(endpointId)).set(withBearer(outsiderAccessToken));
 
     expect(response.status).toBe(403);
@@ -915,9 +857,7 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     const createResponse = await createEndpoint(ownerAccessToken, {
       name: 'Phase 18 Viewer Restricted Target',
     });
-
     const endpointId = (body(createResponse).endpoint as JsonRecord).id as string;
-
     const rotateResponse = await request(app.getHttpServer()).post(rotateUrl(endpointId)).set(withBearer(viewerAccessToken));
 
     expect(rotateResponse.status).toBe(403);
@@ -973,7 +913,6 @@ describe('Phase 18 Webhook Integrations E2E', () => {
 
   it('enforces the webhook secret rotation rate limit of 5 per hour', async () => {
     const rateLimitIdentity = `phase18-rotation-${randomUUID()}`;
-
     const createResponse = await createEndpoint(ownerAccessToken, {
       name: 'Phase 18 Rate Limit Target',
     });
@@ -981,16 +920,12 @@ describe('Phase 18 Webhook Integrations E2E', () => {
     expect(createResponse.status).toBe(201);
 
     const endpointId = (body(createResponse).endpoint as JsonRecord).id as string;
-
     let lastStatus = 0;
 
     for (let attempt = 0; attempt < 6; attempt += 1) {
       // All attempts intentionally share one identity so the real
       // five-per-hour production rate limit is exercised deterministically.
-      const response = await request(app.getHttpServer())
-        .post(rotateUrl(endpointId))
-        .set(withBearer(ownerAccessToken))
-        .set('x-tracking-key', rateLimitIdentity);
+      const response = await request(app.getHttpServer()).post(rotateUrl(endpointId)).set(withBearer(ownerAccessToken)).set('x-tracking-key', rateLimitIdentity);
 
       lastStatus = response.status;
     }

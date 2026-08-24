@@ -1,5 +1,5 @@
-import { getAnalyticsOverview } from '@/features/analytics-overview/analytics-overview-api';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getAnalyticsOverview } from '@/features/analytics-overview/analytics-overview-api';
 
 const { apiRequestMock } = vi.hoisted(() => ({
   apiRequestMock: vi.fn(),

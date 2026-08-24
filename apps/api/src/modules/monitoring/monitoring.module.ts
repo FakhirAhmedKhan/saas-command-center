@@ -12,19 +12,7 @@ import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-
 @Module({
   imports: [WorkspaceMembersModule, DatabaseModule],
   controllers: [MonitoringController],
-  providers: [
-    PostgresAdvisoryLockService,
-
-    SafeHttpClientService,
-
-    MonitoringAccessService,
-
-    MonitoringService,
-
-    HealthCheckRunnerService,
-
-    HealthMonitoringSchedulerService,
-  ],
+  providers: [PostgresAdvisoryLockService, SafeHttpClientService, MonitoringAccessService, MonitoringService, HealthCheckRunnerService, HealthMonitoringSchedulerService],
 
   exports: [MonitoringService, HealthCheckRunnerService],
 })

@@ -46,20 +46,13 @@ export async function getAnonymousAnalyticsEngineStatus(app: INestApplication, w
   return request(app.getHttpServer()).get(analyticsEngineRoutes.status(workspaceId, websiteId));
 }
 
-export async function processAnalytics(
-  actor: WorkspaceTestUser,
-  workspaceId: string,
-  websiteId: string,
-  body: Record<string, unknown> = {},
-): Promise<Response> {
+export async function processAnalytics(actor: WorkspaceTestUser, workspaceId: string, websiteId: string, body: Record<string, unknown> = {}): Promise<Response> {
   return actor.agent.post(analyticsEngineRoutes.process(workspaceId, websiteId)).set(withBearer(actor.accessToken)).send(body);
 }
 
 export function readAnalyticsEngineStatus(response: Response): AnalyticsEngineStatusBody {
   const body = asRecord(response.body);
-
   const website = asRecord(body?.website);
-
   const countsRecord = asRecord(body?.counts);
 
   if (!body || !website || !countsRecord) {
@@ -74,9 +67,7 @@ export function readAnalyticsEngineStatus(response: Response): AnalyticsEngineSt
     }
   }
 
-  const recentSessions = Array.isArray(body.recentSessions)
-    ? body.recentSessions.map(asRecord).filter((value): value is Record<string, unknown> => value !== undefined)
-    : [];
+  const recentSessions = Array.isArray(body.recentSessions) ? body.recentSessions.map(asRecord).filter((value): value is Record<string, unknown> => value !== undefined) : [];
 
   return {
     website,

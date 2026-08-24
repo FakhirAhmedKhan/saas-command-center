@@ -174,8 +174,7 @@ async function seedDemoData(): Promise<void> {
 
       shortDescription: 'Central control panel for managing SaaS products, analytics, development and integrations.',
 
-      longDescription:
-        'A unified SaaS management platform containing application management, analytics, releases, monitoring, GitHub repositories and development workflows.',
+      longDescription: 'A unified SaaS management platform containing application management, analytics, releases, monitoring, GitHub repositories and development workflows.',
 
       category: 'SAAS',
 

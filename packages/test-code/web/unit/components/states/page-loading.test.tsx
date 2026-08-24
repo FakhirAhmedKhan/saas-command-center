@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { PageLoading } from '@/components/states/page-loading';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { PageLoading } from '@/components/states/page-loading';
 
 describe('PageLoading', () => {
   it('announces the default loading label via an accessible status region', () => {

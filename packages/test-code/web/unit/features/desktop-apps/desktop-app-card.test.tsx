@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 
-import { DesktopAppCard } from '@/features/desktop-apps/desktop-app-card';
 import type { DesktopApplicationDetails } from '@command-center/shared-types';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { DesktopAppCard } from '@/features/desktop-apps/desktop-app-card';
 
 const desktopApp: DesktopApplicationDetails = {
   id: 'desktop-1',

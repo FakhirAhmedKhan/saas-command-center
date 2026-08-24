@@ -12,7 +12,6 @@ test.describe('Batch 11 real website flows', () => {
   let context: BrowserContext;
   let page: Page;
   let websiteId = '';
-
   let domain = '';
 
   test.beforeAll(async ({ browser }) => {

@@ -214,16 +214,7 @@ packages/shared-types/src/desktop-apps/desktop-app.types.ts
 ```
 
 ```ts
-export const DESKTOP_ALERT_RULE_TYPES = [
-  'BUILD_FAILED',
-  'CRASH_RATE',
-  'STARTUP',
-  'MEMORY',
-  'CPU',
-  'RELEASE_REGRESSION',
-  'SIGNING_FAILURE',
-  'TELEMETRY_UNAVAILABLE',
-] as const;
+export const DESKTOP_ALERT_RULE_TYPES = ['BUILD_FAILED', 'CRASH_RATE', 'STARTUP', 'MEMORY', 'CPU', 'RELEASE_REGRESSION', 'SIGNING_FAILURE', 'TELEMETRY_UNAVAILABLE'] as const;
 
 export type DesktopAlertRuleType = (typeof DESKTOP_ALERT_RULE_TYPES)[number];
 
@@ -549,9 +540,7 @@ export class DesktopAlertsService {
       actualValue: null,
       threshold: null,
       title: 'Desktop build failed',
-      message: breached
-        ? `Build ${build.buildNumber ?? build.workflowRunId} failed on ${build.platform} ${build.architecture}.`
-        : 'Latest desktop build is not failed.',
+      message: breached ? `Build ${build.buildNumber ?? build.workflowRunId} failed on ${build.platform} ${build.architecture}.` : 'Latest desktop build is not failed.',
       version: build?.version ?? null,
       buildId: build?.id ?? null,
       dimension: build ? `build:${build.id}` : 'build:none',
@@ -684,9 +673,7 @@ export class DesktopAlertsService {
 
     const failed = security.findings.filter(
       (finding) =>
-        (finding.type === DesktopSecurityCheckType.WINDOWS_SIGNING ||
-          finding.type === DesktopSecurityCheckType.MACOS_SIGNING ||
-          finding.type === DesktopSecurityCheckType.MACOS_NOTARIZATION) &&
+        (finding.type === DesktopSecurityCheckType.WINDOWS_SIGNING || finding.type === DesktopSecurityCheckType.MACOS_SIGNING || finding.type === DesktopSecurityCheckType.MACOS_NOTARIZATION) &&
         finding.status === DesktopSecurityCheckStatus.FAIL,
     );
 
@@ -968,32 +955,19 @@ export class DesktopAlertsController {
 
   @Post('rules')
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
-  createRule(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Body() dto: CreateDesktopAlertRuleDto,
-  ) {
+  createRule(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Body() dto: CreateDesktopAlertRuleDto) {
     return this.service.createRule(workspaceId, desktopAppId, dto);
   }
 
   @Patch('rules/:ruleId')
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
-  updateRule(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Param('ruleId', ParseUUIDPipe) ruleId: string,
-    @Body() dto: UpdateDesktopAlertRuleDto,
-  ) {
+  updateRule(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Param('ruleId', ParseUUIDPipe) ruleId: string, @Body() dto: UpdateDesktopAlertRuleDto) {
     return this.service.updateRule(workspaceId, desktopAppId, ruleId, dto);
   }
 
   @Delete('rules/:ruleId')
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN)
-  deleteRule(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Param('ruleId', ParseUUIDPipe) ruleId: string,
-  ) {
+  deleteRule(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Param('ruleId', ParseUUIDPipe) ruleId: string) {
     return this.service.deleteRule(workspaceId, desktopAppId, ruleId);
   }
 
@@ -1154,8 +1128,7 @@ export type DesktopAnalysisAction = (typeof DESKTOP_ANALYSIS_ACTIONS)[number];
 
 export type DesktopAnalysisConfidence = 'LIMITED' | 'SUPPORTED';
 
-export type DesktopAnalysisEvidenceType =
-  'REPOSITORY' | 'BUILD' | 'ARTIFACT' | 'TEST' | 'RELEASE' | 'CRASH' | 'PERFORMANCE' | 'DEPENDENCY' | 'SECURITY' | 'ALERT';
+export type DesktopAnalysisEvidenceType = 'REPOSITORY' | 'BUILD' | 'ARTIFACT' | 'TEST' | 'RELEASE' | 'CRASH' | 'PERFORMANCE' | 'DEPENDENCY' | 'SECURITY' | 'ALERT';
 
 export interface DesktopAnalysisEvidence {
   type: DesktopAnalysisEvidenceType;
@@ -1948,12 +1921,7 @@ export class DesktopAnalysisController {
 
   @Post()
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
-  analyze(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Req() request: AuthenticatedRequest,
-    @Body() dto: AnalyzeDesktopAppDto,
-  ) {
+  analyze(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Req() request: AuthenticatedRequest, @Body() dto: AnalyzeDesktopAppDto) {
     return this.service.analyze(workspaceId, desktopAppId, request.user.id, dto);
   }
 }
@@ -2291,11 +2259,7 @@ export class DesktopSecurityController {
 
   @Get('permissions')
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER, WorkspaceRole.VIEWER)
-  getPermissions(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) _desktopAppId: string,
-    @Req() request: AuthenticatedRequest,
-  ) {
+  getPermissions(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) _desktopAppId: string, @Req() request: AuthenticatedRequest) {
     void _desktopAppId;
     return this.permissions.get(workspaceId, request.user.id);
   }
@@ -2459,15 +2423,7 @@ apps/web/src/features/desktop-apps/desktop-apps-api.ts
 Keep every existing function and import. Add these type imports:
 
 ```ts
-import type {
-  CreateDesktopAlertRuleInput,
-  DesktopAnalysisResult,
-  DesktopAlertIncident,
-  DesktopAlertRule,
-  DesktopPermissions,
-  AnalyzeDesktopAppInput,
-  UpdateDesktopAlertRuleInput,
-} from '@command-center/shared-types';
+import type { CreateDesktopAlertRuleInput, DesktopAnalysisResult, DesktopAlertIncident, DesktopAlertRule, DesktopPermissions, AnalyzeDesktopAppInput, UpdateDesktopAlertRuleInput } from '@command-center/shared-types';
 ```
 
 Then append:
@@ -2588,15 +2544,7 @@ apps/web/src/features/desktop-apps/desktop-alerts.tsx
 ```tsx
 'use client';
 
-import {
-  createDesktopAlertRule,
-  deleteDesktopAlertRule,
-  evaluateDesktopAlerts,
-  getDesktopPermissions,
-  listDesktopAlertIncidents,
-  listDesktopAlertRules,
-  updateDesktopAlertRule,
-} from './desktop-apps-api';
+import { createDesktopAlertRule, deleteDesktopAlertRule, evaluateDesktopAlerts, getDesktopPermissions, listDesktopAlertIncidents, listDesktopAlertRules, updateDesktopAlertRule } from './desktop-apps-api';
 import { DesktopPermissionGate } from './desktop-permission-gate';
 import { getErrorMessage } from '@/features/lib/api/api-error';
 import type { DesktopAlertIncident, DesktopAlertRule, DesktopAlertRuleType, DesktopPermissions } from '@command-center/shared-types';
@@ -2799,12 +2747,7 @@ export function DesktopAlerts({ workspaceId, desktopAppId }: Props) {
         </div>
 
         <DesktopPermissionGate permissions={permissions} require='write'>
-          <button
-            type='button'
-            onClick={() => void evaluate()}
-            disabled={evaluating}
-            className='inline-flex h-10 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-medium disabled:opacity-50'
-          >
+          <button type='button' onClick={() => void evaluate()} disabled={evaluating} className='inline-flex h-10 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-medium disabled:opacity-50'>
             <RefreshCcw className='size-4' aria-hidden='true' />
             {evaluating ? 'Evaluating…' : 'Evaluate now'}
           </button>
@@ -2863,24 +2806,11 @@ export function DesktopAlerts({ workspaceId, desktopAppId }: Props) {
 
             <label className='space-y-1 text-sm'>
               <span>Cooldown (minutes)</span>
-              <input
-                aria-label='Cooldown minutes'
-                type='number'
-                min='1'
-                max='10080'
-                value={cooldownMinutes}
-                onChange={(event) => setCooldownMinutes(event.target.value)}
-                className='h-10 w-full rounded-lg border px-3'
-              />
+              <input aria-label='Cooldown minutes' type='number' min='1' max='10080' value={cooldownMinutes} onChange={(event) => setCooldownMinutes(event.target.value)} className='h-10 w-full rounded-lg border px-3' />
             </label>
           </div>
 
-          <button
-            type='button'
-            onClick={() => void createRule()}
-            disabled={saving}
-            className='mt-4 h-10 rounded-lg bg-slate-950 px-4 text-sm font-medium text-white disabled:opacity-50'
-          >
+          <button type='button' onClick={() => void createRule()} disabled={saving} className='mt-4 h-10 rounded-lg bg-slate-950 px-4 text-sm font-medium text-white disabled:opacity-50'>
             {saving ? 'Saving…' : 'Create alert'}
           </button>
         </section>
@@ -2908,22 +2838,12 @@ export function DesktopAlerts({ workspaceId, desktopAppId }: Props) {
 
                 <DesktopPermissionGate permissions={permissions} require='write'>
                   <div className='flex items-center gap-2'>
-                    <button
-                      type='button'
-                      aria-label={`${rule.enabled ? 'Disable' : 'Enable'} ${rule.name}`}
-                      onClick={() => void setEnabled(rule, !rule.enabled)}
-                      className='h-9 rounded-lg border px-3 text-sm'
-                    >
+                    <button type='button' aria-label={`${rule.enabled ? 'Disable' : 'Enable'} ${rule.name}`} onClick={() => void setEnabled(rule, !rule.enabled)} className='h-9 rounded-lg border px-3 text-sm'>
                       {rule.enabled ? 'Disable' : 'Enable'}
                     </button>
 
                     <DesktopPermissionGate permissions={permissions} require='manage'>
-                      <button
-                        type='button'
-                        aria-label={`Delete ${rule.name}`}
-                        onClick={() => void remove(rule.id)}
-                        className='inline-flex size-9 items-center justify-center rounded-lg border'
-                      >
+                      <button type='button' aria-label={`Delete ${rule.name}`} onClick={() => void remove(rule.id)} className='inline-flex size-9 items-center justify-center rounded-lg border'>
                         <Trash2 className='size-4' aria-hidden='true' />
                       </button>
                     </DesktopPermissionGate>
@@ -3071,20 +2991,11 @@ export function DesktopAnalysisPanel({ workspaceId, desktopAppId, buildId, relea
         </div>
       ) : null}
 
-      <DesktopPermissionGate
-        permissions={permissions}
-        require='analyze'
-        fallback={permissions ? <p className='mt-4 text-sm text-slate-500'>Your workspace role has read-only access to AI analysis.</p> : null}
-      >
+      <DesktopPermissionGate permissions={permissions} require='analyze' fallback={permissions ? <p className='mt-4 text-sm text-slate-500'>Your workspace role has read-only access to AI analysis.</p> : null}>
         <div className='mt-4 grid gap-3 md:grid-cols-[280px_1fr]'>
           <label className='space-y-1 text-sm'>
             <span>Analysis</span>
-            <select
-              aria-label='Analysis action'
-              value={action}
-              onChange={(event) => setAction(event.target.value as DesktopAnalysisAction)}
-              className='h-10 w-full rounded-lg border px-3'
-            >
+            <select aria-label='Analysis action' value={action} onChange={(event) => setAction(event.target.value as DesktopAnalysisAction)} className='h-10 w-full rounded-lg border px-3'>
               {ACTIONS.map((item) => (
                 <option key={item.value} value={item.value}>
                   {item.label}
@@ -3105,12 +3016,7 @@ export function DesktopAnalysisPanel({ workspaceId, desktopAppId, buildId, relea
           </label>
         </div>
 
-        <button
-          type='button'
-          onClick={() => void run()}
-          disabled={running}
-          className='mt-3 h-10 rounded-lg bg-slate-950 px-4 text-sm font-medium text-white disabled:opacity-50'
-        >
+        <button type='button' onClick={() => void run()} disabled={running} className='mt-3 h-10 rounded-lg bg-slate-950 px-4 text-sm font-medium text-white disabled:opacity-50'>
           {running ? 'Analyzing…' : 'Analyze'}
         </button>
       </DesktopPermissionGate>
@@ -3778,11 +3684,7 @@ describe('Desktop AI Analysis E2E', () => {
       },
     });
 
-    await owner.agent
-      .post(analysisPath(owner.workspaceId, desktop.id))
-      .set('Authorization', `Bearer ${owner.accessToken}`)
-      .send({ action: 'RELEASE_HEALTH' })
-      .expect(201);
+    await owner.agent.post(analysisPath(owner.workspaceId, desktop.id)).set('Authorization', `Bearer ${owner.accessToken}`).send({ action: 'RELEASE_HEALTH' }).expect(201);
 
     const prompt = fake.calls[0]?.prompt ?? '';
 
@@ -3846,11 +3748,7 @@ describe('Desktop AI Analysis E2E', () => {
       },
     });
 
-    await viewer.agent
-      .post(analysisPath(owner.workspaceId, desktop.id))
-      .set('Authorization', `Bearer ${viewer.accessToken}`)
-      .send({ action: 'CUSTOM', question: 'Analyze this app' })
-      .expect(403);
+    await viewer.agent.post(analysisPath(owner.workspaceId, desktop.id)).set('Authorization', `Bearer ${viewer.accessToken}`).send({ action: 'CUSTOM', question: 'Analyze this app' }).expect(403);
   });
 
   it('converts provider failure to a safe 502 response', async () => {
@@ -3863,11 +3761,7 @@ describe('Desktop AI Analysis E2E', () => {
       },
     });
 
-    const response = await owner.agent
-      .post(analysisPath(owner.workspaceId, desktop.id))
-      .set('Authorization', `Bearer ${owner.accessToken}`)
-      .send({ action: 'CUSTOM', question: 'What happened?' })
-      .expect(502);
+    const response = await owner.agent.post(analysisPath(owner.workspaceId, desktop.id)).set('Authorization', `Bearer ${owner.accessToken}`).send({ action: 'CUSTOM', question: 'What happened?' }).expect(502);
 
     expect(JSON.stringify(response.body)).not.toContain('provider leaked internal detail');
   });
@@ -4359,16 +4253,7 @@ describe('DesktopAnalysisPanel', () => {
     vi.mocked(api.analyzeDesktopApplication).mockResolvedValue({
       id: '33333333-3333-4333-8333-333333333333',
       action: 'RELEASE_HEALTH',
-      answer: [
-        'Evidence:',
-        '- build 100 succeeded',
-        'Correlation:',
-        '- no regression observed',
-        'Likely cause:',
-        '- none supported',
-        'Unknown cause:',
-        '- not applicable',
-      ].join('\n'),
+      answer: ['Evidence:', '- build 100 succeeded', 'Correlation:', '- no regression observed', 'Likely cause:', '- none supported', 'Unknown cause:', '- not applicable'].join('\n'),
       confidence: 'SUPPORTED',
       evidence: [
         {
@@ -4720,10 +4605,7 @@ describe('Desktop Phase 18 full flow E2E', () => {
       packageName: `com.commandcenter.${framework.toLowerCase()}.final`,
     });
 
-    const response = await owner.agent
-      .get(`${API}/workspaces/${owner.workspaceId}/desktop-apps/${desktop.id}`)
-      .set('Authorization', `Bearer ${owner.accessToken}`)
-      .expect(200);
+    const response = await owner.agent.get(`${API}/workspaces/${owner.workspaceId}/desktop-apps/${desktop.id}`).set('Authorization', `Bearer ${owner.accessToken}`).expect(200);
 
     expect(response.body.framework).toBe(framework);
     expect(response.body.platform).toBe(platform);

@@ -33,7 +33,6 @@ import { BlockerStatus, WorkItemPriority } from 'src/generated/prisma/enums';
 
 describe('Development E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
 
   beforeAll(async () => {
@@ -52,7 +51,6 @@ describe('Development E2E', () => {
 
   it('lists available development templates', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const response = await listTemplates(owner);
 
     expect(response.status).toBe(200);
@@ -62,9 +60,7 @@ describe('Development E2E', () => {
 
   it('creates, lists, and updates a milestone', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const milestone = await createMilestone(owner, application.id, {
       title: 'Backend Foundation',
       weight: 4,
@@ -84,7 +80,6 @@ describe('Development E2E', () => {
     expect(listResponse.status).toBe(200);
 
     const records = readDevelopmentItems(listResponse, ['milestones']);
-
     const stored = findRecordById(records, milestone.id);
 
     expect(stored).toBeDefined();
@@ -94,16 +89,12 @@ describe('Development E2E', () => {
 
   it('creates and updates a task inside a milestone', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const milestone = await createMilestone(owner, application.id);
-
     const task = await createTask(owner, application.id, milestone.id, {
       title: 'Create Authentication',
       weight: 3,
     });
-
     const updateResponse = await updateTask(owner, application.id, task.id, {
       title: 'Create Secure Authentication',
       priority: enumValue(WorkItemPriority, 1),
@@ -116,7 +107,6 @@ describe('Development E2E', () => {
     expectDevelopmentSuccess(statusResponse);
 
     const listResponse = await listMilestones(owner, application.id);
-
     const stored = findRecordById(readDevelopmentItems(listResponse, ['milestones']), task.id);
 
     expect(stored).toBeDefined();
@@ -128,21 +118,16 @@ describe('Development E2E', () => {
 
   it('moves and reorders tasks and milestones', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const firstMilestone = await createMilestone(owner, application.id, {
       title: 'First Milestone',
     });
-
     const secondMilestone = await createMilestone(owner, application.id, {
       title: 'Second Milestone',
     });
-
     const firstTask = await createTask(owner, application.id, firstMilestone.id, {
       title: 'First Task',
     });
-
     const secondTask = await createTask(owner, application.id, secondMilestone.id, {
       title: 'Second Task',
     });
@@ -154,13 +139,11 @@ describe('Development E2E', () => {
     expectDevelopmentSuccess(await reorderMilestones(owner, application.id, [secondMilestone.id, firstMilestone.id]));
 
     const listResponse = await listMilestones(owner, application.id);
-
     const records = readDevelopmentItems(listResponse, ['milestones']);
 
     expect(recordString(records[0] ?? {}, 'id')).toBe(secondMilestone.id);
 
     const secondStored = findRecordById(records, secondMilestone.id);
-
     const nestedJson = JSON.stringify(secondStored);
 
     expect(nestedJson).toContain(firstTask.id);
@@ -170,19 +153,14 @@ describe('Development E2E', () => {
 
   it('creates, updates, resolves, reopens, filters, and deletes a blocker', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const milestone = await createMilestone(owner, application.id);
-
     const task = await createTask(owner, application.id, milestone.id);
-
     const blocker = await createBlocker(owner, application.id, {
       title: 'Waiting for Credentials',
       milestoneId: milestone.id,
       taskId: task.id,
     });
-
     const updateResponse = await updateBlocker(owner, application.id, blocker.id, {
       title: 'Waiting for Production Credentials',
     });
@@ -202,7 +180,6 @@ describe('Development E2E', () => {
     const searchResponse = await listBlockers(owner, application.id, {
       search: 'Production Credentials',
     });
-
     const searched = readDevelopmentItems(searchResponse, ['blockers']);
 
     expect(findRecordById(searched, blocker.id)).toBeDefined();
@@ -216,11 +193,8 @@ describe('Development E2E', () => {
 
   it('deletes tasks and milestones', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const milestone = await createMilestone(owner, application.id);
-
     const task = await createTask(owner, application.id, milestone.id);
 
     expectDevelopmentSuccess(await deleteTask(owner, application.id, task.id));
@@ -228,7 +202,6 @@ describe('Development E2E', () => {
     expectDevelopmentSuccess(await deleteMilestone(owner, application.id, milestone.id));
 
     const listResponse = await listMilestones(owner, application.id);
-
     const records = readDevelopmentItems(listResponse, ['milestones']);
 
     expect(findRecordById(records, task.id)).toBeUndefined();
@@ -238,21 +211,15 @@ describe('Development E2E', () => {
 
   it('rejects invalid milestone, task, blocker, and reorder payloads', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
-    const invalidMilestone = await owner.agent
-      .post(developmentRoutes.milestones(owner.workspaceId, application.id))
-      .set('Authorization', `Bearer ${owner.accessToken}`)
-      .send({
-        title: '',
-        weight: 101,
-      });
+    const invalidMilestone = await owner.agent.post(developmentRoutes.milestones(owner.workspaceId, application.id)).set('Authorization', `Bearer ${owner.accessToken}`).send({
+      title: '',
+      weight: 101,
+    });
 
     expect(invalidMilestone.status).toBe(400);
 
     const milestone = await createMilestone(owner, application.id);
-
     const invalidTask = await owner.agent
       .post(developmentRoutes.tasks(owner.workspaceId, application.id, milestone.id))
       .set('Authorization', `Bearer ${owner.accessToken}`)
@@ -264,13 +231,10 @@ describe('Development E2E', () => {
 
     expect(invalidTask.status).toBe(400);
 
-    const invalidBlocker = await owner.agent
-      .post(developmentRoutes.blockers(owner.workspaceId, application.id))
-      .set('Authorization', `Bearer ${owner.accessToken}`)
-      .send({
-        title: '',
-        severity: 'INVALID_SEVERITY',
-      });
+    const invalidBlocker = await owner.agent.post(developmentRoutes.blockers(owner.workspaceId, application.id)).set('Authorization', `Bearer ${owner.accessToken}`).send({
+      title: '',
+      severity: 'INVALID_SEVERITY',
+    });
 
     expect(invalidBlocker.status).toBe(400);
 
@@ -288,15 +252,10 @@ describe('Development E2E', () => {
 
   it('rejects child IDs belonging to another application', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const firstApplication = await createApplication(owner);
-
     const secondApplication = await createApplication(owner);
-
     const firstMilestone = await createMilestone(owner, firstApplication.id);
-
     const firstTask = await createTask(owner, firstApplication.id, firstMilestone.id);
-
     const milestoneResponse = await updateMilestone(owner, secondApplication.id, firstMilestone.id, {
       title: 'Wrong Application',
     });
@@ -312,13 +271,9 @@ describe('Development E2E', () => {
 
   it('creates a blocker referencing a valid milestone and task combination (DB-05)', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const milestone = await createMilestone(owner, application.id);
-
     const task = await createTask(owner, application.id, milestone.id);
-
     const blocker = await createBlocker(owner, application.id, {
       title: 'Valid combination blocker',
       milestoneId: milestone.id,
@@ -331,99 +286,64 @@ describe('Development E2E', () => {
 
   it('rejects a blocker referencing a milestone from another application (DB-05)', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const firstApplication = await createApplication(owner);
-
     const secondApplication = await createApplication(owner);
-
     const foreignMilestone = await createMilestone(owner, secondApplication.id);
-
-    const response = await owner.agent
-      .post(developmentRoutes.blockers(owner.workspaceId, firstApplication.id))
-      .set('Authorization', `Bearer ${owner.accessToken}`)
-      .send({
-        title: 'Blocker with mismatched milestone',
-        milestoneId: foreignMilestone.id,
-      });
+    const response = await owner.agent.post(developmentRoutes.blockers(owner.workspaceId, firstApplication.id)).set('Authorization', `Bearer ${owner.accessToken}`).send({
+      title: 'Blocker with mismatched milestone',
+      milestoneId: foreignMilestone.id,
+    });
 
     expectBusinessRuleRejected(response);
   });
 
   it('rejects a blocker referencing a task from another application (DB-05)', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const firstApplication = await createApplication(owner);
-
     const secondApplication = await createApplication(owner);
-
     const foreignMilestone = await createMilestone(owner, secondApplication.id);
-
     const foreignTask = await createTask(owner, secondApplication.id, foreignMilestone.id);
-
-    const response = await owner.agent
-      .post(developmentRoutes.blockers(owner.workspaceId, firstApplication.id))
-      .set('Authorization', `Bearer ${owner.accessToken}`)
-      .send({
-        title: 'Blocker with mismatched task',
-        taskId: foreignTask.id,
-      });
+    const response = await owner.agent.post(developmentRoutes.blockers(owner.workspaceId, firstApplication.id)).set('Authorization', `Bearer ${owner.accessToken}`).send({
+      title: 'Blocker with mismatched task',
+      taskId: foreignTask.id,
+    });
 
     expectBusinessRuleRejected(response);
   });
 
   it('rejects a blocker whose task does not belong to the supplied milestone (DB-05)', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const firstMilestone = await createMilestone(owner, application.id);
-
     const secondMilestone = await createMilestone(owner, application.id);
-
     const taskUnderFirstMilestone = await createTask(owner, application.id, firstMilestone.id);
-
-    const response = await owner.agent
-      .post(developmentRoutes.blockers(owner.workspaceId, application.id))
-      .set('Authorization', `Bearer ${owner.accessToken}`)
-      .send({
-        title: 'Blocker with milestone/task mismatch',
-        milestoneId: secondMilestone.id,
-        taskId: taskUnderFirstMilestone.id,
-      });
+    const response = await owner.agent.post(developmentRoutes.blockers(owner.workspaceId, application.id)).set('Authorization', `Bearer ${owner.accessToken}`).send({
+      title: 'Blocker with milestone/task mismatch',
+      milestoneId: secondMilestone.id,
+      taskId: taskUnderFirstMilestone.id,
+    });
 
     expectBusinessRuleRejected(response);
   });
 
   it('rejects a blocker referencing milestone/task IDs from a foreign workspace (DB-05)', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const outsider = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const outsiderApplication = await createApplication(outsider);
-
     const outsiderMilestone = await createMilestone(outsider, outsiderApplication.id);
-
     const outsiderTask = await createTask(outsider, outsiderApplication.id, outsiderMilestone.id);
-
-    const milestoneResponse = await owner.agent
-      .post(developmentRoutes.blockers(owner.workspaceId, application.id))
-      .set('Authorization', `Bearer ${owner.accessToken}`)
-      .send({
-        title: 'Blocker with foreign-workspace milestone',
-        milestoneId: outsiderMilestone.id,
-      });
+    const milestoneResponse = await owner.agent.post(developmentRoutes.blockers(owner.workspaceId, application.id)).set('Authorization', `Bearer ${owner.accessToken}`).send({
+      title: 'Blocker with foreign-workspace milestone',
+      milestoneId: outsiderMilestone.id,
+    });
 
     expectBusinessRuleRejected(milestoneResponse);
 
-    const taskResponse = await owner.agent
-      .post(developmentRoutes.blockers(owner.workspaceId, application.id))
-      .set('Authorization', `Bearer ${owner.accessToken}`)
-      .send({
-        title: 'Blocker with foreign-workspace task',
-        taskId: outsiderTask.id,
-      });
+    const taskResponse = await owner.agent.post(developmentRoutes.blockers(owner.workspaceId, application.id)).set('Authorization', `Bearer ${owner.accessToken}`).send({
+      title: 'Blocker with foreign-workspace task',
+      taskId: outsiderTask.id,
+    });
 
     expectBusinessRuleRejected(taskResponse);
   });

@@ -11,7 +11,6 @@ export function GuestOnly({ children }: GateProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { status, workspaces } = useAuth();
-
   const authenticatedRedirect = pathname === '/register' && workspaces.length === 0 ? '/workspaces/new' : '/dashboard';
 
   useEffect(() => {

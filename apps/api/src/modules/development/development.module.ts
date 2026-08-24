@@ -14,23 +14,7 @@ import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-
 @Module({
   imports: [WorkspaceMembersModule, WorkspaceModule, ActivityModule],
   controllers: [DevelopmentTemplatesController, DevelopmentController],
-  providers: [
-    ProgressCalculatorService,
-    DevelopmentSharedService,
-    DevelopmentSummaryService,
-    DevelopmentTemplatesService,
-    MilestonesService,
-    TasksService,
-    BlockersService,
-  ],
-  exports: [
-    ProgressCalculatorService,
-    DevelopmentSharedService,
-    DevelopmentSummaryService,
-    DevelopmentTemplatesService,
-    MilestonesService,
-    TasksService,
-    BlockersService,
-  ],
+  providers: [ProgressCalculatorService, DevelopmentSharedService, DevelopmentSummaryService, DevelopmentTemplatesService, MilestonesService, TasksService, BlockersService],
+  exports: [ProgressCalculatorService, DevelopmentSharedService, DevelopmentSummaryService, DevelopmentTemplatesService, MilestonesService, TasksService, BlockersService],
 })
 export class DevelopmentModule {}

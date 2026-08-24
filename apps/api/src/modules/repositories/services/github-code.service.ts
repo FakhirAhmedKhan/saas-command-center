@@ -80,14 +80,10 @@ export class GithubCodeService {
 
   async listBranches(installationId: string, owner: string, repository: string): Promise<GithubBranch[]> {
     const token = this.githubApp.getInstallationAccessToken(installationId);
-
     const branches: GithubBranch[] = [];
 
     for (let page = 1; ; page += 1) {
-      const result = await this.requestJson<GithubBranchResponse[]>(
-        await token,
-        `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repository)}/branches?per_page=100&page=${page}`,
-      );
+      const result = await this.requestJson<GithubBranchResponse[]>(await token, `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repository)}/branches?per_page=100&page=${page}`);
 
       for (const branch of result) {
         branches.push({
@@ -107,11 +103,7 @@ export class GithubCodeService {
 
   async getTree(installationId: string, owner: string, repository: string, branch: string): Promise<GithubRepositoryTree> {
     const token = await this.githubApp.getInstallationAccessToken(installationId);
-
-    const result = await this.requestJson<GithubTreeResponse>(
-      token,
-      `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repository)}/git/trees/${encodeURIComponent(branch)}?recursive=1`,
-    );
+    const result = await this.requestJson<GithubTreeResponse>(token, `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repository)}/git/trees/${encodeURIComponent(branch)}?recursive=1`);
 
     return {
       sha: result.sha,
@@ -127,13 +119,8 @@ export class GithubCodeService {
 
   async getFile(installationId: string, owner: string, repository: string, path: string, ref: string): Promise<GithubRepositoryContent | null> {
     const token = this.githubApp.getInstallationAccessToken(installationId);
-
     const encodedPath = this.encodeRepositoryPath(path);
-
-    const response = await this.requestJsonOrNull<GithubContentResponse>(
-      await token,
-      `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repository)}/contents/${encodedPath}?ref=${encodeURIComponent(ref)}`,
-    );
+    const response = await this.requestJsonOrNull<GithubContentResponse>(await token, `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repository)}/contents/${encodedPath}?ref=${encodeURIComponent(ref)}`);
 
     if (!response) {
       return null;
@@ -159,7 +146,6 @@ export class GithubCodeService {
       headers: this.headers(token),
       signal: AbortSignal.timeout(15_000),
     });
-
     const body = await response.text();
 
     if (!response.ok) {

@@ -1,14 +1,7 @@
 import type { AnalyticsOverviewResponse, GetAnalyticsOverviewInput } from './analytics-overview.types';
 import { apiRequest } from '../lib/api/api-client';
 
-export async function getAnalyticsOverview({
-  workspaceId,
-  websiteId,
-  preset = '7d',
-  from,
-  to,
-  signal,
-}: GetAnalyticsOverviewInput): Promise<AnalyticsOverviewResponse> {
+export async function getAnalyticsOverview({ workspaceId, websiteId, preset = '7d', from, to, signal }: GetAnalyticsOverviewInput): Promise<AnalyticsOverviewResponse> {
   const searchParams = new URLSearchParams();
 
   if (from && to) {

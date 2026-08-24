@@ -4,9 +4,7 @@ import vm from 'node:vm';
 
 // Coverage runs point this at an unminified build so the v8 report maps back
 // to readable source instead of a single minified line.
-const bundleUrl = process.env.TRACKER_BUNDLE
-  ? new URL(process.env.TRACKER_BUNDLE, import.meta.url)
-  : new URL('../../../../apps/tracker/dist/tracker.js', import.meta.url);
+const bundleUrl = process.env.TRACKER_BUNDLE ? new URL(process.env.TRACKER_BUNDLE, import.meta.url) : new URL('../../../../apps/tracker/dist/tracker.js', import.meta.url);
 let cachedBundle;
 
 async function readBundle() {
@@ -154,7 +152,6 @@ export async function createTrackerHarness(options = {}) {
     cryptoGetRandomValuesReject = false,
     timeZoneReject = false,
   } = options;
-
   const bundle = await readBundle();
   const requests = [];
   const beacons = [];
@@ -166,7 +163,6 @@ export async function createTrackerHarness(options = {}) {
   let pendingFetchResolver = null;
   let blockFetch = false;
   let identifierSequence = 0;
-
   const storage = new MemoryStorage(initialStorage);
   storage.setThrowOnAccess(storageThrowOnAccess);
 
@@ -200,7 +196,6 @@ export async function createTrackerHarness(options = {}) {
         }
       : null,
   };
-
   const navigator = {
     doNotTrack,
     onLine: online,
@@ -210,7 +205,6 @@ export async function createTrackerHarness(options = {}) {
       return beaconResult;
     },
   };
-
   const history = {
     pushState(_state, _unused, url) {
       if (url !== undefined && url !== null) {
@@ -224,7 +218,6 @@ export async function createTrackerHarness(options = {}) {
       }
     },
   };
-
   const window = {
     ...windowEvents,
     document,

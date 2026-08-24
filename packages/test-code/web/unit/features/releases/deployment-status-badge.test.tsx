@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { DeploymentStatusBadge } from '@/features/releases/deployment-status-badge';
 import type { DeploymentStatus } from '@/features/releases/release-management.types';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { DeploymentStatusBadge } from '@/features/releases/deployment-status-badge';
 
 describe('DeploymentStatusBadge', () => {
   const cases: Array<{ status: DeploymentStatus; text: string; colorClass: string }> = [

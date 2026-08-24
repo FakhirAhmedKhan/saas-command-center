@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { apiRequest } from '@/features/lib/api/api-client';
 import {
   beginGithubConnect,
   completeGithubCallback,
@@ -10,8 +12,6 @@ import {
   syncRepository,
   unlinkRepositoryApplication,
 } from '@/features/repositories/repositories-api';
-import { apiRequest } from '@/features/lib/api/api-client';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 /*
  * This module must route every repository/GitHub call through the shared
@@ -24,7 +24,6 @@ vi.mock('@/features/lib/api/api-client', () => ({
 }));
 
 const mockedApiRequest = vi.mocked(apiRequest);
-
 const WORKSPACE = 'workspace-1';
 
 beforeEach(() => {

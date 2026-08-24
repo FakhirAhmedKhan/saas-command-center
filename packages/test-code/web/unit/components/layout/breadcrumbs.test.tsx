@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { Breadcrumbs } from '@/components/layout/breadcrumbs';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { Breadcrumbs } from '@/components/layout/breadcrumbs';
 
 describe('Breadcrumbs', () => {
   it('renders nothing when given an empty item list', () => {

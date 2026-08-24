@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { ProtectedRoute } from '@/features/auth/protected-route-content';
 import { render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { ProtectedRoute } from '@/features/auth/protected-route-content';
 
 const { useSessionMock, replaceMock, usePathnameMock, useSearchParamsMock } = vi.hoisted(() => ({
   useSessionMock: vi.fn(),

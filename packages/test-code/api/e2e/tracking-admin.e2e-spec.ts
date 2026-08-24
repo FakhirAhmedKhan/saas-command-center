@@ -1,12 +1,4 @@
-import {
-  analyticsIngestionRoutes,
-  buildTrackerEvent,
-  collectEvents,
-  createTrackedWebsite,
-  expectCollectionAccepted,
-  getTrackingStatus,
-  readTrackingStatus,
-} from '../helpers/analytics-ingestion';
+import { analyticsIngestionRoutes, buildTrackerEvent, collectEvents, createTrackedWebsite, expectCollectionAccepted, getTrackingStatus, readTrackingStatus } from '../helpers/analytics-ingestion';
 import { inWorkspace, recordString } from '../helpers/application';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
@@ -18,7 +10,6 @@ import request from 'supertest';
 
 describe('Tracking Admin E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
 
   beforeAll(async () => {
@@ -37,9 +28,7 @@ describe('Tracking Admin E2E', () => {
 
   it('returns empty tracking status before the first event', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const response = await getTrackingStatus(owner, trackedWebsite.id);
 
     expect(response.status).toBe(200);
@@ -63,9 +52,7 @@ describe('Tracking Admin E2E', () => {
 
   it('returns grouped counts and at most five recent events', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const events = [
       buildTrackerEvent(trackedWebsite.origin, {
         type: RawAnalyticsEventType.PAGE_VIEW,
@@ -114,15 +101,12 @@ describe('Tracking Admin E2E', () => {
 
   it('allows VIEWER to inspect tracking status', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const rawViewer = await registerWorkspaceTestUser(app, prisma);
-
     const addResponse = await addWorkspaceMember(owner, rawViewer, WorkspaceRole.VIEWER);
 
     expect([200, 201]).toContain(addResponse.status);
 
     const viewer = inWorkspace(rawViewer, owner.workspaceId);
-
     const trackedWebsite = await createTrackedWebsite(owner);
 
     expect((await getTrackingStatus(viewer, trackedWebsite.id)).status).toBe(200);
@@ -130,14 +114,9 @@ describe('Tracking Admin E2E', () => {
 
   it('prevents outsider and anonymous tracking-admin access', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const outsider = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
-    const outsiderResponse = await outsider.agent
-      .get(analyticsIngestionRoutes.status(owner.workspaceId, trackedWebsite.id))
-      .set('Authorization', `Bearer ${outsider.accessToken}`);
+    const outsiderResponse = await outsider.agent.get(analyticsIngestionRoutes.status(owner.workspaceId, trackedWebsite.id)).set('Authorization', `Bearer ${outsider.accessToken}`);
 
     expectAccessDenied(outsiderResponse);
 
@@ -148,9 +127,7 @@ describe('Tracking Admin E2E', () => {
 
   it('rejects malformed, unknown, and foreign website IDs', async () => {
     const alphaOwner = await registerWorkspaceTestUser(app, prisma);
-
     const betaOwner = await registerWorkspaceTestUser(app, prisma);
-
     const betaWebsite = await createTrackedWebsite(betaOwner);
 
     expect((await getTrackingStatus(alphaOwner, 'not-a-uuid')).status).toBe(400);

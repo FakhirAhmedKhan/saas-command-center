@@ -38,14 +38,12 @@ export class TokenService {
       sub: userId,
       type: 'access',
     };
-
     const refreshPayload: RefreshTokenPayload = {
       sub: userId,
       sid: sessionId,
       fid: familyId,
       type: 'refresh',
     };
-
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(accessPayload, {
         secret: this.accessSecret,
@@ -135,7 +133,6 @@ export class TokenService {
       h: 60 * 60,
       d: 60 * 60 * 24,
     };
-
     const unitMultiplier = multiplier[unit];
 
     if (unitMultiplier === undefined) {

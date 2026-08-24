@@ -40,11 +40,9 @@ export class HealthMonitoringSchedulerService {
       const batchSize = this.config.get('HEALTH_MONITOR_BATCH_SIZE', {
         infer: true,
       });
-
       const concurrency = this.config.get('HEALTH_MONITOR_CONCURRENCY', {
         infer: true,
       });
-
       const dueChecks = await this.prisma.healthCheck.findMany({
         where: {
           enabled: true,
@@ -80,9 +78,7 @@ export class HealthMonitoringSchedulerService {
     const retentionDays = this.config.get('HEALTH_HISTORY_RETENTION_DAYS', {
       infer: true,
     });
-
     const cutoff = new Date(Date.now() - retentionDays * 86_400_000);
-
     const result = await this.prisma.healthCheckHistory.deleteMany({
       where: {
         checkedAt: {

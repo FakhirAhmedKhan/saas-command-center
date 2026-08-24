@@ -1,21 +1,17 @@
-import type { INestApplication } from '@nestjs/common';
-
-import { PrismaService } from 'src/database/prisma.service';
-import { MobilePerformanceMetricType, MobilePlatform } from 'src/generated/prisma/enums';
-
 import { withBearer } from '../helpers/auth';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { MobilePerformanceMetricType, MobilePlatform } from 'src/generated/prisma/enums';
 
 const API = '/api/v1';
 
 describe('Unified Mobile Performance E2E', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-
   let owner: Awaited<ReturnType<typeof registerWorkspaceTestUser>>;
-
   let workspaceId: string;
   let androidId: string;
   let iosId: string;
@@ -62,15 +58,7 @@ describe('Unified Mobile Performance E2E', () => {
     await app.close();
   });
 
-  async function metric(
-    mobileAppId: string,
-    platform: MobilePlatform,
-    version: string,
-    buildNumber: string,
-    type: MobilePerformanceMetricType,
-    value: number,
-    collectedAt = new Date(),
-  ) {
+  async function metric(mobileAppId: string, platform: MobilePlatform, version: string, buildNumber: string, type: MobilePerformanceMetricType, value: number, collectedAt = new Date()) {
     return prisma.mobilePerformanceMetric.create({
       data: {
         workspaceId,
@@ -90,15 +78,8 @@ describe('Unified Mobile Performance E2E', () => {
 
     await metric(iosId, MobilePlatform.IOS, '2.0.0', '200', MobilePerformanceMetricType.COLD_STARTUP_MS, 900);
 
-    const android = await owner.agent
-      .get(`${API}/workspaces/${workspaceId}/mobile-apps/${androidId}/performance/summary`)
-      .set(withBearer(owner.accessToken))
-      .expect(200);
-
-    const ios = await owner.agent
-      .get(`${API}/workspaces/${workspaceId}/mobile-apps/${iosId}/performance/summary`)
-      .set(withBearer(owner.accessToken))
-      .expect(200);
+    const android = await owner.agent.get(`${API}/workspaces/${workspaceId}/mobile-apps/${androidId}/performance/summary`).set(withBearer(owner.accessToken)).expect(200);
+    const ios = await owner.agent.get(`${API}/workspaces/${workspaceId}/mobile-apps/${iosId}/performance/summary`).set(withBearer(owner.accessToken)).expect(200);
 
     expect(android.body.platform).toBe('ANDROID');
     expect(ios.body.platform).toBe('IOS');
@@ -111,10 +92,7 @@ describe('Unified Mobile Performance E2E', () => {
   it('filters performance by platform', async () => {
     await metric(androidId, MobilePlatform.ANDROID, '3.0.0', '300', MobilePerformanceMetricType.MEMORY_MB, 180);
 
-    const response = await owner.agent
-      .get(`${API}/workspaces/${workspaceId}/mobile-apps/${androidId}/performance/summary?platform=ANDROID`)
-      .set(withBearer(owner.accessToken))
-      .expect(200);
+    const response = await owner.agent.get(`${API}/workspaces/${workspaceId}/mobile-apps/${androidId}/performance/summary?platform=ANDROID`).set(withBearer(owner.accessToken)).expect(200);
 
     expect(response.body.platform).toBe('ANDROID');
 
@@ -126,10 +104,7 @@ describe('Unified Mobile Performance E2E', () => {
 
     await metric(androidId, MobilePlatform.ANDROID, '4.0.0', '401', MobilePerformanceMetricType.COLD_STARTUP_MS, 2000);
 
-    const response = await owner.agent
-      .get(`${API}/workspaces/${workspaceId}/mobile-apps/${androidId}/performance/summary?version=4.0.0&buildNumber=400`)
-      .set(withBearer(owner.accessToken))
-      .expect(200);
+    const response = await owner.agent.get(`${API}/workspaces/${workspaceId}/mobile-apps/${androidId}/performance/summary?version=4.0.0&buildNumber=400`).set(withBearer(owner.accessToken)).expect(200);
 
     expect(response.body.buildNumber).toBe('400');
 
@@ -154,11 +129,7 @@ describe('Unified Mobile Performance E2E', () => {
 
     await metric(androidId, MobilePlatform.ANDROID, '6.0.0', '600', MobilePerformanceMetricType.CRASH_RATE, 1);
 
-    const response = await owner.agent
-      .get(`${API}/workspaces/${workspaceId}/mobile-apps/${androidId}/performance/compare?fromVersion=5.0.0&toVersion=6.0.0`)
-      .set(withBearer(owner.accessToken))
-      .expect(200);
-
+    const response = await owner.agent.get(`${API}/workspaces/${workspaceId}/mobile-apps/${androidId}/performance/compare?fromVersion=5.0.0&toVersion=6.0.0`).set(withBearer(owner.accessToken)).expect(200);
     const crash = response.body.metrics.find((item: { metric: string }) => item.metric === 'CRASH_RATE');
 
     expect(crash.before).toBe(3);
@@ -171,15 +142,8 @@ describe('Unified Mobile Performance E2E', () => {
 
     await metric(iosId, MobilePlatform.IOS, '20.0.0', '2000', MobilePerformanceMetricType.CRASH_RATE, 2);
 
-    const android = await owner.agent
-      .get(`${API}/workspaces/${workspaceId}/mobile-apps/${androidId}/performance/versions`)
-      .set(withBearer(owner.accessToken))
-      .expect(200);
-
-    const ios = await owner.agent
-      .get(`${API}/workspaces/${workspaceId}/mobile-apps/${iosId}/performance/versions`)
-      .set(withBearer(owner.accessToken))
-      .expect(200);
+    const android = await owner.agent.get(`${API}/workspaces/${workspaceId}/mobile-apps/${androidId}/performance/versions`).set(withBearer(owner.accessToken)).expect(200);
+    const ios = await owner.agent.get(`${API}/workspaces/${workspaceId}/mobile-apps/${iosId}/performance/versions`).set(withBearer(owner.accessToken)).expect(200);
 
     expect(android.body.some((item: { version: string }) => item.version === '10.0.0')).toBe(true);
 

@@ -5,15 +5,10 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const currentFile = fileURLToPath(import.meta.url);
-
 const scriptsDirectory = dirname(currentFile);
-
 const packageRoot = resolve(scriptsDirectory, '..');
-
 const entryFile = resolve(packageRoot, 'src', 'tracker.ts');
-
 const outputDirectory = resolve(packageRoot, 'dist');
-
 const outputFile = resolve(outputDirectory, 'tracker.js');
 
 if (!existsSync(entryFile)) {

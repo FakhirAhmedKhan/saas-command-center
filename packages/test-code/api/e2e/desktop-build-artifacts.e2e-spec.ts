@@ -1,8 +1,8 @@
-import type { INestApplication } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { createLinkedDesktopFixture, ingestSuccessfulBuild } from './helpers/desktop-test-fixtures';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
 
 describe('Desktop Build Artifacts E2E', () => {
   let app: INestApplication;
@@ -24,9 +24,7 @@ describe('Desktop Build Artifacts E2E', () => {
 
   it('stores multiple artifact types for a build', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
-
     const build = await ingestSuccessfulBuild(fixture.owner, fixture.desktopApp.id, fixture.repository.id);
-
     const endpoint = path(fixture.owner.workspaceId, fixture.desktopApp.id, build.id);
 
     await fixture.owner.agent
@@ -66,11 +64,8 @@ describe('Desktop Build Artifacts E2E', () => {
 
   it('is idempotent for duplicate provider artifact ID', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
-
     const build = await ingestSuccessfulBuild(fixture.owner, fixture.desktopApp.id, fixture.repository.id);
-
     const endpoint = path(fixture.owner.workspaceId, fixture.desktopApp.id, build.id);
-
     const payload = {
       providerArtifactId: 'duplicate-1',
       platform: 'WINDOWS',
@@ -113,9 +108,7 @@ describe('Desktop Build Artifacts E2E', () => {
 
   it('rejects artifact matrix metadata that does not match the build', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
-
     const build = await ingestSuccessfulBuild(fixture.owner, fixture.desktopApp.id, fixture.repository.id);
-
     const response = await fixture.owner.agent
       .post(path(fixture.owner.workspaceId, fixture.desktopApp.id, build.id))
       .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
@@ -133,7 +126,6 @@ describe('Desktop Build Artifacts E2E', () => {
   it('returns 404 for an unknown build', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
     const { randomUUID } = await import('node:crypto');
-
     const response = await fixture.owner.agent
       .post(path(fixture.owner.workspaceId, fixture.desktopApp.id, randomUUID()))
       .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
@@ -150,9 +142,7 @@ describe('Desktop Build Artifacts E2E', () => {
 
   it('allows artifact metadata without a remote URL', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
-
     const build = await ingestSuccessfulBuild(fixture.owner, fixture.desktopApp.id, fixture.repository.id);
-
     const response = await fixture.owner.agent
       .post(path(fixture.owner.workspaceId, fixture.desktopApp.id, build.id))
       .set('Authorization', `Bearer ${fixture.owner.accessToken}`)

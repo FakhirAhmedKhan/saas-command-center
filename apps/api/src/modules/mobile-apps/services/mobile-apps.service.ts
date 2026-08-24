@@ -33,9 +33,7 @@ export class MobileAppsService {
 
   async create(workspaceId: string, dto: CreateMobileAppDto, actorUserId: string): Promise<MobileApplicationDetails> {
     const name = this.normalizeRequiredText(dto.name, 'Mobile application name');
-
     const baseSlug = this.normalizeSlug(name);
-
     const slug = await this.generateUniqueSlug(workspaceId, baseSlug);
 
     try {
@@ -374,7 +372,6 @@ export class MobileAppsService {
 
   private async generateUniqueSlug(workspaceId: string, baseSlug: string): Promise<string> {
     let candidate = baseSlug;
-
     let suffix = 2;
 
     while (
@@ -390,9 +387,7 @@ export class MobileAppsService {
       })
     ) {
       const suffixText = `-${suffix}`;
-
       const maxBaseLength = 160 - suffixText.length;
-
       const truncatedBase = baseSlug.slice(0, maxBaseLength).replace(/-+$/g, '');
 
       candidate = `${truncatedBase}${suffixText}`;

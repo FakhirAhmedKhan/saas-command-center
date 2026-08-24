@@ -1,10 +1,9 @@
-import { calculateSessionMetrics } from 'src/modules/analytics-engine/utils/analytics-metrics';
 import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
+import { calculateSessionMetrics } from 'src/modules/analytics-engine/utils/analytics-metrics';
 
 describe('calculateSessionMetrics', () => {
   it('marks a single unengaged page view as a bounce', () => {
     const occurredAt = new Date('2026-08-01T10:00:00.000Z');
-
     const result = calculateSessionMetrics(
       [
         {

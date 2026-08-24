@@ -94,7 +94,6 @@ test('ignores a persisted queue when valid JSON is not an array', async () => {
       }),
     },
   });
-
   const queue = harness.queuedEvents();
 
   assert.equal(queue.length, 1);

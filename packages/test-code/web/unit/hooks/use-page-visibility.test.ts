@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { usePageVisibility } from '@/hooks/use-page-visibility';
 import { renderHook, act } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
+import { usePageVisibility } from '@/hooks/use-page-visibility';
 
 function setVisibility(state: 'visible' | 'hidden'): void {
   Object.defineProperty(document, 'visibilityState', {

@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
-import { WebsiteForm } from '@/features/websites/components/website-form';
-import type { Website } from '@/features/websites/website-types';
 import type { SaasApplication } from '@/features/applications/application-types';
+import type { Website } from '@/features/websites/website-types';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { WebsiteForm } from '@/features/websites/components/website-form';
 
 function makeApplication(overrides: Partial<SaasApplication> = {}): SaasApplication {
   return {
@@ -124,15 +124,7 @@ describe('WebsiteForm submission payload', () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined);
     const application = makeApplication();
 
-    render(
-      <WebsiteForm
-        applications={[application]}
-        initialApplicationId={application.id}
-        cancelHref='/workspaces/workspace-1/websites'
-        submitLabel='Create website'
-        onSubmit={onSubmit}
-      />,
-    );
+    render(<WebsiteForm applications={[application]} initialApplicationId={application.id} cancelHref='/workspaces/workspace-1/websites' submitLabel='Create website' onSubmit={onSubmit} />);
 
     expect(screen.getByLabelText('SaaS application')).toHaveValue(application.id);
 

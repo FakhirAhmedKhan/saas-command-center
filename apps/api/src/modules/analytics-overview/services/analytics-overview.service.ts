@@ -51,9 +51,7 @@ export class AnalyticsOverviewService {
 
   async getOverview(workspaceId: string, websiteId: string, query: AnalyticsOverviewQueryDto): Promise<AnalyticsOverviewResponseDto> {
     const website = await this.requireWebsite(workspaceId, websiteId);
-
     const range = resolveAnalyticsDateRange(query, website.timeZone);
-
     const [currentMetrics, previousMetrics, trendRows, pageRows, sourceRows, countryRows, deviceRows, browserRows, operatingSystemRows] = await Promise.all([
       this.loadPeriodMetrics(website.id, range.current.start, range.current.end),
 
@@ -259,23 +257,14 @@ export class AnalyticsOverviewService {
                             ) AS total_duration_ms
                     `,
     );
-
     const row = rows[0];
-
     const visitors = toSafeNumber(row?.visitors);
-
     const sessions = toSafeNumber(row?.sessions);
-
     const pageViews = toSafeNumber(row?.page_views);
-
     const bouncedSessions = toSafeNumber(row?.bounced_sessions);
-
     const measuredSessions = toSafeNumber(row?.measured_sessions);
-
     const totalDurationMs = toSafeNumber(row?.total_duration_ms);
-
     const bounceRate = measuredSessions === 0 ? 0 : roundMetric((bouncedSessions / measuredSessions) * 100, 1);
-
     const averageDurationSeconds = measuredSessions === 0 ? 0 : roundMetric(totalDurationMs / measuredSessions / 1000, 1);
 
     return {
@@ -297,7 +286,6 @@ export class AnalyticsOverviewService {
         lt: end,
       },
     };
-
     const select = {
       bucketStart: true,
       visitors: true,
@@ -326,13 +314,7 @@ export class AnalyticsOverviewService {
     });
   }
 
-  private async loadBreakdownRows(
-    websiteId: string,
-    start: Date,
-    end: Date,
-    granularity: 'hour' | 'day',
-    dimension: AnalyticsAggregateDimension,
-  ): Promise<BreakdownAggregateRow[]> {
+  private async loadBreakdownRows(websiteId: string, start: Date, end: Date, granularity: 'hour' | 'day', dimension: AnalyticsAggregateDimension): Promise<BreakdownAggregateRow[]> {
     const where = {
       websiteId,
 
@@ -343,7 +325,6 @@ export class AnalyticsOverviewService {
         lt: end,
       },
     };
-
     const select = {
       dimensionValue: true,
       dimensionLabel: true,
@@ -384,11 +365,8 @@ export class AnalyticsOverviewService {
 
     for (const row of rows) {
       const key = row.dimensionValue.trim() || 'unknown';
-
       const label = row.dimensionLabel.trim() || 'Unknown';
-
       const value = row[metric];
-
       const existing = grouped.get(key);
 
       if (existing) {

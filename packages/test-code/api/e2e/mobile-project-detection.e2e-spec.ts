@@ -1,26 +1,17 @@
-import type { INestApplication } from '@nestjs/common';
-
-import { PrismaService } from 'src/database/prisma.service';
-
-import { RepositoryProvider } from 'src/generated/prisma/enums';
-
-import { GithubCodeService } from 'src/modules/repositories/services/github-code.service';
-
 import { withBearer } from '../helpers/auth';
-
 import { createTestApp } from '../helpers/create-test-app';
-
 import { resetDatabase } from '../helpers/database';
-
 import { registerWorkspaceTestUser } from '../helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { RepositoryProvider } from 'src/generated/prisma/enums';
+import { GithubCodeService } from 'src/modules/repositories/services/github-code.service';
 
 const API = '/api/v1';
 
 describe('Mobile Project Detection E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
-
   let githubCode: GithubCodeService;
 
   beforeEach(async () => {
@@ -41,7 +32,6 @@ describe('Mobile Project Detection E2E', () => {
 
   async function createFixture() {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobileResponse = await owner.agent.post(`${API}/workspaces/${owner.workspaceId}/mobile-apps`).set(withBearer(owner.accessToken)).send({
       name: 'Android Detection',
 
@@ -65,7 +55,6 @@ describe('Mobile Project Detection E2E', () => {
         accountType: 'Organization',
       },
     });
-
     const repository = await prisma.repositoryConnection.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -166,7 +155,6 @@ describe('Mobile Project Detection E2E', () => {
 
         'app/src/main/AndroidManifest.xml': '<manifest package="com.karwa.passenger" />',
       };
-
       const content = contents[path];
 
       if (!content) {
@@ -188,9 +176,7 @@ describe('Mobile Project Detection E2E', () => {
       };
     });
 
-    const response = await fixture.owner.agent
-      .post(`${API}/workspaces/${fixture.owner.workspaceId}` + `/mobile-apps/${fixture.mobile.id}/detect`)
-      .set(withBearer(fixture.owner.accessToken));
+    const response = await fixture.owner.agent.post(`${API}/workspaces/${fixture.owner.workspaceId}` + `/mobile-apps/${fixture.mobile.id}/detect`).set(withBearer(fixture.owner.accessToken));
 
     expect(response.status).toBe(201);
 
@@ -215,7 +201,6 @@ describe('Mobile Project Detection E2E', () => {
 
   it('rejects detection when no repository is linked', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobile = await owner.agent.post(`${API}/workspaces/${owner.workspaceId}/mobile-apps`).set(withBearer(owner.accessToken)).send({
       name: 'No Repository',
 
@@ -223,7 +208,6 @@ describe('Mobile Project Detection E2E', () => {
 
       framework: 'ANDROID_NATIVE',
     });
-
     const response = await owner.agent.post(`${API}/workspaces/${owner.workspaceId}/mobile-apps/${mobile.body.id}/detect`).set(withBearer(owner.accessToken));
 
     expect(response.status).toBe(400);
@@ -251,10 +235,7 @@ describe('Mobile Project Detection E2E', () => {
     } as never);
 
     const fileSpy = jest.spyOn(githubCode, 'getFile');
-
-    const response = await fixture.owner.agent
-      .post(`${API}/workspaces/${fixture.owner.workspaceId}/mobile-apps/${fixture.mobile.id}/detect`)
-      .set(withBearer(fixture.owner.accessToken));
+    const response = await fixture.owner.agent.post(`${API}/workspaces/${fixture.owner.workspaceId}/mobile-apps/${fixture.mobile.id}/detect`).set(withBearer(fixture.owner.accessToken));
 
     expect(response.status).toBe(201);
 
@@ -265,12 +246,8 @@ describe('Mobile Project Detection E2E', () => {
 
   it('protects detection by workspace', async () => {
     const fixture = await createFixture();
-
     const anotherWorkspace = await registerWorkspaceTestUser(app, prisma);
-
-    const response = await anotherWorkspace.agent
-      .post(`${API}/workspaces/${fixture.owner.workspaceId}/mobile-apps/${fixture.mobile.id}/detect`)
-      .set(withBearer(anotherWorkspace.accessToken));
+    const response = await anotherWorkspace.agent.post(`${API}/workspaces/${fixture.owner.workspaceId}/mobile-apps/${fixture.mobile.id}/detect`).set(withBearer(anotherWorkspace.accessToken));
 
     expect([403, 404]).toContain(response.status);
   });

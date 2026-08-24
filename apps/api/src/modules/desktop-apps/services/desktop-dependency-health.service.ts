@@ -47,7 +47,6 @@ export class DesktopDependencyHealthService {
     const snapshot = await this.metadata.load(workspaceId, desktopAppId);
     const parsed = this.parse(snapshot);
     const vulnerabilities = this.vulnerabilities(snapshot);
-
     const vulnerabilityByName = new Map(vulnerabilities.map((item) => [item.packageName.toLowerCase(), item]));
 
     await this.prisma.$transaction(async (transaction) => {
@@ -81,7 +80,6 @@ export class DesktopDependencyHealthService {
 
   parse(snapshot: DesktopRepositoryMetadataSnapshot): ParsedDependency[] {
     const output = new Map<string, ParsedDependency>();
-
     const add = (dependency: ParsedDependency) => {
       const key = [dependency.ecosystem, dependency.manifestPath, dependency.name].join('|');
       output.set(key, dependency);
@@ -364,12 +362,10 @@ export class DesktopDependencyHealthService {
 
     const record = value as Record<string, unknown>;
     const packageName = typeof record.package === 'string' ? record.package : typeof record.name === 'string' ? record.name : null;
-
     const ids = [record.id, record.advisory, record.cve]
       .filter((item): item is string => typeof item === 'string')
       .map((item) => item.trim())
       .filter(Boolean);
-
     const severityRaw = String(record.severity ?? '').toUpperCase();
     const severity =
       severityRaw === 'CRITICAL'

@@ -83,7 +83,6 @@ export class WebhookManagementService {
     await this.outbound.validateUrl(input.url);
 
     const rawSecret = this.crypto.generateSecret();
-
     const encrypted = this.crypto.encrypt(rawSecret);
 
     try {
@@ -194,9 +193,7 @@ export class WebhookManagementService {
     await this.access.assertCanManage(workspaceId, userId);
 
     const endpoint = await this.requireEndpoint(workspaceId, endpointId);
-
     const rawSecret = this.crypto.generateSecret();
-
     const encrypted = this.crypto.encrypt(rawSecret);
 
     await this.prisma.webhookEndpoint.update({
@@ -245,7 +242,6 @@ export class WebhookManagementService {
 
       status: query.status,
     };
-
     const [total, deliveries] = await Promise.all([
       this.prisma.webhookDelivery.count({
         where,

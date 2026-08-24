@@ -1,11 +1,4 @@
-import {
-  analyticsIngestionRoutes,
-  buildCollectPayload,
-  buildTrackerEvent,
-  collectEvents,
-  createTrackedWebsite,
-  expectCollectionAccepted,
-} from '../helpers/analytics-ingestion';
+import { analyticsIngestionRoutes, buildCollectPayload, buildTrackerEvent, collectEvents, createTrackedWebsite, expectCollectionAccepted } from '../helpers/analytics-ingestion';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { archiveWebsite, disableWebsite, expectWebsiteSuccess } from '../helpers/website';
@@ -17,9 +10,7 @@ import request from 'supertest';
 
 describe('Analytics Ingestion Security E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
-
   let originalAllowOriginless: string | undefined;
 
   beforeEach(async () => {
@@ -46,13 +37,9 @@ describe('Analytics Ingestion Security E2E', () => {
 
   it('rejects invalid, malformed, and mismatched tracking credentials', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const firstWebsite = await createTrackedWebsite(owner);
-
     const secondWebsite = await createTrackedWebsite(owner);
-
     const event = buildTrackerEvent(firstWebsite.origin);
-
     const malformed = await collectEvents(app, firstWebsite, [event], {
       trackingKey: 'invalid-key',
     });
@@ -74,11 +61,8 @@ describe('Analytics Ingestion Security E2E', () => {
 
   it('requires an allowed HTTP or HTTPS Origin header', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const event = buildTrackerEvent(trackedWebsite.origin);
-
     const missingOrigin = await collectEvents(app, trackedWebsite, [event], {
       origin: null,
     });
@@ -112,7 +96,6 @@ describe('Analytics Ingestion Security E2E', () => {
 
   it('rejects collection for disabled and archived websites', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const disabledWebsite = await createTrackedWebsite(owner);
 
     expectWebsiteSuccess(await disableWebsite(owner, disabledWebsite.id));
@@ -132,9 +115,7 @@ describe('Analytics Ingestion Security E2E', () => {
 
   it('rejects tracked URLs that are invalid, unsafe, or from another origin', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const invalidUrl = await collectEvents(app, trackedWebsite, [
       buildTrackerEvent(trackedWebsite.origin, {
         url: 'not-a-url',
@@ -162,11 +143,8 @@ describe('Analytics Ingestion Security E2E', () => {
 
   it('validates timestamps and custom-event names', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const tooOld = new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString();
-
     const tooFarFuture = new Date(Date.now() + 6 * 60 * 1000).toISOString();
 
     expect(
@@ -212,17 +190,12 @@ describe('Analytics Ingestion Security E2E', () => {
 
   it('rejects invalid payload shapes, oversized batches, and oversized bodies', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const emptyObject = await request(app.getHttpServer()).post(analyticsIngestionRoutes.collect()).set('Origin', trackedWebsite.origin).send({});
 
     expect(emptyObject.status).toBe(400);
 
-    const emptyEvents = await request(app.getHttpServer())
-      .post(analyticsIngestionRoutes.collect())
-      .set('Origin', trackedWebsite.origin)
-      .send(buildCollectPayload(trackedWebsite, []));
+    const emptyEvents = await request(app.getHttpServer()).post(analyticsIngestionRoutes.collect()).set('Origin', trackedWebsite.origin).send(buildCollectPayload(trackedWebsite, []));
 
     expect(emptyEvents.status).toBe(400);
 
@@ -239,19 +212,14 @@ describe('Analytics Ingestion Security E2E', () => {
 
     oversizedBody.padding = 'x'.repeat(70_000);
 
-    const oversizedResponse = await request(app.getHttpServer())
-      .post(analyticsIngestionRoutes.collect())
-      .set('Origin', trackedWebsite.origin)
-      .send(oversizedBody);
+    const oversizedResponse = await request(app.getHttpServer()).post(analyticsIngestionRoutes.collect()).set('Origin', trackedWebsite.origin).send(oversizedBody);
 
     expect(oversizedResponse.status).toBe(413);
   });
 
   it('sanitizes tracked URLs, referrers, properties, time zones, and IP addresses', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const event = buildTrackerEvent(trackedWebsite.origin, {
       url: `${trackedWebsite.origin}/checkout?token=secret&safe=value&a=1#private`,
       referrer: 'https://referrer.example.test/page?password=secret&campaign=summer#hidden',

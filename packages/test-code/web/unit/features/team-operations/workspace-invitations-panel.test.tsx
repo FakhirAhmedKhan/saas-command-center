@@ -1,15 +1,10 @@
 // @vitest-environment jsdom
-import {
-  createWorkspaceInvitation,
-  getWorkspaceInvitations,
-  resendWorkspaceInvitation,
-  revokeWorkspaceInvitation,
-} from '@/features/team-operations/team-operations-api';
 import type { WorkspaceInvitation } from '@/features/team-operations/team-operations.types';
-import { WorkspaceInvitationsPanel } from '@/features/team-operations/workspace-invitations-panel';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { createWorkspaceInvitation, getWorkspaceInvitations, resendWorkspaceInvitation, revokeWorkspaceInvitation } from '@/features/team-operations/team-operations-api';
+import { WorkspaceInvitationsPanel } from '@/features/team-operations/workspace-invitations-panel';
 
 vi.mock('@/features/team-operations/team-operations-api', () => ({
   getWorkspaceInvitations: vi.fn(),
@@ -114,7 +109,6 @@ describe('WorkspaceInvitationsPanel invite flow', () => {
     createWorkspaceInvitationMock.mockResolvedValue({
       invitation: invitation(),
       invitationUrl: 'http://localhost:3000/invitations/test-token',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
     const user = userEvent.setup();
 

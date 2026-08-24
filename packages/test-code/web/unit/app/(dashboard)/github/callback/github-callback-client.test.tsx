@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { GithubCallbackClient } from '@/app/(dashboard)/github/callback/github-callback-client';
 import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { GithubCallbackClient } from '@/app/(dashboard)/github/callback/github-callback-client';
 
 const { useSessionMock, completeGithubCallbackMock, completePersonalGithubCallbackMock, replaceMock, useSearchParamsMock } = vi.hoisted(() => ({
   useSessionMock: vi.fn(),

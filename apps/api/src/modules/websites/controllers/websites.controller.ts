@@ -16,7 +16,6 @@ interface AuthenticatedRequest extends Request {
 }
 
 const WRITE_ROLES = [WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER];
-
 const ADMIN_ROLES = [WorkspaceRole.OWNER, WorkspaceRole.ADMIN];
 
 @ApiTags('Websites')

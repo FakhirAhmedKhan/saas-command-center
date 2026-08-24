@@ -1,12 +1,10 @@
 // @vitest-environment jsdom
 import '@testing-library/jest-dom/vitest';
-import { MobileTests } from '@/features/mobile-apps/mobile-tests';
-
-import { getMobileTestsDashboard } from '@/features/mobile-apps/mobile-apps-api';
 
 import { render, screen } from '@testing-library/react';
-
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getMobileTestsDashboard } from '@/features/mobile-apps/mobile-apps-api';
+import { MobileTests } from '@/features/mobile-apps/mobile-tests';
 
 vi.mock('@/features/mobile-apps/mobile-apps-api', () => ({
   getMobileTestsDashboard: vi.fn(),

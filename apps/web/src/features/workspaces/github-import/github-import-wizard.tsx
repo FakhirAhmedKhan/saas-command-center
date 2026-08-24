@@ -36,15 +36,10 @@ function analysisErrorMessage(error: unknown): string {
 
 export function GithubImportWizard({ onCancel, onImported }: GithubImportWizardProps) {
   const [step, setStep] = useState<WizardStep>('connect');
-
   const [checkingConnection, setCheckingConnection] = useState(true);
-
   const [selectedRepository, setSelectedRepository] = useState<ImportableGithubRepository | null>(null);
-
   const [analysis, setAnalysis] = useState<RepositoryAnalysisResult | null>(null);
-
   const [analysisError, setAnalysisError] = useState<string | null>(null);
-
   const checkExistingConnection = useCallback(async () => {
     setCheckingConnection(true);
 
@@ -101,16 +96,12 @@ export function GithubImportWizard({ onCancel, onImported }: GithubImportWizardP
 
       <h1 className='mt-5 text-2xl font-semibold tracking-tight text-slate-950'>Import from GitHub</h1>
 
-      <p className='mt-1.5 text-sm leading-6 text-slate-500'>
-        Connect a repository and we&apos;ll suggest a workspace and application configuration for you to review.
-      </p>
+      <p className='mt-1.5 text-sm leading-6 text-slate-500'>Connect a repository and we&apos;ll suggest a workspace and application configuration for you to review.</p>
 
       <div className='mt-8'>
         {step === 'connect' ? <ConnectGithubStep checking={checkingConnection} /> : null}
 
-        {step === 'select-repository' ? (
-          <RepositoryPicker error={analysisError} onSelect={(repository) => void runAnalysis(repository)} onReconnect={() => setStep('connect')} />
-        ) : null}
+        {step === 'select-repository' ? <RepositoryPicker error={analysisError} onSelect={(repository) => void runAnalysis(repository)} onReconnect={() => setStep('connect')} /> : null}
 
         {step === 'analyzing' && selectedRepository ? <AnalysisProgress repository={selectedRepository} /> : null}
 

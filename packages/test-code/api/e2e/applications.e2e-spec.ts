@@ -23,7 +23,6 @@ import { ApplicationCategory, ApplicationPriority, ApplicationStatus } from 'src
 
 describe('Applications E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
 
   beforeAll(async () => {
@@ -42,7 +41,6 @@ describe('Applications E2E', () => {
 
   it('creates an application with all supported fields', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const created = await createApplication(owner, {
       name: 'Complete Batch 3 App',
       slug: 'complete-batch-3-app',
@@ -65,7 +63,6 @@ describe('Applications E2E', () => {
 
   it('creates an application using only required fields', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const response = await owner.agent.post(applicationRoutes.root(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
       name: 'Minimal Application',
     });
@@ -85,7 +82,6 @@ describe('Applications E2E', () => {
 
   it('rejects invalid application payloads', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const invalidName = await owner.agent.post(applicationRoutes.root(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
       name: '',
     });
@@ -118,13 +114,9 @@ describe('Applications E2E', () => {
 
   it('updates application fields', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const created = await createApplication(owner);
-
     const status = enumValue(ApplicationStatus, 1);
-
     const priority = enumValue(ApplicationPriority, 1);
-
     const response = await updateApplication(owner, created.id, {
       name: 'Updated Application',
       shortDescription: 'Updated description',
@@ -136,7 +128,6 @@ describe('Applications E2E', () => {
     expect(response.status).toBe(200);
 
     const detailsResponse = await getApplication(owner, created.id);
-
     const details = readApiRecord(detailsResponse, ['application']);
 
     expect(recordString(details, 'name')).toBe('Updated Application');
@@ -148,17 +139,11 @@ describe('Applications E2E', () => {
 
   it('supports search and filters', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const statusOne = enumValue(ApplicationStatus);
-
     const statusTwo = enumValue(ApplicationStatus, 1);
-
     const priorityOne = enumValue(ApplicationPriority);
-
     const priorityTwo = enumValue(ApplicationPriority, 1);
-
     const category = enumValue(ApplicationCategory);
-
     const alpha = await createApplication(owner, {
       name: 'Alpha Search Product',
       slug: 'alpha-search-product',
@@ -167,7 +152,6 @@ describe('Applications E2E', () => {
 
       category,
     });
-
     const beta = await createApplication(owner, {
       name: 'Beta Search Product',
       slug: 'beta-search-product',
@@ -176,7 +160,6 @@ describe('Applications E2E', () => {
 
       category,
     });
-
     const searchResponse = await listApplications(owner, {
       search: 'Alpha',
     });
@@ -195,7 +178,6 @@ describe('Applications E2E', () => {
 
       category,
     });
-
     const filteredItems = readApiItems(filterResponse, ['applications']);
 
     expect(filteredItems.some((item) => recordString(item, 'id') === beta.id)).toBe(true);
@@ -220,16 +202,13 @@ describe('Applications E2E', () => {
       page: 1,
       limit: 1,
     });
-
     const pageTwoResponse = await listApplications(owner, {
       sortBy: 'name',
       sortOrder: 'asc',
       page: 2,
       limit: 1,
     });
-
     const pageOne = readApiItems(pageOneResponse, ['applications']);
-
     const pageTwo = readApiItems(pageTwoResponse, ['applications']);
 
     expect(pageOne).toHaveLength(1);
@@ -253,13 +232,11 @@ describe('Applications E2E', () => {
 
   it('archives and restores an application', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const created = await createApplication(owner);
 
     expect((await archiveApplication(owner, created.id)).status).toBe(200);
 
     const activeResponse = await listApplications(owner);
-
     const activeItems = readApiItems(activeResponse, ['applications']);
 
     expect(activeItems.some((item) => recordString(item, 'id') === created.id)).toBe(false);
@@ -267,7 +244,6 @@ describe('Applications E2E', () => {
     const archivedResponse = await listApplications(owner, {
       archived: true,
     });
-
     const archivedItems = readApiItems(archivedResponse, ['applications']);
 
     expect(archivedItems.some((item) => recordString(item, 'id') === created.id)).toBe(true);
@@ -277,7 +253,6 @@ describe('Applications E2E', () => {
 
   it('rejects changes to an archived application', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const created = await createApplication(owner);
 
     expect((await archiveApplication(owner, created.id)).status).toBe(200);
@@ -291,7 +266,6 @@ describe('Applications E2E', () => {
 
   it('permanently deletes an archived application', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const created = await createApplication(owner);
 
     expect((await archiveApplication(owner, created.id)).status).toBe(200);
@@ -309,11 +283,8 @@ describe('Applications E2E', () => {
 
   it('prevents cross-workspace access', async () => {
     const alphaOwner = await registerWorkspaceTestUser(app, prisma);
-
     const betaOwner = await registerWorkspaceTestUser(app, prisma);
-
     const alphaApp = await createApplication(alphaOwner);
-
     const response = await betaOwner.agent.get(applicationRoutes.details(alphaOwner.workspaceId, alphaApp.id)).set(withBearer(betaOwner.accessToken));
 
     expectAccessDenied(response);
@@ -321,7 +292,6 @@ describe('Applications E2E', () => {
 
   it('rejects malformed application UUID', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const response = await getApplication(owner, 'not-a-uuid');
 
     expect(response.status).toBe(400);

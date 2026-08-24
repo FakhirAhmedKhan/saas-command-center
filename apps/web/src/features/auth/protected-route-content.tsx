@@ -7,11 +7,8 @@ import { useEffect, type PropsWithChildren } from 'react';
 
 export function ProtectedRoute({ children }: PropsWithChildren) {
   const router = useRouter();
-
   const pathname = usePathname();
-
   const searchParams = useSearchParams();
-
   const { status } = useSession();
 
   useEffect(() => {
@@ -20,7 +17,6 @@ export function ProtectedRoute({ children }: PropsWithChildren) {
     }
 
     const query = searchParams.toString();
-
     const currentPath = query.length > 0 ? `${pathname}?${query}` : pathname;
 
     router.replace(`/login?next=${encodeURIComponent(currentPath)}`);

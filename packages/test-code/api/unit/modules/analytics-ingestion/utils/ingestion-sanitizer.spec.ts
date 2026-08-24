@@ -9,7 +9,6 @@ describe('hashIpAddressWithSalt (SEC-03)', () => {
 
   it('is deterministic for the same salt and IP', () => {
     const first = hashIpAddressWithSalt('same-salt', '203.0.113.7');
-
     const second = hashIpAddressWithSalt('same-salt', '203.0.113.7');
 
     expect(first).toBe(second);
@@ -17,7 +16,6 @@ describe('hashIpAddressWithSalt (SEC-03)', () => {
 
   it('produces different hashes for different salts with the same IP', () => {
     const first = hashIpAddressWithSalt('salt-a', '203.0.113.7');
-
     const second = hashIpAddressWithSalt('salt-b', '203.0.113.7');
 
     expect(first).not.toBe(second);
@@ -25,7 +23,6 @@ describe('hashIpAddressWithSalt (SEC-03)', () => {
 
   it('produces different hashes for different IPs with the same salt', () => {
     const first = hashIpAddressWithSalt('same-salt', '203.0.113.7');
-
     const second = hashIpAddressWithSalt('same-salt', '198.51.100.9');
 
     expect(first).not.toBe(second);

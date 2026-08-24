@@ -10,11 +10,8 @@ export default function NewMobileAppPage() {
   const params = useParams<{
     workspaceId: string;
   }>();
-
   const router = useRouter();
-
   const workspaceId = params.workspaceId;
-
   const listHref = `/workspaces/${workspaceId}/mobile-apps`;
 
   async function handleCreate(payload: CreateMobileApplicationInput): Promise<void> {

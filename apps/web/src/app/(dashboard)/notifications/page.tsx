@@ -12,11 +12,8 @@ type NotificationTab = 'all' | 'unread' | 'critical';
 
 function formatRelativeTime(value: string): string {
   const date = new Date(value);
-
   const difference = date.getTime() - Date.now();
-
   const absoluteDifference = Math.abs(difference);
-
   const formatter = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
 
   if (absoluteDifference < 60_000) {
@@ -36,13 +33,9 @@ function formatRelativeTime(value: string): string {
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<UserNotification[]>([]);
-
   const [tab, setTab] = useState<NotificationTab>('all');
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
-
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
@@ -98,7 +91,6 @@ export default function NotificationsPage() {
   }
 
   const visibleNotifications = tab === 'critical' ? notifications.filter((notification) => notification.priority === 'CRITICAL') : notifications;
-
   const tabs: { key: NotificationTab; label: string }[] = [
     { key: 'all', label: 'All' },
     { key: 'unread', label: 'Unread' },
@@ -125,9 +117,7 @@ export default function NotificationsPage() {
             type='button'
             onClick={() => setTab(tabItem.key)}
             aria-current={tab === tabItem.key ? 'page' : undefined}
-            className={`relative flex h-9 items-center px-3 text-sm font-medium transition ${
-              tab === tabItem.key ? 'text-brand-700' : 'text-slate-500 hover:text-slate-800'
-            }`}
+            className={`relative flex h-9 items-center px-3 text-sm font-medium transition ${tab === tabItem.key ? 'text-brand-700' : 'text-slate-500 hover:text-slate-800'}`}
           >
             {tabItem.label}
             {tab === tabItem.key ? <span className='absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-brand-600' aria-hidden='true' /> : null}
@@ -149,9 +139,7 @@ export default function NotificationsPage() {
         <section className='overflow-hidden rounded-xl border border-slate-200 bg-white'>
           {visibleNotifications.map((notification, index) => {
             const content = (
-              <div
-                className={`flex items-start gap-3 px-4 py-3 ${index > 0 ? 'border-t border-slate-100' : ''} ${notification.readAt ? '' : 'bg-brand-50/40'}`}
-              >
+              <div className={`flex items-start gap-3 px-4 py-3 ${index > 0 ? 'border-t border-slate-100' : ''} ${notification.readAt ? '' : 'bg-brand-50/40'}`}>
                 <span className={`mt-1.5 size-1.5 shrink-0 rounded-full ${notification.readAt ? 'bg-transparent' : 'bg-brand-600'}`} aria-hidden='true' />
 
                 <div className='min-w-0 flex-1'>
@@ -170,12 +158,7 @@ export default function NotificationsPage() {
                 {content}
               </Link>
             ) : (
-              <button
-                key={notification.id}
-                type='button'
-                className='block w-full text-left hover:bg-slate-50'
-                onClick={() => void openNotification(notification)}
-              >
+              <button key={notification.id} type='button' className='block w-full text-left hover:bg-slate-50' onClick={() => void openNotification(notification)}>
                 {content}
               </button>
             );

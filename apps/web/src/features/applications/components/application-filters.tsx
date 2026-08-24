@@ -1,14 +1,7 @@
 'use client';
 
 import { CATEGORY_LABELS, PRIORITY_LABELS, STATUS_LABELS } from '../application-constants';
-import {
-  APPLICATION_CATEGORIES,
-  APPLICATION_PRIORITIES,
-  APPLICATION_STATUSES,
-  type ApplicationCategory,
-  type ApplicationPriority,
-  type ApplicationStatus,
-} from '../application-types';
+import { APPLICATION_CATEGORIES, APPLICATION_PRIORITIES, APPLICATION_STATUSES, type ApplicationCategory, type ApplicationPriority, type ApplicationStatus } from '../application-types';
 import { Button, Input, Select } from '@command-center/ui';
 import { RotateCcw, Search } from 'lucide-react';
 import type { FormEvent } from 'react';
@@ -57,12 +50,7 @@ export function ApplicationFilters({ value, onChange, onApply, onReset }: Applic
           />
         </div>
 
-        <Select
-          aria-label='Status'
-          value={value.status}
-          className='h-10 w-35 shrink-0'
-          onChange={(event) => updateValue('status', event.target.value as ApplicationStatus | '')}
-        >
+        <Select aria-label='Status' value={value.status} className='h-10 w-35 shrink-0' onChange={(event) => updateValue('status', event.target.value as ApplicationStatus | '')}>
           <option value=''>All statuses</option>
 
           {APPLICATION_STATUSES.map((status) => (
@@ -72,12 +60,7 @@ export function ApplicationFilters({ value, onChange, onApply, onReset }: Applic
           ))}
         </Select>
 
-        <Select
-          aria-label='Priority'
-          value={value.priority}
-          className='h-10 w-37.5 shrink-0'
-          onChange={(event) => updateValue('priority', event.target.value as ApplicationPriority | '')}
-        >
+        <Select aria-label='Priority' value={value.priority} className='h-10 w-37.5 shrink-0' onChange={(event) => updateValue('priority', event.target.value as ApplicationPriority | '')}>
           <option value=''>All priorities</option>
 
           {APPLICATION_PRIORITIES.map((priority) => (
@@ -87,12 +70,7 @@ export function ApplicationFilters({ value, onChange, onApply, onReset }: Applic
           ))}
         </Select>
 
-        <Select
-          aria-label='Category'
-          value={value.category}
-          className='h-10 w-45 shrink-0'
-          onChange={(event) => updateValue('category', event.target.value as ApplicationCategory | '')}
-        >
+        <Select aria-label='Category' value={value.category} className='h-10 w-45 shrink-0' onChange={(event) => updateValue('category', event.target.value as ApplicationCategory | '')}>
           <option value=''>All categories</option>
 
           {APPLICATION_CATEGORIES.map((category) => (
@@ -102,12 +80,7 @@ export function ApplicationFilters({ value, onChange, onApply, onReset }: Applic
           ))}
         </Select>
 
-        <Select
-          aria-label='Archive view'
-          value={value.archiveView}
-          className='h-10 w-35 shrink-0'
-          onChange={(event) => updateValue('archiveView', event.target.value as 'active' | 'archived')}
-        >
+        <Select aria-label='Archive view' value={value.archiveView} className='h-10 w-35 shrink-0' onChange={(event) => updateValue('archiveView', event.target.value as 'active' | 'archived')}>
           <option value='active'>Active</option>
           <option value='archived'>Archived</option>
         </Select>

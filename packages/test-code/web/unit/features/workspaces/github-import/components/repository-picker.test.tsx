@@ -1,10 +1,10 @@
 ﻿// @vitest-environment jsdom
-import { RepositoryPicker } from '@/features/workspaces/github-import/components/repository-picker';
-import { listImportableRepositories } from '@/features/workspaces/github-import/github-import-api';
 import type { ImportableGithubRepository } from '@/features/workspaces/github-import/github-import-types';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { RepositoryPicker } from '@/features/workspaces/github-import/components/repository-picker';
+import { listImportableRepositories } from '@/features/workspaces/github-import/github-import-api';
 
 vi.mock('@/features/workspaces/github-import/github-import-api', () => ({
   listImportableRepositories: vi.fn(),

@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   addApplicationLink,
   addApplicationTechnology,
@@ -14,14 +15,12 @@ import {
   updateApplicationTechnology,
 } from '@/features/applications/application-api';
 import { apiRequest } from '@/features/lib/api/api-client';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/lib/api/api-client', () => ({
   apiRequest: vi.fn(),
 }));
 
 const mockedApiRequest = vi.mocked(apiRequest);
-
 const WORKSPACE_ID = 'workspace-1';
 const APPLICATION_ID = 'application-1';
 
@@ -52,7 +51,7 @@ describe('getApplications', () => {
     await getApplications(WORKSPACE_ID, {
       search: '',
       status: undefined,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising runtime filtering of nullish query values
+
       priority: null as any,
       category: 'AI',
     });

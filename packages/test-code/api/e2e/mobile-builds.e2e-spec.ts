@@ -1,13 +1,10 @@
-import type { INestApplication } from '@nestjs/common';
-
-import { PrismaService } from 'src/database/prisma.service';
-
-import { RepositoryProvider } from 'src/generated/prisma/enums';
-
 import { withBearer } from '../helpers/auth';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { RepositoryProvider } from 'src/generated/prisma/enums';
 
 const API = '/api/v1';
 
@@ -29,7 +26,6 @@ describe('Mobile Builds E2E', () => {
 
   async function fixture() {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobileResponse = await owner.agent.post(`${API}/workspaces/${owner.workspaceId}/mobile-apps`).set(withBearer(owner.accessToken)).send({
       name: 'Build App',
 
@@ -53,7 +49,6 @@ describe('Mobile Builds E2E', () => {
         accountType: 'Organization',
       },
     });
-
     const repository = await prisma.repositoryConnection.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -117,7 +112,6 @@ describe('Mobile Builds E2E', () => {
 
   it('creates build from GitHub ingestion', async () => {
     const data = await fixture();
-
     const response = await data.owner.agent
       .post(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/builds/ingest/github`)
       .set(withBearer(data.owner.accessToken))
@@ -132,9 +126,7 @@ describe('Mobile Builds E2E', () => {
 
   it('does not duplicate repeated workflow delivery', async () => {
     const data = await fixture();
-
     const url = `${API}/workspaces/${data.owner.workspaceId}` + `/mobile-apps/${data.mobile.id}` + '/builds/ingest/github';
-
     const payload = buildPayload(data.repository.id);
 
     await data.owner.agent.post(url).set(withBearer(data.owner.accessToken)).send(payload).expect(201);
@@ -146,7 +138,6 @@ describe('Mobile Builds E2E', () => {
 
   it('transitions queued to building to success', async () => {
     const data = await fixture();
-
     const url = `${API}/workspaces/${data.owner.workspaceId}` + `/mobile-apps/${data.mobile.id}` + '/builds/ingest/github';
 
     for (const status of ['QUEUED', 'BUILDING', 'SUCCESS'] as const) {
@@ -174,9 +165,7 @@ describe('Mobile Builds E2E', () => {
 
   it('ignores unrelated repository', async () => {
     const data = await fixture();
-
     const other = await registerWorkspaceTestUser(app, prisma);
-
     const installation = await prisma.repositoryInstallation.create({
       data: {
         workspaceId: other.workspaceId,
@@ -190,7 +179,6 @@ describe('Mobile Builds E2E', () => {
         accountType: 'Organization',
       },
     });
-
     const repository = await prisma.repositoryConnection.create({
       data: {
         workspaceId: other.workspaceId,
@@ -218,7 +206,6 @@ describe('Mobile Builds E2E', () => {
         isAvailable: true,
       },
     });
-
     const response = await data.owner.agent
       .post(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/builds/ingest/github`)
       .set(withBearer(data.owner.accessToken))
@@ -238,9 +225,7 @@ describe('Mobile Builds E2E', () => {
       .send(buildPayload(data.repository.id, 'SUCCESS'))
       .expect(201);
 
-    const response = await data.owner.agent
-      .get(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/builds`)
-      .set(withBearer(data.owner.accessToken));
+    const response = await data.owner.agent.get(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/builds`).set(withBearer(data.owner.accessToken));
 
     expect(response.status).toBe(200);
 

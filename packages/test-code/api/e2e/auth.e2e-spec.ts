@@ -4,9 +4,9 @@ import { buildCookieWithValue, readCookiePair, readCookieValue, readFirstSetCook
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { expectSuccessfulStatus, readAccessToken, readResponseEmail, readSetCookies } from '../helpers/response';
-import { PrismaService } from 'src/database/prisma.service';
 import type { INestApplication } from '@nestjs/common';
 import { createHash } from 'node:crypto';
+import { PrismaService } from 'src/database/prisma.service';
 import request from 'supertest';
 
 function hashRefreshToken(token: string): string {
@@ -49,7 +49,6 @@ function asRecord(value: unknown): Record<string, unknown> {
 
 describe('Phase 11 - Foundation & Authentication E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
 
   beforeAll(async () => {
@@ -69,9 +68,7 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
   describe('registration', () => {
     it('registers a new user and creates an authenticated session', async () => {
       const agent = createAgent(app);
-
       const user = createTestUser();
-
       const registerResponse = await registerUser(agent, user);
 
       expectSuccessfulStatus(registerResponse);
@@ -89,7 +86,6 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
 
     it('registers the user without automatically creating a workspace', async () => {
       const user = createTestUser();
-
       const response = await registerUser(createAgent(app), user);
 
       expectSuccessfulStatus(response);
@@ -126,7 +122,6 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
       expectSuccessfulStatus(response);
 
       const body: unknown = response.body;
-
       const serialized = JSON.stringify(body).toLowerCase();
 
       expect(serialized).not.toContain('refreshtoken');
@@ -136,7 +131,6 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
 
     it('rejects duplicate email registration with 409 conflict', async () => {
       const user = createTestUser();
-
       const firstResponse = await registerUser(createAgent(app), user);
 
       expectSuccessfulStatus(firstResponse);
@@ -166,13 +160,11 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
   describe('login and protected-route authorization', () => {
     it('logs in using valid credentials', async () => {
       const user = createTestUser();
-
       const registrationAgent = createAgent(app);
 
       expectSuccessfulStatus(await registerUser(registrationAgent, user));
 
       const loginAgent = createAgent(app);
-
       const loginResponse = await loginUser(loginAgent, user);
 
       expectSuccessfulStatus(loginResponse);
@@ -201,7 +193,6 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
       expect(response.status).toBe(401);
 
       const body: unknown = response.body;
-
       const responseText = JSON.stringify(body).toLowerCase();
 
       expect(responseText).not.toContain('hash');
@@ -222,7 +213,6 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
       expect(response.status).toBe(401);
 
       const body: unknown = response.body;
-
       const responseText = JSON.stringify(body).toLowerCase();
 
       expect(responseText).not.toContain('hash');
@@ -242,9 +232,7 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
       expectSuccessfulStatus(response);
 
       const accessToken = readAccessToken(response);
-
       const tamperedAccessToken = tamperJwt(accessToken);
-
       const protectedResponse = await request(app.getHttpServer()).get(TEST_ROUTES.auth.me).set(withBearer(tamperedAccessToken));
 
       expect(protectedResponse.status).toBe(401);
@@ -256,9 +244,7 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
       expectSuccessfulStatus(response);
 
       const refreshCookie = readCookiePair(readFirstSetCookie(response));
-
       const refreshToken = readCookieValue(refreshCookie);
-
       const protectedResponse = await request(app.getHttpServer()).get(TEST_ROUTES.auth.me).set(withBearer(refreshToken));
 
       expect(protectedResponse.status).toBe(401);
@@ -286,11 +272,8 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
       expectSuccessfulStatus(response);
 
       const refreshCookie = readCookiePair(readFirstSetCookie(response));
-
       const rawRefreshToken = readCookieValue(refreshCookie);
-
       const expectedHash = hashRefreshToken(rawRefreshToken);
-
       const session = await prisma.authSession.findUnique({
         where: {
           refreshTokenHash: expectedHash,
@@ -321,9 +304,7 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
       expectSuccessfulStatus(registrationResponse);
 
       const validCookie = readCookiePair(readFirstSetCookie(registrationResponse));
-
       const tamperedCookie = buildCookieWithValue(validCookie, 'not-a-valid-refresh-token');
-
       const response = await request(app.getHttpServer()).post(TEST_ROUTES.auth.refresh).set('Cookie', tamperedCookie);
 
       expect(response.status).toBe(401);
@@ -333,7 +314,6 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
   describe('refresh rotation and replay protection', () => {
     it('rotates the refresh session and returns a new access token', async () => {
       const user = createTestUser();
-
       const agent = createAgent(app);
 
       expectSuccessfulStatus(await registerUser(agent, user));
@@ -343,15 +323,12 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
       expectSuccessfulStatus(loginResponse);
 
       const firstAccessToken = readAccessToken(loginResponse);
-
       const firstCookie = readCookiePair(readFirstSetCookie(loginResponse));
-
       const refreshResponse = await agent.post(TEST_ROUTES.auth.refresh);
 
       expectSuccessfulStatus(refreshResponse);
 
       const secondAccessToken = readAccessToken(refreshResponse);
-
       const secondCookie = readCookiePair(readFirstSetCookie(refreshResponse));
 
       expect(secondAccessToken).toEqual(expect.any(String));
@@ -371,17 +348,13 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
       expectSuccessfulStatus(await registerUser(createAgent(app), user));
 
       const agent = createAgent(app);
-
       const loginResponse = await loginUser(agent, user);
 
       expectSuccessfulStatus(loginResponse);
 
       const oldCookie = readCookiePair(readFirstSetCookie(loginResponse));
-
       const oldRefreshToken = readCookieValue(oldCookie);
-
       const oldRefreshTokenHash = hashRefreshToken(oldRefreshToken);
-
       const oldSession = await prisma.authSession.findUnique({
         where: {
           refreshTokenHash: oldRefreshTokenHash,
@@ -423,15 +396,12 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
 
     it('rejects an expired refresh session and records EXPIRED revocation', async () => {
       const agent = createAgent(app);
-
       const registrationResponse = await registerUser(agent, createTestUser());
 
       expectSuccessfulStatus(registrationResponse);
 
       const refreshCookie = readCookiePair(readFirstSetCookie(registrationResponse));
-
       const rawRefreshToken = readCookieValue(refreshCookie);
-
       const refreshTokenHash = hashRefreshToken(rawRefreshToken);
 
       await prisma.authSession.update({
@@ -466,17 +436,13 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
   describe('logout', () => {
     it('revokes the current refresh session and clears the refresh cookie', async () => {
       const agent = createAgent(app);
-
       const registrationResponse = await registerUser(agent, createTestUser());
 
       expectSuccessfulStatus(registrationResponse);
 
       const originalCookie = readCookiePair(readFirstSetCookie(registrationResponse));
-
       const rawRefreshToken = readCookieValue(originalCookie);
-
       const refreshTokenHash = hashRefreshToken(rawRefreshToken);
-
       const logoutResponse = await agent.post(TEST_ROUTES.auth.logout);
 
       expect(logoutResponse.status).toBe(200);
@@ -486,9 +452,7 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
       expect(clearCookies.length).toBeGreaterThan(0);
 
       const clearCookieText = clearCookies.join('; ');
-
       const clearsUsingMaxAge = /Max-Age=0/i.test(clearCookieText);
-
       const clearsUsingExpiredDate = /Expires=[^;]*(?:1970|1969)/i.test(clearCookieText);
 
       expect(clearsUsingMaxAge || clearsUsingExpiredDate).toBe(true);
@@ -518,7 +482,6 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
 
     it('keeps logout idempotent when no refresh cookie exists', async () => {
       const firstResponse = await request(app.getHttpServer()).post(TEST_ROUTES.auth.logout);
-
       const secondResponse = await request(app.getHttpServer()).post(TEST_ROUTES.auth.logout);
 
       expect(firstResponse.status).toBe(200);
@@ -536,13 +499,9 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
 
     it('revokes every active refresh session for the authenticated user', async () => {
       const user = createTestUser();
-
       const registrationAgent = createAgent(app);
-
       const firstLoginAgent = createAgent(app);
-
       const secondLoginAgent = createAgent(app);
-
       const registrationResponse = await registerUser(registrationAgent, user);
 
       expectSuccessfulStatus(registrationResponse);
@@ -578,7 +537,6 @@ describe('Phase 11 - Foundation & Authentication E2E', () => {
       expect(activeSessionsBefore).toBeGreaterThanOrEqual(3);
 
       const accessToken = readAccessToken(firstLoginResponse);
-
       const logoutAllResponse = await firstLoginAgent.post(TEST_ROUTES.auth.logoutAll).set(withBearer(accessToken));
 
       expect(logoutAllResponse.status).toBe(200);

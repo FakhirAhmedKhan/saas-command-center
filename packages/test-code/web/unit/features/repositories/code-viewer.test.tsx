@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import type { RepositoryCodeFile } from '@/features/repositories/code-explorer.types';
-import { CodeViewer } from '@/features/repositories/code-viewer';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { CodeViewer } from '@/features/repositories/code-viewer';
 
 vi.mock('@monaco-editor/react', () => ({
   default: ({ value, language, path }: { value: string; language: string; path: string }) => (
@@ -13,7 +13,6 @@ vi.mock('@monaco-editor/react', () => ({
 }));
 
 vi.mock('next/image', () => ({
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   default: (props: any) => <img alt={props.alt} src={props.src} />,
 }));
 

@@ -1,9 +1,9 @@
-import type { INestApplication } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
 import { API, createDesktopApp } from './helpers/desktop-test-fixtures';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
 
 function base(workspaceId: string, desktopAppId: string) {
   return `${API}/workspaces/${workspaceId}/desktop-apps/${desktopAppId}`;
@@ -28,7 +28,6 @@ describe('Desktop Performance and Crashes E2E', () => {
   async function fixture() {
     const owner = await registerWorkspaceTestUser(app, prisma);
     const desktopApp = await createDesktopApp(owner);
-
     const integration = await owner.agent
       .post(`${base(owner.workspaceId, desktopApp.id)}/telemetry`)
       .set('Authorization', `Bearer ${owner.accessToken}`)
@@ -45,10 +44,7 @@ describe('Desktop Performance and Crashes E2E', () => {
 
   it('syncs provider metrics and crash groups', async () => {
     const value = await fixture();
-
-    const response = await value.owner.agent
-      .post(`${base(value.owner.workspaceId, value.desktopApp.id)}/telemetry/${value.integrationId}/sync`)
-      .set('Authorization', `Bearer ${value.owner.accessToken}`);
+    const response = await value.owner.agent.post(`${base(value.owner.workspaceId, value.desktopApp.id)}/telemetry/${value.integrationId}/sync`).set('Authorization', `Bearer ${value.owner.accessToken}`);
 
     expect(response.status).toBe(201);
     expect(response.body.performanceInserted).toBe(4);
@@ -156,9 +152,7 @@ describe('Desktop Performance and Crashes E2E', () => {
       .set('Authorization', `Bearer ${value.owner.accessToken}`)
       .expect(201);
 
-    const response = await attacker.agent
-      .get(`${base(value.owner.workspaceId, value.desktopApp.id)}/performance`)
-      .set('Authorization', `Bearer ${attacker.accessToken}`);
+    const response = await attacker.agent.get(`${base(value.owner.workspaceId, value.desktopApp.id)}/performance`).set('Authorization', `Bearer ${attacker.accessToken}`);
 
     expect(response.status).toBe(403);
   });

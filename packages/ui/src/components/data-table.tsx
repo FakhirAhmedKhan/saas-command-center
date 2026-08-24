@@ -33,14 +33,7 @@ export function DataTable<Row>({ columns, rows, getRowKey, onRowClick, className
         <thead>
           <tr className='border-b border-slate-100'>
             {columns.map((column) => (
-              <th
-                key={column.key}
-                className={cn(
-                  'px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-slate-400',
-                  column.hideBelow ? HIDE_BELOW_CLASS[column.hideBelow] : undefined,
-                  column.headerClassName,
-                )}
-              >
+              <th key={column.key} className={cn('px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-slate-400', column.hideBelow ? HIDE_BELOW_CLASS[column.hideBelow] : undefined, column.headerClassName)}>
                 {column.header}
               </th>
             ))}
@@ -49,16 +42,9 @@ export function DataTable<Row>({ columns, rows, getRowKey, onRowClick, className
 
         <tbody>
           {rows.map((row) => (
-            <tr
-              key={getRowKey(row)}
-              onClick={onRowClick ? () => onRowClick(row) : undefined}
-              className={cn('border-b border-slate-50 last:border-b-0', onRowClick && 'cursor-pointer transition hover:bg-slate-50')}
-            >
+            <tr key={getRowKey(row)} onClick={onRowClick ? () => onRowClick(row) : undefined} className={cn('border-b border-slate-50 last:border-b-0', onRowClick && 'cursor-pointer transition hover:bg-slate-50')}>
               {columns.map((column) => (
-                <td
-                  key={column.key}
-                  className={cn('px-4 py-3 align-middle text-slate-700', column.hideBelow ? HIDE_BELOW_CLASS[column.hideBelow] : undefined, column.className)}
-                >
+                <td key={column.key} className={cn('px-4 py-3 align-middle text-slate-700', column.hideBelow ? HIDE_BELOW_CLASS[column.hideBelow] : undefined, column.className)}>
                   {column.cell(row)}
                 </td>
               ))}

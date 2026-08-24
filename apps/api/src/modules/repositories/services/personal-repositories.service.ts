@@ -12,16 +12,11 @@ export class PersonalRepositoriesService {
 
   async list(userId: string): Promise<ImportableRepositoryListResponse> {
     const installationIds = await this.personalGithubConnect.listAccessibleInstallationIds(userId);
-
     const installations: ImportableGithubInstallation[] = [];
-
     const repositories: ImportableGithubRepository[] = [];
 
     for (const installationId of installationIds) {
-      const [installation, installationRepositories] = await Promise.all([
-        this.githubApp.getInstallation(installationId),
-        this.githubApp.listImportableInstallationRepositories(installationId),
-      ]);
+      const [installation, installationRepositories] = await Promise.all([this.githubApp.getInstallation(installationId), this.githubApp.listImportableInstallationRepositories(installationId)]);
 
       installations.push(installation);
 
@@ -59,7 +54,6 @@ export class PersonalRepositoriesService {
 
     for (const installationId of installationIds) {
       const repositories = await this.githubApp.listImportableInstallationRepositories(installationId);
-
       const match = repositories.find((repository) => repository.id === repositoryId);
 
       if (match) {

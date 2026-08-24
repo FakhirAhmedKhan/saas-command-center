@@ -4,14 +4,7 @@ import { PrismaService } from '../../../database/prisma.service';
 import { NotificationService } from '../../team-operations/services/notification.service';
 import { CreateMobileAlertRuleDto, UpdateMobileAlertRuleDto } from '../dto/mobile-alert.dto';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import {
-  MobileAlertIncidentStatus,
-  MobileAlertRuleType,
-  MobileBuildStatus,
-  NotificationPriority,
-  NotificationType,
-  WorkspaceRole,
-} from 'src/generated/prisma/enums';
+import { MobileAlertIncidentStatus, MobileAlertRuleType, MobileBuildStatus, NotificationPriority, NotificationType, WorkspaceRole } from 'src/generated/prisma/enums';
 
 @Injectable()
 export class MobileAlertsService {
@@ -238,12 +231,7 @@ export class MobileAlertsService {
 
       const comparison = await this.performance.compare(workspaceId, mobileAppId, previous.version, latest.version);
 
-      const maxRegression = Math.max(
-        0,
-        ...comparison.metrics
-          .filter((metric) => metric.direction === 'DEGRADED' && metric.percentDelta !== null)
-          .map((metric) => Math.abs(metric.percentDelta)),
-      );
+      const maxRegression = Math.max(0, ...comparison.metrics.filter((metric) => metric.direction === 'DEGRADED' && metric.percentDelta !== null).map((metric) => Math.abs(metric.percentDelta)));
 
       return {
         breached: maxRegression > (rule.threshold ?? 0),

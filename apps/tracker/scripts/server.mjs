@@ -2,11 +2,8 @@ import { readFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 
 const port = Number(process.env.TRACKER_PORT) || 3002;
-
 const outputFile = new URL('../dist/tracker.js', import.meta.url);
-
 const content = await readFile(outputFile);
-
 const server = createServer((request, response) => {
   if (request.url !== '/tracker.js' && request.url !== '/') {
     response.statusCode = 404;

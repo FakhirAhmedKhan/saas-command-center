@@ -2,15 +2,10 @@ import { defineConfig, devices } from '@playwright/test';
 import { resolve } from 'node:path';
 
 const apiRoot = resolve(__dirname, '../../../apps/api');
-
 const webRoot = resolve(__dirname, '../../../apps/web');
-
 const trackerRoot = resolve(__dirname, '../../../apps/tracker');
-
 const databaseUrl = 'postgresql://command_center_full_e2e:command_center_full_e2e@127.0.0.1:5435/command_center_full_e2e?schema=public';
-
 const apiUrl = process.env.FULLSTACK_API_URL ?? 'http://127.0.0.1:4100/api/v1';
-
 const webUrl = process.env.FULLSTACK_WEB_URL ?? 'http://127.0.0.1:3100';
 
 export default defineConfig({

@@ -81,11 +81,7 @@ export default function MobileAppsPage() {
 
           <p className='mt-1 text-sm text-red-700'>{error}</p>
 
-          <button
-            type='button'
-            onClick={() => void loadMobileApps()}
-            className='mt-4 inline-flex items-center gap-2 text-sm font-semibold text-red-700 hover:text-red-900'
-          >
+          <button type='button' onClick={() => void loadMobileApps()} className='mt-4 inline-flex items-center gap-2 text-sm font-semibold text-red-700 hover:text-red-900'>
             <RefreshCw className='size-4' />
             Try again
           </button>
@@ -100,14 +96,9 @@ export default function MobileAppsPage() {
 
           <h2 className='mt-4 text-lg font-semibold text-slate-950'>No mobile applications yet</h2>
 
-          <p className='mt-2 max-w-md text-sm leading-6 text-slate-500'>
-            Add your first Android, iOS, Flutter, React Native or Kotlin Multiplatform application.
-          </p>
+          <p className='mt-2 max-w-md text-sm leading-6 text-slate-500'>Add your first Android, iOS, Flutter, React Native or Kotlin Multiplatform application.</p>
 
-          <Link
-            href={`/workspaces/${workspaceId}/mobile-apps/new`}
-            className='mt-5 inline-flex h-10 items-center gap-2 rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700'
-          >
+          <Link href={`/workspaces/${workspaceId}/mobile-apps/new`} className='mt-5 inline-flex h-10 items-center gap-2 rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700'>
             <Plus className='size-4' />
             Add Mobile App
           </Link>

@@ -1,11 +1,5 @@
-import {
-  getAnalyticsAggregates,
-  getAnalyticsEngineStatus,
-  processAnalytics,
-  reprocessAnalytics,
-  runAnalyticsRetention,
-} from '@/features/analytics-engine/analytics-engine-api';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getAnalyticsAggregates, getAnalyticsEngineStatus, processAnalytics, reprocessAnalytics, runAnalyticsRetention } from '@/features/analytics-engine/analytics-engine-api';
 
 const { apiRequestMock } = vi.hoisted(() => ({
   apiRequestMock: vi.fn(),

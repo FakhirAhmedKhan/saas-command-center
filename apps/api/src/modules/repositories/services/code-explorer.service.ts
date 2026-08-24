@@ -32,9 +32,7 @@ export class CodeExplorerService {
 
   async getTree(workspaceId: string, repositoryId: string, branch?: string) {
     const repository = await this.repositoriesService.findOne(workspaceId, repositoryId);
-
     const selectedBranch = this.cleanBranch(branch ?? repository.defaultBranch);
-
     const tree = await this.githubCodeService.getTree(
       repository.installation.externalInstallationId,
 
@@ -56,9 +54,7 @@ export class CodeExplorerService {
 
   async search(workspaceId: string, repositoryId: string, query: string, branch?: string) {
     const repository = await this.repositoriesService.findOne(workspaceId, repositoryId);
-
     const selectedBranch = this.cleanBranch(branch ?? repository.defaultBranch);
-
     const cleanedQuery = query.trim().toLowerCase();
 
     if (cleanedQuery.length < 1) {
@@ -74,7 +70,6 @@ export class CodeExplorerService {
 
       selectedBranch,
     );
-
     const matches = tree.entries
       .filter((entry) => entry.type === 'file' && entry.path.toLowerCase().includes(cleanedQuery))
       .slice(0, 100)
@@ -96,11 +91,8 @@ export class CodeExplorerService {
 
   async getFile(workspaceId: string, repositoryId: string, path: string, branch?: string): Promise<CodeFile> {
     const repository = await this.repositoriesService.findOne(workspaceId, repositoryId);
-
     const safePath = this.validatePath(path);
-
     const selectedBranch = this.cleanBranch(branch ?? repository.defaultBranch);
-
     const file = await this.githubCodeService.getFile(
       repository.installation.externalInstallationId,
 
@@ -122,13 +114,9 @@ export class CodeExplorerService {
 
   async getDiff(workspaceId: string, repositoryId: string, base: string, head: string, path: string) {
     const repository = await this.repositoriesService.findOne(workspaceId, repositoryId);
-
     const safePath = this.validatePath(path);
-
     const baseBranch = this.cleanBranch(base);
-
     const headBranch = this.cleanBranch(head);
-
     const [baseFile, headFile] = await Promise.all([
       this.githubCodeService.getFile(
         repository.installation.externalInstallationId,
@@ -160,9 +148,7 @@ export class CodeExplorerService {
     }
 
     const original = baseFile ? this.transformFile(baseFile, baseBranch) : null;
-
     const modified = headFile ? this.transformFile(headFile, headBranch) : null;
-
     const textDiff = (!original || original.kind === 'text') && (!modified || modified.kind === 'text');
 
     return {
@@ -186,7 +172,6 @@ export class CodeExplorerService {
     }
 
     const language = this.languageForFile(file.name);
-
     const imageMimeType = this.imageMimeType(file.name);
 
     if (file.encoding !== 'base64' || !file.content) {
@@ -268,12 +253,9 @@ export class CodeExplorerService {
 
   private buildTree(entries: GithubTreeEntry[]): CodeTreeNode[] {
     const roots: CodeTreeNode[] = [];
-
     const directoryMap = new Map<string, CodeTreeNode>();
-
     const sorted = [...entries].sort((left, right) => {
       const leftDepth = left.path.split('/').length;
-
       const rightDepth = right.path.split('/').length;
 
       if (leftDepth !== rightDepth) {
@@ -297,9 +279,7 @@ export class CodeExplorerService {
             }
           : {}),
       };
-
       const slash = entry.path.lastIndexOf('/');
-
       const parentPath = slash === -1 ? null : entry.path.slice(0, slash);
 
       if (parentPath) {
@@ -382,7 +362,6 @@ export class CodeExplorerService {
 
   private imageMimeType(fileName: string): string | null {
     const extension = this.extension(fileName);
-
     const types: Record<string, string> = {
       png: 'image/png',
       jpg: 'image/jpeg',
@@ -397,7 +376,6 @@ export class CodeExplorerService {
 
   private languageForFile(fileName: string): string {
     const lower = fileName.toLowerCase();
-
     const exact: Record<string, string> = {
       dockerfile: 'dockerfile',
       makefile: 'makefile',
@@ -412,7 +390,6 @@ export class CodeExplorerService {
     }
 
     const extension = this.extension(lower);
-
     const languages: Record<string, string> = {
       ts: 'typescript',
       tsx: 'typescript',

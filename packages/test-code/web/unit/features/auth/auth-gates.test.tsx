@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { AuthenticatedOnly, GuestOnly } from '@/features/auth/auth-gates';
 import { render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { AuthenticatedOnly, GuestOnly } from '@/features/auth/auth-gates';
 
 const { useAuthMock, replaceMock } = vi.hoisted(() => ({
   useAuthMock: vi.fn(),

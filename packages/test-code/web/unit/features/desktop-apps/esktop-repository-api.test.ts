@@ -1,17 +1,15 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getDesktopRepository, linkDesktopRepository, unlinkDesktopRepository } from '@/features/desktop-apps/desktop-apps-api';
 import { apiRequest } from '@/features/lib/api/api-client';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/lib/api/api-client', () => ({
   apiRequest: vi.fn(),
 }));
 
 const mockedApiRequest = vi.mocked(apiRequest);
-
 const WORKSPACE_ID = 'workspace-1';
 const DESKTOP_APP_ID = 'desktop-1';
 const REPOSITORY_ID = 'repository-1';
-
 const ENDPOINT = `/workspaces/${WORKSPACE_ID}` + `/desktop-apps/${DESKTOP_APP_ID}` + '/repository';
 
 describe('Desktop repository API', () => {

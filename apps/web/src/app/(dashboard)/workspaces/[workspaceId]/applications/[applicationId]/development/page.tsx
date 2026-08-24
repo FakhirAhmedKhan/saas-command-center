@@ -9,7 +9,6 @@ export default function ApplicationDevelopmentPage() {
     workspaceId: string;
     applicationId: string;
   }>();
-
   const { workspaceId, applicationId } = params;
 
   return (

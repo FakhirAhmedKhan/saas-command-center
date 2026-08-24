@@ -13,9 +13,7 @@ import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
 const MAX_BODY_BYTES = 64 * 1024;
 const MAX_FUTURE_EVENT_AGE_MS = 5 * 60 * 1000;
 const MAX_PAST_EVENT_AGE_MS = 7 * 24 * 60 * 60 * 1000;
-
 const TRACKING_KEY_PATTERN = /^cc_live_([a-f0-9]{16})_[A-Za-z0-9_-]{20,}$/;
-
 const SHA_256_HEX_PATTERN = /^[a-f0-9]{64}$/i;
 
 export interface CollectionContext {
@@ -71,27 +69,20 @@ export class AnalyticsIngestionService {
       throw new ForbiddenException('Tracking requests require a valid Origin header');
     }
     const payload = await this.parseAndValidatePayload(rawBody);
-
     const website = await this.authenticateWebsite(payload.websiteId, payload.trackingKey);
 
     this.ensureWebsiteAvailable(website);
 
     const origin = this.resolveAndValidateOrigin(context.origin, website.allowedOrigins);
-
     const normalizedIpAddress = this.normalizeIpAddress(context.ipAddress);
-
     const ipHash = normalizedIpAddress ? this.hashIpAddress(normalizedIpAddress) : null;
-
     const countryCode = this.normalizeCountryCode(context.countryCode);
-
     const rateLimitIdentifier = ipHash ?? origin;
-
     const rateLimitKey = `${website.id}:${rateLimitIdentifier}`;
 
     this.rateLimit.consume(rateLimitKey, payload.events.length);
 
     const receivedAt = new Date();
-
     const sdkVersion = payload.sdkVersion.trim().slice(0, 32);
 
     if (!sdkVersion) {
@@ -100,9 +91,7 @@ export class AnalyticsIngestionService {
 
     const data: Prisma.RawAnalyticsEventCreateManyInput[] = payload.events.map((event) => {
       const occurredAt = this.validateEventTime(event.timestamp);
-
       const trackedUrl = sanitizeTrackedUrl(event.url, origin);
-
       const eventName = this.normalizeOptionalString(event.eventName, 100);
 
       this.validateEventName(event.type, eventName);
@@ -148,7 +137,6 @@ export class AnalyticsIngestionService {
         sdkVersion,
       };
     });
-
     const result = await this.prisma.$transaction(async (transaction) => {
       const created = await transaction.rawAnalyticsEvent.createMany({
         data,
@@ -184,7 +172,6 @@ export class AnalyticsIngestionService {
     }
 
     const payload = plainToInstance(CollectEventsDto, parsed);
-
     const errors = await validate(payload, {
       whitelist: true,
       forbidNonWhitelisted: true,
@@ -270,9 +257,7 @@ export class AnalyticsIngestionService {
 
   private async authenticateWebsite(websiteId: string, trackingKey: string): Promise<ValidWebsite> {
     const normalizedKey = trackingKey.trim();
-
     const match = TRACKING_KEY_PATTERN.exec(normalizedKey);
-
     const prefix = match?.[1];
 
     if (!prefix) {
@@ -312,7 +297,6 @@ export class AnalyticsIngestionService {
     }
 
     const candidateBuffer = Buffer.from(candidateHash, 'hex');
-
     const storedBuffer = Buffer.from(storedHash, 'hex');
 
     return timingSafeEqual(candidateBuffer, storedBuffer);
@@ -336,10 +320,7 @@ export class AnalyticsIngestionService {
     }
 
     const requestOrigin = normalizeRequestOrigin(suppliedOrigin);
-
-    const normalizedAllowedOrigins = new Set(
-      allowedOrigins.map((allowedOrigin) => this.tryNormalizeOrigin(allowedOrigin)).filter((allowedOrigin): allowedOrigin is string => allowedOrigin !== null),
-    );
+    const normalizedAllowedOrigins = new Set(allowedOrigins.map((allowedOrigin) => this.tryNormalizeOrigin(allowedOrigin)).filter((allowedOrigin): allowedOrigin is string => allowedOrigin !== null));
 
     if (!normalizedAllowedOrigins.has(requestOrigin)) {
       throw new ForbiddenException('Origin is not allowed for this website');
@@ -375,9 +356,7 @@ export class AnalyticsIngestionService {
     }
 
     const currentTime = Date.now();
-
     const maximumFutureTime = currentTime + MAX_FUTURE_EVENT_AGE_MS;
-
     const minimumPastTime = currentTime - MAX_PAST_EVENT_AGE_MS;
 
     if (timestamp > maximumFutureTime || timestamp < minimumPastTime) {

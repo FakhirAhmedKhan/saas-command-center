@@ -25,18 +25,14 @@ describe('Tracker -> API Transport E2E', () => {
 
   it('accepts the Tracker text/plain wire format and persists the event', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const event = buildTrackerEvent(trackedWebsite.origin, {
       url: `${trackedWebsite.origin}/tracker-transport`,
       title: 'Tracker Transport Test',
     });
-
     const payload = buildCollectPayload(trackedWebsite, [event], {
       sdkVersion: '1.0.0',
     });
-
     const response = await request(app.getHttpServer())
       .post('/api/v1/collect')
       .set('Origin', trackedWebsite.origin)

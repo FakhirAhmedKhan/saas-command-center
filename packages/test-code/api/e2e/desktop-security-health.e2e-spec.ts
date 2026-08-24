@@ -1,10 +1,10 @@
-import type { INestApplication } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
-import { GithubCodeService } from 'src/modules/repositories/services/github-code.service';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
 import { API, createLinkedDesktopFixture } from './helpers/desktop-test-fixtures';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { GithubCodeService } from 'src/modules/repositories/services/github-code.service';
 
 function base(workspaceId: string, desktopAppId: string) {
   return `${API}/workspaces/${workspaceId}/desktop-apps/${desktopAppId}`;
@@ -179,10 +179,7 @@ afterSign: scripts/notarize.js
   it('rejects cross-workspace security access', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
     const attacker = await registerWorkspaceTestUser(app, prisma);
-
-    const response = await attacker.agent
-      .get(`${base(fixture.owner.workspaceId, fixture.desktopApp.id)}/security`)
-      .set('Authorization', `Bearer ${attacker.accessToken}`);
+    const response = await attacker.agent.get(`${base(fixture.owner.workspaceId, fixture.desktopApp.id)}/security`).set('Authorization', `Bearer ${attacker.accessToken}`);
 
     expect(response.status).toBe(403);
   });

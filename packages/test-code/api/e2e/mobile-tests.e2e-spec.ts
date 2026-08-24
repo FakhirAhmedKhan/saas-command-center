@@ -1,13 +1,10 @@
-import type { INestApplication } from '@nestjs/common';
-
-import { PrismaService } from 'src/database/prisma.service';
-
-import { MobileBuildStatus, MobilePlatform, RepositoryProvider } from 'src/generated/prisma/enums';
-
 import { withBearer } from '../helpers/auth';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { MobileBuildStatus, MobilePlatform, RepositoryProvider } from 'src/generated/prisma/enums';
 
 const API = '/api/v1';
 
@@ -29,7 +26,6 @@ describe('Mobile Tests E2E', () => {
 
   async function fixture() {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobile = await owner.agent.post(`${API}/workspaces/${owner.workspaceId}/mobile-apps`).set(withBearer(owner.accessToken)).send({
       name: 'Test App',
 
@@ -37,7 +33,6 @@ describe('Mobile Tests E2E', () => {
 
       framework: 'ANDROID_NATIVE',
     });
-
     const installation = await prisma.repositoryInstallation.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -51,7 +46,6 @@ describe('Mobile Tests E2E', () => {
         accountType: 'Organization',
       },
     });
-
     const repository = await prisma.repositoryConnection.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -81,7 +75,6 @@ describe('Mobile Tests E2E', () => {
         isAvailable: true,
       },
     });
-
     const build = await prisma.mobileBuild.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -115,21 +108,17 @@ describe('Mobile Tests E2E', () => {
 
   it('stores test run counts', async () => {
     const data = await fixture();
+    const response = await data.owner.agent.post(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/builds/${data.build.id}/tests/ingest`).set(withBearer(data.owner.accessToken)).send({
+      type: 'UNIT',
 
-    const response = await data.owner.agent
-      .post(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/builds/${data.build.id}/tests/ingest`)
-      .set(withBearer(data.owner.accessToken))
-      .send({
-        type: 'UNIT',
+      status: 'PASSED',
 
-        status: 'PASSED',
+      passed: 428,
+      failed: 0,
+      skipped: 4,
 
-        passed: 428,
-        failed: 0,
-        skipped: 4,
-
-        durationMs: 42000,
-      });
+      durationMs: 42000,
+    });
 
     expect(response.status).toBe(201);
 
@@ -143,7 +132,6 @@ describe('Mobile Tests E2E', () => {
 
   it('stores test failure details', async () => {
     const data = await fixture();
-
     const response = await data.owner.agent
       .post(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/builds/${data.build.id}/tests/ingest`)
       .set(withBearer(data.owner.accessToken))
@@ -178,9 +166,7 @@ describe('Mobile Tests E2E', () => {
 
   it('duplicate ingestion updates rather than duplicates', async () => {
     const data = await fixture();
-
     const url = `${API}/workspaces/${data.owner.workspaceId}` + `/mobile-apps/${data.mobile.id}` + `/builds/${data.build.id}` + '/tests/ingest';
-
     const payload = {
       type: 'UNIT',
       status: 'PASSED',
@@ -232,9 +218,7 @@ describe('Mobile Tests E2E', () => {
       })
       .expect(201);
 
-    const response = await data.owner.agent
-      .get(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/builds/${data.build.id}`)
-      .set(withBearer(data.owner.accessToken));
+    const response = await data.owner.agent.get(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/builds/${data.build.id}`).set(withBearer(data.owner.accessToken));
 
     expect(response.body.testSummary).toMatchObject({
       totalRuns: 2,
@@ -247,19 +231,14 @@ describe('Mobile Tests E2E', () => {
 
   it('cannot attach tests to another app build', async () => {
     const first = await fixture();
-
     const second = await registerWorkspaceTestUser(app, prisma);
-
-    const response = await second.agent
-      .post(`${API}/workspaces/${second.workspaceId}/mobile-apps/${first.mobile.id}/builds/${first.build.id}/tests/ingest`)
-      .set(withBearer(second.accessToken))
-      .send({
-        type: 'UNIT',
-        status: 'PASSED',
-        passed: 1,
-        failed: 0,
-        skipped: 0,
-      });
+    const response = await second.agent.post(`${API}/workspaces/${second.workspaceId}/mobile-apps/${first.mobile.id}/builds/${first.build.id}/tests/ingest`).set(withBearer(second.accessToken)).send({
+      type: 'UNIT',
+      status: 'PASSED',
+      passed: 1,
+      failed: 0,
+      skipped: 0,
+    });
 
     expect([403, 404]).toContain(response.status);
   });

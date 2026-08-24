@@ -216,7 +216,6 @@ export function makeWebsite(overrides: Partial<MockWebsite> = {}): MockWebsite {
 
 export async function installMockApi(page: Page, options: MockApiOptions = {}): Promise<MockApiState> {
   const primaryWorkspace = makeWorkspace();
-
   const secondaryWorkspace = makeWorkspace({
     id: SECONDARY_WORKSPACE_ID,
     name: 'MadadAI Team',
@@ -231,7 +230,6 @@ export async function installMockApi(page: Page, options: MockApiOptions = {}): 
       saasApplications: 0,
     },
   });
-
   const state: MockApiState = {
     authenticated: options.authenticated ?? true,
     requests: [],
@@ -240,7 +238,6 @@ export async function installMockApi(page: Page, options: MockApiOptions = {}): 
     websites: options.websites ?? [makeWebsite()],
     trackingKey: 'cc_live_abcdefghijklmnopqrstuvwxyz123456',
   };
-
   const user = {
     id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
     email: options.email ?? 'owner@example.com',
@@ -252,7 +249,6 @@ export async function installMockApi(page: Page, options: MockApiOptions = {}): 
     updatedAt: NOW,
     deletedAt: null,
   };
-
   const authResponse = () => ({
     accessToken: 'mock-access-token',
     tokenType: 'Bearer' as const,
@@ -421,7 +417,6 @@ export async function installMockApi(page: Page, options: MockApiOptions = {}): 
         const priority = url.searchParams.get('priority');
         const category = url.searchParams.get('category');
         const archived = url.searchParams.get('archived') === 'true';
-
         const filtered = state.applications.filter(
           (application) =>
             application.workspaceId === workspaceId &&
@@ -497,7 +492,6 @@ export async function installMockApi(page: Page, options: MockApiOptions = {}): 
         const archived = url.searchParams.get('archived') === 'true';
         const enabledValue = url.searchParams.get('enabled');
         const connectedValue = url.searchParams.get('connected');
-
         const filtered = state.websites.filter(
           (website) =>
             website.workspaceId === workspaceId &&

@@ -35,7 +35,6 @@ export class GithubConnectIntentCleanupService {
     }
 
     const now = new Date();
-
     const [personalIntents, repositoryIntents] = await Promise.all([
       this.prisma.personalGithubConnectIntent.deleteMany({
         where: {

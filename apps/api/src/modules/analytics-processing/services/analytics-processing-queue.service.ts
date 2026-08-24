@@ -50,7 +50,6 @@ export class AnalyticsProcessingQueueService {
     }
 
     const lockKey = ['analytics-processing', input.websiteId, input.from.toISOString(), input.to.toISOString()].join(':');
-
     const activeKey = createHash('sha256').update(lockKey).digest('hex');
 
     try {
@@ -143,7 +142,6 @@ export class AnalyticsProcessingQueueService {
     }
 
     const rangeDays = (to.getTime() - from.getTime()) / MILLISECONDS_PER_DAY;
-
     const maximumDays = this.config.get('ANALYTICS_REPROCESS_MAX_DAYS', {
       infer: true,
     });

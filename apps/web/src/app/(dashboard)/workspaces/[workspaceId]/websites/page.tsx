@@ -24,37 +24,23 @@ export default function WebsitesPage() {
   const params = useParams<{
     workspaceId: string;
   }>();
-
   const workspaceId = params.workspaceId;
-
   const { workspaces } = useAuth();
-
   const role = workspaces.find((workspace) => workspace.id === workspaceId)?.members?.[0]?.role ?? 'VIEWER';
-
   const canCreate = role !== 'VIEWER';
-
   const [search, setSearch] = useState('');
-
   const [status, setStatus] = useState<'all' | 'enabled' | 'disabled'>('all');
-
   const [connection, setConnection] = useState<'all' | 'connected' | 'unconnected'>('all');
-
   const [archiveView, setArchiveView] = useState<'active' | 'archived'>('active');
-
   const [query, setQuery] = useState<WebsiteListQuery>({
     archived: false,
     page: 1,
     limit: 12,
   });
-
   const [websites, setWebsites] = useState<Website[]>([]);
-
   const [pagination, setPagination] = useState<WebsitePagination>(DEFAULT_PAGINATION);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
-
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
@@ -143,9 +129,7 @@ export default function WebsitesPage() {
 
           <h1 className='mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-[28px]'>Websites</h1>
 
-          <p className='mt-1.5 max-w-2xl text-sm leading-6 text-slate-500'>
-            Register domains, configure allowed origins, connect websites to SaaS products, and manage tracking keys.
-          </p>
+          <p className='mt-1.5 max-w-2xl text-sm leading-6 text-slate-500'>Register domains, configure allowed origins, connect websites to SaaS products, and manage tracking keys.</p>
         </div>
 
         <div className='flex shrink-0 gap-2.5'>
@@ -175,43 +159,22 @@ export default function WebsitesPage() {
           }}
         >
           <div className='min-w-60 flex-1'>
-            <SearchInput
-              aria-label='Search websites'
-              placeholder='Search websites...'
-              className='h-10'
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-            />
+            <SearchInput aria-label='Search websites' placeholder='Search websites...' className='h-10' value={search} onChange={(event) => setSearch(event.target.value)} />
           </div>
 
-          <Select
-            aria-label='Status'
-            className='h-10 w-36 shrink-0'
-            value={status}
-            onChange={(event) => setStatus(event.target.value as 'all' | 'enabled' | 'disabled')}
-          >
+          <Select aria-label='Status' className='h-10 w-36 shrink-0' value={status} onChange={(event) => setStatus(event.target.value as 'all' | 'enabled' | 'disabled')}>
             <option value='all'>All states</option>
             <option value='enabled'>Enabled</option>
             <option value='disabled'>Disabled</option>
           </Select>
 
-          <Select
-            aria-label='Connection'
-            className='h-10 w-44 shrink-0'
-            value={connection}
-            onChange={(event) => setConnection(event.target.value as 'all' | 'connected' | 'unconnected')}
-          >
+          <Select aria-label='Connection' className='h-10 w-44 shrink-0' value={connection} onChange={(event) => setConnection(event.target.value as 'all' | 'connected' | 'unconnected')}>
             <option value='all'>All connections</option>
             <option value='connected'>Connected</option>
             <option value='unconnected'>Not connected</option>
           </Select>
 
-          <Select
-            aria-label='Archive view'
-            className='h-10 w-36 shrink-0'
-            value={archiveView}
-            onChange={(event) => setArchiveView(event.target.value as 'active' | 'archived')}
-          >
+          <Select aria-label='Archive view' className='h-10 w-36 shrink-0' value={archiveView} onChange={(event) => setArchiveView(event.target.value as 'active' | 'archived')}>
             <option value='active'>Active</option>
             <option value='archived'>Archived</option>
           </Select>
@@ -243,10 +206,7 @@ export default function WebsitesPage() {
           description={query.archived ? 'Archived websites will appear here.' : 'Add a website to start collecting analytics.'}
           action={
             !query.archived ? (
-              <Link
-                href={`/workspaces/${workspaceId}/websites/new`}
-                className='inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white hover:bg-brand-700'
-              >
+              <Link href={`/workspaces/${workspaceId}/websites/new`} className='inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white hover:bg-brand-700'>
                 <Plus className='size-4' />
                 Create website
               </Link>

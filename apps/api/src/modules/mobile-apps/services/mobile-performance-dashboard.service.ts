@@ -25,7 +25,6 @@ const ALL_METRICS: MobilePerformanceMetricName[] = [
   'VERSION_ADOPTION_RATE',
   'SLOW_SCREEN_COUNT',
 ];
-
 const SUM_METRICS = new Set<MobilePerformanceMetricName>(['CRASH_COUNT', 'ANR_COUNT', 'HANG_COUNT', 'SLOW_SCREEN_COUNT']);
 
 @Injectable()
@@ -50,20 +49,9 @@ export class MobilePerformanceDashboardService {
     await this.mobileApps.findOne(workspaceId, mobileAppId);
 
     const filters = this.filters(query);
-
-    const [rows, providerAvailable] = await Promise.all([
-      this.repository.find(workspaceId, mobileAppId, filters),
-
-      this.repository.providerAvailable(workspaceId, mobileAppId),
-    ]);
-
+    const [rows, providerAvailable] = await Promise.all([this.repository.find(workspaceId, mobileAppId, filters), this.repository.providerAvailable(workspaceId, mobileAppId)]);
     const grouped = this.groupMetrics(rows);
-
-    const metrics = Object.fromEntries(ALL_METRICS.map((metric) => [metric, this.aggregate(metric, grouped.get(metric) ?? [])])) as Record<
-      MobilePerformanceMetricName,
-      MobilePerformanceValue
-    >;
-
+    const metrics = Object.fromEntries(ALL_METRICS.map((metric) => [metric, this.aggregate(metric, grouped.get(metric) ?? [])])) as Record<MobilePerformanceMetricName, MobilePerformanceValue>;
     const latest = rows.at(-1);
 
     return {
@@ -95,7 +83,6 @@ export class MobilePerformanceDashboardService {
     await this.mobileApps.findOne(workspaceId, mobileAppId);
 
     const rows = await this.repository.find(workspaceId, mobileAppId, this.filters(query));
-
     const byVersion = new Map<string, NormalizedPerformanceRow[]>();
 
     for (const row of rows) {
@@ -130,7 +117,6 @@ export class MobilePerformanceDashboardService {
     this.pushProblem(problems, summary, 'CRASH_RATE', 2, 'CRITICAL', 'High crash rate', 'Crash rate exceeds 2%.');
 
     const anrs = summary.metrics.ANR_COUNT.value ?? 0;
-
     const hangs = summary.metrics.HANG_COUNT.value ?? 0;
 
     if (anrs + hangs > 0) {
@@ -180,12 +166,9 @@ export class MobilePerformanceDashboardService {
     await this.mobileApps.findOne(workspaceId, mobileAppId);
 
     const before = this.groupMetrics(beforeRows);
-
     const after = this.groupMetrics(afterRows);
-
     const metrics = ALL_METRICS.map((metric): MobilePerformanceComparisonMetric => {
       const beforeValue = this.aggregate(metric, before.get(metric) ?? []).value;
-
       const afterValue = this.aggregate(metric, after.get(metric) ?? []).value;
 
       return this.compareMetric(metric, beforeValue, afterValue);
@@ -198,15 +181,8 @@ export class MobilePerformanceDashboardService {
     };
   }
 
-  private filters(query: {
-    from?: string;
-    to?: string;
-    version?: string;
-    buildNumber?: string;
-    platform?: 'ANDROID' | 'IOS' | 'CROSS_PLATFORM';
-  }): PerformanceRowFilters {
+  private filters(query: { from?: string; to?: string; version?: string; buildNumber?: string; platform?: 'ANDROID' | 'IOS' | 'CROSS_PLATFORM' }): PerformanceRowFilters {
     const from = query.from ? new Date(query.from) : undefined;
-
     const to = query.to ? new Date(query.to) : undefined;
 
     if (from && to && from > to) {
@@ -268,7 +244,6 @@ export class MobilePerformanceDashboardService {
 
   private versionSummary(version: string, rows: NormalizedPerformanceRow[]): MobilePerformanceVersionSummary {
     const grouped = this.groupMetrics(rows);
-
     const value = (metric: MobilePerformanceMetricName) => this.aggregate(metric, grouped.get(metric) ?? []).value;
 
     return {
@@ -316,13 +291,9 @@ export class MobilePerformanceDashboardService {
     }
 
     const absoluteDelta = after - before;
-
     const percentDelta = before === 0 ? null : (absoluteDelta / Math.abs(before)) * 100;
-
     const lowerIsBetter = metric !== 'CRASH_FREE_USERS_RATE' && metric !== 'VERSION_ADOPTION_RATE';
-
     const improved = lowerIsBetter ? after < before : after > before;
-
     const degraded = lowerIsBetter ? after > before : after < before;
 
     return {

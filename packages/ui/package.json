@@ -10,8 +10,9 @@
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "eslint src --max-warnings=0",
-    "test": "node --test"
+    "lint": "eslint .",
+    "test": "node --test",
+    "lint:fix": "eslint . --fix"
   },
   "peerDependencies": {
     "react": ">=19.0.0"
@@ -22,7 +23,8 @@
     "eslint": "^9.34.0",
     "react": "^19.2.0",
     "typescript": "^5.9.2",
-    "typescript-eslint": "^8.67.0"
+    "typescript-eslint": "^8.67.0",
+    "@command-center/eslint-config": "workspace:*"
   },
   "dependencies": {
     "clsx": "^2.1.1",

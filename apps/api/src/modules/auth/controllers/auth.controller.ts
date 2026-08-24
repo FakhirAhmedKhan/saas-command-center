@@ -35,14 +35,12 @@ const REGISTER_THROTTLE = {
     ttl: () => readPositiveInteger(process.env.AUTH_REGISTER_RATE_WINDOW_MS, 60_000),
   },
 };
-
 const LOGIN_THROTTLE = {
   default: {
     limit: () => readPositiveInteger(process.env.AUTH_LOGIN_RATE_LIMIT, 5),
     ttl: () => readPositiveInteger(process.env.AUTH_LOGIN_RATE_WINDOW_MS, 60_000),
   },
 };
-
 const REFRESH_THROTTLE = {
   default: {
     limit: () => readPositiveInteger(process.env.AUTH_REFRESH_RATE_LIMIT, 10),

@@ -1,9 +1,4 @@
-import {
-  directoryFileNamesFromTree,
-  directoryOf,
-  findPackageJsonPaths,
-  rootFileNamesFromTree,
-} from 'src/modules/repositories/services/analyzer/repository-tree-analyzer';
+import { directoryFileNamesFromTree, directoryOf, findPackageJsonPaths, rootFileNamesFromTree } from 'src/modules/repositories/services/analyzer/repository-tree-analyzer';
 import type { GithubTreeEntry } from 'src/modules/repositories/services/github-code.service';
 
 function file(path: string): GithubTreeEntry {
@@ -33,7 +28,6 @@ describe('findPackageJsonPaths', () => {
 
   it('finds nested package.json files for a monorepo', () => {
     const entries = [file('package.json'), file('apps/web/package.json'), file('apps/api/package.json'), file('packages/shared/package.json')];
-
     const result = findPackageJsonPaths(entries);
 
     expect(result).toEqual(expect.arrayContaining(['package.json', 'apps/web/package.json', 'apps/api/package.json', 'packages/shared/package.json']));

@@ -55,7 +55,6 @@ jsonPayload.name:"/apps/${context.config.appId}/"
           `.trim(),
       ),
     ]);
-
     const crashSessions = new Set<string>();
 
     for (const entry of crashes) {
@@ -116,7 +115,6 @@ logName="projects/${context.externalProjectId}/logs/firebasecrashlytics.googleap
 jsonPayload.name:"/apps/${context.config.appId}/"
         `.trim(),
     );
-
     const versions = new Map<
       string,
       {
@@ -128,7 +126,6 @@ jsonPayload.name:"/apps/${context.config.appId}/"
 
     for (const entry of entries) {
       const payload = entry.jsonPayload;
-
       const version = this.stringAt(payload, 'version.displayVersion');
 
       if (!version) {
@@ -140,7 +137,6 @@ jsonPayload.name:"/apps/${context.config.appId}/"
 
         sessions: new Set<string>(),
       };
-
       const session = this.stringAt(payload, 'sessionId');
 
       if (session) {
@@ -165,13 +161,9 @@ jsonPayload.name:"/apps/${context.config.appId}/"
     baseFilter: string,
   ) {
     const token = await this.token(context.config);
-
     const after = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-
     const filter = `${baseFilter}\ntimestamp>="${after}"`;
-
     const result: CloudLogEntry[] = [];
-
     let pageToken: string | undefined;
 
     for (let page = 0; page < 5; page += 1) {
@@ -231,9 +223,7 @@ jsonPayload.name:"/apps/${context.config.appId}/"
 
       scopes: ['https://www.googleapis.com/auth/logging.read'],
     });
-
     const client = await auth.getClient();
-
     const token = await client.getAccessToken();
 
     if (!token.token) {
@@ -258,12 +248,6 @@ jsonPayload.name:"/apps/${context.config.appId}/"
       value = (value as Record<string, unknown>)[key];
     }
 
-    return typeof value === 'string'
-      ? value
-      : value === undefined || value === null
-        ? null
-        : typeof value === 'string'
-          ? value
-          : (JSON.stringify(value) ?? '[unserializable]');
+    return typeof value === 'string' ? value : value === undefined || value === null ? null : typeof value === 'string' ? value : (JSON.stringify(value) ?? '[unserializable]');
   }
 }

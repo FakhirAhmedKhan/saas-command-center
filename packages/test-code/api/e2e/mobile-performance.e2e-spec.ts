@@ -1,24 +1,19 @@
-import type { INestApplication } from '@nestjs/common';
-
-import { PrismaService } from 'src/database/prisma.service';
-import { MobilePerformanceMetricType, MobilePlatform } from 'src/generated/prisma/enums';
-
 import { withBearer } from '../helpers/auth';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { MobilePerformanceMetricType, MobilePlatform } from 'src/generated/prisma/enums';
 
 const API = '/api/v1';
 
 describe('Mobile Performance E2E', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-
   let owner: Awaited<ReturnType<typeof registerWorkspaceTestUser>>;
-
   let workspaceId: string;
   let mobileAppId: string;
-
   let sequence = 0;
 
   beforeEach(async () => {
@@ -98,10 +93,7 @@ describe('Mobile Performance E2E', () => {
 
     await createMetric('6.14.0', 'COLD_STARTUP_MS', 1700);
 
-    const response = await owner.agent
-      .get(`${API}/workspaces/${workspaceId}/mobile-apps/${mobileAppId}/performance/summary?version=6.14.0&platform=ANDROID`)
-      .set(withBearer(owner.accessToken))
-      .expect(200);
+    const response = await owner.agent.get(`${API}/workspaces/${workspaceId}/mobile-apps/${mobileAppId}/performance/summary?version=6.14.0&platform=ANDROID`).set(withBearer(owner.accessToken)).expect(200);
 
     expect(response.body.hasData).toBe(true);
 
@@ -117,11 +109,7 @@ describe('Mobile Performance E2E', () => {
 
     await createMetric('6.14.0', 'COLD_STARTUP_MS', 1700, '815');
 
-    const response = await owner.agent
-      .get(`${API}/workspaces/${workspaceId}/mobile-apps/${mobileAppId}/performance/compare?fromVersion=6.13.1&toVersion=6.14.0`)
-      .set(withBearer(owner.accessToken))
-      .expect(200);
-
+    const response = await owner.agent.get(`${API}/workspaces/${workspaceId}/mobile-apps/${mobileAppId}/performance/compare?fromVersion=6.13.1&toVersion=6.14.0`).set(withBearer(owner.accessToken)).expect(200);
     const startup = response.body.metrics.find((metric: { metric: string }) => metric.metric === 'COLD_STARTUP_MS');
 
     expect(startup.before).toBe(1100);
@@ -140,10 +128,7 @@ describe('Mobile Performance E2E', () => {
 
     await createMetric('6.14.0', 'CRASH_COUNT', 3);
 
-    const response = await owner.agent
-      .get(`${API}/workspaces/${workspaceId}/mobile-apps/${mobileAppId}/performance/summary?version=6.14.0`)
-      .set(withBearer(owner.accessToken))
-      .expect(200);
+    const response = await owner.agent.get(`${API}/workspaces/${workspaceId}/mobile-apps/${mobileAppId}/performance/summary?version=6.14.0`).set(withBearer(owner.accessToken)).expect(200);
 
     expect(response.body.metrics.COLD_STARTUP_MS.value).toBe(1500);
 
@@ -157,10 +142,7 @@ describe('Mobile Performance E2E', () => {
 
     await createMetric('6.14.0', 'COLD_STARTUP_MS', 3500);
 
-    const response = await owner.agent
-      .get(`${API}/workspaces/${workspaceId}/mobile-apps/${mobileAppId}/performance/issues?version=6.14.0`)
-      .set(withBearer(owner.accessToken))
-      .expect(200);
+    const response = await owner.agent.get(`${API}/workspaces/${workspaceId}/mobile-apps/${mobileAppId}/performance/issues?version=6.14.0`).set(withBearer(owner.accessToken)).expect(200);
 
     expect(response.body).toEqual(
       expect.arrayContaining([
@@ -179,7 +161,6 @@ describe('Mobile Performance E2E', () => {
 
   it('prevents cross-workspace performance access', async () => {
     const second = await registerWorkspaceTestUser(app, prisma);
-
     const secondMobile = await second.agent
       .post(`${API}/workspaces/${second.workspaceId}/mobile-apps`)
       .set(withBearer(second.accessToken))
@@ -194,9 +175,6 @@ describe('Mobile Performance E2E', () => {
       })
       .expect(201);
 
-    await owner.agent
-      .get(`${API}/workspaces/${workspaceId}/mobile-apps/${secondMobile.body.id}/performance/summary`)
-      .set(withBearer(owner.accessToken))
-      .expect(404);
+    await owner.agent.get(`${API}/workspaces/${workspaceId}/mobile-apps/${secondMobile.body.id}/performance/summary`).set(withBearer(owner.accessToken)).expect(404);
   });
 });

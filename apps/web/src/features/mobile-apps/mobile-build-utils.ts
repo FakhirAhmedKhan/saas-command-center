@@ -33,9 +33,7 @@ export function formatDuration(durationMs: number | null): string {
   }
 
   const seconds = Math.round(durationMs / 1000);
-
   const minutes = Math.floor(seconds / 60);
-
   const remaining = seconds % 60;
 
   if (minutes === 0) {

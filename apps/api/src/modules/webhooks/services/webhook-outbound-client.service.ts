@@ -25,7 +25,6 @@ export interface WebhookHttpResult {
 }
 
 const BLOCKED_HOSTS = new Set(['localhost', 'localhost.localdomain', 'metadata', 'metadata.google.internal', 'host.docker.internal']);
-
 const BLOCKED_SUFFIXES = ['.localhost', '.local', '.internal', '.lan', '.home'];
 
 function isBlockedHostname(hostname: string): boolean {
@@ -60,14 +59,11 @@ export class WebhookOutboundClientService {
 
   async sendJson(rawUrl: string, rawBody: string, headers: Record<string, string>, timeoutMs: number): Promise<WebhookHttpResult> {
     const startedAt = performance.now();
-
     let dispatcher: Agent | undefined;
 
     try {
       const url = this.parseUrl(rawUrl);
-
       const addresses = await this.resolvePublicAddresses(url.hostname);
-
       const selectedAddress = addresses.find((address) => address.family === 4) ?? addresses[0];
 
       if (!selectedAddress) {
@@ -105,7 +101,6 @@ export class WebhookOutboundClientService {
       await response.body.dump();
 
       const durationMs = Math.max(0, Math.round(performance.now() - startedAt));
-
       const success = response.statusCode >= 200 && response.statusCode < 300;
 
       return {
@@ -121,9 +116,7 @@ export class WebhookOutboundClientService {
       };
     } catch (error) {
       const durationMs = Math.max(0, Math.round(performance.now() - startedAt));
-
       const unsafeDestination = error instanceof BadRequestException;
-
       const message = error instanceof Error ? error.message.slice(0, 500) : 'Unknown webhook delivery failure.';
 
       return {

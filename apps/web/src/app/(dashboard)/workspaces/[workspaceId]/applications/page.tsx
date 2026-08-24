@@ -26,7 +26,6 @@ const DEFAULT_FILTERS: ApplicationFilterValue = {
   sortBy: 'updatedAt',
   sortOrder: 'desc',
 };
-
 const DEFAULT_PAGINATION: ApplicationPagination = {
   page: 1,
   limit: 12,
@@ -58,29 +57,17 @@ export default function ApplicationsPage() {
   const params = useParams<{
     workspaceId: string;
   }>();
-
   const workspaceId = params.workspaceId;
-
   const { workspaces } = useAuth();
-
   const role = workspaces.find((workspace) => workspace.id === workspaceId)?.members?.[0]?.role ?? 'VIEWER';
-
   const canCreate = role !== 'VIEWER';
-
   const [filterDraft, setFilterDraft] = useState<ApplicationFilterValue>(DEFAULT_FILTERS);
-
   const [appliedFilters, setAppliedFilters] = useState<ApplicationFilterValue>(DEFAULT_FILTERS);
-
   const [query, setQuery] = useState<ApplicationListQuery>(filtersToQuery(DEFAULT_FILTERS));
-
   const [applications, setApplications] = useState<SaasApplication[]>([]);
-
   const [pagination, setPagination] = useState<ApplicationPagination>(DEFAULT_PAGINATION);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
-
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
@@ -159,12 +146,7 @@ export default function ApplicationsPage() {
       ) : error ? (
         <ApplicationsErrorState message={error} onRetry={refresh} />
       ) : showEmptyState ? (
-        <ApplicationsEmptyState
-          workspaceId={workspaceId}
-          hasActiveFilters={hasActiveFilters(appliedFilters)}
-          isArchivedView={appliedFilters.archiveView === 'archived'}
-          onClearFilters={resetFilters}
-        />
+        <ApplicationsEmptyState workspaceId={workspaceId} hasActiveFilters={hasActiveFilters(appliedFilters)} isArchivedView={appliedFilters.archiveView === 'archived'} onClearFilters={resetFilters} />
       ) : (
         <>
           <ApplicationsResultSummary shown={applications.length} total={pagination.total} />

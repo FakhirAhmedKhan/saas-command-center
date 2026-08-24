@@ -11,7 +11,6 @@ const STATUS_CLASSES: Record<HealthCheckStatus, string> = {
   UNKNOWN: 'bg-slate-100 text-slate-700 border-slate-200',
   DISABLED: 'bg-slate-100 text-slate-500 border-slate-200',
 };
-
 const STATUS_LABELS: Record<HealthCheckStatus, string> = {
   HEALTHY: 'Healthy',
   DEGRADED: 'Degraded',

@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   applyDevelopmentTemplate,
   completeMilestone,
@@ -25,14 +26,12 @@ import {
   updateTask,
 } from '@/features/development/development-api';
 import { apiRequest } from '@/features/lib/api/api-client';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/lib/api/api-client', () => ({
   apiRequest: vi.fn(),
 }));
 
 const apiRequestMock = vi.mocked(apiRequest);
-
 const WORKSPACE = 'workspace-1';
 const APP = 'app-1';
 const BASE = `/workspaces/${WORKSPACE}/applications/${APP}/development`;

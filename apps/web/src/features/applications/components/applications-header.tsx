@@ -17,9 +17,7 @@ export function ApplicationsHeader({ workspaceId, onRefresh, refreshing = false,
 
         <h1 className='mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-[28px]'>Applications</h1>
 
-        <p className='mt-1.5 max-w-2xl text-sm leading-6 text-slate-500'>
-          Manage your SaaS products, technology stacks, important links, status and launch dates.
-        </p>
+        <p className='mt-1.5 max-w-2xl text-sm leading-6 text-slate-500'>Manage your SaaS products, technology stacks, important links, status and launch dates.</p>
       </div>
 
       <div className='flex shrink-0 gap-2.5'>

@@ -11,15 +11,10 @@ import { useEffect, useRef, useState } from 'react';
 
 export function GithubCallbackClient() {
   const router = useRouter();
-
   const searchParams = useSearchParams();
-
   const { status } = useSession();
-
   const started = useRef(false);
-
   const [error, setError] = useState<string | null>(null);
-
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
@@ -29,7 +24,6 @@ export function GithubCallbackClient() {
 
     if (status === 'unauthenticated') {
       const query = searchParams.toString();
-
       const nextPath = query ? `/github/callback?${query}` : '/github/callback';
 
       router.replace(`/login?next=${encodeURIComponent(nextPath)}`);
@@ -42,7 +36,6 @@ export function GithubCallbackClient() {
     }
 
     const code = searchParams.get('code');
-
     const state = searchParams.get('state');
 
     if (!code || !state) {
@@ -93,9 +86,7 @@ export function GithubCallbackClient() {
   return (
     <main className='flex min-h-[70vh] items-center justify-center p-6'>
       <section className='w-full max-w-sm rounded-xl border border-slate-200 bg-white p-6 text-center'>
-        <div className='mx-auto flex size-11 items-center justify-center rounded-xl bg-slate-950 text-white'>
-          {connected ? <CheckCircle2 className='size-5' /> : <FolderGit2 className='size-5' />}
-        </div>
+        <div className='mx-auto flex size-11 items-center justify-center rounded-xl bg-slate-950 text-white'>{connected ? <CheckCircle2 className='size-5' /> : <FolderGit2 className='size-5' />}</div>
 
         {error ? (
           <>

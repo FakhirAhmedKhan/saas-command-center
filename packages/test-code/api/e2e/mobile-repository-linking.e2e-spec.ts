@@ -1,22 +1,15 @@
-import type { INestApplication } from '@nestjs/common';
-
-import { PrismaService } from 'src/database/prisma.service';
-
-import { RepositoryProvider, WorkspaceRole } from 'src/generated/prisma/enums';
-
 import { withBearer } from '../helpers/auth';
-
 import { createTestApp } from '../helpers/create-test-app';
-
 import { resetDatabase } from '../helpers/database';
-
 import { registerWorkspaceTestUser } from '../helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { RepositoryProvider, WorkspaceRole } from 'src/generated/prisma/enums';
 
 const API = '/api/v1';
 
 describe('Mobile Repository Linking E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
 
   beforeEach(async () => {
@@ -97,17 +90,11 @@ describe('Mobile Repository Linking E2E', () => {
 
   it('links repository to mobile application', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobile = await createMobile(owner);
-
     const repository = await createRepository(owner.workspaceId, '101');
-
-    const response = await owner.agent
-      .post(`${API}/workspaces/${owner.workspaceId}/mobile-apps/${mobile.id}/repository`)
-      .set(withBearer(owner.accessToken))
-      .send({
-        repositoryId: repository.id,
-      });
+    const response = await owner.agent.post(`${API}/workspaces/${owner.workspaceId}/mobile-apps/${mobile.id}/repository`).set(withBearer(owner.accessToken)).send({
+      repositoryId: repository.id,
+    });
 
     expect(response.status).toBe(201);
 
@@ -124,13 +111,9 @@ describe('Mobile Repository Linking E2E', () => {
 
   it('changes repository without leaving duplicate mobile links', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobile = await createMobile(owner);
-
     const first = await createRepository(owner.workspaceId, '201');
-
     const second = await createRepository(owner.workspaceId, '202');
-
     const url = `${API}/workspaces/${owner.workspaceId}` + `/mobile-apps/${mobile.id}/repository`;
 
     await owner.agent
@@ -164,11 +147,8 @@ describe('Mobile Repository Linking E2E', () => {
 
   it('unlinks repository', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobile = await createMobile(owner);
-
     const repository = await createRepository(owner.workspaceId, '301');
-
     const url = `${API}/workspaces/${owner.workspaceId}` + `/mobile-apps/${mobile.id}/repository`;
 
     await owner.agent
@@ -192,45 +172,30 @@ describe('Mobile Repository Linking E2E', () => {
 
   it('rejects repository from another workspace', async () => {
     const workspaceA = await registerWorkspaceTestUser(app, prisma);
-
     const workspaceB = await registerWorkspaceTestUser(app, prisma);
-
     const mobile = await createMobile(workspaceA);
-
     const repository = await createRepository(workspaceB.workspaceId, '401');
-
-    const response = await workspaceA.agent
-      .post(`${API}/workspaces/${workspaceA.workspaceId}/mobile-apps/${mobile.id}/repository`)
-      .set(withBearer(workspaceA.accessToken))
-      .send({
-        repositoryId: repository.id,
-      });
+    const response = await workspaceA.agent.post(`${API}/workspaces/${workspaceA.workspaceId}/mobile-apps/${mobile.id}/repository`).set(withBearer(workspaceA.accessToken)).send({
+      repositoryId: repository.id,
+    });
 
     expect(response.status).toBe(404);
   });
 
   it('rejects archived repository', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobile = await createMobile(owner);
-
     const repository = await createRepository(owner.workspaceId, '501', true);
-
-    const response = await owner.agent
-      .post(`${API}/workspaces/${owner.workspaceId}/mobile-apps/${mobile.id}/repository`)
-      .set(withBearer(owner.accessToken))
-      .send({
-        repositoryId: repository.id,
-      });
+    const response = await owner.agent.post(`${API}/workspaces/${owner.workspaceId}/mobile-apps/${mobile.id}/repository`).set(withBearer(owner.accessToken)).send({
+      repositoryId: repository.id,
+    });
 
     expect(response.status).toBe(400);
   });
 
   it('prevents viewer from changing repository', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobile = await createMobile(owner);
-
     const repository = await createRepository(owner.workspaceId, '601');
 
     await prisma.workspaceMember.updateMany({
@@ -243,12 +208,9 @@ describe('Mobile Repository Linking E2E', () => {
       },
     });
 
-    const response = await owner.agent
-      .post(`${API}/workspaces/${owner.workspaceId}/mobile-apps/${mobile.id}/repository`)
-      .set(withBearer(owner.accessToken))
-      .send({
-        repositoryId: repository.id,
-      });
+    const response = await owner.agent.post(`${API}/workspaces/${owner.workspaceId}/mobile-apps/${mobile.id}/repository`).set(withBearer(owner.accessToken)).send({
+      repositoryId: repository.id,
+    });
 
     expect(response.status).toBe(403);
   });

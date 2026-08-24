@@ -28,14 +28,7 @@ const databaseName = parsedDatabaseUrl.pathname.replace(/^\//, '').toLowerCase()
 const safeTestDatabase = databaseName.includes('test');
 
 if (!safeTestDatabase) {
-  throw new Error(
-    [
-      'E2E tests refused to start.',
-      'TEST_DATABASE_URL does not look like a test database.',
-      `Database: ${databaseName}`,
-      `Port: ${parsedDatabaseUrl.port}`,
-    ].join(' '),
-  );
+  throw new Error(['E2E tests refused to start.', 'TEST_DATABASE_URL does not look like a test database.', `Database: ${databaseName}`, `Port: ${parsedDatabaseUrl.port}`].join(' '));
 }
 
 process.env.DATABASE_URL = testDatabaseUrl;
@@ -59,9 +52,7 @@ const redisDatabaseRaw = parsedRedisUrl.pathname.replace(/^\//, '');
 const redisDatabase = redisDatabaseRaw ? Number(redisDatabaseRaw) : 0;
 
 if (!Number.isInteger(redisDatabase) || redisDatabase <= 0) {
-  throw new Error(
-    ['E2E tests refused to start.', 'TEST_REDIS_URL must use a dedicated non-zero Redis database.', `Redis database: ${redisDatabase}`].join(' '),
-  );
+  throw new Error(['E2E tests refused to start.', 'TEST_REDIS_URL must use a dedicated non-zero Redis database.', `Redis database: ${redisDatabase}`].join(' '));
 }
 
 process.env.REDIS_URL = testRedisUrl;

@@ -745,16 +745,7 @@ Then add the controller/service without removing any Phase 1–10 registration:
     DesktopReleasesController,
   ],
 
-  providers: [
-    DesktopAppsService,
-    DesktopRepositoryService,
-    DesktopProjectDetectionService,
-    DesktopBuildsService,
-    DesktopBuildArtifactsService,
-    DesktopTestsService,
-    DesktopReleasesService,
-    DesktopOverviewService,
-  ],
+  providers: [DesktopAppsService, DesktopRepositoryService, DesktopProjectDetectionService, DesktopBuildsService, DesktopBuildArtifactsService, DesktopTestsService, DesktopReleasesService, DesktopOverviewService],
 
   exports: [DesktopAppsService, DesktopRepositoryService, DesktopBuildsService, DesktopTestsService, DesktopReleasesService],
 })
@@ -838,11 +829,9 @@ export function nextDesktopReleaseActions(status: DesktopReleaseStatus): Array<{
 }
 
 export function formatReleaseTarget(release: Pick<DesktopRelease, 'platform' | 'architecture'>): string {
-  const platform =
-    release.platform === 'MACOS' ? 'macOS' : release.platform === 'WINDOWS' ? 'Windows' : release.platform === 'LINUX' ? 'Linux' : 'Cross-platform';
+  const platform = release.platform === 'MACOS' ? 'macOS' : release.platform === 'WINDOWS' ? 'Windows' : release.platform === 'LINUX' ? 'Linux' : 'Cross-platform';
 
-  const architecture =
-    release.architecture === 'ARM64' ? 'arm64' : release.architecture === 'X64' ? 'x64' : release.architecture === 'X86' ? 'x86' : 'Universal';
+  const architecture = release.architecture === 'ARM64' ? 'arm64' : release.architecture === 'X64' ? 'x64' : release.architecture === 'X86' ? 'x86' : 'Universal';
 
   return `${platform} • ${architecture}`;
 }
@@ -946,25 +935,10 @@ apps/web/src/features/desktop-apps/desktop-releases.tsx
 'use client';
 
 import { createDesktopRelease, listDesktopBuilds, listDesktopReleases, updateDesktopReleaseStatus } from './desktop-apps-api';
-import {
-  DESKTOP_RELEASE_CHANNEL_LABELS,
-  DESKTOP_RELEASE_STATUS_LABELS,
-  formatReleaseDate,
-  formatReleaseTarget,
-  nextDesktopReleaseActions,
-} from './desktop-release-utils';
+import { DESKTOP_RELEASE_CHANNEL_LABELS, DESKTOP_RELEASE_STATUS_LABELS, formatReleaseDate, formatReleaseTarget, nextDesktopReleaseActions } from './desktop-release-utils';
 import { shortSha } from './desktop-build-utils';
 import { getErrorMessage } from '@/features/lib/api/api-error';
-import type {
-  CreateDesktopReleaseInput,
-  DesktopArchitecture,
-  DesktopBuild,
-  DesktopPlatform,
-  DesktopRelease,
-  DesktopReleaseChannel,
-  DesktopReleaseFilters,
-  DesktopReleaseStatus,
-} from '@command-center/shared-types';
+import type { CreateDesktopReleaseInput, DesktopArchitecture, DesktopBuild, DesktopPlatform, DesktopRelease, DesktopReleaseChannel, DesktopReleaseFilters, DesktopReleaseStatus } from '@command-center/shared-types';
 import { AlertTriangle, CheckCircle2, ExternalLink, PackageCheck, RefreshCw, RotateCcw, Rocket } from 'lucide-react';
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -1117,11 +1091,7 @@ export function DesktopReleases({ workspaceId, desktopAppId }: Props) {
   }
 
   async function transition(release: DesktopRelease, status: DesktopReleaseStatus) {
-    const confirmed = window.confirm(
-      status === 'ROLLED_BACK'
-        ? `Roll back ${release.version} on ${DESKTOP_RELEASE_CHANNEL_LABELS[release.channel]}?`
-        : `${DESKTOP_RELEASE_STATUS_LABELS[status]} ${release.version}?`,
-    );
+    const confirmed = window.confirm(status === 'ROLLED_BACK' ? `Roll back ${release.version} on ${DESKTOP_RELEASE_CHANNEL_LABELS[release.channel]}?` : `${DESKTOP_RELEASE_STATUS_LABELS[status]} ${release.version}?`);
 
     if (!confirmed) {
       return;
@@ -1159,11 +1129,7 @@ export function DesktopReleases({ workspaceId, desktopAppId }: Props) {
           <div className='min-w-0 flex-1'>
             <h2 className='font-semibold text-red-900'>Releases could not be loaded</h2>
             <p className='mt-1 text-sm text-red-700'>{error}</p>
-            <button
-              type='button'
-              onClick={() => void load()}
-              className='mt-4 inline-flex items-center gap-2 rounded-lg border border-red-300 bg-white px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-100'
-            >
+            <button type='button' onClick={() => void load()} className='mt-4 inline-flex items-center gap-2 rounded-lg border border-red-300 bg-white px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-100'>
               <RefreshCw className='h-4 w-4' />
               Retry
             </button>
@@ -1213,13 +1179,7 @@ export function DesktopReleases({ workspaceId, desktopAppId }: Props) {
           <div className='grid gap-4 lg:grid-cols-2'>
             <label className='space-y-1.5 text-sm font-medium text-slate-700'>
               <span>Successful build</span>
-              <select
-                aria-label='Successful build'
-                value={buildId}
-                onChange={(event) => setBuildId(event.target.value)}
-                required
-                className='h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm'
-              >
+              <select aria-label='Successful build' value={buildId} onChange={(event) => setBuildId(event.target.value)} required className='h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm'>
                 <option value=''>Select build</option>
                 {availableBuilds.map((build) => (
                   <option key={build.id} value={build.id}>
@@ -1304,11 +1264,7 @@ export function DesktopReleases({ workspaceId, desktopAppId }: Props) {
               {submitting ? 'Creating...' : 'Create Desktop Release'}
             </button>
 
-            <button
-              type='button'
-              onClick={() => setShowCreateForm(false)}
-              className='rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50'
-            >
+            <button type='button' onClick={() => setShowCreateForm(false)} className='rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50'>
               Cancel
             </button>
           </div>
@@ -1397,9 +1353,7 @@ export function DesktopReleases({ workspaceId, desktopAppId }: Props) {
         <div className='rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center'>
           <Rocket className='mx-auto h-8 w-8 text-slate-400' />
           <h3 className='mt-3 font-semibold text-slate-950'>No desktop releases yet</h3>
-          <p className='mx-auto mt-1 max-w-xl text-sm text-slate-600'>
-            Create a release from a successful desktop build. The release will keep its build, commit, target, and artifact history traceable.
-          </p>
+          <p className='mx-auto mt-1 max-w-xl text-sm text-slate-600'>Create a release from a successful desktop build. The release will keep its build, commit, target, and artifact history traceable.</p>
         </div>
       ) : (
         <div className='space-y-4'>
@@ -1414,13 +1368,9 @@ export function DesktopReleases({ workspaceId, desktopAppId }: Props) {
                     <div className='flex flex-wrap items-center gap-2'>
                       <h3 className='text-lg font-semibold text-slate-950'>{release.version}</h3>
 
-                      <span className='rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700'>
-                        {DESKTOP_RELEASE_CHANNEL_LABELS[release.channel]}
-                      </span>
+                      <span className='rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700'>{DESKTOP_RELEASE_CHANNEL_LABELS[release.channel]}</span>
 
-                      <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${releaseStatusClasses(release.status)}`}>
-                        {DESKTOP_RELEASE_STATUS_LABELS[release.status]}
-                      </span>
+                      <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${releaseStatusClasses(release.status)}`}>{DESKTOP_RELEASE_STATUS_LABELS[release.status]}</span>
                     </div>
 
                     <div className='mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm text-slate-600'>
@@ -1443,13 +1393,7 @@ export function DesktopReleases({ workspaceId, desktopAppId }: Props) {
                           onClick={() => void transition(release, action.status)}
                           className='inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50'
                         >
-                          {action.status === 'ROLLED_BACK' ? (
-                            <RotateCcw className='h-4 w-4' />
-                          ) : action.status === 'PUBLISHED' ? (
-                            <Rocket className='h-4 w-4' />
-                          ) : (
-                            <CheckCircle2 className='h-4 w-4' />
-                          )}
+                          {action.status === 'ROLLED_BACK' ? <RotateCcw className='h-4 w-4' /> : action.status === 'PUBLISHED' ? <Rocket className='h-4 w-4' /> : <CheckCircle2 className='h-4 w-4' />}
                           {busy ? 'Updating...' : action.label}
                         </button>
                       ))}
@@ -1485,13 +1429,7 @@ export function DesktopReleases({ workspaceId, desktopAppId }: Props) {
                             </div>
 
                             {artifact.externalUrl ? (
-                              <a
-                                href={artifact.externalUrl}
-                                target='_blank'
-                                rel='noreferrer'
-                                aria-label={`Open ${artifact.fileName}`}
-                                className='rounded-md p-1.5 text-slate-500 hover:bg-white hover:text-slate-900'
-                              >
+                              <a href={artifact.externalUrl} target='_blank' rel='noreferrer' aria-label={`Open ${artifact.fileName}`} className='rounded-md p-1.5 text-slate-500 hover:bg-white hover:text-slate-900'>
                                 <ExternalLink className='h-4 w-4' />
                               </a>
                             ) : null}
@@ -1539,9 +1477,7 @@ export default function DesktopReleasesPage() {
       <header>
         <p className='text-sm font-medium text-slate-500'>Desktop Application</p>
         <h1 className='mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl'>Releases & Update Channels</h1>
-        <p className='mt-2 max-w-3xl text-sm text-slate-600'>
-          Track versioned desktop releases across Dev, Alpha, Beta, Stable, and LTS channels while preserving the exact build and artifact source.
-        </p>
+        <p className='mt-2 max-w-3xl text-sm text-slate-600'>Track versioned desktop releases across Dev, Alpha, Beta, Stable, and LTS channels while preserving the exact build and artifact source.</p>
       </header>
 
       <DesktopAppSubNav workspaceId={params.workspaceId} desktopAppId={params.desktopAppId} />
@@ -2011,20 +1947,12 @@ describe('Desktop Releases E2E', () => {
 
     await fixture.owner.agent.patch(path).set('Authorization', `Bearer ${fixture.owner.accessToken}`).send({ status: 'READY' }).expect(200);
 
-    const published = await fixture.owner.agent
-      .patch(path)
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
-      .send({ status: 'PUBLISHED' })
-      .expect(200);
+    const published = await fixture.owner.agent.patch(path).set('Authorization', `Bearer ${fixture.owner.accessToken}`).send({ status: 'PUBLISHED' }).expect(200);
 
     expect(published.body.status).toBe('PUBLISHED');
     expect(published.body.releasedAt).not.toBeNull();
 
-    const rolledBack = await fixture.owner.agent
-      .patch(path)
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
-      .send({ status: 'ROLLED_BACK' })
-      .expect(200);
+    const rolledBack = await fixture.owner.agent.patch(path).set('Authorization', `Bearer ${fixture.owner.accessToken}`).send({ status: 'ROLLED_BACK' }).expect(200);
 
     expect(rolledBack.body.status).toBe('ROLLED_BACK');
     expect(rolledBack.body.releasedAt).toBe(published.body.releasedAt);
@@ -2119,10 +2047,7 @@ describe('Desktop Releases E2E', () => {
       },
     });
 
-    const list = await fixture.owner.agent
-      .get(releasePath(fixture.owner.workspaceId, fixture.desktopApp.id))
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
-      .expect(200);
+    const list = await fixture.owner.agent.get(releasePath(fixture.owner.workspaceId, fixture.desktopApp.id)).set('Authorization', `Bearer ${fixture.owner.accessToken}`).expect(200);
 
     expect(list.body.map((item: { id: string }) => item.id)).toEqual([second.body.id, first.body.id]);
   });
@@ -2160,9 +2085,7 @@ describe('Desktop Releases E2E', () => {
   it('rejects release creation for an archived desktop application', async () => {
     const fixture = await createSuccessfulFixture();
 
-    const archiveResponse = await fixture.owner.agent
-      .delete(`${API}/workspaces/${fixture.owner.workspaceId}` + `/desktop-apps/${fixture.desktopApp.id}`)
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`);
+    const archiveResponse = await fixture.owner.agent.delete(`${API}/workspaces/${fixture.owner.workspaceId}` + `/desktop-apps/${fixture.desktopApp.id}`).set('Authorization', `Bearer ${fixture.owner.accessToken}`);
 
     expect([200, 204]).toContain(archiveResponse.status);
 

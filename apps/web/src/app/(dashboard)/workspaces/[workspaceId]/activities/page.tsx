@@ -9,7 +9,6 @@ export default function WorkspaceActivityPage() {
   const params = useParams<{
     workspaceId: string;
   }>();
-
   const workspaceId = params.workspaceId;
 
   return (
@@ -35,12 +34,7 @@ export default function WorkspaceActivityPage() {
         </div>
       </header>
 
-      <ActivityFeed
-        workspaceId={workspaceId}
-        showApplication
-        title='Workspace activity'
-        description='Application, technology and link changes across this workspace.'
-      />
+      <ActivityFeed workspaceId={workspaceId} showApplication title='Workspace activity' description='Application, technology and link changes across this workspace.' />
     </div>
   );
 }

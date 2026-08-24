@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  connectDesktopTelemetry,
-  disconnectDesktopTelemetry,
-  listDesktopTelemetryIntegrations,
-  previewDesktopTelemetry,
-  syncDesktopTelemetry,
-} from './desktop-apps-api';
+import { connectDesktopTelemetry, disconnectDesktopTelemetry, listDesktopTelemetryIntegrations, previewDesktopTelemetry, syncDesktopTelemetry } from './desktop-apps-api';
 import { getErrorMessage } from '@/features/lib/api/api-error';
 import type { DesktopTelemetryIntegration, DesktopTelemetryProvider, DesktopTelemetrySnapshot } from '@command-center/shared-types';
 import { Activity, CheckCircle2, Loader2, RefreshCw, Trash2 } from 'lucide-react';
@@ -38,7 +32,6 @@ export function DesktopTelemetrySettings({ workspaceId, desktopAppId }: Props) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const load = useCallback(async () => {
     try {
       setIntegrations(await listDesktopTelemetryIntegrations(workspaceId, desktopAppId));
@@ -134,9 +127,7 @@ export function DesktopTelemetrySettings({ workspaceId, desktopAppId }: Props) {
 
           <div>
             <h2 className='text-lg font-semibold text-slate-950'>Runtime Monitoring</h2>
-            <p className='mt-1 text-sm leading-6 text-slate-500'>
-              Connect a provider through the normalized telemetry adapter. Provider tokens are encrypted by the API and never returned to the browser.
-            </p>
+            <p className='mt-1 text-sm leading-6 text-slate-500'>Connect a provider through the normalized telemetry adapter. Provider tokens are encrypted by the API and never returned to the browser.</p>
           </div>
         </div>
 
@@ -205,11 +196,7 @@ export function DesktopTelemetrySettings({ workspaceId, desktopAppId }: Props) {
           </label>
 
           <div className='md:col-span-2 flex justify-end'>
-            <button
-              type='submit'
-              disabled={saving}
-              className='inline-flex h-10 items-center gap-2 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white disabled:opacity-50'
-            >
+            <button type='submit' disabled={saving} className='inline-flex h-10 items-center gap-2 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white disabled:opacity-50'>
               {saving ? <Loader2 className='size-4 animate-spin' /> : null}
               Connect Provider
             </button>
@@ -247,9 +234,7 @@ export function DesktopTelemetrySettings({ workspaceId, desktopAppId }: Props) {
                     </div>
                     <p className='mt-2 text-sm text-slate-500'>Project: {integration.externalProjectId}</p>
                     <p className='mt-1 text-sm text-slate-500'>Secret: {integration.hasSecret ? 'Configured' : 'Removed'}</p>
-                    <p className='mt-1 text-sm text-slate-500'>
-                      Last sync: {integration.lastSyncedAt ? new Date(integration.lastSyncedAt).toLocaleString() : 'Never'}
-                    </p>
+                    <p className='mt-1 text-sm text-slate-500'>Last sync: {integration.lastSyncedAt ? new Date(integration.lastSyncedAt).toLocaleString() : 'Never'}</p>
                     {integration.lastError ? <p className='mt-2 text-sm text-red-600'>{integration.lastError}</p> : null}
                   </div>
 

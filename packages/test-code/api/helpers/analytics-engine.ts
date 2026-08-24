@@ -50,20 +50,13 @@ export async function getAnonymousAnalyticsEngineStatus(app: INestApplication, w
   return request(app.getHttpServer() as Server).get(analyticsEngineRoutes.status(workspaceId, websiteId));
 }
 
-export async function processAnalytics(
-  actor: WorkspaceTestUser,
-  workspaceId: string,
-  websiteId: string,
-  body: Record<string, unknown> = {},
-): Promise<Response> {
+export async function processAnalytics(actor: WorkspaceTestUser, workspaceId: string, websiteId: string, body: Record<string, unknown> = {}): Promise<Response> {
   return actor.agent.post(analyticsEngineRoutes.process(workspaceId, websiteId)).set(withBearer(actor.accessToken)).send(body);
 }
 
 export function readAnalyticsEngineStatus(response: Response): AnalyticsEngineStatusBody {
   const body = asRecord(response.body);
-
   const website = asRecord(body?.website);
-
   const countsRecord = asRecord(body?.counts);
 
   if (!body || !website || !countsRecord) {
@@ -78,9 +71,7 @@ export function readAnalyticsEngineStatus(response: Response): AnalyticsEngineSt
     }
   }
 
-  const recentSessions = Array.isArray(body.recentSessions)
-    ? body.recentSessions.map(asRecord).filter((value): value is Record<string, unknown> => value !== undefined)
-    : [];
+  const recentSessions = Array.isArray(body.recentSessions) ? body.recentSessions.map(asRecord).filter((value): value is Record<string, unknown> => value !== undefined) : [];
 
   return {
     website,
@@ -103,21 +94,11 @@ export interface AnalyticsAggregateListBody {
   data: Record<string, unknown>[];
 }
 
-export async function listAnalyticsAggregates(
-  actor: WorkspaceTestUser,
-  workspaceId: string,
-  websiteId: string,
-  query: Record<string, string | number> = {},
-): Promise<Response> {
+export async function listAnalyticsAggregates(actor: WorkspaceTestUser, workspaceId: string, websiteId: string, query: Record<string, string | number> = {}): Promise<Response> {
   return actor.agent.get(analyticsEngineRoutes.aggregates(workspaceId, websiteId)).set(withBearer(actor.accessToken)).query(query);
 }
 
-export async function getAnonymousAnalyticsAggregates(
-  app: INestApplication,
-  workspaceId: string,
-  websiteId: string,
-  query: Record<string, string | number> = {},
-): Promise<Response> {
+export async function getAnonymousAnalyticsAggregates(app: INestApplication, workspaceId: string, websiteId: string, query: Record<string, string | number> = {}): Promise<Response> {
   return request(app.getHttpServer() as Server)
     .get(analyticsEngineRoutes.aggregates(workspaceId, websiteId))
     .query(query);
@@ -137,7 +118,6 @@ export async function runAnonymousAnalyticsRetention(app: INestApplication, work
 
 export function readAnalyticsAggregateList(response: Response): AnalyticsAggregateListBody {
   const body = asRecord(response.body);
-
   const data = Array.isArray(body?.data) ? body.data.map(asRecord).filter((item): item is Record<string, unknown> => item !== undefined) : [];
 
   if (!body || typeof body.period !== 'string' || typeof body.dimension !== 'string') {
@@ -174,11 +154,8 @@ export interface RawAnalyticsEventOverrides {
 
 export async function createRawAnalyticsEvent(prisma: PrismaService, trackedWebsite: TrackedWebsite, overrides: Partial<RawAnalyticsEventOverrides> = {}) {
   const pageUrl = overrides.pageUrl ?? `${trackedWebsite.origin}/dashboard`;
-
   const parsedUrl = new URL(pageUrl);
-
   const type = overrides.type ?? RawAnalyticsEventType.PAGE_VIEW;
-
   const eventName = overrides.eventName !== undefined ? overrides.eventName : type === RawAnalyticsEventType.CUSTOM ? 'custom_event' : null;
 
   return prisma.rawAnalyticsEvent.create({

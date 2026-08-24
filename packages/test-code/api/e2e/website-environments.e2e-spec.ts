@@ -27,7 +27,6 @@ import { PrismaService } from 'src/database/prisma.service';
 
 describe('Website Operational State E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
 
   beforeEach(async () => {
@@ -44,7 +43,6 @@ describe('Website Operational State E2E', () => {
 
   it('disables and enables a website', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createWebsite(owner);
 
     expectWebsiteSuccess(await disableWebsite(owner, website.id));
@@ -62,7 +60,6 @@ describe('Website Operational State E2E', () => {
 
   it('archives and restores a website', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createWebsite(owner);
 
     expectWebsiteSuccess(await archiveWebsite(owner, website.id));
@@ -88,9 +85,7 @@ describe('Website Operational State E2E', () => {
 
   it('rejects regular mutations while archived', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const website = await createWebsite(owner);
 
     expectWebsiteSuccess(await archiveWebsite(owner, website.id));
@@ -108,15 +103,12 @@ describe('Website Operational State E2E', () => {
 
   it('rotates the tracking key and returns a new raw key', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createWebsite(owner);
-
     const firstResponse = await rotateWebsiteKey(owner, website.id);
 
     expectWebsiteSuccess(firstResponse);
 
     const firstKey = readTrackingKey(firstResponse);
-
     const secondResponse = await rotateWebsiteKey(owner, website.id);
 
     expectWebsiteSuccess(secondResponse);
@@ -132,9 +124,7 @@ describe('Website Operational State E2E', () => {
 
   it('connects and disconnects a website from an application', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const website = await createWebsite(owner);
 
     expectWebsiteSuccess(await connectWebsite(owner, website.id, application.id));
@@ -169,11 +159,8 @@ describe('Website Operational State E2E', () => {
 
   it('rejects connection to a foreign or invalid application', async () => {
     const alphaOwner = await registerWorkspaceTestUser(app, prisma);
-
     const betaOwner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createWebsite(alphaOwner);
-
     const betaApplication = await createApplication(betaOwner);
 
     expectBusinessRuleRejected(await connectWebsite(alphaOwner, website.id, betaApplication.id));

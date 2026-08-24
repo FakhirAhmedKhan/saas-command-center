@@ -1,15 +1,15 @@
-import { AppModule } from 'src/app.module';
 import { createAgent, createTestUser, registerUser, withBearer } from '../helpers/auth';
 import { resetDatabase } from '../helpers/database';
 import { readAccessToken } from '../helpers/response';
-import { PrismaService } from 'src/database/prisma.service';
-import { WorkspaceRole } from 'src/generated/prisma/enums';
-import { GithubAppService } from 'src/modules/repositories/services/github-app.service';
-import { GithubCodeService } from 'src/modules/repositories/services/github-code.service';
 import { ValidationPipe, type INestApplication } from '@nestjs/common';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import cookieParser from 'cookie-parser';
+import { AppModule } from 'src/app.module';
+import { PrismaService } from 'src/database/prisma.service';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
+import { GithubAppService } from 'src/modules/repositories/services/github-app.service';
+import { GithubCodeService } from 'src/modules/repositories/services/github-code.service';
 import request, { type Response } from 'supertest';
 
 const API_PREFIX = '/api/v1';
@@ -45,7 +45,6 @@ const DEFAULT_GITHUB_FIXTURE: GithubFixture = {
   name: 'saas-command-center',
   fullName: 'phase20-org/saas-command-center',
 };
-
 const githubAppMock = {
   buildInstallationUrl: jest.fn((state: string): string => {
     return `https://github.test/apps/command-center/installations/new?state=${encodeURIComponent(state)}`;
@@ -98,7 +97,6 @@ const githubAppMock = {
     return 'ghs_phase20_test_installation_token';
   }),
 };
-
 const githubCodeMock = {
   listBranches: jest.fn(async (_installationId: string, _owner: string, _repository: string) => {
     return [
@@ -304,7 +302,6 @@ async function createPhase20TestApp(): Promise<INestApplication> {
     .overrideProvider(GithubCodeService)
     .useValue(githubCodeMock)
     .compile();
-
   const app = testingModule.createNestApplication<NestExpressApplication>();
   const expressInstance = app.getHttpAdapter().getInstance();
   expressInstance.set('trust proxy', 1);
@@ -331,7 +328,6 @@ async function registerIdentity(app: INestApplication, prisma: PrismaService, la
     name: `${label} User`,
     workspaceName: `${label} Workspace`,
   });
-
   const response = await registerUser(createAgent(app), userInput);
   expect(response.status).toBe(201);
 
@@ -386,13 +382,7 @@ async function addWorkspaceRole(prisma: PrismaService, workspaceId: string, iden
   });
 }
 
-async function connectRepository(
-  app: INestApplication,
-  prisma: PrismaService,
-  identity: Identity,
-  workspaceId: string,
-  fixture: GithubFixture = DEFAULT_GITHUB_FIXTURE,
-): Promise<string> {
+async function connectRepository(app: INestApplication, prisma: PrismaService, identity: Identity, workspaceId: string, fixture: GithubFixture = DEFAULT_GITHUB_FIXTURE): Promise<string> {
   configureGithubFixture(fixture);
 
   const beginResponse = await request(app.getHttpServer())
@@ -402,7 +392,6 @@ async function connectRepository(
   expect(beginResponse.status).toBe(201);
 
   const installationState = queryParameter(requireString(responseRecord(beginResponse), 'installationUrl'), 'state');
-
   const setupResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/setup`).set(withBearer(identity.token)).send({
     installState: installationState,
     installationId: fixture.installationId,
@@ -411,7 +400,6 @@ async function connectRepository(
   expect(setupResponse.status).toBe(201);
 
   const oauthState = queryParameter(requireString(responseRecord(setupResponse), 'authorizationUrl'), 'state');
-
   const callbackResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/callback`).set(withBearer(identity.token)).send({
     code: 'phase20-oauth-code',
     state: oauthState,
@@ -488,21 +476,19 @@ describe('Phase 20 - Code Explorer E2E', () => {
       ],
     });
 
-    githubCodeMock.getFile.mockImplementation(
-      async (_installationId: string, _owner: string, _repository: string, path: string, ref: string): Promise<GithubFileMock | null> => {
-        const text = `// ${ref}\nexport const filePath = '${path}';\n`;
+    githubCodeMock.getFile.mockImplementation(async (_installationId: string, _owner: string, _repository: string, path: string, ref: string): Promise<GithubFileMock | null> => {
+      const text = `// ${ref}\nexport const filePath = '${path}';\n`;
 
-        return {
-          name: path.split('/').at(-1) ?? path,
-          path,
-          sha: `sha-${ref}-${path.replaceAll('/', '-')}`,
-          size: Buffer.byteLength(text, 'utf8'),
-          encoding: 'base64',
-          content: Buffer.from(text, 'utf8').toString('base64'),
-          type: 'file',
-        };
-      },
-    );
+      return {
+        name: path.split('/').at(-1) ?? path,
+        path,
+        sha: `sha-${ref}-${path.replaceAll('/', '-')}`,
+        size: Buffer.byteLength(text, 'utf8'),
+        encoding: 'base64',
+        content: Buffer.from(text, 'utf8').toString('base64'),
+        type: 'file',
+      };
+    });
 
     await resetDatabase(prisma);
   });
@@ -515,7 +501,6 @@ describe('Phase 20 - Code Explorer E2E', () => {
     it('rejects anonymous code access', async () => {
       const owner = await registerIdentity(app, prisma, 'Anonymous Code Owner');
       const repositoryId = await connectRepository(app, prisma, owner, owner.workspaceId);
-
       const response = await request(app.getHttpServer()).get(`${codeRoute(owner.workspaceId, repositoryId)}/branches`);
 
       expect(response.status).toBe(401);
@@ -525,7 +510,6 @@ describe('Phase 20 - Code Explorer E2E', () => {
       const owner = await registerIdentity(app, prisma, 'Code Workspace Owner');
       const outsider = await registerIdentity(app, prisma, 'Code Outsider');
       const repositoryId = await connectRepository(app, prisma, owner, owner.workspaceId);
-
       const response = await request(app.getHttpServer())
         .get(`${codeRoute(owner.workspaceId, repositoryId)}/branches`)
         .set(withBearer(outsider.token));
@@ -544,7 +528,6 @@ describe('Phase 20 - Code Explorer E2E', () => {
         fullName: 'phase20-org-b/private-b',
       };
       const repositoryB = await connectRepository(app, prisma, ownerB, ownerB.workspaceId, fixtureB);
-
       const response = await request(app.getHttpServer())
         .get(`${codeRoute(ownerA.workspaceId, repositoryB)}/branches`)
         .set(withBearer(ownerA.token));
@@ -557,7 +540,6 @@ describe('Phase 20 - Code Explorer E2E', () => {
       const viewer = await registerIdentity(app, prisma, 'Viewer Code User');
       await addWorkspaceRole(prisma, owner.workspaceId, viewer, WorkspaceRole.VIEWER);
       const repositoryId = await connectRepository(app, prisma, owner, owner.workspaceId);
-
       const response = await request(app.getHttpServer())
         .get(`${codeRoute(owner.workspaceId, repositoryId)}/branches`)
         .set(withBearer(viewer.token));
@@ -567,7 +549,6 @@ describe('Phase 20 - Code Explorer E2E', () => {
 
     it('rejects a malformed repository UUID', async () => {
       const owner = await registerIdentity(app, prisma, 'Malformed Repository Owner');
-
       const response = await request(app.getHttpServer())
         .get(`${codeRoute(owner.workspaceId, 'not-a-uuid')}/branches`)
         .set(withBearer(owner.token));
@@ -580,7 +561,6 @@ describe('Phase 20 - Code Explorer E2E', () => {
     it('returns repository branches', async () => {
       const owner = await registerIdentity(app, prisma, 'Branches Owner');
       const repositoryId = await connectRepository(app, prisma, owner, owner.workspaceId);
-
       const response = await request(app.getHttpServer())
         .get(`${codeRoute(owner.workspaceId, repositoryId)}/branches`)
         .set(withBearer(owner.token));
@@ -590,17 +570,12 @@ describe('Phase 20 - Code Explorer E2E', () => {
       expect(branches).toHaveLength(2);
       expect(JSON.stringify(branches)).toContain('main');
       expect(JSON.stringify(branches)).toContain('develop');
-      expect(githubCodeMock.listBranches).toHaveBeenCalledWith(
-        DEFAULT_GITHUB_FIXTURE.installationId,
-        DEFAULT_GITHUB_FIXTURE.owner,
-        DEFAULT_GITHUB_FIXTURE.name,
-      );
+      expect(githubCodeMock.listBranches).toHaveBeenCalledWith(DEFAULT_GITHUB_FIXTURE.installationId, DEFAULT_GITHUB_FIXTURE.owner, DEFAULT_GITHUB_FIXTURE.name);
     });
 
     it('loads the recursive tree using the repository default branch', async () => {
       const owner = await registerIdentity(app, prisma, 'Default Tree Owner');
       const repositoryId = await connectRepository(app, prisma, owner, owner.workspaceId);
-
       const response = await request(app.getHttpServer())
         .get(`${codeRoute(owner.workspaceId, repositoryId)}/tree`)
         .set(withBearer(owner.token));
@@ -610,18 +585,12 @@ describe('Phase 20 - Code Explorer E2E', () => {
       expect(text).toContain('README.md');
       expect(text).toContain('src');
       expect(text).toContain('src/index.ts');
-      expect(githubCodeMock.getTree).toHaveBeenCalledWith(
-        DEFAULT_GITHUB_FIXTURE.installationId,
-        DEFAULT_GITHUB_FIXTURE.owner,
-        DEFAULT_GITHUB_FIXTURE.name,
-        'main',
-      );
+      expect(githubCodeMock.getTree).toHaveBeenCalledWith(DEFAULT_GITHUB_FIXTURE.installationId, DEFAULT_GITHUB_FIXTURE.owner, DEFAULT_GITHUB_FIXTURE.name, 'main');
     });
 
     it('forwards an explicit branch to GitHub', async () => {
       const owner = await registerIdentity(app, prisma, 'Explicit Branch Owner');
       const repositoryId = await connectRepository(app, prisma, owner, owner.workspaceId);
-
       const response = await request(app.getHttpServer())
         .get(`${codeRoute(owner.workspaceId, repositoryId)}/tree`)
         .query({
@@ -630,12 +599,7 @@ describe('Phase 20 - Code Explorer E2E', () => {
         .set(withBearer(owner.token));
 
       expect(response.status).toBe(200);
-      expect(githubCodeMock.getTree).toHaveBeenCalledWith(
-        DEFAULT_GITHUB_FIXTURE.installationId,
-        DEFAULT_GITHUB_FIXTURE.owner,
-        DEFAULT_GITHUB_FIXTURE.name,
-        'develop',
-      );
+      expect(githubCodeMock.getTree).toHaveBeenCalledWith(DEFAULT_GITHUB_FIXTURE.installationId, DEFAULT_GITHUB_FIXTURE.owner, DEFAULT_GITHUB_FIXTURE.name, 'develop');
     });
 
     it('preserves GitHub truncated-tree state', async () => {
@@ -659,7 +623,6 @@ describe('Phase 20 - Code Explorer E2E', () => {
     it('rejects a blank branch after normalization', async () => {
       const owner = await registerIdentity(app, prisma, 'Blank Branch Owner');
       const repositoryId = await connectRepository(app, prisma, owner, owner.workspaceId);
-
       const response = await request(app.getHttpServer())
         .get(`${codeRoute(owner.workspaceId, repositoryId)}/tree`)
         .query({
@@ -729,7 +692,6 @@ describe('Phase 20 - Code Explorer E2E', () => {
     it('rejects a blank search query', async () => {
       const owner = await registerIdentity(app, prisma, 'Blank Search Owner');
       const repositoryId = await connectRepository(app, prisma, owner, owner.workspaceId);
-
       const response = await request(app.getHttpServer())
         .get(`${codeRoute(owner.workspaceId, repositoryId)}/search`)
         .query({
@@ -866,7 +828,6 @@ describe('Phase 20 - Code Explorer E2E', () => {
     it('rejects parent-directory traversal', async () => {
       const owner = await registerIdentity(app, prisma, 'Traversal Owner');
       const repositoryId = await connectRepository(app, prisma, owner, owner.workspaceId);
-
       const response = await request(app.getHttpServer())
         .get(`${codeRoute(owner.workspaceId, repositoryId)}/file`)
         .query({
@@ -881,7 +842,6 @@ describe('Phase 20 - Code Explorer E2E', () => {
     it('rejects absolute repository paths', async () => {
       const owner = await registerIdentity(app, prisma, 'Absolute Path Owner');
       const repositoryId = await connectRepository(app, prisma, owner, owner.workspaceId);
-
       const response = await request(app.getHttpServer())
         .get(`${codeRoute(owner.workspaceId, repositoryId)}/file`)
         .query({
@@ -896,7 +856,6 @@ describe('Phase 20 - Code Explorer E2E', () => {
     it('uses repository owner and name from the database instead of client input', async () => {
       const owner = await registerIdentity(app, prisma, 'Scoped Repository Owner');
       const repositoryId = await connectRepository(app, prisma, owner, owner.workspaceId);
-
       const response = await request(app.getHttpServer())
         .get(`${codeRoute(owner.workspaceId, repositoryId)}/file`)
         .query({
@@ -920,13 +879,7 @@ describe('Phase 20 - Code Explorer E2E', () => {
         .set(withBearer(owner.token));
 
       expect(validResponse.status).toBe(200);
-      expect(githubCodeMock.getFile).toHaveBeenCalledWith(
-        DEFAULT_GITHUB_FIXTURE.installationId,
-        DEFAULT_GITHUB_FIXTURE.owner,
-        DEFAULT_GITHUB_FIXTURE.name,
-        'src/index.ts',
-        'main',
-      );
+      expect(githubCodeMock.getFile).toHaveBeenCalledWith(DEFAULT_GITHUB_FIXTURE.installationId, DEFAULT_GITHUB_FIXTURE.owner, DEFAULT_GITHUB_FIXTURE.name, 'src/index.ts', 'main');
     });
   });
 
@@ -1058,7 +1011,6 @@ describe('Phase 20 - Code Explorer E2E', () => {
     it('rejects traversal paths before making either GitHub file request', async () => {
       const owner = await registerIdentity(app, prisma, 'Diff Traversal Owner');
       const repositoryId = await connectRepository(app, prisma, owner, owner.workspaceId);
-
       const response = await request(app.getHttpServer())
         .get(`${codeRoute(owner.workspaceId, repositoryId)}/diff`)
         .query({

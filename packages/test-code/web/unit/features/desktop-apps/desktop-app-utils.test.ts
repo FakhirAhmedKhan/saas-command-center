@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest';
-
-import { DESKTOP_ARCHITECTURE_LABELS, DESKTOP_FRAMEWORK_LABELS, DESKTOP_PLATFORM_LABELS } from '@/features/desktop-apps/desktop-app.constants';
-
 import { getDesktopFrameworksForPlatform, getDesktopPrimaryIdentifier, isDesktopFrameworkAllowed } from '@/features/desktop-apps/desktop-app-utils';
+import { DESKTOP_ARCHITECTURE_LABELS, DESKTOP_FRAMEWORK_LABELS, DESKTOP_PLATFORM_LABELS } from '@/features/desktop-apps/desktop-app.constants';
 
 describe('desktop app foundation', () => {
   it('provides readable platform labels', () => {
@@ -50,9 +48,7 @@ describe('desktop app foundation', () => {
   });
 
   it('returns package name as the primary identifier', () => {
-    expect(getDesktopPrimaryIdentifier({ packageName: 'com.commandcenter.desktop' } as Parameters<typeof getDesktopPrimaryIdentifier>[0])).toBe(
-      'com.commandcenter.desktop',
-    );
+    expect(getDesktopPrimaryIdentifier({ packageName: 'com.commandcenter.desktop' } as Parameters<typeof getDesktopPrimaryIdentifier>[0])).toBe('com.commandcenter.desktop');
   });
 
   it('returns application slug when package name is missing', () => {

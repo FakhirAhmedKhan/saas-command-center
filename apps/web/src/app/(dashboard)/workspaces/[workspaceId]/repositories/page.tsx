@@ -9,7 +9,6 @@ type RouteParameters = Record<string, string | string[]> & {
 
 export default function RepositoriesPage() {
   const params = useParams<RouteParameters>();
-
   const workspaceId = params.workspaceId;
 
   return <RepositoriesDashboard workspaceId={workspaceId} />;

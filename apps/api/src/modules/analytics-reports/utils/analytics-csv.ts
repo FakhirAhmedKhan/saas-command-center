@@ -28,7 +28,6 @@ function escapeCsvValue(value: CsvValue): string {
 
 export function createCsv<T>(columns: CsvColumn<T>[], rows: T[]): string {
   const header = columns.map((column) => escapeCsvValue(column.header)).join(',');
-
   const content = rows.map((row) => columns.map((column) => escapeCsvValue(column.value(row))).join(','));
 
   return ['\uFEFF' + header, ...content].join('\r\n');

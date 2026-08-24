@@ -1,10 +1,4 @@
-import type {
-  RepositoryBranchesResponse,
-  RepositoryCodeFile,
-  RepositoryDiffResponse,
-  RepositorySearchResponse,
-  RepositoryTreeResponse,
-} from './code-explorer.types';
+import type { RepositoryBranchesResponse, RepositoryCodeFile, RepositoryDiffResponse, RepositorySearchResponse, RepositoryTreeResponse } from './code-explorer.types';
 import { apiRequest } from '@/features/lib/api/api-client';
 
 function codeBase(workspaceId: string, repositoryId: string): string {

@@ -18,9 +18,7 @@ interface RefreshPayload {
 }
 
 let accessToken: string | null = null;
-
 let refreshPromise: Promise<RefreshPayload | null> | null = null;
-
 let unauthorizedHandler: (() => void) | null = null;
 
 export function setAccessToken(token: string | null): void {
@@ -41,7 +39,6 @@ function buildUrl(path: string): string {
   }
 
   const normalizedBaseUrl = API_URL.replace(/\/+$/, '');
-
   const normalizedPath = path.replace(/^\/+/, '');
 
   return `${normalizedBaseUrl}/${normalizedPath}`;
@@ -193,7 +190,6 @@ export async function refreshSession<T extends RefreshPayload>(): Promise<T | nu
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { body, skipAuthentication, skipRefresh, ...requestInit } = options;
-
   const execute = (): Promise<Response> =>
     fetch(buildUrl(path), {
       ...requestInit,
@@ -208,7 +204,6 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 
       credentials: 'include',
     });
-
   let response = await execute();
 
   if (response.status === 401 && !skipAuthentication && !skipRefresh && path !== '/auth/refresh') {
@@ -230,7 +225,6 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 
 function getDownloadFilename(response: Response, fallback: string): string {
   const disposition = response.headers.get('content-disposition');
-
   const match = disposition?.match(/filename="?([^"]+)"?/i);
 
   return match?.[1] ?? fallback;
@@ -271,9 +265,7 @@ export async function apiDownload(path: string, fallbackFilename: string): Promi
   }
 
   const blob = await response.blob();
-
   const filename = getDownloadFilename(response, fallbackFilename);
-
   const objectUrl = URL.createObjectURL(blob);
 
   try {

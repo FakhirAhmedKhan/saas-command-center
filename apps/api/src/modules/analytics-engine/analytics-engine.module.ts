@@ -25,14 +25,6 @@ import { WorkspaceMembersModule } from 'src/modules/workspace/modules/workspace-
     AnalyticsAggregationService,
   ],
 
-  exports: [
-    AnalyticsEngineQueryService,
-    AnalyticsProcessingService,
-    RawEventProcessingService,
-    VisitorRebuilderService,
-    SessionRebuilderService,
-    PageViewRebuilderService,
-    AnalyticsAggregationService,
-  ],
+  exports: [AnalyticsEngineQueryService, AnalyticsProcessingService, RawEventProcessingService, VisitorRebuilderService, SessionRebuilderService, PageViewRebuilderService, AnalyticsAggregationService],
 })
 export class AnalyticsEngineModule {}

@@ -1,14 +1,7 @@
-import { GithubAppService } from 'src/modules/repositories/services/github-app.service';
 import { generateKeyPairSync } from 'node:crypto';
+import { GithubAppService } from 'src/modules/repositories/services/github-app.service';
 
-const GITHUB_ENV_KEYS = [
-  'GITHUB_APP_SLUG',
-  'GITHUB_APP_CLIENT_ID',
-  'GITHUB_APP_CLIENT_SECRET',
-  'GITHUB_APP_CALLBACK_URL',
-  'GITHUB_APP_WEBHOOK_SECRET',
-  'GITHUB_APP_PRIVATE_KEY_BASE64',
-] as const;
+const GITHUB_ENV_KEYS = ['GITHUB_APP_SLUG', 'GITHUB_APP_CLIENT_ID', 'GITHUB_APP_CLIENT_SECRET', 'GITHUB_APP_CALLBACK_URL', 'GITHUB_APP_WEBHOOK_SECRET', 'GITHUB_APP_PRIVATE_KEY_BASE64'] as const;
 
 function validPrivateKeyBase64(): string {
   const { privateKey } = generateKeyPairSync('rsa', {
@@ -29,9 +22,7 @@ function validPrivateKeyBase64(): string {
 
 describe(GithubAppService.name, () => {
   const originalEnv: Record<string, string | undefined> = {};
-
   let service: GithubAppService;
-
   let fetchMock: jest.Mock;
 
   beforeEach(() => {
@@ -68,9 +59,7 @@ describe(GithubAppService.name, () => {
     it('throws a clear ServiceUnavailableException when GITHUB_APP_CLIENT_ID is missing', () => {
       process.env.GITHUB_APP_CALLBACK_URL = 'http://localhost:3000/github/callback';
 
-      expect(() => service.buildUserAuthorizationUrl('state-1', 'challenge-1')).toThrow(
-        'GitHub integration is not configured: GITHUB_APP_CLIENT_ID is missing.',
-      );
+      expect(() => service.buildUserAuthorizationUrl('state-1', 'challenge-1')).toThrow('GitHub integration is not configured: GITHUB_APP_CLIENT_ID is missing.');
     });
 
     it('throws before making any network call', async () => {
@@ -107,7 +96,6 @@ describe(GithubAppService.name, () => {
 
     it('always builds an https://github.com authorization URL', () => {
       const authorizationUrl = service.buildUserAuthorizationUrl('state-1', 'challenge-1');
-
       const parsed = new URL(authorizationUrl);
 
       expect(parsed.protocol).toBe('https:');
@@ -117,7 +105,6 @@ describe(GithubAppService.name, () => {
 
     it('includes the PKCE challenge and state as query parameters', () => {
       const authorizationUrl = service.buildUserAuthorizationUrl('state-1', 'challenge-1');
-
       const parsed = new URL(authorizationUrl);
 
       expect(parsed.searchParams.get('state')).toBe('state-1');
@@ -129,7 +116,6 @@ describe(GithubAppService.name, () => {
       process.env.GITHUB_APP_SLUG = 'command-center-dev';
 
       const installationUrl = service.buildInstallationUrl('state-1');
-
       const parsed = new URL(installationUrl);
 
       expect(parsed.protocol).toBe('https:');

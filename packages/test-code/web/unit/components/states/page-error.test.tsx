@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { PageError } from '@/components/states/page-error';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { PageError } from '@/components/states/page-error';
 
 describe('PageError', () => {
   it('renders only the safe, caller-supplied message text — never a raw error object', () => {
@@ -51,7 +51,6 @@ describe('PageError', () => {
   it('renders a retry button only when onRetry is supplied, and invokes it on click', async () => {
     const user = userEvent.setup();
     const onRetry = vi.fn();
-
     const { rerender } = render(<PageError message='Failed.' />);
 
     expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument();

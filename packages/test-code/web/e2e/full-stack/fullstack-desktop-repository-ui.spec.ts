@@ -45,7 +45,6 @@ test.describe('Desktop repository frontend', () => {
     await loginThroughUi(page, state.owner);
 
     const desktopApp = await createDesktopApplication(request);
-
     const repositoryA = {
       id: '11111111-1111-4111-8111-111111111111',
 
@@ -97,7 +96,6 @@ test.describe('Desktop repository frontend', () => {
         lastSyncedAt: null,
       },
     };
-
     const repositoryB = {
       ...repositoryA,
 
@@ -113,11 +111,8 @@ test.describe('Desktop repository frontend', () => {
 
       htmlUrl: 'https://github.com/command-center/desktop-tauri',
     };
-
     let linkedRepository: typeof repositoryA | typeof repositoryB | null = null;
-
     const repositoriesPath = `/api/v1/workspaces/${state.owner.workspaceId}/repositories`;
-
     const desktopRepositoryPath = `/api/v1/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktopApp.id}` + '/repository';
 
     await page.route(`**${repositoriesPath}`, async (route) => {
@@ -159,7 +154,6 @@ test.describe('Desktop repository frontend', () => {
         const body = route.request().postDataJSON() as {
           repositoryId: string;
         };
-
         const selected = [repositoryA, repositoryB].find((repository) => repository.id === body.repositoryId);
 
         if (!selected) {

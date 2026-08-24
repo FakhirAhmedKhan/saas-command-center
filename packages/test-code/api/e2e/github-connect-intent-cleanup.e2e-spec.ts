@@ -1,8 +1,8 @@
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
-import { createHash, randomBytes } from 'node:crypto';
 import type { INestApplication } from '@nestjs/common';
+import { createHash, randomBytes } from 'node:crypto';
 import { PrismaService } from 'src/database/prisma.service';
 import { GithubConnectIntentCleanupService } from 'src/modules/repositories/services/github-connect-intent-cleanup.service';
 
@@ -16,9 +16,7 @@ function secret(): string {
 
 describe('GitHub Connect Intent Cleanup (BE-06)', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
-
   let cleanupService: GithubConnectIntentCleanupService;
 
   beforeAll(async () => {
@@ -39,7 +37,6 @@ describe('GitHub Connect Intent Cleanup (BE-06)', () => {
 
   it('removes an expired, never-consumed personal intent', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const intent = await prisma.personalGithubConnectIntent.create({
       data: {
         userId: owner.userId,
@@ -57,7 +54,6 @@ describe('GitHub Connect Intent Cleanup (BE-06)', () => {
 
   it('retains a personal intent that has not expired yet', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const intent = await prisma.personalGithubConnectIntent.create({
       data: {
         userId: owner.userId,
@@ -75,7 +71,6 @@ describe('GitHub Connect Intent Cleanup (BE-06)', () => {
 
   it('retains a consumed personal intent even after its expiry, since it is the durable installation-access record', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const intent = await prisma.personalGithubConnectIntent.create({
       data: {
         userId: owner.userId,
@@ -98,7 +93,6 @@ describe('GitHub Connect Intent Cleanup (BE-06)', () => {
 
   it('removes an expired repository (workspace-scoped) connect intent regardless of consumption state', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const expiredUnconsumed = await prisma.repositoryConnectIntent.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -107,7 +101,6 @@ describe('GitHub Connect Intent Cleanup (BE-06)', () => {
         expiresAt: new Date(Date.now() - 60_000),
       },
     });
-
     const expiredConsumed = await prisma.repositoryConnectIntent.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -117,7 +110,6 @@ describe('GitHub Connect Intent Cleanup (BE-06)', () => {
         consumedAt: new Date(Date.now() - 30_000),
       },
     });
-
     const stillValid = await prisma.repositoryConnectIntent.create({
       data: {
         workspaceId: owner.workspaceId,

@@ -37,14 +37,11 @@ interface BrowserTrackerApi {
 }
 
 let state: FullStackState;
-
 let websiteId = '';
 let trackingKey = '';
 let trackingOrigin = '';
-
 let visitorId = '';
 let sessionId = '';
-
 const trackerScriptUrl = 'http://127.0.0.1:3102/tracker.js';
 
 test.describe.configure({
@@ -146,7 +143,6 @@ test.describe('Real Chrome Tracker SDK E2E', () => {
     test.setTimeout(120_000);
 
     const abortedCollectRequests: string[] = [];
-
     const domain = `${uniqueValue('chrome-tracker', state.runId)}.example.test`;
 
     trackingOrigin = state.webUrl;
@@ -257,9 +253,7 @@ test.describe('Real Chrome Tracker SDK E2E', () => {
     await cdp.send('Network.enable');
 
     const collectRequestIds = new Set<string>();
-
     const rawHeadersByRequestId = new Map<string, Record<string, string>>();
-
     let collectSecFetchMode: string | undefined;
 
     function captureCollectFetchMode(requestId: string): void {
@@ -295,7 +289,6 @@ test.describe('Real Chrome Tracker SDK E2E', () => {
     await installTracker(page);
 
     const initialRequest = await initialRequestPromise;
-
     const initialHeaders = await initialRequest.allHeaders();
     const initialPayload = readPayload(initialRequest);
 
@@ -338,12 +331,9 @@ test.describe('Real Chrome Tracker SDK E2E', () => {
     expect(storedBrowserState).toContain(visitorId);
     expect(storedBrowserState).toContain(sessionId);
 
-    const customRequestPromise = page.waitForRequest(
-      (candidate) => containsEvent(candidate, (event) => event.type === 'CUSTOM' && event.eventName === 'browser_checkout_started'),
-      {
-        timeout: 10_000,
-      },
-    );
+    const customRequestPromise = page.waitForRequest((candidate) => containsEvent(candidate, (event) => event.type === 'CUSTOM' && event.eventName === 'browser_checkout_started'), {
+      timeout: 10_000,
+    });
 
     await page.evaluate(() => {
       const tracker = (
@@ -361,7 +351,6 @@ test.describe('Real Chrome Tracker SDK E2E', () => {
     });
 
     const customRequest = await customRequestPromise;
-
     const customEvent = readPayload(customRequest).events.find((event) => event.type === 'CUSTOM' && event.eventName === 'browser_checkout_started');
 
     expect(customEvent).toBeDefined();
@@ -373,12 +362,9 @@ test.describe('Real Chrome Tracker SDK E2E', () => {
       plan: 'pro',
     });
 
-    const spaPageViewPromise = page.waitForRequest(
-      (candidate) => containsEvent(candidate, (event) => event.type === 'PAGE_VIEW' && event.url.includes('/pricing/compare')),
-      {
-        timeout: 10_000,
-      },
-    );
+    const spaPageViewPromise = page.waitForRequest((candidate) => containsEvent(candidate, (event) => event.type === 'PAGE_VIEW' && event.url.includes('/pricing/compare')), {
+      timeout: 10_000,
+    });
 
     await page.evaluate(() => {
       history.pushState({}, '', '/pricing/compare?z=9&token=hide&utm_campaign=browser#private');
@@ -391,7 +377,6 @@ test.describe('Real Chrome Tracker SDK E2E', () => {
     });
 
     const spaRequest = await spaPageViewPromise;
-
     const spaPageView = readPayload(spaRequest).events.find((event) => event.type === 'PAGE_VIEW' && event.url.includes('/pricing/compare'));
 
     expect(spaPageView).toBeDefined();
@@ -407,9 +392,7 @@ test.describe('Real Chrome Tracker SDK E2E', () => {
     const heartbeatRequestPromise = page.waitForRequest((candidate) => containsEvent(candidate, (event) => event.type === 'HEARTBEAT'), {
       timeout: 22_000,
     });
-
     const heartbeatRequest = await heartbeatRequestPromise;
-
     const heartbeat = readPayload(heartbeatRequest).events.find((event) => event.type === 'HEARTBEAT');
 
     expect(heartbeat).toBeDefined();
@@ -428,7 +411,6 @@ test.describe('Real Chrome Tracker SDK E2E', () => {
     await installTracker(page);
 
     const reloadRequest = await reloadPageViewPromise;
-
     const reloadPageView = readPayload(reloadRequest).events.find((event) => event.type === 'PAGE_VIEW');
 
     expect(reloadPageView).toBeDefined();
@@ -453,7 +435,6 @@ test.describe('Real Chrome Tracker SDK E2E', () => {
       .toBe(5);
 
     const rawEvents = await readRawEvents(websiteId);
-
     const countsByType = rawEvents.reduce<Record<string, number>>((counts, row) => {
       counts[row.type] = (counts[row.type] ?? 0) + 1;
 
@@ -535,18 +516,14 @@ test.describe('Real Chrome Tracker SDK E2E', () => {
     const pendingLabel = page.locator('span', {
       hasText: /^Pending$/,
     });
-
     const pendingValue = pendingLabel.locator('xpath=../following-sibling::p[1]');
-
     const pendingBefore = Number((await pendingValue.textContent())?.trim() ?? '0');
 
     expect(pendingBefore).toBeGreaterThanOrEqual(0);
     expect(pendingBefore).toBeLessThanOrEqual(5);
 
     if (pendingBefore > 0) {
-      const processingResponse = page.waitForResponse(
-        (response) => response.url().endsWith('/analytics-engine/process') && response.request().method() === 'POST',
-      );
+      const processingResponse = page.waitForResponse((response) => response.url().endsWith('/analytics-engine/process') && response.request().method() === 'POST');
 
       await page
         .getByRole('button', {
@@ -576,7 +553,6 @@ test.describe('Real Chrome Tracker SDK E2E', () => {
      * otherwise perturb the 5/3/1/1 baseline of the first test.
      */
     const beaconDomain = `${uniqueValue('chrome-beacon', state.runId)}.example.test`;
-
     const createResponse = await authorizedApiRequest(request, state, state.owner.accessToken, `/workspaces/${state.owner.workspaceId}/websites`, {
       method: 'POST',
       data: {
@@ -615,7 +591,6 @@ test.describe('Real Chrome Tracker SDK E2E', () => {
      */
     await page.evaluate(() => {
       const beaconCalls: string[] = [];
-
       const originalSendBeacon = navigator.sendBeacon.bind(navigator);
 
       (window as typeof window & { __beaconCalls?: string[] }).__beaconCalls = beaconCalls;
@@ -654,7 +629,6 @@ test.describe('Real Chrome Tracker SDK E2E', () => {
       .toBeGreaterThan(0);
 
     const beaconEvents = await readRawEvents(beaconSite.website.id);
-
     const beaconCustom = beaconEvents.find((row) => row.eventName === 'beacon_only_event');
 
     expect(beaconCustom).toBeDefined();
@@ -668,7 +642,6 @@ test.describe('Real Chrome Tracker SDK E2E', () => {
 
   test('rejects an invalid tracking key and a disallowed origin from the real browser', async ({ page, request }) => {
     const negativeDomain = `${uniqueValue('chrome-negative', state.runId)}.example.test`;
-
     const createResponse = await authorizedApiRequest(request, state, state.owner.accessToken, `/workspaces/${state.owner.workspaceId}/websites`, {
       method: 'POST',
       data: {

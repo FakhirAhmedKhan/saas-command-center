@@ -1,13 +1,10 @@
 // @vitest-environment jsdom
-import { MobileProjectDetectionPanel } from '@/features/mobile-apps/mobile-project-detection-panel';
-
-import { detectMobileProject, updateMobileApp } from '@/features/mobile-apps/mobile-apps-api';
 
 import { render, screen, waitFor } from '@testing-library/react';
-
 import userEvent from '@testing-library/user-event';
-
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { detectMobileProject, updateMobileApp } from '@/features/mobile-apps/mobile-apps-api';
+import { MobileProjectDetectionPanel } from '@/features/mobile-apps/mobile-project-detection-panel';
 
 vi.mock('@/features/mobile-apps/mobile-apps-api', () => ({
   detectMobileProject: vi.fn(),
@@ -16,9 +13,7 @@ vi.mock('@/features/mobile-apps/mobile-apps-api', () => ({
 }));
 
 const mockedDetect = vi.mocked(detectMobileProject);
-
 const mockedUpdate = vi.mocked(updateMobileApp);
-
 const mobileApp = {
   id: 'mobile-1',
 
@@ -172,7 +167,6 @@ describe('MobileProjectDetectionPanel', () => {
 
   it('applies detected configuration', async () => {
     const user = userEvent.setup();
-
     const applied = vi.fn();
 
     render(<MobileProjectDetectionPanel workspaceId='workspace-1' mobileApp={mobileApp} onApplied={applied} />);

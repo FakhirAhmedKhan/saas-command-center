@@ -1,16 +1,14 @@
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { addWorkspaceMember, registerWorkspaceTestUser } from '../helpers/workspace';
-import { PrismaService } from 'src/database/prisma.service';
-import { RepositoryProvider, WorkspaceRole } from 'src/generated/prisma/enums';
 import type { INestApplication } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
+import { PrismaService } from 'src/database/prisma.service';
+import { RepositoryProvider, WorkspaceRole } from 'src/generated/prisma/enums';
 
 describe('Desktop Repository Linking E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
-
   let sequence = 0;
 
   beforeEach(async () => {
@@ -68,7 +66,6 @@ describe('Desktop Repository Linking E2E', () => {
     } = {},
   ) {
     const { archived = false, isAvailable = true, name = 'desktop-repository' } = options;
-
     const installation = await prisma.repositoryInstallation.create({
       data: {
         workspaceId,
@@ -122,11 +119,8 @@ describe('Desktop Repository Linking E2E', () => {
 
   it('links repository to desktop application', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const desktopApp = await createDesktopApp(owner);
-
     const repository = await createRepository(owner.workspaceId);
-
     const response = await owner.agent.post(repositoryPath(owner.workspaceId, desktopApp.id)).set('Authorization', `Bearer ${owner.accessToken}`).send({
       repositoryId: repository.id,
     });
@@ -148,9 +142,7 @@ describe('Desktop Repository Linking E2E', () => {
 
   it('returns linked repository after reload/read', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const desktopApp = await createDesktopApp(owner);
-
     const repository = await createRepository(owner.workspaceId);
 
     await owner.agent
@@ -174,13 +166,10 @@ describe('Desktop Repository Linking E2E', () => {
 
   it('changes repository without leaving duplicate desktop links', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const desktopApp = await createDesktopApp(owner);
-
     const repositoryA = await createRepository(owner.workspaceId, {
       name: 'desktop-a',
     });
-
     const repositoryB = await createRepository(owner.workspaceId, {
       name: 'desktop-b',
     });
@@ -228,9 +217,7 @@ describe('Desktop Repository Linking E2E', () => {
 
   it('unlinks repository', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const desktopApp = await createDesktopApp(owner);
-
     const repository = await createRepository(owner.workspaceId);
 
     await owner.agent
@@ -267,19 +254,12 @@ describe('Desktop Repository Linking E2E', () => {
 
   it('rejects repository from another workspace', async () => {
     const workspaceA = await registerWorkspaceTestUser(app, prisma);
-
     const workspaceB = await registerWorkspaceTestUser(app, prisma);
-
     const desktopApp = await createDesktopApp(workspaceA);
-
     const repository = await createRepository(workspaceB.workspaceId);
-
-    const response = await workspaceA.agent
-      .post(repositoryPath(workspaceA.workspaceId, desktopApp.id))
-      .set('Authorization', `Bearer ${workspaceA.accessToken}`)
-      .send({
-        repositoryId: repository.id,
-      });
+    const response = await workspaceA.agent.post(repositoryPath(workspaceA.workspaceId, desktopApp.id)).set('Authorization', `Bearer ${workspaceA.accessToken}`).send({
+      repositoryId: repository.id,
+    });
 
     /*
      * Same-workspace find should hide the
@@ -298,9 +278,7 @@ describe('Desktop Repository Linking E2E', () => {
 
   it('rejects missing repository', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const desktopApp = await createDesktopApp(owner);
-
     const response = await owner.agent.post(repositoryPath(owner.workspaceId, desktopApp.id)).set('Authorization', `Bearer ${owner.accessToken}`).send({
       repositoryId: randomUUID(),
     });
@@ -310,9 +288,7 @@ describe('Desktop Repository Linking E2E', () => {
 
   it('rejects malformed repository ID', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const desktopApp = await createDesktopApp(owner);
-
     const response = await owner.agent.post(repositoryPath(owner.workspaceId, desktopApp.id)).set('Authorization', `Bearer ${owner.accessToken}`).send({
       repositoryId: 'not-a-uuid',
     });
@@ -322,13 +298,10 @@ describe('Desktop Repository Linking E2E', () => {
 
   it('rejects archived repository', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const desktopApp = await createDesktopApp(owner);
-
     const repository = await createRepository(owner.workspaceId, {
       archived: true,
     });
-
     const response = await owner.agent.post(repositoryPath(owner.workspaceId, desktopApp.id)).set('Authorization', `Bearer ${owner.accessToken}`).send({
       repositoryId: repository.id,
     });
@@ -338,13 +311,10 @@ describe('Desktop Repository Linking E2E', () => {
 
   it('rejects unavailable repository', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const desktopApp = await createDesktopApp(owner);
-
     const repository = await createRepository(owner.workspaceId, {
       isAvailable: false,
     });
-
     const response = await owner.agent.post(repositoryPath(owner.workspaceId, desktopApp.id)).set('Authorization', `Bearer ${owner.accessToken}`).send({
       repositoryId: repository.id,
     });
@@ -359,13 +329,9 @@ describe('Desktop Repository Linking E2E', () => {
 
   it('prevents viewer from linking repository', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const viewer = await registerWorkspaceTestUser(app, prisma);
-
     const desktopApp = await createDesktopApp(owner);
-
     const repository = await createRepository(owner.workspaceId);
-
     const membershipResponse = await addWorkspaceMember(owner, viewer, WorkspaceRole.VIEWER);
 
     expect([200, 201]).toContain(membershipResponse.status);
@@ -379,11 +345,8 @@ describe('Desktop Repository Linking E2E', () => {
 
   it('prevents viewer from unlinking repository', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const viewer = await registerWorkspaceTestUser(app, prisma);
-
     const desktopApp = await createDesktopApp(owner);
-
     const repository = await createRepository(owner.workspaceId);
 
     await owner.agent
@@ -403,11 +366,8 @@ describe('Desktop Repository Linking E2E', () => {
 
   it('requires authentication for repository modification', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const desktopApp = await createDesktopApp(owner);
-
     const repository = await createRepository(owner.workspaceId);
-
     const response = await owner.agent.post(repositoryPath(owner.workspaceId, desktopApp.id)).send({
       repositoryId: repository.id,
     });

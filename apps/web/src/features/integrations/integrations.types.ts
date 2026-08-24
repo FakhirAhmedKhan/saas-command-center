@@ -1,10 +1,1 @@
-export type {
-  SaveWebhookInput,
-  WebhookDelivery,
-  WebhookDeliveryAttempt,
-  WebhookDeliveryStatus,
-  WebhookEndpoint,
-  WebhookEventCatalogItem,
-  WebhookEventType,
-  WebhookListResponse,
-} from '@command-center/shared-types';
+export type { SaveWebhookInput, WebhookDelivery, WebhookDeliveryAttempt, WebhookDeliveryStatus, WebhookEndpoint, WebhookEventCatalogItem, WebhookEventType, WebhookListResponse } from '@command-center/shared-types';

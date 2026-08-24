@@ -18,17 +18,11 @@ interface MobileRepositoryPanelProps {
 
 export function MobileRepositoryPanel({ workspaceId, mobileApp, onRepositoryChanged }: MobileRepositoryPanelProps) {
   const [linkedRepository, setLinkedRepository] = useState<RepositoryConnection | null>(null);
-
   const [repositories, setRepositories] = useState<RepositoryConnection[]>([]);
-
   const [selectedRepositoryId, setSelectedRepositoryId] = useState('');
-
   const [loading, setLoading] = useState(true);
-
   const [saving, setSaving] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
-
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -54,11 +48,7 @@ export function MobileRepositoryPanel({ workspaceId, mobileApp, onRepositoryChan
   }, [load]);
 
   const selectableRepositories = useMemo(
-    () =>
-      repositories.filter(
-        (repository) =>
-          !repository.archived && repository.isAvailable && (repository.applicationId === null || repository.applicationId === mobileApp.applicationId),
-      ),
+    () => repositories.filter((repository) => !repository.archived && repository.isAvailable && (repository.applicationId === null || repository.applicationId === mobileApp.applicationId)),
     [mobileApp.applicationId, repositories],
   );
 

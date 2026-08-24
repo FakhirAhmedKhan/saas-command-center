@@ -1,6 +1,6 @@
 import { DesktopDependencyHealthService } from 'src/modules/desktop-apps/services/desktop-dependency-health.service';
-import { DesktopSecurityService } from 'src/modules/desktop-apps/services/desktop-security.service';
 import type { DesktopRepositoryMetadataSnapshot } from 'src/modules/desktop-apps/services/desktop-repository-metadata.service';
+import { DesktopSecurityService } from 'src/modules/desktop-apps/services/desktop-security.service';
 
 function snapshot(files: Record<string, string>): DesktopRepositoryMetadataSnapshot {
   return {
@@ -15,7 +15,6 @@ function snapshot(files: Record<string, string>): DesktopRepositoryMetadataSnaps
 
 describe('Desktop dependency/security parsers', () => {
   const dependencies = new DesktopDependencyHealthService({} as never, {} as never, {} as never);
-
   const security = new DesktopSecurityService({} as never, {} as never, {} as never, dependencies);
 
   it('parses npm dependencies', () => {

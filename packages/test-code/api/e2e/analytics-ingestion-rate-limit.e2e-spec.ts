@@ -7,11 +7,8 @@ import { PrismaService } from 'src/database/prisma.service';
 
 describe('Analytics Ingestion Rate Limit E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
-
   let originalMaxEvents: string | undefined;
-
   let originalWindowMs: string | undefined;
 
   beforeEach(async () => {
@@ -48,7 +45,6 @@ describe('Analytics Ingestion Rate Limit E2E', () => {
 
   it('accepts events up to the configured limit and rejects the next event', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
 
     expectCollectionAccepted(await collectEvents(app, trackedWebsite, buildEventBatch(trackedWebsite.origin, 3)), 3);
@@ -72,9 +68,7 @@ describe('Analytics Ingestion Rate Limit E2E', () => {
 
   it('rejects a single request whose event count exceeds the limit', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const response = await collectEvents(app, trackedWebsite, buildEventBatch(trackedWebsite.origin, 6));
 
     /*
@@ -95,9 +89,7 @@ describe('Analytics Ingestion Rate Limit E2E', () => {
 
   it('maintains independent buckets for different websites', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const firstWebsite = await createTrackedWebsite(owner);
-
     const secondWebsite = await createTrackedWebsite(owner);
 
     expectCollectionAccepted(await collectEvents(app, firstWebsite, buildEventBatch(firstWebsite.origin, 5)), 5);
@@ -111,9 +103,7 @@ describe('Analytics Ingestion Rate Limit E2E', () => {
 
   it('counts duplicate submissions toward the request rate', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const duplicateEvent = buildTrackerEvent(trackedWebsite.origin);
 
     expectCollectionAccepted(await collectEvents(app, trackedWebsite, [duplicateEvent]), 1);

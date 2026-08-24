@@ -1,5 +1,5 @@
-import { ARGON2ID_OPTIONS, PasswordService } from 'src/modules/auth/services/password.service';
 import * as argon2 from 'argon2';
+import { ARGON2ID_OPTIONS, PasswordService } from 'src/modules/auth/services/password.service';
 
 describe('PasswordService', () => {
   const service = new PasswordService();
@@ -16,7 +16,6 @@ describe('PasswordService', () => {
 
   it('verifies the correct password against its own hash', async () => {
     const password = 'CorrectHorseBatteryStaple1!';
-
     const hash = await service.hash(password);
 
     await expect(service.verify(hash, password)).resolves.toBe(true);
@@ -34,7 +33,6 @@ describe('PasswordService', () => {
 
   it('still verifies a hash produced under the library defaults (pre-hardening format)', async () => {
     const password = 'CorrectHorseBatteryStaple1!';
-
     // Simulates a hash created before explicit parameters were pinned.
     const legacyStyleHash = await argon2.hash(password, { type: argon2.argon2id });
 

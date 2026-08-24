@@ -9,7 +9,6 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { WorkspaceRole } from 'src/generated/prisma/enums';
 
 const WRITE_ROLES = [WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER];
-
 const ADMIN_ROLES = [WorkspaceRole.OWNER, WorkspaceRole.ADMIN];
 
 @ApiTags('Repositories')

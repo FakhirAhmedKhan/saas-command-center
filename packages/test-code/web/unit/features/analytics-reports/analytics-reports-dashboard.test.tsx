@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { AnalyticsReportsDashboard } from '@/features/analytics-reports/analytics-reports-dashboard';
 import { render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { AnalyticsReportsDashboard } from '@/features/analytics-reports/analytics-reports-dashboard';
 
 const { getAnalyticsReportMock, routerReplaceMock, downloadAnalyticsReportMock } = vi.hoisted(() => ({
   getAnalyticsReportMock: vi.fn(),

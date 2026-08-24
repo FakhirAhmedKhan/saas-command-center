@@ -46,7 +46,6 @@ test.describe('Desktop Phase 11 releases frontend', () => {
     await loginThroughUi(page, state.owner);
 
     const desktop = await createDesktopApp(request);
-
     const build = {
       id: '11111111-1111-4111-8111-111111111111',
       workspaceId: state.owner.workspaceId,
@@ -67,7 +66,6 @@ test.describe('Desktop Phase 11 releases frontend', () => {
       createdAt: '2026-08-23T01:00:00.000Z',
       updatedAt: '2026-08-23T01:04:00.000Z',
     };
-
     const artifact = {
       id: '33333333-3333-4333-8333-333333333333',
       buildId: build.id,
@@ -103,7 +101,6 @@ test.describe('Desktop Phase 11 releases frontend', () => {
     };
 
     let releases: Release[] = [];
-
     const apiBase = `/api/v1/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktop.id}`;
 
     await page.route(`**${apiBase}/builds*`, async (route) => {
@@ -133,7 +130,6 @@ test.describe('Desktop Phase 11 releases frontend', () => {
           buildNumber?: string;
           releaseNotes?: string;
         };
-
         const created: Release = {
           id: '44444444-4444-4444-8444-444444444444',
           workspaceId: state.owner.workspaceId,

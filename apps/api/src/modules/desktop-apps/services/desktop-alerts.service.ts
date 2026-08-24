@@ -77,7 +77,6 @@ export class DesktopAlertsService {
 
   async updateRule(workspaceId: string, desktopAppId: string, ruleId: string, dto: UpdateDesktopAlertRuleDto) {
     const rule = await this.requireRule(workspaceId, desktopAppId, ruleId);
-
     const nextType = dto.type ?? rule.type;
     const nextThreshold = dto.threshold ?? rule.threshold;
 
@@ -136,7 +135,6 @@ export class DesktopAlertsService {
       },
       orderBy: { createdAt: 'asc' },
     });
-
     let triggered = 0;
     let resolved = 0;
     let unchanged = 0;
@@ -191,7 +189,6 @@ export class DesktopAlertsService {
       where: { workspaceId, desktopAppId },
       orderBy: { createdAt: 'desc' },
     });
-
     const breached = build?.status === DesktopBuildStatus.FAILED;
 
     return {
@@ -199,9 +196,7 @@ export class DesktopAlertsService {
       actualValue: null,
       threshold: null,
       title: 'Desktop build failed',
-      message: breached
-        ? `Build ${build.buildNumber ?? build.workflowRunId} failed on ${build.platform} ${build.architecture}.`
-        : 'Latest desktop build is not failed.',
+      message: breached ? `Build ${build.buildNumber ?? build.workflowRunId} failed on ${build.platform} ${build.architecture}.` : 'Latest desktop build is not failed.',
       version: build?.version ?? null,
       buildId: build?.id ?? null,
       dimension: build ? `build:${build.id}` : 'build:none',
@@ -222,7 +217,6 @@ export class DesktopAlertsService {
   private async performanceSignal(workspaceId: string, desktopAppId: string, rule: RuleRecord): Promise<AlertSignal> {
     const result = await this.performance.get(workspaceId, desktopAppId, {});
     const threshold = rule.threshold ?? 0;
-
     let actual: number | null = null;
     let label = 'Performance threshold';
 
@@ -293,20 +287,16 @@ export class DesktopAlertsService {
 
     const current = releases[0]!;
     const previous = releases[1]!;
-
     const [currentStartup, previousStartup, currentCrashFree, previousCrashFree] = await Promise.all([
       this.metricAverage(workspaceId, desktopAppId, current.version, DesktopPerformanceMetricType.STARTUP_MS),
       this.metricAverage(workspaceId, desktopAppId, previous.version, DesktopPerformanceMetricType.STARTUP_MS),
       this.metricAverage(workspaceId, desktopAppId, current.version, DesktopPerformanceMetricType.CRASH_FREE_USERS_PERCENT),
       this.metricAverage(workspaceId, desktopAppId, previous.version, DesktopPerformanceMetricType.CRASH_FREE_USERS_PERCENT),
     ]);
-
     const startupDelta = this.percentIncrease(previousStartup, currentStartup);
-
     const previousCrashRate = previousCrashFree === null ? null : Math.max(0, 100 - previousCrashFree);
     const currentCrashRate = currentCrashFree === null ? null : Math.max(0, 100 - currentCrashFree);
     const crashDelta = this.percentIncrease(previousCrashRate, currentCrashRate);
-
     const regression = Math.max(startupDelta ?? 0, crashDelta ?? 0);
     const threshold = rule.threshold ?? 0;
 
@@ -332,12 +322,9 @@ export class DesktopAlertsService {
 
   private async signingFailureSignal(workspaceId: string, desktopAppId: string): Promise<AlertSignal> {
     const security = await this.security.get(workspaceId, desktopAppId);
-
     const failed = security.findings.filter(
       (finding) =>
-        (finding.type === DesktopSecurityCheckType.WINDOWS_SIGNING ||
-          finding.type === DesktopSecurityCheckType.MACOS_SIGNING ||
-          finding.type === DesktopSecurityCheckType.MACOS_NOTARIZATION) &&
+        (finding.type === DesktopSecurityCheckType.WINDOWS_SIGNING || finding.type === DesktopSecurityCheckType.MACOS_SIGNING || finding.type === DesktopSecurityCheckType.MACOS_NOTARIZATION) &&
         finding.status === DesktopSecurityCheckStatus.FAIL,
     );
 
@@ -373,7 +360,6 @@ export class DesktopAlertsService {
         lastError: true,
       },
     });
-
     const connected = integrations.some((item) => item.status === DesktopTelemetryIntegrationStatus.CONNECTED);
 
     return {
@@ -398,7 +384,6 @@ export class DesktopAlertsService {
 
   private async trigger(workspaceId: string, desktopAppId: string, applicationId: string, rule: RuleRecord, signal: AlertSignal): Promise<boolean> {
     const activeKey = `${rule.id}:${signal.dimension}`.slice(0, 255);
-
     const existing = await this.prisma.desktopAlertIncident.findFirst({
       where: {
         workspaceId,

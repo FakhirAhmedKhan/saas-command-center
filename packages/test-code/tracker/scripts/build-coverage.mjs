@@ -6,7 +6,6 @@ import { fileURLToPath } from 'node:url';
 const scriptsDirectory = dirname(fileURLToPath(import.meta.url));
 const packageRoot = resolve(scriptsDirectory, '..');
 const trackerRoot = resolve(packageRoot, '../../../apps/tracker');
-
 const outputFile = resolve(packageRoot, 'dist-coverage', 'tracker.js');
 
 await mkdir(dirname(outputFile), { recursive: true });

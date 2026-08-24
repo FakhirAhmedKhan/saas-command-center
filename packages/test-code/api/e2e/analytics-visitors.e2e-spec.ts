@@ -9,9 +9,7 @@ import { AnalyticsProcessingService } from 'src/modules/analytics-engine/service
 
 describe('Analytics Visitors E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
-
   let processingService: AnalyticsProcessingService;
 
   beforeAll(async () => {
@@ -32,9 +30,7 @@ describe('Analytics Visitors E2E', () => {
 
   it('creates one visitor per website and external visitor ID', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const visitorId = uniqueTrackerId('visitor');
 
     expectCollectionAccepted(
@@ -72,11 +68,8 @@ describe('Analytics Visitors E2E', () => {
 
   it('isolates the same external visitor ID between websites', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const websiteA = await createTrackedWebsite(owner);
-
     const websiteB = await createTrackedWebsite(owner);
-
     const visitorId = uniqueTrackerId('shared_visitor');
 
     for (const website of [websiteA, websiteB]) {
@@ -109,15 +102,10 @@ describe('Analytics Visitors E2E', () => {
 
   it('rebuilds firstSeenAt and lastSeenAt from out-of-order events', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const visitorId = uniqueTrackerId('visitor');
-
     const sessionId = uniqueTrackerId('session');
-
     const earlier = new Date(Date.now() - 120_000);
-
     const later = new Date(earlier.getTime() + 60_000);
 
     expectCollectionAccepted(
@@ -155,11 +143,8 @@ describe('Analytics Visitors E2E', () => {
 
   it('keeps visitor counts idempotent across repeated processing runs', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const visitorId = uniqueTrackerId('visitor');
-
     const sessionId = uniqueTrackerId('session');
 
     expectCollectionAccepted(

@@ -39,19 +39,12 @@ const COMMON_TIME_ZONES = [
 
 export function WebsiteForm({ website, applications, initialApplicationId = '', cancelHref, submitLabel, onSubmit }: WebsiteFormProps) {
   const [name, setName] = useState(website?.name ?? '');
-
   const [domain, setDomain] = useState(website?.domain ?? '');
-
   const [timeZone, setTimeZone] = useState(website?.timeZone ?? 'UTC');
-
   const [applicationId, setApplicationId] = useState(website?.applicationId ?? initialApplicationId);
-
   const [originsText, setOriginsText] = useState(website ? originsToText(website.allowedOrigins) : '');
-
   const [enabled, setEnabled] = useState(website?.enabled ?? true);
-
   const [submitting, setSubmitting] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -113,15 +106,7 @@ export function WebsiteForm({ website, applications, initialApplicationId = '', 
           ) : null}
 
           <div className='grid gap-5 md:grid-cols-2'>
-            <Input
-              name='websiteName'
-              label='Website name'
-              placeholder='SaaS Command Center'
-              value={name}
-              disabled={submitting}
-              required
-              onChange={(event) => setName(event.target.value)}
-            />
+            <Input name='websiteName' label='Website name' placeholder='SaaS Command Center' value={name} disabled={submitting} required onChange={(event) => setName(event.target.value)} />
 
             <Input
               name='websiteDomain'
@@ -155,13 +140,7 @@ export function WebsiteForm({ website, applications, initialApplicationId = '', 
               </datalist>
             </div>
 
-            <Select
-              name='applicationId'
-              label='SaaS application'
-              value={applicationId}
-              disabled={submitting}
-              onChange={(event) => setApplicationId(event.target.value)}
-            >
+            <Select name='applicationId' label='SaaS application' value={applicationId} disabled={submitting} onChange={(event) => setApplicationId(event.target.value)}>
               <option value=''>Not connected</option>
 
               {applications.map((application) => (
@@ -189,18 +168,13 @@ export function WebsiteForm({ website, applications, initialApplicationId = '', 
             <span>
               <span className='block text-sm font-semibold text-slate-900'>Enable tracking</span>
 
-              <span className='mt-1 block text-sm leading-6 text-slate-500'>
-                Enabled websites will accept tracking events after the Phase 9 ingestion API is installed.
-              </span>
+              <span className='mt-1 block text-sm leading-6 text-slate-500'>Enabled websites will accept tracking events after the Phase 9 ingestion API is installed.</span>
             </span>
           </label>
         </CardContent>
 
         <CardFooter className='flex flex-wrap justify-end gap-3'>
-          <Link
-            href={cancelHref}
-            className='inline-flex h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50'
-          >
+          <Link href={cancelHref} className='inline-flex h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50'>
             Cancel
           </Link>
 

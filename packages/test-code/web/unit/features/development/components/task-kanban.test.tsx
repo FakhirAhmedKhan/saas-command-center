@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
-import { TaskKanban } from '@/features/development/components/task-kanban';
-import { completeTask, reopenTask, setTaskStatus } from '@/features/development/development-api';
 import type { ApplicationMilestone, ApplicationTask } from '@/features/development/development-types';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { TaskKanban } from '@/features/development/components/task-kanban';
+import { completeTask, reopenTask, setTaskStatus } from '@/features/development/development-api';
 
 vi.mock('@/features/development/development-api', () => ({
   completeTask: vi.fn(),
@@ -69,10 +69,7 @@ beforeEach(() => {
 
 describe('TaskKanban', () => {
   it('groups tasks from multiple milestones into their matching status column', () => {
-    const milestones = [
-      milestone({ id: 'm-1', tasks: [task({ id: 't-1', title: 'Todo task', status: 'TODO' })] }),
-      milestone({ id: 'm-2', tasks: [task({ id: 't-2', title: 'Blocked task', status: 'BLOCKED' })] }),
-    ];
+    const milestones = [milestone({ id: 'm-1', tasks: [task({ id: 't-1', title: 'Todo task', status: 'TODO' })] }), milestone({ id: 'm-2', tasks: [task({ id: 't-2', title: 'Blocked task', status: 'BLOCKED' })] })];
 
     render(<TaskKanban workspaceId='workspace-1' applicationId='app-1' milestones={milestones} onChanged={vi.fn()} />);
 
@@ -91,14 +88,7 @@ describe('TaskKanban', () => {
     const onChanged = vi.fn();
     const user = userEvent.setup();
 
-    render(
-      <TaskKanban
-        workspaceId='workspace-1'
-        applicationId='app-1'
-        milestones={[milestone({ tasks: [task({ id: 't-1', status: 'TODO' })] })]}
-        onChanged={onChanged}
-      />,
-    );
+    render(<TaskKanban workspaceId='workspace-1' applicationId='app-1' milestones={[milestone({ tasks: [task({ id: 't-1', status: 'TODO' })] })]} onChanged={onChanged} />);
 
     await user.click(screen.getByRole('button', { name: /Completed/ }));
 
@@ -110,14 +100,7 @@ describe('TaskKanban', () => {
   it('calls setTaskStatus directly for a same-lane transition between TODO/IN_PROGRESS/BLOCKED', async () => {
     const user = userEvent.setup();
 
-    render(
-      <TaskKanban
-        workspaceId='workspace-1'
-        applicationId='app-1'
-        milestones={[milestone({ tasks: [task({ id: 't-1', status: 'TODO' })] })]}
-        onChanged={vi.fn()}
-      />,
-    );
+    render(<TaskKanban workspaceId='workspace-1' applicationId='app-1' milestones={[milestone({ tasks: [task({ id: 't-1', status: 'TODO' })] })]} onChanged={vi.fn()} />);
 
     await user.click(screen.getByRole('button', { name: /Blocked/ }));
 
@@ -128,14 +111,7 @@ describe('TaskKanban', () => {
   it('reopens a completed task before setting a non-TODO target status', async () => {
     const user = userEvent.setup();
 
-    render(
-      <TaskKanban
-        workspaceId='workspace-1'
-        applicationId='app-1'
-        milestones={[milestone({ tasks: [task({ id: 't-1', status: 'COMPLETED' })] })]}
-        onChanged={vi.fn()}
-      />,
-    );
+    render(<TaskKanban workspaceId='workspace-1' applicationId='app-1' milestones={[milestone({ tasks: [task({ id: 't-1', status: 'COMPLETED' })] })]} onChanged={vi.fn()} />);
 
     await user.click(screen.getByRole('button', { name: /In progress/ }));
 
@@ -146,14 +122,7 @@ describe('TaskKanban', () => {
   it('reopens a completed task and does NOT call setTaskStatus again when the target is TODO', async () => {
     const user = userEvent.setup();
 
-    render(
-      <TaskKanban
-        workspaceId='workspace-1'
-        applicationId='app-1'
-        milestones={[milestone({ tasks: [task({ id: 't-1', status: 'COMPLETED' })] })]}
-        onChanged={vi.fn()}
-      />,
-    );
+    render(<TaskKanban workspaceId='workspace-1' applicationId='app-1' milestones={[milestone({ tasks: [task({ id: 't-1', status: 'COMPLETED' })] })]} onChanged={vi.fn()} />);
 
     await user.click(screen.getByRole('button', { name: /To do/ }));
 

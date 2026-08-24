@@ -1,5 +1,5 @@
-import { formatTrackingDate, getTrackingError } from '@/features/tracking/tracking-utils';
 import { describe, expect, it } from 'vitest';
+import { formatTrackingDate, getTrackingError } from '@/features/tracking/tracking-utils';
 
 describe('formatTrackingDate', () => {
   it.each([[null], [undefined], ['']])('returns "Never" for %s', (value) => {

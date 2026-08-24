@@ -59,13 +59,9 @@ export class WebsitesService {
     trackingKey: string;
   }> {
     const name = this.normalizeRequiredText(dto.name, 'Website name');
-
     const domain = this.normalizeDomain(dto.domain);
-
     const timeZone = this.normalizeTimeZone(dto.timeZone ?? 'UTC');
-
     const allowedOrigins = this.normalizeAllowedOrigins(dto.allowedOrigins, domain);
-
     let application: {
       id: string;
       name: string;
@@ -139,9 +135,7 @@ export class WebsitesService {
 
   async list(workspaceId: string, query: WebsiteListQueryDto) {
     const skip = (query.page - 1) * query.limit;
-
     const search = query.search?.trim();
-
     const where: Prisma.WebsiteWhereInput = {
       workspaceId,
 
@@ -239,7 +233,6 @@ export class WebsitesService {
         where,
       }),
     ]);
-
     const totalPages = Math.ceil(total / query.limit);
 
     return {
@@ -265,9 +258,7 @@ export class WebsitesService {
     this.ensureNotArchived(website);
 
     const data: Prisma.WebsiteUpdateInput = {};
-
     const changedFields: string[] = [];
-
     let newDomain = website.domain;
 
     if (dto.name !== undefined) {
@@ -686,11 +677,8 @@ export class WebsitesService {
 
   private generateTrackingKey(): GeneratedTrackingKey {
     const prefix = randomBytes(8).toString('hex');
-
     const secret = randomBytes(32).toString('base64url');
-
     const rawKey = `cc_live_${prefix}_${secret}`;
-
     const hash = createHash('sha256').update(rawKey).digest('hex');
 
     return {
@@ -738,7 +726,6 @@ export class WebsitesService {
 
   private normalizeAllowedOrigins(values: string[] | undefined, domain: string): string[] {
     const source = values && values.length > 0 ? values : [this.defaultOrigin(domain)];
-
     const origins = source.map((value) => {
       let url: URL;
 
@@ -764,7 +751,6 @@ export class WebsitesService {
 
   private defaultOrigin(domain: string): string {
     const hostname = domain.split(':').at(0) ?? domain;
-
     const local = hostname === 'localhost' || hostname.endsWith('.localhost') || isIP(hostname) !== 0;
 
     return `${local ? 'http' : 'https'}://${domain}`;

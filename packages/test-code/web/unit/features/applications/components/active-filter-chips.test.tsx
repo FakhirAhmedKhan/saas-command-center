@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
-import { ActiveFilterChips } from '@/features/applications/components/active-filter-chips';
 import type { ApplicationFilterValue } from '@/features/applications/components/application-filters';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { ActiveFilterChips } from '@/features/applications/components/active-filter-chips';
 
 const BASE_VALUE: ApplicationFilterValue = {
   search: '',
@@ -23,13 +23,7 @@ describe('ActiveFilterChips', () => {
   });
 
   it('renders a chip per active filter with human-readable labels', () => {
-    render(
-      <ActiveFilterChips
-        value={{ ...BASE_VALUE, search: '  PriceScout  ', status: 'LIVE', priority: 'HIGH', category: 'AI', archiveView: 'archived' }}
-        onChange={vi.fn()}
-        onClearAll={vi.fn()}
-      />,
-    );
+    render(<ActiveFilterChips value={{ ...BASE_VALUE, search: '  PriceScout  ', status: 'LIVE', priority: 'HIGH', category: 'AI', archiveView: 'archived' }} onChange={vi.fn()} onClearAll={vi.fn()} />);
 
     expect(screen.getByRole('button', { name: /"PriceScout"/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^Live/ })).toBeInTheDocument();

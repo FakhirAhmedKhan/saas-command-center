@@ -11,13 +11,7 @@ import { MobileTelemetryProvider } from 'src/generated/prisma/enums';
 export class MobileTelemetryProviderRegistry {
   private readonly providers: Map<MobileTelemetryProvider, MobileTelemetryProviderAdapter>;
 
-  constructor(
-    firebase: FirebaseMobileTelemetryProvider,
-    sentry: SentryMobileTelemetryProvider,
-    datadog: DatadogMobileTelemetryProvider,
-    newRelic: NewRelicMobileTelemetryProvider,
-    custom: CustomMobileTelemetryProvider,
-  ) {
+  constructor(firebase: FirebaseMobileTelemetryProvider, sentry: SentryMobileTelemetryProvider, datadog: DatadogMobileTelemetryProvider, newRelic: NewRelicMobileTelemetryProvider, custom: CustomMobileTelemetryProvider) {
     this.providers = new Map<MobileTelemetryProvider, MobileTelemetryProviderAdapter>([
       [MobileTelemetryProvider.FIREBASE, firebase],
       [MobileTelemetryProvider.SENTRY, sentry],

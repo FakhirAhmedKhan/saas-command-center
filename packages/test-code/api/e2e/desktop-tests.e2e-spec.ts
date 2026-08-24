@@ -1,8 +1,8 @@
-import type { INestApplication } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { createLinkedDesktopFixture, ingestSuccessfulBuild } from './helpers/desktop-test-fixtures';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
 
 describe('Desktop Tests E2E', () => {
   let app: INestApplication;
@@ -24,9 +24,7 @@ describe('Desktop Tests E2E', () => {
 
   it('stores counts and failure details', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
-
     const build = await ingestSuccessfulBuild(fixture.owner, fixture.desktopApp.id, fixture.repository.id);
-
     const response = await fixture.owner.agent
       .post(buildTestsPath(fixture.owner.workspaceId, fixture.desktopApp.id, build.id))
       .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
@@ -64,9 +62,7 @@ describe('Desktop Tests E2E', () => {
 
   it('re-ingestion replaces duplicate run/failures instead of duplicating them', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
-
     const build = await ingestSuccessfulBuild(fixture.owner, fixture.desktopApp.id, fixture.repository.id);
-
     const endpoint = buildTestsPath(fixture.owner.workspaceId, fixture.desktopApp.id, build.id);
 
     await fixture.owner.agent
@@ -128,9 +124,7 @@ describe('Desktop Tests E2E', () => {
 
   it('returns aggregate app test summary', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
-
     const build = await ingestSuccessfulBuild(fixture.owner, fixture.desktopApp.id, fixture.repository.id);
-
     const endpoint = buildTestsPath(fixture.owner.workspaceId, fixture.desktopApp.id, build.id);
 
     await fixture.owner.agent
@@ -157,9 +151,7 @@ describe('Desktop Tests E2E', () => {
       })
       .expect(201);
 
-    const response = await fixture.owner.agent
-      .get(`/api/v1/workspaces/${fixture.owner.workspaceId}/desktop-apps/${fixture.desktopApp.id}/tests/summary`)
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`);
+    const response = await fixture.owner.agent.get(`/api/v1/workspaces/${fixture.owner.workspaceId}/desktop-apps/${fixture.desktopApp.id}/tests/summary`).set('Authorization', `Bearer ${fixture.owner.accessToken}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -175,9 +167,7 @@ describe('Desktop Tests E2E', () => {
   it('cannot attach tests to a build from another desktop app', async () => {
     const fixtureA = await createLinkedDesktopFixture(app, prisma);
     const fixtureB = await createLinkedDesktopFixture(app, prisma);
-
     const buildA = await ingestSuccessfulBuild(fixtureA.owner, fixtureA.desktopApp.id, fixtureA.repository.id);
-
     const response = await fixtureB.owner.agent
       .post(buildTestsPath(fixtureB.owner.workspaceId, fixtureB.desktopApp.id, buildA.id))
       .set('Authorization', `Bearer ${fixtureB.owner.accessToken}`)

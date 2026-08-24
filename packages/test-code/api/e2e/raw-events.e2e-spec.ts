@@ -1,13 +1,4 @@
-import {
-  buildTrackerEvent,
-  collectEvents,
-  createTrackedWebsite,
-  expectCollectionAccepted,
-  findRawEvent,
-  listRawEvents,
-  readRawEventList,
-  uniqueTrackerId,
-} from '../helpers/analytics-ingestion';
+import { buildTrackerEvent, collectEvents, createTrackedWebsite, expectCollectionAccepted, findRawEvent, listRawEvents, readRawEventList, uniqueTrackerId } from '../helpers/analytics-ingestion';
 import { recordString } from '../helpers/application';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
@@ -18,7 +9,6 @@ import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
 
 describe('Raw Events E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
 
   beforeAll(async () => {
@@ -37,9 +27,7 @@ describe('Raw Events E2E', () => {
 
   it('lists raw events with pagination metadata', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const events = Array.from(
       {
         length: 3,
@@ -86,18 +74,14 @@ describe('Raw Events E2E', () => {
 
   it('filters by type and case-insensitive custom event name', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const pageView = buildTrackerEvent(trackedWebsite.origin, {
       type: RawAnalyticsEventType.PAGE_VIEW,
     });
-
     const checkout = buildTrackerEvent(trackedWebsite.origin, {
       type: RawAnalyticsEventType.CUSTOM,
       eventName: 'Checkout_Completed',
     });
-
     const signup = buildTrackerEvent(trackedWebsite.origin, {
       type: RawAnalyticsEventType.CUSTOM,
       eventName: 'signup_completed',
@@ -128,22 +112,15 @@ describe('Raw Events E2E', () => {
 
   it('filters by visitor and session identifiers', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const visitorA = uniqueTrackerId('visitor_a');
-
     const visitorB = uniqueTrackerId('visitor_b');
-
     const sessionA = uniqueTrackerId('session_a');
-
     const sessionB = uniqueTrackerId('session_b');
-
     const firstEvent = buildTrackerEvent(trackedWebsite.origin, {
       visitorId: visitorA,
       sessionId: sessionA,
     });
-
     const secondEvent = buildTrackerEvent(trackedWebsite.origin, {
       visitorId: visitorB,
       sessionId: sessionB,
@@ -174,15 +151,11 @@ describe('Raw Events E2E', () => {
 
   it('filters by occurred-at date range', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const now = Date.now();
-
     const older = buildTrackerEvent(trackedWebsite.origin, {
       timestamp: new Date(now - 3 * 60 * 60 * 1000).toISOString(),
     });
-
     const newer = buildTrackerEvent(trackedWebsite.origin, {
       timestamp: new Date(now - 30 * 60 * 1000).toISOString(),
     });
@@ -203,19 +176,12 @@ describe('Raw Events E2E', () => {
 
   it('keeps raw events isolated between websites and workspaces', async () => {
     const alphaOwner = await registerWorkspaceTestUser(app, prisma);
-
     const betaOwner = await registerWorkspaceTestUser(app, prisma);
-
     const alphaWebsite = await createTrackedWebsite(alphaOwner);
-
     const secondAlphaWebsite = await createTrackedWebsite(alphaOwner);
-
     const betaWebsite = await createTrackedWebsite(betaOwner);
-
     const alphaEvent = buildTrackerEvent(alphaWebsite.origin);
-
     const secondAlphaEvent = buildTrackerEvent(secondAlphaWebsite.origin);
-
     const betaEvent = buildTrackerEvent(betaWebsite.origin);
 
     expectCollectionAccepted(await collectEvents(app, alphaWebsite, [alphaEvent]), 1);
@@ -241,7 +207,6 @@ describe('Raw Events E2E', () => {
 
   it('rejects invalid raw-event query parameters', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
 
     expect(
@@ -279,9 +244,7 @@ describe('Raw Events E2E', () => {
 
   it('does not expose IP hashes, country codes, or user agents through the admin API', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const event = buildTrackerEvent(trackedWebsite.origin);
 
     expectCollectionAccepted(
@@ -292,7 +255,6 @@ describe('Raw Events E2E', () => {
     );
 
     const response = await listRawEvents(owner, trackedWebsite.id);
-
     const serialized = JSON.stringify(response.body).toLowerCase();
 
     expect(serialized).not.toContain('iphash');

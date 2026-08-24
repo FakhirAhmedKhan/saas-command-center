@@ -32,7 +32,6 @@ export class DesktopAlertWorkerService {
           },
         },
       });
-
       let evaluated = 0;
       let failed = 0;
 

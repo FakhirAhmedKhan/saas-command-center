@@ -1,12 +1,6 @@
 import type { AnalyticsAggregateDimension, AnalyticsAggregatePeriod, AnalyticsDeviceType, AnalyticsSourceType } from '@command-center/shared-types';
 
-export type {
-  AnalyticsAggregateDimension,
-  AnalyticsAggregatePeriod,
-  AnalyticsDeviceType,
-  AnalyticsReprocessInput as ReprocessAnalyticsPayload,
-  AnalyticsSourceType,
-} from '@command-center/shared-types';
+export type { AnalyticsAggregateDimension, AnalyticsAggregatePeriod, AnalyticsDeviceType, AnalyticsReprocessInput as ReprocessAnalyticsPayload, AnalyticsSourceType } from '@command-center/shared-types';
 export type AnalyticsProcessingStatus = 'RUNNING' | 'COMPLETED' | 'FAILED';
 
 export interface AnalyticsProcessingState {

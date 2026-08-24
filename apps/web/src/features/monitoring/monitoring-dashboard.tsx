@@ -2,26 +2,8 @@
 'use client';
 
 import { HealthStatusBadge } from './health-status-badge';
-import {
-  createHealthCheck,
-  getHealthCheckHistory,
-  getHealthChecks,
-  getHealthIncidents,
-  getMonitoringSummary,
-  getMonitoringTargets,
-  runHealthCheckNow,
-  updateHealthCheck,
-} from './monitoring-api';
-import type {
-  HealthCheck,
-  HealthCheckHistory,
-  HealthCheckStatus,
-  HealthIncident,
-  HealthTargetType,
-  MonitoringSummary,
-  MonitoringTarget,
-  SaveHealthCheckInput,
-} from './monitoring.types';
+import { createHealthCheck, getHealthCheckHistory, getHealthChecks, getHealthIncidents, getMonitoringSummary, getMonitoringTargets, runHealthCheckNow, updateHealthCheck } from './monitoring-api';
+import type { HealthCheck, HealthCheckHistory, HealthCheckStatus, HealthIncident, HealthTargetType, MonitoringSummary, MonitoringTarget, SaveHealthCheckInput } from './monitoring.types';
 import { getErrorMessage } from '../applications/application-utils';
 import { PageError } from '@/components/states/page-error';
 import { ApiError } from '@/features/lib/api/api-error';
@@ -80,7 +62,6 @@ const INITIAL_FORM: HealthCheckFormState = {
   failureThreshold: 3,
   enabled: true,
 };
-
 const numberFormatter = new Intl.NumberFormat('en-US');
 
 function formatDateTime(value: string | null): string {
@@ -418,33 +399,19 @@ function MonitoringForm({
 
 export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
   const [data, setData] = useState<DashboardData | null>(null);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<unknown>(null);
-
   const [statusFilter, setStatusFilter] = useState<HealthCheckStatus | 'ALL'>('ALL');
-
   const [targetFilter, setTargetFilter] = useState<HealthTargetType | 'ALL'>('ALL');
-
   const [showForm, setShowForm] = useState(false);
-
   const [editing, setEditing] = useState<HealthCheck | null>(null);
-
   const [selectedCheck, setSelectedCheck] = useState<HealthCheck | null>(null);
-
   const [history, setHistory] = useState<HealthCheckHistory[]>([]);
-
   const [historyLoading, setHistoryLoading] = useState(false);
-
   const [submitting, setSubmitting] = useState(false);
-
   const [actionError, setActionError] = useState<string | null>(null);
-
   const controllerRef = useRef<AbortController | null>(null);
-
   const visible = usePageVisibility();
-
   const load = useCallback(async () => {
     controllerRef.current?.abort();
 
@@ -513,10 +480,7 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
   }, [load, visible]);
 
   const filteredChecks = useMemo(
-    () =>
-      (data?.checks ?? []).filter(
-        (check) => (statusFilter === 'ALL' || check.latestStatus === statusFilter) && (targetFilter === 'ALL' || check.targetType === targetFilter),
-      ),
+    () => (data?.checks ?? []).filter((check) => (statusFilter === 'ALL' || check.latestStatus === statusFilter) && (targetFilter === 'ALL' || check.targetType === targetFilter)),
     [data, statusFilter, targetFilter],
   );
 
@@ -716,11 +680,7 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
       </section>
 
       {data.checks.length === 0 ? (
-        <EmptyState
-          title='Monitoring is not configured'
-          description='Add a health check to begin tracking application or website availability.'
-          icon={undefined}
-        />
+        <EmptyState title='Monitoring is not configured' description='Add a health check to begin tracking application or website availability.' icon={undefined} />
       ) : filteredChecks.length === 0 ? (
         <EmptyState title='No matching health checks' description='No health checks match the selected filters.' icon={undefined} />
       ) : (
@@ -846,13 +806,7 @@ export function MonitoringDashboard({ workspaceId }: MonitoringDashboardProps) {
                     <p className='mt-1 text-sm text-slate-500'>{incident.targetName}</p>
                   </div>
 
-                  <span
-                    className={
-                      incident.status === 'OPEN'
-                        ? 'rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700'
-                        : 'rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700'
-                    }
-                  >
+                  <span className={incident.status === 'OPEN' ? 'rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700' : 'rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700'}>
                     {incident.status}
                   </span>
                 </div>

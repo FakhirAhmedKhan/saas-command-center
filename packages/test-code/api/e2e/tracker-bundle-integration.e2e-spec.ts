@@ -2,12 +2,12 @@
 import { createTrackedWebsite } from '../helpers/analytics-ingestion';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
-import { AppModule } from 'src/app.module';
-import { configureApplication } from 'src/bootstrap/configure-application';
 import type { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
+import { AppModule } from 'src/app.module';
+import { configureApplication } from 'src/bootstrap/configure-application';
 import { PrismaService } from 'src/database/prisma.service';
 import { AnalyticsProcessingStatus, RawAnalyticsEventType } from 'src/generated/prisma/enums';
 import request from 'supertest';
@@ -67,11 +67,8 @@ describe('Actual Tracker Bundle -> API -> Analytics E2E', () => {
 
   it('executes the built Tracker bundle and processes its real HTTP payload end to end', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const captureScript = resolve(__dirname, '../test-support/tracker-bundle-capture.mjs');
-
     const captureResult = spawnSync(process.execPath, [captureScript, trackedWebsite.id, trackedWebsite.trackingKey, trackedWebsite.origin], {
       cwd: process.cwd(),
       encoding: 'utf8',
@@ -85,14 +82,11 @@ describe('Actual Tracker Bundle -> API -> Analytics E2E', () => {
     expect(capturedRequests.length).toBeGreaterThanOrEqual(2);
 
     const payloads = capturedRequests.map((captured) => JSON.parse(captured.body) as TrackerPayload);
-
     const trackerEvents = payloads.flatMap((payload) => payload.events);
 
     expect(trackerEvents).toHaveLength(3);
 
-    expect(new Set(trackerEvents.map((event) => event.type))).toEqual(
-      new Set([RawAnalyticsEventType.PAGE_VIEW, RawAnalyticsEventType.HEARTBEAT, RawAnalyticsEventType.CUSTOM]),
-    );
+    expect(new Set(trackerEvents.map((event) => event.type))).toEqual(new Set([RawAnalyticsEventType.PAGE_VIEW, RawAnalyticsEventType.HEARTBEAT, RawAnalyticsEventType.CUSTOM]));
 
     for (const payload of payloads) {
       expect(payload.websiteId).toBe(trackedWebsite.id);
@@ -160,14 +154,10 @@ describe('Actual Tracker Bundle -> API -> Analytics E2E', () => {
       },
     });
 
-    expect(new Set(rawEvents.map((event) => event.type))).toEqual(
-      new Set([RawAnalyticsEventType.PAGE_VIEW, RawAnalyticsEventType.HEARTBEAT, RawAnalyticsEventType.CUSTOM]),
-    );
+    expect(new Set(rawEvents.map((event) => event.type))).toEqual(new Set([RawAnalyticsEventType.PAGE_VIEW, RawAnalyticsEventType.HEARTBEAT, RawAnalyticsEventType.CUSTOM]));
 
     const rawPageView = rawEvents.find((event) => event.type === RawAnalyticsEventType.PAGE_VIEW);
-
     const rawHeartbeat = rawEvents.find((event) => event.type === RawAnalyticsEventType.HEARTBEAT);
-
     const rawCustomEvent = rawEvents.find((event) => event.type === RawAnalyticsEventType.CUSTOM);
 
     expect(rawPageView).toBeDefined();
@@ -195,7 +185,6 @@ describe('Actual Tracker Bundle -> API -> Analytics E2E', () => {
 
     const [externalVisitorId] = [...visitorIds];
     const [externalSessionId] = [...sessionIds];
-
     const processResponse = await processAnalytics(owner, owner.workspaceId, trackedWebsite.id, {
       maxEvents: 100,
     });

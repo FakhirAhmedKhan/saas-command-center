@@ -25,30 +25,18 @@ export interface RawEventProcessingResult {
 
 @Injectable()
 export class RawEventProcessingService {
-  async process(
-    transaction: Prisma.TransactionClient,
-    website: AnalyticsProcessingWebsite,
-    rawEvents: RawAnalyticsEventRecord[],
-  ): Promise<RawEventProcessingResult> {
+  async process(transaction: Prisma.TransactionClient, website: AnalyticsProcessingWebsite, rawEvents: RawAnalyticsEventRecord[]): Promise<RawEventProcessingResult> {
     const affectedSessions = new Set<string>();
-
     const affectedVisitors = new Set<string>();
-
     const hourlyBuckets = new Set<string>();
-
     const dailyBuckets = new Set<string>();
-
     let processedEvents = 0;
 
     for (const raw of rawEvents) {
       const page = normalizeAnalyticsPage(raw.pageUrl);
-
       const source = normalizeSource(raw.referrerUrl, page.origin);
-
       const agent = parseUserAgent(raw.userAgent);
-
       const countryCode = this.readCountryCode(raw);
-
       let visitor = await transaction.analyticsVisitor.findUnique({
         where: {
           websiteId_externalVisitorId: {
@@ -108,7 +96,6 @@ export class RawEventProcessingService {
       }
 
       const eventVisitorId = session.visitorId;
-
       const analyticsEvent = await transaction.analyticsEvent.upsert({
         where: {
           websiteId_sourceEventId: {
@@ -260,11 +247,7 @@ export class RawEventProcessingService {
     };
   }
 
-  async processBatch(
-    transaction: Prisma.TransactionClient,
-    website: AnalyticsProcessingWebsite,
-    rawEvents: RawAnalyticsEventRecord[],
-  ): Promise<RawEventProcessingResult> {
+  async processBatch(transaction: Prisma.TransactionClient, website: AnalyticsProcessingWebsite, rawEvents: RawAnalyticsEventRecord[]): Promise<RawEventProcessingResult> {
     return this.process(transaction, website, rawEvents);
   }
   async processRange(
@@ -289,7 +272,6 @@ export class RawEventProcessingService {
         timeZone: true,
       },
     });
-
     const rawEvents = await transaction.rawAnalyticsEvent.findMany({
       where: {
         websiteId: input.websiteId,
@@ -310,7 +292,6 @@ export class RawEventProcessingService {
         },
       ],
     });
-
     const result = await this.process(transaction, website, rawEvents);
 
     if (rawEvents.length > 0) {

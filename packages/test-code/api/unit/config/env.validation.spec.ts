@@ -1,5 +1,5 @@
-import { validateEnvironment } from 'src/config/env.validation';
 import { generateKeyPairSync } from 'node:crypto';
+import { validateEnvironment } from 'src/config/env.validation';
 
 const TEST_GITHUB_PRIVATE_KEY_BASE64 = Buffer.from(
   generateKeyPairSync('rsa', {
@@ -67,7 +67,6 @@ describe('validateEnvironment ? ANALYTICS_IP_HASH_SALT (SEC-03)', () => {
 
   it('accepts a strong explicit value in production', () => {
     const salt = 'z'.repeat(40);
-
     const result = validateEnvironment(
       productionConfig({
         ANALYTICS_IP_HASH_SALT: salt,
@@ -87,7 +86,6 @@ describe('validateEnvironment ? ANALYTICS_IP_HASH_SALT (SEC-03)', () => {
 
   it('honors an explicitly configured value outside production instead of the fallback', () => {
     const salt = 'y'.repeat(40);
-
     const result = validateEnvironment(
       baseConfig({
         NODE_ENV: 'development',
@@ -103,7 +101,6 @@ describe('validateEnvironment ? ANALYTICS_IP_HASH_SALT (SEC-03)', () => {
       NODE_ENV: 'test',
       TEST_DATABASE_URL: 'postgresql://user:pass@localhost:5432/db_test',
     });
-
     const first = validateEnvironment(config);
     const second = validateEnvironment(config);
 

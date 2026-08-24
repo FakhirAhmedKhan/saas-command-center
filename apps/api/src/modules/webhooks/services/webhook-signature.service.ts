@@ -12,9 +12,7 @@ export class WebhookSignatureService {
 
   verify(secret: string, timestamp: string, rawBody: string, suppliedSignature: string): boolean {
     const expected = this.sign(secret, timestamp, rawBody);
-
     const expectedBuffer = Buffer.from(expected, 'utf8');
-
     const suppliedBuffer = Buffer.from(suppliedSignature, 'utf8');
 
     if (expectedBuffer.length !== suppliedBuffer.length) {

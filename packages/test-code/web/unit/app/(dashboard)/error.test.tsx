@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
-import DashboardError from '@/app/(dashboard)/error';
-import { ApiError } from '@/features/lib/api/api-error';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import DashboardError from '@/app/(dashboard)/error';
+import { ApiError } from '@/features/lib/api/api-error';
 
 describe('DashboardError boundary', () => {
   it('renders a friendly fallback message', () => {

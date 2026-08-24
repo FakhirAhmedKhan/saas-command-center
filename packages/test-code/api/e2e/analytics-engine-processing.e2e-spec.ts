@@ -1,12 +1,5 @@
 import { processAnalytics } from '../helpers/analytics-engine-old';
-import {
-  buildEventBatch,
-  buildTrackerEvent,
-  collectEvents,
-  createTrackedWebsite,
-  expectCollectionAccepted,
-  uniqueTrackerId,
-} from '../helpers/analytics-ingestion';
+import { buildEventBatch, buildTrackerEvent, collectEvents, createTrackedWebsite, expectCollectionAccepted, uniqueTrackerId } from '../helpers/analytics-ingestion';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { archiveWebsite, disableWebsite, expectWebsiteSuccess } from '../helpers/website';
@@ -18,9 +11,7 @@ import { AnalyticsProcessingService } from 'src/modules/analytics-engine/service
 
 describe('Analytics Engine Processing E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
-
   let processingService: AnalyticsProcessingService;
 
   beforeAll(async () => {
@@ -41,7 +32,6 @@ describe('Analytics Engine Processing E2E', () => {
 
   it('processes pending raw events through the protected endpoint', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
 
     expectCollectionAccepted(await collectEvents(app, trackedWebsite, buildEventBatch(trackedWebsite.origin, 3)), 3);
@@ -72,7 +62,6 @@ describe('Analytics Engine Processing E2E', () => {
 
   it('honors maxEvents and leaves the remaining raw events pending', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
 
     expectCollectionAccepted(await collectEvents(app, trackedWebsite, buildEventBatch(trackedWebsite.origin, 5)), 5);
@@ -103,9 +92,7 @@ describe('Analytics Engine Processing E2E', () => {
 
   it('creates a completed zero-work run when no events are pending', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const run = await processingService.processForWorkspace(owner.workspaceId, trackedWebsite.id, owner.userId, 100);
 
     expect(run.status).toBe(AnalyticsProcessingStatus.COMPLETED);
@@ -123,7 +110,6 @@ describe('Analytics Engine Processing E2E', () => {
 
   it('validates maxEvents boundaries', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
 
     for (const invalidValue of [0, -1, 1.5, 50_001, 'not-a-number']) {
@@ -137,11 +123,8 @@ describe('Analytics Engine Processing E2E', () => {
 
   it('allows DEVELOPER processing but denies VIEWER processing', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const developer = await registerWorkspaceTestUser(app, prisma);
-
     const viewer = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
 
     expect([200, 201]).toContain((await addWorkspaceMember(owner, developer, WorkspaceRole.DEVELOPER)).status);
@@ -175,7 +158,6 @@ describe('Analytics Engine Processing E2E', () => {
 
   it('rejects processing for disabled and archived websites', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const disabledWebsite = await createTrackedWebsite(owner);
 
     expectWebsiteSuccess(await disableWebsite(owner, disabledWebsite.id));
@@ -199,9 +181,7 @@ describe('Analytics Engine Processing E2E', () => {
 
   it('marks the run and processing state as FAILED when a session ID is reused by another visitor', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const sessionId = uniqueTrackerId('shared_session');
 
     expectCollectionAccepted(
@@ -218,16 +198,13 @@ describe('Analytics Engine Processing E2E', () => {
       2,
     );
 
-    await expect(processingService.processForWorkspace(owner.workspaceId, trackedWebsite.id, owner.userId, 100)).rejects.toThrow(
-      'A session identifier cannot belong to multiple visitors',
-    );
+    await expect(processingService.processForWorkspace(owner.workspaceId, trackedWebsite.id, owner.userId, 100)).rejects.toThrow('A session identifier cannot belong to multiple visitors');
 
     const state = await prisma.analyticsProcessingState.findUnique({
       where: {
         websiteId: trackedWebsite.id,
       },
     });
-
     const run = await prisma.analyticsProcessingRun.findFirst({
       where: {
         websiteId: trackedWebsite.id,

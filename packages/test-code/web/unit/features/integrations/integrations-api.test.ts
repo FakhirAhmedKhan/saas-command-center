@@ -1,21 +1,12 @@
-import {
-  createWebhookEndpoint,
-  disableWebhookEndpoint,
-  getWebhookDeliveries,
-  getWebhookEndpoints,
-  rotateWebhookSecret,
-  sendWebhookTest,
-  updateWebhookEndpoint,
-} from '@/features/integrations/integrations-api';
-import { apiRequest } from '@/features/lib/api/api-client';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { createWebhookEndpoint, disableWebhookEndpoint, getWebhookDeliveries, getWebhookEndpoints, rotateWebhookSecret, sendWebhookTest, updateWebhookEndpoint } from '@/features/integrations/integrations-api';
+import { apiRequest } from '@/features/lib/api/api-client';
 
 vi.mock('@/features/lib/api/api-client', () => ({
   apiRequest: vi.fn(),
 }));
 
 const apiRequestMock = vi.mocked(apiRequest);
-
 const WORKSPACE = 'workspace-1';
 const BASE = `/workspaces/${WORKSPACE}/integrations/webhooks`;
 

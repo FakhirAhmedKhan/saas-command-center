@@ -1,13 +1,10 @@
 // @vitest-environment jsdom
-import { MobileAiAnalysis } from '@/features/mobile-apps/mobile-ai-analysis';
-
-import { analyzeMobileApp } from '@/features/mobile-apps/mobile-apps-api';
 
 import { render, screen } from '@testing-library/react';
-
 import userEvent from '@testing-library/user-event';
-
 import { expect, it, vi } from 'vitest';
+import { MobileAiAnalysis } from '@/features/mobile-apps/mobile-ai-analysis';
+import { analyzeMobileApp } from '@/features/mobile-apps/mobile-apps-api';
 
 vi.mock('@/features/mobile-apps/mobile-apps-api', () => ({
   analyzeMobileApp: vi.fn(),

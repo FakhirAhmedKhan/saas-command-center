@@ -16,13 +16,9 @@ export default function WebsiteDetailsPage() {
     workspaceId: string;
     websiteId: string;
   }>();
-
   const { workspaceId, websiteId } = params;
-
   const [website, setWebsite] = useState<Website | null>(null);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -71,10 +67,7 @@ export default function WebsiteDetailsPage() {
   return (
     <div className='mx-auto w-full max-w-[1600px] space-y-5 p-4 sm:p-6 lg:p-8'>
       <div>
-        <Link
-          href={`/workspaces/${workspaceId}/websites`}
-          className='inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-500 transition hover:text-slate-800'
-        >
+        <Link href={`/workspaces/${workspaceId}/websites`} className='inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-500 transition hover:text-slate-800'>
           <ArrowLeft className='size-3.5' aria-hidden='true' />
           Back to websites
         </Link>
@@ -82,25 +75,14 @@ export default function WebsiteDetailsPage() {
         <div className='mt-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
           <div className='min-w-0'>
             <div className='flex flex-wrap items-center gap-1.5'>
-              {website.archivedAt ? (
-                <Badge variant='slate'>Archived</Badge>
-              ) : website.enabled ? (
-                <Badge variant='green'>Tracking enabled</Badge>
-              ) : (
-                <Badge variant='orange'>Tracking disabled</Badge>
-              )}
+              {website.archivedAt ? <Badge variant='slate'>Archived</Badge> : website.enabled ? <Badge variant='green'>Tracking enabled</Badge> : <Badge variant='orange'>Tracking disabled</Badge>}
 
               {website.application ? <Badge variant='blue'>{website.application.name}</Badge> : <Badge variant='slate'>Not connected</Badge>}
             </div>
 
             <h1 className='mt-2 truncate text-xl font-semibold tracking-tight text-slate-950'>{website.name}</h1>
 
-            <a
-              href={`https://${website.domain}`}
-              target='_blank'
-              rel='noreferrer'
-              className='mt-1.5 inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:underline'
-            >
+            <a href={`https://${website.domain}`} target='_blank' rel='noreferrer' className='mt-1.5 inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:underline'>
               <Globe2 className='size-3.5' aria-hidden='true' />
               {website.domain}
             </a>
@@ -117,10 +99,7 @@ export default function WebsiteDetailsPage() {
               </Link>
             ) : null}
 
-            <Link
-              href={`${baseHref}/installation`}
-              className='inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white transition hover:bg-brand-700'
-            >
+            <Link href={`${baseHref}/installation`} className='inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white transition hover:bg-brand-700'>
               <Code2 className='size-3.5' aria-hidden='true' />
               Installation
             </Link>

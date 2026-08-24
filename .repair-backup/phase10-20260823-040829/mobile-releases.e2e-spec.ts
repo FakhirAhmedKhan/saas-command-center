@@ -4,16 +4,13 @@ describe('Mobile Releases E2E', () => {
       buildStatus: 'SUCCESS',
     });
 
-    const response = await owner.agent
-      .post(`${API}/workspaces/${owner.workspaceId}/mobile-apps/${mobile.id}/releases`)
-      .set(withBearer(owner.accessToken))
-      .send({
-        buildId: build.id,
+    const response = await owner.agent.post(`${API}/workspaces/${owner.workspaceId}/mobile-apps/${mobile.id}/releases`).set(withBearer(owner.accessToken)).send({
+      buildId: build.id,
 
-        environment: 'PRODUCTION',
+      environment: 'PRODUCTION',
 
-        releaseNotes: 'Production release',
-      });
+      releaseNotes: 'Production release',
+    });
 
     expect(response.status).toBe(201);
 

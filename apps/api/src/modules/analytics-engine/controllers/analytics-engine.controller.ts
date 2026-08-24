@@ -17,7 +17,6 @@ interface AuthenticatedRequest extends Request {
 }
 
 const WRITE_ROLES = [WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER];
-
 const ADMIN_ROLES = [WorkspaceRole.OWNER, WorkspaceRole.ADMIN];
 
 @ApiTags('Analytics Engine')
@@ -78,7 +77,6 @@ export class AnalyticsEngineController {
     dto: ProcessAnalyticsDto,
   ) {
     const run = await this.processingService.processForWorkspace(workspaceId, websiteId, request.user.id, dto.maxEvents);
-
     const status = await this.queryService.getStatus(workspaceId, websiteId);
 
     return {
@@ -103,7 +101,6 @@ export class AnalyticsEngineController {
     dto: ReprocessAnalyticsDto,
   ) {
     const run = await this.processingService.reprocessRange(workspaceId, websiteId, dto, request.user.id);
-
     const status = await this.queryService.getStatus(workspaceId, websiteId);
 
     return {

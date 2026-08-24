@@ -18,7 +18,6 @@ export function DesktopPerformance({ workspaceId, desktopAppId }: Props) {
   const [architecture, setArchitecture] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const load = useCallback(async () => {
     const filters: DesktopRuntimeFilters = {
       ...(version ? { version } : {}),
@@ -59,31 +58,15 @@ export function DesktopPerformance({ workspaceId, desktopAppId }: Props) {
           </div>
 
           <div className='grid gap-2 sm:grid-cols-3'>
-            <input
-              aria-label='Performance version filter'
-              value={version}
-              onChange={(event) => setVersion(event.target.value)}
-              placeholder='Version'
-              className='h-9 rounded-lg border border-slate-300 px-3 text-sm'
-            />
-            <select
-              aria-label='Performance platform filter'
-              value={platform}
-              onChange={(event) => setPlatform(event.target.value)}
-              className='h-9 rounded-lg border border-slate-300 px-3 text-sm'
-            >
+            <input aria-label='Performance version filter' value={version} onChange={(event) => setVersion(event.target.value)} placeholder='Version' className='h-9 rounded-lg border border-slate-300 px-3 text-sm' />
+            <select aria-label='Performance platform filter' value={platform} onChange={(event) => setPlatform(event.target.value)} className='h-9 rounded-lg border border-slate-300 px-3 text-sm'>
               <option value=''>All platforms</option>
               <option value='WINDOWS'>Windows</option>
               <option value='MACOS'>macOS</option>
               <option value='LINUX'>Linux</option>
               <option value='CROSS_PLATFORM'>Cross-platform</option>
             </select>
-            <select
-              aria-label='Performance architecture filter'
-              value={architecture}
-              onChange={(event) => setArchitecture(event.target.value)}
-              className='h-9 rounded-lg border border-slate-300 px-3 text-sm'
-            >
+            <select aria-label='Performance architecture filter' value={architecture} onChange={(event) => setArchitecture(event.target.value)} className='h-9 rounded-lg border border-slate-300 px-3 text-sm'>
               <option value=''>All architectures</option>
               <option value='X64'>x64</option>
               <option value='ARM64'>ARM64</option>
@@ -118,9 +101,7 @@ export function DesktopPerformance({ workspaceId, desktopAppId }: Props) {
             <MetricCard label='Version adoption' value={formatPercent(data.summary.versionAdoptionPercent)} />
           </div>
         ) : !loading && !error ? (
-          <div className='mt-6 rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500'>
-            No performance metrics match the current filters.
-          </div>
+          <div className='mt-6 rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500'>No performance metrics match the current filters.</div>
         ) : null}
       </div>
     </section>

@@ -20,7 +20,6 @@ export class WorkspaceInvitationService {
 
   async create(workspaceId: string, invitedById: string, input: CreateWorkspaceInvitationDto) {
     const email = this.normalizeEmail(input.email);
-
     const [workspace, inviter, existingUser] = await Promise.all([
       this.prisma.workspace.findUnique({
         where: {
@@ -85,7 +84,6 @@ export class WorkspaceInvitationService {
     await this.expirePendingInvitations(workspaceId, email);
 
     const generated = this.tokens.generate();
-
     let invitation;
 
     try {
@@ -191,7 +189,6 @@ export class WorkspaceInvitationService {
     }
 
     const generated = this.tokens.generate();
-
     const updated = await this.prisma.workspaceInvitation.update({
       where: {
         id: invitation.id,
@@ -211,7 +208,6 @@ export class WorkspaceInvitationService {
 
       include: this.invitationInclude(),
     });
-
     const invitationUrl = this.tokens.createInvitationUrl(generated.rawToken);
 
     await this.deliverInvitation(
@@ -271,7 +267,6 @@ export class WorkspaceInvitationService {
 
   async preview(rawToken: string) {
     const invitation = await this.findByToken(rawToken);
-
     const status = await this.resolveCurrentStatus(invitation);
 
     return {

@@ -13,9 +13,7 @@ import request from 'supertest';
 
 describe('Analytics Reprocessing E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
-
   let processingService: AnalyticsProcessingService;
 
   beforeAll(async () => {
@@ -36,13 +34,9 @@ describe('Analytics Reprocessing E2E', () => {
 
   it('rebuilds only the selected range and preserves events outside it', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
-
     const inRangeId = uniqueTrackerId('in_range');
-
     const outsideId = uniqueTrackerId('outside_range');
-
     const inRangeRaw = await createRawAnalyticsEvent(prisma, website, {
       eventId: inRangeId,
       occurredAt: new Date('2026-08-01T10:00:00.000Z'),
@@ -105,11 +99,8 @@ describe('Analytics Reprocessing E2E', () => {
 
   it('is idempotent across repeated reprocessing of the same range', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
-
     const visitorId = uniqueTrackerId('reprocess_visitor');
-
     const sessionId = uniqueTrackerId('reprocess_session');
 
     await createRawAnalyticsEvent(prisma, website, {
@@ -165,9 +156,7 @@ describe('Analytics Reprocessing E2E', () => {
 
   it('rejects invalid and oversized date ranges', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
-
     const invalidBodies = [
       {
         dateFrom: 'not-a-date',
@@ -194,7 +183,6 @@ describe('Analytics Reprocessing E2E', () => {
 
   it('rejects invalid maxEvents and a range larger than maxEvents', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
 
     await createRawAnalyticsEvent(prisma, website, {
@@ -230,13 +218,9 @@ describe('Analytics Reprocessing E2E', () => {
 
   it('allows OWNER and ADMIN but denies DEVELOPER and VIEWER', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const admin = await registerWorkspaceTestUser(app, prisma);
-
     const developer = await registerWorkspaceTestUser(app, prisma);
-
     const viewer = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
 
     for (const [actor, role] of [
@@ -264,7 +248,6 @@ describe('Analytics Reprocessing E2E', () => {
 
   it('does not increment the processing total or move the normal cursor', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
 
     await createRawAnalyticsEvent(prisma, website, {
@@ -303,7 +286,6 @@ describe('Analytics Reprocessing E2E', () => {
 
   it('rejects disabled and archived websites without deleting valid normalized data', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const websites = [await createTrackedWebsite(owner), await createTrackedWebsite(owner)];
 
     for (const website of websites) {
@@ -339,11 +321,8 @@ describe('Analytics Reprocessing E2E', () => {
 
   it('requires authentication and hides foreign websites', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const foreignOwner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
-
     const body = {
       dateFrom: '2026-08-01T00:00:00.000Z',
       dateTo: '2026-08-02T00:00:00.000Z',

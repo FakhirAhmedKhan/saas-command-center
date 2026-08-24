@@ -44,12 +44,10 @@ export const applicationRoutes = {
   archive: (workspaceId: string, applicationId: string): string => `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/archive`,
   restore: (workspaceId: string, applicationId: string): string => `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/restore`,
   technologies: (workspaceId: string, applicationId: string): string => `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/technologies`,
-  technology: (workspaceId: string, applicationId: string, technologyId: string): string =>
-    `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/technologies/${technologyId}`,
+  technology: (workspaceId: string, applicationId: string, technologyId: string): string => `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/technologies/${technologyId}`,
 
   links: (workspaceId: string, applicationId: string): string => `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/links`,
-  link: (workspaceId: string, applicationId: string, linkId: string): string =>
-    `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/links/${linkId}`,
+  link: (workspaceId: string, applicationId: string, linkId: string): string => `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/links/${linkId}`,
 
   workspaceActivities: (workspaceId: string): string => `/api/v1/workspaces/${workspaceId}/activities`,
   applicationActivities: (workspaceId: string, applicationId: string): string => `/api/v1/workspaces/${workspaceId}/applications/${applicationId}/activities`,
@@ -61,7 +59,6 @@ function uniqueSuffix(): string {
 
 export function enumValue<T extends string>(enumObject: StringEnumObject<T>, index = 0): T {
   const values = Object.values(enumObject);
-
   const value = values[index] ?? values[0];
 
   if (!value) {
@@ -140,21 +137,8 @@ export function recordString(record: Record<string, unknown>, ...keys: string[])
 
 export function readApiRecord(response: Response, preferredKeys: string[] = []): Record<string, unknown> {
   const body = asRecord(response.body);
-
   const data = asRecord(body?.data);
-
-  const candidates: unknown[] = [
-    response.body,
-    body?.data,
-    body?.item,
-    body?.application,
-    body?.technology,
-    body?.link,
-    data?.item,
-    data?.application,
-    data?.technology,
-    data?.link,
-  ];
+  const candidates: unknown[] = [response.body, body?.data, body?.item, body?.application, body?.technology, body?.link, data?.item, data?.application, data?.technology, data?.link];
 
   for (const key of preferredKeys) {
     candidates.push(body?.[key], data?.[key]);
@@ -173,21 +157,8 @@ export function readApiRecord(response: Response, preferredKeys: string[] = []):
 
 export function readApiItems(response: Response, preferredKeys: string[] = []): Record<string, unknown>[] {
   const body = asRecord(response.body);
-
   const data = asRecord(body?.data);
-
-  const candidates: unknown[] = [
-    response.body,
-    body?.items,
-    body?.results,
-    body?.applications,
-    body?.activities,
-    body?.data,
-    data?.items,
-    data?.results,
-    data?.applications,
-    data?.activities,
-  ];
+  const candidates: unknown[] = [response.body, body?.items, body?.results, body?.applications, body?.activities, body?.data, data?.items, data?.results, data?.applications, data?.activities];
 
   for (const key of preferredKeys) {
     candidates.push(body?.[key], data?.[key]);
@@ -206,7 +177,6 @@ export function readApiItems(response: Response, preferredKeys: string[] = []): 
 
 export function readEntityId(response: Response, preferredKeys: string[] = []): string {
   const record = readApiRecord(response, preferredKeys);
-
   const id = recordString(record, 'id', 'applicationId', 'technologyId', 'linkId');
 
   if (!id) {
@@ -222,7 +192,6 @@ export function expectMutationSuccess(response: Response): void {
 
 export async function createApplication(actor: WorkspaceTestUser, overrides: Partial<CreateApplicationPayload> = {}): Promise<CreatedApplication> {
   const payload = buildApplicationPayload(overrides);
-
   const response = await actor.agent.post(applicationRoutes.root(actor.workspaceId)).set(withBearer(actor.accessToken)).send(payload);
 
   expectSuccessfulStatus(response);
@@ -263,18 +232,10 @@ export async function permanentlyDeleteApplication(actor: WorkspaceTestUser, app
 }
 
 export async function addTechnology(actor: WorkspaceTestUser, applicationId: string, overrides: Partial<TechnologyPayload> = {}): Promise<Response> {
-  return actor.agent
-    .post(applicationRoutes.technologies(actor.workspaceId, applicationId))
-    .set(withBearer(actor.accessToken))
-    .send(buildTechnologyPayload(overrides));
+  return actor.agent.post(applicationRoutes.technologies(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken)).send(buildTechnologyPayload(overrides));
 }
 
-export async function updateTechnology(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  technologyId: string,
-  payload: Partial<TechnologyPayload>,
-): Promise<Response> {
+export async function updateTechnology(actor: WorkspaceTestUser, applicationId: string, technologyId: string, payload: Partial<TechnologyPayload>): Promise<Response> {
   return actor.agent
     .patch(applicationRoutes.technology(actor.workspaceId, applicationId, technologyId))
     .set(withBearer(actor.accessToken))

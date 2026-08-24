@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
-import { ReviewConfiguration } from '@/features/workspaces/github-import/components/review-configuration';
 import type { RepositoryAnalysisResult } from '@/features/workspaces/github-import/github-import-types';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { ReviewConfiguration } from '@/features/workspaces/github-import/components/review-configuration';
 
 function monorepoAnalysis(): RepositoryAnalysisResult {
   return {
@@ -114,7 +114,6 @@ describe('ReviewConfiguration', () => {
 
   it('blocks submission when no applications are selected', async () => {
     const onSubmit = vi.fn();
-
     const analysis = monorepoAnalysis();
 
     render(<ReviewConfiguration analysis={{ ...analysis, applications: [{ ...analysis.applications[0]!, runnable: false }] }} onSubmit={onSubmit} />);

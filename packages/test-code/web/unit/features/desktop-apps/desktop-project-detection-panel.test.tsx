@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
 
-import { applyDetectedDesktopConfiguration, detectDesktopProject } from '@/features/desktop-apps/desktop-apps-api';
-import { DesktopProjectDetectionPanel } from '@/features/desktop-apps/desktop-project-detection-panel';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { applyDetectedDesktopConfiguration, detectDesktopProject } from '@/features/desktop-apps/desktop-apps-api';
+import { DesktopProjectDetectionPanel } from '@/features/desktop-apps/desktop-project-detection-panel';
 
 vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
   detectDesktopProject: vi.fn(),
@@ -12,7 +12,6 @@ vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
 }));
 
 const detectMock = vi.mocked(detectDesktopProject);
-
 const updateMock = vi.mocked(applyDetectedDesktopConfiguration);
 
 type DesktopAppFixture = Awaited<ReturnType<typeof applyDetectedDesktopConfiguration>>;

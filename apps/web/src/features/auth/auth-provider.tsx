@@ -43,11 +43,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
 function AuthProviderRoot({ children }: PropsWithChildren) {
   const [status, setStatus] = useState<AuthStatus>('loading');
-
   const [user, setUser] = useState<User | null>(null);
-
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-
   const applyAuthResponse = useCallback((response: AuthResponse) => {
     setAccessToken(response.accessToken);
 
@@ -57,7 +54,6 @@ function AuthProviderRoot({ children }: PropsWithChildren) {
 
     setStatus('authenticated');
   }, []);
-
   const clearSession = useCallback(() => {
     setAccessToken(null);
 
@@ -67,7 +63,6 @@ function AuthProviderRoot({ children }: PropsWithChildren) {
 
     setStatus('unauthenticated');
   }, []);
-
   const refresh = useCallback(async () => {
     /*
      * Goes through the api-client's single-flight refreshSession() rather
@@ -119,7 +114,6 @@ function AuthProviderRoot({ children }: PropsWithChildren) {
     },
     [applyAuthResponse],
   );
-
   const register = useCallback(
     async (input: RegisterInput) => {
       const response = await apiRequest<AuthResponse>('/auth/register', {
@@ -133,7 +127,6 @@ function AuthProviderRoot({ children }: PropsWithChildren) {
     },
     [applyAuthResponse],
   );
-
   const logout = useCallback(async () => {
     try {
       await apiRequest<{
@@ -146,7 +139,6 @@ function AuthProviderRoot({ children }: PropsWithChildren) {
       clearSession();
     }
   }, [clearSession]);
-
   const logoutAll = useCallback(async () => {
     try {
       await apiRequest<{
@@ -159,7 +151,6 @@ function AuthProviderRoot({ children }: PropsWithChildren) {
       clearSession();
     }
   }, [clearSession]);
-
   const refreshCurrentUser = useCallback(async () => {
     const response = await apiRequest<CurrentUserResponse>('/auth/me');
 
@@ -167,7 +158,6 @@ function AuthProviderRoot({ children }: PropsWithChildren) {
 
     setWorkspaces(response.workspaces ?? []);
   }, []);
-
   const updateWorkspaceInState = useCallback((updatedWorkspace: Workspace) => {
     setWorkspaces((current) => {
       const exists = current.some((workspace) => workspace.id === updatedWorkspace.id);
@@ -186,7 +176,6 @@ function AuthProviderRoot({ children }: PropsWithChildren) {
       );
     });
   }, []);
-
   const value = useMemo<AuthContextValue>(
     () => ({
       status,

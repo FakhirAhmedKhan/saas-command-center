@@ -1,9 +1,9 @@
-import type { INestApplication } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
 import { buildPath, createLinkedDesktopFixture, createRepository } from './helpers/desktop-test-fixtures';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
 
 describe('Desktop Builds E2E', () => {
   let app: INestApplication;
@@ -38,7 +38,6 @@ describe('Desktop Builds E2E', () => {
   it('tracks queued -> building -> success idempotently', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
     const path = `${buildPath(fixture.owner.workspaceId, fixture.desktopApp.id)}/ingest/github`;
-
     const queued = await fixture.owner.agent.post(path).set('Authorization', `Bearer ${fixture.owner.accessToken}`).send(payload(fixture.repository.id));
 
     expect(queued.status).toBe(201);
@@ -83,7 +82,6 @@ describe('Desktop Builds E2E', () => {
 
   it('tracks failed build', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
-
     const response = await fixture.owner.agent
       .post(`${buildPath(fixture.owner.workspaceId, fixture.desktopApp.id)}/ingest/github`)
       .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
@@ -139,9 +137,7 @@ describe('Desktop Builds E2E', () => {
 
   it('ignores an unrelated repository', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
-
     const unrelated = await createRepository(prisma, fixture.owner.workspaceId, null);
-
     const response = await fixture.owner.agent
       .post(`${buildPath(fixture.owner.workspaceId, fixture.desktopApp.id)}/ingest/github`)
       .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
@@ -207,10 +203,7 @@ describe('Desktop Builds E2E', () => {
   it('rejects cross-workspace build reads', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
     const outsider = await registerWorkspaceTestUser(app, prisma);
-
-    const response = await outsider.agent
-      .get(buildPath(fixture.owner.workspaceId, fixture.desktopApp.id))
-      .set('Authorization', `Bearer ${outsider.accessToken}`);
+    const response = await outsider.agent.get(buildPath(fixture.owner.workspaceId, fixture.desktopApp.id)).set('Authorization', `Bearer ${outsider.accessToken}`);
 
     expect(response.status).toBe(403);
   });

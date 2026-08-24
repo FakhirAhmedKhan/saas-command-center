@@ -65,14 +65,9 @@ declare global {
 }
 
 const SDK_VERSION = '1.0.0';
-
 const MAX_QUEUE_SIZE = 100;
-
 const MAX_BATCH_SIZE = 25;
-
-const SENSITIVE_QUERY_PARAMETER =
-  /^(access_?token|refresh_?token|token|password|pass|secret|authorization|auth|api_?key|session|session_?id|jwt|email|code|otp)$/i;
-
+const SENSITIVE_QUERY_PARAMETER = /^(access_?token|refresh_?token|token|password|pass|secret|authorization|auth|api_?key|session|session_?id|jwt|email|code|otp)$/i;
 const SENSITIVE_PROPERTY_KEY = /(password|passcode|token|secret|authorization|cookie|session|email|phone|address|credit|card|cvv|ssn|private|api.?key)/i;
 
 function safely(operation: () => void): void {
@@ -180,10 +175,7 @@ function sanitizeProperties(source: Record<string, unknown> | undefined): Tracke
     if (Array.isArray(value)) {
       result[key] = value
         .slice(0, 20)
-        .filter(
-          (item): item is string | number | boolean =>
-            typeof item === 'string' || (typeof item === 'number' && Number.isFinite(item)) || typeof item === 'boolean',
-        )
+        .filter((item): item is string | number | boolean => typeof item === 'string' || (typeof item === 'number' && Number.isFinite(item)) || typeof item === 'boolean')
         .map((item) => (typeof item === 'string' ? item.slice(0, 200) : item));
     }
   }
@@ -199,9 +191,7 @@ function readConfiguration(): TrackerConfiguration | null {
   }
 
   const websiteId = script.dataset.websiteId?.trim();
-
   const trackingKey = script.dataset.trackingKey?.trim();
-
   const endpoint = script.dataset.endpoint?.trim();
 
   if (!websiteId || !trackingKey || !endpoint) {
@@ -333,7 +323,6 @@ class CommandCenterTracker {
     this.flushing = true;
 
     const batch = this.queue.slice(0, MAX_BATCH_SIZE);
-
     const payload: TrackerPayload = {
       websiteId: this.config.websiteId,
       trackingKey: this.config.trackingKey,
@@ -341,7 +330,6 @@ class CommandCenterTracker {
       sentAt: new Date().toISOString(),
       events: batch,
     };
-
     const body = JSON.stringify(payload);
 
     try {
@@ -479,7 +467,6 @@ class CommandCenterTracker {
     }
 
     const now = Date.now();
-
     const durationMs = Math.max(0, Math.min(now - this.lastHeartbeatAt, 300_000));
 
     this.lastHeartbeatAt = now;
@@ -507,7 +494,6 @@ class CommandCenterTracker {
 
   private resolveSession(): StoredSession {
     const now = Date.now();
-
     const stored = readStorage(localStorage, this.sessionKey);
 
     if (stored) {
@@ -591,7 +577,6 @@ class CommandCenterTracker {
         this.trackPageView();
       }, 0);
     };
-
     const originalPushState = history.pushState;
 
     history.pushState = function pushState(...args: Parameters<History['pushState']>) {

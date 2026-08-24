@@ -38,24 +38,16 @@ export default function RawEventsPage() {
     workspaceId: string;
     websiteId: string;
   }>();
-
   const { workspaceId, websiteId } = params;
-
   const [type, setType] = useState<RawEventType | ''>('');
-
   const [eventName, setEventName] = useState('');
-
   const [query, setQuery] = useState<RawEventQuery>({
     page: 1,
     limit: 50,
   });
-
   const [response, setResponse] = useState<RawEventsResponse>(EMPTY_RESPONSE);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
-
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
@@ -152,9 +144,7 @@ export default function RawEventsPage() {
       <header className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
         <div>
           <h1 className='text-xl font-semibold tracking-tight text-slate-950'>Raw events</h1>
-          <p className='mt-1 text-sm leading-6 text-slate-500'>
-            Inspect the raw tracking stream before it&apos;s converted into visitors, sessions and reports.
-          </p>
+          <p className='mt-1 text-sm leading-6 text-slate-500'>Inspect the raw tracking stream before it&apos;s converted into visitors, sessions and reports.</p>
         </div>
 
         <Button variant='outline' size='sm' onClick={refresh} loading={loading}>

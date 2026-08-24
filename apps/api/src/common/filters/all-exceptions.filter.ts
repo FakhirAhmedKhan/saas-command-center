@@ -36,7 +36,6 @@ function getExpressErrorStatus(exception: unknown): number | undefined {
   }
 
   const candidate = exception as { status?: unknown; statusCode?: unknown };
-
   const status = typeof candidate.status === 'number' ? candidate.status : candidate.statusCode;
 
   if (typeof status !== 'number' || !Number.isInteger(status)) {
@@ -91,11 +90,8 @@ function normalizeHttpException(exception: HttpException): NormalizedException {
   }
 
   const responseRecord = exceptionResponse as Record<string, unknown>;
-
   const rawMessage = responseRecord.message;
-
   const message = typeof rawMessage === 'string' || isStringArray(rawMessage) ? rawMessage : exception.message;
-
   const rawError = responseRecord.error;
 
   return {
@@ -110,21 +106,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const context = host.switchToHttp();
-
     const request = context.getRequest<RequestWithId>();
-
     const response = context.getResponse<Response>();
-
     const isHttpException = exception instanceof HttpException;
-
     const isPrismaKnownError = !isHttpException && exception instanceof Prisma.PrismaClientKnownRequestError;
-
     const prismaResponse = isPrismaKnownError ? PRISMA_KNOWN_ERROR_RESPONSES[exception.code] : undefined;
-
     const expressErrorStatus = isHttpException || isPrismaKnownError ? undefined : getExpressErrorStatus(exception);
-
     const statusCode = isHttpException ? exception.getStatus() : (prismaResponse?.status ?? expressErrorStatus ?? HttpStatus.INTERNAL_SERVER_ERROR);
-
     const normalizedException = isHttpException
       ? normalizeHttpException(exception)
       : prismaResponse
@@ -148,20 +136,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
        * treating it as a genuine 500-level failure.
        */
       this.logger.warn(
-        [
-          `${request.method} ${request.originalUrl}`,
-          request.requestId ? `requestId=${request.requestId}` : undefined,
-          `Unhandled Prisma ${exception.code} reached the global filter; consider a service-level catch.`,
-        ]
+        [`${request.method} ${request.originalUrl}`, request.requestId ? `requestId=${request.requestId}` : undefined, `Unhandled Prisma ${exception.code} reached the global filter; consider a service-level catch.`]
           .filter(Boolean)
           .join(' | '),
       );
     } else if (!isHttpException && expressErrorStatus === undefined) {
       const stack = exception instanceof Error ? exception.stack : String(exception);
 
-      this.logger.error(
-        [`${request.method} ${request.originalUrl}`, request.requestId ? `requestId=${request.requestId}` : undefined, stack].filter(Boolean).join(' | '),
-      );
+      this.logger.error([`${request.method} ${request.originalUrl}`, request.requestId ? `requestId=${request.requestId}` : undefined, stack].filter(Boolean).join(' | '));
     }
 
     const body: ErrorResponse = {

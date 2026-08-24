@@ -98,7 +98,6 @@ test('truncates property keys and string values', async () => {
   const event = await collectCustomEvent(harness, 'limits_test', {
     [longKey]: 'v'.repeat(250),
   });
-
   const entries = Object.entries(event.properties);
   assert.equal(entries.length, 1);
   assert.equal(entries[0][0].length, 64);
@@ -108,7 +107,6 @@ test('truncates property keys and string values', async () => {
 test('keeps at most 20 properties', async () => {
   const harness = await createTrackerHarness();
   const properties = Object.fromEntries(Array.from({ length: 30 }, (_, index) => [`field_${index}`, index]));
-
   const event = await collectCustomEvent(harness, 'property_limit', properties);
 
   assert.equal(Object.keys(event.properties).length, 20);

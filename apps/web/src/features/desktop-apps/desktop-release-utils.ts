@@ -60,11 +60,8 @@ export function nextDesktopReleaseActions(status: DesktopReleaseStatus): Array<{
 }
 
 export function formatReleaseTarget(release: Pick<DesktopRelease, 'platform' | 'architecture'>): string {
-  const platform =
-    release.platform === 'MACOS' ? 'macOS' : release.platform === 'WINDOWS' ? 'Windows' : release.platform === 'LINUX' ? 'Linux' : 'Cross-platform';
-
-  const architecture =
-    release.architecture === 'ARM64' ? 'arm64' : release.architecture === 'X64' ? 'x64' : release.architecture === 'X86' ? 'x86' : 'Universal';
+  const platform = release.platform === 'MACOS' ? 'macOS' : release.platform === 'WINDOWS' ? 'Windows' : release.platform === 'LINUX' ? 'Linux' : 'Cross-platform';
+  const architecture = release.architecture === 'ARM64' ? 'arm64' : release.architecture === 'X64' ? 'x64' : release.architecture === 'X86' ? 'x86' : 'Universal';
 
   return `${platform} • ${architecture}`;
 }

@@ -30,19 +30,12 @@ function NewWebsiteContent() {
   const params = useParams<{
     workspaceId: string;
   }>();
-
   const router = useRouter();
-
   const searchParams = useSearchParams();
-
   const workspaceId = params.workspaceId;
-
   const initialApplicationId = searchParams.get('applicationId') ?? '';
-
   const [applications, setApplications] = useState<SaasApplication[]>([]);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -122,17 +115,9 @@ function NewWebsiteContent() {
         </div>
       </header>
 
-      {error ? (
-        <div className='rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800'>Applications could not be loaded: {error}</div>
-      ) : null}
+      {error ? <div className='rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800'>Applications could not be loaded: {error}</div> : null}
 
-      <WebsiteForm
-        applications={applications}
-        initialApplicationId={initialApplicationId}
-        cancelHref={listHref}
-        submitLabel='Create website'
-        onSubmit={handleCreate}
-      />
+      <WebsiteForm applications={applications} initialApplicationId={initialApplicationId} cancelHref={listHref} submitLabel='Create website' onSubmit={handleCreate} />
     </div>
   );
 }

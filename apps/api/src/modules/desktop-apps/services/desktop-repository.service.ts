@@ -19,7 +19,6 @@ export class DesktopRepositoryService {
    */
   async getLinkedRepository(workspaceId: string, desktopAppId: string) {
     const desktopApp = await this.desktopAppsService.findOne(workspaceId, desktopAppId);
-
     const linkedRepository = await this.prisma.repositoryConnection.findFirst({
       where: {
         workspaceId,

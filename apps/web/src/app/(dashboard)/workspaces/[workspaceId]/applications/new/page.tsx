@@ -11,10 +11,8 @@ export default function NewApplicationPage() {
   const params = useParams<{
     workspaceId: string;
   }>();
-
   const router = useRouter();
   const workspaceId = params.workspaceId;
-
   const applicationsHref = `/workspaces/${workspaceId}/applications`;
 
   async function handleCreate(payload: CreateApplicationPayload): Promise<void> {

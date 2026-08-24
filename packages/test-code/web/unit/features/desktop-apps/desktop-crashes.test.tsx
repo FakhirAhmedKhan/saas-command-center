@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 
-import { DesktopCrashes } from '@/features/desktop-apps/desktop-crashes';
-import { listDesktopCrashes } from '@/features/desktop-apps/desktop-apps-api';
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { listDesktopCrashes } from '@/features/desktop-apps/desktop-apps-api';
+import { DesktopCrashes } from '@/features/desktop-apps/desktop-crashes';
 
 vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
   listDesktopCrashes: vi.fn(),

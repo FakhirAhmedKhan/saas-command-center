@@ -15,19 +15,12 @@ export default function DesktopCodePage() {
     workspaceId: string;
     desktopAppId: string;
   }>();
-
   const workspaceId = params.workspaceId;
-
   const desktopAppId = params.desktopAppId;
-
   const baseHref = `/workspaces/${workspaceId}` + `/desktop-apps/${desktopAppId}`;
-
   const [overview, setOverview] = useState<DesktopAppOverview | null>(null);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
-
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -102,10 +95,7 @@ export default function DesktopCodePage() {
 
           <p className='mt-2 max-w-md text-sm leading-6 text-slate-500'>This desktop application does not currently have a GitHub repository connected.</p>
 
-          <Link
-            href={`${baseHref}#settings`}
-            className='mt-5 inline-flex h-10 items-center rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700'
-          >
+          <Link href={`${baseHref}#settings`} className='mt-5 inline-flex h-10 items-center rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700'>
             Connect Repository
           </Link>
         </section>

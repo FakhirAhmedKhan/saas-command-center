@@ -1,6 +1,6 @@
-import { createWorkspace } from '@/features/workspaces/workspace-api';
-import { apiRequest } from '@/features/lib/api/api-client';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { apiRequest } from '@/features/lib/api/api-client';
+import { createWorkspace } from '@/features/workspaces/workspace-api';
 
 vi.mock('@/features/lib/api/api-client', () => ({
   apiRequest: vi.fn(),

@@ -14,20 +14,12 @@ export class DesktopCrashesController {
   constructor(private readonly service: DesktopCrashesService) {}
 
   @Get()
-  list(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Query() query: DesktopRuntimeQueryDto,
-  ) {
+  list(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Query() query: DesktopRuntimeQueryDto) {
     return this.service.list(workspaceId, desktopAppId, query);
   }
 
   @Get(':crashId')
-  findOne(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Param('crashId', ParseUUIDPipe) crashId: string,
-  ) {
+  findOne(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Param('crashId', ParseUUIDPipe) crashId: string) {
     return this.service.findOne(workspaceId, desktopAppId, crashId);
   }
 }

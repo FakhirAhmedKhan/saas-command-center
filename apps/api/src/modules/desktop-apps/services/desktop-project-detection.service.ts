@@ -27,27 +27,14 @@ export class DesktopProjectDetectionService {
     }
 
     const tree = await this.githubCode.getTree(repository.installation.externalInstallationId, repository.owner, repository.name, repository.defaultBranch);
-
     const paths = tree.entries.filter((entry) => entry.type === 'file').map((entry) => entry.path);
-
-    const candidateEntries = tree.entries.filter(
-      (entry) =>
-        entry.type === 'file' && this.isDetectionFile(entry.path) && (entry.size === null || entry.size === undefined || entry.size <= MAX_METADATA_FILE_SIZE),
-    );
-
+    const candidateEntries = tree.entries.filter((entry) => entry.type === 'file' && this.isDetectionFile(entry.path) && (entry.size === null || entry.size === undefined || entry.size <= MAX_METADATA_FILE_SIZE));
     const selectedEntries = candidateEntries.slice(0, MAX_METADATA_FILES);
-
     const files: Record<string, string> = {};
 
     for (const entry of selectedEntries) {
       try {
-        const file = await this.githubCode.getFile(
-          repository.installation.externalInstallationId,
-          repository.owner,
-          repository.name,
-          entry.path,
-          repository.defaultBranch,
-        );
+        const file = await this.githubCode.getFile(repository.installation.externalInstallationId, repository.owner, repository.name, entry.path, repository.defaultBranch);
 
         if (!file || file.content === null || file.size > MAX_METADATA_FILE_SIZE) {
           continue;
@@ -66,13 +53,7 @@ export class DesktopProjectDetectionService {
 
     for (const entry of xcodeProjectFiles) {
       try {
-        const file = await this.githubCode.getFile(
-          repository.installation.externalInstallationId,
-          repository.owner,
-          repository.name,
-          entry.path,
-          repository.defaultBranch,
-        );
+        const file = await this.githubCode.getFile(repository.installation.externalInstallationId, repository.owner, repository.name, entry.path, repository.defaultBranch);
 
         if (file && file.content !== null && file.size <= MAX_METADATA_FILE_SIZE) {
           files[entry.path] = file.content;
@@ -86,24 +67,12 @@ export class DesktopProjectDetectionService {
     // bounded source sample as well. This lets the pure detector find imports
     // such as javax.swing without downloading the entire repository.
     const javaSourceFiles = tree.entries
-      .filter(
-        (entry) =>
-          entry.type === 'file' &&
-          /\.(java|kt)$/i.test(entry.path) &&
-          !files[entry.path] &&
-          (entry.size === null || entry.size === undefined || entry.size <= MAX_METADATA_FILE_SIZE),
-      )
+      .filter((entry) => entry.type === 'file' && /\.(java|kt)$/i.test(entry.path) && !files[entry.path] && (entry.size === null || entry.size === undefined || entry.size <= MAX_METADATA_FILE_SIZE))
       .slice(0, 20);
 
     for (const entry of javaSourceFiles) {
       try {
-        const file = await this.githubCode.getFile(
-          repository.installation.externalInstallationId,
-          repository.owner,
-          repository.name,
-          entry.path,
-          repository.defaultBranch,
-        );
+        const file = await this.githubCode.getFile(repository.installation.externalInstallationId, repository.owner, repository.name, entry.path, repository.defaultBranch);
 
         if (file && file.content !== null && file.size <= MAX_METADATA_FILE_SIZE) {
           files[entry.path] = file.content;

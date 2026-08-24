@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { MobileReleases } from '@/features/mobile-apps/mobile-releases';
-import { createMobileRelease, listMobileBuilds, listMobileReleases, updateMobileReleaseStatus } from '@/features/mobile-apps/mobile-apps-api';
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { createMobileRelease, listMobileBuilds, listMobileReleases, updateMobileReleaseStatus } from '@/features/mobile-apps/mobile-apps-api';
+import { MobileReleases } from '@/features/mobile-apps/mobile-releases';
 
 vi.mock('@/features/mobile-apps/mobile-apps-api', () => ({
   createMobileRelease: vi.fn(),

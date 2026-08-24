@@ -33,24 +33,12 @@ export class DesktopRepositoryMetadataService {
     }
 
     const tree = await this.githubCode.getTree(repository.installation.externalInstallationId, repository.owner, repository.name, repository.defaultBranch);
-
-    const entries = tree.entries
-      .filter(
-        (entry) => entry.type === 'file' && this.isInteresting(entry.path) && (entry.size === null || entry.size === undefined || entry.size <= MAX_FILE_SIZE),
-      )
-      .slice(0, MAX_FILES);
-
+    const entries = tree.entries.filter((entry) => entry.type === 'file' && this.isInteresting(entry.path) && (entry.size === null || entry.size === undefined || entry.size <= MAX_FILE_SIZE)).slice(0, MAX_FILES);
     const files: Record<string, string> = {};
 
     for (const entry of entries) {
       try {
-        const file = await this.githubCode.getFile(
-          repository.installation.externalInstallationId,
-          repository.owner,
-          repository.name,
-          entry.path,
-          repository.defaultBranch,
-        );
+        const file = await this.githubCode.getFile(repository.installation.externalInstallationId, repository.owner, repository.name, entry.path, repository.defaultBranch);
 
         if (file && file.content !== null && file.size <= MAX_FILE_SIZE) {
           files[entry.path] = file.content;

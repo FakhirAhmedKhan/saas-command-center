@@ -34,7 +34,6 @@ export class WebhookEventPublisherService {
           occurredAt: input.occurredAt ?? new Date(),
         },
       });
-
       const endpoints = await transaction.webhookEndpoint.findMany({
         where: {
           workspaceId: input.workspaceId,
@@ -88,7 +87,6 @@ export class WebhookEventPublisherService {
           maxAttempts: true,
         },
       });
-
       const event = await transaction.webhookEvent.create({
         data: {
           workspaceId,

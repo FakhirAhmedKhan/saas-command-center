@@ -34,25 +34,14 @@ export class AnalyticsAggregationService {
     });
   }
 
-  async rebuildBucketsInTransaction(
-    transaction: Prisma.TransactionClient,
-    website: AnalyticsAggregationWebsite,
-    period: AnalyticsAggregatePeriod,
-    bucketStarts: readonly Date[],
-  ): Promise<void> {
+  async rebuildBucketsInTransaction(transaction: Prisma.TransactionClient, website: AnalyticsAggregationWebsite, period: AnalyticsAggregatePeriod, bucketStarts: readonly Date[]): Promise<void> {
     for (const bucketStart of bucketStarts) {
       await this.rebuildBucketInTransaction(transaction, website, period, bucketStart);
     }
   }
 
-  private async rebuildBucketInTransaction(
-    transaction: Prisma.TransactionClient,
-    website: AnalyticsAggregationWebsite,
-    period: AnalyticsAggregatePeriod,
-    bucketStart: Date,
-  ): Promise<void> {
+  private async rebuildBucketInTransaction(transaction: Prisma.TransactionClient, website: AnalyticsAggregationWebsite, period: AnalyticsAggregatePeriod, bucketStart: Date): Promise<void> {
     const bucket = getAnalyticsBucket(bucketStart, website.timeZone, period);
-
     const events = await transaction.analyticsEvent.findMany({
       where: {
         websiteId: website.id,
@@ -69,7 +58,6 @@ export class AnalyticsAggregationService {
         eventName: true,
       },
     });
-
     const pageViews = await transaction.analyticsPageView.findMany({
       where: {
         websiteId: website.id,
@@ -86,7 +74,6 @@ export class AnalyticsAggregationService {
         title: true,
       },
     });
-
     const sessions = await transaction.analyticsSession.findMany({
       where: {
         websiteId: website.id,
@@ -111,9 +98,7 @@ export class AnalyticsAggregationService {
         durationMs: true,
       },
     });
-
     const aggregates = new Map<string, MutableAggregate>();
-
     const overview = this.getAggregate(aggregates, AnalyticsAggregateDimension.OVERVIEW, 'overview', 'Overview');
 
     for (const event of events) {
@@ -125,7 +110,6 @@ export class AnalyticsAggregationService {
         overview.customEvents += 1;
 
         const eventName = event.eventName ?? 'Unknown';
-
         const custom = this.getAggregate(
           aggregates,
 
@@ -202,27 +186,14 @@ export class AnalyticsAggregationService {
         session,
       );
 
-      this.addSessionDimension(
-        aggregates,
-        AnalyticsAggregateDimension.DEVICE,
-        session.deviceType ?? AnalyticsDeviceType.OTHER,
-        session.deviceType ?? AnalyticsDeviceType.OTHER,
-        session,
-      );
+      this.addSessionDimension(aggregates, AnalyticsAggregateDimension.DEVICE, session.deviceType ?? AnalyticsDeviceType.OTHER, session.deviceType ?? AnalyticsDeviceType.OTHER, session);
 
       this.addSessionDimension(aggregates, AnalyticsAggregateDimension.BROWSER, session.browserName || 'Unknown', session.browserName || 'Unknown', session);
 
-      this.addSessionDimension(
-        aggregates,
-        AnalyticsAggregateDimension.OPERATING_SYSTEM,
-        session.operatingSystem || 'Unknown',
-        session.operatingSystem || 'Unknown',
-        session,
-      );
+      this.addSessionDimension(aggregates, AnalyticsAggregateDimension.OPERATING_SYSTEM, session.operatingSystem || 'Unknown', session.operatingSystem || 'Unknown', session);
     }
 
     const generatedAt = new Date();
-
     const data = [...aggregates.values()].map((item) => ({
       websiteId: website.id,
       bucketStart: bucket.start,
@@ -285,7 +256,6 @@ export class AnalyticsAggregationService {
 
   private getAggregate(collection: Map<string, MutableAggregate>, dimension: AnalyticsAggregateDimension, value: string, label: string): MutableAggregate {
     const key = `${dimension}:${value}`;
-
     const existing = collection.get(key);
 
     if (existing) {

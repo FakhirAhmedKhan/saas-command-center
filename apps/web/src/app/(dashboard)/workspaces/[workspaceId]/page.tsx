@@ -15,13 +15,9 @@ export default function WorkspacePage() {
   const params = useParams<{
     workspaceId: string;
   }>();
-
   const workspaceId = params.workspaceId;
-
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
-
   const [applicationCount, setApplicationCount] = useState<number | null>(null);
-
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -29,10 +25,7 @@ export default function WorkspacePage() {
 
     async function loadWorkspace() {
       try {
-        const [workspaceResponse, applicationsResponse] = await Promise.all([
-          apiRequest<Workspace>(`/workspaces/${workspaceId}`),
-          getApplications(workspaceId, { limit: 1 }),
-        ]);
+        const [workspaceResponse, applicationsResponse] = await Promise.all([apiRequest<Workspace>(`/workspaces/${workspaceId}`), getApplications(workspaceId, { limit: 1 })]);
 
         if (active) {
           setWorkspace(workspaceResponse);
@@ -93,10 +86,7 @@ export default function WorkspacePage() {
         </div>
 
         <div className='grid gap-3 p-4 sm:grid-cols-2 sm:p-5'>
-          <Link
-            href={`/workspaces/${workspace.id}/settings`}
-            className='group flex flex-col gap-1 rounded-lg border border-slate-200 p-3.5 transition hover:border-slate-300'
-          >
+          <Link href={`/workspaces/${workspace.id}/settings`} className='group flex flex-col gap-1 rounded-lg border border-slate-200 p-3.5 transition hover:border-slate-300'>
             <h3 className='text-sm font-semibold text-slate-900'>Workspace settings</h3>
             <p className='text-xs leading-5 text-slate-500'>Update the workspace name and slug.</p>
             <span className='mt-1 inline-flex items-center gap-1 text-xs font-medium text-brand-700'>
@@ -105,10 +95,7 @@ export default function WorkspacePage() {
             </span>
           </Link>
 
-          <Link
-            href={`/workspaces/${workspace.id}/settings/members`}
-            className='group flex flex-col gap-1 rounded-lg border border-slate-200 p-3.5 transition hover:border-slate-300'
-          >
+          <Link href={`/workspaces/${workspace.id}/settings/members`} className='group flex flex-col gap-1 rounded-lg border border-slate-200 p-3.5 transition hover:border-slate-300'>
             <h3 className='text-sm font-semibold text-slate-900'>Members and roles</h3>
             <p className='text-xs leading-5 text-slate-500'>Add users and control workspace permissions.</p>
             <span className='mt-1 inline-flex items-center gap-1 text-xs font-medium text-brand-700'>

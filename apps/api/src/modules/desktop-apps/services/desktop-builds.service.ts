@@ -112,15 +112,10 @@ export class DesktopBuildsService {
 
     const platform = dto.platform ?? app.platform;
     const architecture = dto.architecture ?? app.architecture;
-
     const status = this.resolveStatus(dto.status, dto.conclusion);
-
     const startedAt = dto.startedAt ? new Date(dto.startedAt) : null;
-
     const completedAt = dto.completedAt ? new Date(dto.completedAt) : null;
-
     const durationMs = dto.durationMs ?? (startedAt && completedAt ? Math.max(0, completedAt.getTime() - startedAt.getTime()) : null);
-
     const build = await this.prisma.desktopBuild.upsert({
       where: {
         repositoryId_workflowRunId_platform_architecture: {

@@ -14,21 +14,13 @@ export default function WorkspaceSettingsPage() {
   const params = useParams<{
     workspaceId: string;
   }>();
-
   const workspaceId = params.workspaceId;
-
   const { updateWorkspaceInState } = useAuth();
-
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
-
   const [name, setName] = useState('');
-
   const [slug, setSlug] = useState('');
-
   const [error, setError] = useState<string | null>(null);
-
   const [success, setSuccess] = useState<string | null>(null);
-
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -91,7 +83,6 @@ export default function WorkspaceSettingsPage() {
   }
 
   const role = workspace?.members?.[0]?.role ?? 'VIEWER';
-
   const canEdit = role === 'OWNER' || role === 'ADMIN';
 
   return (
@@ -122,21 +113,9 @@ export default function WorkspaceSettingsPage() {
             </div>
           ) : null}
 
-          {!canEdit ? (
-            <div className='rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600'>
-              Your role has read-only access to workspace settings.
-            </div>
-          ) : null}
+          {!canEdit ? <div className='rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600'>Your role has read-only access to workspace settings.</div> : null}
 
-          <Input
-            id='workspaceName'
-            label='Workspace name'
-            disabled={!canEdit}
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            minLength={2}
-            required
-          />
+          <Input id='workspaceName' label='Workspace name' disabled={!canEdit} value={name} onChange={(event) => setName(event.target.value)} minLength={2} required />
 
           <Input
             id='workspaceSlug'

@@ -53,14 +53,12 @@ export class AnalyticsRangeProcessorService {
             processedAt: null,
           },
         });
-
         /*
          * Keep all processing sequential inside the interactive
          * transaction. Parallel Prisma queries on one transaction
          * client previously caused pg warnings.
          */
         const rawResult = await this.rawEvents.processRange(transaction, input);
-
         /*
          * Rebuilding a session also rebuilds its page-view
          * entry/exit state through PageViewRebuilderService.
@@ -81,7 +79,6 @@ export class AnalyticsRangeProcessorService {
             timeZone: true,
           },
         });
-
         /*
          * Event/page-view aggregates belong to buckets based on
          * event occurrence time.
@@ -92,7 +89,6 @@ export class AnalyticsRangeProcessorService {
          * buckets must be rebuilt.
          */
         const hourlyBuckets = new Set(rawResult.hourlyBuckets);
-
         const dailyBuckets = new Set(rawResult.dailyBuckets);
 
         for (const rebuilt of rebuiltSessions) {

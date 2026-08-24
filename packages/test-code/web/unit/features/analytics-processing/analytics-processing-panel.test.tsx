@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { AnalyticsProcessingPanel } from '@/features/analytics-processing/analytics-processing-panel';
 import type { AnalyticsProcessingStatus, ProcessingRun } from '@/features/analytics-processing/analytics-processing.types';
 import { render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { AnalyticsProcessingPanel } from '@/features/analytics-processing/analytics-processing-panel';
 
 const { getAnalyticsProcessingStatusMock } = vi.hoisted(() => ({
   getAnalyticsProcessingStatusMock: vi.fn(),

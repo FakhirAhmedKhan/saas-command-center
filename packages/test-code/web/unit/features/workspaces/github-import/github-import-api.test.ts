@@ -1,4 +1,6 @@
-﻿import {
+﻿import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { apiRequest } from '@/features/lib/api/api-client';
+import {
   analyzeRepository,
   beginPersonalGithubConnect,
   completePersonalGithubCallback,
@@ -6,8 +8,6 @@
   importWorkspaceFromGithub,
   listImportableRepositories,
 } from '@/features/workspaces/github-import/github-import-api';
-import { apiRequest } from '@/features/lib/api/api-client';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/lib/api/api-client', () => ({
   apiRequest: vi.fn(),

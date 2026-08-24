@@ -22,7 +22,6 @@ function toDateInput(date: Date): string {
 
 function createInitialDates() {
   const to = new Date();
-
   const from = new Date(to);
 
   from.setUTCDate(from.getUTCDate() - 7);
@@ -123,25 +122,16 @@ export function AnalyticsProcessingPanel({ workspaceId, websiteId }: AnalyticsPr
     createInitialDates,
     [],
   );
-
   const [from, setFrom] = useState(initialDates.from);
-
   const [to, setTo] = useState(initialDates.to);
-
   const [submitting, setSubmitting] = useState(false);
-
   const [retryingRunId, setRetryingRunId] = useState<string | null>(null);
-
   const [actionError, setActionError] = useState<string | null>(null);
-
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
   const { data, loading, error, reload } = useAnalyticsProcessing(workspaceId, websiteId);
 
   async function reprocess(): Promise<void> {
-    const confirmed = window.confirm(
-      `Reprocess analytics from ${from} through ${to}? Existing analytics will remain available unless the complete rebuild succeeds.`,
-    );
+    const confirmed = window.confirm(`Reprocess analytics from ${from} through ${to}? Existing analytics will remain available unless the complete rebuild succeeds.`);
 
     if (!confirmed) {
       return;
@@ -155,7 +145,6 @@ export function AnalyticsProcessingPanel({ workspaceId, websiteId }: AnalyticsPr
 
     try {
       const rangeStart = new Date(`${from}T00:00:00.000Z`);
-
       const exclusiveEnd = new Date(`${to}T00:00:00.000Z`);
 
       exclusiveEnd.setUTCDate(exclusiveEnd.getUTCDate() + 1);
@@ -204,14 +193,7 @@ export function AnalyticsProcessingPanel({ workspaceId, websiteId }: AnalyticsPr
   }
 
   if (error) {
-    return (
-      <PageError
-        title='Processing status unavailable'
-        message={getErrorMessage(error)}
-        requestId={error instanceof ApiError ? error.requestId : undefined}
-        onRetry={reload}
-      />
-    );
+    return <PageError title='Processing status unavailable' message={getErrorMessage(error)} requestId={error instanceof ApiError ? error.requestId : undefined} onRetry={reload} />;
   }
 
   if (!data) {

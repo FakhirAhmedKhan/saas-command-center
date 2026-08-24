@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
-import { connectMobileTelemetry, disconnectMobileTelemetry, getMobileTelemetryIntegration, syncMobileTelemetry } from '@/features/mobile-apps/mobile-apps-api';
-import { MobileTelemetrySettings } from '@/features/mobile-apps/mobile-telemetry-settings';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { connectMobileTelemetry, disconnectMobileTelemetry, getMobileTelemetryIntegration, syncMobileTelemetry } from '@/features/mobile-apps/mobile-apps-api';
+import { MobileTelemetrySettings } from '@/features/mobile-apps/mobile-telemetry-settings';
 
 vi.mock('@/features/mobile-apps/mobile-apps-api', () => ({
   connectMobileTelemetry: vi.fn(),
@@ -13,11 +13,9 @@ vi.mock('@/features/mobile-apps/mobile-apps-api', () => ({
 }));
 
 const mockedGetIntegration = vi.mocked(getMobileTelemetryIntegration);
-
 const mockedConnect = vi.mocked(connectMobileTelemetry);
 const mockedDisconnect = vi.mocked(disconnectMobileTelemetry);
 const mockedSync = vi.mocked(syncMobileTelemetry);
-
 const connectedIntegration = {
   id: 'integration-1',
   workspaceId: 'workspace-1',

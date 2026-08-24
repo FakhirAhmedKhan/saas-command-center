@@ -1,10 +1,4 @@
-﻿import {
-  createRawAnalyticsEvent,
-  findAggregate,
-  getAnonymousAnalyticsAggregates,
-  listAnalyticsAggregates,
-  readAnalyticsAggregateList,
-} from '../helpers/analytics-engine';
+﻿import { createRawAnalyticsEvent, findAggregate, getAnonymousAnalyticsAggregates, listAnalyticsAggregates, readAnalyticsAggregateList } from '../helpers/analytics-engine';
 import { createTrackedWebsite, uniqueTrackerId } from '../helpers/analytics-ingestion';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
@@ -36,9 +30,7 @@ function readString(record: Record<string, unknown>, key: string): string {
 
 describe('Analytics Aggregates E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
-
   let processingService: AnalyticsProcessingService;
 
   beforeAll(async () => {
@@ -59,13 +51,9 @@ describe('Analytics Aggregates E2E', () => {
 
   it('builds correct hourly and daily overview totals', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
-
     const visitorId = uniqueTrackerId('aggregate_visitor');
-
     const sessionId = uniqueTrackerId('aggregate_session');
-
     const base = new Date(Date.now() - 6 * 60 * 60 * 1000);
 
     base.setUTCMinutes(10, 0, 0);
@@ -131,13 +119,9 @@ describe('Analytics Aggregates E2E', () => {
 
   it('builds PAGE and CUSTOM_EVENT dimensions', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
-
     const visitorId = uniqueTrackerId('dimension_visitor');
-
     const sessionId = uniqueTrackerId('dimension_session');
-
     const occurredAt = new Date(Date.now() - 60_000);
 
     await createRawAnalyticsEvent(prisma, website, {
@@ -164,7 +148,6 @@ describe('Analytics Aggregates E2E', () => {
         dimension: AnalyticsAggregateDimension.PAGE,
       }),
     );
-
     const page = findAggregate(pageResult.data, '/pricing?a=1&b=2');
 
     expect(page).toBeDefined();
@@ -177,7 +160,6 @@ describe('Analytics Aggregates E2E', () => {
         dimension: AnalyticsAggregateDimension.CUSTOM_EVENT,
       }),
     );
-
     const custom = findAggregate(customResult.data, 'signup_completed');
 
     expect(custom).toBeDefined();
@@ -187,9 +169,7 @@ describe('Analytics Aggregates E2E', () => {
 
   it('builds SOURCE, COUNTRY, DEVICE, BROWSER, and OPERATING_SYSTEM dimensions', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
-
     const userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 Version/17.5 Mobile/15E148 Safari/604.1';
 
     await createRawAnalyticsEvent(prisma, website, {
@@ -222,9 +202,7 @@ describe('Analytics Aggregates E2E', () => {
 
   it('filters by period, dimension, date range, and limit', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
-
     const start = new Date('2026-08-01T00:00:00.000Z');
 
     await prisma.analyticsHourlyAggregate.createMany({
@@ -270,7 +248,6 @@ describe('Analytics Aggregates E2E', () => {
 
   it('rebuilds aggregates idempotently', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
 
     await createRawAnalyticsEvent(prisma, website);
@@ -320,11 +297,8 @@ describe('Analytics Aggregates E2E', () => {
 
   it('allows VIEWER reads and denies outsider and anonymous reads', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const viewer = await registerWorkspaceTestUser(app, prisma);
-
     const outsider = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
 
     expect([200, 201]).toContain((await addWorkspaceMember(owner, viewer, WorkspaceRole.VIEWER)).status);
@@ -338,9 +312,7 @@ describe('Analytics Aggregates E2E', () => {
 
   it('rejects malformed aggregate queries and hides foreign websites', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const foreignOwner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
 
     for (const query of [
@@ -374,11 +346,8 @@ describe('Analytics Aggregates E2E', () => {
 
   it('serializes BigInt duration without precision loss', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
-
     const unsafeDuration = 9_007_199_254_740_993n;
-
     const bucketStart = new Date('2026-08-01T00:00:00.000Z');
 
     await prisma.analyticsDailyAggregate.create({

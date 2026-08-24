@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { ApplicationCard } from '@/features/applications/components/application-card';
 import type { ApplicationTechnology, SaasApplication } from '@/features/applications/application-types';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { ApplicationCard } from '@/features/applications/components/application-card';
 
 function makeTechnology(id: string, name: string): ApplicationTechnology {
   return {
@@ -58,14 +58,7 @@ describe('ApplicationCard technology overflow', () => {
 
   it('caps visible technologies at 4 and shows a "+N" badge for the remainder', () => {
     const application = makeApplication({
-      technologies: [
-        makeTechnology('t1', 'Next.js'),
-        makeTechnology('t2', 'Prisma'),
-        makeTechnology('t3', 'Postgres'),
-        makeTechnology('t4', 'Redis'),
-        makeTechnology('t5', 'Docker'),
-        makeTechnology('t6', 'Kubernetes'),
-      ],
+      technologies: [makeTechnology('t1', 'Next.js'), makeTechnology('t2', 'Prisma'), makeTechnology('t3', 'Postgres'), makeTechnology('t4', 'Redis'), makeTechnology('t5', 'Docker'), makeTechnology('t6', 'Kubernetes')],
     });
 
     render(<ApplicationCard workspaceId='workspace-1' application={application} />);

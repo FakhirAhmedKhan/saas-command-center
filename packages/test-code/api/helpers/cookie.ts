@@ -3,7 +3,6 @@ import type { Response } from 'supertest';
 
 export function readFirstSetCookie(response: Response): string {
   const cookies = readSetCookies(response);
-
   const firstCookie = cookies.at(0);
 
   if (!firstCookie) {

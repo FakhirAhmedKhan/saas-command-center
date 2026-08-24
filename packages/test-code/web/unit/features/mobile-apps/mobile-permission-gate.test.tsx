@@ -1,9 +1,8 @@
 // @vitest-environment jsdom
-import { MobilePermissionGate } from '@/features/mobile-apps/mobile-permission-gate';
 
 import { render, screen } from '@testing-library/react';
-
 import { expect, it } from 'vitest';
+import { MobilePermissionGate } from '@/features/mobile-apps/mobile-permission-gate';
 
 const viewer = {
   role: 'VIEWER' as const,
@@ -16,7 +15,6 @@ const viewer = {
 
   canManageSecrets: false,
 };
-
 const admin = {
   role: 'ADMIN' as const,
 

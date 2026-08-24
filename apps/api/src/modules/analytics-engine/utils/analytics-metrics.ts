@@ -65,16 +65,13 @@ export function calculateSessionMetrics(events: readonly SessionMetricEvent[], p
   }
 
   const durationMs = Math.max(0, endedAtMs - startedAtMs);
-
   /*
    * Multiple heartbeat events can overlap.
    * Engagement therefore cannot exceed total session duration.
    */
   const engagedDurationMs = Math.min(totalEngagedDurationMs, durationMs);
-
   const pageViewCount = pageViews.length;
   const eventCount = events.length;
-
   const bounced = pageViewCount <= 1 && customEventCount === 0 && engagedDurationMs < BOUNCE_ENGAGEMENT_THRESHOLD_MS;
 
   return {

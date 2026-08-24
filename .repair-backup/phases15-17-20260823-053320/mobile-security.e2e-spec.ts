@@ -130,10 +130,7 @@ describe('Mobile Security E2E', () => {
 
     await addWorkspaceMember(owner, viewer, WorkspaceRole.VIEWER);
 
-    const response = await viewer.agent
-      .get(`${API}/workspaces/${owner.workspaceId}/mobile-security/permissions`)
-      .set(withBearer(viewer.accessToken))
-      .expect(200);
+    const response = await viewer.agent.get(`${API}/workspaces/${owner.workspaceId}/mobile-security/permissions`).set(withBearer(viewer.accessToken)).expect(200);
 
     expect(response.body).toMatchObject({
       role: 'VIEWER',

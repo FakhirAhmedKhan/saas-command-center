@@ -14,19 +14,14 @@ const MAX_VISIBLE_TECHNOLOGIES = 4;
 
 export function ApplicationCard({ workspaceId, application }: ApplicationCardProps) {
   const technologies = application.technologies.slice(0, MAX_VISIBLE_TECHNOLOGIES);
-
   const extraTechnologyCount = application.technologies.length - technologies.length;
-
   const updatedLabel = formatRelativeApplicationDate(application.updatedAt);
-
   const href = `/workspaces/${workspaceId}/applications/${application.id}`;
 
   return (
     <Card className='group flex h-full flex-col gap-4 p-5 transition duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-card-hover'>
       <div className='flex items-start gap-3'>
-        <div className='flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-sm font-bold text-brand-700'>
-          {getApplicationInitials(application.name)}
-        </div>
+        <div className='flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-sm font-bold text-brand-700'>{getApplicationInitials(application.name)}</div>
 
         <div className='min-w-0 flex-1'>
           <div className='flex items-start justify-between gap-2'>
@@ -62,9 +57,7 @@ export function ApplicationCard({ workspaceId, application }: ApplicationCardPro
               </span>
             ))}
 
-            {extraTechnologyCount > 0 ? (
-              <span className='rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500'>+{extraTechnologyCount}</span>
-            ) : null}
+            {extraTechnologyCount > 0 ? <span className='rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500'>+{extraTechnologyCount}</span> : null}
           </div>
         </div>
       ) : null}

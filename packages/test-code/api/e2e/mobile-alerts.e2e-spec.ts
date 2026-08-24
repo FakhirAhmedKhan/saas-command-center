@@ -1,25 +1,20 @@
-import type { INestApplication } from '@nestjs/common';
-
-import { PrismaService } from 'src/database/prisma.service';
-import { MobilePerformanceMetricType, RepositoryProvider } from 'src/generated/prisma/enums';
-
 import { withBearer } from '../helpers/auth';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { MobilePerformanceMetricType, RepositoryProvider } from 'src/generated/prisma/enums';
 
 const API = '/api/v1';
 
 describe('Mobile Alerts E2E', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-
   let owner: Awaited<ReturnType<typeof registerWorkspaceTestUser>>;
-
   let workspaceId: string;
   let mobileAppId: string;
   let applicationId: string;
-
   let sequence = 0;
 
   beforeEach(async () => {

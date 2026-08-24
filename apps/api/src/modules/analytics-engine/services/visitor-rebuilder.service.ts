@@ -24,27 +24,22 @@ export class VisitorRebuilderService {
         occurredAt: true,
       },
     });
-
     const sessionCount = await transaction.analyticsSession.count({
       where: {
         visitorId,
       },
     });
-
     const pageViewCount = await transaction.analyticsPageView.count({
       where: {
         visitorId,
       },
     });
-
     const eventCount = await transaction.analyticsEvent.count({
       where: {
         visitorId,
       },
     });
-
     const firstSeenAt = eventStats._min.occurredAt;
-
     const lastSeenAt = eventStats._max.occurredAt;
 
     if (!firstSeenAt || !lastSeenAt) {

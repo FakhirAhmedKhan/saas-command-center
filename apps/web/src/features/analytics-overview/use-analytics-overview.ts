@@ -27,13 +27,11 @@ interface AnalyticsOverviewState {
 
 export function useAnalyticsOverview({ workspaceId, websiteId, preset, from, to }: UseAnalyticsOverviewInput) {
   const [reloadKey, setReloadKey] = useState(0);
-
   const [state, setState] = useState<AnalyticsOverviewState>({
     data: null,
     loading: true,
     error: null,
   });
-
   const reload = useCallback(() => {
     setReloadKey((current) => current + 1);
   }, []);

@@ -2,13 +2,7 @@
 
 import { applyDetectedDesktopConfiguration, detectDesktopProject } from './desktop-apps-api';
 import { getErrorMessage } from '@/features/lib/api/api-error';
-import type {
-  DesktopApplicationDetails,
-  DesktopArchitecture,
-  DesktopFramework,
-  DesktopPlatform,
-  DesktopProjectDetectionCandidate,
-} from '@command-center/shared-types';
+import type { DesktopApplicationDetails, DesktopArchitecture, DesktopFramework, DesktopPlatform, DesktopProjectDetectionCandidate } from '@command-center/shared-types';
 import { Loader2, SearchCode } from 'lucide-react';
 import { useState } from 'react';
 
@@ -83,9 +77,7 @@ export function DesktopProjectDetectionPanel({ workspaceId, desktopApp, onApplie
       <div className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
         <div>
           <h2 className='text-lg font-semibold text-slate-950'>Project detection</h2>
-          <p className='mt-1 max-w-2xl text-sm leading-6 text-slate-500'>
-            Analyze the linked repository for Electron, Tauri, .NET, Qt, Java desktop, or native macOS project metadata.
-          </p>
+          <p className='mt-1 max-w-2xl text-sm leading-6 text-slate-500'>Analyze the linked repository for Electron, Tauri, .NET, Qt, Java desktop, or native macOS project metadata.</p>
         </div>
 
         <button
@@ -200,12 +192,7 @@ export function DesktopProjectDetectionPanel({ workspaceId, desktopApp, onApplie
             </div>
           </div>
 
-          <button
-            type='button'
-            disabled={saving}
-            onClick={() => void apply()}
-            className='inline-flex h-10 items-center justify-center rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white disabled:opacity-50'
-          >
+          <button type='button' disabled={saving} onClick={() => void apply()} className='inline-flex h-10 items-center justify-center rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white disabled:opacity-50'>
             {saving ? 'Saving...' : 'Use Detected Configuration'}
           </button>
         </div>

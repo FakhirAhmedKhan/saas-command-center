@@ -1,7 +1,7 @@
-import { DesktopAnalysisPanel } from '@/features/desktop-apps/desktop-analysis-panel';
-import * as api from '@/features/desktop-apps/desktop-apps-api';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { DesktopAnalysisPanel } from '@/features/desktop-apps/desktop-analysis-panel';
+import * as api from '@/features/desktop-apps/desktop-apps-api';
 
 vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
   analyzeDesktopApplication: vi.fn(),
@@ -28,16 +28,7 @@ describe('DesktopAnalysisPanel', () => {
     vi.mocked(api.analyzeDesktopApplication).mockResolvedValue({
       id: '33333333-3333-4333-8333-333333333333',
       action: 'RELEASE_HEALTH',
-      answer: [
-        'Evidence:',
-        '- build 100 succeeded',
-        'Correlation:',
-        '- no regression observed',
-        'Likely cause:',
-        '- none supported',
-        'Unknown cause:',
-        '- not applicable',
-      ].join('\n'),
+      answer: ['Evidence:', '- build 100 succeeded', 'Correlation:', '- no regression observed', 'Likely cause:', '- none supported', 'Unknown cause:', '- not applicable'].join('\n'),
       confidence: 'SUPPORTED',
       evidence: [
         {

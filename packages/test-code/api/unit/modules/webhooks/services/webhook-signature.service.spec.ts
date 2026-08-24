@@ -5,11 +5,8 @@ describe(WebhookSignatureService.name, () => {
 
   it('creates a verifiable signature', () => {
     const secret = 'test-secret';
-
     const timestamp = '1786068000';
-
     const body = '{"id":"event-1"}';
-
     const signature = service.sign(secret, timestamp, body);
 
     expect(service.verify(secret, timestamp, body, signature)).toBe(true);

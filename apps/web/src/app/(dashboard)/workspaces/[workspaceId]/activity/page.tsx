@@ -16,9 +16,7 @@ function humanize(value: string): string {
 
 function formatDayLabel(value: string): string {
   const date = new Date(value);
-
   const today = new Date();
-
   const isSameDay = date.toDateString() === today.toDateString();
 
   if (isSameDay) {
@@ -40,7 +38,6 @@ function groupByDay(activities: WorkspaceActivity[]): Array<[string, WorkspaceAc
 
   for (const activity of activities) {
     const key = formatDayLabel(activity.createdAt);
-
     const existing = groups.get(key);
 
     if (existing) {
@@ -57,24 +54,16 @@ export default function WorkspaceActivityPage() {
   const params = useParams<{
     workspaceId: string;
   }>();
-
   const [activities, setActivities] = useState<WorkspaceActivity[]>([]);
-
   const [search, setSearch] = useState('');
-
   const [entityType, setEntityType] = useState('');
-
   const [from, setFrom] = useState('');
-
   const [to, setTo] = useState('');
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
-
     const timer = window.setTimeout(() => {
       setLoading(true);
 
@@ -111,7 +100,6 @@ export default function WorkspaceActivityPage() {
   }, [params.workspaceId, search, entityType, from, to]);
 
   const hasFilters = Boolean(search || entityType || from || to);
-
   const groupedActivities = groupByDay(activities);
 
   return (
@@ -178,9 +166,7 @@ export default function WorkspaceActivityPage() {
                         </div>
                       </div>
 
-                      <time className='shrink-0 text-xs text-slate-400'>
-                        {new Intl.DateTimeFormat('en-US', { timeStyle: 'short' }).format(new Date(activity.createdAt))}
-                      </time>
+                      <time className='shrink-0 text-xs text-slate-400'>{new Intl.DateTimeFormat('en-US', { timeStyle: 'short' }).format(new Date(activity.createdAt))}</time>
                     </div>
                   </div>
                 ))}

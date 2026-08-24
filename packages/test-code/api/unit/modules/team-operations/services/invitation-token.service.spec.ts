@@ -12,12 +12,10 @@ describe(InvitationTokenService.name, () => {
       return values[key];
     },
   };
-
   const service = new InvitationTokenService(config as never);
 
   it('generates random tokens and deterministic hashes', () => {
     const first = service.generate();
-
     const second = service.generate();
 
     expect(first.rawToken).not.toBe(second.rawToken);

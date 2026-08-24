@@ -20,7 +20,6 @@ export class SessionRebuilderService {
         id: sessionId,
       },
     });
-
     const events = await transaction.analyticsEvent.findMany({
       where: {
         sessionId,
@@ -35,9 +34,7 @@ export class SessionRebuilderService {
         },
       ],
     });
-
     const { pageViews, firstPage, lastPage } = await this.pageViews.rebuildForSession(transaction, sessionId);
-
     const firstEvent = events[0];
 
     if (!firstEvent) {
@@ -48,9 +45,7 @@ export class SessionRebuilderService {
     }
 
     const metrics = calculateSessionMetrics(events, pageViews);
-
     const lastEvent = events.at(-1) ?? firstEvent;
-
     const updatedSession = await transaction.analyticsSession.update({
       where: {
         id: sessionId,

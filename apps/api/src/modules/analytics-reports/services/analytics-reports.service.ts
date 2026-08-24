@@ -117,12 +117,7 @@ export class AnalyticsReportsService {
     return this.loadEventsReport(context, query, query.page, query.limit);
   }
 
-  async getDimensionReport(
-    workspaceId: string,
-    websiteId: string,
-    dimension: AnalyticsReportDimension,
-    query: DimensionReportQueryDto,
-  ): Promise<DimensionReportResponseDto> {
+  async getDimensionReport(workspaceId: string, websiteId: string, dimension: AnalyticsReportDimension, query: DimensionReportQueryDto): Promise<DimensionReportResponseDto> {
     const context = await this.resolveContext(workspaceId, websiteId, query);
 
     return this.loadDimensionReport(context, dimension, query, query.page, query.limit);
@@ -312,15 +307,10 @@ export class AnalyticsReportsService {
 
   private async loadPagesReport(context: WebsiteReportContext, query: PageReportQueryDto, page: number, limit: number): Promise<PageReportResponseDto> {
     const offset = (page - 1) * limit;
-
     const search = query.search?.trim() ?? '';
-
     const searchPattern = `%${search}%`;
-
     const sortColumn = this.getPageSortColumn(query.sortBy);
-
     const sortDirection = query.sortDirection === AnalyticsSortDirection.ASC ? Prisma.sql`ASC` : Prisma.sql`DESC`;
-
     const rows = await this.prisma.$queryRaw<PageDatabaseRow[]>(
       Prisma.sql`
                         WITH page_report AS (
@@ -474,9 +464,7 @@ export class AnalyticsReportsService {
                             ${offset}
                     `,
     );
-
     const total = toSafeNumber(rows[0]?.total_count);
-
     const items = rows.map((row) => this.mapPageRow(row));
 
     return {
@@ -489,15 +477,10 @@ export class AnalyticsReportsService {
 
   private async loadEventsReport(context: WebsiteReportContext, query: EventReportQueryDto, page: number, limit: number): Promise<EventReportResponseDto> {
     const offset = (page - 1) * limit;
-
     const search = query.search?.trim() ?? '';
-
     const searchPattern = `%${search}%`;
-
     const sortColumn = this.getEventSortColumn(query.sortBy);
-
     const sortDirection = query.sortDirection === AnalyticsSortDirection.ASC ? Prisma.sql`ASC` : Prisma.sql`DESC`;
-
     const [rows, summaryRows] = await Promise.all([
       this.prisma.$queryRaw<EventDatabaseRow[]>(
         Prisma.sql`
@@ -633,9 +616,7 @@ export class AnalyticsReportsService {
                     `,
       ),
     ]);
-
     const total = toSafeNumber(rows[0]?.total_count);
-
     const summary = summaryRows[0];
 
     return {
@@ -657,25 +638,13 @@ export class AnalyticsReportsService {
     };
   }
 
-  private async loadDimensionReport(
-    context: WebsiteReportContext,
-    dimension: AnalyticsReportDimension,
-    query: DimensionReportQueryDto,
-    page: number,
-    limit: number,
-  ): Promise<DimensionReportResponseDto> {
+  private async loadDimensionReport(context: WebsiteReportContext, dimension: AnalyticsReportDimension, query: DimensionReportQueryDto, page: number, limit: number): Promise<DimensionReportResponseDto> {
     const aggregateDimension = this.mapDimension(dimension);
-
     const offset = (page - 1) * limit;
-
     const search = query.search?.trim() ?? '';
-
     const searchPattern = `%${search}%`;
-
     const sortColumn = this.getDimensionSortColumn(query.sortBy);
-
     const sortDirection = query.sortDirection === AnalyticsSortDirection.ASC ? Prisma.sql`ASC` : Prisma.sql`DESC`;
-
     /*
      * The aggregate table name can't be a bind parameter, but it is never
      * derived from user input -- it's chosen solely from the server-computed
@@ -683,7 +652,6 @@ export class AnalyticsReportsService {
      * injection path.
      */
     const aggregateTable = context.range.granularity === 'hour' ? Prisma.raw('analytics_hourly_aggregates') : Prisma.raw('analytics_daily_aggregates');
-
     const rows = await this.prisma.$queryRaw<DimensionDatabaseRow[]>(
       Prisma.sql`
                         WITH dimension_agg AS (
@@ -763,11 +731,8 @@ export class AnalyticsReportsService {
                             ${offset}
                     `,
     );
-
     const total = toSafeNumber(rows[0]?.total_count);
-
     const totalSessions = toSafeNumber(rows[0]?.total_sessions);
-
     const items: DimensionReportItemDto[] = rows.map((row) => {
       const sessions = toSafeNumber(row.sessions);
 
@@ -793,11 +758,8 @@ export class AnalyticsReportsService {
 
   private mapPageRow(row: PageDatabaseRow): PageReportItemDto {
     const views = toSafeNumber(row.views);
-
     const entrances = toSafeNumber(row.entrances);
-
     const bouncedSessions = toSafeNumber(row.bounced_sessions);
-
     const totalDurationMs = toSafeNumber(row.total_duration_ms);
 
     return {

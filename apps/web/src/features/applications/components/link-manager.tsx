@@ -18,17 +18,11 @@ interface LinkManagerProps {
 
 export function LinkManager({ workspaceId, applicationId, links, disabled = false, onChanged }: LinkManagerProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
-
   const [label, setLabel] = useState('');
-
   const [type, setType] = useState<ApplicationLinkType>('PRODUCTION');
-
   const [url, setUrl] = useState('');
-
   const [saving, setSaving] = useState(false);
-
   const [busyId, setBusyId] = useState<string | null>(null);
-
   const [error, setError] = useState<string | null>(null);
 
   function resetForm(): void {
@@ -111,18 +105,10 @@ export function LinkManager({ workspaceId, applicationId, links, disabled = fals
 
       <CardContent className='space-y-6'>
         {disabled ? (
-          <div className='rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800'>
-            Restore this application before modifying its links.
-          </div>
+          <div className='rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800'>Restore this application before modifying its links.</div>
         ) : (
           <form onSubmit={handleSubmit} className='grid gap-4 rounded-2xl bg-slate-50 p-4 xl:grid-cols-[200px_180px_minmax(240px,1fr)_auto]'>
-            <Input
-              aria-label='Link label'
-              placeholder='Production website'
-              value={label}
-              disabled={saving}
-              onChange={(event) => setLabel(event.target.value)}
-            />
+            <Input aria-label='Link label' placeholder='Production website' value={label} disabled={saving} onChange={(event) => setLabel(event.target.value)} />
 
             <Select aria-label='Link type' value={type} disabled={saving} onChange={(event) => setType(event.target.value as ApplicationLinkType)}>
               {APPLICATION_LINK_TYPES.map((linkType) => (
@@ -132,14 +118,7 @@ export function LinkManager({ workspaceId, applicationId, links, disabled = fals
               ))}
             </Select>
 
-            <Input
-              aria-label='Link URL'
-              type='url'
-              placeholder='https://example.com'
-              value={url}
-              disabled={saving}
-              onChange={(event) => setUrl(event.target.value)}
-            />
+            <Input aria-label='Link URL' type='url' placeholder='https://example.com' value={url} disabled={saving} onChange={(event) => setUrl(event.target.value)} />
 
             <div className='flex gap-2'>
               <Button type='submit' loading={saving} className='flex-1'>
@@ -172,12 +151,7 @@ export function LinkManager({ workspaceId, applicationId, links, disabled = fals
                     <Badge variant='slate'>{LINK_TYPE_LABELS[link.type]}</Badge>
                   </div>
 
-                  <a
-                    href={link.url}
-                    target='_blank'
-                    rel='noreferrer'
-                    className='mt-1 inline-flex max-w-full items-center gap-1 text-sm text-brand-700 hover:underline'
-                  >
+                  <a href={link.url} target='_blank' rel='noreferrer' className='mt-1 inline-flex max-w-full items-center gap-1 text-sm text-brand-700 hover:underline'>
                     <span className='truncate'>{link.url}</span>
 
                     <ExternalLink className='size-3.5 shrink-0' />

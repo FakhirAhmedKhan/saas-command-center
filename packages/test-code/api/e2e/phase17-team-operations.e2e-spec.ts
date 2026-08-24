@@ -3,11 +3,11 @@ import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { resetTestRedis } from '../helpers/redis';
 import { readAccessToken } from '../helpers/response';
+import type { INestApplication } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
 import { PrismaService } from 'src/database/prisma.service';
 import { NotificationType, WorkspaceInvitationStatus, WorkspaceRole } from 'src/generated/prisma/enums';
 import { RedisService } from 'src/infrastructure/redis/redis.service';
-import type { INestApplication } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
 import request, { type Response } from 'supertest';
 
 /**
@@ -107,10 +107,8 @@ function isRecordArray(value: unknown): value is JsonRecord[] {
 describe('Phase 17 Team Operations E2E', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-
   let workspaceId: string;
   let ownerId: string;
-
   let ownerAccessToken: string;
   let adminAccessToken: string;
   let developerAccessToken: string;
@@ -165,7 +163,6 @@ describe('Phase 17 Team Operations E2E', () => {
 
   function extractTokenFromUrl(invitationUrl: string): string {
     const url = new URL(invitationUrl);
-
     const segments = url.pathname.split('/').filter(Boolean);
 
     return decodeURIComponent(requireValue(segments[segments.length - 1], 'Missing token segment'));
@@ -185,7 +182,6 @@ describe('Phase 17 Team Operations E2E', () => {
       name: 'Phase 17 Owner',
       workspaceName: 'Phase 17 Workspace',
     });
-
     const ownerRegistration = await registerUser(createAgent(app), owner);
 
     expect(ownerRegistration.status).toBe(201);
@@ -216,7 +212,6 @@ describe('Phase 17 Team Operations E2E', () => {
       name: 'Phase 17 Admin',
       workspaceName: 'Phase 17 Admin Workspace',
     });
-
     const adminRegistration = await registerUser(createAgent(app), admin);
 
     expect(adminRegistration.status).toBe(201);
@@ -240,7 +235,6 @@ describe('Phase 17 Team Operations E2E', () => {
       name: 'Phase 17 Developer',
       workspaceName: 'Phase 17 Developer Workspace',
     });
-
     const developerRegistration = await registerUser(createAgent(app), developer);
 
     expect(developerRegistration.status).toBe(201);
@@ -321,7 +315,6 @@ describe('Phase 17 Team Operations E2E', () => {
 
   it('rejects inviting an email that already belongs to a workspace member (409)', async () => {
     const admin = await prisma.user.findFirstOrThrow({ where: { displayName: 'Phase 17 Admin' } });
-
     const response = await createInvitation(ownerAccessToken, { email: admin.email });
 
     expect(response.status).toBe(409);
@@ -332,7 +325,6 @@ describe('Phase 17 Team Operations E2E', () => {
       name: 'Phase 17 Future Member',
       workspaceName: 'Phase 17 Future Member Workspace',
     });
-
     const outsiderRegistration = await registerUser(createAgent(app), outsider);
 
     expect(outsiderRegistration.status).toBe(201);
@@ -343,7 +335,6 @@ describe('Phase 17 Team Operations E2E', () => {
 
     // The invited existing user should receive an in-app notification.
     const outsiderId = requireValue((await prisma.user.findUnique({ where: { email: outsider.email.toLowerCase() } }))?.id, 'Outsider user missing');
-
     const notification = await prisma.notification.findFirst({
       where: { userId: outsiderId, type: NotificationType.WORKSPACE_INVITATION },
     });
@@ -353,9 +344,7 @@ describe('Phase 17 Team Operations E2E', () => {
   });
 
   it('lists invitations scoped to the workspace, filterable by status', async () => {
-    const response = await request(app.getHttpServer())
-      .get(`${invitationsUrl()}?status=${WorkspaceInvitationStatus.PENDING}`)
-      .set(withBearer(ownerAccessToken));
+    const response = await request(app.getHttpServer()).get(`${invitationsUrl()}?status=${WorkspaceInvitationStatus.PENDING}`).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
 
@@ -379,10 +368,8 @@ describe('Phase 17 Team Operations E2E', () => {
     const createResponse = await createInvitation(ownerAccessToken, {
       email: 'resend-target@example.test',
     });
-
     const invitationId = (body(createResponse).invitation as JsonRecord).id as string;
     const originalHash = await findInvitationRawToken(invitationId);
-
     const resendResponse = await request(app.getHttpServer()).post(resendUrl(invitationId)).set(withBearer(ownerAccessToken));
 
     expect(resendResponse.status).toBe(201);
@@ -400,9 +387,7 @@ describe('Phase 17 Team Operations E2E', () => {
     const createResponse = await createInvitation(ownerAccessToken, {
       email: 'revoke-then-resend@example.test',
     });
-
     const invitationId = (body(createResponse).invitation as JsonRecord).id as string;
-
     const revokeResponse = await request(app.getHttpServer()).post(revokeUrl(invitationId)).set(withBearer(ownerAccessToken));
 
     expect(revokeResponse.status).toBe(201);
@@ -424,9 +409,7 @@ describe('Phase 17 Team Operations E2E', () => {
     const createResponse = await createInvitation(ownerAccessToken, {
       email: 'double-revoke@example.test',
     });
-
     const invitationId = (body(createResponse).invitation as JsonRecord).id as string;
-
     const firstRevoke = await request(app.getHttpServer()).post(revokeUrl(invitationId)).set(withBearer(ownerAccessToken));
 
     expect(firstRevoke.status).toBe(201);
@@ -446,20 +429,16 @@ describe('Phase 17 Team Operations E2E', () => {
     const createResponse = await createInvitation(ownerAccessToken, {
       email: 'cross-workspace-scope@example.test',
     });
-
     const invitationId = (body(createResponse).invitation as JsonRecord).id as string;
-
     const secondOwner = createTestUser({
       name: 'Phase 17 Second Owner',
       workspaceName: 'Phase 17 Second Workspace',
     });
-
     const secondOwnerRegistration = await registerUser(createAgent(app), secondOwner);
 
     expect(secondOwnerRegistration.status).toBe(201);
 
     const secondOwnerAccessToken = readAccessToken(secondOwnerRegistration);
-
     const secondWorkspaceResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces`).set(withBearer(secondOwnerAccessToken)).send({
       name: secondOwner.workspaceName,
     });
@@ -467,10 +446,7 @@ describe('Phase 17 Team Operations E2E', () => {
     expect(secondWorkspaceResponse.status).toBe(201);
 
     const secondWorkspaceId = requireValue(body(secondWorkspaceResponse).id as string | undefined, 'Second owner workspace missing');
-
-    const response = await request(app.getHttpServer())
-      .post(`${API_PREFIX}/workspaces/${secondWorkspaceId}/invitations/${invitationId}/revoke`)
-      .set(withBearer(secondOwnerAccessToken));
+    const response = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces/${secondWorkspaceId}/invitations/${invitationId}/revoke`).set(withBearer(secondOwnerAccessToken));
 
     // The caller IS an OWNER, just of a different workspace than the invitation belongs to ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â
     // revoke's atomic updateMany requires BOTH id and workspaceId to match, so this must 404,
@@ -484,11 +460,8 @@ describe('Phase 17 Team Operations E2E', () => {
 
   it('allows anonymous preview of a pending invitation by token', async () => {
     const invitedEmail = `preview-flow-${randomUUID()}@example.test`;
-
     const createResponse = await createInvitation(ownerAccessToken, { email: invitedEmail });
-
     const rawToken = extractTokenFromUrl(body(createResponse).invitationUrl as string);
-
     const response = await request(app.getHttpServer()).get(previewUrl(rawToken));
 
     expect(response.status).toBe(200);
@@ -510,9 +483,7 @@ describe('Phase 17 Team Operations E2E', () => {
     const createResponse = await createInvitation(ownerAccessToken, {
       email: `accept-auth-${randomUUID()}@example.test`,
     });
-
     const rawToken = extractTokenFromUrl(body(createResponse).invitationUrl as string);
-
     const response = await request(app.getHttpServer()).post(acceptUrl(rawToken));
 
     expect(response.status).toBe(401);
@@ -522,9 +493,7 @@ describe('Phase 17 Team Operations E2E', () => {
     const createResponse = await createInvitation(ownerAccessToken, {
       email: `mismatched-owner-only-${randomUUID()}@example.test`,
     });
-
     const rawToken = extractTokenFromUrl(body(createResponse).invitationUrl as string);
-
     // developerAccessToken belongs to a user whose email does not match the invited email above.
     const response = await request(app.getHttpServer()).post(acceptUrl(rawToken)).set(withBearer(developerAccessToken));
 
@@ -536,27 +505,22 @@ describe('Phase 17 Team Operations E2E', () => {
       name: 'Phase 17 Invitee',
       workspaceName: 'Phase 17 Invitee Workspace',
     });
-
     const inviteeRegistration = await registerUser(createAgent(app), invitee);
 
     expect(inviteeRegistration.status).toBe(201);
 
     const inviteeAccessToken = readAccessToken(inviteeRegistration);
-
     const createResponse = await createInvitation(ownerAccessToken, {
       email: invitee.email,
       role: WorkspaceRole.ADMIN,
     });
-
     const rawToken = extractTokenFromUrl(body(createResponse).invitationUrl as string);
-
     const response = await request(app.getHttpServer()).post(acceptUrl(rawToken)).set(withBearer(inviteeAccessToken));
 
     expect(response.status).toBe(201);
     expect(body(response)).toMatchObject({ success: true, workspaceId });
 
     const inviteeId = requireValue((await prisma.user.findUnique({ where: { email: invitee.email.toLowerCase() } }))?.id, 'Invitee user missing');
-
     const membership = await prisma.workspaceMember.findFirstOrThrow({
       where: { workspaceId, userId: inviteeId },
     });
@@ -583,17 +547,13 @@ describe('Phase 17 Team Operations E2E', () => {
       name: 'Phase 17 Double Accept Invitee',
       workspaceName: 'Phase 17 Double Accept Workspace',
     });
-
     const inviteeRegistration = await registerUser(createAgent(app), invitee);
 
     expect(inviteeRegistration.status).toBe(201);
 
     const inviteeAccessToken = readAccessToken(inviteeRegistration);
-
     const createResponse = await createInvitation(ownerAccessToken, { email: invitee.email });
-
     const rawToken = extractTokenFromUrl(body(createResponse).invitationUrl as string);
-
     const first = await request(app.getHttpServer()).post(acceptUrl(rawToken)).set(withBearer(inviteeAccessToken));
 
     expect(first.status).toBe(201);
@@ -626,7 +586,6 @@ describe('Phase 17 Team Operations E2E', () => {
         expiresAt: new Date(Date.now() + 60 * 60 * 1000),
       },
     });
-
     // We cannot forge a valid raw token for this seeded row (tokenHash is HMAC'd with a secret
     // pepper we don't have direct access to), so instead this asserts the DB-level invariant the
     // service is designed to preserve: exactly one WorkspaceMember row for (workspaceId, ownerId).
@@ -643,9 +602,7 @@ describe('Phase 17 Team Operations E2E', () => {
     const createResponse = await createInvitation(ownerAccessToken, {
       email: `decline-auth-${randomUUID()}@example.test`,
     });
-
     const rawToken = extractTokenFromUrl(body(createResponse).invitationUrl as string);
-
     const response = await request(app.getHttpServer()).post(declineUrl(rawToken));
 
     expect(response.status).toBe(401);
@@ -656,17 +613,13 @@ describe('Phase 17 Team Operations E2E', () => {
       name: 'Phase 17 Decliner',
       workspaceName: 'Phase 17 Decliner Workspace',
     });
-
     const inviteeRegistration = await registerUser(createAgent(app), invitee);
 
     expect(inviteeRegistration.status).toBe(201);
 
     const inviteeAccessToken = readAccessToken(inviteeRegistration);
-
     const createResponse = await createInvitation(ownerAccessToken, { email: invitee.email });
-
     const rawToken = extractTokenFromUrl(body(createResponse).invitationUrl as string);
-
     const response = await request(app.getHttpServer()).post(declineUrl(rawToken)).set(withBearer(inviteeAccessToken));
 
     expect(response.status).toBe(201);
@@ -680,7 +633,6 @@ describe('Phase 17 Team Operations E2E', () => {
     expect(persisted.declinedAt).not.toBeNull();
 
     const inviteeId = requireValue((await prisma.user.findUnique({ where: { email: invitee.email.toLowerCase() } }))?.id, 'Decliner user missing');
-
     const membership = await prisma.workspaceMember.findFirst({
       where: { workspaceId, userId: inviteeId },
     });
@@ -692,7 +644,6 @@ describe('Phase 17 Team Operations E2E', () => {
     const createResponse = await createInvitation(ownerAccessToken, {
       email: `expiry-flow-${randomUUID()}@example.test`,
     });
-
     const invitationId = (body(createResponse).invitation as JsonRecord).id as string;
     const rawToken = extractTokenFromUrl(body(createResponse).invitationUrl as string);
 
@@ -718,15 +669,12 @@ describe('Phase 17 Team Operations E2E', () => {
       name: 'Phase 17 Expired Invitee',
       workspaceName: 'Phase 17 Expired Workspace',
     });
-
     const inviteeRegistration = await registerUser(createAgent(app), invitee);
 
     expect(inviteeRegistration.status).toBe(201);
 
     const inviteeAccessToken = readAccessToken(inviteeRegistration);
-
     const createResponse = await createInvitation(ownerAccessToken, { email: invitee.email });
-
     const invitationId = (body(createResponse).invitation as JsonRecord).id as string;
     const rawToken = extractTokenFromUrl(body(createResponse).invitationUrl as string);
 
@@ -746,7 +694,6 @@ describe('Phase 17 Team Operations E2E', () => {
 
   it('enforces the invitation resend rate limit of 5 per 15 minutes', async () => {
     const rateLimitIdentity = `phase17-resend-${randomUUID()}`;
-
     const createResponse = await request(app.getHttpServer())
       .post(invitationsUrl())
       .set(withBearer(ownerAccessToken))
@@ -759,16 +706,12 @@ describe('Phase 17 Team Operations E2E', () => {
     expect(createResponse.status).toBe(201);
 
     const invitationId = (body(createResponse).invitation as JsonRecord).id as string;
-
     let lastStatus = 0;
 
     for (let attempt = 0; attempt < 6; attempt += 1) {
       // All resend attempts intentionally use the same identity so the
       // real shared 5-per-15-minute rate limit is exercised deterministically.
-      const response = await request(app.getHttpServer())
-        .post(resendUrl(invitationId))
-        .set(withBearer(ownerAccessToken))
-        .set('x-tracking-key', rateLimitIdentity);
+      const response = await request(app.getHttpServer()).post(resendUrl(invitationId)).set(withBearer(ownerAccessToken)).set('x-tracking-key', rateLimitIdentity);
 
       lastStatus = response.status;
     }
@@ -836,7 +779,6 @@ describe('Phase 17 Team Operations E2E', () => {
         message: 'Phase 17 single-read test message',
       },
     });
-
     const response = await request(app.getHttpServer()).post(`${notificationsUrl()}/${seeded.id}/read`).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(201);
@@ -857,7 +799,6 @@ describe('Phase 17 Team Operations E2E', () => {
         message: 'Should not be readable by the owner',
       },
     });
-
     const response = await request(app.getHttpServer()).post(`${notificationsUrl()}/${foreignNotification.id}/read`).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(404);

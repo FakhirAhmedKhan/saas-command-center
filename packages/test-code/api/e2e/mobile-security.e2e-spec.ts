@@ -1,24 +1,16 @@
-import type { INestApplication } from '@nestjs/common';
-
-import request from 'supertest';
-
-import { PrismaService } from 'src/database/prisma.service';
-
-import { RepositoryProvider, WorkspaceRole } from 'src/generated/prisma/enums';
-
 import { withBearer } from '../helpers/auth';
-
 import { createTestApp } from '../helpers/create-test-app';
-
 import { resetDatabase } from '../helpers/database';
-
 import { addWorkspaceMember, registerWorkspaceTestUser } from '../helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { RepositoryProvider, WorkspaceRole } from 'src/generated/prisma/enums';
+import request from 'supertest';
 
 const API = '/api/v1';
 
 describe('Mobile Security E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
 
   beforeEach(async () => {
@@ -107,7 +99,6 @@ describe('Mobile Security E2E', () => {
 
   it('returns role-aware permissions', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const response = await owner.agent.get(`${API}/workspaces/${owner.workspaceId}/mobile-security/permissions`).set(withBearer(owner.accessToken)).expect(200);
 
     expect(response.body).toMatchObject({
@@ -125,15 +116,11 @@ describe('Mobile Security E2E', () => {
 
   it('viewer gets read-only permissions', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const viewer = await registerWorkspaceTestUser(app, prisma);
 
     await addWorkspaceMember(owner, viewer, WorkspaceRole.VIEWER);
 
-    const response = await viewer.agent
-      .get(`${API}/workspaces/${owner.workspaceId}/mobile-security/permissions`)
-      .set(withBearer(viewer.accessToken))
-      .expect(200);
+    const response = await viewer.agent.get(`${API}/workspaces/${owner.workspaceId}/mobile-security/permissions`).set(withBearer(viewer.accessToken)).expect(200);
 
     expect(response.body).toMatchObject({
       role: 'VIEWER',
@@ -150,11 +137,8 @@ describe('Mobile Security E2E', () => {
 
   it('workspace A cannot read workspace B mobile app', async () => {
     const a = await registerWorkspaceTestUser(app, prisma);
-
     const b = await registerWorkspaceTestUser(app, prisma);
-
     const mobileB = await createMobile(b, 'Workspace B Mobile');
-
     const response = await a.agent.get(`${API}/workspaces/${b.workspaceId}/mobile-apps/${mobileB.id}`).set(withBearer(a.accessToken));
 
     expect([403, 404]).toContain(response.status);
@@ -162,15 +146,10 @@ describe('Mobile Security E2E', () => {
 
   it('workspace A repository cannot link to workspace B app', async () => {
     const a = await registerWorkspaceTestUser(app, prisma);
-
     const b = await registerWorkspaceTestUser(app, prisma);
-
     const mobileA = await createMobile(a, 'App A');
-
     const mobileB = await createMobile(b, 'App B');
-
     const repositoryB = await createRepository(b.workspaceId, mobileB.applicationId);
-
     const response = await a.agent.post(`${API}/workspaces/${a.workspaceId}/mobile-apps/${mobileA.id}/repository`).set(withBearer(a.accessToken)).send({
       repositoryId: repositoryB.id,
     });
@@ -180,15 +159,10 @@ describe('Mobile Security E2E', () => {
 
   it('build from workspace A cannot create workspace B release', async () => {
     const a = await registerWorkspaceTestUser(app, prisma);
-
     const b = await registerWorkspaceTestUser(app, prisma);
-
     const mobileA = await createMobile(a, 'A Build');
-
     const mobileB = await createMobile(b, 'B Release');
-
     const repositoryA = await createRepository(a.workspaceId, mobileA.applicationId);
-
     const buildA = await prisma.mobileBuild.create({
       data: {
         workspaceId: a.workspaceId,
@@ -214,7 +188,6 @@ describe('Mobile Security E2E', () => {
         status: 'SUCCESS',
       },
     });
-
     const response = await b.agent.post(`${API}/workspaces/${b.workspaceId}/mobile-apps/${mobileB.id}/releases`).set(withBearer(b.accessToken)).send({
       buildId: buildA.id,
 
@@ -226,11 +199,8 @@ describe('Mobile Security E2E', () => {
 
   it('workspace A cannot query workspace B performance', async () => {
     const a = await registerWorkspaceTestUser(app, prisma);
-
     const b = await registerWorkspaceTestUser(app, prisma);
-
     const mobileB = await createMobile(b, 'B Performance');
-
     const response = await a.agent.get(`${API}/workspaces/${b.workspaceId}/mobile-apps/${mobileB.id}/performance/summary`).set(withBearer(a.accessToken));
 
     expect([403, 404]).toContain(response.status);
@@ -238,7 +208,6 @@ describe('Mobile Security E2E', () => {
 
   it('viewer cannot modify mobile app', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const viewer = await registerWorkspaceTestUser(app, prisma);
 
     await addWorkspaceMember(owner, viewer, WorkspaceRole.VIEWER);
@@ -256,7 +225,6 @@ describe('Mobile Security E2E', () => {
 
   it('viewer cannot create alert rule', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const viewer = await registerWorkspaceTestUser(app, prisma);
 
     await addWorkspaceMember(owner, viewer, WorkspaceRole.VIEWER);
@@ -278,7 +246,6 @@ describe('Mobile Security E2E', () => {
 
   it('unauthenticated request returns 401', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobile = await createMobile(owner, 'Anonymous Test');
 
     await request(app.getHttpServer()).get(`${API}/workspaces/${owner.workspaceId}/mobile-apps/${mobile.id}/performance/summary`).expect(401);
@@ -286,9 +253,7 @@ describe('Mobile Security E2E', () => {
 
   it('telemetry secret is encrypted and never returned', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobile = await createMobile(owner, 'Secret Test');
-
     const response = await owner.agent
       .post(`${API}/workspaces/${owner.workspaceId}/mobile-apps/${mobile.id}/telemetry/connect`)
       .set(withBearer(owner.accessToken))
@@ -325,7 +290,6 @@ describe('Mobile Security E2E', () => {
 
   it('rejects custom provider SSRF host', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobile = await createMobile(owner, 'SSRF');
 
     await owner.agent
@@ -347,7 +311,6 @@ describe('Mobile Security E2E', () => {
 
   it('rejects oversized provider config', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobile = await createMobile(owner, 'Large Config');
 
     await owner.agent
@@ -371,11 +334,8 @@ describe('Mobile Security E2E', () => {
 
   it('duplicate build delivery remains idempotent', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobile = await createMobile(owner, 'Replay');
-
     const repository = await createRepository(owner.workspaceId, mobile.applicationId);
-
     const payload = {
       repositoryId: repository.id,
 
@@ -389,7 +349,6 @@ describe('Mobile Security E2E', () => {
 
       status: 'SUCCESS',
     };
-
     const url = `${API}/workspaces/${owner.workspaceId}` + `/mobile-apps/${mobile.id}` + '/builds/ingest/github';
 
     await owner.agent.post(url).set(withBearer(owner.accessToken)).send(payload).expect(201);

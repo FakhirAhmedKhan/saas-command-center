@@ -47,9 +47,7 @@ export function DevelopmentTimeline({ milestones }: DevelopmentTimelineProps) {
 
       <CardContent>
         {items.length === 0 ? (
-          <p className='rounded-xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500'>
-            Add milestone or task due dates to build the timeline.
-          </p>
+          <p className='rounded-xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500'>Add milestone or task due dates to build the timeline.</p>
         ) : (
           <div className='divide-y divide-slate-100'>
             {items.map((item) => (
@@ -66,9 +64,7 @@ export function DevelopmentTimeline({ milestones }: DevelopmentTimelineProps) {
 
                 <div className='text-right'>
                   {'TODO' in TASK_STATUS_LABELS && item.type === 'Task' ? (
-                    <Badge variant={TASK_STATUS_VARIANTS[item.status as keyof typeof TASK_STATUS_VARIANTS]}>
-                      {TASK_STATUS_LABELS[item.status as keyof typeof TASK_STATUS_LABELS]}
-                    </Badge>
+                    <Badge variant={TASK_STATUS_VARIANTS[item.status as keyof typeof TASK_STATUS_VARIANTS]}>{TASK_STATUS_LABELS[item.status as keyof typeof TASK_STATUS_LABELS]}</Badge>
                   ) : null}
 
                   <p className='mt-2 text-sm font-medium text-slate-700'>{formatDevelopmentDate(item.date)}</p>

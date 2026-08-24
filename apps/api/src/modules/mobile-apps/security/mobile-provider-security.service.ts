@@ -1,9 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 const SAFE_EXTERNAL_ID = /^[A-Za-z0-9][A-Za-z0-9:._/@+-]{0,254}$/;
-
 const SAFE_CONFIG_KEY = /^[A-Za-z][A-Za-z0-9_]{0,63}$/;
-
 const FORBIDDEN_KEYS = new Set(['__proto__', 'prototype', 'constructor']);
 
 @Injectable()
@@ -30,7 +28,6 @@ export class MobileProviderSecurityService {
     }
 
     const output: Record<string, string> = {};
-
     let totalBytes = 0;
 
     for (const [rawKey, rawValue] of entries) {
@@ -45,7 +42,6 @@ export class MobileProviderSecurityService {
       }
 
       const value = rawValue.trim();
-
       const maxLength = key === 'serviceAccountJson' ? 65536 : 16384;
 
       if (!value || value.length > maxLength) {

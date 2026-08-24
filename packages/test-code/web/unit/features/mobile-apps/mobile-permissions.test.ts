@@ -1,8 +1,6 @@
-import { getMobilePermissions } from '@/features/mobile-apps/mobile-permissions';
-
-import { apiRequest } from '@/features/lib/api/api-client';
-
 import { expect, it, vi } from 'vitest';
+import { apiRequest } from '@/features/lib/api/api-client';
+import { getMobilePermissions } from '@/features/mobile-apps/mobile-permissions';
 
 vi.mock('@/features/lib/api/api-client', () => ({
   apiRequest: vi.fn(),

@@ -1,9 +1,8 @@
 // @vitest-environment jsdom
-import { MobileAppSubNav } from '@/features/mobile-apps/mobile-app-sub-nav';
 
 import { render, screen } from '@testing-library/react';
-
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { MobileAppSubNav } from '@/features/mobile-apps/mobile-app-sub-nav';
 
 const { usePathnameMock } = vi.hoisted(() => ({
   usePathnameMock: vi.fn(),

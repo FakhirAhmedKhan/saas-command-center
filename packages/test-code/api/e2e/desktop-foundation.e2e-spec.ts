@@ -1,20 +1,13 @@
-import type { INestApplication } from '@nestjs/common';
-
-import { randomUUID } from 'node:crypto';
-
-import { PrismaService } from 'src/database/prisma.service';
-
-import { ApplicationType, DesktopArchitecture, DesktopFramework, DesktopPlatform, MobileFramework, MobilePlatform } from 'src/generated/prisma/enums';
-
 import { createTestApp } from '../helpers/create-test-app';
-
 import { resetDatabase } from '../helpers/database';
-
 import { registerWorkspaceTestUser } from '../helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
+import { PrismaService } from 'src/database/prisma.service';
+import { ApplicationType, DesktopArchitecture, DesktopFramework, DesktopPlatform, MobileFramework, MobilePlatform } from 'src/generated/prisma/enums';
 
 describe('Desktop Application Foundation E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
 
   beforeEach(async () => {
@@ -47,7 +40,6 @@ describe('Desktop Application Foundation E2E', () => {
 
   it('creates a DESKTOP application with desktop metadata', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await prisma.saasApplication.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -99,7 +91,6 @@ describe('Desktop Application Foundation E2E', () => {
 
   it('persists the one-to-one application relationship', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await prisma.saasApplication.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -111,7 +102,6 @@ describe('Desktop Application Foundation E2E', () => {
         type: ApplicationType.DESKTOP,
       },
     });
-
     const desktop = await prisma.desktopApplication.create({
       data: {
         applicationId: application.id,
@@ -125,7 +115,6 @@ describe('Desktop Application Foundation E2E', () => {
         packageName: 'com.example.windows',
       },
     });
-
     const stored = await prisma.desktopApplication.findUnique({
       where: {
         applicationId: application.id,
@@ -147,7 +136,6 @@ describe('Desktop Application Foundation E2E', () => {
 
   it('rejects duplicate desktop metadata for one application', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await prisma.saasApplication.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -191,7 +179,6 @@ describe('Desktop Application Foundation E2E', () => {
 
   it('rejects invalid desktop enum values', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await prisma.saasApplication.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -221,7 +208,6 @@ describe('Desktop Application Foundation E2E', () => {
 
   it('deletes desktop metadata when the parent application is deleted', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await prisma.saasApplication.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -269,7 +255,6 @@ describe('Desktop Application Foundation E2E', () => {
 
   it('does not break existing WEB applications', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const web = await prisma.saasApplication.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -281,7 +266,6 @@ describe('Desktop Application Foundation E2E', () => {
         type: ApplicationType.WEB,
       },
     });
-
     const stored = await prisma.saasApplication.findUniqueOrThrow({
       where: {
         id: web.id,
@@ -293,7 +277,6 @@ describe('Desktop Application Foundation E2E', () => {
 
   it('does not break existing MOBILE applications', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobile = await prisma.saasApplication.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -327,9 +310,7 @@ describe('Desktop Application Foundation E2E', () => {
 
   it('keeps desktop applications isolated by workspace relationship', async () => {
     const workspaceA = await registerWorkspaceTestUser(app, prisma);
-
     const workspaceB = await registerWorkspaceTestUser(app, prisma);
-
     const desktop = await prisma.saasApplication.create({
       data: {
         workspaceId: workspaceA.workspaceId,
@@ -355,7 +336,6 @@ describe('Desktop Application Foundation E2E', () => {
         desktopApplication: true,
       },
     });
-
     const workspaceBDesktop = await prisma.desktopApplication.findMany({
       where: {
         application: {

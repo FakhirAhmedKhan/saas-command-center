@@ -9,7 +9,6 @@ export default function AnalyticsEnginePage() {
     workspaceId: string;
     websiteId: string;
   }>();
-
   const { workspaceId, websiteId } = params;
 
   return (

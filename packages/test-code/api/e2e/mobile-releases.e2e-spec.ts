@@ -1,19 +1,16 @@
-import type { INestApplication } from '@nestjs/common';
-
-import { PrismaService } from 'src/database/prisma.service';
-import { MobileBuildStatus, MobilePlatform, RepositoryProvider } from 'src/generated/prisma/enums';
-
 import { withBearer } from '../helpers/auth';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { MobileBuildStatus, MobilePlatform, RepositoryProvider } from 'src/generated/prisma/enums';
 
 const API = '/api/v1';
 
 describe('Mobile Releases E2E', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-
   let sequence = 0;
 
   beforeEach(async () => {
@@ -32,9 +29,7 @@ describe('Mobile Releases E2E', () => {
     sequence += 1;
 
     const suffix = `${Date.now()}-${sequence}`;
-
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobileResponse = await owner.agent
       .post(`${API}/workspaces/${owner.workspaceId}/mobile-apps`)
       .set(withBearer(owner.accessToken))
@@ -45,9 +40,7 @@ describe('Mobile Releases E2E', () => {
         packageId: `com.commandcenter.release${sequence}`,
       })
       .expect(201);
-
     const mobile = mobileResponse.body;
-
     const installation = await prisma.repositoryInstallation.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -61,7 +54,6 @@ describe('Mobile Releases E2E', () => {
         accountType: 'Organization',
       },
     });
-
     const repository = await prisma.repositoryConnection.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -91,9 +83,7 @@ describe('Mobile Releases E2E', () => {
         isAvailable: true,
       },
     });
-
     const status = options?.buildStatus === 'FAILED' ? MobileBuildStatus.FAILED : MobileBuildStatus.SUCCESS;
-
     const build = await prisma.mobileBuild.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -136,17 +126,13 @@ describe('Mobile Releases E2E', () => {
     const { owner, mobile, build } = await createReleaseFixture({
       buildStatus: 'SUCCESS',
     });
+    const response = await owner.agent.post(`${API}/workspaces/${owner.workspaceId}/mobile-apps/${mobile.id}/releases`).set(withBearer(owner.accessToken)).send({
+      buildId: build.id,
 
-    const response = await owner.agent
-      .post(`${API}/workspaces/${owner.workspaceId}/mobile-apps/${mobile.id}/releases`)
-      .set(withBearer(owner.accessToken))
-      .send({
-        buildId: build.id,
+      environment: 'PRODUCTION',
 
-        environment: 'PRODUCTION',
-
-        releaseNotes: 'Production release',
-      });
+      releaseNotes: 'Production release',
+    });
 
     expect(response.status).toBe(201);
 
@@ -199,7 +185,6 @@ describe('Mobile Releases E2E', () => {
 
   it('transitions DRAFT to READY to RELEASED to ROLLED_BACK', async () => {
     const { owner, mobile, build } = await createReleaseFixture();
-
     const created = await owner.agent
       .post(`${API}/workspaces/${owner.workspaceId}/mobile-apps/${mobile.id}/releases`)
       .set(withBearer(owner.accessToken))
@@ -209,7 +194,6 @@ describe('Mobile Releases E2E', () => {
         environment: 'PRODUCTION',
       })
       .expect(201);
-
     const url = `${API}/workspaces/${owner.workspaceId}` + `/mobile-apps/${mobile.id}` + `/releases/${created.body.id}/status`;
 
     await owner.agent
@@ -245,7 +229,6 @@ describe('Mobile Releases E2E', () => {
 
   it('rejects invalid lifecycle transition', async () => {
     const { owner, mobile, build } = await createReleaseFixture();
-
     const created = await owner.agent
       .post(`${API}/workspaces/${owner.workspaceId}/mobile-apps/${mobile.id}/releases`)
       .set(withBearer(owner.accessToken))
@@ -267,7 +250,6 @@ describe('Mobile Releases E2E', () => {
 
   it('prevents cross-workspace build release', async () => {
     const workspaceA = await createReleaseFixture();
-
     const workspaceB = await createReleaseFixture();
 
     await workspaceA.owner.agent

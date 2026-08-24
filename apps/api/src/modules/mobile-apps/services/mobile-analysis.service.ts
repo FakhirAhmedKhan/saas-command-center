@@ -35,11 +35,8 @@ export class MobileAnalysisService {
 
       releaseId: dto.releaseId,
     });
-
     const evidence = this.evidence(context);
-
     const confidence: MobileAnalysisConfidence = evidence.length >= 2 ? MobileAnalysisConfidence.SUPPORTED : MobileAnalysisConfidence.LIMITED;
-
     const system = `
 You analyze mobile engineering data from SaaS Command Center.
 
@@ -52,7 +49,6 @@ Rules:
 - Do not mention or infer secrets, credentials or hidden configuration.
 - Be concise and actionable.
 `.trim();
-
     const prompt = JSON.stringify(
       {
         action: dto.action,
@@ -64,7 +60,6 @@ Rules:
       null,
       2,
     ).slice(0, 50_000);
-
     let answer: string;
 
     try {

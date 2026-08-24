@@ -12,11 +12,8 @@ export class MobileTelemetrySecretService {
   encrypt(config: Record<string, string>): string {
     const key = this.key();
     const iv = randomBytes(12);
-
     const cipher = createCipheriv('aes-256-gcm', key, iv);
-
     const encrypted = Buffer.concat([cipher.update(JSON.stringify(config), 'utf8'), cipher.final()]);
-
     const payload: EncryptedPayload = {
       iv: iv.toString('base64'),
       tag: cipher.getAuthTag().toString('base64'),
@@ -28,13 +25,11 @@ export class MobileTelemetrySecretService {
 
   decrypt(value: string): Record<string, string> {
     const payload = JSON.parse(Buffer.from(value, 'base64').toString('utf8')) as EncryptedPayload;
-
     const decipher = createDecipheriv('aes-256-gcm', this.key(), Buffer.from(payload.iv, 'base64'));
 
     decipher.setAuthTag(Buffer.from(payload.tag, 'base64'));
 
     const decrypted = Buffer.concat([decipher.update(Buffer.from(payload.data, 'base64')), decipher.final()]);
-
     const result = JSON.parse(decrypted.toString('utf8')) as unknown;
 
     if (!result || typeof result !== 'object' || Array.isArray(result)) {

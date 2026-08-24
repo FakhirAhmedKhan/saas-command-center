@@ -174,7 +174,6 @@ qt_add_executable(command-center main.cpp)
 
   it('detects native macOS', () => {
     const path = 'MacApp/MacApp.xcodeproj/project.pbxproj';
-
     const result = detector.detect(
       snapshot([path], {
         [path]: `

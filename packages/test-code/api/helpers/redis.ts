@@ -14,7 +14,6 @@ export async function resetTestRedis(redis: RedisService): Promise<void> {
   const parsedRedisUrl = new URL(testRedisUrl);
   const databaseRaw = parsedRedisUrl.pathname.replace(/^\//, '');
   const expectedDatabase = databaseRaw ? Number(databaseRaw) : 0;
-
   const client = redis.getClient();
   const actualDatabase = client.options.db ?? 0;
 

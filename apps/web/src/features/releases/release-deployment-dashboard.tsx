@@ -2,15 +2,7 @@
 'use client';
 
 import { DeploymentStatusBadge } from './deployment-status-badge';
-import {
-  createDeployment,
-  createRelease,
-  getCurrentVersions,
-  getDeployments,
-  getReleaseOptions,
-  getReleases,
-  transitionDeployment,
-} from './release-management-api';
+import { createDeployment, createRelease, getCurrentVersions, getDeployments, getReleaseOptions, getReleases, transitionDeployment } from './release-management-api';
 import type { CurrentEnvironmentVersion, Deployment, DeploymentOptions, DeploymentStatus, Release } from './release-management.types';
 import { getErrorMessage } from '../applications/application-utils';
 import { PageError } from '@/components/states/page-error';
@@ -59,7 +51,6 @@ function formatDuration(durationMs: number | null): string {
   }
 
   const minutes = Math.floor(totalSeconds / 60);
-
   const seconds = totalSeconds % 60;
 
   return `${minutes}m ${seconds}s`;
@@ -77,15 +68,10 @@ function ReleaseForm({
   onCancel: () => void;
 }) {
   const [version, setVersion] = useState('');
-
   const [name, setName] = useState('');
-
   const [notes, setNotes] = useState('');
-
   const [commitRef, setCommitRef] = useState('');
-
   const [repositoryUrl, setRepositoryUrl] = useState('');
-
   const [scheduledAt, setScheduledAt] = useState('');
 
   return (
@@ -218,27 +204,15 @@ function DeploymentForm({
 
   submitting: boolean;
 
-  onSave: (input: {
-    releaseId: string;
-    environmentId: string;
-    ciJobUrl?: string;
-    liveUrl?: string;
-    deploymentNotes?: string;
-    healthIncidentId?: string;
-  }) => Promise<void>;
+  onSave: (input: { releaseId: string; environmentId: string; ciJobUrl?: string; liveUrl?: string; deploymentNotes?: string; healthIncidentId?: string }) => Promise<void>;
 
   onCancel: () => void;
 }) {
   const [releaseId, setReleaseId] = useState('');
-
   const [environmentId, setEnvironmentId] = useState('');
-
   const [ciJobUrl, setCiJobUrl] = useState('');
-
   const [liveUrl, setLiveUrl] = useState('');
-
   const [deploymentNotes, setDeploymentNotes] = useState('');
-
   const [healthIncidentId, setHealthIncidentId] = useState('');
 
   return (
@@ -382,25 +356,15 @@ function DeploymentForm({
 
 export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: DashboardProps) {
   const [data, setData] = useState<DashboardData | null>(null);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<unknown>(null);
-
   const [environmentFilter, setEnvironmentFilter] = useState('');
-
   const [statusFilter, setStatusFilter] = useState<DeploymentStatus | ''>('');
-
   const [showReleaseForm, setShowReleaseForm] = useState(false);
-
   const [showDeploymentForm, setShowDeploymentForm] = useState(false);
-
   const [submitting, setSubmitting] = useState(false);
-
   const [actionError, setActionError] = useState<string | null>(null);
-
   const controllerRef = useRef<AbortController | null>(null);
-
   const load = useCallback(async () => {
     controllerRef.current?.abort();
 
@@ -546,11 +510,8 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
       }
 
       const list = candidates.map((candidate, index) => `${index + 1}. ${candidate.release.version}`).join('\n');
-
       const selection = window.prompt(`Select rollback target:\n${list}`, '1');
-
       const index = Number(selection) - 1;
-
       const selected = candidates[index];
 
       if (!selected) {
@@ -818,9 +779,7 @@ export function ReleaseDeploymentDashboard({ workspaceId, applicationId }: Dashb
                 </div>
               ) : null}
 
-              {deployment.failureReason ? (
-                <div className='mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800'>{deployment.failureReason}</div>
-              ) : null}
+              {deployment.failureReason ? <div className='mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800'>{deployment.failureReason}</div> : null}
 
               {deployment.healthIncident ? (
                 <div className='mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4'>

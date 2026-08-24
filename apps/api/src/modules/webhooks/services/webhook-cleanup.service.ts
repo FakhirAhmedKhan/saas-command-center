@@ -29,9 +29,7 @@ export class WebhookCleanupService {
     const retentionDays = this.config.get('WEBHOOK_RETENTION_DAYS', {
       infer: true,
     });
-
     const cutoff = new Date(Date.now() - retentionDays * 86_400_000);
-
     const deliveries = await this.prisma.webhookDelivery.deleteMany({
       where: {
         createdAt: {
@@ -43,7 +41,6 @@ export class WebhookCleanupService {
         },
       },
     });
-
     const events = await this.prisma.webhookEvent.deleteMany({
       where: {
         createdAt: {

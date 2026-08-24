@@ -1,11 +1,11 @@
-import type { INestApplication } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
-import type { DesktopAnalysisProvider } from 'src/modules/desktop-apps/analysis/desktop-analysis-provider.interface';
-import { DesktopAnalysisService } from 'src/modules/desktop-apps/services/desktop-analysis.service';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
 import { API, createDesktopApp, createRepository } from './helpers/desktop-test-fixtures';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import type { DesktopAnalysisProvider } from 'src/modules/desktop-apps/analysis/desktop-analysis-provider.interface';
+import { DesktopAnalysisService } from 'src/modules/desktop-apps/services/desktop-analysis.service';
 
 class FakeDesktopAnalysisProvider implements DesktopAnalysisProvider {
   calls: Array<{ system: string; prompt: string }> = [];
@@ -99,11 +99,7 @@ describe('Desktop AI Analysis E2E', () => {
       },
     });
 
-    await owner.agent
-      .post(analysisPath(owner.workspaceId, desktop.id))
-      .set('Authorization', `Bearer ${owner.accessToken}`)
-      .send({ action: 'RELEASE_HEALTH' })
-      .expect(201);
+    await owner.agent.post(analysisPath(owner.workspaceId, desktop.id)).set('Authorization', `Bearer ${owner.accessToken}`).send({ action: 'RELEASE_HEALTH' }).expect(201);
 
     const prompt = fake.calls[0]?.prompt ?? '';
 
@@ -115,7 +111,6 @@ describe('Desktop AI Analysis E2E', () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
     const first = await createDesktopApp(owner);
     const second = await createDesktopApp(owner);
-
     const integration = await prisma.desktopTelemetryIntegration.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -128,7 +123,6 @@ describe('Desktop AI Analysis E2E', () => {
         configuredAt: new Date(),
       },
     });
-
     const crash = await prisma.desktopCrash.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -167,11 +161,7 @@ describe('Desktop AI Analysis E2E', () => {
       },
     });
 
-    await viewer.agent
-      .post(analysisPath(owner.workspaceId, desktop.id))
-      .set('Authorization', `Bearer ${viewer.accessToken}`)
-      .send({ action: 'CUSTOM', question: 'Analyze this app' })
-      .expect(403);
+    await viewer.agent.post(analysisPath(owner.workspaceId, desktop.id)).set('Authorization', `Bearer ${viewer.accessToken}`).send({ action: 'CUSTOM', question: 'Analyze this app' }).expect(403);
   });
 
   it('converts provider failure to a safe 502 response', async () => {
@@ -184,11 +174,7 @@ describe('Desktop AI Analysis E2E', () => {
       },
     });
 
-    const response = await owner.agent
-      .post(analysisPath(owner.workspaceId, desktop.id))
-      .set('Authorization', `Bearer ${owner.accessToken}`)
-      .send({ action: 'CUSTOM', question: 'What happened?' })
-      .expect(502);
+    const response = await owner.agent.post(analysisPath(owner.workspaceId, desktop.id)).set('Authorization', `Bearer ${owner.accessToken}`).send({ action: 'CUSTOM', question: 'What happened?' }).expect(502);
 
     expect(JSON.stringify(response.body)).not.toContain('provider leaked internal detail');
   });

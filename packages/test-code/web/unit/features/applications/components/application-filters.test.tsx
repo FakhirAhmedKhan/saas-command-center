@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { ApplicationFilters, type ApplicationFilterValue } from '@/features/applications/components/application-filters';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { ApplicationFilters, type ApplicationFilterValue } from '@/features/applications/components/application-filters';
 
 const DEFAULT_VALUE: ApplicationFilterValue = {
   search: '',

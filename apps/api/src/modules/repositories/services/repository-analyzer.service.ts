@@ -10,9 +10,7 @@ import type { DetectedApplication, RepositoryAnalysisResult, RepositoryType } fr
 import { BadRequestException, Injectable, UnprocessableEntityException } from '@nestjs/common';
 
 const MAX_FILE_READS = 25;
-
 const MAX_ANALYZED_FILE_BYTES = 1_000_000;
-
 const TYPESCRIPT_CONFIG_FILES = ['tsconfig.json'];
 
 @Injectable()
@@ -24,13 +22,9 @@ export class RepositoryAnalyzerService {
 
   async analyze(userId: string, repositoryId: number): Promise<RepositoryAnalysisResult> {
     const { installationId, repository } = await this.personalRepositories.findRepository(userId, repositoryId);
-
     const branch = this.cleanBranch(repository.defaultBranch);
-
     const tree = await this.githubCode.getTree(installationId, repository.owner.login, repository.name, branch);
-
     const rootFileNames = rootFileNamesFromTree(tree.entries);
-
     const packageJsonPaths = findPackageJsonPaths(tree.entries);
 
     if (packageJsonPaths.length === 0) {
@@ -52,22 +46,15 @@ export class RepositoryAnalyzerService {
     }
 
     const rootPackageJson = packageJsonByPath.get('package.json') ?? null;
-
     const packageManager = detectPackageManager(rootFileNames, rootPackageJson?.packageManager);
-
     const workspaceGlobs = await this.resolveWorkspaceGlobs(installationId, repository.owner.login, repository.name, branch, rootFileNames, rootPackageJson);
-
     const repositoryType: RepositoryType = workspaceGlobs.length > 0 || packageJsonByPath.size > 1 ? 'monorepo' : 'single-app';
-
     const applications: DetectedApplication[] = [];
 
     for (const [path, packageJson] of packageJsonByPath) {
       const rootDirectory = directoryOf(path);
-
       const directoryFileNames = rootDirectory === '.' ? rootFileNames : directoryFileNamesFromTree(tree.entries, rootDirectory);
-
       const hasTypescriptConfig = TYPESCRIPT_CONFIG_FILES.some((fileName) => directoryFileNames.has(fileName));
-
       const candidate: ApplicationCandidate = {
         rootDirectory,
         packageJson,
@@ -106,17 +93,9 @@ export class RepositoryAnalyzerService {
     };
   }
 
-  private async resolveWorkspaceGlobs(
-    installationId: string,
-    owner: string,
-    name: string,
-    branch: string,
-    rootFileNames: ReadonlySet<string>,
-    rootPackageJson: ParsedPackageJson | null,
-  ): Promise<string[]> {
+  private async resolveWorkspaceGlobs(installationId: string, owner: string, name: string, branch: string, rootFileNames: ReadonlySet<string>, rootPackageJson: ParsedPackageJson | null): Promise<string[]> {
     if (rootFileNames.has('pnpm-workspace.yaml')) {
       const file = await this.githubCode.getFile(installationId, owner, name, 'pnpm-workspace.yaml', branch);
-
       const content = file && file.size <= MAX_ANALYZED_FILE_BYTES ? this.decodeTextFile(file) : null;
 
       if (content) {

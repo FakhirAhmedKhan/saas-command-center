@@ -39,7 +39,6 @@ export class DevelopmentSharedService {
     }
 
     const existing = new Set(existingIds);
-
     const valid = orderedIds.every((id) => existing.has(id));
 
     if (!valid) {

@@ -9,9 +9,7 @@ import { AnalyticsProcessingService } from 'src/modules/analytics-engine/service
 
 describe('Analytics Sessions E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
-
   let processingService: AnalyticsProcessingService;
 
   beforeAll(async () => {
@@ -37,7 +35,6 @@ describe('Analytics Sessions E2E', () => {
     } = {},
   ) {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
 
     expectCollectionAccepted(
@@ -72,11 +69,8 @@ describe('Analytics Sessions E2E', () => {
 
   it('marks a single unengaged page view as a bounce', async () => {
     const visitorId = uniqueTrackerId('visitor');
-
     const sessionId = uniqueTrackerId('session');
-
     const origin = 'https://placeholder.example.test';
-
     const result = await processSession([
       buildTrackerEvent(origin, {
         visitorId,
@@ -96,13 +90,9 @@ describe('Analytics Sessions E2E', () => {
 
   it('marks a page view plus ten seconds of engagement as not bounced', async () => {
     const visitorId = uniqueTrackerId('visitor');
-
     const sessionId = uniqueTrackerId('session');
-
     const origin = 'https://placeholder.example.test';
-
     const timestamp = new Date(Date.now() - 60_000).toISOString();
-
     const result = await processSession([
       buildTrackerEvent(origin, {
         visitorId,
@@ -128,15 +118,10 @@ describe('Analytics Sessions E2E', () => {
 
   it('marks two page views as not bounced and sets entry and exit paths', async () => {
     const visitorId = uniqueTrackerId('visitor');
-
     const sessionId = uniqueTrackerId('session');
-
     const origin = 'https://placeholder.example.test';
-
     const first = new Date(Date.now() - 120_000);
-
     const second = new Date(first.getTime() + 30_000);
-
     const result = await processSession([
       buildTrackerEvent(origin, {
         visitorId,
@@ -165,7 +150,6 @@ describe('Analytics Sessions E2E', () => {
 
   it('supports a custom-event-only session with null entry and exit', async () => {
     const origin = 'https://placeholder.example.test';
-
     const result = await processSession([
       buildTrackerEvent(origin, {
         type: RawAnalyticsEventType.CUSTOM,
@@ -186,13 +170,9 @@ describe('Analytics Sessions E2E', () => {
 
   it('rebuilds session start and end when late events arrive', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const visitorId = uniqueTrackerId('visitor');
-
     const sessionId = uniqueTrackerId('session');
-
     const middle = new Date(Date.now() - 120_000);
 
     expectCollectionAccepted(
@@ -209,7 +189,6 @@ describe('Analytics Sessions E2E', () => {
     await processingService.processForWorkspace(owner.workspaceId, trackedWebsite.id, owner.userId, 100);
 
     const earlier = new Date(middle.getTime() - 30_000);
-
     const later = new Date(middle.getTime() + 45_000);
 
     expectCollectionAccepted(
@@ -249,13 +228,9 @@ describe('Analytics Sessions E2E', () => {
 
   it('caps overlapping engagement at the session wall duration', async () => {
     const visitorId = uniqueTrackerId('visitor');
-
     const sessionId = uniqueTrackerId('session');
-
     const origin = 'https://placeholder.example.test';
-
     const start = new Date(Date.now() - 120_000);
-
     const result = await processSession([
       buildTrackerEvent(origin, {
         visitorId,
@@ -280,7 +255,6 @@ describe('Analytics Sessions E2E', () => {
 
   it('classifies bot user agents', async () => {
     const origin = 'https://placeholder.example.test';
-
     const result = await processSession([buildTrackerEvent(origin)], {
       userAgent: 'Googlebot/2.1 (+http://www.google.com/bot.html)',
     });

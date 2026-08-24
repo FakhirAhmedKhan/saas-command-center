@@ -10,11 +10,8 @@ export function getMobilePermissions(workspaceId: string) {
 
 export function useMobilePermissions(workspaceId: string) {
   const [permissions, setPermissions] = useState<MobilePermissionSnapshot | null>(null);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<unknown>(null);
-
   const reload = useCallback(async () => {
     setLoading(true);
     setError(null);

@@ -2,13 +2,7 @@
 
 import { compareMobilePerformance, getMobilePerformanceIssues, getMobilePerformanceSummary, getMobilePerformanceVersions } from './mobile-apps-api';
 import { getErrorMessage } from '@/features/lib/api/api-error';
-import type {
-  MobilePerformanceComparison,
-  MobilePerformanceFilters,
-  MobilePerformanceProblem,
-  MobilePerformanceSummary,
-  MobilePerformanceVersionSummary,
-} from '@command-center/shared-types';
+import type { MobilePerformanceComparison, MobilePerformanceFilters, MobilePerformanceProblem, MobilePerformanceSummary, MobilePerformanceVersionSummary } from '@command-center/shared-types';
 import { AlertTriangle, Gauge, RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -21,25 +15,15 @@ interface Props {
 
 export function MobilePerformanceDashboard({ workspaceId, mobileAppId }: Props) {
   const [section, setSection] = useState<Section>('OVERVIEW');
-
   const [filters, setFilters] = useState<MobilePerformanceFilters>({});
-
   const [summary, setSummary] = useState<MobilePerformanceSummary | null>(null);
-
   const [versions, setVersions] = useState<MobilePerformanceVersionSummary[]>([]);
-
   const [problems, setProblems] = useState<MobilePerformanceProblem[]>([]);
-
   const [comparison, setComparison] = useState<MobilePerformanceComparison | null>(null);
-
   const [fromVersion, setFromVersion] = useState('');
-
   const [toVersion, setToVersion] = useState('');
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
-
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -250,12 +234,7 @@ export function MobilePerformanceDashboard({ workspaceId, mobileAppId }: Props) 
       {section === 'COMPARISON' ? (
         <div className='space-y-4'>
           <div className='grid gap-3 md:grid-cols-3'>
-            <select
-              aria-label='Compare from version'
-              value={fromVersion}
-              onChange={(event) => setFromVersion(event.target.value)}
-              className='h-10 rounded-lg border px-3'
-            >
+            <select aria-label='Compare from version' value={fromVersion} onChange={(event) => setFromVersion(event.target.value)} className='h-10 rounded-lg border px-3'>
               <option value=''>From version</option>
 
               {versions.map((item) => (
@@ -265,12 +244,7 @@ export function MobilePerformanceDashboard({ workspaceId, mobileAppId }: Props) 
               ))}
             </select>
 
-            <select
-              aria-label='Compare to version'
-              value={toVersion}
-              onChange={(event) => setToVersion(event.target.value)}
-              className='h-10 rounded-lg border px-3'
-            >
+            <select aria-label='Compare to version' value={toVersion} onChange={(event) => setToVersion(event.target.value)} className='h-10 rounded-lg border px-3'>
               <option value=''>To version</option>
 
               {versions.map((item) => (

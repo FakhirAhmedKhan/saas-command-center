@@ -20,21 +20,13 @@ function formatDateTime(value: string): string {
 
 export function WorkspaceInvitationsPanel({ workspaceId, canManageMembers }: WorkspaceInvitationsPanelProps) {
   const [invitations, setInvitations] = useState<WorkspaceInvitation[]>([]);
-
   const [loading, setLoading] = useState(true);
-
   const [email, setEmail] = useState('');
-
   const [role, setRole] = useState<WorkspaceRole>('VIEWER');
-
   const [submitting, setSubmitting] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
-
   const [invitationUrl, setInvitationUrl] = useState<string | null>(null);
-
   const controllerRef = useRef<AbortController | null>(null);
-
   const load = useCallback(async () => {
     controllerRef.current?.abort();
 
@@ -176,11 +168,7 @@ export function WorkspaceInvitationsPanel({ workspaceId, canManageMembers }: Wor
               </select>
             </label>
 
-            <button
-              type='submit'
-              disabled={submitting}
-              className='self-end rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50'
-            >
+            <button type='submit' disabled={submitting} className='self-end rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50'>
               {submitting ? 'Inviting…' : 'Send invitation'}
             </button>
           </div>

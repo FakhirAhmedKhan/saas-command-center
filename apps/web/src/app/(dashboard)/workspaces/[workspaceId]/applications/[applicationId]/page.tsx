@@ -20,15 +20,10 @@ export default function ApplicationDetailsPage() {
     workspaceId: string;
     applicationId: string;
   }>();
-
   const { workspaceId, applicationId } = params;
-
   const [application, setApplication] = useState<SaasApplication | null>(null);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
-
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
@@ -85,19 +80,14 @@ export default function ApplicationDetailsPage() {
   return (
     <div className='mx-auto w-full max-w-[1600px] space-y-5 p-4 sm:p-6 lg:p-8'>
       <div>
-        <Link
-          href={`/workspaces/${workspaceId}/applications`}
-          className='inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-500 transition hover:text-slate-800'
-        >
+        <Link href={`/workspaces/${workspaceId}/applications`} className='inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-500 transition hover:text-slate-800'>
           <ArrowLeft className='size-3.5' aria-hidden='true' />
           Back to applications
         </Link>
 
         <div className='mt-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
           <div className='flex min-w-0 items-start gap-3'>
-            <div className='flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-sm font-bold text-brand-700'>
-              {getApplicationInitials(application.name)}
-            </div>
+            <div className='flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-sm font-bold text-brand-700'>{getApplicationInitials(application.name)}</div>
 
             <div className='min-w-0'>
               <h1 className='truncate text-xl font-semibold tracking-tight text-slate-950'>{application.name}</h1>
@@ -148,28 +138,11 @@ export default function ApplicationDetailsPage() {
             </CardContent>
           </Card>
 
-          <TechnologyManager
-            workspaceId={workspaceId}
-            applicationId={applicationId}
-            technologies={application.technologies}
-            disabled={Boolean(application.archivedAt)}
-            onChanged={reload}
-          />
+          <TechnologyManager workspaceId={workspaceId} applicationId={applicationId} technologies={application.technologies} disabled={Boolean(application.archivedAt)} onChanged={reload} />
 
-          <LinkManager
-            workspaceId={workspaceId}
-            applicationId={applicationId}
-            links={application.links}
-            disabled={Boolean(application.archivedAt)}
-            onChanged={reload}
-          />
+          <LinkManager workspaceId={workspaceId} applicationId={applicationId} links={application.links} disabled={Boolean(application.archivedAt)} onChanged={reload} />
 
-          <ActivityFeed
-            workspaceId={workspaceId}
-            applicationId={applicationId}
-            title='Recent activity'
-            description='Review how this application changed over time.'
-          />
+          <ActivityFeed workspaceId={workspaceId} applicationId={applicationId} title='Recent activity' description='Review how this application changed over time.' />
         </div>
 
         <div className='space-y-5'>

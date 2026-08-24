@@ -275,22 +275,16 @@ function validateCorsOrigins(value: string): void {
 
 export function validateEnvironment(config: Record<string, unknown>): EnvironmentVariables {
   const nodeEnvironment = parseNodeEnvironment(getOptionalString(config, 'NODE_ENV'));
-
   const databaseUrl = getRequiredString(config, 'DATABASE_URL');
-
   const testDatabaseUrl = getOptionalString(config, 'TEST_DATABASE_URL');
-
   const jwtAccessSecret = getRequiredString(config, 'JWT_ACCESS_SECRET');
-
   const jwtRefreshSecret = getRequiredString(config, 'JWT_REFRESH_SECRET');
-
   const frontendUrl = getRequiredString(config, 'FRONTEND_URL');
   const invitationTokenPepper = getRequiredString(config, 'INVITATION_TOKEN_PEPPER');
 
   validateSecret('INVITATION_TOKEN_PEPPER', invitationTokenPepper, nodeEnvironment);
 
   const webhookEncryptionKey = getRequiredString(config, 'WEBHOOK_ENCRYPTION_KEY');
-
   let decodedWebhookKey: Buffer;
 
   try {
@@ -304,7 +298,6 @@ export function validateEnvironment(config: Record<string, unknown>): Environmen
   }
 
   const webhookDefaultTimeoutMs = getPositiveInteger(config, 'WEBHOOK_DEFAULT_TIMEOUT_MS', 10_000);
-
   const webhookMaxTimeoutMs = getPositiveInteger(config, 'WEBHOOK_MAX_TIMEOUT_MS', 30_000);
 
   if (webhookDefaultTimeoutMs > webhookMaxTimeoutMs) {
@@ -312,14 +305,12 @@ export function validateEnvironment(config: Record<string, unknown>): Environmen
   }
 
   const webhookDefaultMaxAttempts = getPositiveInteger(config, 'WEBHOOK_DEFAULT_MAX_ATTEMPTS', 5);
-
   const webhookMaxAttempts = getPositiveInteger(config, 'WEBHOOK_MAX_ATTEMPTS', 8);
 
   if (webhookDefaultMaxAttempts > webhookMaxAttempts) {
     throw new Error('WEBHOOK_DEFAULT_MAX_ATTEMPTS cannot exceed WEBHOOK_MAX_ATTEMPTS.');
   }
   const minimumInterval = getPositiveInteger(config, 'HEALTH_MIN_INTERVAL_SECONDS', 60);
-
   const maximumInterval = getPositiveInteger(config, 'HEALTH_MAX_INTERVAL_SECONDS', 86_400);
 
   if (maximumInterval < minimumInterval) {
@@ -327,16 +318,13 @@ export function validateEnvironment(config: Record<string, unknown>): Environmen
   }
 
   const minimumTimeout = getPositiveInteger(config, 'HEALTH_MIN_TIMEOUT_MS', 1_000);
-
   const maximumTimeout = getPositiveInteger(config, 'HEALTH_MAX_TIMEOUT_MS', 30_000);
 
   if (maximumTimeout < minimumTimeout) {
     throw new Error('HEALTH_MAX_TIMEOUT_MS must be greater than or equal to HEALTH_MIN_TIMEOUT_MS.');
   }
   const corsOrigins = getOptionalString(config, 'CORS_ORIGINS') ?? frontendUrl;
-
   const cookieSameSite = parseCookieSameSite(getOptionalString(config, 'COOKIE_SAME_SITE'));
-
   const cookieSecure = getBoolean(config, 'COOKIE_SECURE', nodeEnvironment === 'production');
 
   validateUrl('DATABASE_URL', databaseUrl, ['postgres:', 'postgresql:']);

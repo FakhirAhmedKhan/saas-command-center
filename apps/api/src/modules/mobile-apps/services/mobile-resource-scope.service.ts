@@ -39,7 +39,6 @@ export class MobileResourceScopeService {
 
   async requireRepositoryForMobileApp(workspaceId: string, mobileAppId: string, repositoryId: string) {
     const mobileApp = await this.requireMobileApp(workspaceId, mobileAppId);
-
     const repository = await this.prisma.repositoryConnection.findFirst({
       where: {
         id: repositoryId,

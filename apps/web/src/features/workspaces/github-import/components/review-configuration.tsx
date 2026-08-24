@@ -26,24 +26,17 @@ function generateSlugPreview(value: string): string {
 
 export function ReviewConfiguration({ analysis, onSubmit }: ReviewConfigurationProps) {
   const [workspaceName, setWorkspaceName] = useState(analysis.suggestedWorkspace.name);
-
   const [workspaceSlug, setWorkspaceSlug] = useState(analysis.suggestedWorkspace.slug);
-
   const [workspaceDescription, setWorkspaceDescription] = useState(analysis.suggestedWorkspace.description ?? '');
-
   const [applications, setApplications] = useState<EditableApplication[]>(() =>
     analysis.applications.map((application) => ({
       ...application,
       selected: application.runnable,
     })),
   );
-
   const [submitting, setSubmitting] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
-
   const slugPreview = workspaceSlug.trim() || generateSlugPreview(workspaceName);
-
   const selectedCount = useMemo(() => applications.filter((application) => application.selected).length, [applications]);
 
   function updateApplication(index: number, patch: Partial<EditableApplication>): void {
@@ -110,15 +103,7 @@ export function ReviewConfiguration({ analysis, onSubmit }: ReviewConfigurationP
 
         <CardContent className='space-y-5'>
           <div className='grid gap-5 md:grid-cols-2'>
-            <Input
-              name='workspaceName'
-              label='Workspace name'
-              value={workspaceName}
-              required
-              minLength={2}
-              maxLength={120}
-              onChange={(event) => setWorkspaceName(event.target.value)}
-            />
+            <Input name='workspaceName' label='Workspace name' value={workspaceName} required minLength={2} maxLength={120} onChange={(event) => setWorkspaceName(event.target.value)} />
 
             <Input
               name='workspaceSlug'
@@ -130,14 +115,7 @@ export function ReviewConfiguration({ analysis, onSubmit }: ReviewConfigurationP
             />
           </div>
 
-          <Textarea
-            name='workspaceDescription'
-            label='Description'
-            rows={3}
-            maxLength={280}
-            value={workspaceDescription}
-            onChange={(event) => setWorkspaceDescription(event.target.value)}
-          />
+          <Textarea name='workspaceDescription' label='Description' rows={3} maxLength={280} value={workspaceDescription} onChange={(event) => setWorkspaceDescription(event.target.value)} />
 
           <p className='text-xs text-slate-400'>
             {analysis.repositoryType === 'monorepo' ? 'Monorepo' : 'Single application'} &middot; Package manager: {analysis.packageManager}
@@ -148,9 +126,7 @@ export function ReviewConfiguration({ analysis, onSubmit }: ReviewConfigurationP
       <Card>
         <CardHeader>
           <h2 className='text-lg font-semibold text-slate-950'>Applications</h2>
-          <p className='mt-1 text-sm leading-6 text-slate-500'>
-            {analysis.repositoryType === 'monorepo' ? 'Choose which detected applications to import.' : 'Review the detected application configuration.'}
-          </p>
+          <p className='mt-1 text-sm leading-6 text-slate-500'>{analysis.repositoryType === 'monorepo' ? 'Choose which detected applications to import.' : 'Review the detected application configuration.'}</p>
         </CardHeader>
 
         <CardContent className='space-y-3'>
@@ -160,9 +136,7 @@ export function ReviewConfiguration({ analysis, onSubmit }: ReviewConfigurationP
               <p className='text-sm text-slate-500'>No applications were detected in this repository.</p>
             </div>
           ) : (
-            applications.map((application, index) => (
-              <ApplicationCard key={`${application.rootDirectory}-${index}`} application={application} onChange={(patch) => updateApplication(index, patch)} />
-            ))
+            applications.map((application, index) => <ApplicationCard key={`${application.rootDirectory}-${index}`} application={application} onChange={(patch) => updateApplication(index, patch)} />)
           )}
         </CardContent>
 
@@ -201,9 +175,7 @@ function ApplicationCard({ application, onChange }: ApplicationCardProps) {
               </span>
             ) : null}
 
-            {application.framework ? (
-              <span className='rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600'>{application.framework}</span>
-            ) : null}
+            {application.framework ? <span className='rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600'>{application.framework}</span> : null}
 
             <span className='font-mono text-[11px] text-slate-400'>{application.rootDirectory}</span>
           </div>

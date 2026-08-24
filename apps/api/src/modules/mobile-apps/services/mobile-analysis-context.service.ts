@@ -23,7 +23,6 @@ export class MobileAnalysisContextService {
     } = {},
   ) {
     const mobileApp = await this.mobileApps.findOne(workspaceId, mobileAppId);
-
     const [repository, builds, releases, metrics, alerts] = await Promise.all([
       this.prisma.repositoryConnection.findFirst({
         where: {

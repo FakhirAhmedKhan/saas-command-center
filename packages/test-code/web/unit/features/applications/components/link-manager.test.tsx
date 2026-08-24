@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
-import { LinkManager } from '@/features/applications/components/link-manager';
-import { addApplicationLink, removeApplicationLink, updateApplicationLink } from '@/features/applications/application-api';
 import type { ApplicationLink } from '@/features/applications/application-types';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { addApplicationLink, removeApplicationLink, updateApplicationLink } from '@/features/applications/application-api';
+import { LinkManager } from '@/features/applications/components/link-manager';
 
 vi.mock('@/features/applications/application-api', () => ({
   addApplicationLink: vi.fn(),
@@ -15,7 +15,6 @@ vi.mock('@/features/applications/application-api', () => ({
 const mockedAdd = vi.mocked(addApplicationLink);
 const mockedUpdate = vi.mocked(updateApplicationLink);
 const mockedRemove = vi.mocked(removeApplicationLink);
-
 const WORKSPACE_ID = 'workspace-1';
 const APPLICATION_ID = 'application-1';
 

@@ -51,9 +51,7 @@ export class PersonalGithubConnectService {
     await this.githubApp.getInstallation(dto.installationId);
 
     const oauthState = this.randomSecret();
-
     const verifier = randomBytes(48).toString('base64url');
-
     const challenge = createHash('sha256').update(verifier).digest('base64url');
 
     await this.prisma.personalGithubConnectIntent.update({
@@ -87,7 +85,6 @@ export class PersonalGithubConnectService {
     }
 
     const userAccessToken = await this.githubApp.exchangeUserCode(dto.code, intent.pkceVerifier);
-
     const authorized = await this.githubApp.userCanAccessInstallation(userAccessToken, intent.installationId);
 
     if (!authorized) {

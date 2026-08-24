@@ -11,11 +11,8 @@ export function hashIpAddressWithSalt(salt: string, ipAddress: string): string {
   return createHash('sha256').update(`${salt}:${ipAddress}`).digest('hex');
 }
 
-const SENSITIVE_QUERY_PARAMETER =
-  /^(access_?token|refresh_?token|token|password|pass|secret|authorization|auth|api_?key|session|session_?id|jwt|email|code|otp)$/i;
-
+const SENSITIVE_QUERY_PARAMETER = /^(access_?token|refresh_?token|token|password|pass|secret|authorization|auth|api_?key|session|session_?id|jwt|email|code|otp)$/i;
 const SENSITIVE_PROPERTY_KEY = /(password|passcode|token|secret|authorization|cookie|session|email|phone|address|credit|card|cvv|ssn|private|api.?key)/i;
-
 const MAX_PROPERTY_KEYS = 20;
 const MAX_PROPERTY_STRING = 200;
 const MAX_ARRAY_ITEMS = 20;
@@ -97,7 +94,6 @@ export function sanitizeEventProperties(properties?: Record<string, unknown>): P
   }
 
   const sanitized: Record<string, Prisma.InputJsonValue | null> = {};
-
   const entries = Object.entries(properties).slice(0, MAX_PROPERTY_KEYS);
 
   for (const [rawKey, value] of entries) {

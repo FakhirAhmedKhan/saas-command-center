@@ -26,7 +26,6 @@ export class DevelopmentSummaryService {
 
   async getSummaryWithClient(client: PrismaService | Prisma.TransactionClient, workspaceId: string, applicationId: string) {
     const application = await this.shared.requireApplication(client, workspaceId, applicationId);
-
     const milestones = await client.applicationMilestone.findMany({
       where: {
         applicationId,
@@ -36,7 +35,6 @@ export class DevelopmentSummaryService {
       },
       include: milestoneInclude,
     });
-
     const blockers = await client.applicationBlocker.findMany({
       where: {
         applicationId,
@@ -64,31 +62,16 @@ export class DevelopmentSummaryService {
         },
       },
     });
-
     const now = new Date();
-
     const upcomingUntil = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
-
     const allTasks = milestones.flatMap((milestone) =>
       milestone.tasks.map((task) => ({
         ...task,
         milestoneTitle: milestone.title,
       })),
     );
-
-    const overdueTasks = allTasks.filter(
-      (task) => task.dueAt && task.dueAt < now && task.status !== ApplicationTaskStatus.COMPLETED && task.status !== ApplicationTaskStatus.SKIPPED,
-    );
-
-    const upcomingTasks = allTasks.filter(
-      (task) =>
-        task.dueAt &&
-        task.dueAt >= now &&
-        task.dueAt <= upcomingUntil &&
-        task.status !== ApplicationTaskStatus.COMPLETED &&
-        task.status !== ApplicationTaskStatus.SKIPPED,
-    );
-
+    const overdueTasks = allTasks.filter((task) => task.dueAt && task.dueAt < now && task.status !== ApplicationTaskStatus.COMPLETED && task.status !== ApplicationTaskStatus.SKIPPED);
+    const upcomingTasks = allTasks.filter((task) => task.dueAt && task.dueAt >= now && task.dueAt <= upcomingUntil && task.status !== ApplicationTaskStatus.COMPLETED && task.status !== ApplicationTaskStatus.SKIPPED);
     const progress = this.progressCalculator.calculateSnapshot(milestones);
 
     return {

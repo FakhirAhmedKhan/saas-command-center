@@ -19,31 +19,18 @@ export default function DesktopAppDetailsPage() {
     workspaceId: string;
     desktopAppId: string;
   }>();
-
   const router = useRouter();
-
   const workspaceId = params.workspaceId;
-
   const desktopAppId = params.desktopAppId;
-
   const listHref = `/workspaces/${workspaceId}/desktop-apps`;
-
   const [desktopApp, setDesktopApp] = useState<DesktopApplicationDetails | null>(null);
-
   const [overview, setOverview] = useState<DesktopAppOverview | null>(null);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
-
   const [archiving, setArchiving] = useState(false);
-
   const load = useCallback(async (): Promise<void> => {
     try {
-      const [detailsResponse, overviewResponse] = await Promise.all([
-        getDesktopApp(workspaceId, desktopAppId),
-        getDesktopAppOverview(workspaceId, desktopAppId),
-      ]);
+      const [detailsResponse, overviewResponse] = await Promise.all([getDesktopApp(workspaceId, desktopAppId), getDesktopAppOverview(workspaceId, desktopAppId)]);
 
       setDesktopApp(detailsResponse);
       setOverview(overviewResponse);
@@ -153,13 +140,9 @@ export default function DesktopAppDetailsPage() {
               <div className='mt-3 flex flex-wrap gap-2'>
                 <span className='rounded-md bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700'>{DESKTOP_PLATFORM_LABELS[desktopApp.platform]}</span>
 
-                <span className='rounded-md bg-violet-50 px-2.5 py-1 text-xs font-semibold text-violet-700'>
-                  {DESKTOP_FRAMEWORK_LABELS[desktopApp.framework]}
-                </span>
+                <span className='rounded-md bg-violet-50 px-2.5 py-1 text-xs font-semibold text-violet-700'>{DESKTOP_FRAMEWORK_LABELS[desktopApp.framework]}</span>
 
-                <span className='rounded-md bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600'>
-                  {DESKTOP_ARCHITECTURE_LABELS[desktopApp.architecture]}
-                </span>
+                <span className='rounded-md bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600'>{DESKTOP_ARCHITECTURE_LABELS[desktopApp.architecture]}</span>
               </div>
             </div>
           </div>

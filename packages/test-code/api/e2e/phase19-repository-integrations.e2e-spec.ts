@@ -1,16 +1,16 @@
-import { AppModule } from 'src/app.module';
 import { createAgent, createTestUser, registerUser, withBearer } from '../helpers/auth';
 import { resetDatabase } from '../helpers/database';
 import { readAccessToken } from '../helpers/response';
-import { PrismaService } from 'src/database/prisma.service';
-import { ApplicationCategory, ApplicationPriority, ApplicationStatus, WorkspaceRole } from 'src/generated/prisma/enums';
-import { GithubAppService } from 'src/modules/repositories/services/github-app.service';
 import { ValidationPipe, type INestApplication } from '@nestjs/common';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import cookieParser from 'cookie-parser';
 import { json, raw, urlencoded } from 'express';
 import { createHmac } from 'node:crypto';
+import { AppModule } from 'src/app.module';
+import { PrismaService } from 'src/database/prisma.service';
+import { ApplicationCategory, ApplicationPriority, ApplicationStatus, WorkspaceRole } from 'src/generated/prisma/enums';
+import { GithubAppService } from 'src/modules/repositories/services/github-app.service';
 import request, { type Response } from 'supertest';
 
 const API_PREFIX = '/api/v1';
@@ -38,7 +38,6 @@ const DEFAULT_GITHUB_FIXTURE: GithubFixture = {
   name: 'saas-command-center',
   fullName: 'phase19-org/saas-command-center',
 };
-
 const githubAppMock = {
   buildInstallationUrl: jest.fn((state: string): string => {
     return `https://github.test/apps/command-center/installations/new?state=${encodeURIComponent(state)}`;
@@ -177,11 +176,9 @@ async function createRepositoryTestApp(): Promise<INestApplication> {
     .overrideProvider(GithubAppService)
     .useValue(githubAppMock)
     .compile();
-
   const app = testingModule.createNestApplication<NestExpressApplication>({
     bodyParser: false,
   });
-
   const expressInstance = app.getHttpAdapter().getInstance();
   expressInstance.set('trust proxy', 1);
 
@@ -232,7 +229,6 @@ async function registerIdentity(app: INestApplication, prisma: PrismaService, la
     name: `${label} User`,
     workspaceName: `${label} Workspace`,
   });
-
   const response = await registerUser(createAgent(app), userInput);
 
   expect(response.status).toBe(201);
@@ -365,7 +361,6 @@ async function connectRepository(
 
   const installationState = await beginGithubConnect(app, identity, workspaceId);
   const oauthState = await completeGithubSetup(app, identity, installationState, fixture.installationId);
-
   const callbackResponse = await finishGithubCallback(app, identity, oauthState);
   expect(callbackResponse.status).toBe(201);
 
@@ -377,7 +372,6 @@ async function connectRepository(
       id: true,
     },
   });
-
   const repository = await prisma.repositoryConnection.findFirst({
     where: {
       workspaceId,
@@ -420,7 +414,6 @@ describe('Phase 19 - Repository Integrations E2E', () => {
   describe('GitHub connection authorization', () => {
     it('rejects anonymous GitHub connection attempts', async () => {
       const owner = await registerIdentity(app, prisma, 'Anonymous Connect Owner');
-
       const response = await request(app.getHttpServer()).post(`${routeForWorkspace(owner.workspaceId)}/github/connect`);
 
       expect(response.status).toBe(401);
@@ -428,7 +421,6 @@ describe('Phase 19 - Repository Integrations E2E', () => {
 
     it('rejects a malformed workspace identifier', async () => {
       const owner = await registerIdentity(app, prisma, 'Malformed Workspace Owner');
-
       const response = await request(app.getHttpServer())
         .post(`${routeForWorkspace('not-a-uuid')}/github/connect`)
         .set(withBearer(owner.token));
@@ -502,7 +494,6 @@ describe('Phase 19 - Repository Integrations E2E', () => {
 
     it('rejects an unknown installation state', async () => {
       const owner = await registerIdentity(app, prisma, 'Unknown State Owner');
-
       const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/setup`).set(withBearer(owner.token)).send({
         installState: 'unknown-installation-state-value-1234567890',
         installationId: DEFAULT_GITHUB_FIXTURE.installationId,
@@ -515,7 +506,6 @@ describe('Phase 19 - Repository Integrations E2E', () => {
       const owner = await registerIdentity(app, prisma, 'State Owner');
       const attacker = await registerIdentity(app, prisma, 'State Attacker');
       const installationState = await beginGithubConnect(app, owner, owner.workspaceId);
-
       const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/setup`).set(withBearer(attacker.token)).send({
         installState: installationState,
         installationId: DEFAULT_GITHUB_FIXTURE.installationId,
@@ -598,7 +588,6 @@ describe('Phase 19 - Repository Integrations E2E', () => {
       const owner = await registerIdentity(app, prisma, 'Replay Owner');
       const installationState = await beginGithubConnect(app, owner, owner.workspaceId);
       const oauthState = await completeGithubSetup(app, owner, installationState, DEFAULT_GITHUB_FIXTURE.installationId);
-
       const first = await finishGithubCallback(app, owner, oauthState);
       const second = await finishGithubCallback(app, owner, oauthState);
 
@@ -611,7 +600,6 @@ describe('Phase 19 - Repository Integrations E2E', () => {
     it('lists only repositories in the requested workspace', async () => {
       const owner = await registerIdentity(app, prisma, 'List Owner');
       const connected = await connectRepository(app, prisma, owner, owner.workspaceId);
-
       const response = await request(app.getHttpServer()).get(routeForWorkspace(owner.workspaceId)).set(withBearer(owner.token));
 
       expect(response.status).toBe(200);
@@ -647,7 +635,6 @@ describe('Phase 19 - Repository Integrations E2E', () => {
     it('returns 404 when a repository belongs to a different workspace', async () => {
       const ownerA = await registerIdentity(app, prisma, 'Tenant A Owner');
       const ownerB = await registerIdentity(app, prisma, 'Tenant B Owner');
-
       const fixtureB: GithubFixture = {
         installationId: '910002',
         repositoryId: '920002',
@@ -655,9 +642,7 @@ describe('Phase 19 - Repository Integrations E2E', () => {
         name: 'private-b',
         fullName: 'phase19-org-b/private-b',
       };
-
       const repositoryB = await connectRepository(app, prisma, ownerB, ownerB.workspaceId, fixtureB);
-
       const response = await request(app.getHttpServer())
         .get(`${routeForWorkspace(ownerA.workspaceId)}/${repositoryB.repositoryId}`)
         .set(withBearer(ownerA.token));
@@ -668,7 +653,6 @@ describe('Phase 19 - Repository Integrations E2E', () => {
     it('links a repository to an application in the same workspace', async () => {
       const owner = await registerIdentity(app, prisma, 'Application Link Owner');
       const connected = await connectRepository(app, prisma, owner, owner.workspaceId);
-
       const application = await prisma.saasApplication.create({
         data: {
           workspaceId: owner.workspaceId,
@@ -679,7 +663,6 @@ describe('Phase 19 - Repository Integrations E2E', () => {
           priority: ApplicationPriority.MEDIUM,
         },
       });
-
       const response = await request(app.getHttpServer())
         .patch(`${routeForWorkspace(owner.workspaceId)}/${connected.repositoryId}/application`)
         .set(withBearer(owner.token))
@@ -705,7 +688,6 @@ describe('Phase 19 - Repository Integrations E2E', () => {
       const ownerA = await registerIdentity(app, prisma, 'Foreign App Owner A');
       const ownerB = await registerIdentity(app, prisma, 'Foreign App Owner B');
       const connected = await connectRepository(app, prisma, ownerA, ownerA.workspaceId);
-
       const foreignApplication = await prisma.saasApplication.create({
         data: {
           workspaceId: ownerB.workspaceId,
@@ -716,7 +698,6 @@ describe('Phase 19 - Repository Integrations E2E', () => {
           priority: ApplicationPriority.MEDIUM,
         },
       });
-
       const response = await request(app.getHttpServer())
         .patch(`${routeForWorkspace(ownerA.workspaceId)}/${connected.repositoryId}/application`)
         .set(withBearer(ownerA.token))
@@ -730,7 +711,6 @@ describe('Phase 19 - Repository Integrations E2E', () => {
     it('unlinks an application from a repository', async () => {
       const owner = await registerIdentity(app, prisma, 'Application Unlink Owner');
       const connected = await connectRepository(app, prisma, owner, owner.workspaceId);
-
       const application = await prisma.saasApplication.create({
         data: {
           workspaceId: owner.workspaceId,
@@ -773,7 +753,6 @@ describe('Phase 19 - Repository Integrations E2E', () => {
       const developer = await registerIdentity(app, prisma, 'Sync Developer');
       await addWorkspaceRole(prisma, owner.workspaceId, developer, WorkspaceRole.DEVELOPER);
       const connected = await connectRepository(app, prisma, owner, owner.workspaceId);
-
       const response = await request(app.getHttpServer())
         .post(`${routeForWorkspace(owner.workspaceId)}/${connected.repositoryId}/sync`)
         .set(withBearer(developer.token));
@@ -799,7 +778,6 @@ describe('Phase 19 - Repository Integrations E2E', () => {
       const developer = await registerIdentity(app, prisma, 'Disconnect Developer');
       await addWorkspaceRole(prisma, owner.workspaceId, developer, WorkspaceRole.DEVELOPER);
       const connected = await connectRepository(app, prisma, owner, owner.workspaceId);
-
       const response = await request(app.getHttpServer())
         .delete(`${routeForWorkspace(owner.workspaceId)}/github/installations/${connected.installationRecordId}`)
         .set(withBearer(developer.token));
@@ -810,7 +788,6 @@ describe('Phase 19 - Repository Integrations E2E', () => {
     it('allows OWNER to disconnect an installation and removes its repositories', async () => {
       const owner = await registerIdentity(app, prisma, 'Disconnect Owner');
       const connected = await connectRepository(app, prisma, owner, owner.workspaceId);
-
       const response = await request(app.getHttpServer())
         .delete(`${routeForWorkspace(owner.workspaceId)}/github/installations/${connected.installationRecordId}`)
         .set(withBearer(owner.token));
@@ -863,7 +840,6 @@ describe('Phase 19 - Repository Integrations E2E', () => {
 
     it('rejects a webhook when GitHub delivery headers are missing', async () => {
       const rawBody = JSON.stringify(webhookPayload());
-
       const response = await request(app.getHttpServer()).post(webhookRoute).set('content-type', 'application/json').send(rawBody);
 
       expect(response.status).toBe(401);
@@ -871,7 +847,6 @@ describe('Phase 19 - Repository Integrations E2E', () => {
 
     it('rejects a webhook with an invalid signature', async () => {
       const rawBody = JSON.stringify(webhookPayload());
-
       const response = await request(app.getHttpServer())
         .post(webhookRoute)
         .set('content-type', 'application/json')
@@ -887,7 +862,6 @@ describe('Phase 19 - Repository Integrations E2E', () => {
     it('accepts a correctly signed webhook and records the delivery', async () => {
       const rawBody = JSON.stringify(webhookPayload());
       const deliveryId = 'phase19-valid-delivery';
-
       const response = await request(app.getHttpServer())
         .post(webhookRoute)
         .set('content-type', 'application/json')
@@ -920,7 +894,6 @@ describe('Phase 19 - Repository Integrations E2E', () => {
         'x-github-event': 'push',
         'x-hub-signature-256': sign(rawBody),
       };
-
       const first = await request(app.getHttpServer()).post(webhookRoute).set(headers).send(rawBody);
       const second = await request(app.getHttpServer()).post(webhookRoute).set(headers).send(rawBody);
 

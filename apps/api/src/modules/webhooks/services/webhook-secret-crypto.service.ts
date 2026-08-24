@@ -42,11 +42,8 @@ export class WebhookSecretCryptoService {
 
   encrypt(plaintext: string): EncryptedWebhookSecret {
     const iv = randomBytes(12);
-
     const cipher = createCipheriv('aes-256-gcm', this.key, iv);
-
     const ciphertext = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
-
     const authTag = cipher.getAuthTag();
 
     return {

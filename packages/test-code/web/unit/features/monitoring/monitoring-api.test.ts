@@ -1,22 +1,12 @@
-import {
-  createHealthCheck,
-  getHealthCheckHistory,
-  getHealthChecks,
-  getHealthIncidents,
-  getMonitoringSummary,
-  getMonitoringTargets,
-  runHealthCheckNow,
-  updateHealthCheck,
-} from '@/features/monitoring/monitoring-api';
-import { apiRequest } from '@/features/lib/api/api-client';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { apiRequest } from '@/features/lib/api/api-client';
+import { createHealthCheck, getHealthCheckHistory, getHealthChecks, getHealthIncidents, getMonitoringSummary, getMonitoringTargets, runHealthCheckNow, updateHealthCheck } from '@/features/monitoring/monitoring-api';
 
 vi.mock('@/features/lib/api/api-client', () => ({
   apiRequest: vi.fn(),
 }));
 
 const apiRequestMock = vi.mocked(apiRequest);
-
 const WORKSPACE = 'workspace-1';
 const BASE = `/workspaces/${WORKSPACE}/monitoring`;
 

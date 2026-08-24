@@ -51,18 +51,11 @@ export class MobilePerformanceDashboardService {
 
     const filters = this.filters(query);
 
-    const [rows, providerAvailable] = await Promise.all([
-      this.repository.find(workspaceId, mobileAppId, filters),
-
-      this.repository.providerAvailable(workspaceId, mobileAppId),
-    ]);
+    const [rows, providerAvailable] = await Promise.all([this.repository.find(workspaceId, mobileAppId, filters), this.repository.providerAvailable(workspaceId, mobileAppId)]);
 
     const grouped = this.groupMetrics(rows);
 
-    const metrics = Object.fromEntries(ALL_METRICS.map((metric) => [metric, this.aggregate(metric, grouped.get(metric) ?? [])])) as Record<
-      MobilePerformanceMetricName,
-      MobilePerformanceValue
-    >;
+    const metrics = Object.fromEntries(ALL_METRICS.map((metric) => [metric, this.aggregate(metric, grouped.get(metric) ?? [])])) as Record<MobilePerformanceMetricName, MobilePerformanceValue>;
 
     const latest = rows.at(-1);
 

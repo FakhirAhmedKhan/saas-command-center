@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
 
-import { DesktopReleases } from '@/features/desktop-apps/desktop-releases';
-import { createDesktopRelease, listDesktopBuilds, listDesktopReleases, updateDesktopReleaseStatus } from '@/features/desktop-apps/desktop-apps-api';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { createDesktopRelease, listDesktopBuilds, listDesktopReleases, updateDesktopReleaseStatus } from '@/features/desktop-apps/desktop-apps-api';
+import { DesktopReleases } from '@/features/desktop-apps/desktop-releases';
 
 vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
   createDesktopRelease: vi.fn(),
@@ -17,7 +17,6 @@ const listReleasesMock = vi.mocked(listDesktopReleases);
 const listBuildsMock = vi.mocked(listDesktopBuilds);
 const createReleaseMock = vi.mocked(createDesktopRelease);
 const updateStatusMock = vi.mocked(updateDesktopReleaseStatus);
-
 const build = {
   id: 'build-1',
   workspaceId: 'workspace-1',
@@ -38,7 +37,6 @@ const build = {
   createdAt: '2026-08-23T01:00:00.000Z',
   updatedAt: '2026-08-23T01:04:00.000Z',
 } as const;
-
 const release = {
   id: 'release-1',
   workspaceId: 'workspace-1',

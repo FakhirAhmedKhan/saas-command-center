@@ -187,9 +187,7 @@ export class AnalyticsProcessingWorkerService {
     error: unknown,
   ): Promise<void> {
     const message = error instanceof Error ? error.message : String(error);
-
     const code = error instanceof Error ? error.name : 'UnknownError';
-
     const nextRetryCount = run.retryCount + 1;
 
     if (nextRetryCount <= run.maxRetries) {

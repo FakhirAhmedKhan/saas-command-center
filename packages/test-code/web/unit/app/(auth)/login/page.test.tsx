@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
-import LoginPage from '@/app/(auth)/login/page';
-import { ApiError } from '@/features/lib/api/api-error';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import LoginPage from '@/app/(auth)/login/page';
+import { ApiError } from '@/features/lib/api/api-error';
 
 const { loginMock, replaceMock, useSearchParamsMock } = vi.hoisted(() => ({
   loginMock: vi.fn(),

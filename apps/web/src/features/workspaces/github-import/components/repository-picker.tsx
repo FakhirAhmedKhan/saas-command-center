@@ -28,13 +28,9 @@ function formatUpdatedAt(value: string): string {
 
 export function RepositoryPicker({ error, onSelect, onReconnect }: RepositoryPickerProps) {
   const [repositories, setRepositories] = useState<ImportableGithubRepository[]>([]);
-
   const [loading, setLoading] = useState(true);
-
   const [loadError, setLoadError] = useState<string | null>(null);
-
   const [search, setSearch] = useState('');
-
   const load = useCallback(async () => {
     setLoading(true);
     setLoadError(null);
@@ -61,9 +57,7 @@ export function RepositoryPicker({ error, onSelect, onReconnect }: RepositoryPic
       return repositories;
     }
 
-    return repositories.filter(
-      (repository) => repository.fullName.toLowerCase().includes(query) || (repository.description ?? '').toLowerCase().includes(query),
-    );
+    return repositories.filter((repository) => repository.fullName.toLowerCase().includes(query) || (repository.description ?? '').toLowerCase().includes(query));
   }, [repositories, search]);
 
   if (loading) {
@@ -102,11 +96,7 @@ export function RepositoryPicker({ error, onSelect, onReconnect }: RepositoryPic
         <EmptyState
           icon={<FolderGit2 className='size-5' />}
           title={repositories.length === 0 ? 'No repositories found' : 'No repositories match your search'}
-          description={
-            repositories.length === 0
-              ? 'The GitHub App installation you connected has no accessible repositories, or its access was revoked.'
-              : 'Try a different search term.'
-          }
+          description={repositories.length === 0 ? 'The GitHub App installation you connected has no accessible repositories, or its access was revoked.' : 'Try a different search term.'}
         />
       ) : (
         <ul className='space-y-2'>

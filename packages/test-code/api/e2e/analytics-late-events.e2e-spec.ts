@@ -10,9 +10,7 @@ import { AnalyticsProcessingService } from 'src/modules/analytics-engine/service
 
 describe('Analytics Late Events E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
-
   let processingService: AnalyticsProcessingService;
 
   beforeAll(async () => {
@@ -33,7 +31,6 @@ describe('Analytics Late Events E2E', () => {
 
   it('moves the session start and entry page when an earlier page view arrives', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
 
     await prisma.website.update({
@@ -46,11 +43,8 @@ describe('Analytics Late Events E2E', () => {
     });
 
     const visitorId = uniqueTrackerId('late_visitor');
-
     const sessionId = uniqueTrackerId('late_session');
-
     const later = new Date('2026-08-06T12:10:00.000Z');
-
     const earlier = new Date('2026-08-06T10:10:00.000Z');
 
     await createRawAnalyticsEvent(prisma, website, {
@@ -100,7 +94,6 @@ describe('Analytics Late Events E2E', () => {
 
   it('rebuilds both the previous and new session-start buckets', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
 
     await prisma.website.update({
@@ -113,7 +106,6 @@ describe('Analytics Late Events E2E', () => {
     });
 
     const visitorId = uniqueTrackerId('bucket_visitor');
-
     const sessionId = uniqueTrackerId('bucket_session');
 
     await createRawAnalyticsEvent(prisma, website, {
@@ -155,7 +147,6 @@ describe('Analytics Late Events E2E', () => {
 
   it('updates duration in the original session-start bucket when a later heartbeat arrives', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
 
     await prisma.website.update({
@@ -168,7 +159,6 @@ describe('Analytics Late Events E2E', () => {
     });
 
     const visitorId = uniqueTrackerId('duration_visitor');
-
     const sessionId = uniqueTrackerId('duration_session');
 
     await createRawAnalyticsEvent(prisma, website, {
@@ -202,13 +192,9 @@ describe('Analytics Late Events E2E', () => {
 
   it('adds late custom-event aggregates without duplicating existing rows', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
-
     const visitorId = uniqueTrackerId('custom_visitor');
-
     const sessionId = uniqueTrackerId('custom_session');
-
     const occurredAt = new Date('2026-08-06T10:10:00.000Z');
 
     await createRawAnalyticsEvent(prisma, website, {
@@ -246,7 +232,6 @@ describe('Analytics Late Events E2E', () => {
 
   it('does not rebuild unrelated daily buckets', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
 
     await prisma.website.update({
@@ -259,7 +244,6 @@ describe('Analytics Late Events E2E', () => {
     });
 
     const firstVisitor = uniqueTrackerId('first_visitor');
-
     const firstSession = uniqueTrackerId('first_session');
 
     await createRawAnalyticsEvent(prisma, website, {

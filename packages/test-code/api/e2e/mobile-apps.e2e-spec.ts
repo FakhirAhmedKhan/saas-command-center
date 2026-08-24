@@ -1,21 +1,13 @@
+import { withBearer } from '../helpers/auth';
+import { createTestApp } from '../helpers/create-test-app';
+import { resetDatabase } from '../helpers/database';
+import { registerWorkspaceTestUser } from '../helpers/workspace';
 import type { INestApplication } from '@nestjs/common';
-
+import { PrismaService } from 'src/database/prisma.service';
+import { ApplicationCategory, ApplicationType, MobileFramework, MobilePlatform, WorkspaceRole } from 'src/generated/prisma/enums';
 import request from 'supertest';
 
-import { PrismaService } from 'src/database/prisma.service';
-
-import { ApplicationCategory, ApplicationType, MobileFramework, MobilePlatform, WorkspaceRole } from 'src/generated/prisma/enums';
-
-import { withBearer } from '../helpers/auth';
-
-import { createTestApp } from '../helpers/create-test-app';
-
-import { resetDatabase } from '../helpers/database';
-
-import { registerWorkspaceTestUser } from '../helpers/workspace';
-
 const API_PREFIX = '/api/v1';
-
 const createPayload = {
   name: 'Karwa Passenger',
   platform: 'ANDROID',
@@ -37,7 +29,6 @@ function mobileAppUrl(workspaceId: string, mobileAppId: string): string {
 
 describe('Mobile Applications E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
 
   beforeEach(async () => {
@@ -54,7 +45,6 @@ describe('Mobile Applications E2E', () => {
 
   it('allows an owner to create a mobile application', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const response = await owner.agent.post(mobileAppsUrl(owner.workspaceId)).set(withBearer(owner.accessToken)).send(createPayload);
 
     expect(response.status).toBe(201);
@@ -126,7 +116,6 @@ describe('Mobile Applications E2E', () => {
 
   it('rejects unauthenticated mobile application creation', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const response = await request(app.getHttpServer()).post(mobileAppsUrl(owner.workspaceId)).send(createPayload);
 
     expect(response.status).toBe(401);
@@ -134,7 +123,6 @@ describe('Mobile Applications E2E', () => {
 
   it('rejects invalid mobile platform', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const response = await owner.agent
       .post(mobileAppsUrl(owner.workspaceId))
       .set(withBearer(owner.accessToken))
@@ -148,7 +136,6 @@ describe('Mobile Applications E2E', () => {
 
   it('rejects invalid mobile framework', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const response = await owner.agent
       .post(mobileAppsUrl(owner.workspaceId))
       .set(withBearer(owner.accessToken))
@@ -162,7 +149,6 @@ describe('Mobile Applications E2E', () => {
 
   it('rejects missing required fields', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const response = await owner.agent.post(mobileAppsUrl(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
       packageId: 'com.invalid.app',
     });
@@ -172,7 +158,6 @@ describe('Mobile Applications E2E', () => {
 
   it('lists only active mobile applications from the current workspace', async () => {
     const workspaceA = await registerWorkspaceTestUser(app, prisma);
-
     const workspaceB = await registerWorkspaceTestUser(app, prisma);
 
     await workspaceA.agent
@@ -210,7 +195,6 @@ describe('Mobile Applications E2E', () => {
 
   it('returns mobile application details', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const created = await owner.agent.post(mobileAppsUrl(owner.workspaceId)).set(withBearer(owner.accessToken)).send(createPayload);
 
     expect(created.status).toBe(201);
@@ -233,7 +217,6 @@ describe('Mobile Applications E2E', () => {
 
   it('updates mobile application metadata', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const created = await owner.agent.post(mobileAppsUrl(owner.workspaceId)).set(withBearer(owner.accessToken)).send(createPayload);
 
     expect(created.status).toBe(201);
@@ -285,7 +268,6 @@ describe('Mobile Applications E2E', () => {
 
   it('archives a mobile application and removes it from active list', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const created = await owner.agent.post(mobileAppsUrl(owner.workspaceId)).set(withBearer(owner.accessToken)).send(createPayload);
 
     expect(created.status).toBe(201);
@@ -317,9 +299,7 @@ describe('Mobile Applications E2E', () => {
 
   it('prevents one workspace from reading another workspace mobile application', async () => {
     const workspaceA = await registerWorkspaceTestUser(app, prisma);
-
     const workspaceB = await registerWorkspaceTestUser(app, prisma);
-
     const created = await workspaceA.agent.post(mobileAppsUrl(workspaceA.workspaceId)).set(withBearer(workspaceA.accessToken)).send(createPayload);
 
     expect(created.status).toBe(201);
@@ -331,9 +311,7 @@ describe('Mobile Applications E2E', () => {
 
   it('prevents a non-member from using another workspace route', async () => {
     const workspaceA = await registerWorkspaceTestUser(app, prisma);
-
     const workspaceB = await registerWorkspaceTestUser(app, prisma);
-
     const response = await workspaceB.agent.get(mobileAppsUrl(workspaceA.workspaceId)).set(withBearer(workspaceB.accessToken));
 
     expect([403, 404]).toContain(response.status);
@@ -341,7 +319,6 @@ describe('Mobile Applications E2E', () => {
 
   it('prevents viewer from modifying mobile applications', async () => {
     const viewer = await registerWorkspaceTestUser(app, prisma);
-
     const created = await viewer.agent.post(mobileAppsUrl(viewer.workspaceId)).set(withBearer(viewer.accessToken)).send(createPayload);
 
     expect(created.status).toBe(201);

@@ -2,16 +2,7 @@ import type { ActivityActorType, ActivityEntityType, ApplicationActivityType } f
 
 export { ACTIVITY_ACTOR_TYPES, ACTIVITY_ENTITY_TYPES, APPLICATION_ACTIVITY_TYPES } from '@command-center/shared-types';
 
-export type {
-  ActivityActor,
-  ActivityActorType,
-  ActivityApplication,
-  ActivityEntityType,
-  ActivityListResponse,
-  ActivityPagination,
-  ApplicationActivity,
-  ApplicationActivityType,
-} from '@command-center/shared-types';
+export type { ActivityActor, ActivityActorType, ActivityApplication, ActivityEntityType, ActivityListResponse, ActivityPagination, ApplicationActivity, ApplicationActivityType } from '@command-center/shared-types';
 
 /**
  * Frontend filter model.

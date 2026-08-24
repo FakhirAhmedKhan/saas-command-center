@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { HealthStatusBadge } from '@/features/monitoring/health-status-badge';
 import type { HealthCheckStatus } from '@/features/monitoring/monitoring.types';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { HealthStatusBadge } from '@/features/monitoring/health-status-badge';
 
 describe('HealthStatusBadge', () => {
   const cases: Array<{ status: HealthCheckStatus; label: string; colorClass: string }> = [

@@ -13,11 +13,8 @@ interface Props {
 
 export function DesktopTests({ workspaceId, desktopAppId }: Props) {
   const [runs, setRuns] = useState<DesktopTestRun[]>([]);
-
   const [summary, setSummary] = useState<DesktopTestSummary | null>(null);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -77,9 +74,7 @@ export function DesktopTests({ workspaceId, desktopAppId }: Props) {
       ) : null}
 
       {runs.length === 0 ? (
-        <div className='rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500'>
-          No desktop test results have been recorded yet.
-        </div>
+        <div className='rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500'>No desktop test results have been recorded yet.</div>
       ) : (
         <div className='space-y-4'>
           {runs.map((run) => (

@@ -79,7 +79,6 @@ export class MonitoringService {
     await this.access.assertCanManage(workspaceId, userId);
 
     const existing = await this.requireCheck(workspaceId, checkId);
-
     const merged = {
       targetType: input.targetType ?? existing.targetType,
       applicationId: input.applicationId !== undefined ? input.applicationId : (existing.applicationId ?? undefined),
@@ -256,17 +255,11 @@ export class MonitoringService {
         },
       }),
     ]);
-
     const counts = new Map(groupedStatuses.map((group) => [group.latestStatus, group._count._all]));
-
     const healthy = counts.get(HealthCheckStatus.HEALTHY) ?? 0;
-
     const degraded = counts.get(HealthCheckStatus.DEGRADED) ?? 0;
-
     const down = counts.get(HealthCheckStatus.DOWN) ?? 0;
-
     const unknown = counts.get(HealthCheckStatus.UNKNOWN) ?? 0;
-
     const disabled = counts.get(HealthCheckStatus.DISABLED) ?? 0;
 
     return {
@@ -319,9 +312,7 @@ export class MonitoringService {
         lastCheckedAt: true,
       },
     });
-
     const priority = [HealthCheckStatus.DOWN, HealthCheckStatus.DEGRADED, HealthCheckStatus.UNKNOWN, HealthCheckStatus.HEALTHY, HealthCheckStatus.DISABLED];
-
     const status = priority.find((candidate) => checks.some((check) => check.latestStatus === candidate)) ?? HealthCheckStatus.UNKNOWN;
 
     return {
@@ -430,7 +421,6 @@ export class MonitoringService {
     const minimumInterval = this.config.get('HEALTH_MIN_INTERVAL_SECONDS', {
       infer: true,
     });
-
     const maximumInterval = this.config.get('HEALTH_MAX_INTERVAL_SECONDS', {
       infer: true,
     });
@@ -442,7 +432,6 @@ export class MonitoringService {
     const minimumTimeout = this.config.get('HEALTH_MIN_TIMEOUT_MS', {
       infer: true,
     });
-
     const maximumTimeout = this.config.get('HEALTH_MAX_TIMEOUT_MS', {
       infer: true,
     });

@@ -22,12 +22,7 @@ export class DesktopAnalysisController {
 
   @Post()
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
-  analyze(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string,
-    @Req() request: AuthenticatedRequest,
-    @Body() dto: AnalyzeDesktopAppDto,
-  ) {
+  analyze(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Req() request: AuthenticatedRequest, @Body() dto: AnalyzeDesktopAppDto) {
     return this.service.analyze(workspaceId, desktopAppId, request.user.id, dto);
   }
 }

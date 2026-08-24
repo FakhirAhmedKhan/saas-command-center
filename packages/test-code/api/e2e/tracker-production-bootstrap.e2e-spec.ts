@@ -1,10 +1,10 @@
 import { buildCollectPayload, buildTrackerEvent, createTrackedWebsite } from '../helpers/analytics-ingestion';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
-import { AppModule } from 'src/app.module';
-import { configureApplication } from 'src/bootstrap/configure-application';
 import type { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { AppModule } from 'src/app.module';
+import { configureApplication } from 'src/bootstrap/configure-application';
 import { PrismaService } from 'src/database/prisma.service';
 import request from 'supertest';
 
@@ -35,18 +35,14 @@ describe('Tracker -> Production HTTP Bootstrap E2E', () => {
 
   it('accepts a real Tracker text/plain request through the production HTTP pipeline', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const event = buildTrackerEvent(trackedWebsite.origin, {
       url: `${trackedWebsite.origin}/production-bootstrap`,
       title: 'Production Bootstrap Tracker Test',
     });
-
     const payload = buildCollectPayload(trackedWebsite, [event], {
       sdkVersion: '1.0.0',
     });
-
     const response = await request(app.getHttpServer())
       .post('/api/v1/collect')
       .set('Origin', trackedWebsite.origin)
@@ -89,15 +85,11 @@ describe('Tracker -> Production HTTP Bootstrap E2E', () => {
 
   it('rejects Tracker requests whose Origin is not allowed for the website', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const event = buildTrackerEvent(trackedWebsite.origin);
-
     const payload = buildCollectPayload(trackedWebsite, [event], {
       sdkVersion: '1.0.0',
     });
-
     const response = await request(app.getHttpServer())
       .post('/api/v1/collect')
       .set('Origin', 'https://untrusted-tracker-origin.example.test')

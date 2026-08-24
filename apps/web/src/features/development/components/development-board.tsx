@@ -19,25 +19,15 @@ interface DevelopmentBoardProps {
 
 export function DevelopmentBoard({ workspaceId, applicationId }: DevelopmentBoardProps) {
   const [summary, setSummary] = useState<DevelopmentSummary | null>(null);
-
   const [templates, setTemplates] = useState<DevelopmentTemplate[]>([]);
-
   const [selectedTemplate, setSelectedTemplate] = useState<DevelopmentTemplateType>('STANDARD_SAAS');
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
-
   const [reloadKey, setReloadKey] = useState(0);
-
   const [milestoneTitle, setMilestoneTitle] = useState('');
-
   const [milestoneWeight, setMilestoneWeight] = useState('10');
-
   const [milestoneStart, setMilestoneStart] = useState('');
-
   const [milestoneDue, setMilestoneDue] = useState('');
-
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -45,10 +35,7 @@ export function DevelopmentBoard({ workspaceId, applicationId }: DevelopmentBoar
 
     async function load(): Promise<void> {
       try {
-        const [summaryResponse, templatesResponse] = await Promise.all([
-          getDevelopmentSummary(workspaceId, applicationId),
-          getDevelopmentTemplates(workspaceId),
-        ]);
+        const [summaryResponse, templatesResponse] = await Promise.all([getDevelopmentSummary(workspaceId, applicationId), getDevelopmentTemplates(workspaceId)]);
 
         if (cancelled) {
           return;
@@ -123,7 +110,6 @@ export function DevelopmentBoard({ workspaceId, applicationId }: DevelopmentBoar
     }
 
     const orderedIds = summary.milestones.map((milestone) => milestone.id);
-
     const targetIndex = index + direction;
 
     if (targetIndex < 0 || targetIndex >= orderedIds.length) {
@@ -131,7 +117,6 @@ export function DevelopmentBoard({ workspaceId, applicationId }: DevelopmentBoar
     }
 
     const currentId = orderedIds[index];
-
     const targetId = orderedIds[targetIndex];
 
     if (!currentId || !targetId) {
@@ -245,10 +230,7 @@ export function DevelopmentBoard({ workspaceId, applicationId }: DevelopmentBoar
             <Button
               loading={saving}
               onClick={() => {
-                const replace =
-                  summary.milestones.length > 0
-                    ? window.confirm('This application already has milestones. Replace all milestones, tasks and blockers?')
-                    : false;
+                const replace = summary.milestones.length > 0 ? window.confirm('This application already has milestones. Replace all milestones, tasks and blockers?') : false;
 
                 if (summary.milestones.length === 0 || replace) {
                   void run(() => applyDevelopmentTemplate(workspaceId, applicationId, selectedTemplate, replace));

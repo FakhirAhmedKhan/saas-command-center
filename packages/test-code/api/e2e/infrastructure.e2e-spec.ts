@@ -3,9 +3,9 @@ import { API_PREFIX, buildWorkspacePayload, TEST_ROUTES } from '../helpers/contr
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { readAccessToken } from '../helpers/response';
+import type { INestApplication } from '@nestjs/common';
 import { REQUEST_ID_HEADER } from 'src/common/middleware/request-id.middleware';
 import { PrismaService } from 'src/database/prisma.service';
-import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -18,9 +18,7 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
  */
 describe('Infrastructure E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
-
   let accessToken: string;
 
   beforeAll(async () => {
@@ -33,7 +31,6 @@ describe('Infrastructure E2E', () => {
     await resetDatabase(prisma);
 
     const agent = createAgent(app);
-
     const user = createTestUser();
 
     accessToken = readAccessToken(await registerUser(agent, user));
@@ -117,7 +114,6 @@ describe('Infrastructure E2E', () => {
 
     it('echoes a client supplied request id', async () => {
       const suppliedId = 'client-supplied-request-id';
-
       const response = await request(app.getHttpServer()).get(TEST_ROUTES.system.health).set(REQUEST_ID_HEADER, suppliedId);
 
       expect(response.headers[REQUEST_ID_HEADER]).toBe(suppliedId);
@@ -131,7 +127,6 @@ describe('Infrastructure E2E', () => {
 
     it('issues a different id per request', async () => {
       const first = await request(app.getHttpServer()).get(TEST_ROUTES.system.health);
-
       const second = await request(app.getHttpServer()).get(TEST_ROUTES.system.health);
 
       expect(first.headers[REQUEST_ID_HEADER]).not.toBe(second.headers[REQUEST_ID_HEADER]);
@@ -194,10 +189,7 @@ describe('Infrastructure E2E', () => {
 
   describe('body limits', () => {
     it('accepts a payload within the configured limit', async () => {
-      const response = await request(app.getHttpServer())
-        .post(TEST_ROUTES.workspaces.root)
-        .set(withBearer(accessToken))
-        .send(buildWorkspacePayload('Body Limit Workspace'));
+      const response = await request(app.getHttpServer()).post(TEST_ROUTES.workspaces.root).set(withBearer(accessToken)).send(buildWorkspacePayload('Body Limit Workspace'));
 
       expect(response.status).toBeLessThan(400);
     });
@@ -207,7 +199,6 @@ describe('Infrastructure E2E', () => {
         ...buildWorkspacePayload('Oversized Workspace'),
         padding: 'x'.repeat(2 * 1024 * 1024),
       };
-
       const response = await request(app.getHttpServer()).post(TEST_ROUTES.workspaces.root).set(withBearer(accessToken)).send(oversizedPayload);
 
       expect(response.status).toBe(413);

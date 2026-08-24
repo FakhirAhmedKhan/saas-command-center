@@ -1,6 +1,6 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getApplicationActivities, getWorkspaceActivities } from '@/features/activity/activity-api';
 import { apiRequest } from '@/features/lib/api/api-client';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/lib/api/api-client', () => ({
   apiRequest: vi.fn(),
@@ -42,7 +42,7 @@ describe('getWorkspaceActivities', () => {
     await getWorkspaceActivities('workspace-1', {
       search: '',
       activityType: undefined,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       entityType: null as any,
       page: 1,
     });

@@ -21,9 +21,7 @@ export function formatRelativeActivityDate(value: string): string {
   }
 
   const difference = date.getTime() - Date.now();
-
   const absoluteDifference = Math.abs(difference);
-
   const formatter = new Intl.RelativeTimeFormat('en', {
     numeric: 'auto',
   });
@@ -63,7 +61,6 @@ export function getMetadataSummary(activity: ApplicationActivity): string | null
   }
 
   const previousStatus = metadata.previousStatus;
-
   const currentStatus = metadata.currentStatus;
 
   if (typeof previousStatus === 'string' && typeof currentStatus === 'string') {
@@ -71,7 +68,6 @@ export function getMetadataSummary(activity: ApplicationActivity): string | null
   }
 
   const previousPriority = metadata.previousPriority;
-
   const currentPriority = metadata.currentPriority;
 
   if (typeof previousPriority === 'string' && typeof currentPriority === 'string') {

@@ -13,7 +13,6 @@ import { useParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
 const TRACKER_SCRIPT_URL = process.env.NEXT_PUBLIC_TRACKER_SCRIPT_URL ?? 'http://localhost:3002/tracker.js';
-
 const INGESTION_URL = process.env.NEXT_PUBLIC_INGESTION_URL ?? 'http://localhost:4000/api/v1/collect';
 
 export default function WebsiteInstallationPage() {
@@ -21,17 +20,11 @@ export default function WebsiteInstallationPage() {
     workspaceId: string;
     websiteId: string;
   }>();
-
   const { workspaceId, websiteId } = params;
-
   const [website, setWebsite] = useState<Website | null>(null);
-
   const [trackingKey, setTrackingKey] = useState<string | null>(null);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
-
   const [copied, setCopied] = useState<'key' | 'snippet' | 'custom' | null>(null);
 
   useEffect(() => {
@@ -40,7 +33,6 @@ export default function WebsiteInstallationPage() {
     async function load(): Promise<void> {
       try {
         const response = await getWebsite(workspaceId, websiteId);
-
         const storedKey = sessionStorage.getItem(websiteKeyStorageName(websiteId));
 
         if (!cancelled) {
@@ -78,7 +70,6 @@ export default function WebsiteInstallationPage() {
   data-require-consent="false"
 ></script>`;
   }, [trackingKey, websiteId]);
-
   const customEventSnippet = `window.CommandCenterAnalytics?.track(
   'signup_completed',
   {

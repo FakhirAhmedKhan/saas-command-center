@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { ApplicationsEmptyState } from '@/features/applications/components/applications-empty-state';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { ApplicationsEmptyState } from '@/features/applications/components/applications-empty-state';
 
 const WORKSPACE_ID = 'workspace-1';
 

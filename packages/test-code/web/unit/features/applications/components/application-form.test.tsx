@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
-import { ApplicationForm } from '@/features/applications/components/application-form';
 import type { SaasApplication } from '@/features/applications/application-types';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { ApplicationForm } from '@/features/applications/components/application-form';
 
 function baseApplication(overrides: Partial<SaasApplication> = {}): SaasApplication {
   return {

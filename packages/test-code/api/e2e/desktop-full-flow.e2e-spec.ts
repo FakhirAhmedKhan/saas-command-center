@@ -1,7 +1,9 @@
+import { createTestApp } from '../helpers/create-test-app';
+import { resetDatabase } from '../helpers/database';
+import { registerWorkspaceTestUser } from '../helpers/workspace';
+import { API, createDesktopApp, createRepository, ingestSuccessfulBuild } from './helpers/desktop-test-fixtures';
 import type { INestApplication } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
-import type { DesktopAnalysisProvider } from 'src/modules/desktop-apps/analysis/desktop-analysis-provider.interface';
-import { DesktopAnalysisService } from 'src/modules/desktop-apps/services/desktop-analysis.service';
 import {
   DesktopArchitecture,
   DesktopBuildArtifactType,
@@ -17,10 +19,8 @@ import {
   DesktopTestStatus,
   DesktopTestType,
 } from 'src/generated/prisma/enums';
-import { createTestApp } from '../helpers/create-test-app';
-import { resetDatabase } from '../helpers/database';
-import { registerWorkspaceTestUser } from '../helpers/workspace';
-import { API, createDesktopApp, createRepository, ingestSuccessfulBuild } from './helpers/desktop-test-fixtures';
+import type { DesktopAnalysisProvider } from 'src/modules/desktop-apps/analysis/desktop-analysis-provider.interface';
+import { DesktopAnalysisService } from 'src/modules/desktop-apps/services/desktop-analysis.service';
 
 class FinalDesktopAiProvider implements DesktopAnalysisProvider {
   async analyze() {
@@ -70,11 +70,8 @@ describe('Desktop Phase 18 full flow E2E', () => {
       currentVersion: '3.0.0',
       currentBuildNumber: '300',
     });
-
     const repository = await createRepository(prisma, owner.workspaceId, desktop.applicationId);
-
     const build = await ingestSuccessfulBuild(owner, desktop.id, repository.id, 'desktop-final-electron');
-
     const artifact = await prisma.desktopBuildArtifact.create({
       data: {
         buildId: build.id,
@@ -88,7 +85,6 @@ describe('Desktop Phase 18 full flow E2E', () => {
         externalUrl: 'https://artifacts.example.test/command-center.msi',
       },
     });
-
     const testRun = await prisma.desktopTestRun.create({
       data: {
         buildId: build.id,
@@ -103,7 +99,6 @@ describe('Desktop Phase 18 full flow E2E', () => {
         completedAt: new Date(),
       },
     });
-
     const release = await prisma.desktopRelease.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -119,7 +114,6 @@ describe('Desktop Phase 18 full flow E2E', () => {
         releasedAt: new Date(),
       },
     });
-
     const integration = await prisma.desktopTelemetryIntegration.create({
       data: {
         workspaceId: owner.workspaceId,
@@ -212,7 +206,6 @@ describe('Desktop Phase 18 full flow E2E', () => {
         enabled: true,
       })
       .expect(201);
-
     const evaluation = await owner.agent
       .post(`${base(owner.workspaceId, desktop.id)}/alerts/evaluate`)
       .set('Authorization', `Bearer ${owner.accessToken}`)
@@ -292,11 +285,7 @@ describe('Desktop Phase 18 full flow E2E', () => {
       architecture,
       packageName: `com.commandcenter.${framework.toLowerCase()}.final`,
     });
-
-    const response = await owner.agent
-      .get(`${API}/workspaces/${owner.workspaceId}/desktop-apps/${desktop.id}`)
-      .set('Authorization', `Bearer ${owner.accessToken}`)
-      .expect(200);
+    const response = await owner.agent.get(`${API}/workspaces/${owner.workspaceId}/desktop-apps/${desktop.id}`).set('Authorization', `Bearer ${owner.accessToken}`).expect(200);
 
     expect(response.body.framework).toBe(framework);
     expect(response.body.platform).toBe(platform);

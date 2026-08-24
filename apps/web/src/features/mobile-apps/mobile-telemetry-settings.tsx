@@ -15,19 +15,12 @@ const PROVIDERS: MobileTelemetryProvider[] = ['FIREBASE', 'SENTRY', 'DATADOG', '
 
 export function MobileTelemetrySettings({ workspaceId, mobileAppId }: Props) {
   const [integration, setIntegration] = useState<MobileTelemetryIntegration | null>(null);
-
   const [provider, setProvider] = useState<MobileTelemetryProvider>('SENTRY');
-
   const [externalProjectId, setExternalProjectId] = useState('');
-
   const [config, setConfig] = useState<Record<string, string>>({});
-
   const [loading, setLoading] = useState(true);
-
   const [saving, setSaving] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
-
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -153,22 +146,12 @@ export function MobileTelemetrySettings({ workspaceId, mobileAppId }: Props) {
           <p className='mt-4 text-sm text-slate-500'>Project: {integration.externalProjectId}</p>
 
           <div className='mt-4 flex flex-wrap gap-2'>
-            <button
-              type='button'
-              disabled={saving}
-              onClick={() => void sync()}
-              className='inline-flex h-9 items-center gap-2 rounded-lg border border-slate-300 px-3 text-sm font-semibold'
-            >
+            <button type='button' disabled={saving} onClick={() => void sync()} className='inline-flex h-9 items-center gap-2 rounded-lg border border-slate-300 px-3 text-sm font-semibold'>
               <RefreshCw className='size-4' />
               Sync
             </button>
 
-            <button
-              type='button'
-              disabled={saving}
-              onClick={() => void disconnect()}
-              className='inline-flex h-9 items-center gap-2 rounded-lg border border-red-200 px-3 text-sm font-semibold text-red-600'
-            >
+            <button type='button' disabled={saving} onClick={() => void disconnect()} className='inline-flex h-9 items-center gap-2 rounded-lg border border-red-200 px-3 text-sm font-semibold text-red-600'>
               <Unplug className='size-4' />
               Disconnect
             </button>
@@ -183,12 +166,7 @@ export function MobileTelemetrySettings({ workspaceId, mobileAppId }: Props) {
           <label className='block'>
             <span className='mb-2 block text-sm font-medium'>Provider</span>
 
-            <select
-              aria-label='Telemetry provider'
-              value={provider}
-              onChange={(event) => setProvider(event.target.value as MobileTelemetryProvider)}
-              className='h-10 w-full rounded-lg border border-slate-300 px-3'
-            >
+            <select aria-label='Telemetry provider' value={provider} onChange={(event) => setProvider(event.target.value as MobileTelemetryProvider)} className='h-10 w-full rounded-lg border border-slate-300 px-3'>
               {PROVIDERS.map((value) => (
                 <option key={value} value={value}>
                   {formatEnum(value)}
@@ -200,22 +178,12 @@ export function MobileTelemetrySettings({ workspaceId, mobileAppId }: Props) {
           <label className='block'>
             <span className='mb-2 block text-sm font-medium'>External Project ID</span>
 
-            <input
-              aria-label='Telemetry project ID'
-              value={externalProjectId}
-              onChange={(event) => setExternalProjectId(event.target.value)}
-              className='h-10 w-full rounded-lg border border-slate-300 px-3'
-            />
+            <input aria-label='Telemetry project ID' value={externalProjectId} onChange={(event) => setExternalProjectId(event.target.value)} className='h-10 w-full rounded-lg border border-slate-300 px-3' />
           </label>
 
           <ProviderFields provider={provider} config={config} onChange={setConfig} />
 
-          <button
-            type='button'
-            disabled={saving}
-            onClick={() => void connect()}
-            className='h-10 rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white disabled:opacity-50'
-          >
+          <button type='button' disabled={saving} onClick={() => void connect()} className='h-10 rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white disabled:opacity-50'>
             Connect Provider
           </button>
         </div>

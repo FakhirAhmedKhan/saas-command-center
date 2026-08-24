@@ -2,26 +2,13 @@ import { createApplication, readApiItems } from '../helpers/application';
 import { withBearer } from '../helpers/auth';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
-import {
-  archiveWebsite,
-  connectWebsite,
-  createWebsite,
-  disableWebsite,
-  disconnectWebsite,
-  enableWebsite,
-  expectWebsiteSuccess,
-  restoreWebsite,
-  rotateWebsiteKey,
-  updateWebsite,
-  websiteRoutes,
-} from '../helpers/website';
+import { archiveWebsite, connectWebsite, createWebsite, disableWebsite, disconnectWebsite, enableWebsite, expectWebsiteSuccess, restoreWebsite, rotateWebsiteKey, updateWebsite, websiteRoutes } from '../helpers/website';
 import { expectAccessDenied, registerWorkspaceTestUser, type WorkspaceTestUser } from '../helpers/workspace';
 import type { INestApplication } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 
 describe('Website Activity E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
 
   beforeAll(async () => {
@@ -54,9 +41,7 @@ describe('Website Activity E2E', () => {
 
   it('writes activity for website creation and update', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const initialCount = await activityCount(owner);
-
     const website = await createWebsite(owner, {
       domain: 'website-activity.example.test',
     });
@@ -70,7 +55,6 @@ describe('Website Activity E2E', () => {
     ).toBe(200);
 
     const response = await listActivity(owner);
-
     const activities = readApiItems(response, ['activities']);
 
     expect(activities.length).toBeGreaterThanOrEqual(initialCount + 2);
@@ -82,11 +66,8 @@ describe('Website Activity E2E', () => {
 
   it('writes activity for state, connection, and key-management actions', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const website = await createWebsite(owner);
-
     const beforeCount = await activityCount(owner);
 
     expectWebsiteSuccess(await disableWebsite(owner, website.id));
@@ -112,9 +93,7 @@ describe('Website Activity E2E', () => {
 
   it('does not write activity for rejected validation', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const beforeCount = await activityCount(owner);
-
     const response = await owner.agent.post(websiteRoutes.root(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
       name: '',
       domain: 'example.com/path',
@@ -127,7 +106,6 @@ describe('Website Activity E2E', () => {
 
   it('keeps website activity isolated across workspaces', async () => {
     const alphaOwner = await registerWorkspaceTestUser(app, prisma);
-
     const betaOwner = await registerWorkspaceTestUser(app, prisma);
 
     await createWebsite(alphaOwner, {
@@ -139,7 +117,6 @@ describe('Website Activity E2E', () => {
     });
 
     const alphaResponse = await listActivity(alphaOwner);
-
     const serialized = JSON.stringify(alphaResponse.body);
 
     expect(serialized).toContain('alpha-activity.example.test');
@@ -153,17 +130,13 @@ describe('Website Activity E2E', () => {
 
   it('does not expose raw tracking keys or authentication secrets in activity', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createWebsite(owner);
-
     const rotateResponse = await rotateWebsiteKey(owner, website.id);
 
     expectWebsiteSuccess(rotateResponse);
 
     const rawRotatePayload = JSON.stringify(rotateResponse.body);
-
     const response = await listActivity(owner);
-
     const serialized = JSON.stringify(response.body);
 
     expect(serialized).not.toContain(owner.input.password);

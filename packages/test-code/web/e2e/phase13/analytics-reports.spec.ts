@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test';
 
 const workspaceId = '11111111-1111-4111-8111-111111111111';
-
 const websiteId = '22222222-2222-4222-8222-222222222222';
 
 test.describe('Phase 13 analytics reports', () => {
@@ -199,7 +198,6 @@ test.describe('Phase 13 analytics reports', () => {
   test('paginates through report pages using Previous/Next controls', async ({ page }) => {
     await page.route('**/analytics/reports/pages*', async (route) => {
       const url = new URL(route.request().url());
-
       const requestedPage = url.searchParams.get('page') ?? '1';
 
       await route.fulfill({

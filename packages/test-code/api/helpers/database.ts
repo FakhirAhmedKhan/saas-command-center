@@ -12,9 +12,7 @@ function assertTestDatabase(): void {
   }
 
   const parsed = new URL(databaseUrl);
-
   const databaseName = parsed.pathname.replace(/^\//, '').toLowerCase();
-
   const safe = databaseName.includes('test');
 
   if (!safe) {

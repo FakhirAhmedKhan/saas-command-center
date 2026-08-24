@@ -16,14 +16,7 @@ import {
   updateMilestone,
   updateTask,
 } from '../development-api';
-import {
-  MILESTONE_STATUS_LABELS,
-  MILESTONE_STATUS_VARIANTS,
-  PRIORITY_LABELS,
-  PRIORITY_VARIANTS,
-  TASK_STATUS_LABELS,
-  TASK_STATUS_VARIANTS,
-} from '../development-constants';
+import { MILESTONE_STATUS_LABELS, MILESTONE_STATUS_VARIANTS, PRIORITY_LABELS, PRIORITY_VARIANTS, TASK_STATUS_LABELS, TASK_STATUS_VARIANTS } from '../development-constants';
 import type { ApplicationMilestone, WorkItemPriority } from '../development-types';
 import { formatDevelopmentDate, getDevelopmentError, toApiDate } from '../development-utils';
 import { Badge, Button, Card, CardContent, CardHeader, Input, Select } from '@command-center/ui';
@@ -130,7 +123,6 @@ export function MilestoneCard({ workspaceId, applicationId, milestone, milestone
 
   async function reorderTask(taskIndex: number, direction: -1 | 1): Promise<void> {
     const orderedIds = milestone.tasks.map((task) => task.id);
-
     const targetIndex = taskIndex + direction;
 
     if (targetIndex < 0 || targetIndex >= orderedIds.length) {
@@ -138,7 +130,6 @@ export function MilestoneCard({ workspaceId, applicationId, milestone, milestone
     }
 
     const currentTaskId = orderedIds[taskIndex];
-
     const targetTaskId = orderedIds[targetIndex];
 
     if (!currentTaskId || !targetTaskId) {
@@ -310,12 +301,7 @@ export function MilestoneCard({ workspaceId, applicationId, milestone, milestone
                     <ArrowDown className='size-4' />
                   </Button>
 
-                  <Select
-                    aria-label={`Move ${task.title}`}
-                    value={task.milestoneId}
-                    className='min-w-44'
-                    onChange={(event) => void run(() => moveTask(workspaceId, applicationId, task.id, event.target.value))}
-                  >
+                  <Select aria-label={`Move ${task.title}`} value={task.milestoneId} className='min-w-44' onChange={(event) => void run(() => moveTask(workspaceId, applicationId, task.id, event.target.value))}>
                     {milestones
                       .filter((item) => item.status !== 'SKIPPED')
                       .map((item) => (
@@ -335,9 +321,7 @@ export function MilestoneCard({ workspaceId, applicationId, milestone, milestone
                         aria-label={`Status for ${task.title}`}
                         value={task.status === 'COMPLETED' || task.status === 'SKIPPED' ? 'TODO' : task.status}
                         className='min-w-36'
-                        onChange={(event) =>
-                          void run(() => setTaskStatus(workspaceId, applicationId, task.id, event.target.value as 'TODO' | 'IN_PROGRESS' | 'BLOCKED'))
-                        }
+                        onChange={(event) => void run(() => setTaskStatus(workspaceId, applicationId, task.id, event.target.value as 'TODO' | 'IN_PROGRESS' | 'BLOCKED'))}
                       >
                         <option value='TODO'>To do</option>
                         <option value='IN_PROGRESS'>In progress</option>

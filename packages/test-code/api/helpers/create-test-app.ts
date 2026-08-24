@@ -1,14 +1,13 @@
-import { AppModule } from 'src/app.module';
-import { configureApplication } from 'src/bootstrap/configure-application';
 import { type INestApplication } from '@nestjs/common';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
+import { AppModule } from 'src/app.module';
+import { configureApplication } from 'src/bootstrap/configure-application';
 
 export async function createTestApp(): Promise<INestApplication> {
   const testingModule = await Test.createTestingModule({
     imports: [AppModule],
   }).compile();
-
   const app = testingModule.createNestApplication<NestExpressApplication>();
 
   /*

@@ -20,23 +20,14 @@ export default function MobileAppOverviewPage() {
     workspaceId: string;
     mobileAppId: string;
   }>();
-
   const router = useRouter();
-
   const workspaceId = params.workspaceId;
-
   const mobileAppId = params.mobileAppId;
-
   const listHref = `/workspaces/${workspaceId}/mobile-apps`;
-
   const [overview, setOverview] = useState<MobileAppOverview | null>(null);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
-
   const [archiving, setArchiving] = useState(false);
-
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -135,9 +126,7 @@ export default function MobileAppOverviewPage() {
   }
 
   const mobileApp = overview.mobileApp;
-
   const repository = overview.repository;
-
   const archived = Boolean(mobileApp.application.archivedAt);
 
   return (

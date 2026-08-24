@@ -1,14 +1,7 @@
 'use client';
 
 import { ACTIVITY_TYPE_LABELS, ACTOR_TYPE_LABELS, ENTITY_TYPE_LABELS } from '../activity-constants';
-import {
-  ACTIVITY_ACTOR_TYPES,
-  ACTIVITY_ENTITY_TYPES,
-  APPLICATION_ACTIVITY_TYPES,
-  type ActivityActorType,
-  type ActivityEntityType,
-  type ApplicationActivityType,
-} from '../activity-types';
+import { ACTIVITY_ACTOR_TYPES, ACTIVITY_ENTITY_TYPES, APPLICATION_ACTIVITY_TYPES, type ActivityActorType, type ActivityEntityType, type ApplicationActivityType } from '../activity-types';
 import { Button, Input, Select } from '@command-center/ui';
 import { RotateCcw, Search } from 'lucide-react';
 import type { FormEvent } from 'react';
@@ -53,19 +46,9 @@ export function ActivityFilters({ value, onChange, onApply, onReset }: ActivityF
   return (
     <form onSubmit={handleSubmit} className='rounded-2xl border border-slate-200 bg-white p-4 shadow-card'>
       <div className='grid gap-4 xl:grid-cols-[minmax(220px,1.5fr)_repeat(3,minmax(150px,1fr))_170px_170px]'>
-        <Input
-          aria-label='Search activity'
-          placeholder='Search activity...'
-          value={value.search}
-          leadingIcon={<Search className='size-4' />}
-          onChange={(event) => update('search', event.target.value)}
-        />
+        <Input aria-label='Search activity' placeholder='Search activity...' value={value.search} leadingIcon={<Search className='size-4' />} onChange={(event) => update('search', event.target.value)} />
 
-        <Select
-          aria-label='Activity type'
-          value={value.activityType}
-          onChange={(event) => update('activityType', event.target.value as ApplicationActivityType | '')}
-        >
+        <Select aria-label='Activity type' value={value.activityType} onChange={(event) => update('activityType', event.target.value as ApplicationActivityType | '')}>
           <option value=''>All activities</option>
           {APPLICATION_ACTIVITY_TYPES.map((type) => (
             <option key={type} value={type}>

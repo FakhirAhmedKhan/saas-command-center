@@ -100,12 +100,7 @@ export function updateTask(workspaceId: string, applicationId: string, taskId: s
   });
 }
 
-export function setTaskStatus(
-  workspaceId: string,
-  applicationId: string,
-  taskId: string,
-  status: Extract<ApplicationTaskStatus, 'TODO' | 'IN_PROGRESS' | 'BLOCKED'>,
-) {
+export function setTaskStatus(workspaceId: string, applicationId: string, taskId: string, status: Extract<ApplicationTaskStatus, 'TODO' | 'IN_PROGRESS' | 'BLOCKED'>) {
   return apiRequest<ApplicationTask>(`${basePath(workspaceId, applicationId)}/tasks/${taskId}/status`, {
     method: 'POST',
     body: JSON.stringify({

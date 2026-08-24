@@ -21,11 +21,7 @@ export class DesktopSecurityController {
 
   @Get('permissions')
   @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER, WorkspaceRole.VIEWER)
-  getPermissions(
-    @Param('workspaceId', ParseUUIDPipe) workspaceId: string,
-    @Param('desktopAppId', ParseUUIDPipe) _desktopAppId: string,
-    @Req() request: AuthenticatedRequest,
-  ) {
+  getPermissions(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) _desktopAppId: string, @Req() request: AuthenticatedRequest) {
     void _desktopAppId;
     return this.permissions.get(workspaceId, request.user.id);
   }

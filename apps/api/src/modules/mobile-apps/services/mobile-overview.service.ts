@@ -19,7 +19,6 @@ export class MobileOverviewService {
 
   async getOverview(workspaceId: string, mobileAppId: string): Promise<MobileAppOverview> {
     const mobileApp = await this.mobileAppsService.findOne(workspaceId, mobileAppId);
-
     const repository = await this.prisma.repositoryConnection.findFirst({
       where: {
         workspaceId,

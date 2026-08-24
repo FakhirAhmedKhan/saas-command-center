@@ -50,11 +50,9 @@ export class WebhookDeliveryWorkerService {
       const batchSize = this.config.get('WEBHOOK_WORKER_BATCH_SIZE', {
         infer: true,
       });
-
       const concurrency = this.config.get('WEBHOOK_WORKER_CONCURRENCY', {
         infer: true,
       });
-
       const deliveries = await this.prisma.webhookDelivery.findMany({
         where: {
           status: {
@@ -156,9 +154,7 @@ export class WebhookDeliveryWorkerService {
     }
 
     const attemptNumber = delivery.attemptCount + 1;
-
     const attemptStartedAt = new Date();
-
     const rawPayload = JSON.stringify({
       apiVersion: delivery.event.payloadVersion,
       id: delivery.event.id,
@@ -173,9 +169,7 @@ export class WebhookDeliveryWorkerService {
 
       data: delivery.event.payload,
     });
-
     const timestamp = Math.floor(Date.now() / 1_000).toString();
-
     let result: Awaited<ReturnType<WebhookOutboundClientService['sendJson']>>;
 
     try {
@@ -185,7 +179,6 @@ export class WebhookDeliveryWorkerService {
         authTag: delivery.endpoint.secretAuthTag,
         keyVersion: delivery.endpoint.secretKeyVersion,
       });
-
       const signature = this.signature.sign(secret, timestamp, rawPayload);
 
       result = await this.outbound.sendJson(
@@ -221,20 +214,13 @@ export class WebhookDeliveryWorkerService {
     }
 
     const attemptFinishedAt = new Date();
-
     const shouldRetry = !result.success && result.retriable && attemptNumber < delivery.maxAttempts;
-
     const nextDelay = Math.min(
       WEBHOOK_RETRY_BASE_DELAY_MS * 2 ** Math.max(0, attemptNumber - 1),
 
       WEBHOOK_RETRY_MAX_DELAY_MS,
     );
-
-    const finalStatus = result.success
-      ? WebhookDeliveryStatus.SUCCEEDED
-      : shouldRetry
-        ? WebhookDeliveryStatus.RETRY_SCHEDULED
-        : WebhookDeliveryStatus.DEAD_LETTERED;
+    const finalStatus = result.success ? WebhookDeliveryStatus.SUCCEEDED : shouldRetry ? WebhookDeliveryStatus.RETRY_SCHEDULED : WebhookDeliveryStatus.DEAD_LETTERED;
 
     await this.prisma.$transaction(async (transaction) => {
       await transaction.webhookDeliveryAttempt.create({
@@ -304,7 +290,6 @@ export class WebhookDeliveryWorkerService {
     const timeoutMs = this.config.get('WEBHOOK_PROCESSING_TIMEOUT_MS', {
       infer: true,
     });
-
     const staleBefore = new Date(Date.now() - timeoutMs);
 
     await this.prisma.webhookDelivery.updateMany({

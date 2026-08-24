@@ -9,7 +9,6 @@ import { PrismaService } from 'src/database/prisma.service';
 
 describe('Development Activity E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
 
   beforeAll(async () => {
@@ -42,11 +41,8 @@ describe('Development Activity E2E', () => {
 
   it('writes activity for milestone, task, and blocker creation', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const initialCount = await activityCount(owner, application.id);
-
     const milestone = await createMilestone(owner, application.id);
 
     await createTask(owner, application.id, milestone.id);
@@ -62,17 +58,12 @@ describe('Development Activity E2E', () => {
 
   it('writes activity for updates, completion, and blocker resolution', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const milestone = await createMilestone(owner, application.id);
-
     const task = await createTask(owner, application.id, milestone.id);
-
     const blocker = await createBlocker(owner, application.id, {
       taskId: task.id,
     });
-
     const beforeCount = await activityCount(owner, application.id);
 
     expect(
@@ -94,18 +85,12 @@ describe('Development Activity E2E', () => {
 
   it('does not create activity for rejected validation', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
-
     const beforeCount = await activityCount(owner, application.id);
-
-    const response = await owner.agent
-      .post(`/api/v1/workspaces/${owner.workspaceId}/applications/${application.id}/development/milestones`)
-      .set(withBearer(owner.accessToken))
-      .send({
-        title: '',
-        weight: 0,
-      });
+    const response = await owner.agent.post(`/api/v1/workspaces/${owner.workspaceId}/applications/${application.id}/development/milestones`).set(withBearer(owner.accessToken)).send({
+      title: '',
+      weight: 0,
+    });
 
     expect(response.status).toBe(400);
 
@@ -114,35 +99,25 @@ describe('Development Activity E2E', () => {
 
   it('keeps development activity isolated between workspaces', async () => {
     const alphaOwner = await registerWorkspaceTestUser(app, prisma);
-
     const betaOwner = await registerWorkspaceTestUser(app, prisma);
-
     const alphaApplication = await createApplication(alphaOwner);
-
     const betaApplication = await createApplication(betaOwner);
-
     const alphaMilestone = await createMilestone(alphaOwner, alphaApplication.id);
-
     const betaMilestone = await createMilestone(betaOwner, betaApplication.id);
-
     const alphaResponse = await listActivity(alphaOwner, alphaApplication.id);
-
     const serialized = JSON.stringify(alphaResponse.body);
 
     expect(serialized).toContain(alphaMilestone.id);
 
     expect(serialized).not.toContain(betaMilestone.id);
 
-    const foreignResponse = await betaOwner.agent
-      .get(applicationRoutes.applicationActivities(alphaOwner.workspaceId, alphaApplication.id))
-      .set(withBearer(betaOwner.accessToken));
+    const foreignResponse = await betaOwner.agent.get(applicationRoutes.applicationActivities(alphaOwner.workspaceId, alphaApplication.id)).set(withBearer(betaOwner.accessToken));
 
     expectAccessDenied(foreignResponse);
   });
 
   it('does not expose authentication secrets in development activity', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const application = await createApplication(owner);
 
     await createMilestone(owner, application.id, {
@@ -150,7 +125,6 @@ describe('Development Activity E2E', () => {
     });
 
     const response = await listActivity(owner, application.id);
-
     const serialized = JSON.stringify(response.body).toLowerCase();
 
     expect(serialized).not.toContain(owner.input.password.toLowerCase());

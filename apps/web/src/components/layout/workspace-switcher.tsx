@@ -13,13 +13,9 @@ interface WorkspaceSwitcherProps {
 
 export function WorkspaceSwitcher({ workspaceId }: WorkspaceSwitcherProps) {
   const { workspaces } = useAuth();
-
   const router = useRouter();
-
   const [open, setOpen] = useState(false);
-
   const containerRef = useRef<HTMLDivElement>(null);
-
   const activeWorkspace = workspaces.find((workspace) => workspace.id === workspaceId) ?? workspaces[0] ?? null;
 
   useEffect(() => {
@@ -70,9 +66,7 @@ export function WorkspaceSwitcher({ workspaceId }: WorkspaceSwitcherProps) {
         aria-label='Select workspace'
         className='flex w-full items-center gap-2 rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-left transition hover:bg-slate-50'
       >
-        <span className='flex size-6 shrink-0 items-center justify-center rounded-md bg-brand-600 text-[10px] font-bold text-white'>
-          {activeWorkspace.name.slice(0, 2).toUpperCase()}
-        </span>
+        <span className='flex size-6 shrink-0 items-center justify-center rounded-md bg-brand-600 text-[10px] font-bold text-white'>{activeWorkspace.name.slice(0, 2).toUpperCase()}</span>
 
         <span className='min-w-0 flex-1 truncate text-[13px] font-semibold text-slate-900'>{activeWorkspace.name}</span>
 
@@ -100,14 +94,9 @@ export function WorkspaceSwitcher({ workspaceId }: WorkspaceSwitcherProps) {
                       router.push(`/workspaces/${workspace.id}`);
                     }
                   }}
-                  className={cn(
-                    'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition',
-                    isActive ? 'bg-brand-50 text-brand-700' : 'text-slate-700 hover:bg-slate-50',
-                  )}
+                  className={cn('flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition', isActive ? 'bg-brand-50 text-brand-700' : 'text-slate-700 hover:bg-slate-50')}
                 >
-                  <span className='flex size-6 shrink-0 items-center justify-center rounded-md bg-slate-100 text-[10px] font-bold text-slate-600'>
-                    {workspace.name.slice(0, 2).toUpperCase()}
-                  </span>
+                  <span className='flex size-6 shrink-0 items-center justify-center rounded-md bg-slate-100 text-[10px] font-bold text-slate-600'>{workspace.name.slice(0, 2).toUpperCase()}</span>
 
                   <span className='min-w-0 flex-1 truncate'>{workspace.name}</span>
 
@@ -118,20 +107,12 @@ export function WorkspaceSwitcher({ workspaceId }: WorkspaceSwitcherProps) {
           </div>
 
           <div className='mt-1 space-y-0.5 border-t border-slate-100 pt-1'>
-            <Link
-              href='/workspaces/new'
-              onClick={() => setOpen(false)}
-              className='flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-slate-700 transition hover:bg-slate-50'
-            >
+            <Link href='/workspaces/new' onClick={() => setOpen(false)} className='flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-slate-700 transition hover:bg-slate-50'>
               <Plus className='size-3.5 shrink-0 text-slate-400' aria-hidden='true' />
               Create workspace
             </Link>
 
-            <Link
-              href={`/workspaces/${activeWorkspace.id}/settings`}
-              onClick={() => setOpen(false)}
-              className='flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-slate-700 transition hover:bg-slate-50'
-            >
+            <Link href={`/workspaces/${activeWorkspace.id}/settings`} onClick={() => setOpen(false)} className='flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-slate-700 transition hover:bg-slate-50'>
               <Settings className='size-3.5 shrink-0 text-slate-400' aria-hidden='true' />
               Workspace settings
             </Link>

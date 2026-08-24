@@ -1,22 +1,15 @@
-import type { INestApplication } from '@nestjs/common';
-
-import { PrismaService } from 'src/database/prisma.service';
-
-import { RepositoryProvider } from 'src/generated/prisma/enums';
-
 import { withBearer } from '../helpers/auth';
-
 import { createTestApp } from '../helpers/create-test-app';
-
 import { resetDatabase } from '../helpers/database';
-
 import { registerWorkspaceTestUser } from '../helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { RepositoryProvider } from 'src/generated/prisma/enums';
 
 const API = '/api/v1';
 
 describe('Mobile Overview E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
 
   beforeEach(async () => {
@@ -108,9 +101,7 @@ describe('Mobile Overview E2E', () => {
 
   it('returns mobile overview metadata', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobile = await createMobile(owner);
-
     const response = await owner.agent.get(`${API}/workspaces/${owner.workspaceId}/mobile-apps/${mobile.id}/overview`).set(withBearer(owner.accessToken));
 
     expect(response.status).toBe(200);
@@ -144,11 +135,8 @@ describe('Mobile Overview E2E', () => {
 
   it('returns linked repository data', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobile = await createMobile(owner);
-
     const repository = await createRepository(owner.workspaceId, mobile.applicationId);
-
     const response = await owner.agent.get(`${API}/workspaces/${owner.workspaceId}/mobile-apps/${mobile.id}/overview`).set(withBearer(owner.accessToken));
 
     expect(response.status).toBe(200);
@@ -168,7 +156,6 @@ describe('Mobile Overview E2E', () => {
 
   it('handles missing optional metadata', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobile = await createMobile(owner, {
       packageId: null,
 
@@ -180,7 +167,6 @@ describe('Mobile Overview E2E', () => {
 
       currentBuildNumber: null,
     });
-
     const response = await owner.agent.get(`${API}/workspaces/${owner.workspaceId}/mobile-apps/${mobile.id}/overview`).set(withBearer(owner.accessToken));
 
     expect(response.status).toBe(200);
@@ -192,21 +178,15 @@ describe('Mobile Overview E2E', () => {
 
   it('prevents another workspace from opening overview', async () => {
     const workspaceA = await registerWorkspaceTestUser(app, prisma);
-
     const workspaceB = await registerWorkspaceTestUser(app, prisma);
-
     const mobile = await createMobile(workspaceA);
-
-    const response = await workspaceB.agent
-      .get(`${API}/workspaces/${workspaceA.workspaceId}/mobile-apps/${mobile.id}/overview`)
-      .set(withBearer(workspaceB.accessToken));
+    const response = await workspaceB.agent.get(`${API}/workspaces/${workspaceA.workspaceId}/mobile-apps/${mobile.id}/overview`).set(withBearer(workspaceB.accessToken));
 
     expect([403, 404]).toContain(response.status);
   });
 
   it('keeps archived mobile application available for historical overview', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobile = await createMobile(owner);
 
     await owner.agent.delete(`${API}/workspaces/${owner.workspaceId}/mobile-apps/${mobile.id}`).set(withBearer(owner.accessToken)).expect(200);
@@ -220,7 +200,6 @@ describe('Mobile Overview E2E', () => {
 
   it('rejects unauthenticated overview access', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const mobile = await createMobile(owner);
 
     await owner.agent.get(`${API}/workspaces/${owner.workspaceId}/mobile-apps/${mobile.id}/overview`).expect(401);

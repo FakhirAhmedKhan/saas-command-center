@@ -1,16 +1,12 @@
-import type { INestApplication } from '@nestjs/common';
-
-import { PrismaService } from 'src/database/prisma.service';
-import { MobilePerformanceMetricType, MobilePlatform, MobileTelemetryProvider } from 'src/generated/prisma/enums';
-
-import type { MobileTelemetryProviderAdapter, MobileTelemetryProviderContext } from 'src/modules/mobile-apps/telemetry/mobile-telemetry-provider.interface';
-
-import { MobileTelemetryProviderRegistry } from 'src/modules/mobile-apps/telemetry/mobile-telemetry-provider.registry';
-
 import { withBearer } from '../helpers/auth';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { MobilePerformanceMetricType, MobilePlatform, MobileTelemetryProvider } from 'src/generated/prisma/enums';
+import type { MobileTelemetryProviderAdapter, MobileTelemetryProviderContext } from 'src/modules/mobile-apps/telemetry/mobile-telemetry-provider.interface';
+import { MobileTelemetryProviderRegistry } from 'src/modules/mobile-apps/telemetry/mobile-telemetry-provider.registry';
 
 const API = '/api/v1';
 
@@ -66,14 +62,10 @@ class FakeIosTelemetryProvider implements MobileTelemetryProviderAdapter {
 describe('iOS Mobile Performance E2E', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-
   let fake: FakeIosTelemetryProvider;
-
   let owner: Awaited<ReturnType<typeof registerWorkspaceTestUser>>;
-
   let workspaceId: string;
   let mobileAppId: string;
-
   let sequence = 0;
 
   beforeEach(async () => {
@@ -254,10 +246,7 @@ describe('iOS Mobile Performance E2E', () => {
 
     await syncTelemetry().expect(201);
 
-    const response = await owner.agent
-      .get(`${API}/workspaces/${workspaceId}/mobile-apps/${mobileAppId}/performance/summary?version=7.2.0&platform=IOS`)
-      .set(withBearer(owner.accessToken))
-      .expect(200);
+    const response = await owner.agent.get(`${API}/workspaces/${workspaceId}/mobile-apps/${mobileAppId}/performance/summary?version=7.2.0&platform=IOS`).set(withBearer(owner.accessToken)).expect(200);
 
     expect(response.body.hasData).toBe(true);
 
@@ -283,10 +272,7 @@ describe('iOS Mobile Performance E2E', () => {
 
     await syncTelemetry().expect(201);
 
-    const response = await owner.agent
-      .get(`${API}/workspaces/${workspaceId}/mobile-apps/${mobileAppId}/performance/issues?version=7.2.0`)
-      .set(withBearer(owner.accessToken))
-      .expect(200);
+    const response = await owner.agent.get(`${API}/workspaces/${workspaceId}/mobile-apps/${mobileAppId}/performance/issues?version=7.2.0`).set(withBearer(owner.accessToken)).expect(200);
 
     expect(response.body).toEqual(
       expect.arrayContaining([
@@ -346,13 +332,8 @@ describe('iOS Mobile Performance E2E', () => {
       '920',
     );
 
-    const response = await owner.agent
-      .get(`${API}/workspaces/${workspaceId}/mobile-apps/${mobileAppId}/performance/compare?fromVersion=7.1.0&toVersion=7.2.0`)
-      .set(withBearer(owner.accessToken))
-      .expect(200);
-
+    const response = await owner.agent.get(`${API}/workspaces/${workspaceId}/mobile-apps/${mobileAppId}/performance/compare?fromVersion=7.1.0&toVersion=7.2.0`).set(withBearer(owner.accessToken)).expect(200);
     const startup = response.body.metrics.find((item: { metric: string }) => item.metric === 'COLD_STARTUP_MS');
-
     const crashFree = response.body.metrics.find((item: { metric: string }) => item.metric === 'CRASH_FREE_USERS_RATE');
 
     expect(startup.before).toBe(1200);
@@ -389,10 +370,7 @@ describe('iOS Mobile Performance E2E', () => {
       '920',
     );
 
-    const response = await owner.agent
-      .get(`${API}/workspaces/${workspaceId}/mobile-apps/${mobileAppId}/performance/versions`)
-      .set(withBearer(owner.accessToken))
-      .expect(200);
+    const response = await owner.agent.get(`${API}/workspaces/${workspaceId}/mobile-apps/${mobileAppId}/performance/versions`).set(withBearer(owner.accessToken)).expect(200);
 
     expect(response.body).toEqual(
       expect.arrayContaining([

@@ -1,11 +1,10 @@
-import request from 'supertest';
 import { createAgent, createTestUser, registerUser, withBearer } from './auth';
 import type { TestUserInput } from './contracts';
 import { expectSuccessfulStatus, readAccessToken, readResponseArray } from './response';
 import type { INestApplication } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { WorkspaceRole } from 'src/generated/prisma/enums';
-import type { Response, SuperAgentTest } from 'supertest';
+import request, { type Response } from 'supertest';
 
 export const workspaceRoutes = {
   root: '/api/v1/workspaces',
@@ -41,21 +40,14 @@ export interface NormalizedWorkspaceMember {
   role: string | undefined;
 }
 
-export async function registerWorkspaceTestUser(
-  app: INestApplication,
-  prisma: PrismaService,
-  overrides: Partial<TestUserInput> = {},
-): Promise<WorkspaceTestUser> {
+export async function registerWorkspaceTestUser(app: INestApplication, prisma: PrismaService, overrides: Partial<TestUserInput> = {}): Promise<WorkspaceTestUser> {
   const input = createTestUser(overrides);
-
   const agent = createAgent(app);
-
   const registrationResponse = await registerUser(agent, input);
 
   expectSuccessfulStatus(registrationResponse);
 
   const accessToken = readAccessToken(registrationResponse);
-
   const workspaceResponse = await agent.post(workspaceRoutes.root).set(withBearer(accessToken)).send({
     name: input.workspaceName,
   });
@@ -146,11 +138,8 @@ export function readWorkspaceMembers(response: Response): NormalizedWorkspaceMem
 
   return rawMembers.map((member): NormalizedWorkspaceMember => {
     const nestedUser = member.user && typeof member.user === 'object' ? (member.user as Record<string, unknown>) : undefined;
-
     const userId = typeof member.userId === 'string' ? member.userId : typeof nestedUser?.id === 'string' ? nestedUser.id : undefined;
-
     const email = typeof member.email === 'string' ? member.email : typeof nestedUser?.email === 'string' ? nestedUser.email : undefined;
-
     const role = typeof member.role === 'string' ? member.role : undefined;
 
     return {

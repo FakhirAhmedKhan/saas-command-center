@@ -56,7 +56,6 @@ export class AuthSessionsService {
       }
 
       const now = new Date();
-
       const updated = await transaction.authSession.updateMany({
         where: {
           id: currentSession.id,

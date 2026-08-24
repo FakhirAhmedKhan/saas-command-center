@@ -2,7 +2,6 @@ import { createServer } from 'node:http';
 
 const host = '127.0.0.1';
 const port = Number(process.env.MOBILE_AI_MOCK_PORT ?? 3103);
-
 const server = createServer((request, response) => {
   if (request.method === 'GET' && request.url === '/health') {
     response.writeHead(200, {

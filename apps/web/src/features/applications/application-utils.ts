@@ -50,9 +50,7 @@ export function formatRelativeApplicationDate(value: string | null | undefined):
   }
 
   const difference = date.getTime() - Date.now();
-
   const absoluteDifference = Math.abs(difference);
-
   const formatter = new Intl.RelativeTimeFormat('en', {
     numeric: 'auto',
   });

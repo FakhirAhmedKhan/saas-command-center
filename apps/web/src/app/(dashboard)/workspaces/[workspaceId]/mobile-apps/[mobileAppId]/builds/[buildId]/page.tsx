@@ -16,9 +16,7 @@ export default function MobileBuildDetailPage() {
     mobileAppId: string;
     buildId: string;
   }>();
-
   const [build, setBuild] = useState<MobileBuildDetails | null>(null);
-
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {

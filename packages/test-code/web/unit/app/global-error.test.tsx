@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import GlobalError from '@/app/global-error';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import GlobalError from '@/app/global-error';
 
 describe('GlobalError boundary', () => {
   it('renders a friendly fallback message and calls reset on retry', async () => {

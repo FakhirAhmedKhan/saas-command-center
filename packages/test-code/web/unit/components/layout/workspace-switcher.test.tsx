@@ -1,11 +1,11 @@
 // @vitest-environment jsdom
-import { WorkspaceSwitcher } from '@/components/layout/workspace-switcher';
-import { useAuth } from '@/features/auth/auth-provider';
 import type { Workspace } from '@/features/auth/auth.types';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useRouter } from 'next/navigation';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { WorkspaceSwitcher } from '@/components/layout/workspace-switcher';
+import { useAuth } from '@/features/auth/auth-provider';
 
 vi.mock('@/features/auth/auth-provider', () => ({
   useAuth: vi.fn(),
@@ -35,13 +35,12 @@ const push = vi.fn();
 
 beforeEach(() => {
   push.mockReset();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   useRouterMock.mockReturnValue({ push } as any);
 });
 
 describe('WorkspaceSwitcher', () => {
   it('offers to create a workspace and renders no listbox when the member has no workspaces', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     useAuthMock.mockReturnValue({ workspaces: [] } as any);
 
     render(<WorkspaceSwitcher workspaceId='workspace-1' />);
@@ -54,7 +53,6 @@ describe('WorkspaceSwitcher', () => {
   it('renders only the workspaces supplied by the auth context — it cannot fabricate access to a workspace the member is not in', async () => {
     const memberWorkspaces = [workspace({ id: 'workspace-1', name: 'Acme Corp' }), workspace({ id: 'workspace-2', name: 'Globex Inc' })];
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     useAuthMock.mockReturnValue({ workspaces: memberWorkspaces } as any);
 
     const user = userEvent.setup();
@@ -74,7 +72,6 @@ describe('WorkspaceSwitcher', () => {
   it('falls back to the first membership workspace when the current workspaceId is not among them', () => {
     const memberWorkspaces = [workspace({ id: 'workspace-1', name: 'Acme Corp' })];
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     useAuthMock.mockReturnValue({ workspaces: memberWorkspaces } as any);
 
     render(<WorkspaceSwitcher workspaceId='workspace-does-not-belong-to-member' />);
@@ -86,7 +83,6 @@ describe('WorkspaceSwitcher', () => {
   it('marks the active workspace as selected and navigates to a different one on click', async () => {
     const memberWorkspaces = [workspace({ id: 'workspace-1', name: 'Acme Corp' }), workspace({ id: 'workspace-2', name: 'Globex Inc' })];
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     useAuthMock.mockReturnValue({ workspaces: memberWorkspaces } as any);
 
     const user = userEvent.setup();
@@ -109,7 +105,6 @@ describe('WorkspaceSwitcher', () => {
   it('does not navigate when the already-active workspace option is clicked again', async () => {
     const memberWorkspaces = [workspace({ id: 'workspace-1', name: 'Acme Corp' })];
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     useAuthMock.mockReturnValue({ workspaces: memberWorkspaces } as any);
 
     const user = userEvent.setup();

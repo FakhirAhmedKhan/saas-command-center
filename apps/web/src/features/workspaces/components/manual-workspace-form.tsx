@@ -28,13 +28,9 @@ interface ManualWorkspaceFormProps {
 
 export function ManualWorkspaceForm({ onBack }: ManualWorkspaceFormProps) {
   const [name, setName] = useState('');
-
   const [slug, setSlug] = useState('');
-
   const [submitting, setSubmitting] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
-
   const slugPreview = slug.trim() || generateSlugPreview(name);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -73,11 +69,7 @@ export function ManualWorkspaceForm({ onBack }: ManualWorkspaceFormProps) {
 
   return (
     <div className='mx-auto w-full max-w-md p-4 pt-16 sm:p-6 sm:pt-24'>
-      <button
-        type='button'
-        onClick={onBack}
-        className='inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-500 transition hover:text-slate-800'
-      >
+      <button type='button' onClick={onBack} className='inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-500 transition hover:text-slate-800'>
         <ArrowLeft className='size-3.5' aria-hidden='true' />
         Back
       </button>
@@ -93,17 +85,7 @@ export function ManualWorkspaceForm({ onBack }: ManualWorkspaceFormProps) {
           </div>
         ) : null}
 
-        <Input
-          name='workspaceName'
-          label='Workspace name'
-          placeholder='Demo Command Center'
-          value={name}
-          required
-          minLength={2}
-          maxLength={120}
-          disabled={submitting}
-          onChange={(event) => setName(event.target.value)}
-        />
+        <Input name='workspaceName' label='Workspace name' placeholder='Demo Command Center' value={name} required minLength={2} maxLength={120} disabled={submitting} onChange={(event) => setName(event.target.value)} />
 
         <Input
           name='workspaceSlug'

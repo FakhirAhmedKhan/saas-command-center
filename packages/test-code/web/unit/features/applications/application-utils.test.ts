@@ -1,12 +1,5 @@
-import {
-  formatApplicationDate,
-  formatRelativeApplicationDate,
-  getApplicationInitials,
-  getErrorMessage,
-  toApiDateValue,
-  toDateInputValue,
-} from '@/features/applications/application-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { formatApplicationDate, formatRelativeApplicationDate, getApplicationInitials, getErrorMessage, toApiDateValue, toDateInputValue } from '@/features/applications/application-utils';
 
 describe('formatApplicationDate', () => {
   it.each([[null], [undefined], ['']])('returns "Not set" for %s', (value) => {

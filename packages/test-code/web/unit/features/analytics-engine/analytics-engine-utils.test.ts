@@ -1,5 +1,5 @@
-import { calculateBounceRate, formatAnalyticsDate, formatDuration, getAnalyticsEngineError } from '@/features/analytics-engine/analytics-engine-utils';
 import { describe, expect, it } from 'vitest';
+import { calculateBounceRate, formatAnalyticsDate, formatDuration, getAnalyticsEngineError } from '@/features/analytics-engine/analytics-engine-utils';
 
 describe('formatAnalyticsDate', () => {
   it.each([[null], [undefined], ['']])('returns "Never" for %s', (value) => {

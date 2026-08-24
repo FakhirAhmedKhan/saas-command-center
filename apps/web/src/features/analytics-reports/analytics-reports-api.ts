@@ -39,7 +39,6 @@ function createBasePath(request: AnalyticsReportRequest): string {
 
 function createReportPath(request: AnalyticsReportRequest, exportMode: boolean): string {
   const basePath = createBasePath(request);
-
   const prefix = exportMode ? `${basePath}/exports` : basePath;
 
   if (request.tab === 'pages') {
@@ -61,7 +60,6 @@ function createReportPath(request: AnalyticsReportRequest, exportMode: boolean):
 
 export async function getAnalyticsReport(request: AnalyticsReportRequest): Promise<AnalyticsReportResponse> {
   const params = createSearchParams(request);
-
   const path = createReportPath(request, false);
 
   return apiRequest<AnalyticsReportResponse>(`${path}?${params.toString()}`, {
@@ -77,7 +75,6 @@ export async function downloadAnalyticsReport(request: AnalyticsReportRequest): 
     page: 1,
     limit: 100,
   });
-
   const path = createReportPath(request, true);
 
   await apiDownload(`${path}?${params.toString()}`, `analytics-${request.tab}.csv`);

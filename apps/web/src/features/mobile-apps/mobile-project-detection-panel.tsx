@@ -3,13 +3,7 @@
 import { MOBILE_FRAMEWORK_LABELS, MOBILE_PLATFORM_LABELS } from './mobile-app.constants';
 import { detectMobileProject, updateMobileApp } from './mobile-apps-api';
 import { getErrorMessage } from '@/features/lib/api/api-error';
-import type {
-  MobileApplicationDetails,
-  MobileFramework,
-  MobilePlatform,
-  MobileProjectDetection,
-  MobileProjectDetectionResponse,
-} from '@command-center/shared-types';
+import type { MobileApplicationDetails, MobileFramework, MobilePlatform, MobileProjectDetection, MobileProjectDetectionResponse } from '@command-center/shared-types';
 import { CheckCircle2, Loader2, ScanSearch } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -23,17 +17,11 @@ interface MobileProjectDetectionPanelProps {
 
 export function MobileProjectDetectionPanel({ workspaceId, mobileApp, onApplied }: MobileProjectDetectionPanelProps) {
   const [result, setResult] = useState<MobileProjectDetectionResponse | null>(null);
-
   const [selectedIndex, setSelectedIndex] = useState(0);
-
   const [draft, setDraft] = useState<MobileProjectDetection | null>(null);
-
   const [detecting, setDetecting] = useState(false);
-
   const [applying, setApplying] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
-
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
@@ -261,12 +249,7 @@ export function MobileProjectDetectionPanel({ workspaceId, mobileApp, onApplied 
             </div>
           ) : null}
 
-          <button
-            type='button'
-            disabled={applying}
-            onClick={() => void apply()}
-            className='inline-flex h-10 items-center rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white disabled:opacity-50'
-          >
+          <button type='button' disabled={applying} onClick={() => void apply()} className='inline-flex h-10 items-center rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white disabled:opacity-50'>
             {applying ? 'Applying...' : 'Use Detected Configuration'}
           </button>
         </div>
@@ -300,12 +283,7 @@ function TextField({ label, value, onChange }: { label: string; value: string; o
     <label>
       <span className='mb-2 block text-sm font-medium text-slate-700'>{label}</span>
 
-      <input
-        aria-label={label}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className='h-10 w-full rounded-lg border border-slate-300 px-3 text-sm'
-      />
+      <input aria-label={label} value={value} onChange={(event) => onChange(event.target.value)} className='h-10 w-full rounded-lg border border-slate-300 px-3 text-sm' />
     </label>
   );
 }

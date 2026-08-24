@@ -45,7 +45,6 @@ export class NewRelicMobileTelemetryProvider implements MobileTelemetryProviderA
 
   async getCrashes(context: MobileTelemetryProviderContext) {
     const { appId } = context.config;
-
     const crash = await this.nrql(
       context.config,
 
@@ -57,7 +56,6 @@ WHERE appId = '${appId}'
 SINCE 1 day ago
         `.trim(),
     );
-
     const rate = await this.nrql(
       context.config,
 
@@ -71,7 +69,6 @@ WHERE appId = '${appId}'
 SINCE 1 day ago
         `.trim(),
     );
-
     const crashRate = this.number(rate[0]?.crashRate);
 
     return {
@@ -85,7 +82,6 @@ SINCE 1 day ago
 
   async getPerformance(context: MobileTelemetryProviderContext) {
     const appId = context.config.appId!;
-
     const sessions = await this.nrql(
       context.config,
 
@@ -96,7 +92,6 @@ WHERE appId = '${appId}'
 SINCE 1 day ago
         `.trim(),
     );
-
     const requests = await this.nrql(
       context.config,
 
@@ -107,7 +102,6 @@ WHERE appId = '${appId}'
 SINCE 1 day ago
         `.trim(),
     );
-
     const networkSeconds = this.number(requests[0]?.networkLatencySeconds);
 
     return {
@@ -143,9 +137,7 @@ LIMIT MAX
     return rows
       .map((row) => {
         const facet = row.facet;
-
         const values = Array.isArray(facet) ? facet : [facet];
-
         const version = typeof values[0] === 'string' ? values[0] : null;
 
         if (!version) {
@@ -179,9 +171,7 @@ LIMIT MAX
     nrql: string,
   ) {
     const accountId = Number(config.accountId);
-
     const endpoint = this.endpoint(config.region ?? 'US');
-
     const response = await this.http.json<NerdGraphResponse>(
       endpoint,
 

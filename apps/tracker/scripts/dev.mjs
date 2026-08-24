@@ -4,9 +4,7 @@ import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 
 const port = Number(process.env.TRACKER_PORT) || 3002;
-
 const outputFile = fileURLToPath(new URL('../dist/tracker.js', import.meta.url));
-
 const buildContext = await context({
   entryPoints: [fileURLToPath(new URL('../src/tracker.ts', import.meta.url))],
 

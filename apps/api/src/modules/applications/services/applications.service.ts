@@ -55,15 +55,10 @@ export class ApplicationsService {
 
   async create(workspaceId: string, dto: CreateApplicationDto, actorUserId: string): Promise<ApplicationDetails> {
     const name = this.normalizeRequiredText(dto.name, 'Application name');
-
     const requestedSlug = dto.slug ? this.normalizeSlug(dto.slug) : this.normalizeSlug(name);
-
     const slug = await this.generateUniqueSlug(workspaceId, requestedSlug);
-
     const startedAt = this.toNullableDate(dto.startedAt);
-
     const targetLaunchAt = this.toNullableDate(dto.targetLaunchAt);
-
     const launchedAt = this.toNullableDate(dto.launchedAt);
 
     this.validateDates(startedAt, targetLaunchAt, launchedAt);
@@ -144,9 +139,7 @@ export class ApplicationsService {
     const page = query.page;
     const limit = query.limit;
     const skip = (page - 1) * limit;
-
     const search = query.search?.trim();
-
     const where: Prisma.SaasApplicationWhereInput = {
       workspaceId,
 
@@ -209,9 +202,7 @@ export class ApplicationsService {
           }
         : {}),
     };
-
     const orderBy = this.buildOrderBy(query);
-
     const [applications, total] = await this.prisma.$transaction([
       this.prisma.saasApplication.findMany({
         where,
@@ -225,7 +216,6 @@ export class ApplicationsService {
         where,
       }),
     ]);
-
     const totalPages = Math.ceil(total / limit);
 
     return {
@@ -264,7 +254,6 @@ export class ApplicationsService {
     this.ensureNotArchived(existing);
 
     const data: Prisma.SaasApplicationUpdateInput = {};
-
     const changedFields: string[] = [];
 
     if (dto.name !== undefined) {
@@ -326,9 +315,7 @@ export class ApplicationsService {
     }
 
     const startedAt = dto.startedAt !== undefined ? this.toNullableDate(dto.startedAt) : existing.startedAt;
-
     const targetLaunchAt = dto.targetLaunchAt !== undefined ? this.toNullableDate(dto.targetLaunchAt) : existing.targetLaunchAt;
-
     const launchedAt = dto.launchedAt !== undefined ? this.toNullableDate(dto.launchedAt) : existing.launchedAt;
 
     this.validateDates(startedAt, targetLaunchAt, launchedAt);
@@ -364,9 +351,7 @@ export class ApplicationsService {
 
           data,
         });
-
         const events: ActivityWriteInput[] = [];
-
         const generalFields = changedFields.filter((field) => field !== 'status' && field !== 'priority');
 
         if (generalFields.length > 0) {
@@ -614,7 +599,6 @@ export class ApplicationsService {
     }
 
     const data: Prisma.ApplicationTechnologyUpdateInput = {};
-
     const changedFields: string[] = [];
 
     if (dto.name !== undefined) {
@@ -793,7 +777,6 @@ export class ApplicationsService {
     }
 
     const data: Prisma.ApplicationLinkUpdateInput = {};
-
     const changedFields: string[] = [];
 
     if (dto.label !== undefined) {

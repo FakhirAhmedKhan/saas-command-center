@@ -16,12 +16,10 @@ export interface RequestWithId extends Request {
  * injection) or be used to send an oversized value.
  */
 const MAX_REQUEST_ID_LENGTH = 128;
-
 const VALID_REQUEST_ID_PATTERN = /^[A-Za-z0-9:_-]+$/;
 
 function getExistingRequestId(value: string | string[] | undefined): string | undefined {
   const rawValue = Array.isArray(value) ? value[0] : value;
-
   const normalizedValue = rawValue?.trim();
 
   if (!normalizedValue) {
@@ -37,7 +35,6 @@ function getExistingRequestId(value: string | string[] | undefined): string | un
 
 export function requestIdMiddleware(request: Request, response: Response, next: NextFunction): void {
   const existingRequestId = getExistingRequestId(request.headers[REQUEST_ID_HEADER]);
-
   const requestId = existingRequestId ?? randomUUID();
 
   (request as RequestWithId).requestId = requestId;

@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
 
-import { DesktopSecurity } from '@/features/desktop-apps/desktop-security';
-import { getDesktopSecurity, scanDesktopSecurity } from '@/features/desktop-apps/desktop-apps-api';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getDesktopSecurity, scanDesktopSecurity } from '@/features/desktop-apps/desktop-apps-api';
+import { DesktopSecurity } from '@/features/desktop-apps/desktop-security';
 
 vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
   getDesktopSecurity: vi.fn(),
@@ -13,7 +13,6 @@ vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
 
 const getMock = vi.mocked(getDesktopSecurity);
 const scanMock = vi.mocked(scanDesktopSecurity);
-
 const summary = {
   windowsSigning: 'PASS',
   macosSigning: 'PASS',

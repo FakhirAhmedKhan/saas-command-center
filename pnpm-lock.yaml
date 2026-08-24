@@ -12,6 +12,9 @@ importers:
 
   .:
     devDependencies:
+      '@stylistic/eslint-plugin':
+        specifier: ^5.10.0
+        version: 5.10.0(eslint@9.39.5(jiti@2.7.0)(supports-color@8.1.1))
       concurrently:
         specifier: ^9.2.1
         version: 9.2.4
@@ -308,19 +311,24 @@ importers:
       '@eslint/js':
         specifier: ^9.0.0
         version: 9.39.5
+      '@stylistic/eslint-plugin':
+        specifier: ^5.10.0
+        version: 5.10.0(eslint@9.39.5(jiti@2.7.0)(supports-color@8.1.1))
       eslint:
         specifier: ^9.0.0
         version: 9.39.5(jiti@2.7.0)(supports-color@8.1.1)
-      typescript-eslint:
-        specifier: ^8.67.0
-        version: 8.67.0(eslint@9.39.5(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.3)
-    devDependencies:
       eslint-plugin-import:
         specifier: ^2.32.0
         version: 2.32.0(@typescript-eslint/parser@8.67.0(eslint@9.39.5(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.5(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)
+      typescript-eslint:
+        specifier: ^8.67.0
+        version: 8.67.0(eslint@9.39.5(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.3)
 
   packages/shared-types:
     devDependencies:
+      '@command-center/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
       '@eslint/js':
         specifier: ^9.34.0
         version: 9.39.5
@@ -336,18 +344,38 @@ importers:
 
   packages/test-code: {}
 
-  packages/test-code/api: {}
+  packages/test-code/api:
+    devDependencies:
+      '@command-center/eslint-config':
+        specifier: workspace:*
+        version: link:../../eslint-config
+      globals:
+        specifier: ^17.11.0
+        version: 17.11.0
 
   packages/test-code/tracker:
     devDependencies:
+      '@command-center/eslint-config':
+        specifier: workspace:*
+        version: link:../../eslint-config
       esbuild:
         specifier: ^0.25.12
         version: 0.25.12
+      globals:
+        specifier: ^17.11.0
+        version: 17.11.0
       typescript:
         specifier: ^5.9.2
         version: 5.9.3
 
-  packages/test-code/web: {}
+  packages/test-code/web:
+    devDependencies:
+      '@command-center/eslint-config':
+        specifier: workspace:*
+        version: link:../../eslint-config
+      globals:
+        specifier: ^17.11.0
+        version: 17.11.0
 
   packages/tsconfig: {}
 
@@ -363,6 +391,9 @@ importers:
         specifier: ^3.6.0
         version: 3.6.0
     devDependencies:
+      '@command-center/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
       '@eslint/js':
         specifier: ^9.34.0
         version: 9.39.5
@@ -1968,6 +1999,12 @@ packages:
 
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
+
+  '@stylistic/eslint-plugin@5.10.0':
+    resolution: {integrity: sha512-nPK52ZHvot8Ju/0A4ucSX1dcPV2/1clx0kLcH5wDmrE4naKso7TUC/voUyU1O9OTKTrR6MYip6LP0ogEMQ9jPQ==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      eslint: ^9.0.0 || ^10.0.0
 
   '@swc/helpers@0.5.23':
     resolution: {integrity: sha512-5lSsMOTXURePglDfvuAQUqkGek9Hg2kksOYay2m0+XR++b2NWYL/4sWyuvVBIs8oKnJaxkdi9whaL/sqN13afw==}
@@ -7640,6 +7677,16 @@ snapshots:
       '@sinonjs/commons': 3.0.1
 
   '@standard-schema/spec@1.1.0': {}
+
+  '@stylistic/eslint-plugin@5.10.0(eslint@9.39.5(jiti@2.7.0)(supports-color@8.1.1))':
+    dependencies:
+      '@eslint-community/eslint-utils': 4.10.1(eslint@9.39.5(jiti@2.7.0)(supports-color@8.1.1))
+      '@typescript-eslint/types': 8.67.0
+      eslint: 9.39.5(jiti@2.7.0)(supports-color@8.1.1)
+      eslint-visitor-keys: 4.2.1
+      espree: 10.4.0
+      estraverse: 5.3.0
+      picomatch: 4.0.5
 
   '@swc/helpers@0.5.23':
     dependencies:

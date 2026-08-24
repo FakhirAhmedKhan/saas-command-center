@@ -8,9 +8,7 @@ export class WorkspaceAccessGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<WorkspaceRequest>();
-
     const rawWorkspaceId = request.params?.workspaceId;
-
     const workspaceId = Array.isArray(rawWorkspaceId) ? rawWorkspaceId.at(0) : rawWorkspaceId;
 
     if (typeof workspaceId !== 'string' || workspaceId.trim().length === 0) {

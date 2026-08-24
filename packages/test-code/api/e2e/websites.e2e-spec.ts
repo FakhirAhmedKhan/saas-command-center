@@ -10,7 +10,6 @@ import { PrismaService } from 'src/database/prisma.service';
 
 describe('Websites E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
 
   beforeEach(async () => {
@@ -27,7 +26,6 @@ describe('Websites E2E', () => {
 
   it('creates a website and normalizes its domain', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createWebsite(owner, {
       name: 'Command Center Website',
       domain: 'https://Command-Center.Example.com',
@@ -52,7 +50,6 @@ describe('Websites E2E', () => {
 
   it('creates a website using only required fields and applies defaults', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const response = await owner.agent.post(websiteRoutes.root(owner.workspaceId)).set(withBearer(owner.accessToken)).send({
       name: 'Minimal Website',
       domain: 'minimal.example.test',
@@ -69,7 +66,6 @@ describe('Websites E2E', () => {
 
   it('rejects invalid domains and invalid DTO fields', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const invalidDomains = ['', '*.example.com', 'https://user:pass@example.com', 'example.com/path', 'example.com?query=true', 'example.com#fragment'];
 
     for (const domain of invalidDomains) {
@@ -117,9 +113,7 @@ describe('Websites E2E', () => {
 
   it('rejects duplicate domains within a workspace but allows them across workspaces', async () => {
     const alphaOwner = await registerWorkspaceTestUser(app, prisma);
-
     const betaOwner = await registerWorkspaceTestUser(app, prisma);
-
     const domain = 'shared-domain.example.test';
 
     await createWebsite(alphaOwner, {
@@ -145,9 +139,7 @@ describe('Websites E2E', () => {
 
   it('updates website configuration', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createWebsite(owner);
-
     const response = await updateWebsite(owner, website.id, {
       name: 'Updated Website',
       domain: 'updated.example.test',
@@ -174,19 +166,16 @@ describe('Websites E2E', () => {
 
   it('supports search, enabled filtering, and pagination', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const alpha = await createWebsite(owner, {
       name: 'Alpha Analytics',
       domain: 'alpha-analytics.example.test',
       enabled: true,
     });
-
     const beta = await createWebsite(owner, {
       name: 'Beta Storefront',
       domain: 'beta-storefront.example.test',
       enabled: false,
     });
-
     const searchResponse = await listWebsites(owner, {
       search: 'Alpha',
     });
@@ -211,7 +200,6 @@ describe('Websites E2E', () => {
         limit: 1,
       }),
     );
-
     const secondPage = readWebsiteItems(
       await listWebsites(owner, {
         page: 2,
@@ -244,11 +232,8 @@ describe('Websites E2E', () => {
 
   it('prevents cross-workspace website access', async () => {
     const alphaOwner = await registerWorkspaceTestUser(app, prisma);
-
     const betaOwner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createWebsite(alphaOwner);
-
     const response = await betaOwner.agent.get(websiteRoutes.details(alphaOwner.workspaceId, website.id)).set(withBearer(betaOwner.accessToken));
 
     expectAccessDenied(response);
@@ -256,7 +241,6 @@ describe('Websites E2E', () => {
 
   it('rejects malformed and unknown website IDs', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const malformed = await getWebsite(owner, 'not-a-uuid');
 
     expect(malformed.status).toBe(400);

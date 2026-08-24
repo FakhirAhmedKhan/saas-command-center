@@ -23,7 +23,6 @@ export function BlockerPanel({ workspaceId, applicationId, milestones, blockers,
   const [taskId, setTaskId] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const availableTasks = useMemo(() => {
     if (!milestoneId) {
       return milestones.flatMap((milestone) => milestone.tasks);
@@ -149,9 +148,7 @@ export function BlockerPanel({ workspaceId, applicationId, milestones, blockers,
 
                   <p className='mt-1 text-sm text-slate-500'>{blocker.task?.title ?? blocker.milestone?.title ?? 'Application-level blocker'}</p>
 
-                  {blocker.resolution ? (
-                    <p className='mt-2 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800'>Resolution: {blocker.resolution}</p>
-                  ) : null}
+                  {blocker.resolution ? <p className='mt-2 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800'>Resolution: {blocker.resolution}</p> : null}
                 </div>
 
                 <div className='flex gap-2'>

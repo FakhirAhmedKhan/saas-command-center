@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { ApplicationsErrorState } from '@/features/applications/components/applications-error-state';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { ApplicationsErrorState } from '@/features/applications/components/applications-error-state';
 
 describe('ApplicationsErrorState', () => {
   it('renders the provided error message', () => {

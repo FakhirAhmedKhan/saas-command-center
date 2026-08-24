@@ -1,16 +1,13 @@
 // @vitest-environment jsdom
-import { MobileAppForm } from '@/features/mobile-apps/mobile-app-form';
 
 import { render, screen } from '@testing-library/react';
-
 import userEvent from '@testing-library/user-event';
-
 import { describe, expect, it, vi } from 'vitest';
+import { MobileAppForm } from '@/features/mobile-apps/mobile-app-form';
 
 describe('MobileAppForm', () => {
   it('creates Android payload', async () => {
     const user = userEvent.setup();
-
     const onSubmit = vi.fn();
 
     render(<MobileAppForm cancelHref='/mobile-apps' submitLabel='Create Mobile App' onSubmit={onSubmit} />);
@@ -49,7 +46,6 @@ describe('MobileAppForm', () => {
 
   it('prevents empty application name', async () => {
     const user = userEvent.setup();
-
     const onSubmit = vi.fn();
 
     render(<MobileAppForm cancelHref='/mobile-apps' submitLabel='Create Mobile App' onSubmit={onSubmit} />);

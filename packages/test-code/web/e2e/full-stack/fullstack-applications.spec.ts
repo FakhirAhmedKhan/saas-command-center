@@ -12,9 +12,7 @@ test.describe('Batch 11 real application flows', () => {
   let context: BrowserContext;
   let page: Page;
   let applicationId = '';
-
   const applicationName = `Batch 11 Real App ${Date.now()}`;
-
   let applicationSlug = '';
 
   test.beforeAll(async ({ browser }) => {

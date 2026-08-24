@@ -184,7 +184,6 @@ export function findRecordById(records: Record<string, unknown>[], id: string): 
     for (const value of Object.values(record)) {
       if (Array.isArray(value)) {
         const nested = value.map(asRecord).filter((item): item is Record<string, unknown> => item !== undefined);
-
         const found = findRecordById(nested, id);
 
         if (found) {
@@ -281,12 +280,7 @@ export async function getDevelopmentSummary(actor: WorkspaceTestUser, applicatio
   return actor.agent.get(developmentRoutes.summary(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken));
 }
 
-export async function applyDevelopmentTemplate(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  template: DevelopmentTemplateType = enumValue(DevelopmentTemplateType),
-  replaceExisting = false,
-): Promise<Response> {
+export async function applyDevelopmentTemplate(actor: WorkspaceTestUser, applicationId: string, template: DevelopmentTemplateType = enumValue(DevelopmentTemplateType), replaceExisting = false): Promise<Response> {
   return actor.agent.post(developmentRoutes.applyTemplate(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken)).send({
     template,
     replaceExisting,
@@ -297,13 +291,8 @@ export async function listMilestones(actor: WorkspaceTestUser, applicationId: st
   return actor.agent.get(developmentRoutes.milestones(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken));
 }
 
-export async function createMilestone(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  overrides: Partial<MilestonePayload> = {},
-): Promise<CreatedDevelopmentEntity<MilestonePayload>> {
+export async function createMilestone(actor: WorkspaceTestUser, applicationId: string, overrides: Partial<MilestonePayload> = {}): Promise<CreatedDevelopmentEntity<MilestonePayload>> {
   const payload = buildMilestonePayload(overrides);
-
   const response = await actor.agent.post(developmentRoutes.milestones(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken)).send(payload);
 
   expectDevelopmentSuccess(response);
@@ -319,12 +308,7 @@ export async function createMilestone(
   };
 }
 
-export async function updateMilestone(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  milestoneId: string,
-  payload: Partial<MilestonePayload>,
-): Promise<Response> {
+export async function updateMilestone(actor: WorkspaceTestUser, applicationId: string, milestoneId: string, payload: Partial<MilestonePayload>): Promise<Response> {
   return actor.agent
     .patch(developmentRoutes.milestone(actor.workspaceId, applicationId, milestoneId))
     .set(withBearer(actor.accessToken))
@@ -339,12 +323,7 @@ export async function reopenMilestone(actor: WorkspaceTestUser, applicationId: s
   return actor.agent.post(developmentRoutes.reopenMilestone(actor.workspaceId, applicationId, milestoneId)).set(withBearer(actor.accessToken));
 }
 
-export async function skipMilestone(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  milestoneId: string,
-  reason = 'Removed from current scope',
-): Promise<Response> {
+export async function skipMilestone(actor: WorkspaceTestUser, applicationId: string, milestoneId: string, reason = 'Removed from current scope'): Promise<Response> {
   return actor.agent
     .post(developmentRoutes.skipMilestone(actor.workspaceId, applicationId, milestoneId))
     .set(withBearer(actor.accessToken))
@@ -363,14 +342,8 @@ export async function reorderMilestones(actor: WorkspaceTestUser, applicationId:
   });
 }
 
-export async function createTask(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  milestoneId: string,
-  overrides: Partial<TaskPayload> = {},
-): Promise<CreatedDevelopmentEntity<TaskPayload>> {
+export async function createTask(actor: WorkspaceTestUser, applicationId: string, milestoneId: string, overrides: Partial<TaskPayload> = {}): Promise<CreatedDevelopmentEntity<TaskPayload>> {
   const payload = buildTaskPayload(overrides);
-
   const response = await actor.agent
     .post(developmentRoutes.tasks(actor.workspaceId, applicationId, milestoneId))
     .set(withBearer(actor.accessToken))
@@ -422,13 +395,7 @@ export async function skipTask(actor: WorkspaceTestUser, applicationId: string, 
     });
 }
 
-export async function moveTask(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  taskId: string,
-  targetMilestoneId: string,
-  position?: number,
-): Promise<Response> {
+export async function moveTask(actor: WorkspaceTestUser, applicationId: string, taskId: string, targetMilestoneId: string, position?: number): Promise<Response> {
   const payload: {
     targetMilestoneId: string;
     position?: number;
@@ -463,13 +430,8 @@ export async function listBlockers(actor: WorkspaceTestUser, applicationId: stri
   return actor.agent.get(developmentRoutes.blockers(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken)).query(query);
 }
 
-export async function createBlocker(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  overrides: Partial<BlockerPayload> = {},
-): Promise<CreatedDevelopmentEntity<BlockerPayload>> {
+export async function createBlocker(actor: WorkspaceTestUser, applicationId: string, overrides: Partial<BlockerPayload> = {}): Promise<CreatedDevelopmentEntity<BlockerPayload>> {
   const payload = buildBlockerPayload(overrides);
-
   const response = await actor.agent.post(developmentRoutes.blockers(actor.workspaceId, applicationId)).set(withBearer(actor.accessToken)).send(payload);
 
   expectDevelopmentSuccess(response);
@@ -492,12 +454,7 @@ export async function updateBlocker(actor: WorkspaceTestUser, applicationId: str
     .send(payload);
 }
 
-export async function resolveBlocker(
-  actor: WorkspaceTestUser,
-  applicationId: string,
-  blockerId: string,
-  resolution = 'Credentials were issued',
-): Promise<Response> {
+export async function resolveBlocker(actor: WorkspaceTestUser, applicationId: string, blockerId: string, resolution = 'Credentials were issued'): Promise<Response> {
   return actor.agent
     .post(developmentRoutes.resolveBlocker(actor.workspaceId, applicationId, blockerId))
     .set(withBearer(actor.accessToken))

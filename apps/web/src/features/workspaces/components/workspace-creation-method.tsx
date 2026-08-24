@@ -21,11 +21,7 @@ export function WorkspaceCreationMethod({ onSelectManual, onSelectGithub }: Work
       <p className='mt-1.5 text-sm leading-6 text-slate-500'>How would you like to create your workspace?</p>
 
       <div className='mt-6 grid gap-4 sm:grid-cols-2'>
-        <button
-          type='button'
-          onClick={onSelectManual}
-          className='flex flex-col items-start rounded-2xl border border-slate-200 bg-white p-5 text-left transition hover:border-brand-300 hover:shadow-sm'
-        >
+        <button type='button' onClick={onSelectManual} className='flex flex-col items-start rounded-2xl border border-slate-200 bg-white p-5 text-left transition hover:border-brand-300 hover:shadow-sm'>
           <div className='flex size-10 items-center justify-center rounded-xl bg-slate-100'>
             <Pencil className='size-5 text-slate-700' />
           </div>
@@ -35,11 +31,7 @@ export function WorkspaceCreationMethod({ onSelectManual, onSelectGithub }: Work
           <p className='mt-1.5 text-sm leading-6 text-slate-500'>Configure the workspace yourself.</p>
         </button>
 
-        <button
-          type='button'
-          onClick={onSelectGithub}
-          className='flex flex-col items-start rounded-2xl border border-slate-200 bg-white p-5 text-left transition hover:border-brand-300 hover:shadow-sm'
-        >
+        <button type='button' onClick={onSelectGithub} className='flex flex-col items-start rounded-2xl border border-slate-200 bg-white p-5 text-left transition hover:border-brand-300 hover:shadow-sm'>
           <div className='flex size-10 items-center justify-center rounded-xl bg-slate-950'>
             <FolderGit2 className='size-5 text-white' />
           </div>

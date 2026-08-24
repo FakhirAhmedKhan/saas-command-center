@@ -82,7 +82,6 @@ const TECHNOLOGY_RULES: TechnologyRule[] = [
 
 export function detectTechnologies(packageJson: ParsedPackageJson, rootFileNames: ReadonlySet<string>): string[] {
   const dependencyNames = collectDependencyNames(packageJson);
-
   const technologies = new Set<string>();
 
   for (const rule of TECHNOLOGY_RULES) {

@@ -1,8 +1,8 @@
 import { spawnSync } from 'node:child_process';
 import { readdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
+import { fileURLToPath } from 'node:url';
 
 const scriptsDirectory = dirname(fileURLToPath(import.meta.url));
 const packageRoot = resolve(scriptsDirectory, '..');
@@ -10,7 +10,6 @@ const repoRoot = resolve(packageRoot, '../../..');
 const appRoot = resolve(repoRoot, 'apps/api');
 const configPath = resolve(packageRoot, 'jest-e2e.config.cjs');
 const e2eDirectory = resolve(packageRoot, 'e2e');
-
 const files = readdirSync(e2eDirectory)
   .filter((name) => name.endsWith('.e2e-spec.ts'))
   .sort()
@@ -58,14 +57,12 @@ for (let index = 0; index < files.length; index += 1) {
   line();
 
   const startedAt = performance.now();
-
   const result = spawnSync('pnpm', ['exec', 'jest', '--config', configPath, '--runInBand', '--runTestsByPath', file.path], {
     cwd: appRoot,
     stdio: 'inherit',
     shell: true,
     env: process.env,
   });
-
   const elapsed = performance.now() - startedAt;
   const passed = result.status === 0 && !result.error && !result.signal;
 

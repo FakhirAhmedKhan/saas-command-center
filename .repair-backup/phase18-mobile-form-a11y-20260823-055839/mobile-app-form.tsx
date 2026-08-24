@@ -117,12 +117,7 @@ export function MobileAppForm({ mobileApp, cancelHref, submitLabel, onSubmit }: 
           <label>
             <span className='mb-2 block text-sm font-medium'>Platform</span>
 
-            <select
-              aria-label='Platform'
-              value={platform}
-              onChange={(event) => handlePlatformChange(event.target.value as MobilePlatform)}
-              className='h-10 w-full rounded-lg border border-slate-300 px-3'
-            >
+            <select aria-label='Platform' value={platform} onChange={(event) => handlePlatformChange(event.target.value as MobilePlatform)} className='h-10 w-full rounded-lg border border-slate-300 px-3'>
               {Object.entries(MOBILE_PLATFORM_LABELS).map(([value, label]) => (
                 <option key={value} value={value}>
                   {label}
@@ -134,12 +129,7 @@ export function MobileAppForm({ mobileApp, cancelHref, submitLabel, onSubmit }: 
           <label>
             <span className='mb-2 block text-sm font-medium'>Framework</span>
 
-            <select
-              aria-label='Framework'
-              value={framework}
-              onChange={(event) => setFramework(event.target.value as MobileFramework)}
-              className='h-10 w-full rounded-lg border border-slate-300 px-3'
-            >
+            <select aria-label='Framework' value={framework} onChange={(event) => setFramework(event.target.value as MobileFramework)} className='h-10 w-full rounded-lg border border-slate-300 px-3'>
               {availableFrameworks.map((value) => (
                 <option key={value} value={value}>
                   {MOBILE_FRAMEWORK_LABELS[value]}

@@ -18,7 +18,6 @@ const variantClasses: Record<ButtonVariant, string> = {
   ghost: 'bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-slate-400',
   danger: 'bg-red-600 text-white shadow-sm hover:bg-red-700 focus-visible:ring-red-500',
 };
-
 const sizeClasses: Record<ButtonSize, string> = {
   sm: 'h-8 rounded-md px-2.5 text-[13px]',
   md: 'h-9 rounded-lg px-3.5 text-sm',
@@ -26,10 +25,7 @@ const sizeClasses: Record<ButtonSize, string> = {
   icon: 'size-9 rounded-lg',
 };
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { className, variant = 'primary', size = 'md', loading = false, disabled, children, type = 'button', ...props },
-  ref,
-) {
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button({ className, variant = 'primary', size = 'md', loading = false, disabled, children, type = 'button', ...props }, ref) {
   return (
     <button
       ref={ref}

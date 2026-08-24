@@ -85,9 +85,7 @@ export function expectWebsiteSuccess(response: Response): void {
 
 export function readWebsiteRecord(response: Response): Record<string, unknown> {
   const body = asRecord(response.body);
-
   const data = asRecord(body?.data);
-
   const candidates: unknown[] = [body?.website, data?.website, data, body];
 
   for (const candidate of candidates) {
@@ -197,13 +195,11 @@ export function readTrackingKey(response: Response): string {
 
 export async function createWebsite(actor: WorkspaceTestUser, overrides: Partial<WebsitePayload> = {}): Promise<CreatedWebsite> {
   const payload = buildWebsitePayload(overrides);
-
   const response = await actor.agent.post(websiteRoutes.root(actor.workspaceId)).set(withBearer(actor.accessToken)).send(payload);
 
   expectWebsiteSuccess(response);
 
   const record = readWebsiteRecord(response);
-
   const id = recordString(record, 'id', 'websiteId');
 
   if (!id) {

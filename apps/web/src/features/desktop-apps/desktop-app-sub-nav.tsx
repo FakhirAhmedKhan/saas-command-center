@@ -21,14 +21,12 @@ const LIVE_TABS = [
   { label: 'Alerts', path: '/alerts' },
   { label: 'Settings', path: '/settings' },
 ] as const;
-
 const FUTURE_TABS = [] as const;
 
 // const FUTURE_TABS = ['Performance', 'Crashes', 'Dependencies', 'Security'] as const;
 
 export function DesktopAppSubNav({ workspaceId, desktopAppId }: Props) {
   const pathname = usePathname();
-
   const base = `/workspaces/${workspaceId}/desktop-apps/${desktopAppId}`;
 
   return (
@@ -42,11 +40,7 @@ export function DesktopAppSubNav({ workspaceId, desktopAppId }: Props) {
             key={tab.label}
             href={href}
             aria-current={active ? 'page' : undefined}
-            className={
-              active
-                ? 'whitespace-nowrap rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white'
-                : 'whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100'
-            }
+            className={active ? 'whitespace-nowrap rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white' : 'whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100'}
           >
             {tab.label}
           </Link>
@@ -54,12 +48,7 @@ export function DesktopAppSubNav({ workspaceId, desktopAppId }: Props) {
       })}
 
       {FUTURE_TABS.map((tab) => (
-        <span
-          key={tab}
-          aria-disabled='true'
-          title='Available in a later desktop support phase'
-          className='cursor-not-allowed whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-300'
-        >
+        <span key={tab} aria-disabled='true' title='Available in a later desktop support phase' className='cursor-not-allowed whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-300'>
           {tab}
         </span>
       ))}

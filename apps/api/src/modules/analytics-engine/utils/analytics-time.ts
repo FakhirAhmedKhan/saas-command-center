@@ -16,7 +16,6 @@ export function getAnalyticsBucket(value: Date, timeZone: string, period: Analyt
   }
 
   const start = period === AnalyticsAggregatePeriod.HOURLY ? local.startOf('hour') : local.startOf('day');
-
   const end =
     period === AnalyticsAggregatePeriod.HOURLY
       ? start.plus({

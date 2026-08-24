@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { AnalyticsOverviewDashboard } from '@/features/analytics-overview/analytics-overview-dashboard';
 import type { AnalyticsOverviewResponse } from '@/features/analytics-overview/analytics-overview.types';
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { AnalyticsOverviewDashboard } from '@/features/analytics-overview/analytics-overview-dashboard';
 
 const { useAnalyticsOverviewMock, routerReplaceMock } = vi.hoisted(() => ({
   useAnalyticsOverviewMock: vi.fn(),
@@ -118,7 +118,7 @@ describe('AnalyticsOverviewDashboard metric change formatting', () => {
     render(<AnalyticsOverviewDashboard workspaceId='workspace-1' websiteId='website-1' />);
 
     // Regression test for a fixed mojibake bug: formatMetricChange used to store a
-    // mis-encoded glyph instead of U+2191 ("↑"), so real users saw "Ã¢â€ â€˜ 28%". The
+    // mis-encoded glyph instead of U+2191 ("↑"), so real users saw "Ã¢â€ â€˜ 28%". The
     // source now uses the real arrow character.
     expect(screen.getByText('↑ 28%')).toBeInTheDocument();
   });

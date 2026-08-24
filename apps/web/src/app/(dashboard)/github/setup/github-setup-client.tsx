@@ -12,13 +12,9 @@ import { useEffect, useRef, useState } from 'react';
 
 export function GithubSetupClient() {
   const router = useRouter();
-
   const searchParams = useSearchParams();
-
   const { status } = useSession();
-
   const started = useRef(false);
-
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -28,7 +24,6 @@ export function GithubSetupClient() {
 
     if (status === 'unauthenticated') {
       const query = searchParams.toString();
-
       const nextPath = query ? `/github/setup?${query}` : '/github/setup';
 
       router.replace(`/login?next=${encodeURIComponent(nextPath)}`);
@@ -41,7 +36,6 @@ export function GithubSetupClient() {
     }
 
     const installationId = searchParams.get('installation_id');
-
     const installState = searchParams.get('state');
 
     if (!installationId || !installState) {

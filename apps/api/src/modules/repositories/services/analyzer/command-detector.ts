@@ -26,7 +26,6 @@ const COMMAND_KEYS: Array<{
     scriptNames: ['lint'],
   },
 ];
-
 const RUN_PREFIX_BY_MANAGER: Record<PackageManager, string> = {
   pnpm: 'pnpm run',
   yarn: 'yarn run',
@@ -37,9 +36,7 @@ const RUN_PREFIX_BY_MANAGER: Record<PackageManager, string> = {
 
 export function detectCommands(packageJson: ParsedPackageJson, packageManager: PackageManager): DetectedApplicationCommands {
   const scripts = packageJson.scripts ?? {};
-
   const runPrefix = RUN_PREFIX_BY_MANAGER[packageManager];
-
   const commands: DetectedApplicationCommands = {};
 
   for (const { key, scriptNames } of COMMAND_KEYS) {

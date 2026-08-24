@@ -5,9 +5,9 @@
  * @vitest-environment jsdom
  */
 
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { apiDownload, setAccessToken, setUnauthorizedHandler } from '@/features/lib/api/api-client';
 import { ApiError } from '@/features/lib/api/api-error';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const BASE_URL = 'http://localhost:4000/api/v1';
 

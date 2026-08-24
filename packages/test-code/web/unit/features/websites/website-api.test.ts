@@ -1,25 +1,12 @@
-import {
-  archiveWebsite,
-  connectWebsite,
-  createWebsite,
-  disableWebsite,
-  disconnectWebsite,
-  enableWebsite,
-  getWebsite,
-  getWebsites,
-  restoreWebsite,
-  rotateWebsiteKey,
-  updateWebsite,
-} from '@/features/websites/website-api';
-import { apiRequest } from '@/features/lib/api/api-client';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { apiRequest } from '@/features/lib/api/api-client';
+import { archiveWebsite, connectWebsite, createWebsite, disableWebsite, disconnectWebsite, enableWebsite, getWebsite, getWebsites, restoreWebsite, rotateWebsiteKey, updateWebsite } from '@/features/websites/website-api';
 
 vi.mock('@/features/lib/api/api-client', () => ({
   apiRequest: vi.fn(),
 }));
 
 const mockedApiRequest = vi.mocked(apiRequest);
-
 const WORKSPACE_ID = 'workspace-1';
 const WEBSITE_ID = 'website-1';
 
@@ -49,7 +36,7 @@ describe('getWebsites', () => {
   it('omits undefined, null and empty-string query values', async () => {
     await getWebsites(WORKSPACE_ID, {
       search: '',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising runtime filtering of nullish query values
+
       enabled: null as any,
       applicationId: 'app-1',
     });

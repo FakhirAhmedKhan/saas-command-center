@@ -1,9 +1,9 @@
-import type { INestApplication } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
 import { buildPath, createLinkedDesktopFixture, ingestSuccessfulBuild } from './helpers/desktop-test-fixtures';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
 
 const API = '/api/v1';
 
@@ -24,7 +24,6 @@ describe('Desktop Releases E2E', () => {
   async function createSuccessfulFixture() {
     const fixture = await createLinkedDesktopFixture(app, prisma);
     const build = await ingestSuccessfulBuild(fixture.owner, fixture.desktopApp.id, fixture.repository.id);
-
     const artifactResponse = await fixture.owner.agent
       .post(`${buildPath(fixture.owner.workspaceId, fixture.desktopApp.id)}/${build.id}/artifacts`)
       .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
@@ -74,7 +73,6 @@ describe('Desktop Releases E2E', () => {
 
   it('creates a release from a successful build and inherits target metadata', async () => {
     const fixture = await createSuccessfulFixture();
-
     const response = await createRelease(fixture, {
       releaseNotes: 'Stable desktop release',
     });
@@ -97,7 +95,6 @@ describe('Desktop Releases E2E', () => {
 
   it('returns source build and artifact traceability', async () => {
     const fixture = await createSuccessfulFixture();
-
     const response = await createRelease(fixture);
 
     expect(response.status).toBe(201);
@@ -118,7 +115,6 @@ describe('Desktop Releases E2E', () => {
 
   it('rejects a failed build', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
-
     const failedBuildResponse = await fixture.owner.agent
       .post(`${buildPath(fixture.owner.workspaceId, fixture.desktopApp.id)}/ingest/github`)
       .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
@@ -163,7 +159,6 @@ describe('Desktop Releases E2E', () => {
 
   it('persists explicit version, build number, and update channel', async () => {
     const fixture = await createSuccessfulFixture();
-
     const response = await createRelease(fixture, {
       channel: 'BETA',
       version: '2.5.0-beta.2',
@@ -212,20 +207,12 @@ describe('Desktop Releases E2E', () => {
 
     await fixture.owner.agent.patch(path).set('Authorization', `Bearer ${fixture.owner.accessToken}`).send({ status: 'READY' }).expect(200);
 
-    const published = await fixture.owner.agent
-      .patch(path)
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
-      .send({ status: 'PUBLISHED' })
-      .expect(200);
+    const published = await fixture.owner.agent.patch(path).set('Authorization', `Bearer ${fixture.owner.accessToken}`).send({ status: 'PUBLISHED' }).expect(200);
 
     expect(published.body.status).toBe('PUBLISHED');
     expect(published.body.releasedAt).not.toBeNull();
 
-    const rolledBack = await fixture.owner.agent
-      .patch(path)
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
-      .send({ status: 'ROLLED_BACK' })
-      .expect(200);
+    const rolledBack = await fixture.owner.agent.patch(path).set('Authorization', `Bearer ${fixture.owner.accessToken}`).send({ status: 'ROLLED_BACK' }).expect(200);
 
     expect(rolledBack.body.status).toBe('ROLLED_BACK');
     expect(rolledBack.body.releasedAt).toBe(published.body.releasedAt);
@@ -295,7 +282,6 @@ describe('Desktop Releases E2E', () => {
 
   it('orders release history newest first', async () => {
     const fixture = await createSuccessfulFixture();
-
     const first = await createRelease(fixture, {
       channel: 'BETA',
     });
@@ -320,10 +306,7 @@ describe('Desktop Releases E2E', () => {
       },
     });
 
-    const list = await fixture.owner.agent
-      .get(releasePath(fixture.owner.workspaceId, fixture.desktopApp.id))
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`)
-      .expect(200);
+    const list = await fixture.owner.agent.get(releasePath(fixture.owner.workspaceId, fixture.desktopApp.id)).set('Authorization', `Bearer ${fixture.owner.accessToken}`).expect(200);
 
     expect(list.body.map((item: { id: string }) => item.id)).toEqual([second.body.id, first.body.id]);
   });
@@ -360,10 +343,7 @@ describe('Desktop Releases E2E', () => {
 
   it('rejects release creation for an archived desktop application', async () => {
     const fixture = await createSuccessfulFixture();
-
-    const archiveResponse = await fixture.owner.agent
-      .delete(`${API}/workspaces/${fixture.owner.workspaceId}` + `/desktop-apps/${fixture.desktopApp.id}`)
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`);
+    const archiveResponse = await fixture.owner.agent.delete(`${API}/workspaces/${fixture.owner.workspaceId}` + `/desktop-apps/${fixture.desktopApp.id}`).set('Authorization', `Bearer ${fixture.owner.accessToken}`);
 
     expect([200, 204]).toContain(archiveResponse.status);
 

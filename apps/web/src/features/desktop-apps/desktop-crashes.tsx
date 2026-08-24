@@ -17,7 +17,6 @@ export function DesktopCrashes({ workspaceId, desktopAppId }: Props) {
   const [platform, setPlatform] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const load = useCallback(async () => {
     const filters: DesktopRuntimeFilters = {
       ...(version ? { version } : {}),
@@ -51,19 +50,8 @@ export function DesktopCrashes({ workspaceId, desktopAppId }: Props) {
           <p className='mt-1 text-sm text-slate-500'>Crash groups ordered by impact and recency.</p>
         </div>
         <div className='flex gap-2'>
-          <input
-            aria-label='Crash version filter'
-            value={version}
-            onChange={(event) => setVersion(event.target.value)}
-            placeholder='Version'
-            className='h-9 w-32 rounded-lg border border-slate-300 px-3 text-sm'
-          />
-          <select
-            aria-label='Crash platform filter'
-            value={platform}
-            onChange={(event) => setPlatform(event.target.value)}
-            className='h-9 rounded-lg border border-slate-300 px-3 text-sm'
-          >
+          <input aria-label='Crash version filter' value={version} onChange={(event) => setVersion(event.target.value)} placeholder='Version' className='h-9 w-32 rounded-lg border border-slate-300 px-3 text-sm' />
+          <select aria-label='Crash platform filter' value={platform} onChange={(event) => setPlatform(event.target.value)} className='h-9 rounded-lg border border-slate-300 px-3 text-sm'>
             <option value=''>All platforms</option>
             <option value='WINDOWS'>Windows</option>
             <option value='MACOS'>macOS</option>
@@ -84,9 +72,7 @@ export function DesktopCrashes({ workspaceId, desktopAppId }: Props) {
           <Loader2 className='size-4 animate-spin' /> Loading crashes...
         </div>
       ) : crashes.length === 0 ? (
-        <div className='mt-6 rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500'>
-          No crashes match the current filters.
-        </div>
+        <div className='mt-6 rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500'>No crashes match the current filters.</div>
       ) : (
         <div className='mt-6 space-y-3'>
           {crashes.map((crash) => (

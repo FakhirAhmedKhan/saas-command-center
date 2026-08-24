@@ -3,7 +3,6 @@ import { readFullStackState, type FullStackState } from './fixtures/state';
 import { expect, test, type Page } from '@playwright/test';
 
 let state: FullStackState;
-
 let page: Page;
 
 test.describe('Desktop application frontend', () => {
@@ -19,9 +18,7 @@ test.describe('Desktop application frontend', () => {
 
   test('completes desktop CRUD through the real frontend', async () => {
     const name = uniqueValue('Phase 3 Electron', state.runId);
-
     const workspaceId = state.owner.workspaceId;
-
     const listUrl = `/workspaces/${workspaceId}` + '/desktop-apps';
 
     await page.goto(listUrl);

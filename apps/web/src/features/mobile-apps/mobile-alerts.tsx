@@ -13,17 +13,11 @@ interface Props {
 
 export function MobileAlerts({ workspaceId, mobileAppId }: Props) {
   const [rules, setRules] = useState<MobileAlertRule[]>([]);
-
   const [incidents, setIncidents] = useState<MobileAlertIncident[]>([]);
-
   const [type, setType] = useState<MobileAlertRuleType>('CRASH_RATE');
-
   const [threshold, setThreshold] = useState('2');
-
   const [name, setName] = useState('Crash rate > 2%');
-
   const [error, setError] = useState<string | null>(null);
-
   const load = useCallback(async () => {
     try {
       const [ruleData, incidentData] = await Promise.all([listMobileAlertRules(workspaceId, mobileAppId), listMobileAlertIncidents(workspaceId, mobileAppId)]);
@@ -73,12 +67,7 @@ export function MobileAlerts({ workspaceId, mobileAppId }: Props) {
         <div className='mt-4 grid gap-3 md:grid-cols-3'>
           <input aria-label='Alert name' value={name} onChange={(event) => setName(event.target.value)} className='h-10 rounded-lg border px-3' />
 
-          <select
-            aria-label='Alert type'
-            value={type}
-            onChange={(event) => setType(event.target.value as MobileAlertRuleType)}
-            className='h-10 rounded-lg border px-3'
-          >
+          <select aria-label='Alert type' value={type} onChange={(event) => setType(event.target.value as MobileAlertRuleType)} className='h-10 rounded-lg border px-3'>
             <option value='CRASH_RATE'>Crash Rate</option>
 
             <option value='ANR_HANG'>ANR/Hang</option>
@@ -92,24 +81,10 @@ export function MobileAlerts({ workspaceId, mobileAppId }: Props) {
             <option value='RELEASE_REGRESSION'>Release Regression</option>
           </select>
 
-          {type !== 'BUILD_FAILED' ? (
-            <input
-              aria-label='Alert threshold'
-              type='number'
-              value={threshold}
-              onChange={(event) => setThreshold(event.target.value)}
-              className='h-10 rounded-lg border px-3'
-            />
-          ) : (
-            <div />
-          )}
+          {type !== 'BUILD_FAILED' ? <input aria-label='Alert threshold' type='number' value={threshold} onChange={(event) => setThreshold(event.target.value)} className='h-10 rounded-lg border px-3' /> : <div />}
         </div>
 
-        <button
-          type='button'
-          onClick={() => void create()}
-          className='mt-4 inline-flex h-10 items-center gap-2 rounded-lg bg-brand-600 px-4 font-semibold text-white'
-        >
+        <button type='button' onClick={() => void create()} className='mt-4 inline-flex h-10 items-center gap-2 rounded-lg bg-brand-600 px-4 font-semibold text-white'>
           <Plus className='size-4' />
           Create Alert
         </button>

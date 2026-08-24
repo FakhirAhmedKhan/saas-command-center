@@ -98,7 +98,6 @@ export class GithubAppService {
   buildUserAuthorizationUrl(state: string, codeChallenge: string): string {
     const clientId = this.required('GITHUB_APP_CLIENT_ID');
     const callbackUrl = this.required('GITHUB_APP_CALLBACK_URL');
-
     const url = new URL('https://github.com/login/oauth/authorize');
 
     url.searchParams.set('client_id', clientId);
@@ -114,7 +113,6 @@ export class GithubAppService {
     const data = await this.appJson<GithubInstallationResponse>(`/app/installations/${this.numericId(installationId)}`, {
       method: 'GET',
     });
-
     const accountLogin = data.account?.login?.trim();
 
     if (!accountLogin) {
@@ -136,7 +134,6 @@ export class GithubAppService {
       redirect_uri: this.required('GITHUB_APP_CALLBACK_URL'),
       code_verifier: codeVerifier,
     });
-
     const response = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
       headers: {
@@ -148,7 +145,6 @@ export class GithubAppService {
 
       signal: AbortSignal.timeout(15_000),
     });
-
     const data = (await response.json()) as GithubOauthResponse;
 
     if (!response.ok || !data.access_token) {
@@ -208,7 +204,6 @@ export class GithubAppService {
 
   async listImportableInstallationRepositories(installationId: string): Promise<GithubImportableRepository[]> {
     const token = await this.createInstallationAccessToken(installationId);
-
     const repositories: GithubImportableRepository[] = [];
 
     for (let page = 1; ; page += 1) {
@@ -243,7 +238,6 @@ export class GithubAppService {
 
   async listInstallationRepositories(installationId: string): Promise<GithubRepository[]> {
     const token = await this.createInstallationAccessToken(installationId);
-
     const repositories: GithubRepository[] = [];
 
     for (let page = 1; ; page += 1) {
@@ -307,9 +301,7 @@ export class GithubAppService {
       ...init,
       signal: AbortSignal.timeout(15_000),
     });
-
     const text = await response.text();
-
     let body: unknown;
 
     if (text) {
@@ -345,16 +337,13 @@ export class GithubAppService {
   private createAppJwt(): string {
     const clientId = this.required('GITHUB_APP_CLIENT_ID');
     const privateKey = this.privateKey();
-
     const now = Math.floor(Date.now() / 1000);
-
     const header = Buffer.from(
       JSON.stringify({
         alg: 'RS256',
         typ: 'JWT',
       }),
     ).toString('base64url');
-
     const payload = Buffer.from(
       JSON.stringify({
         iat: now - 60,
@@ -362,9 +351,7 @@ export class GithubAppService {
         iss: clientId,
       }),
     ).toString('base64url');
-
     const unsignedToken = `${header}.${payload}`;
-
     const signer = createSign('RSA-SHA256');
 
     signer.update(unsignedToken);
@@ -377,7 +364,6 @@ export class GithubAppService {
 
   private privateKey(): string {
     const encoded = this.required('GITHUB_APP_PRIVATE_KEY_BASE64');
-
     const key = Buffer.from(encoded, 'base64').toString('utf8');
 
     if (!key.includes('BEGIN') || !key.includes('PRIVATE KEY')) {

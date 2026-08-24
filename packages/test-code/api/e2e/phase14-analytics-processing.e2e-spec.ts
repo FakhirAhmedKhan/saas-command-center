@@ -2,11 +2,11 @@ import { createAgent, createTestUser, registerUser, withBearer } from '../helper
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { readAccessToken } from '../helpers/response';
+import type { INestApplication } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
 import { PrismaService } from 'src/database/prisma.service';
 import { AnalyticsProcessingStatus, AnalyticsProcessingTrigger, RawAnalyticsEventType, WorkspaceRole } from 'src/generated/prisma/enums';
 import { AnalyticsProcessingWorkerService } from 'src/modules/analytics-processing/services/analytics-processing-worker.service';
-import type { INestApplication } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
 import request, { type Response } from 'supertest';
 
 /**
@@ -78,11 +78,9 @@ describe('Phase 14 Analytics Processing E2E', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let worker: AnalyticsProcessingWorkerService;
-
   let workspaceId: string;
   let websiteId: string;
   let otherWorkspaceWebsiteId: string;
-
   let ownerAccessToken: string;
   let viewerAccessToken: string;
   let developerAccessToken: string;
@@ -134,7 +132,6 @@ describe('Phase 14 Analytics Processing E2E', () => {
     const rangeStart = new Date('2026-08-27T00:00:00.000Z');
     const rangeEnd = new Date('2026-08-28T00:00:00.000Z');
     const lockKey = `phase14-dead-letter-${randomUUID()}`;
-
     const run = await prisma.analyticsProcessingRun.create({
       data: {
         workspaceId: targetWorkspaceId,
@@ -176,7 +173,6 @@ describe('Phase 14 Analytics Processing E2E', () => {
       name: 'Phase 14 Owner',
       workspaceName: 'Phase 14 Workspace',
     });
-
     const ownerRegistration = await registerUser(createAgent(app), owner);
 
     expect(ownerRegistration.status).toBe(201);
@@ -193,9 +189,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
       where: { email: owner.email.toLowerCase() },
       select: { id: true },
     });
-
     const ownerId = requireValue(ownerRecord?.id, 'Phase 14 owner was not persisted');
-
     const ownerMembership = await prisma.workspaceMember.findFirst({
       where: { userId: ownerId, role: WorkspaceRole.OWNER },
       select: { workspaceId: true },
@@ -207,7 +201,6 @@ describe('Phase 14 Analytics Processing E2E', () => {
       name: 'Phase 14 Viewer',
       workspaceName: 'Phase 14 Viewer Workspace',
     });
-
     const viewerRegistration = await registerUser(createAgent(app), viewer);
 
     expect(viewerRegistration.status).toBe(201);
@@ -231,7 +224,6 @@ describe('Phase 14 Analytics Processing E2E', () => {
       name: 'Phase 14 Developer',
       workspaceName: 'Phase 14 Developer Workspace',
     });
-
     const developerRegistration = await registerUser(createAgent(app), developer);
 
     expect(developerRegistration.status).toBe(201);
@@ -255,7 +247,6 @@ describe('Phase 14 Analytics Processing E2E', () => {
       name: 'Phase 14 Outsider',
       workspaceName: 'Phase 14 Outsider Workspace',
     });
-
     const outsiderRegistration = await registerUser(createAgent(app), outsider);
 
     expect(outsiderRegistration.status).toBe(201);
@@ -272,7 +263,6 @@ describe('Phase 14 Analytics Processing E2E', () => {
       where: { email: outsider.email.toLowerCase() },
       select: { id: true },
     });
-
     const outsiderMembership = await prisma.workspaceMember.findFirst({
       where: {
         userId: requireValue(outsiderRecord?.id, 'Phase 14 outsider was not persisted'),
@@ -280,9 +270,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
       },
       select: { workspaceId: true },
     });
-
     const outsiderWorkspaceId = requireValue(outsiderMembership?.workspaceId, 'Phase 14 outsider workspace was not found');
-
     const website = await prisma.website.create({
       data: {
         workspaceId,
@@ -345,28 +333,19 @@ describe('Phase 14 Analytics Processing E2E', () => {
   });
 
   it('rejects a VIEWER triggering manual reprocessing (requires OWNER or ADMIN)', async () => {
-    const response = await request(app.getHttpServer())
-      .post(reprocessUrl())
-      .set(withBearer(viewerAccessToken))
-      .send({ from: '2026-08-01T00:00:00.000Z', to: '2026-08-02T00:00:00.000Z' });
+    const response = await request(app.getHttpServer()).post(reprocessUrl()).set(withBearer(viewerAccessToken)).send({ from: '2026-08-01T00:00:00.000Z', to: '2026-08-02T00:00:00.000Z' });
 
     expect(response.status).toBe(403);
   });
 
   it('rejects a DEVELOPER triggering manual reprocessing (requires OWNER or ADMIN)', async () => {
-    const response = await request(app.getHttpServer())
-      .post(reprocessUrl())
-      .set(withBearer(developerAccessToken))
-      .send({ from: '2026-08-01T00:00:00.000Z', to: '2026-08-02T00:00:00.000Z' });
+    const response = await request(app.getHttpServer()).post(reprocessUrl()).set(withBearer(developerAccessToken)).send({ from: '2026-08-01T00:00:00.000Z', to: '2026-08-02T00:00:00.000Z' });
 
     expect(response.status).toBe(403);
   });
 
   it('rejects an outsider triggering manual reprocessing on a foreign website', async () => {
-    const response = await request(app.getHttpServer())
-      .post(reprocessUrl())
-      .set(withBearer(outsiderAccessToken))
-      .send({ from: '2026-08-01T00:00:00.000Z', to: '2026-08-02T00:00:00.000Z' });
+    const response = await request(app.getHttpServer()).post(reprocessUrl()).set(withBearer(outsiderAccessToken)).send({ from: '2026-08-01T00:00:00.000Z', to: '2026-08-02T00:00:00.000Z' });
 
     expect(response.status).toBe(403);
   });
@@ -422,28 +401,19 @@ describe('Phase 14 Analytics Processing E2E', () => {
   // ---------------------------------------------------------------------------------------
 
   it('rejects a reprocess request where to <= from', async () => {
-    const response = await request(app.getHttpServer())
-      .post(reprocessUrl())
-      .set(withBearer(ownerAccessToken))
-      .send({ from: '2026-08-05T00:00:00.000Z', to: '2026-08-05T00:00:00.000Z' });
+    const response = await request(app.getHttpServer()).post(reprocessUrl()).set(withBearer(ownerAccessToken)).send({ from: '2026-08-05T00:00:00.000Z', to: '2026-08-05T00:00:00.000Z' });
 
     expect(response.status).toBe(400);
   });
 
   it('rejects a reprocess request exceeding the maximum of 31 days', async () => {
-    const response = await request(app.getHttpServer())
-      .post(reprocessUrl())
-      .set(withBearer(ownerAccessToken))
-      .send({ from: '2026-01-01T00:00:00.000Z', to: '2026-03-01T00:00:00.000Z' });
+    const response = await request(app.getHttpServer()).post(reprocessUrl()).set(withBearer(ownerAccessToken)).send({ from: '2026-01-01T00:00:00.000Z', to: '2026-03-01T00:00:00.000Z' });
 
     expect(response.status).toBe(400);
   });
 
   it('rejects a reprocess request with a malformed date', async () => {
-    const response = await request(app.getHttpServer())
-      .post(reprocessUrl())
-      .set(withBearer(ownerAccessToken))
-      .send({ from: 'not-a-date', to: '2026-08-02T00:00:00.000Z' });
+    const response = await request(app.getHttpServer()).post(reprocessUrl()).set(withBearer(ownerAccessToken)).send({ from: 'not-a-date', to: '2026-08-02T00:00:00.000Z' });
 
     expect(response.status).toBe(400);
   });
@@ -461,7 +431,6 @@ describe('Phase 14 Analytics Processing E2E', () => {
   it('queues a manual processing run and persists it with QUEUED status', async () => {
     const from = '2026-08-10T00:00:00.000Z';
     const to = '2026-08-11T00:00:00.000Z';
-
     const response = await request(app.getHttpServer()).post(reprocessUrl()).set(withBearer(ownerAccessToken)).send({ from, to });
 
     expect(response.status).toBe(201);
@@ -478,7 +447,6 @@ describe('Phase 14 Analytics Processing E2E', () => {
     });
 
     const runId = created.id as string;
-
     const persisted = await prisma.analyticsProcessingRun.findUnique({
       where: { id: runId },
     });
@@ -502,7 +470,6 @@ describe('Phase 14 Analytics Processing E2E', () => {
   it('returns the same run when the identical range is queued twice (idempotent enqueue)', async () => {
     const from = '2026-08-15T00:00:00.000Z';
     const to = '2026-08-16T00:00:00.000Z';
-
     const firstResponse = await request(app.getHttpServer()).post(reprocessUrl()).set(withBearer(ownerAccessToken)).send({ from, to });
 
     expect(firstResponse.status).toBe(201);
@@ -527,7 +494,6 @@ describe('Phase 14 Analytics Processing E2E', () => {
   it('claims and successfully processes a queued analytics run', async () => {
     const from = '2026-08-20T00:00:00.000Z';
     const to = '2026-08-21T00:00:00.000Z';
-
     const queueResponse = await request(app.getHttpServer()).post(reprocessUrl()).set(withBearer(ownerAccessToken)).send({ from, to });
 
     expect(queueResponse.status).toBe(201);
@@ -570,7 +536,6 @@ describe('Phase 14 Analytics Processing E2E', () => {
 
   it('rejects retry from a VIEWER (requires OWNER or ADMIN)', async () => {
     const runId = await seedDeadLetteredRun();
-
     const response = await request(app.getHttpServer()).post(retryUrl(runId)).set(withBearer(viewerAccessToken));
 
     expect(response.status).toBe(403);
@@ -595,7 +560,6 @@ describe('Phase 14 Analytics Processing E2E', () => {
         maxRetries: 3,
       },
     });
-
     const response = await request(app.getHttpServer()).post(retryUrl(run.id)).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(404);
@@ -603,7 +567,6 @@ describe('Phase 14 Analytics Processing E2E', () => {
 
   it('retries a dead-lettered run: creates a new QUEUED run and resolves the dead letter', async () => {
     const originalRunId = await seedDeadLetteredRun();
-
     const response = await request(app.getHttpServer()).post(retryUrl(originalRunId)).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(201);
@@ -627,9 +590,7 @@ describe('Phase 14 Analytics Processing E2E', () => {
       where: { id: otherWorkspaceWebsiteId },
       select: { workspaceId: true },
     });
-
     const foreignRunId = await seedDeadLetteredRun(outsiderWebsite.workspaceId, otherWorkspaceWebsiteId);
-
     const response = await request(app.getHttpServer()).post(retryUrl(foreignRunId)).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(404);

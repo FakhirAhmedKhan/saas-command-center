@@ -10,9 +10,7 @@ import { AnalyticsProcessingService } from 'src/modules/analytics-engine/service
 
 describe('Analytics Time Zones E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
-
   let processingService: AnalyticsProcessingService;
 
   beforeAll(async () => {
@@ -33,7 +31,6 @@ describe('Analytics Time Zones E2E', () => {
 
   async function processOneEvent(timeZone: string, occurredAt: Date) {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
 
     await prisma.website.update({
@@ -59,7 +56,6 @@ describe('Analytics Time Zones E2E', () => {
 
   it('uses UTC midnight for UTC daily buckets', async () => {
     const { website } = await processOneEvent('UTC', new Date('2026-08-06T23:30:00.000Z'));
-
     const aggregate = await prisma.analyticsDailyAggregate.findFirstOrThrow({
       where: {
         websiteId: website.id,
@@ -74,7 +70,6 @@ describe('Analytics Time Zones E2E', () => {
 
   it('uses Asia/Dubai local midnight for daily buckets', async () => {
     const { website } = await processOneEvent('Asia/Dubai', new Date('2026-08-06T23:30:00.000Z'));
-
     const aggregate = await prisma.analyticsDailyAggregate.findFirstOrThrow({
       where: {
         websiteId: website.id,
@@ -89,7 +84,6 @@ describe('Analytics Time Zones E2E', () => {
 
   it('creates a 23-hour daily bucket across DST spring-forward', async () => {
     const { website } = await processOneEvent('America/New_York', new Date('2026-03-08T12:00:00.000Z'));
-
     const aggregate = await prisma.analyticsDailyAggregate.findFirstOrThrow({
       where: {
         websiteId: website.id,
@@ -106,7 +100,6 @@ describe('Analytics Time Zones E2E', () => {
 
   it('creates a 25-hour daily bucket across DST fall-back', async () => {
     const { website } = await processOneEvent('America/New_York', new Date('2026-11-01T12:00:00.000Z'));
-
     const aggregate = await prisma.analyticsDailyAggregate.findFirstOrThrow({
       where: {
         websiteId: website.id,
@@ -123,7 +116,6 @@ describe('Analytics Time Zones E2E', () => {
 
   it('splits events across Asia/Dubai local midnight', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
 
     await prisma.website.update({

@@ -7,8 +7,7 @@ import { Client } from 'pg';
  * than in the seeded state file because these helpers assert against the raw
  * ingestion tables, which the API never exposes over HTTP.
  */
-const FULL_STACK_DATABASE_URL =
-  process.env.FULLSTACK_DATABASE_URL ?? 'postgresql://command_center_full_e2e:command_center_full_e2e@127.0.0.1:5435/command_center_full_e2e?schema=public';
+const FULL_STACK_DATABASE_URL = process.env.FULLSTACK_DATABASE_URL ?? 'postgresql://command_center_full_e2e:command_center_full_e2e@127.0.0.1:5435/command_center_full_e2e?schema=public';
 
 export type RawEventType = 'PAGE_VIEW' | 'HEARTBEAT' | 'CUSTOM';
 

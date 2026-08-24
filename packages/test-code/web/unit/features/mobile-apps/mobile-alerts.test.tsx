@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { MobileAlerts } from '@/features/mobile-apps/mobile-alerts';
-import { createMobileAlertRule, listMobileAlertIncidents, listMobileAlertRules, updateMobileAlertRule } from '@/features/mobile-apps/mobile-apps-api';
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { MobileAlerts } from '@/features/mobile-apps/mobile-alerts';
+import { createMobileAlertRule, listMobileAlertIncidents, listMobileAlertRules, updateMobileAlertRule } from '@/features/mobile-apps/mobile-apps-api';
 
 vi.mock('@/features/mobile-apps/mobile-apps-api', () => ({
   createMobileAlertRule: vi.fn(),

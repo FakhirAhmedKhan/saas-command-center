@@ -22,7 +22,6 @@ export class BlockersService {
     await this.shared.requireApplication(this.prisma, workspaceId, applicationId);
 
     const search = query.search?.trim();
-
     const where: Prisma.ApplicationBlockerWhereInput = {
       applicationId,
       ...(query.status
@@ -60,9 +59,7 @@ export class BlockersService {
           }
         : {}),
     };
-
     const skip = (query.page - 1) * query.limit;
-
     const [blockers, total] = await this.prisma.$transaction([
       this.prisma.applicationBlocker.findMany({
         where,
@@ -109,7 +106,6 @@ export class BlockersService {
         where,
       }),
     ]);
-
     const totalPages = Math.ceil(total / query.limit);
 
     return {
@@ -191,7 +187,6 @@ export class BlockersService {
       this.shared.ensureApplicationActive(application);
 
       const blocker = await this.requireBlocker(transaction, applicationId, blockerId);
-
       const updated = await transaction.applicationBlocker.update({
         where: {
           id: blockerId,
@@ -238,7 +233,6 @@ export class BlockersService {
       this.shared.ensureApplicationActive(application);
 
       const blocker = await this.requireBlocker(transaction, applicationId, blockerId);
-
       const updated = await transaction.applicationBlocker.update({
         where: {
           id: blockerId,
@@ -279,7 +273,6 @@ export class BlockersService {
       this.shared.ensureApplicationActive(application);
 
       const blocker = await this.requireBlocker(transaction, applicationId, blockerId);
-
       const updated = await transaction.applicationBlocker.update({
         where: {
           id: blockerId,

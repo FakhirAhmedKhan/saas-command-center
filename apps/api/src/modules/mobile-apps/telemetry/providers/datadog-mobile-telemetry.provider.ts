@@ -35,7 +35,6 @@ export class DatadogMobileTelemetryProvider implements MobileTelemetryProviderAd
 
   async getCrashes(context: MobileTelemetryProviderContext) {
     const applicationId = context.externalProjectId;
-
     const [errors, sessions] = await Promise.all([
       this.search(
         context.config,
@@ -49,7 +48,6 @@ export class DatadogMobileTelemetryProvider implements MobileTelemetryProviderAd
         `@type:session @application.id:${applicationId}`,
       ),
     ]);
-
     const affected = new Set<string>();
 
     for (const event of errors) {
@@ -83,7 +81,6 @@ export class DatadogMobileTelemetryProvider implements MobileTelemetryProviderAd
 
   async getPerformance(context: MobileTelemetryProviderContext) {
     const applicationId = context.externalProjectId;
-
     const [views, resources] = await Promise.all([
       this.search(
         context.config,
@@ -97,18 +94,13 @@ export class DatadogMobileTelemetryProvider implements MobileTelemetryProviderAd
         `@type:resource @application.id:${applicationId}`,
       ),
     ]);
-
     const scale = Number(context.config.durationScale ?? '1000000');
-
     const network = resources
       .map((event) => this.firstNumber(event, ['resource.duration', 'duration']))
       .filter((item): item is number => item !== null)
       .map((item) => item / scale);
-
     const coldPath = context.config.coldStartupAttribute;
-
     const warmPath = context.config.warmStartupAttribute;
-
     const memoryPath = context.config.memoryAttribute;
 
     return {
@@ -128,7 +120,6 @@ export class DatadogMobileTelemetryProvider implements MobileTelemetryProviderAd
 
       `@type:session @application.id:${context.externalProjectId}`,
     );
-
     const grouped = new Map<
       string,
       {
@@ -150,7 +141,6 @@ export class DatadogMobileTelemetryProvider implements MobileTelemetryProviderAd
 
         users: new Set<string>(),
       };
-
       const user = this.firstString(event, ['usr.id', 'user.id', 'session.id']);
 
       if (user) {
@@ -175,9 +165,7 @@ export class DatadogMobileTelemetryProvider implements MobileTelemetryProviderAd
     query: string,
   ): Promise<DatadogEvent[]> {
     const base = this.baseUrl(config.site ?? 'datadoghq.com');
-
     let url = `${base}/api/v2/rum/events/search`;
-
     const results: DatadogEvent[] = [];
 
     for (let page = 0; page < 5; page += 1) {
@@ -230,17 +218,7 @@ export class DatadogMobileTelemetryProvider implements MobileTelemetryProviderAd
   }
 
   private baseUrl(site: string) {
-    const allowed = new Set([
-      'datadoghq.com',
-      'datadoghq.eu',
-      'us3.datadoghq.com',
-      'us5.datadoghq.com',
-      'ap1.datadoghq.com',
-      'ap2.datadoghq.com',
-      'uk1.datadoghq.com',
-      'ddog-gov.com',
-      'us2.ddog-gov.com',
-    ]);
+    const allowed = new Set(['datadoghq.com', 'datadoghq.eu', 'us3.datadoghq.com', 'us5.datadoghq.com', 'ap1.datadoghq.com', 'ap2.datadoghq.com', 'uk1.datadoghq.com', 'ddog-gov.com', 'us2.ddog-gov.com']);
 
     if (!allowed.has(site)) {
       throw new BadRequestException('Unsupported Datadog site.');
@@ -259,7 +237,6 @@ export class DatadogMobileTelemetryProvider implements MobileTelemetryProviderAd
     path: string,
   ): number | null {
     const value = this.getPath(this.attributes(event), path);
-
     const number = Number(value);
 
     return Number.isFinite(number) ? number : null;

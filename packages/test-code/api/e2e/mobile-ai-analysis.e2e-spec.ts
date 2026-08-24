@@ -1,16 +1,12 @@
-import type { INestApplication } from '@nestjs/common';
-
-import { PrismaService } from 'src/database/prisma.service';
-import { RepositoryProvider } from 'src/generated/prisma/enums';
-
-import type { MobileAnalysisProvider, MobileAnalysisProviderInput } from 'src/modules/mobile-apps/analysis/mobile-analysis-provider.interface';
-
-import { MobileAnalysisService } from 'src/modules/mobile-apps/services/mobile-analysis.service';
-
 import { withBearer } from '../helpers/auth';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { RepositoryProvider } from 'src/generated/prisma/enums';
+import type { MobileAnalysisProvider, MobileAnalysisProviderInput } from 'src/modules/mobile-apps/analysis/mobile-analysis-provider.interface';
+import { MobileAnalysisService } from 'src/modules/mobile-apps/services/mobile-analysis.service';
 
 const API = '/api/v1';
 
@@ -33,17 +29,12 @@ class FakeMobileAiProvider implements MobileAnalysisProvider {
 describe('Mobile AI Analysis E2E', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-
   let fake: FakeMobileAiProvider;
-
   let owner: Awaited<ReturnType<typeof registerWorkspaceTestUser>>;
-
   let workspaceId: string;
   let mobileAppId: string;
   let applicationId: string;
-
   let buildId: string;
-
   let sequence = 0;
 
   beforeEach(async () => {
@@ -90,7 +81,6 @@ describe('Mobile AI Analysis E2E', () => {
         accountType: 'Organization',
       },
     });
-
     const repository = await prisma.repositoryConnection.create({
       data: {
         workspaceId,
@@ -120,7 +110,6 @@ describe('Mobile AI Analysis E2E', () => {
         isAvailable: true,
       },
     });
-
     const build = await prisma.mobileBuild.create({
       data: {
         workspaceId,

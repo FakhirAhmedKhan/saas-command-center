@@ -9,9 +9,7 @@ import { AnalyticsProcessingService } from 'src/modules/analytics-engine/service
 
 describe('Analytics Page Views E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
-
   let processingService: AnalyticsProcessingService;
 
   beforeAll(async () => {
@@ -32,7 +30,6 @@ describe('Analytics Page Views E2E', () => {
 
   it('normalizes paths, removes tracking parameters, and sorts retained query parameters', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
 
     expectCollectionAccepted(
@@ -61,7 +58,6 @@ describe('Analytics Page Views E2E', () => {
 
   it('marks one page as both entry and exit', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
 
     expectCollectionAccepted(
@@ -88,9 +84,7 @@ describe('Analytics Page Views E2E', () => {
 
   it('derives direct, internal, search, social, and referral sources', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const cases = [
       {
         referrer: undefined,
@@ -113,7 +107,6 @@ describe('Analytics Page Views E2E', () => {
         expected: AnalyticsSourceType.REFERRAL,
       },
     ];
-
     const events = cases.map((item, index) => {
       const event = buildTrackerEvent(trackedWebsite.origin, {
         visitorId: uniqueTrackerId(`visitor_${index}`),
@@ -142,7 +135,6 @@ describe('Analytics Page Views E2E', () => {
         normalizedPath: 'asc',
       },
     });
-
     const sourceTypes = new Set(pageViews.map((pageView) => pageView.sourceType));
 
     for (const item of cases) {
@@ -152,11 +144,8 @@ describe('Analytics Page Views E2E', () => {
 
   it('creates page views only for PAGE_VIEW events', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const visitorId = uniqueTrackerId('visitor');
-
     const sessionId = uniqueTrackerId('session');
 
     expectCollectionAccepted(
@@ -203,9 +192,7 @@ describe('Analytics Page Views E2E', () => {
 
   it('does not duplicate normalized events or page views on repeated processing', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const event = buildTrackerEvent(trackedWebsite.origin);
 
     expectCollectionAccepted(await collectEvents(app, trackedWebsite, [event]), 1);
@@ -234,11 +221,8 @@ describe('Analytics Page Views E2E', () => {
 
   it('keeps normalized event IDs isolated between websites', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const websiteA = await createTrackedWebsite(owner);
-
     const websiteB = await createTrackedWebsite(owner);
-
     const sharedEventId = uniqueTrackerId('shared_event');
 
     for (const website of [websiteA, websiteB]) {

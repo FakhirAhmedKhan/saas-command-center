@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 import type { CodeTreeNode } from '@/features/repositories/code-explorer.types';
-import { CodeTree } from '@/features/repositories/code-tree';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { CodeTree } from '@/features/repositories/code-tree';
 
 function file(overrides: Partial<CodeTreeNode> = {}): CodeTreeNode {
   return { name: 'index.ts', path: 'src/index.ts', type: 'file', sha: 'sha-1', size: 100, ...overrides };
@@ -29,13 +29,7 @@ describe('CodeTree', () => {
     const onOpenFile = vi.fn();
     const user = userEvent.setup();
 
-    render(
-      <CodeTree
-        nodes={[directory({ name: 'src', path: 'src', children: [file({ name: 'index.ts', path: 'src/index.ts' })] })]}
-        activePath={null}
-        onOpenFile={onOpenFile}
-      />,
-    );
+    render(<CodeTree nodes={[directory({ name: 'src', path: 'src', children: [file({ name: 'index.ts', path: 'src/index.ts' })] })]} activePath={null} onOpenFile={onOpenFile} />);
 
     await user.click(screen.getByText('src'));
 
@@ -43,13 +37,7 @@ describe('CodeTree', () => {
   });
 
   it('renders top-level directory children expanded by default', () => {
-    render(
-      <CodeTree
-        nodes={[directory({ name: 'src', path: 'src', children: [file({ name: 'index.ts', path: 'src/index.ts' })] })]}
-        activePath={null}
-        onOpenFile={vi.fn()}
-      />,
-    );
+    render(<CodeTree nodes={[directory({ name: 'src', path: 'src', children: [file({ name: 'index.ts', path: 'src/index.ts' })] })]} activePath={null} onOpenFile={vi.fn()} />);
 
     expect(screen.getByText('index.ts')).toBeInTheDocument();
   });
@@ -57,13 +45,7 @@ describe('CodeTree', () => {
   it('collapses a directory after clicking it once, hiding its children', async () => {
     const user = userEvent.setup();
 
-    render(
-      <CodeTree
-        nodes={[directory({ name: 'src', path: 'src', children: [file({ name: 'index.ts', path: 'src/index.ts' })] })]}
-        activePath={null}
-        onOpenFile={vi.fn()}
-      />,
-    );
+    render(<CodeTree nodes={[directory({ name: 'src', path: 'src', children: [file({ name: 'index.ts', path: 'src/index.ts' })] })]} activePath={null} onOpenFile={vi.fn()} />);
 
     expect(screen.getByText('index.ts')).toBeInTheDocument();
 

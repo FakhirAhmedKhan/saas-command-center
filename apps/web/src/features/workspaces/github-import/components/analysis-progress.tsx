@@ -11,7 +11,6 @@ interface AnalysisProgressProps {
 }
 
 const STEPS = ['Repository structure loaded', 'Package manager detected', 'Applications discovered', 'Frameworks detected', 'Commands detected'];
-
 const STEP_INTERVAL_MS = 550;
 
 export function AnalysisProgress({ repository }: AnalysisProgressProps) {
@@ -36,32 +35,21 @@ export function AnalysisProgress({ repository }: AnalysisProgressProps) {
 
         <h2 className='mt-5 text-lg font-semibold text-slate-950'>Analyzing {repository.fullName}...</h2>
 
-        <p className='mt-1.5 max-w-sm text-sm leading-6 text-slate-500'>
-          We&apos;re statically inspecting the repository&apos;s structure. No code is executed and no scripts are run.
-        </p>
+        <p className='mt-1.5 max-w-sm text-sm leading-6 text-slate-500'>We&apos;re statically inspecting the repository&apos;s structure. No code is executed and no scripts are run.</p>
 
         <ul className='mt-6 w-full max-w-xs space-y-2.5 text-left'>
           {STEPS.map((label, index) => {
             const isComplete = index < completedSteps;
-
             const isActive = index === completedSteps;
 
             return (
               <li key={label} className='flex items-center gap-2.5 text-sm'>
                 <span
                   className={`flex size-5 shrink-0 items-center justify-center rounded-full border transition ${
-                    isComplete
-                      ? 'border-emerald-500 bg-emerald-500 text-white'
-                      : isActive
-                        ? 'border-brand-500 text-brand-600'
-                        : 'border-slate-200 text-transparent'
+                    isComplete ? 'border-emerald-500 bg-emerald-500 text-white' : isActive ? 'border-brand-500 text-brand-600' : 'border-slate-200 text-transparent'
                   }`}
                 >
-                  {isComplete ? (
-                    <Check className='size-3' strokeWidth={3} />
-                  ) : isActive ? (
-                    <span className='size-2 animate-pulse rounded-full bg-brand-500' />
-                  ) : null}
+                  {isComplete ? <Check className='size-3' strokeWidth={3} /> : isActive ? <span className='size-2 animate-pulse rounded-full bg-brand-500' /> : null}
                 </span>
 
                 <span className={isComplete ? 'text-slate-700' : isActive ? 'font-medium text-slate-950' : 'text-slate-400'}>{label}</span>

@@ -2,7 +2,6 @@ import { AnalyticsDatePreset, AnalyticsOverviewQueryDto } from '../dto/analytics
 import { BadRequestException } from '@nestjs/common';
 
 const MILLISECONDS_PER_DAY = 86_400_000;
-
 const MAXIMUM_RANGE_DAYS = 366;
 
 export interface DatePeriod {
@@ -55,7 +54,6 @@ function getDateParts(date: Date, timeZone: string): DateParts {
     second: '2-digit',
     hourCycle: 'h23',
   });
-
   const values = new Map<string, string>();
 
   for (const part of formatter.formatToParts(date)) {
@@ -96,11 +94,8 @@ function parseDateKey(dateKey: string): {
   }
 
   const year = Number(match[1]);
-
   const month = Number(match[2]);
-
   const day = Number(match[3]);
-
   const date = new Date(Date.UTC(year, month - 1, day));
 
   if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) {
@@ -116,7 +111,6 @@ function parseDateKey(dateKey: string): {
 
 export function addDateKeyDays(dateKey: string, amount: number): string {
   const { year, month, day } = parseDateKey(dateKey);
-
   const date = new Date(Date.UTC(year, month - 1, day + amount));
 
   return formatDateKey(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
@@ -124,7 +118,6 @@ export function addDateKeyDays(dateKey: string, amount: number): string {
 
 function getTimeZoneOffsetMilliseconds(instant: Date, timeZone: string): number {
   const parts = getDateParts(instant, timeZone);
-
   const representedAsUtc = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
 
   return representedAsUtc - instant.getTime();
@@ -132,13 +125,9 @@ function getTimeZoneOffsetMilliseconds(instant: Date, timeZone: string): number 
 
 export function startOfDateInTimeZone(dateKey: string, timeZone: string): Date {
   const { year, month, day } = parseDateKey(dateKey);
-
   const utcGuess = Date.UTC(year, month - 1, day, 0, 0, 0);
-
   const firstOffset = getTimeZoneOffsetMilliseconds(new Date(utcGuess), timeZone);
-
   let result = new Date(utcGuess - firstOffset);
-
   const finalOffset = getTimeZoneOffsetMilliseconds(result, timeZone);
 
   if (finalOffset !== firstOffset) {
@@ -150,11 +139,8 @@ export function startOfDateInTimeZone(dateKey: string, timeZone: string): Date {
 
 function getInclusiveDayCount(from: string, to: string): number {
   const fromParts = parseDateKey(from);
-
   const toParts = parseDateKey(to);
-
   const fromTimestamp = Date.UTC(fromParts.year, fromParts.month - 1, fromParts.day);
-
   const toTimestamp = Date.UTC(toParts.year, toParts.month - 1, toParts.day);
 
   return Math.floor((toTimestamp - fromTimestamp) / MILLISECONDS_PER_DAY) + 1;
@@ -191,13 +177,9 @@ export function resolveAnalyticsDateRange(
   }
 
   const today = getDateKeyInTimeZone(now, timeZone);
-
   const preset = query.preset ?? AnalyticsDatePreset.SEVEN_DAYS;
-
   const currentFrom = hasCustomRange ? query.from! : resolvePresetStart(preset, today);
-
   const currentTo = hasCustomRange ? query.to! : today;
-
   const days = getInclusiveDayCount(currentFrom, currentTo);
 
   if (days <= 0) {
@@ -209,7 +191,6 @@ export function resolveAnalyticsDateRange(
   }
 
   const previousTo = addDateKeyDays(currentFrom, -1);
-
   const previousFrom = addDateKeyDays(previousTo, -(days - 1));
 
   return {

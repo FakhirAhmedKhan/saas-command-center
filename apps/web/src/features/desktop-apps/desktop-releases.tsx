@@ -3,24 +3,9 @@
 
 import { createDesktopRelease, listDesktopBuilds, listDesktopReleases, updateDesktopReleaseStatus } from './desktop-apps-api';
 import { shortSha } from './desktop-build-utils';
-import {
-  DESKTOP_RELEASE_CHANNEL_LABELS,
-  DESKTOP_RELEASE_STATUS_LABELS,
-  formatReleaseDate,
-  formatReleaseTarget,
-  nextDesktopReleaseActions,
-} from './desktop-release-utils';
+import { DESKTOP_RELEASE_CHANNEL_LABELS, DESKTOP_RELEASE_STATUS_LABELS, formatReleaseDate, formatReleaseTarget, nextDesktopReleaseActions } from './desktop-release-utils';
 import { getErrorMessage } from '@/features/lib/api/api-error';
-import type {
-  CreateDesktopReleaseInput,
-  DesktopArchitecture,
-  DesktopBuild,
-  DesktopPlatform,
-  DesktopRelease,
-  DesktopReleaseChannel,
-  DesktopReleaseFilters,
-  DesktopReleaseStatus,
-} from '@command-center/shared-types';
+import type { CreateDesktopReleaseInput, DesktopArchitecture, DesktopBuild, DesktopPlatform, DesktopRelease, DesktopReleaseChannel, DesktopReleaseFilters, DesktopReleaseStatus } from '@command-center/shared-types';
 import { AlertTriangle, CheckCircle2, ExternalLink, PackageCheck, RefreshCw, RotateCcw, Rocket } from 'lucide-react';
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -30,11 +15,8 @@ interface Props {
 }
 
 const CHANNELS: DesktopReleaseChannel[] = ['DEV', 'ALPHA', 'BETA', 'STABLE', 'LTS'];
-
 const STATUSES: DesktopReleaseStatus[] = ['DRAFT', 'READY', 'PUBLISHED', 'FAILED', 'ROLLED_BACK'];
-
 const PLATFORMS: DesktopPlatform[] = ['WINDOWS', 'MACOS', 'LINUX', 'CROSS_PLATFORM'];
-
 const ARCHITECTURES: DesktopArchitecture[] = ['X64', 'ARM64', 'X86', 'UNIVERSAL'];
 
 function releaseStatusClasses(status: DesktopReleaseStatus): string {
@@ -73,15 +55,12 @@ export function DesktopReleases({ workspaceId, desktopAppId }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [transitioningId, setTransitioningId] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
-
   const [filters, setFilters] = useState<DesktopReleaseFilters>({});
-
   const [buildId, setBuildId] = useState('');
   const [channel, setChannel] = useState<DesktopReleaseChannel>('STABLE');
   const [version, setVersion] = useState('');
   const [buildNumber, setBuildNumber] = useState('');
   const [releaseNotes, setReleaseNotes] = useState('');
-
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -173,11 +152,7 @@ export function DesktopReleases({ workspaceId, desktopAppId }: Props) {
   }
 
   async function transition(release: DesktopRelease, status: DesktopReleaseStatus) {
-    const confirmed = window.confirm(
-      status === 'ROLLED_BACK'
-        ? `Roll back ${release.version} on ${DESKTOP_RELEASE_CHANNEL_LABELS[release.channel]}?`
-        : `${DESKTOP_RELEASE_STATUS_LABELS[status]} ${release.version}?`,
-    );
+    const confirmed = window.confirm(status === 'ROLLED_BACK' ? `Roll back ${release.version} on ${DESKTOP_RELEASE_CHANNEL_LABELS[release.channel]}?` : `${DESKTOP_RELEASE_STATUS_LABELS[status]} ${release.version}?`);
 
     if (!confirmed) {
       return;
@@ -215,11 +190,7 @@ export function DesktopReleases({ workspaceId, desktopAppId }: Props) {
           <div className='min-w-0 flex-1'>
             <h2 className='font-semibold text-red-900'>Releases could not be loaded</h2>
             <p className='mt-1 text-sm text-red-700'>{error}</p>
-            <button
-              type='button'
-              onClick={() => void load()}
-              className='mt-4 inline-flex items-center gap-2 rounded-lg border border-red-300 bg-white px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-100'
-            >
+            <button type='button' onClick={() => void load()} className='mt-4 inline-flex items-center gap-2 rounded-lg border border-red-300 bg-white px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-100'>
               <RefreshCw className='h-4 w-4' />
               Retry
             </button>
@@ -269,13 +240,7 @@ export function DesktopReleases({ workspaceId, desktopAppId }: Props) {
           <div className='grid gap-4 lg:grid-cols-2'>
             <label className='space-y-1.5 text-sm font-medium text-slate-700'>
               <span>Successful build</span>
-              <select
-                aria-label='Successful build'
-                value={buildId}
-                onChange={(event) => setBuildId(event.target.value)}
-                required
-                className='h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm'
-              >
+              <select aria-label='Successful build' value={buildId} onChange={(event) => setBuildId(event.target.value)} required className='h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm'>
                 <option value=''>Select build</option>
                 {availableBuilds.map((build) => (
                   <option key={build.id} value={build.id}>
@@ -360,11 +325,7 @@ export function DesktopReleases({ workspaceId, desktopAppId }: Props) {
               {submitting ? 'Creating...' : 'Create Desktop Release'}
             </button>
 
-            <button
-              type='button'
-              onClick={() => setShowCreateForm(false)}
-              className='rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50'
-            >
+            <button type='button' onClick={() => setShowCreateForm(false)} className='rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50'>
               Cancel
             </button>
           </div>
@@ -453,9 +414,7 @@ export function DesktopReleases({ workspaceId, desktopAppId }: Props) {
         <div className='rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center'>
           <Rocket className='mx-auto h-8 w-8 text-slate-400' />
           <h3 className='mt-3 font-semibold text-slate-950'>No desktop releases yet</h3>
-          <p className='mx-auto mt-1 max-w-xl text-sm text-slate-600'>
-            Create a release from a successful desktop build. The release will keep its build, commit, target, and artifact history traceable.
-          </p>
+          <p className='mx-auto mt-1 max-w-xl text-sm text-slate-600'>Create a release from a successful desktop build. The release will keep its build, commit, target, and artifact history traceable.</p>
         </div>
       ) : (
         <div className='space-y-4'>
@@ -470,13 +429,9 @@ export function DesktopReleases({ workspaceId, desktopAppId }: Props) {
                     <div className='flex flex-wrap items-center gap-2'>
                       <h3 className='text-lg font-semibold text-slate-950'>{release.version}</h3>
 
-                      <span className='rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700'>
-                        {DESKTOP_RELEASE_CHANNEL_LABELS[release.channel]}
-                      </span>
+                      <span className='rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700'>{DESKTOP_RELEASE_CHANNEL_LABELS[release.channel]}</span>
 
-                      <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${releaseStatusClasses(release.status)}`}>
-                        {DESKTOP_RELEASE_STATUS_LABELS[release.status]}
-                      </span>
+                      <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${releaseStatusClasses(release.status)}`}>{DESKTOP_RELEASE_STATUS_LABELS[release.status]}</span>
                     </div>
 
                     <div className='mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm text-slate-600'>
@@ -499,13 +454,7 @@ export function DesktopReleases({ workspaceId, desktopAppId }: Props) {
                           onClick={() => void transition(release, action.status)}
                           className='inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50'
                         >
-                          {action.status === 'ROLLED_BACK' ? (
-                            <RotateCcw className='h-4 w-4' />
-                          ) : action.status === 'PUBLISHED' ? (
-                            <Rocket className='h-4 w-4' />
-                          ) : (
-                            <CheckCircle2 className='h-4 w-4' />
-                          )}
+                          {action.status === 'ROLLED_BACK' ? <RotateCcw className='h-4 w-4' /> : action.status === 'PUBLISHED' ? <Rocket className='h-4 w-4' /> : <CheckCircle2 className='h-4 w-4' />}
                           {busy ? 'Updating...' : action.label}
                         </button>
                       ))}
@@ -541,13 +490,7 @@ export function DesktopReleases({ workspaceId, desktopAppId }: Props) {
                             </div>
 
                             {artifact.externalUrl ? (
-                              <a
-                                href={artifact.externalUrl}
-                                target='_blank'
-                                rel='noreferrer'
-                                aria-label={`Open ${artifact.fileName}`}
-                                className='rounded-md p-1.5 text-slate-500 hover:bg-white hover:text-slate-900'
-                              >
+                              <a href={artifact.externalUrl} target='_blank' rel='noreferrer' aria-label={`Open ${artifact.fileName}`} className='rounded-md p-1.5 text-slate-500 hover:bg-white hover:text-slate-900'>
                                 <ExternalLink className='h-4 w-4' />
                               </a>
                             ) : null}

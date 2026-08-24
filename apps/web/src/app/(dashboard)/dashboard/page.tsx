@@ -34,10 +34,7 @@ export default function DashboardPage() {
           <p className='mt-1 text-sm leading-6 text-slate-500'>Here&apos;s what needs your attention.</p>
         </div>
 
-        <Link
-          href='/workspaces/new'
-          className='inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white transition hover:bg-brand-700'
-        >
+        <Link href='/workspaces/new' className='inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white transition hover:bg-brand-700'>
           <Plus className='size-4' />
           New workspace
         </Link>
@@ -52,10 +49,7 @@ export default function DashboardPage() {
             title='No workspace found'
             description='Create a workspace to start tracking applications, websites, and team activity.'
             action={
-              <Link
-                href='/workspaces/new'
-                className='inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white transition hover:bg-brand-700'
-              >
+              <Link href='/workspaces/new' className='inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white transition hover:bg-brand-700'>
                 <Plus className='size-4' />
                 Create workspace
               </Link>
@@ -67,15 +61,9 @@ export default function DashboardPage() {
               const role = workspace.members?.[0]?.role ?? 'VIEWER';
 
               return (
-                <Link
-                  key={workspace.id}
-                  href={`/workspaces/${workspace.id}`}
-                  className='group flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-slate-300'
-                >
+                <Link key={workspace.id} href={`/workspaces/${workspace.id}`} className='group flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-slate-300'>
                   <div className='flex items-start justify-between gap-3'>
-                    <div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-sm font-bold text-brand-700'>
-                      {workspace.name.charAt(0).toUpperCase()}
-                    </div>
+                    <div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-sm font-bold text-brand-700'>{workspace.name.charAt(0).toUpperCase()}</div>
 
                     <span className='rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600'>{role}</span>
                   </div>

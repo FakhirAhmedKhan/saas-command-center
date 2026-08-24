@@ -22,11 +22,8 @@ const METRIC_TYPES = new Set([
   'API_FAILURE_RATE_PERCENT',
   'VERSION_ADOPTION_PERCENT',
 ]);
-
 const PLATFORMS = new Set(['WINDOWS', 'MACOS', 'LINUX', 'CROSS_PLATFORM']);
-
 const ARCHITECTURES = new Set(['X64', 'ARM64', 'X86', 'UNIVERSAL']);
-
 const CHANNELS = new Set(['DEV', 'ALPHA', 'BETA', 'STABLE', 'LTS']);
 
 @Injectable()

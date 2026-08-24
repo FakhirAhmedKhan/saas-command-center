@@ -47,7 +47,6 @@ export class CustomMobileTelemetryProvider implements MobileTelemetryProviderAda
     }
 
     const base = this.security.assertCustomBaseUrl(baseUrl);
-
     const url = new URL(path, base);
 
     url.searchParams.set('projectId', context.externalProjectId);

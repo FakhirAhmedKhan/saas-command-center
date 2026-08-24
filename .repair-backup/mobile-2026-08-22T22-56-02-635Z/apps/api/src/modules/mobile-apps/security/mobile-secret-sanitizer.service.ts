@@ -2,13 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 const SENSITIVE_KEY = /(password|passwd|token|secret|api[_-]?key|app[_-]?key|authorization|cookie|private[_-]?key|credential|serviceaccount|encryptedconfig)/i;
 
-const SECRET_PATTERNS = [
-  /Bearer\s+[A-Za-z0-9\-._~+/]+=*/gi,
-
-  /(?:api[_-]?key|token|secret|password)\s*[:=]\s*["']?[^"',\s}]+/gi,
-
-  /-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/gi,
-];
+const SECRET_PATTERNS = [/Bearer\s+[A-Za-z0-9\-._~+/]+=*/gi, /(?:api[_-]?key|token|secret|password)\s*[:=]\s*["']?[^"',\s}]+/gi, /-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/gi];
 
 @Injectable()
 export class MobileSecretSanitizerService {

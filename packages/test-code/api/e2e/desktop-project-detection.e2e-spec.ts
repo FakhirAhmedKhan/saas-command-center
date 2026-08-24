@@ -1,9 +1,9 @@
-import type { INestApplication } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
-import { GithubCodeService } from 'src/modules/repositories/services/github-code.service';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { createLinkedDesktopFixture, detectPath } from './helpers/desktop-test-fixtures';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { GithubCodeService } from 'src/modules/repositories/services/github-code.service';
 
 describe('Desktop Project Detection E2E', () => {
   let app: INestApplication;
@@ -53,9 +53,7 @@ describe('Desktop Project Detection E2E', () => {
       encoding: 'base64',
     } as never);
 
-    const response = await fixture.owner.agent
-      .post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id))
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`);
+    const response = await fixture.owner.agent.post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id)).set('Authorization', `Bearer ${fixture.owner.accessToken}`);
 
     expect(response.status).toBe(201);
     expect(response.body.primary).toMatchObject({
@@ -94,9 +92,7 @@ describe('Desktop Project Detection E2E', () => {
       encoding: 'base64',
     } as never);
 
-    const response = await fixture.owner.agent
-      .post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id))
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`);
+    const response = await fixture.owner.agent.post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id)).set('Authorization', `Bearer ${fixture.owner.accessToken}`);
 
     expect(response.status).toBe(201);
     expect(response.body.primary).toBeNull();
@@ -141,9 +137,7 @@ describe('Desktop Project Detection E2E', () => {
         encoding: 'base64',
       } as never);
 
-    const response = await fixture.owner.agent
-      .post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id))
-      .set('Authorization', `Bearer ${fixture.owner.accessToken}`);
+    const response = await fixture.owner.agent.post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id)).set('Authorization', `Bearer ${fixture.owner.accessToken}`);
 
     expect(response.status).toBe(201);
     expect(response.body.primary.framework).toBe('ELECTRON');
@@ -151,7 +145,6 @@ describe('Desktop Project Detection E2E', () => {
 
   it('requires authentication', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
-
     const response = await fixture.owner.agent.post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id));
 
     expect(response.status).toBe(401);
@@ -160,10 +153,7 @@ describe('Desktop Project Detection E2E', () => {
   it('rejects cross-workspace desktop application access', async () => {
     const fixture = await createLinkedDesktopFixture(app, prisma);
     const attacker = await (await import('../helpers/workspace')).registerWorkspaceTestUser(app, prisma);
-
-    const response = await attacker.agent
-      .post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id))
-      .set('Authorization', `Bearer ${attacker.accessToken}`);
+    const response = await attacker.agent.post(detectPath(fixture.owner.workspaceId, fixture.desktopApp.id)).set('Authorization', `Bearer ${attacker.accessToken}`);
 
     expect(response.status).toBe(403);
   });

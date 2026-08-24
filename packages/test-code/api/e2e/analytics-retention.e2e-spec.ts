@@ -18,11 +18,8 @@ function asNumber(value: unknown): number {
 
 describe('Analytics Retention E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
-
   let processingService: AnalyticsProcessingService;
-
   const previousEnvironment = {
     raw: process.env.ANALYTICS_RAW_RETENTION_DAYS,
     normalized: process.env.ANALYTICS_NORMALIZED_RETENTION_DAYS,
@@ -69,17 +66,13 @@ describe('Analytics Retention E2E', () => {
 
   it('deletes only processed raw events older than the raw cutoff', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
-
     const now = Date.now();
-
     const oldProcessed = await createRawAnalyticsEvent(prisma, website, {
       eventId: uniqueTrackerId('old_processed'),
       occurredAt: new Date(now - 2 * 86_400_000),
       receivedAt: new Date(now - 2 * 86_400_000),
     });
-
     const recentProcessed = await createRawAnalyticsEvent(prisma, website, {
       eventId: uniqueTrackerId('recent_processed'),
       occurredAt: new Date(now - 12 * 60 * 60 * 1000),
@@ -131,13 +124,9 @@ describe('Analytics Retention E2E', () => {
 
   it('deletes expired sessions and removes only orphaned visitors', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
-
     const now = Date.now();
-
     const oldVisitorId = uniqueTrackerId('old_visitor');
-
     const recentVisitorId = uniqueTrackerId('recent_visitor');
 
     await createRawAnalyticsEvent(prisma, website, {
@@ -189,13 +178,9 @@ describe('Analytics Retention E2E', () => {
 
   it('deletes expired hourly and daily aggregates while preserving recent buckets', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
-
     const now = Date.now();
-
     const oldStart = new Date(now - 2 * 86_400_000);
-
     const recentStart = new Date(now - 12 * 60 * 60 * 1000);
 
     for (const bucketStart of [oldStart, recentStart]) {
@@ -255,11 +240,8 @@ describe('Analytics Retention E2E', () => {
 
   it('limits retention changes to the requested website', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const websiteA = await createTrackedWebsite(owner);
-
     const websiteB = await createTrackedWebsite(owner);
-
     const oldStart = new Date(Date.now() - 2 * 86_400_000);
 
     for (const website of [websiteA, websiteB]) {
@@ -300,13 +282,9 @@ describe('Analytics Retention E2E', () => {
 
   it('allows OWNER and ADMIN but denies DEVELOPER and VIEWER', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const admin = await registerWorkspaceTestUser(app, prisma);
-
     const developer = await registerWorkspaceTestUser(app, prisma);
-
     const viewer = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
 
     for (const [actor, role] of [
@@ -328,9 +306,7 @@ describe('Analytics Retention E2E', () => {
 
   it('requires authentication and hides foreign websites', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const foreignOwner = await registerWorkspaceTestUser(app, prisma);
-
     const website = await createTrackedWebsite(owner);
 
     expectAccessDenied(await runAnalyticsRetention(foreignOwner, owner.workspaceId, website.id));

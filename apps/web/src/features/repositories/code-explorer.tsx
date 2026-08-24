@@ -25,33 +25,19 @@ interface OpenTab {
 
 export function CodeExplorer({ workspaceId, repositoryId }: CodeExplorerProps) {
   const [repository, setRepository] = useState<RepositoryConnection | null>(null);
-
   const [branches, setBranches] = useState<RepositoryBranch[]>([]);
-
   const [branch, setBranch] = useState('');
-
   const [nodes, setNodes] = useState<CodeTreeNode[]>([]);
-
   const [truncated, setTruncated] = useState(false);
-
   const [tabs, setTabs] = useState<OpenTab[]>([]);
-
   const [activePath, setActivePath] = useState<string | null>(null);
-
   const [loading, setLoading] = useState(true);
-
   const [fileLoading, setFileLoading] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
-
   const [search, setSearch] = useState('');
-
   const [searchResults, setSearchResults] = useState<RepositorySearchMatch[]>([]);
-
   const [diff, setDiff] = useState<RepositoryDiffResponse | null>(null);
-
   const [diffMode, setDiffMode] = useState(false);
-
   /*
    * getRepositoryTree/getRepositoryCodeFile/etc. run in response to user
    * actions (branch switch, file click) that can fire again -- or the
@@ -60,7 +46,6 @@ export function CodeExplorer({ workspaceId, repositoryId }: CodeExplorerProps) {
    * state after unmount.
    */
   const mountedRef = useRef(true);
-
   const treeRequestIdRef = useRef(0);
 
   useEffect(() => {
@@ -72,7 +57,6 @@ export function CodeExplorer({ workspaceId, repositoryId }: CodeExplorerProps) {
   }, []);
 
   const activeFile = useMemo(() => tabs.find((tab) => tab.path === activePath)?.file ?? null, [tabs, activePath]);
-
   const loadTree = useCallback(
     async (selectedBranch: string) => {
       const requestId = treeRequestIdRef.current + 1;
@@ -91,7 +75,6 @@ export function CodeExplorer({ workspaceId, repositoryId }: CodeExplorerProps) {
     },
     [workspaceId, repositoryId],
   );
-
   const initialize = useCallback(async () => {
     setLoading(true);
 
@@ -173,7 +156,6 @@ export function CodeExplorer({ workspaceId, repositoryId }: CodeExplorerProps) {
   function closeTab(path: string): void {
     setTabs((current) => {
       const index = current.findIndex((tab) => tab.path === path);
-
       const next = current.filter((tab) => tab.path !== path);
 
       if (activePath === path) {
@@ -337,11 +319,7 @@ export function CodeExplorer({ workspaceId, repositoryId }: CodeExplorerProps) {
 
       {error ? <div className='border-b border-red-900 bg-red-950/60 px-4 py-2 text-xs text-red-300'>{error}</div> : null}
 
-      {truncated ? (
-        <div className='border-b border-amber-900 bg-amber-950/40 px-4 py-2 text-xs text-amber-300'>
-          GitHub returned a truncated repository tree. Some files may not appear.
-        </div>
-      ) : null}
+      {truncated ? <div className='border-b border-amber-900 bg-amber-950/40 px-4 py-2 text-xs text-amber-300'>GitHub returned a truncated repository tree. Some files may not appear.</div> : null}
 
       <div className='grid h-[calc(100vh-190px)] min-h-[620px] grid-cols-[280px_minmax(0,1fr)]'>
         <aside className='flex min-h-0 flex-col border-r border-slate-800 bg-slate-900'>
@@ -413,9 +391,7 @@ export function CodeExplorer({ workspaceId, repositoryId }: CodeExplorerProps) {
 
                       setDiffMode(false);
                     }}
-                    className={`flex h-10 max-w-56 items-center gap-2 border-r border-slate-800 px-3 text-xs ${
-                      tab.path === activePath ? 'bg-slate-950 text-white' : 'bg-slate-900 text-slate-400 hover:bg-slate-800'
-                    }`}
+                    className={`flex h-10 max-w-56 items-center gap-2 border-r border-slate-800 px-3 text-xs ${tab.path === activePath ? 'bg-slate-950 text-white' : 'bg-slate-900 text-slate-400 hover:bg-slate-800'}`}
                   >
                     <span className='truncate'>{tab.file.name}</span>
 

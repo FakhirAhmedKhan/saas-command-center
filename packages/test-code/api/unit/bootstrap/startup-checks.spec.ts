@@ -1,7 +1,7 @@
-import { assertStartupRequirements } from 'src/bootstrap/startup-checks';
-import { PrismaService } from 'src/database/prisma.service';
 import { Logger, type INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { assertStartupRequirements } from 'src/bootstrap/startup-checks';
+import { PrismaService } from 'src/database/prisma.service';
 
 interface AppOptions {
   nodeEnvironment?: string;
@@ -16,11 +16,9 @@ function createApp({ nodeEnvironment = 'test', cookieSecure = true, queryRaw = j
   const config = {
     get: (key: string) => (key === 'NODE_ENV' ? nodeEnvironment : cookieSecure),
   };
-
   const prisma = {
     $queryRaw: queryRaw,
   };
-
   const app = {
     get: (token: unknown) => {
       if (token === ConfigService) {
@@ -110,7 +108,6 @@ describe('assertStartupRequirements', () => {
     const { app } = createApp({
       queryRaw: jest.fn().mockReturnValue(new Promise(() => undefined)),
     });
-
     const assertion = expect(assertStartupRequirements(app)).rejects.toThrow('Database startup check timed out.');
 
     await jest.advanceTimersByTimeAsync(10_000);

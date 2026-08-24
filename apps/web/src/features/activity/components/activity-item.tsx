@@ -100,22 +100,13 @@ const ACTIVITY_ICONS = {
 
 export function ActivityItem({ workspaceId, activity, showApplication = false }: ActivityItemProps) {
   const metadataSummary = getMetadataSummary(activity);
-
   const activityLabel = ACTIVITY_TYPE_LABELS[activity.activityType];
-
   const entityLabel = ENTITY_TYPE_LABELS[activity.entityType];
-
   const badgeVariant = ACTIVITY_BADGE_VARIANTS[activity.activityType];
-
   const formattedDate = formatActivityDate(activity.createdAt);
-
   const relativeDate = formatRelativeActivityDate(activity.createdAt);
-
   const actorName = getActivityActorName(activity);
-
-  const applicationUrl = activity.applicationId
-    ? `/workspaces/${encodeURIComponent(workspaceId)}/applications/${encodeURIComponent(activity.applicationId)}`
-    : null;
+  const applicationUrl = activity.applicationId ? `/workspaces/${encodeURIComponent(workspaceId)}/applications/${encodeURIComponent(activity.applicationId)}` : null;
 
   return (
     <article className='group relative flex gap-4 pb-8 last:pb-0'>

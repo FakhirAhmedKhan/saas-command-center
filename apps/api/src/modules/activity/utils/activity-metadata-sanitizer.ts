@@ -1,8 +1,6 @@
 import { Prisma } from 'src/generated/prisma/client';
 
-const SECRET_KEY_PATTERN =
-  /^(password|passwordhash|token|accesstoken|refreshtoken|authorization|cookie|secret|clientsecret|apikey|privatekey|credentials|session|sessionid)$/i;
-
+const SECRET_KEY_PATTERN = /^(password|passwordhash|token|accesstoken|refreshtoken|authorization|cookie|secret|clientsecret|apikey|privatekey|credentials|session|sessionid)$/i;
 const MAX_DEPTH = 5;
 const MAX_OBJECT_KEYS = 40;
 const MAX_ARRAY_ITEMS = 40;
@@ -54,9 +52,7 @@ function sanitizeValue(value: unknown, depth: number): Prisma.InputJsonValue | u
 
   if (typeof value === 'object') {
     const source = value as Record<string, unknown>;
-
     const result: Record<string, Prisma.InputJsonValue> = {};
-
     const entries = Object.entries(source).slice(0, MAX_OBJECT_KEYS);
 
     for (const [key, item] of entries) {

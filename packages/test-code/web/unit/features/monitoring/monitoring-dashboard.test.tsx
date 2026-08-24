@@ -1,29 +1,22 @@
 // @vitest-environment jsdom
-import { MonitoringDashboard } from '@/features/monitoring/monitoring-dashboard';
 import type { HealthCheck, HealthIncident, MonitoringSummary, MonitoringTarget } from '@/features/monitoring/monitoring.types';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { MonitoringDashboard } from '@/features/monitoring/monitoring-dashboard';
 
-const {
-  getMonitoringSummaryMock,
-  getHealthChecksMock,
-  getHealthIncidentsMock,
-  getMonitoringTargetsMock,
-  updateHealthCheckMock,
-  runHealthCheckNowMock,
-  getHealthCheckHistoryMock,
-  createHealthCheckMock,
-} = vi.hoisted(() => ({
-  getMonitoringSummaryMock: vi.fn(),
-  getHealthChecksMock: vi.fn(),
-  getHealthIncidentsMock: vi.fn(),
-  getMonitoringTargetsMock: vi.fn(),
-  updateHealthCheckMock: vi.fn(),
-  runHealthCheckNowMock: vi.fn(),
-  getHealthCheckHistoryMock: vi.fn(),
-  createHealthCheckMock: vi.fn(),
-}));
+const { getMonitoringSummaryMock, getHealthChecksMock, getHealthIncidentsMock, getMonitoringTargetsMock, updateHealthCheckMock, runHealthCheckNowMock, getHealthCheckHistoryMock, createHealthCheckMock } = vi.hoisted(
+  () => ({
+    getMonitoringSummaryMock: vi.fn(),
+    getHealthChecksMock: vi.fn(),
+    getHealthIncidentsMock: vi.fn(),
+    getMonitoringTargetsMock: vi.fn(),
+    updateHealthCheckMock: vi.fn(),
+    runHealthCheckNowMock: vi.fn(),
+    getHealthCheckHistoryMock: vi.fn(),
+    createHealthCheckMock: vi.fn(),
+  }),
+);
 
 vi.mock('@/features/monitoring/monitoring-api', () => ({
   getMonitoringSummary: getMonitoringSummaryMock,

@@ -17,19 +17,12 @@ export default function EditWebsitePage() {
     workspaceId: string;
     websiteId: string;
   }>();
-
   const router = useRouter();
-
   const { workspaceId, websiteId } = params;
-
   const [website, setWebsite] = useState<Website | null>(null);
-
   const [applications, setApplications] = useState<SaasApplication[]>([]);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
-
   const detailsHref = `/workspaces/${workspaceId}/websites/${websiteId}`;
 
   useEffect(() => {
@@ -101,9 +94,7 @@ export default function EditWebsitePage() {
   }
 
   if (website.archivedAt) {
-    return (
-      <div className='rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-800'>Restore this website before editing its configuration.</div>
-    );
+    return <div className='rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-800'>Restore this website before editing its configuration.</div>;
   }
 
   return (

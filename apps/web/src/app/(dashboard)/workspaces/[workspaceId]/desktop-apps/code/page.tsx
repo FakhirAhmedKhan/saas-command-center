@@ -15,9 +15,7 @@ export default function DesktopCodePage() {
     workspaceId: string;
     desktopAppId: string;
   }>();
-
   const [overview, setOverview] = useState<DesktopAppOverview | null>(null);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -73,9 +71,7 @@ export default function DesktopCodePage() {
 
           <h2 className='mt-4 text-lg font-semibold text-slate-900'>Connect a repository first</h2>
 
-          <p className='mt-2 max-w-lg text-sm text-slate-500'>
-            The Desktop Code tab reuses the workspace Code Explorer. Connect a repository to this desktop application before browsing source.
-          </p>
+          <p className='mt-2 max-w-lg text-sm text-slate-500'>The Desktop Code tab reuses the workspace Code Explorer. Connect a repository to this desktop application before browsing source.</p>
 
           <Link href={`/workspaces/${params.workspaceId}/desktop-apps/${params.desktopAppId}`} className='mt-4 font-semibold text-brand-600'>
             Back to desktop overview

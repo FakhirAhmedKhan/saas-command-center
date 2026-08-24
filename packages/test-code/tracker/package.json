@@ -5,10 +5,14 @@
   "type": "module",
   "scripts": {
     "test": "pnpm --filter @command-center/tracker build && node scripts/test.mjs",
-    "test:cover": "node scripts/build-coverage.mjs && node scripts/test.mjs --coverage"
+    "test:cover": "node scripts/build-coverage.mjs && node scripts/test.mjs --coverage",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
+    "@command-center/eslint-config": "workspace:*",
     "esbuild": "^0.25.12",
+    "globals": "^17.11.0",
     "typescript": "^5.9.2"
   }
 }

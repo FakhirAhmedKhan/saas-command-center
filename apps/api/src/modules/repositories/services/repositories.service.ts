@@ -98,13 +98,8 @@ export class RepositoriesService {
   ): Promise<{
     repositoryCount: number;
   }> {
-    const [installation, repositories] = await Promise.all([
-      this.githubApp.getInstallation(externalInstallationId),
-      this.githubApp.listInstallationRepositories(externalInstallationId),
-    ]);
-
+    const [installation, repositories] = await Promise.all([this.githubApp.getInstallation(externalInstallationId), this.githubApp.listInstallationRepositories(externalInstallationId)]);
     const now = new Date();
-
     const localInstallation = await this.prisma.repositoryInstallation.upsert({
       where: {
         workspaceId_provider_externalInstallationId: {
@@ -131,7 +126,6 @@ export class RepositoriesService {
         lastSyncedAt: now,
       },
     });
-
     const BATCH_SIZE = 10;
 
     for (let index = 0; index < repositories.length; index += BATCH_SIZE) {
@@ -222,7 +216,6 @@ export class RepositoriesService {
         connectedAt: 'asc',
       },
     });
-
     let repositoryCount = 0;
 
     for (const installation of installations) {

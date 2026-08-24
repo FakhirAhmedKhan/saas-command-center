@@ -34,9 +34,7 @@ interface TreeItemProps {
 
 function TreeItem({ node, depth, activePath, onOpenFile }: TreeItemProps) {
   const [expanded, setExpanded] = useState(depth < 1);
-
   const directory = node.type === 'directory';
-
   const active = node.path === activePath;
 
   return (
@@ -54,22 +52,12 @@ function TreeItem({ node, depth, activePath, onOpenFile }: TreeItemProps) {
             onOpenFile(node.path);
           }
         }}
-        className={`flex h-8 w-full items-center gap-1.5 truncate px-2 text-left text-sm transition ${
-          active ? 'bg-slate-200 text-slate-950' : 'text-slate-700 hover:bg-slate-100'
-        }`}
+        className={`flex h-8 w-full items-center gap-1.5 truncate px-2 text-left text-sm transition ${active ? 'bg-slate-200 text-slate-950' : 'text-slate-700 hover:bg-slate-100'}`}
         style={{
           paddingLeft: `${8 + depth * 14}px`,
         }}
       >
-        {directory ? (
-          expanded ? (
-            <ChevronDown className='size-3.5 shrink-0' />
-          ) : (
-            <ChevronRight className='size-3.5 shrink-0' />
-          )
-        ) : (
-          <span className='w-3.5 shrink-0' />
-        )}
+        {directory ? expanded ? <ChevronDown className='size-3.5 shrink-0' /> : <ChevronRight className='size-3.5 shrink-0' /> : <span className='w-3.5 shrink-0' />}
 
         {directory ? <Folder className='size-4 shrink-0 text-amber-500' /> : <File className='size-4 shrink-0 text-slate-500' />}
 

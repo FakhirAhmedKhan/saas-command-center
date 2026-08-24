@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 
 export function NotificationBell() {
   const [count, setCount] = useState(0);
-
   const visible = usePageVisibility();
 
   useEffect(() => {
@@ -49,20 +48,12 @@ export function NotificationBell() {
   }, [visible]);
 
   return (
-    <Link
-      href='/notifications'
-      aria-label={`Notifications, ${count} unread`}
-      className='relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 bg-white'
-    >
+    <Link href='/notifications' aria-label={`Notifications, ${count} unread`} className='relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 bg-white'>
       <span aria-hidden='true' className='text-lg'>
         🔔
       </span>
 
-      {count > 0 ? (
-        <span className='absolute -right-1 -top-1 min-w-5 rounded-full bg-red-600 px-1.5 py-0.5 text-center text-[10px] font-bold text-white'>
-          {count > 99 ? '99+' : count}
-        </span>
-      ) : null}
+      {count > 0 ? <span className='absolute -right-1 -top-1 min-w-5 rounded-full bg-red-600 px-1.5 py-0.5 text-center text-[10px] font-bold text-white'>{count > 99 ? '99+' : count}</span> : null}
     </Link>
   );
 }

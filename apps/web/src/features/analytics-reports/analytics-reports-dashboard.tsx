@@ -29,7 +29,6 @@ interface AnalyticsReportsDashboardProps {
 }
 
 const numberFormatter = new Intl.NumberFormat('en-US');
-
 const MAIN_TABS: Array<{
   value: AnalyticsReportTab;
 
@@ -60,7 +59,6 @@ const MAIN_TABS: Array<{
     label: 'Events',
   },
 ];
-
 const TECHNOLOGY_OPTIONS: Array<{
   value: TechnologyDimension;
 
@@ -81,7 +79,6 @@ const TECHNOLOGY_OPTIONS: Array<{
     label: 'Operating systems',
   },
 ];
-
 const PRESET_OPTIONS: Array<{
   value: AnalyticsPreset;
 
@@ -249,7 +246,6 @@ function formatDuration(seconds: number): string {
   }
 
   const minutes = Math.floor(seconds / 60);
-
   const remainingSeconds = Math.round(seconds % 60);
 
   return `${minutes}m ${remainingSeconds}s`;
@@ -435,37 +431,21 @@ function DimensionReportTable({ report }: { report: DimensionReportResponse }) {
 
 export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsReportsDashboardProps) {
   const router = useRouter();
-
   const pathname = usePathname();
-
   const searchParams = useSearchParams();
-
   const tab = normalizeTab(searchParams.get('tab'));
-
   const dimension = normalizeTechnologyDimension(searchParams.get('dimension'));
-
   const preset = normalizePreset(searchParams.get('range'));
-
   const page = Math.max(1, Number(searchParams.get('page') ?? 1) || 1);
-
   const search = searchParams.get('search') ?? '';
-
   const sortBy = searchParams.get('sort') ?? getDefaultSort(tab);
-
   const sortDirection = normalizeDirection(searchParams.get('direction'));
-
   const [searchInput, setSearchInput] = useState(search);
-
   const [report, setReport] = useState<AnalyticsReportResponse | null>(null);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<unknown>(null);
-
   const [exporting, setExporting] = useState(false);
-
   const [exportError, setExportError] = useState<string | null>(null);
-
   const request = useMemo<AnalyticsReportRequest>(
     () => ({
       workspaceId,
@@ -582,7 +562,6 @@ export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsR
   }
 
   const sortOptions = getSortOptions(tab);
-
   const pagination = report?.pagination;
 
   return (
@@ -596,19 +575,11 @@ export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsR
           </div>
 
           <div className='flex flex-wrap gap-2'>
-            <Link
-              href={`/workspaces/${workspaceId}/websites/${websiteId}/analytics?range=${preset}`}
-              className='rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50'
-            >
+            <Link href={`/workspaces/${workspaceId}/websites/${websiteId}/analytics?range=${preset}`} className='rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50'>
               Overview
             </Link>
 
-            <button
-              type='button'
-              disabled={exporting}
-              onClick={() => void handleExport()}
-              className='rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60'
-            >
+            <button type='button' disabled={exporting} onClick={() => void handleExport()} className='rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60'>
               {exporting ? 'Exportingâ€¦' : 'Export CSV'}
             </button>
           </div>
@@ -632,9 +603,7 @@ export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsR
                   direction: 'desc',
                 });
               }}
-              className={`whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium ${
-                tab === item.value ? 'border-slate-950 text-slate-950' : 'border-transparent text-slate-500 hover:text-slate-900'
-              }`}
+              className={`whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium ${tab === item.value ? 'border-slate-950 text-slate-950' : 'border-transparent text-slate-500 hover:text-slate-900'}`}
             >
               {item.label}
             </button>
@@ -767,13 +736,7 @@ export function AnalyticsReportsDashboard({ workspaceId, websiteId }: AnalyticsR
             <span>{report.pagination.total} results</span>
           </div>
 
-          {isPageReport(report) ? (
-            <PageReportTable report={report} />
-          ) : isEventReport(report) ? (
-            <EventReportTable report={report} />
-          ) : (
-            <DimensionReportTable report={report} />
-          )}
+          {isPageReport(report) ? <PageReportTable report={report} /> : isEventReport(report) ? <EventReportTable report={report} /> : <DimensionReportTable report={report} />}
 
           <div className='flex items-center justify-between gap-4 border-t border-slate-200 px-4 py-4'>
             <button

@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 
-import { DesktopAppForm } from '@/features/desktop-apps/desktop-app-form';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { DesktopAppForm } from '@/features/desktop-apps/desktop-app-form';
 
 describe('DesktopAppForm', () => {
   it('submits normalized desktop application data', async () => {

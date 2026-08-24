@@ -22,14 +22,7 @@ import type {
   MobileTestRunInput,
 } from '@command-center/shared-types';
 import { apiRequest } from '@/features/lib/api/api-client';
-import type {
-  MobileProjectDetectionResponse,
-  CreateMobileApplicationInput,
-  MobileApplicationDetails,
-  RepositoryConnection,
-  UpdateMobileApplicationInput,
-  MobileAppOverview,
-} from '@command-center/shared-types';
+import type { MobileProjectDetectionResponse, CreateMobileApplicationInput, MobileApplicationDetails, RepositoryConnection, UpdateMobileApplicationInput, MobileAppOverview } from '@command-center/shared-types';
 
 export function createMobileApp(workspaceId: string, payload: CreateMobileApplicationInput) {
   return apiRequest<MobileApplicationDetails>(`/workspaces/${workspaceId}/mobile-apps`, {
@@ -198,9 +191,7 @@ export function getMobilePerformanceSummary(workspaceId: string, mobileAppId: st
 }
 
 export function getMobilePerformanceVersions(workspaceId: string, mobileAppId: string, filters: MobilePerformanceFilters = {}) {
-  return apiRequest<MobilePerformanceVersionSummary[]>(
-    `/workspaces/${workspaceId}/mobile-apps/${mobileAppId}/performance/versions${performanceParams(filters)}`,
-  );
+  return apiRequest<MobilePerformanceVersionSummary[]>(`/workspaces/${workspaceId}/mobile-apps/${mobileAppId}/performance/versions${performanceParams(filters)}`);
 }
 
 export function getMobilePerformanceIssues(workspaceId: string, mobileAppId: string, filters: MobilePerformanceFilters = {}) {

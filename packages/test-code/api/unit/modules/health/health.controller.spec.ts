@@ -8,7 +8,6 @@ describe('HealthController', () => {
 
   it('returns a public liveness payload without touching the database', () => {
     const getReadiness = jest.fn();
-
     const controller = createController({
       getPublicHealth: jest.fn().mockReturnValue({
         status: 'ok',
@@ -17,7 +16,6 @@ describe('HealthController', () => {
 
       getReadiness,
     });
-
     const result = controller.getPublicHealth();
 
     expect(result).toEqual({
@@ -40,7 +38,6 @@ describe('HealthController', () => {
         responseTimeMs: 12,
       },
     };
-
     const controller = createController({
       getReadiness: jest.fn().mockResolvedValue(readiness),
     });
@@ -50,7 +47,6 @@ describe('HealthController', () => {
 
   it('propagates a readiness failure instead of swallowing it', async () => {
     const failure = new Error('Database is unavailable.');
-
     const controller = createController({
       getReadiness: jest.fn().mockRejectedValue(failure),
     });

@@ -26,9 +26,7 @@ export class PageViewRebuilderService {
         },
       ],
     });
-
     const firstPage = pageViews[0] ?? null;
-
     const lastPage = pageViews.at(-1) ?? null;
 
     await transaction.analyticsPageView.updateMany({

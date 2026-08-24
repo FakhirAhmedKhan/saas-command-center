@@ -68,7 +68,6 @@ test.describe('Batch 11 real authentication', () => {
     const context = await browser.newContext({
       storageState: state.owner.storageStatePath,
     });
-
     const page = await context.newPage();
 
     await page.goto('/dashboard');

@@ -1,9 +1,9 @@
-import type { INestApplication } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
 import { API, createDesktopApp } from './helpers/desktop-test-fixtures';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
 import request from 'supertest';
 
 function desktopBase(workspaceId: string, desktopAppId: string) {
@@ -28,7 +28,6 @@ describe('Desktop Phase 17 Security E2E', () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
     const desktop = await createDesktopApp(owner);
     const base = desktopBase(owner.workspaceId, desktop.id);
-
     const paths = [
       base,
       `${base}/overview`,
@@ -55,7 +54,6 @@ describe('Desktop Phase 17 Security E2E', () => {
     const workspaceB = await registerWorkspaceTestUser(app, prisma);
     const desktopB = await createDesktopApp(workspaceB);
     const base = desktopBase(workspaceB.workspaceId, desktopB.id);
-
     const paths = [
       base,
       `${base}/overview`,
@@ -143,7 +141,6 @@ describe('Desktop Phase 17 Security E2E', () => {
       .get(`${desktopBase(owner.workspaceId, desktop.id)}/permissions`)
       .set('Authorization', `Bearer ${owner.accessToken}`)
       .expect(200);
-
     const alerts = await owner.agent
       .get(`${desktopBase(owner.workspaceId, desktop.id)}/alerts/incidents`)
       .set('Authorization', `Bearer ${owner.accessToken}`)

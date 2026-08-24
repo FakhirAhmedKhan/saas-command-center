@@ -124,15 +124,10 @@ export class MobileBuildsService {
     }
 
     const input = rawInput as BuildInput;
-
     const repositoryId = this.requiredString(input.repositoryId, 'repositoryId');
-
     const workflowRunId = this.requiredString(input.workflowRunId, 'workflowRunId');
-
     const commitSha = this.requiredString(input.commitSha ?? input.headSha, 'commitSha');
-
     const branch = this.requiredString(input.branch ?? input.headBranch, 'branch');
-
     const repository = await this.prisma.repositoryConnection.findFirst({
       where: {
         id: repositoryId,
@@ -151,15 +146,10 @@ export class MobileBuildsService {
     }
 
     const status = this.normalizeStatus(input.status, input.conclusion);
-
     const startedAt = this.optionalDate(input.startedAt);
-
     const completedAt = this.optionalDate(input.completedAt);
-
     const suppliedDurationMs = this.optionalNumber(input.durationMs);
-
     const durationMs = suppliedDurationMs ?? (startedAt && completedAt ? Math.max(0, completedAt.getTime() - startedAt.getTime()) : null);
-
     const build = await this.prisma.mobileBuild.upsert({
       where: {
         repositoryId_workflowRunId: {
@@ -277,7 +267,6 @@ export class MobileBuildsService {
 
   private normalizeStatus(status: unknown, conclusion: unknown): MobileBuildStatus {
     const normalized = typeof status === 'string' ? status.toLowerCase() : '';
-
     const result = typeof conclusion === 'string' ? conclusion.toLowerCase() : '';
 
     if (result === 'success' || normalized === 'success') {

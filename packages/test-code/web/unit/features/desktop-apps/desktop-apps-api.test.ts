@@ -1,10 +1,7 @@
-import { archiveDesktopApp, createDesktopApp, getDesktopApp, listDesktopApps, updateDesktopApp } from '@/features/desktop-apps/desktop-apps-api';
-
-import { apiRequest } from '@/features/lib/api/api-client';
-
 import type { CreateDesktopApplicationInput, UpdateDesktopApplicationInput } from '@command-center/shared-types';
-
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { archiveDesktopApp, createDesktopApp, getDesktopApp, listDesktopApps, updateDesktopApp } from '@/features/desktop-apps/desktop-apps-api';
+import { apiRequest } from '@/features/lib/api/api-client';
 
 vi.mock('@/features/lib/api/api-client', () => ({
   apiRequest: vi.fn(),

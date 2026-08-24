@@ -24,7 +24,6 @@ export class MobilePermissionsService {
     }
 
     const canWrite = membership.role === WorkspaceRole.OWNER || membership.role === WorkspaceRole.ADMIN || membership.role === WorkspaceRole.DEVELOPER;
-
     const canAdmin = membership.role === WorkspaceRole.OWNER || membership.role === WorkspaceRole.ADMIN;
 
     return {

@@ -16,7 +16,6 @@ export function DesktopDependencies({ workspaceId, desktopAppId }: Props) {
   const [loading, setLoading] = useState(true);
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const load = useCallback(async () => {
     try {
       setDependencies(await listDesktopDependencies(workspaceId, desktopAppId));
@@ -57,12 +56,7 @@ export function DesktopDependencies({ workspaceId, desktopAppId }: Props) {
           <h2 className='text-lg font-semibold text-slate-950'>Dependencies</h2>
           <p className='mt-1 text-sm text-slate-500'>Repository manifests normalized across npm, Cargo, NuGet, Maven, Gradle, Conan and vcpkg.</p>
         </div>
-        <button
-          type='button'
-          disabled={scanning}
-          onClick={() => void scan()}
-          className='inline-flex h-10 items-center gap-2 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white disabled:opacity-50'
-        >
+        <button type='button' disabled={scanning} onClick={() => void scan()} className='inline-flex h-10 items-center gap-2 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white disabled:opacity-50'>
           {scanning ? <Loader2 className='size-4 animate-spin' /> : <RefreshCw className='size-4' />}
           Scan Repository
         </button>
@@ -79,9 +73,7 @@ export function DesktopDependencies({ workspaceId, desktopAppId }: Props) {
           <Loader2 className='size-4 animate-spin' /> Loading dependencies...
         </div>
       ) : dependencies.length === 0 ? (
-        <div className='mt-6 rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500'>
-          No dependency inventory yet. Run a repository scan.
-        </div>
+        <div className='mt-6 rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500'>No dependency inventory yet. Run a repository scan.</div>
       ) : (
         <div className='mt-6 overflow-x-auto'>
           <table className='min-w-full text-left text-sm'>

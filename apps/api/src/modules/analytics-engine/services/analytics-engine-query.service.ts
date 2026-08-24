@@ -9,20 +9,7 @@ export class AnalyticsEngineQueryService {
 
   async getStatus(workspaceId: string, websiteId: string) {
     const website = await this.requireWebsite(workspaceId, websiteId);
-
-    const [
-      rawEvents,
-      pendingRawEvents,
-      visitors,
-      sessions,
-      normalizedEvents,
-      pageViews,
-      hourlyAggregates,
-      dailyAggregates,
-      processingState,
-      latestRun,
-      recentSessions,
-    ] = await this.prisma.$transaction([
+    const [rawEvents, pendingRawEvents, visitors, sessions, normalizedEvents, pageViews, hourlyAggregates, dailyAggregates, processingState, latestRun, recentSessions] = await this.prisma.$transaction([
       this.prisma.rawAnalyticsEvent.count({
         where: {
           websiteId,
@@ -141,11 +128,8 @@ export class AnalyticsEngineQueryService {
     await this.requireWebsite(workspaceId, websiteId);
 
     const now = new Date();
-
     const defaultDays = query.period === AnalyticsAggregatePeriod.HOURLY ? 7 : 30;
-
     const dateFrom = query.dateFrom ? new Date(query.dateFrom) : new Date(now.getTime() - defaultDays * 86_400_000);
-
     const dateTo = query.dateTo ? new Date(query.dateTo) : now;
 
     if (dateFrom > dateTo) {
@@ -234,9 +218,7 @@ export class AnalyticsEngineQueryService {
       ...aggregate,
 
       totalDurationMs:
-        aggregate.totalDurationMs <= BigInt(Number.MAX_SAFE_INTEGER) && aggregate.totalDurationMs >= BigInt(Number.MIN_SAFE_INTEGER)
-          ? Number(aggregate.totalDurationMs)
-          : aggregate.totalDurationMs.toString(),
+        aggregate.totalDurationMs <= BigInt(Number.MAX_SAFE_INTEGER) && aggregate.totalDurationMs >= BigInt(Number.MIN_SAFE_INTEGER) ? Number(aggregate.totalDurationMs) : aggregate.totalDurationMs.toString(),
     };
   }
 

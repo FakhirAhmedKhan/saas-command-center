@@ -40,9 +40,7 @@ test.describe('Desktop Phase 18 final frontend', () => {
   test('renders Alerts with loading, empty, create, incident, and responsive navigation states', async ({ page, request }) => {
     await loginThroughUi(page, state.owner);
     const desktop = await createDesktopApp(request);
-
     const apiBase = `/api/v1/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktop.id}`;
-
     let rules: Array<Record<string, unknown>> = [];
     let incidents: Array<Record<string, unknown>> = [];
 
@@ -159,7 +157,6 @@ test.describe('Desktop Phase 18 final frontend', () => {
   test('renders evidence-grounded AI analysis and never renders a secret', async ({ page, request }) => {
     await loginThroughUi(page, state.owner);
     const desktop = await createDesktopApp(request);
-
     const apiBase = `/api/v1/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktop.id}`;
 
     await page.route(`**${apiBase}/permissions`, (route) =>
@@ -233,7 +230,6 @@ test.describe('Desktop Phase 18 final frontend', () => {
   test('shows read-only desktop controls for a viewer', async ({ page, request }) => {
     await loginThroughUi(page, state.owner);
     const desktop = await createDesktopApp(request);
-
     const apiBase = `/api/v1/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktop.id}`;
 
     await page.route(`**${apiBase}/permissions`, (route) =>

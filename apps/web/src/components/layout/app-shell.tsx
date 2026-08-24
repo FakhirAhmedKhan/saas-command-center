@@ -2,27 +2,9 @@
 
 import { WorkspaceSwitcher } from './workspace-switcher';
 import { useAuth } from '@/features/auth/auth-provider';
-import { NotificationBell } from '@/features/team-operations/notification-bell';
 import { cn } from '@command-center/ui';
-import {
-  Activity,
-  Boxes,
-  Building2,
-  GitBranch,
-  Globe2,
-  LayoutDashboard,
-  LogOut,
-  Menu,
-  Monitor,
-  PanelLeftClose,
-  PanelLeftOpen,
-  Radio,
-  Search,
-  Settings,
-  Smartphone,
-  X,
-  type LucideIcon,
-} from 'lucide-react';
+import { Activity, Boxes, Building2, GitBranch, Globe2, LayoutDashboard, LogOut, Menu, Monitor, PanelLeftClose, PanelLeftOpen, Radio, Settings, Smartphone, X, type LucideIcon } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -124,7 +106,6 @@ interface SidebarContentProps {
 
 function SidebarContent({ pathname, workspaceId, collapsed = false, onNavigate }: SidebarContentProps) {
   const { user, logout } = useAuth();
-
   const router = useRouter();
 
   async function handleLogout(): Promise<void> {
@@ -140,15 +121,21 @@ function SidebarContent({ pathname, workspaceId, collapsed = false, onNavigate }
           href='/dashboard'
           onClick={onNavigate}
           title={collapsed ? 'SaaS Command Center' : undefined}
-          className={cn('flex h-11 items-center rounded-xl transition hover:bg-slate-50', collapsed ? 'justify-center' : 'gap-3 px-2')}
+          className={cn('group flex h-12 items-center rounded-xl transition-all duration-200', 'hover:bg-slate-100/80', collapsed ? 'justify-center px-0' : 'gap-3 px-3')}
         >
-          <span className='flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-[11px] font-bold text-white shadow-sm'>SC</span>
+          {/* Logo */}
+          <div className={cn('flex shrink-0 items-center justify-center rounded-lg transition-all duration-200', collapsed ? 'h-9 w-9' : 'h-9 w-9')}>
+            <Image src='/icon.svg' alt='SaaS Command Center' width={36} height={36} priority className='h-9 w-9 object-contain' />
+          </div>
 
-          {!collapsed ? (
-            <div className='min-w-0'>
-              <p className='truncate text-[13px] font-bold text-slate-950'>SaaS Command Center</p>
+          {/* Brand */}
+          <div className={cn('min-w-0 overflow-hidden transition-all duration-200', collapsed ? 'w-0 opacity-0' : 'w-auto opacity-100')}>
+            <div className='flex flex-col leading-none'>
+              <span className='truncate text-sm font-bold tracking-tight text-slate-950'>SaaS Command Center</span>
+
+              <span className='mt-1 text-[10px] font-medium uppercase tracking-wider text-slate-400'>Command Center</span>
             </div>
-          ) : null}
+          </div>
         </Link>
 
         {workspaceId && !collapsed ? (
@@ -177,16 +164,11 @@ function SidebarContent({ pathname, workspaceId, collapsed = false, onNavigate }
         {workspaceId
           ? NAV_GROUPS.map((group) => (
               <section key={group.label} className='mb-5 last:mb-0'>
-                {!collapsed ? (
-                  <p className='mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400'>{group.label}</p>
-                ) : (
-                  <div className='mx-auto mb-2 h-px w-7 bg-slate-200' />
-                )}
+                {!collapsed ? <p className='mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400'>{group.label}</p> : <div className='mx-auto mb-2 h-px w-7 bg-slate-200' />}
 
                 <div className='space-y-1'>
                   {group.items.map((item) => {
                     const Icon = item.icon;
-
                     const isActive = item.match(pathname, workspaceId);
 
                     return (
@@ -218,10 +200,7 @@ function SidebarContent({ pathname, workspaceId, collapsed = false, onNavigate }
 
       <div className={cn('shrink-0 border-t border-slate-200 bg-white py-4', collapsed ? 'px-2' : 'px-3')}>
         <div className={cn('flex items-center rounded-xl', collapsed ? 'flex-col gap-2' : 'gap-2.5 px-2')}>
-          <div
-            title={collapsed ? user?.displayName || user?.email || 'Account' : undefined}
-            className='flex size-9 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white'
-          >
+          <div title={collapsed ? user?.displayName || user?.email || 'Account' : undefined} className='flex size-9 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white'>
             {(user?.displayName || user?.email || 'U').charAt(0).toUpperCase()}
           </div>
 
@@ -250,11 +229,8 @@ function SidebarContent({ pathname, workspaceId, collapsed = false, onNavigate }
 
 export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
-
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-
   const [desktopNavCollapsed, setDesktopNavCollapsed] = useState(false);
-
   const workspaceId = pathname.match(/\/workspaces\/([^/]+)/)?.[1] ?? '';
 
   return (
@@ -288,12 +264,7 @@ export function AppShell({ children }: AppShellProps) {
 
         {mobileNavOpen ? (
           <div className='fixed inset-0 z-50 lg:hidden'>
-            <button
-              type='button'
-              aria-label='Close navigation'
-              className='absolute inset-0 bg-slate-950/40 backdrop-blur-[1px]'
-              onClick={() => setMobileNavOpen(false)}
-            />
+            <button type='button' aria-label='Close navigation' className='absolute inset-0 bg-slate-950/40 backdrop-blur-[1px]' onClick={() => setMobileNavOpen(false)} />
 
             <aside className='absolute inset-y-0 left-0 h-dvh w-[300px] max-w-[86vw] bg-white shadow-2xl'>
               <SidebarContent pathname={pathname} workspaceId={workspaceId} onNavigate={() => setMobileNavOpen(false)} />

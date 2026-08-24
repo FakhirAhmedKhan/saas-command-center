@@ -69,9 +69,7 @@ export class GithubWebhookService {
     }
 
     const externalInstallationId = payload.installation?.id !== undefined ? String(payload.installation.id) : null;
-
     const externalRepoId = payload.repository?.id !== undefined ? String(payload.repository.id) : null;
-
     let deliveryRecordId: string;
 
     try {
@@ -156,7 +154,6 @@ export class GithubWebhookService {
 
   private verifySignature(rawBody: Buffer, signature: string): void {
     const expected = `sha256=${createHmac('sha256', this.githubApp.getWebhookSecret()).update(rawBody).digest('hex')}`;
-
     const providedBuffer = Buffer.from(signature, 'utf8');
     const expectedBuffer = Buffer.from(expected, 'utf8');
 

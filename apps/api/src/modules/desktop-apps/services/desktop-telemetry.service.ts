@@ -42,7 +42,6 @@ export class DesktopTelemetryService {
 
     const safeUrl = await this.urls.assertSafe(dto.endpointUrl.trim());
     const encrypted = this.secrets.encrypt(dto.secret);
-
     const integration = await this.prisma.desktopTelemetryIntegration.upsert({
       where: {
         desktopAppId_provider: {
@@ -76,7 +75,6 @@ export class DesktopTelemetryService {
 
   async preview(workspaceId: string, desktopAppId: string, integrationId: string) {
     const integration = await this.requireIntegration(workspaceId, desktopAppId, integrationId);
-
     const adapter = this.providers.get();
 
     try {

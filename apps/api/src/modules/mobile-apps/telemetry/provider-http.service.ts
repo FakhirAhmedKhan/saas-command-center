@@ -10,7 +10,6 @@ export class ProviderHttpService {
     timeoutMs = 15000,
   ): Promise<T> {
     const controller = new AbortController();
-
     const timer = setTimeout(() => controller.abort(), timeoutMs);
 
     try {

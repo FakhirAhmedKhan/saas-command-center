@@ -15,19 +15,12 @@ export default function MobileCodePage() {
     workspaceId: string;
     mobileAppId: string;
   }>();
-
   const workspaceId = params.workspaceId;
-
   const mobileAppId = params.mobileAppId;
-
   const baseHref = `/workspaces/${workspaceId}` + `/mobile-apps/${mobileAppId}`;
-
   const [overview, setOverview] = useState<MobileAppOverview | null>(null);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
-
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -102,10 +95,7 @@ export default function MobileCodePage() {
 
           <p className='mt-2 max-w-md text-sm leading-6 text-slate-500'>This mobile application does not currently have a GitHub repository connected.</p>
 
-          <Link
-            href={`${baseHref}#settings`}
-            className='mt-5 inline-flex h-10 items-center rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700'
-          >
+          <Link href={`${baseHref}#settings`} className='mt-5 inline-flex h-10 items-center rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700'>
             Connect Repository
           </Link>
         </section>

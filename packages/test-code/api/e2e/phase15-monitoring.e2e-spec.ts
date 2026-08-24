@@ -2,11 +2,11 @@
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { readAccessToken, readResourceId } from '../helpers/response';
+import type { INestApplication } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
 import { PrismaService } from 'src/database/prisma.service';
 import { ApplicationCategory, ApplicationStatus, HealthCheckStatus, HealthIncidentStatus, HealthTargetType, WorkspaceRole } from 'src/generated/prisma/enums';
 import { HealthCheckRunnerService } from 'src/modules/monitoring/services/health-check-runner.service';
-import type { INestApplication } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
 import request, { type Response } from 'supertest';
 
 /**
@@ -81,7 +81,6 @@ import request, { type Response } from 'supertest';
  */
 
 const API_PREFIX = '/api/v1';
-
 // RFC 2606 reserved TLD guaranteed to never resolve ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â used to deterministically exercise the
 // REAL HealthCheckRunnerService failure path without depending on any external network service.
 const UNRESOLVABLE_URL = 'https://phase15-guaranteed-unresolvable.invalid/health';
@@ -134,11 +133,9 @@ describe('Phase 15 Monitoring E2E', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let runner: HealthCheckRunnerService;
-
   let workspaceId: string;
   let applicationId: string;
   let websiteId: string;
-
   let ownerAccessToken: string;
   let developerAccessToken: string;
   let viewerAccessToken: string;
@@ -178,7 +175,6 @@ describe('Phase 15 Monitoring E2E', () => {
 
   async function createCheck(token: string, overrides: Partial<Record<string, unknown>> = {}): Promise<Response> {
     const requestedUrl = overrides.url;
-
     /*
      * UNRESOLVABLE_URL is used only for runner-failure tests.
      *
@@ -192,7 +188,6 @@ describe('Phase 15 Monitoring E2E', () => {
      * URL directly in the test database.
      */
     const simulateDnsFailureAfterCreation = requestedUrl === UNRESOLVABLE_URL;
-
     const response = await request(app.getHttpServer())
       .post(checksUrl())
       .set(withBearer(token))
@@ -243,7 +238,6 @@ describe('Phase 15 Monitoring E2E', () => {
       name: 'Phase 15 Owner',
       workspaceName: 'Phase 15 Workspace',
     });
-
     const ownerRegistration = await registerUser(createAgent(app), owner);
 
     expect(ownerRegistration.status).toBe(201);
@@ -260,9 +254,7 @@ describe('Phase 15 Monitoring E2E', () => {
       where: { email: owner.email.toLowerCase() },
       select: { id: true },
     });
-
     const ownerId = requireValue(ownerRecord?.id, 'Phase 15 owner was not persisted');
-
     const ownerMembership = await prisma.workspaceMember.findFirst({
       where: { userId: ownerId, role: WorkspaceRole.OWNER },
       select: { workspaceId: true },
@@ -274,7 +266,6 @@ describe('Phase 15 Monitoring E2E', () => {
       name: 'Phase 15 Developer',
       workspaceName: 'Phase 15 Developer Workspace',
     });
-
     const developerRegistration = await registerUser(createAgent(app), developer);
 
     expect(developerRegistration.status).toBe(201);
@@ -298,7 +289,6 @@ describe('Phase 15 Monitoring E2E', () => {
       name: 'Phase 15 Viewer',
       workspaceName: 'Phase 15 Viewer Workspace',
     });
-
     const viewerRegistration = await registerUser(createAgent(app), viewer);
 
     expect(viewerRegistration.status).toBe(201);
@@ -322,7 +312,6 @@ describe('Phase 15 Monitoring E2E', () => {
       name: 'Phase 15 Outsider',
       workspaceName: 'Phase 15 Outsider Workspace',
     });
-
     const outsiderRegistration = await registerUser(createAgent(app), outsider);
 
     expect(outsiderRegistration.status).toBe(201);
@@ -435,9 +424,7 @@ describe('Phase 15 Monitoring E2E', () => {
 
   it('retrieves a single check by id', async () => {
     const createResponse = await createCheck(ownerAccessToken, { name: 'Phase 15 Detail Check' });
-
     const checkId = body(createResponse).id as string;
-
     const response = await request(app.getHttpServer()).get(checkUrl(checkId)).set(withBearer(ownerAccessToken));
 
     expect(response.status).toBe(200);
@@ -446,13 +433,8 @@ describe('Phase 15 Monitoring E2E', () => {
 
   it('updates a check and reflects the new configuration', async () => {
     const createResponse = await createCheck(ownerAccessToken, { name: 'Phase 15 Update Check' });
-
     const checkId = body(createResponse).id as string;
-
-    const response = await request(app.getHttpServer())
-      .patch(checkUrl(checkId))
-      .set(withBearer(ownerAccessToken))
-      .send({ name: 'Phase 15 Renamed Check', intervalSeconds: 600 });
+    const response = await request(app.getHttpServer()).patch(checkUrl(checkId)).set(withBearer(ownerAccessToken)).send({ name: 'Phase 15 Renamed Check', intervalSeconds: 600 });
 
     expect(response.status).toBe(200);
     expect(body(response)).toMatchObject({ name: 'Phase 15 Renamed Check', intervalSeconds: 600 });
@@ -468,7 +450,6 @@ describe('Phase 15 Monitoring E2E', () => {
       name: 'Phase 15 Disable Check',
       failureThreshold: 1,
     });
-
     const checkId = body(createResponse).id as string;
 
     // Directly seed an OPEN incident to verify the disable path resolves it (no delete endpoint
@@ -583,7 +564,6 @@ describe('Phase 15 Monitoring E2E', () => {
 
   it('rejects a check referencing an application from a different workspace', async () => {
     const foreignWorkspaceName = `Phase 15 Foreign Workspace ${randomUUID()}`;
-
     const workspaceResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces`).set(withBearer(outsiderAccessToken)).send({
       name: foreignWorkspaceName,
     });
@@ -591,7 +571,6 @@ describe('Phase 15 Monitoring E2E', () => {
     expect(workspaceResponse.status).toBe(201);
 
     const outsiderWorkspaceId = readResourceId(workspaceResponse);
-
     const outsiderApplication = await prisma.saasApplication.create({
       data: {
         workspaceId: outsiderWorkspaceId,
@@ -605,7 +584,6 @@ describe('Phase 15 Monitoring E2E', () => {
         id: true,
       },
     });
-
     const response = await createCheck(ownerAccessToken, {
       applicationId: outsiderApplication.id,
     });
@@ -651,13 +629,8 @@ describe('Phase 15 Monitoring E2E', () => {
     const createResponse = await createCheck(ownerAccessToken, {
       name: 'Phase 15 URL Update Check',
     });
-
     const checkId = body(createResponse).id as string;
-
-    const response = await request(app.getHttpServer())
-      .patch(checkUrl(checkId))
-      .set(withBearer(ownerAccessToken))
-      .send({ url: 'http://127.0.0.1:9999/health' });
+    const response = await request(app.getHttpServer()).patch(checkUrl(checkId)).set(withBearer(ownerAccessToken)).send({ url: 'http://127.0.0.1:9999/health' });
 
     expect(response.status).toBe(400);
 
@@ -686,9 +659,7 @@ describe('Phase 15 Monitoring E2E', () => {
     const createResponse = await createCheck(ownerAccessToken, {
       name: 'Phase 15 Viewer Update Target',
     });
-
     const checkId = body(createResponse).id as string;
-
     const response = await request(app.getHttpServer()).patch(checkUrl(checkId)).set(withBearer(viewerAccessToken)).send({ name: 'Should not apply' });
 
     expect(response.status).toBe(403);
@@ -708,9 +679,7 @@ describe('Phase 15 Monitoring E2E', () => {
     const createResponse = await createCheck(ownerAccessToken, {
       name: 'Phase 15 Viewer Run Target',
     });
-
     const checkId = body(createResponse).id as string;
-
     const response = await request(app.getHttpServer()).post(runUrl(checkId)).set(withBearer(viewerAccessToken));
 
     expect(response.status).toBe(403);
@@ -752,7 +721,6 @@ describe('Phase 15 Monitoring E2E', () => {
     expect(createResponse.status).toBe(201);
 
     const checkId = body(createResponse).id as string;
-
     // Runs the REAL HealthCheckRunnerService.run() end to end (real HTTP attempt -> DNS
     // resolution failure -> DOWN classification -> history write -> healthCheck update).
     const result = await runner.run(workspaceId, checkId);
@@ -790,7 +758,6 @@ describe('Phase 15 Monitoring E2E', () => {
       name: 'Phase 15 Viewer History Check',
       url: UNRESOLVABLE_URL,
     });
-
     const checkId = body(createResponse).id as string;
 
     await runner.run(workspaceId, checkId);
@@ -810,7 +777,6 @@ describe('Phase 15 Monitoring E2E', () => {
       url: UNRESOLVABLE_URL,
       failureThreshold: 2,
     });
-
     const checkId = body(createResponse).id as string;
 
     // First failure: below threshold, no incident yet.
@@ -853,7 +819,6 @@ describe('Phase 15 Monitoring E2E', () => {
       url: UNRESOLVABLE_URL,
       failureThreshold: 1,
     });
-
     const checkId = body(createResponse).id as string;
 
     await runner.run(workspaceId, checkId);
@@ -914,9 +879,7 @@ describe('Phase 15 Monitoring E2E', () => {
   });
 
   it('filters incidents by status', async () => {
-    const resolvedOnlyResponse = await request(app.getHttpServer())
-      .get(`${incidentsUrl()}?status=${HealthIncidentStatus.RESOLVED}`)
-      .set(withBearer(ownerAccessToken));
+    const resolvedOnlyResponse = await request(app.getHttpServer()).get(`${incidentsUrl()}?status=${HealthIncidentStatus.RESOLVED}`).set(withBearer(ownerAccessToken));
 
     expect(resolvedOnlyResponse.status).toBe(200);
     expect(arrayBody(resolvedOnlyResponse).every((incident) => incident.status === HealthIncidentStatus.RESOLVED)).toBe(true);
@@ -941,9 +904,7 @@ describe('Phase 15 Monitoring E2E', () => {
     expect(createResponse.status).toBe(201);
 
     const checkId = body(createResponse).id as string;
-
     const detailResponse = await request(app.getHttpServer()).get(checkUrl(checkId)).set(withBearer(ownerAccessToken));
-
     const raw = JSON.stringify(detailResponse.body);
 
     expect(raw).not.toContain('JWT_ACCESS_SECRET');
@@ -957,13 +918,11 @@ describe('Phase 15 Monitoring E2E', () => {
       name: 'Phase 15 History Privacy Check',
       url: UNRESOLVABLE_URL,
     });
-
     const checkId = body(createResponse).id as string;
 
     await runner.run(workspaceId, checkId);
 
     const historyResponse = await request(app.getHttpServer()).get(historyUrl(checkId)).set(withBearer(ownerAccessToken));
-
     const raw = JSON.stringify(historyResponse.body);
 
     expect(raw).not.toMatch(/authorization/i);
@@ -1004,9 +963,7 @@ describe('Phase 15 Monitoring E2E', () => {
 
     expect(summary.canManage).toBe(true);
     expect(typeof summary.total).toBe('number');
-    expect(summary.total).toBe(
-      (summary.healthy as number) + (summary.degraded as number) + (summary.down as number) + (summary.unknown as number) + (summary.disabled as number),
-    );
+    expect(summary.total).toBe((summary.healthy as number) + (summary.degraded as number) + (summary.down as number) + (summary.unknown as number) + (summary.disabled as number));
   });
 
   it('lists available monitoring targets (applications and websites)', async () => {

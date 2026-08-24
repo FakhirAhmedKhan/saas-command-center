@@ -8,7 +8,6 @@ export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement
 
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox({ className, label, id, ...props }, ref) {
   const checkboxId = id ?? props.name ?? undefined;
-
   const input = (
     <span className='relative inline-flex size-4 shrink-0 items-center justify-center'>
       <input

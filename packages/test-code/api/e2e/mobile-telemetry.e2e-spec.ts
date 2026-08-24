@@ -1,16 +1,12 @@
-import type { INestApplication } from '@nestjs/common';
-
-import { PrismaService } from 'src/database/prisma.service';
-import { MobileTelemetryProvider } from 'src/generated/prisma/enums';
-
-import type { MobileTelemetryProviderAdapter, MobileTelemetryProviderContext } from 'src/modules/mobile-apps/telemetry/mobile-telemetry-provider.interface';
-
-import { MobileTelemetryProviderRegistry } from 'src/modules/mobile-apps/telemetry/mobile-telemetry-provider.registry';
-
 import { withBearer } from '../helpers/auth';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { MobileTelemetryProvider } from 'src/generated/prisma/enums';
+import type { MobileTelemetryProviderAdapter, MobileTelemetryProviderContext } from 'src/modules/mobile-apps/telemetry/mobile-telemetry-provider.interface';
+import { MobileTelemetryProviderRegistry } from 'src/modules/mobile-apps/telemetry/mobile-telemetry-provider.registry';
 
 const API = '/api/v1';
 
@@ -71,7 +67,6 @@ describe('Mobile Telemetry E2E', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let fake: FakeTelemetryProvider;
-
   let sequence = 0;
 
   beforeEach(async () => {
@@ -98,7 +93,6 @@ describe('Mobile Telemetry E2E', () => {
     sequence += 1;
 
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const response = await owner.agent
       .post(`${API}/workspaces/${owner.workspaceId}/mobile-apps`)
       .set(withBearer(owner.accessToken))
@@ -136,18 +130,13 @@ describe('Mobile Telemetry E2E', () => {
 
   it('returns null when no telemetry integration exists', async () => {
     const data = await fixture();
-
-    const response = await data.owner.agent
-      .get(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/telemetry`)
-      .set(withBearer(data.owner.accessToken))
-      .expect(200);
+    const response = await data.owner.agent.get(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/telemetry`).set(withBearer(data.owner.accessToken)).expect(200);
 
     expect(response.body).toEqual({});
   });
 
   it('connects provider and never returns credentials', async () => {
     const data = await fixture();
-
     const response = await connect(data);
 
     expect(response.status).toBe(201);
@@ -186,10 +175,7 @@ describe('Mobile Telemetry E2E', () => {
 
     await connect(data).expect(201);
 
-    const response = await data.owner.agent
-      .post(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/telemetry/sync`)
-      .set(withBearer(data.owner.accessToken))
-      .expect(201);
+    const response = await data.owner.agent.post(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/telemetry/sync`).set(withBearer(data.owner.accessToken)).expect(201);
 
     expect(response.body.provider).toBe('SENTRY');
 
@@ -239,10 +225,7 @@ describe('Mobile Telemetry E2E', () => {
 
     await connect(data).expect(201);
 
-    await data.owner.agent
-      .post(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/telemetry/sync`)
-      .set(withBearer(data.owner.accessToken))
-      .expect(201);
+    await data.owner.agent.post(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/telemetry/sync`).set(withBearer(data.owner.accessToken)).expect(201);
 
     const metrics = await prisma.mobilePerformanceMetric.findMany({
       where: {
@@ -307,10 +290,7 @@ describe('Mobile Telemetry E2E', () => {
 
     fake.failCount = 2;
 
-    const response = await data.owner.agent
-      .post(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/telemetry/sync`)
-      .set(withBearer(data.owner.accessToken))
-      .expect(201);
+    const response = await data.owner.agent.post(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/telemetry/sync`).set(withBearer(data.owner.accessToken)).expect(201);
 
     expect(response.body.crashes.crashCount).toBe(17);
 
@@ -324,10 +304,7 @@ describe('Mobile Telemetry E2E', () => {
 
     fake.failCount = 3;
 
-    await data.owner.agent
-      .post(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/telemetry/sync`)
-      .set(withBearer(data.owner.accessToken))
-      .expect(502);
+    await data.owner.agent.post(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/telemetry/sync`).set(withBearer(data.owner.accessToken)).expect(502);
 
     expect(fake.attempts).toBe(3);
 
@@ -345,10 +322,7 @@ describe('Mobile Telemetry E2E', () => {
 
     await connect(data).expect(201);
 
-    const response = await data.owner.agent
-      .delete(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/telemetry`)
-      .set(withBearer(data.owner.accessToken))
-      .expect(200);
+    const response = await data.owner.agent.delete(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/telemetry`).set(withBearer(data.owner.accessToken)).expect(200);
 
     expect(response.body.status).toBe('DISCONNECTED');
 
@@ -362,10 +336,7 @@ describe('Mobile Telemetry E2E', () => {
 
     expect(stored.lastSyncedAt).toBeNull();
 
-    await data.owner.agent
-      .post(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/telemetry/sync`)
-      .set(withBearer(data.owner.accessToken))
-      .expect(400);
+    await data.owner.agent.post(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/telemetry/sync`).set(withBearer(data.owner.accessToken)).expect(400);
   });
 
   it('prevents archived app from connecting telemetry', async () => {
@@ -388,12 +359,8 @@ describe('Mobile Telemetry E2E', () => {
 
   it('cannot resolve another workspace mobile app through current workspace', async () => {
     const first = await fixture();
-
     const second = await fixture();
 
-    await first.owner.agent
-      .get(`${API}/workspaces/${first.owner.workspaceId}/mobile-apps/${second.mobile.id}/telemetry`)
-      .set(withBearer(first.owner.accessToken))
-      .expect(404);
+    await first.owner.agent.get(`${API}/workspaces/${first.owner.workspaceId}/mobile-apps/${second.mobile.id}/telemetry`).set(withBearer(first.owner.accessToken)).expect(404);
   });
 });

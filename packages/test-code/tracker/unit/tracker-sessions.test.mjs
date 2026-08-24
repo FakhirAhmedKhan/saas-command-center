@@ -6,12 +6,10 @@ test('persists the visitor ID across tracker reloads for the same website', asyn
   const first = await createTrackerHarness({ online: false });
   const snapshot = first.storage.snapshot();
   const firstVisitor = snapshot['cc_visitor_11111111-1111-4111-8111-111111111111'];
-
   const second = await createTrackerHarness({
     online: false,
     localStorage: snapshot,
   });
-
   const secondVisitor = second.storage.getItem('cc_visitor_11111111-1111-4111-8111-111111111111');
 
   assert.equal(secondVisitor, firstVisitor);
@@ -21,7 +19,6 @@ test('reuses an active session before the configured timeout', async () => {
   const first = await createTrackerHarness({ online: false });
   const firstSession = first.storedSession();
   const snapshot = first.storage.snapshot();
-
   const second = await createTrackerHarness({
     online: false,
     localStorage: snapshot,
@@ -35,7 +32,6 @@ test('creates a new session after the configured timeout', async () => {
   const first = await createTrackerHarness({ online: false });
   const firstSession = first.storedSession();
   const snapshot = first.storage.snapshot();
-
   const second = await createTrackerHarness({
     online: false,
     localStorage: snapshot,
@@ -52,7 +48,6 @@ test('honors a custom session timeout', async () => {
   });
   const firstSession = first.storedSession();
   const snapshot = first.storage.snapshot();
-
   const second = await createTrackerHarness({
     online: false,
     dataset: { sessionTimeout: '1000' },
@@ -68,7 +63,6 @@ test('uses separate visitor and session storage per website', async () => {
     online: false,
     websiteId: '11111111-1111-4111-8111-111111111111',
   });
-
   const second = await createTrackerHarness({
     online: false,
     websiteId: '22222222-2222-4222-8222-222222222222',

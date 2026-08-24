@@ -1,5 +1,5 @@
-import { AllExceptionsFilter } from 'src/common/filters/all-exceptions.filter';
 import { ArgumentsHost, BadRequestException, HttpException, HttpStatus, Logger, NotFoundException } from '@nestjs/common';
+import { AllExceptionsFilter } from 'src/common/filters/all-exceptions.filter';
 import { Prisma } from 'src/generated/prisma/client';
 
 function prismaKnownError(code: string, message = 'Prisma raw internal error text'): Prisma.PrismaClientKnownRequestError {
@@ -26,14 +26,12 @@ function createHost(requestOverrides: Record<string, unknown> = {}): {
     status: jest.fn<CapturedResponse, [number]>().mockReturnThis(),
     json: jest.fn<CapturedResponse, [Record<string, unknown>]>().mockReturnThis(),
   };
-
   const request = {
     method: 'GET',
     originalUrl: '/api/v1/things',
     requestId: 'req-123',
     ...requestOverrides,
   };
-
   const host = {
     switchToHttp: () => ({
       getRequest: () => request,
@@ -52,7 +50,6 @@ function bodyFrom(response: CapturedResponse): Record<string, unknown> {
 
 describe('AllExceptionsFilter', () => {
   let filter: AllExceptionsFilter;
-
   let errorLogger: jest.SpyInstance;
 
   beforeEach(() => {
@@ -109,7 +106,6 @@ describe('AllExceptionsFilter', () => {
 
     it('falls back to the exception message for a non-string, non-array message field', () => {
       const { host, response } = createHost();
-
       const exception = new HttpException(
         {
           message: {
@@ -172,7 +168,6 @@ describe('AllExceptionsFilter', () => {
   describe('express middleware errors', () => {
     it('honours a status carried on a plain express error', () => {
       const { host, response } = createHost();
-
       const payloadTooLarge = Object.assign(new Error('request entity too large'), {
         status: 413,
         type: 'entity.too.large',

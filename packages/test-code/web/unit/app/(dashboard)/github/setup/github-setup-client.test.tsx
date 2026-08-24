@@ -1,18 +1,16 @@
 ﻿// @vitest-environment jsdom
-import { GithubSetupClient } from '@/app/(dashboard)/github/setup/github-setup-client';
 import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { GithubSetupClient } from '@/app/(dashboard)/github/setup/github-setup-client';
 
-const { useSessionMock, completeGithubSetupMock, completePersonalGithubSetupMock, routerReplaceMock, useSearchParamsMock, locationReplaceMock } = vi.hoisted(
-  () => ({
-    useSessionMock: vi.fn(),
-    completeGithubSetupMock: vi.fn(),
-    completePersonalGithubSetupMock: vi.fn(),
-    routerReplaceMock: vi.fn(),
-    useSearchParamsMock: vi.fn(),
-    locationReplaceMock: vi.fn(),
-  }),
-);
+const { useSessionMock, completeGithubSetupMock, completePersonalGithubSetupMock, routerReplaceMock, useSearchParamsMock, locationReplaceMock } = vi.hoisted(() => ({
+  useSessionMock: vi.fn(),
+  completeGithubSetupMock: vi.fn(),
+  completePersonalGithubSetupMock: vi.fn(),
+  routerReplaceMock: vi.fn(),
+  useSearchParamsMock: vi.fn(),
+  locationReplaceMock: vi.fn(),
+}));
 
 vi.mock('@/features/auth/use-session', () => ({
   useSession: useSessionMock,

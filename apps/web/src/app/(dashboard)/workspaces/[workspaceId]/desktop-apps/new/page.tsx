@@ -11,11 +11,8 @@ export default function NewDesktopAppPage() {
   const params = useParams<{
     workspaceId: string;
   }>();
-
   const router = useRouter();
-
   const workspaceId = params.workspaceId;
-
   const listHref = `/workspaces/${workspaceId}/desktop-apps`;
 
   async function handleCreate(payload: CreateDesktopApplicationInput): Promise<void> {

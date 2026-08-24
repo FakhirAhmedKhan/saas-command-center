@@ -14,7 +14,6 @@ interface ConnectGithubStepProps {
 
 export function ConnectGithubStep({ checking }: ConnectGithubStepProps) {
   const [connecting, setConnecting] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
 
   async function handleConnect(): Promise<void> {
@@ -23,7 +22,6 @@ export function ConnectGithubStep({ checking }: ConnectGithubStepProps) {
 
     try {
       const result = await beginPersonalGithubConnect();
-
       const installationUrl = assertTrustedGithubUrl(result.installationUrl);
 
       markGithubImportFlow(`${window.location.pathname}?method=github`);
@@ -57,9 +55,7 @@ export function ConnectGithubStep({ checking }: ConnectGithubStepProps) {
 
         <h2 className='mt-5 text-lg font-semibold text-slate-950'>Connect GitHub</h2>
 
-        <p className='mx-auto mt-2 max-w-sm text-sm leading-6 text-slate-500'>
-          Authorize the Command Center GitHub App to let us read your repositories. We never store your GitHub access token.
-        </p>
+        <p className='mx-auto mt-2 max-w-sm text-sm leading-6 text-slate-500'>Authorize the Command Center GitHub App to let us read your repositories. We never store your GitHub access token.</p>
 
         {error ? (
           <div role='alert' className='mt-5 w-full max-w-sm rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800'>

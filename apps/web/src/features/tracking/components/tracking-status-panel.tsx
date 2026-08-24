@@ -17,13 +17,9 @@ interface TrackingStatusPanelProps {
 
 export function TrackingStatusPanel({ workspaceId, websiteId, autoRefresh = true }: TrackingStatusPanelProps) {
   const [status, setStatus] = useState<TrackingStatus | null>(null);
-
   const [loading, setLoading] = useState(true);
-
   const [refreshing, setRefreshing] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
-
   const visible = usePageVisibility();
 
   useEffect(() => {

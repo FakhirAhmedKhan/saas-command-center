@@ -4,14 +4,7 @@ import { PrismaService } from '../../../database/prisma.service';
 import { NotificationService } from '../../team-operations/services/notification.service';
 import { CreateMobileAlertRuleDto, UpdateMobileAlertRuleDto } from '../dto/mobile-alert.dto';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import {
-  MobileAlertIncidentStatus,
-  MobileAlertRuleType,
-  MobileBuildStatus,
-  NotificationPriority,
-  NotificationType,
-  WorkspaceRole,
-} from 'src/generated/prisma/enums';
+import { MobileAlertIncidentStatus, MobileAlertRuleType, MobileBuildStatus, NotificationPriority, NotificationType, WorkspaceRole } from 'src/generated/prisma/enums';
 
 @Injectable()
 export class MobileAlertsService {
@@ -134,7 +127,6 @@ export class MobileAlertsService {
 
   async evaluateApp(workspaceId: string, mobileAppId: string) {
     const app = await this.mobileApps.findOne(workspaceId, mobileAppId);
-
     const rules = await this.prisma.mobileAlertRule.findMany({
       where: {
         workspaceId,
@@ -142,7 +134,6 @@ export class MobileAlertsService {
         enabled: true,
       },
     });
-
     const results = [];
 
     for (const rule of rules) {
@@ -233,17 +224,9 @@ export class MobileAlertsService {
       }
 
       const latest = releases[0]!;
-
       const previous = releases[1]!;
-
       const comparison = await this.performance.compare(workspaceId, mobileAppId, previous.version, latest.version);
-
-      const maxRegression = Math.max(
-        0,
-        ...comparison.metrics
-          .filter((metric) => metric.direction === 'DEGRADED' && metric.percentDelta !== null)
-          .map((metric) => Math.abs(metric.percentDelta ?? 0)),
-      );
+      const maxRegression = Math.max(0, ...comparison.metrics.filter((metric) => metric.direction === 'DEGRADED' && metric.percentDelta !== null).map((metric) => Math.abs(metric.percentDelta ?? 0)));
 
       return {
         breached: maxRegression > (rule.threshold ?? 0),
@@ -263,9 +246,7 @@ export class MobileAlertsService {
     }
 
     const summary = await this.performance.summary(workspaceId, mobileAppId, {});
-
     const threshold = rule.threshold ?? 0;
-
     const mapping = {
       CRASH_RATE: 'CRASH_RATE',
 
@@ -275,7 +256,6 @@ export class MobileAlertsService {
 
       API_FAILURE_RATE: 'API_FAILURE_RATE',
     } as const;
-
     let actual = 0;
 
     if (rule.type === MobileAlertRuleType.ANR_HANG) {

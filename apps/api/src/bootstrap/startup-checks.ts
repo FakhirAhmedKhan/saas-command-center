@@ -7,7 +7,6 @@ const DATABASE_TIMEOUT_MS = 10_000;
 
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMessage: string): Promise<T> {
   let timer: NodeJS.Timeout | undefined;
-
   const timeoutPromise = new Promise<never>((_resolve, reject) => {
     timer = setTimeout(() => {
       reject(new Error(timeoutMessage));
@@ -25,15 +24,11 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMes
 
 export async function assertStartupRequirements(app: INestApplication): Promise<void> {
   const logger = new Logger('StartupChecks');
-
   const config = app.get<TypedConfigService>(ConfigService);
-
   const prisma = app.get(PrismaService);
-
   const nodeEnvironment = config.get('NODE_ENV', {
     infer: true,
   });
-
   const cookieSecure = config.get('COOKIE_SECURE', {
     infer: true,
   });

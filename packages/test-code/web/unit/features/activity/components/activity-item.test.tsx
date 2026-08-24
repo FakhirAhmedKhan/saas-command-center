@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { ActivityItem } from '@/features/activity/components/activity-item';
 import type { ApplicationActivity } from '@/features/activity/activity-types';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { ActivityItem } from '@/features/activity/components/activity-item';
 
 function buildActivity(overrides: Partial<ApplicationActivity> = {}): ApplicationActivity {
   return {
@@ -76,9 +76,7 @@ describe('ActivityItem', () => {
   });
 
   it("renders the actor's display name, falling back through email to a generic label", () => {
-    const { rerender } = render(
-      <ActivityItem workspaceId='workspace-1' activity={buildActivity({ actor: { id: 'user-1', email: 'dev@example.com', displayName: 'Dev User' } })} />,
-    );
+    const { rerender } = render(<ActivityItem workspaceId='workspace-1' activity={buildActivity({ actor: { id: 'user-1', email: 'dev@example.com', displayName: 'Dev User' } })} />);
 
     expect(screen.getByText('by Dev User')).toBeInTheDocument();
 

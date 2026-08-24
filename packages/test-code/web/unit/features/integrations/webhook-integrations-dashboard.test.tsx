@@ -1,18 +1,11 @@
 // @vitest-environment jsdom
-import { WebhookIntegrationsDashboard } from '@/features/integrations/webhook-integrations-dashboard';
 import type { WebhookEndpoint, WebhookListResponse } from '@/features/integrations/integrations.types';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { WebhookIntegrationsDashboard } from '@/features/integrations/webhook-integrations-dashboard';
 
-const {
-  getWebhookEndpointsMock,
-  disableWebhookEndpointMock,
-  updateWebhookEndpointMock,
-  createWebhookEndpointMock,
-  rotateWebhookSecretMock,
-  sendWebhookTestMock,
-} = vi.hoisted(() => ({
+const { getWebhookEndpointsMock, disableWebhookEndpointMock, updateWebhookEndpointMock, createWebhookEndpointMock, rotateWebhookSecretMock, sendWebhookTestMock } = vi.hoisted(() => ({
   getWebhookEndpointsMock: vi.fn(),
   disableWebhookEndpointMock: vi.fn(),
   updateWebhookEndpointMock: vi.fn(),

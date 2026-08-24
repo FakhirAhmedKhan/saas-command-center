@@ -1,9 +1,9 @@
 ﻿// @vitest-environment jsdom
-import { ConnectGithubStep } from '@/features/workspaces/github-import/components/connect-github-step';
-import { beginPersonalGithubConnect } from '@/features/workspaces/github-import/github-import-api';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ConnectGithubStep } from '@/features/workspaces/github-import/components/connect-github-step';
+import { beginPersonalGithubConnect } from '@/features/workspaces/github-import/github-import-api';
 
 vi.mock('@/features/workspaces/github-import/github-import-api', () => ({
   beginPersonalGithubConnect: vi.fn(),

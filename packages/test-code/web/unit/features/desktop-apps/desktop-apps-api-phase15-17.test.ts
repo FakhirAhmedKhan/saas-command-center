@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   analyzeDesktopApplication,
   createDesktopAlertRule,
@@ -9,7 +10,6 @@ import {
   updateDesktopAlertRule,
 } from '@/features/desktop-apps/desktop-apps-api';
 import { apiRequest } from '@/features/lib/api/api-client';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/lib/api/api-client', () => ({
   apiRequest: vi.fn(),

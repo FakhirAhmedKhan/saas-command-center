@@ -1,10 +1,4 @@
-import type {
-  DesktopArchitecture,
-  DesktopFramework,
-  DesktopPlatform,
-  DesktopProjectDetectionCandidate,
-  DesktopProjectDetectionResponse,
-} from '@command-center/shared-types';
+import type { DesktopArchitecture, DesktopFramework, DesktopPlatform, DesktopProjectDetectionCandidate, DesktopProjectDetectionResponse } from '@command-center/shared-types';
 
 export interface DesktopRepositorySnapshot {
   repositoryId: string;
@@ -109,11 +103,9 @@ function inferArchitectures(text: string): DesktopArchitecture | null {
 
 function inferPlatforms(text: string): DesktopPlatform {
   const lower = text.toLowerCase();
-
   const windows = /(windows|win32|msi|msix|wpf|winui|windows forms)/.test(lower);
   const macos = /(macos|darwin|osx|appkit|mac catalyst)/.test(lower);
   const linux = /(linux|appimage|deb|rpm)/.test(lower);
-
   const count = [windows, macos, linux].filter(Boolean).length;
 
   if (count > 1) return 'CROSS_PLATFORM';
@@ -133,14 +125,11 @@ function detectElectron(snapshot: DesktopRepositorySnapshot, packagePath: string
     ...objectValue(packageJson.dependencies),
     ...objectValue(packageJson.devDependencies),
   };
-
   const scripts = objectValue(packageJson.scripts);
   const build = objectValue(packageJson.build);
-
   const hasElectron = typeof dependencies.electron === 'string';
   const hasBuilder = typeof dependencies['electron-builder'] === 'string';
   const hasForge = typeof dependencies['@electron-forge/cli'] === 'string' || Object.keys(dependencies).some((key) => key.startsWith('@electron-forge/'));
-
   const main = stringValue(packageJson.main);
   const scriptText = JSON.stringify(scripts ?? {}).toLowerCase();
 
@@ -174,13 +163,10 @@ function detectElectron(snapshot: DesktopRepositorySnapshot, packagePath: string
 function detectTauri(snapshot: DesktopRepositorySnapshot, configPath: string): CandidateDraft | null {
   const rootMarker = '/src-tauri/';
   const normalized = normalizePath(configPath);
-
   const markerIndex = normalized.indexOf(rootMarker);
   const root = markerIndex >= 0 ? normalized.slice(0, markerIndex) : normalized.startsWith('src-tauri/') ? '' : dirname(dirname(normalized));
-
   const tauriRoot = join(root, 'src-tauri');
   const cargoPath = join(tauriRoot, 'Cargo.toml');
-
   const config = safeJson(getText(snapshot, normalized));
   const cargo = getText(snapshot, cargoPath);
 
@@ -188,9 +174,7 @@ function detectTauri(snapshot: DesktopRepositorySnapshot, configPath: string): C
 
   const packageNode = objectValue(config?.package);
   const productName = stringValue(packageNode?.productName) ?? stringValue(config?.productName);
-
   const version = stringValue(packageNode?.version) ?? stringValue(config?.version) ?? parseRustVersion(cargo);
-
   const combined = `${getText(snapshot, normalized) ?? ''}\n${cargo ?? ''}`;
 
   return {
@@ -212,27 +196,15 @@ function detectDotnet(snapshot: DesktopRepositorySnapshot, projectPath: string):
   if (!text) return null;
 
   const lower = text.toLowerCase();
-
-  const isDesktop =
-    lower.includes('<usewpf>true</usewpf>') ||
-    lower.includes('<usewindowsforms>true</usewindowsforms>') ||
-    lower.includes('microsoft.windowsappsdk') ||
-    lower.includes('avalonia');
+  const isDesktop = lower.includes('<usewpf>true</usewpf>') || lower.includes('<usewindowsforms>true</usewindowsforms>') || lower.includes('microsoft.windowsappsdk') || lower.includes('avalonia');
 
   if (!isDesktop) return null;
 
   const evidence = [projectPath];
   const targetFramework = text.match(/<TargetFrameworks?>([^<]+)<\/TargetFrameworks?>/i)?.[1] ?? '';
-
   const runtimeIdentifiers = text.match(/<RuntimeIdentifiers?>([^<]+)<\/RuntimeIdentifiers?>/i)?.[1] ?? '';
-
   const combined = `${text}\n${targetFramework}\n${runtimeIdentifiers}`;
-
-  const platform: DesktopPlatform =
-    lower.includes('avalonia') && !/windows/i.test(combined)
-      ? 'CROSS_PLATFORM'
-      : inferPlatforms(combined.includes('windows') ? combined : `${combined} windows`);
-
+  const platform: DesktopPlatform = lower.includes('avalonia') && !/windows/i.test(combined) ? 'CROSS_PLATFORM' : inferPlatforms(combined.includes('windows') ? combined : `${combined} windows`);
   const packageName =
     text.match(/<AssemblyName>([^<]+)<\/AssemblyName>/i)?.[1]?.trim() ??
     projectPath
@@ -260,17 +232,12 @@ function detectQt(snapshot: DesktopRepositorySnapshot, path: string): CandidateD
   if (!text) return null;
 
   const lower = text.toLowerCase();
-
   const qtEvidence = /\bfind_package\s*\(\s*qt[56]/i.test(text) || /\bqt_add_(executable|qml_module)/i.test(text) || /\bqt\s*\+=/i.test(text);
 
   if (!qtEvidence) return null;
 
   const root = dirname(path);
-  const target =
-    text.match(/\bqt_add_executable\s*\(\s*([A-Za-z0-9_.-]+)/i)?.[1] ??
-    text.match(/\badd_executable\s*\(\s*([A-Za-z0-9_.-]+)/i)?.[1] ??
-    text.match(/^\s*TARGET\s*=\s*([^\r\n#]+)/im)?.[1]?.trim() ??
-    null;
+  const target = text.match(/\bqt_add_executable\s*\(\s*([A-Za-z0-9_.-]+)/i)?.[1] ?? text.match(/\badd_executable\s*\(\s*([A-Za-z0-9_.-]+)/i)?.[1] ?? text.match(/^\s*TARGET\s*=\s*([^\r\n#]+)/im)?.[1]?.trim() ?? null;
 
   return {
     projectRoot: root,
@@ -291,12 +258,8 @@ function detectJava(snapshot: DesktopRepositorySnapshot, path: string): Candidat
   if (!text) return null;
 
   const lower = text.toLowerCase();
-
   const javafx = lower.includes('org.openjfx') || lower.includes('javafx-controls') || lower.includes('javafx.fxml') || lower.includes('javafx');
-
-  const swing = snapshot.paths.some(
-    (candidate) => /\.(java|kt)$/i.test(candidate) && /\b(src|app)\b/i.test(candidate) && /swing/i.test(getText(snapshot, candidate) ?? ''),
-  );
+  const swing = snapshot.paths.some((candidate) => /\.(java|kt)$/i.test(candidate) && /\b(src|app)\b/i.test(candidate) && /swing/i.test(getText(snapshot, candidate) ?? ''));
 
   if (!javafx && !swing) return null;
 
@@ -335,7 +298,6 @@ function detectNativeMacos(snapshot: DesktopRepositorySnapshot, path: string): C
 
   const root = dirname(normalized.replace(/\/[^/]+$/, ''));
   const projectFile = snapshot.paths.find((candidate) => candidate.startsWith(root ? `${root}/` : '') && candidate.endsWith('project.pbxproj'));
-
   const pbx = projectFile ? getText(snapshot, projectFile) : null;
 
   if (pbx && !/(SDKROOT\s*=\s*macosx|MACOSX_DEPLOYMENT_TARGET|com\.apple\.product-type\.application)/i.test(pbx)) {
@@ -347,19 +309,16 @@ function detectNativeMacos(snapshot: DesktopRepositorySnapshot, path: string): C
       ?.match(/\bPRODUCT_BUNDLE_IDENTIFIER\s*=\s*([^;]+);/i)?.[1]
       ?.replace(/["']/g, '')
       .trim() ?? null;
-
   const version =
     pbx
       ?.match(/\bMARKETING_VERSION\s*=\s*([^;]+);/i)?.[1]
       ?.replace(/["']/g, '')
       .trim() ?? null;
-
   const buildNumber =
     pbx
       ?.match(/\bCURRENT_PROJECT_VERSION\s*=\s*([^;]+);/i)?.[1]
       ?.replace(/["']/g, '')
       .trim() ?? null;
-
   const minimumOsVersion =
     pbx
       ?.match(/\bMACOSX_DEPLOYMENT_TARGET\s*=\s*([^;]+);/i)?.[1]
@@ -385,7 +344,6 @@ function mergeCandidates(candidates: CandidateDraft[]): DesktopProjectDetectionC
 
   for (const candidate of candidates) {
     const key = `${candidate.projectRoot}:${candidate.framework}`;
-
     const existing = grouped.get(key);
 
     if (!existing || candidate.score > existing.score) {

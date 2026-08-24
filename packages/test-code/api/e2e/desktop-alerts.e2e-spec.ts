@@ -1,3 +1,7 @@
+import { createTestApp } from '../helpers/create-test-app';
+import { resetDatabase } from '../helpers/database';
+import { API, createDesktopApp, createRepository } from './helpers/desktop-test-fixtures';
+import { registerWorkspaceTestUser } from '../helpers/workspace';
 import type { INestApplication } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import {
@@ -12,10 +16,6 @@ import {
   DesktopTelemetryProvider,
   DesktopTelemetryIntegrationStatus,
 } from 'src/generated/prisma/enums';
-import { createTestApp } from '../helpers/create-test-app';
-import { resetDatabase } from '../helpers/database';
-import { API, createDesktopApp, createRepository } from './helpers/desktop-test-fixtures';
-import { registerWorkspaceTestUser } from '../helpers/workspace';
 
 function alertsPath(workspaceId: string, desktopAppId: string) {
   return `${API}/workspaces/${workspaceId}/desktop-apps/${desktopAppId}/alerts`;
@@ -129,7 +129,6 @@ describe('Desktop Alerts E2E', () => {
       .set('Authorization', `Bearer ${owner.accessToken}`)
       .send({})
       .expect(201);
-
     const second = await owner.agent
       .post(`${alertsPath(owner.workspaceId, desktop.id)}/evaluate`)
       .set('Authorization', `Bearer ${owner.accessToken}`)

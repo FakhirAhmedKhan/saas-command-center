@@ -1,7 +1,7 @@
 import eslint from '@eslint/js';
-import importPlugin from 'eslint-plugin-import';
 import tseslint from 'typescript-eslint';
-import importRules from './import-rules.mjs';
+
+import styleConfig from './style.mjs';
 
 export default tseslint.config(
   eslint.configs.recommended,
@@ -11,21 +11,17 @@ export default tseslint.config(
     ignores: [
       '**/node_modules/**',
       '**/dist/**',
+      '**/dist-cjs/**',
       '**/.next/**',
       '**/coverage/**',
       '**/build/**',
       '**/out/**',
       '**/generated/**',
       '**/playwright-report/**',
+      '**/playwright-report-fullstack/**',
       '**/test-results/**',
     ],
   },
 
-  {
-    plugins: {
-      import: importPlugin,
-    },
-
-    ...importRules,
-  },
+  styleConfig,
 );

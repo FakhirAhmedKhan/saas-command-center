@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 
-import { DesktopPerformance } from '@/features/desktop-apps/desktop-performance';
-import { getDesktopPerformance } from '@/features/desktop-apps/desktop-apps-api';
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getDesktopPerformance } from '@/features/desktop-apps/desktop-apps-api';
+import { DesktopPerformance } from '@/features/desktop-apps/desktop-performance';
 
 vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
   getDesktopPerformance: vi.fn(),

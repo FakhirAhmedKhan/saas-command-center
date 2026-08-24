@@ -1,12 +1,4 @@
-import {
-  collectEvents,
-  createTrackedWebsite,
-  expectCollectionAccepted,
-  buildTrackerEvent,
-  getTrackingStatus,
-  readTrackingStatus,
-  uniqueTrackerId,
-} from '../helpers/analytics-ingestion';
+import { collectEvents, createTrackedWebsite, expectCollectionAccepted, buildTrackerEvent, getTrackingStatus, readTrackingStatus, uniqueTrackerId } from '../helpers/analytics-ingestion';
 import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
@@ -16,7 +8,6 @@ import { RawAnalyticsEventType } from 'src/generated/prisma/enums';
 
 describe('Analytics Ingestion E2E', () => {
   let app: INestApplication;
-
   let prisma: PrismaService;
 
   beforeAll(async () => {
@@ -35,13 +26,9 @@ describe('Analytics Ingestion E2E', () => {
 
   it('accepts page-view, heartbeat, and custom events in one batch', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const visitorId = uniqueTrackerId('visitor');
-
     const sessionId = uniqueTrackerId('session');
-
     const events = [
       buildTrackerEvent(trackedWebsite.origin, {
         type: RawAnalyticsEventType.PAGE_VIEW,
@@ -79,7 +66,6 @@ describe('Analytics Ingestion E2E', () => {
         },
       }),
     ];
-
     const response = await collectEvents(app, trackedWebsite, events);
 
     expectCollectionAccepted(response, 3);
@@ -96,18 +82,14 @@ describe('Analytics Ingestion E2E', () => {
 
     expect(stored).toHaveLength(3);
 
-    expect(new Set(stored.map((event) => event.type))).toEqual(
-      new Set([RawAnalyticsEventType.PAGE_VIEW, RawAnalyticsEventType.HEARTBEAT, RawAnalyticsEventType.CUSTOM]),
-    );
+    expect(new Set(stored.map((event) => event.type))).toEqual(new Set([RawAnalyticsEventType.PAGE_VIEW, RawAnalyticsEventType.HEARTBEAT, RawAnalyticsEventType.CUSTOM]));
 
     expect(stored.every((event) => event.sdkVersion === '1.0.0-e2e')).toBe(true);
   });
 
   it('deduplicates repeated event IDs per website', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const event = buildTrackerEvent(trackedWebsite.origin);
 
     expectCollectionAccepted(await collectEvents(app, trackedWebsite, [event]), 1);
@@ -126,11 +108,8 @@ describe('Analytics Ingestion E2E', () => {
 
   it('allows the same event ID on different websites', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const firstWebsite = await createTrackedWebsite(owner);
-
     const secondWebsite = await createTrackedWebsite(owner);
-
     const sharedEventId = uniqueTrackerId('shared_event');
 
     expectCollectionAccepted(
@@ -162,9 +141,7 @@ describe('Analytics Ingestion E2E', () => {
 
   it('updates website lastEventAt and tracking status after collection', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const beforeResponse = await getTrackingStatus(owner, trackedWebsite.id);
 
     expect(beforeResponse.status).toBe(200);
@@ -189,7 +166,6 @@ describe('Analytics Ingestion E2E', () => {
     expectCollectionAccepted(await collectEvents(app, trackedWebsite, events), 2);
 
     const afterResponse = await getTrackingStatus(owner, trackedWebsite.id);
-
     const after = readTrackingStatus(afterResponse);
 
     expect(after.connected).toBe(true);
@@ -213,9 +189,7 @@ describe('Analytics Ingestion E2E', () => {
 
   it('stores request metadata and optional event dimensions', async () => {
     const owner = await registerWorkspaceTestUser(app, prisma);
-
     const trackedWebsite = await createTrackedWebsite(owner);
-
     const event = buildTrackerEvent(trackedWebsite.origin, {
       screenWidth: 2560,
       screenHeight: 1440,

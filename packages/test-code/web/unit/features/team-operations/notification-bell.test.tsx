@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { NotificationBell } from '@/features/team-operations/notification-bell';
-import { getUnreadNotificationCount } from '@/features/team-operations/team-operations-api';
 import { act, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { NotificationBell } from '@/features/team-operations/notification-bell';
+import { getUnreadNotificationCount } from '@/features/team-operations/team-operations-api';
 
 vi.mock('@/features/team-operations/team-operations-api', () => ({
   getUnreadNotificationCount: vi.fn(),

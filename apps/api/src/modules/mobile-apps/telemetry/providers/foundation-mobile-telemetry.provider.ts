@@ -5,13 +5,9 @@ import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
 export class MobileTelemetrySecretService {
   encrypt(value: Record<string, string>): string {
     const key = this.getKey();
-
     const iv = randomBytes(12);
-
     const cipher = createCipheriv('aes-256-gcm', key, iv);
-
     const encrypted = Buffer.concat([cipher.update(JSON.stringify(value), 'utf8'), cipher.final()]);
-
     const tag = cipher.getAuthTag();
 
     return ['v1', iv.toString('base64'), tag.toString('base64'), encrypted.toString('base64')].join('.');

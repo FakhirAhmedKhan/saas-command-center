@@ -36,7 +36,6 @@ function normalizePath(path: string): string {
 
 function parentPath(path: string): string {
   const normalized = normalizePath(path);
-
   const index = normalized.lastIndexOf('/');
 
   if (index < 0) {
@@ -69,7 +68,6 @@ function matchFirst(text: string | undefined, patterns: RegExp[]): string | null
 
   for (const pattern of patterns) {
     const match = text.match(pattern);
-
     const value = match?.[1]?.trim();
 
     if (value) {
@@ -95,29 +93,16 @@ function firstPathMatching(snapshot: MobileRepositorySnapshot, predicate: (path:
 }
 
 function parseAndroid(snapshot: MobileRepositorySnapshot, root: string): AndroidMetadata {
-  const gradlePaths = [
-    joinPath(root, 'app/build.gradle.kts'),
-
-    joinPath(root, 'app/build.gradle'),
-
-    joinPath(root, 'build.gradle.kts'),
-
-    joinPath(root, 'build.gradle'),
-  ];
-
+  const gradlePaths = [joinPath(root, 'app/build.gradle.kts'), joinPath(root, 'app/build.gradle'), joinPath(root, 'build.gradle.kts'), joinPath(root, 'build.gradle')];
   const gradleText = gradlePaths
     .map((path) => fileAt(snapshot, path))
     .filter((value): value is string => Boolean(value))
     .join('\n');
-
   const manifestPath = firstPathMatching(snapshot, (path) => path.startsWith(root === '.' ? '' : `${root}/`) && path.endsWith('AndroidManifest.xml'));
-
   const manifestText = manifestPath ? fileAt(snapshot, manifestPath) : undefined;
 
   return {
-    packageId:
-      matchFirst(gradleText, [/\bapplicationId\s*(?:=)?\s*["']([^"']+)["']/i, /\bnamespace\s*(?:=)?\s*["']([^"']+)["']/i]) ??
-      matchFirst(manifestText, [/<manifest[^>]*\bpackage=["']([^"']+)["']/i]),
+    packageId: matchFirst(gradleText, [/\bapplicationId\s*(?:=)?\s*["']([^"']+)["']/i, /\bnamespace\s*(?:=)?\s*["']([^"']+)["']/i]) ?? matchFirst(manifestText, [/<manifest[^>]*\bpackage=["']([^"']+)["']/i]),
 
     minSdk: matchFirst(gradleText, [/\bminSdk(?:Version)?\s*(?:=)?\s*(\d+)/i]),
 
@@ -135,7 +120,6 @@ function parseIos(snapshot: MobileRepositorySnapshot, root: string): IosMetadata
 
     return path.startsWith(prefix) && path.endsWith('.xcodeproj/project.pbxproj');
   });
-
   const pbxproj = pbxprojPath ? fileAt(snapshot, pbxprojPath) : undefined;
 
   return {
@@ -286,9 +270,7 @@ function buildProject(input: {
 
 export function detectMobileProjects(snapshot: MobileRepositorySnapshot): MobileProjectDetection[] {
   const paths = snapshot.paths.map(normalizePath);
-
   const projects: MobileProjectDetection[] = [];
-
   /*
    * Flutter
    */
@@ -296,24 +278,12 @@ export function detectMobileProjects(snapshot: MobileRepositorySnapshot): Mobile
 
   for (const root of flutterRoots) {
     const pubspecPath = joinPath(root, 'pubspec.yaml');
-
     const androidRoot = joinPath(root, 'android');
-
     const iosRoot = joinPath(root, 'ios');
-
     const android = parseAndroid(snapshot, androidRoot);
-
     const ios = parseIos(snapshot, iosRoot);
-
     const version = parsePubspecVersion(fileAt(snapshot, pubspecPath));
-
-    const evidence = [
-      pubspecPath,
-
-      ...(paths.filter((path) => path.startsWith(`${androidRoot}/`)).length ? [androidRoot] : []),
-
-      ...(paths.filter((path) => path.startsWith(`${iosRoot}/`)).length ? [iosRoot] : []),
-    ];
+    const evidence = [pubspecPath, ...(paths.filter((path) => path.startsWith(`${androidRoot}/`)).length ? [androidRoot] : []), ...(paths.filter((path) => path.startsWith(`${iosRoot}/`)).length ? [iosRoot] : [])];
 
     projects.push(
       buildProject({
@@ -339,11 +309,7 @@ export function detectMobileProjects(snapshot: MobileRepositorySnapshot): Mobile
 
         evidence,
 
-        warnings: [
-          ...(!android.packageId ? ['Android package ID could not be determined.'] : []),
-
-          ...(!ios.bundleId ? ['iOS Bundle ID could not be determined.'] : []),
-        ],
+        warnings: [...(!android.packageId ? ['Android package ID could not be determined.'] : []), ...(!ios.bundleId ? ['iOS Bundle ID could not be determined.'] : [])],
       }),
     );
   }
@@ -363,11 +329,8 @@ export function detectMobileProjects(snapshot: MobileRepositorySnapshot): Mobile
     }
 
     const packagePath = joinPath(root, 'package.json');
-
     const android = parseAndroid(snapshot, joinPath(root, 'android'));
-
     const ios = parseIos(snapshot, joinPath(root, 'ios'));
-
     const metroPath = firstExistingPath(snapshot, [joinPath(root, 'metro.config.js'), joinPath(root, 'metro.config.cjs'), joinPath(root, 'metro.config.mjs')]);
 
     projects.push(
@@ -392,15 +355,7 @@ export function detectMobileProjects(snapshot: MobileRepositorySnapshot): Mobile
 
         buildSystem: 'NODE',
 
-        evidence: [
-          packagePath,
-
-          ...(metroPath ? [metroPath] : []),
-
-          ...(android.packageId ? [joinPath(root, 'android')] : []),
-
-          ...(ios.bundleId ? [joinPath(root, 'ios')] : []),
-        ],
+        evidence: [packagePath, ...(metroPath ? [metroPath] : []), ...(android.packageId ? [joinPath(root, 'android')] : []), ...(ios.bundleId ? [joinPath(root, 'ios')] : [])],
       }),
     );
   }
@@ -410,11 +365,7 @@ export function detectMobileProjects(snapshot: MobileRepositorySnapshot): Mobile
    */
   const kmpRoots = unique(
     Object.entries(snapshot.files)
-      .filter(
-        ([path, text]) =>
-          /build\.gradle(?:\.kts)?$/.test(path) &&
-          (/org\.jetbrains\.kotlin\.multiplatform/i.test(text) || /kotlin\s*\(\s*["']multiplatform["']\s*\)/i.test(text)),
-      )
+      .filter(([path, text]) => /build\.gradle(?:\.kts)?$/.test(path) && (/org\.jetbrains\.kotlin\.multiplatform/i.test(text) || /kotlin\s*\(\s*["']multiplatform["']\s*\)/i.test(text)))
       .map(([path]) => parentPath(path)),
   );
 
@@ -424,9 +375,7 @@ export function detectMobileProjects(snapshot: MobileRepositorySnapshot): Mobile
     }
 
     const gradlePath = firstExistingPath(snapshot, [joinPath(root, 'build.gradle.kts'), joinPath(root, 'build.gradle')]);
-
     const android = parseAndroid(snapshot, root);
-
     const ios = parseIos(snapshot, root);
 
     projects.push(
@@ -457,7 +406,6 @@ export function detectMobileProjects(snapshot: MobileRepositorySnapshot): Mobile
   }
 
   const crossRoots = unique([...flutterRoots, ...reactNativeRoots, ...kmpRoots]);
-
   /*
    * Native Android
    */
@@ -473,19 +421,8 @@ export function detectMobileProjects(snapshot: MobileRepositorySnapshot): Mobile
     }
 
     const settingsPath = firstExistingPath(snapshot, [joinPath(root, 'settings.gradle.kts'), joinPath(root, 'settings.gradle')]);
-
-    const gradlePath = firstExistingPath(snapshot, [
-      joinPath(root, 'app/build.gradle.kts'),
-
-      joinPath(root, 'app/build.gradle'),
-
-      joinPath(root, 'build.gradle.kts'),
-
-      joinPath(root, 'build.gradle'),
-    ]);
-
+    const gradlePath = firstExistingPath(snapshot, [joinPath(root, 'app/build.gradle.kts'), joinPath(root, 'app/build.gradle'), joinPath(root, 'build.gradle.kts'), joinPath(root, 'build.gradle')]);
     const manifest = firstPathMatching(snapshot, (path) => path.startsWith(root === '.' ? '' : `${root}/`) && path.endsWith('AndroidManifest.xml'));
-
     const metadata = parseAndroid(snapshot, root);
 
     projects.push(
@@ -520,7 +457,6 @@ export function detectMobileProjects(snapshot: MobileRepositorySnapshot): Mobile
 
   for (const pbxPath of iosPbxProjects) {
     const projectComponent = pbxPath.match(/^(.*?)(?:\/)?[^/]+\.xcodeproj\/project\.pbxproj$/);
-
     const root = projectComponent?.[1]?.replace(/\/$/, '') || '.';
 
     if (isInsideCrossPlatformRoot(root, crossRoots)) {
@@ -528,11 +464,8 @@ export function detectMobileProjects(snapshot: MobileRepositorySnapshot): Mobile
     }
 
     const infoPlist = firstPathMatching(snapshot, (path) => path.startsWith(root === '.' ? '' : `${root}/`) && path.endsWith('Info.plist'));
-
     const podfile = firstExistingPath(snapshot, [joinPath(root, 'Podfile')]);
-
     const packageSwift = firstExistingPath(snapshot, [joinPath(root, 'Package.swift')]);
-
     const metadata = parseIos(snapshot, root);
 
     projects.push(

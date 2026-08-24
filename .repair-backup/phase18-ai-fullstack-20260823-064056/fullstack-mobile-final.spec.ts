@@ -42,8 +42,7 @@ async function createMobileApplication(request: APIRequestContext, prefix: strin
 }
 
 async function seedPerformanceMetric(mobileAppId: string): Promise<void> {
-  const databaseUrl =
-    process.env.FULLSTACK_DATABASE_URL ?? 'postgresql://command_center_full_e2e:command_center_full_e2e@127.0.0.1:5435/command_center_full_e2e?schema=public';
+  const databaseUrl = process.env.FULLSTACK_DATABASE_URL ?? 'postgresql://command_center_full_e2e:command_center_full_e2e@127.0.0.1:5435/command_center_full_e2e?schema=public';
 
   if (!databaseUrl.includes('127.0.0.1:5435')) {
     throw new Error('Safety stop: full-stack performance seed requires localhost:5435');

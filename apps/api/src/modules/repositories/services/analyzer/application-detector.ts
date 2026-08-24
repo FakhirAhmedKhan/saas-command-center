@@ -4,30 +4,8 @@ import type { ParsedPackageJson } from './package-json.types';
 import { detectTechnologies } from './technology-detector';
 import type { DetectedApplication, PackageManager } from '@command-center/shared-types';
 
-const LIBRARY_NAME_PATTERNS = [
-  /eslint-config/i,
-  /^tsconfig/i,
-  /^config$/i,
-  /^shared-types$/i,
-  /^shared$/i,
-  /^types$/i,
-  /^utils?$/i,
-  /^ui$/i,
-  /^validation$/i,
-  /-config$/i,
-  /^tooling$/i,
-];
-
-const LIBRARY_DIRECTORY_HINTS = [
-  'packages/eslint-config',
-  'packages/tsconfig',
-  'packages/shared',
-  'packages/shared-types',
-  'packages/ui',
-  'packages/config',
-  'packages/utils',
-  'packages/validation',
-];
+const LIBRARY_NAME_PATTERNS = [/eslint-config/i, /^tsconfig/i, /^config$/i, /^shared-types$/i, /^shared$/i, /^types$/i, /^utils?$/i, /^ui$/i, /^validation$/i, /-config$/i, /^tooling$/i];
+const LIBRARY_DIRECTORY_HINTS = ['packages/eslint-config', 'packages/tsconfig', 'packages/shared', 'packages/shared-types', 'packages/ui', 'packages/config', 'packages/utils', 'packages/validation'];
 
 export interface ApplicationCandidate {
   rootDirectory: string;
@@ -38,11 +16,8 @@ export interface ApplicationCandidate {
 
 export function detectApplication(candidate: ApplicationCandidate, packageManager: PackageManager): DetectedApplication {
   const { framework, language } = detectFramework(candidate.packageJson, candidate.hasTypescriptConfig);
-
   const commands = detectCommands(candidate.packageJson, packageManager);
-
   const technologies = detectTechnologies(candidate.packageJson, candidate.rootFileNames);
-
   const runnable = isRunnable(candidate, framework, commands);
 
   return {
@@ -64,7 +39,6 @@ function deriveApplicationName(candidate: ApplicationCandidate): string {
   }
 
   const segments = candidate.rootDirectory.split('/');
-
   const lastSegment = segments.at(-1) ?? candidate.rootDirectory;
 
   return titleCase(lastSegment);
@@ -100,7 +74,6 @@ function isRunnable(
 
 function looksLikeLibrary(candidate: ApplicationCandidate): boolean {
   const packageName = candidate.packageJson.name ?? '';
-
   const shortName = packageName.split('/').pop() ?? packageName;
 
   if (LIBRARY_NAME_PATTERNS.some((pattern) => pattern.test(shortName))) {

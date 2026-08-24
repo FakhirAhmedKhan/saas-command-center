@@ -36,7 +36,6 @@ export class TrackingAdminService {
 
   async getStatus(workspaceId: string, websiteId: string) {
     const website = await this.requireWebsite(workspaceId, websiteId);
-
     const [totalEvents, grouped, recentEvents] = await this.prisma.$transaction([
       this.prisma.rawAnalyticsEvent.count({
         where: {
@@ -72,7 +71,6 @@ export class TrackingAdminService {
         take: 5,
       }),
     ]);
-
     const counts: Record<RawAnalyticsEventType, number> = {
       PAGE_VIEW: 0,
       HEARTBEAT: 0,
@@ -155,9 +153,7 @@ export class TrackingAdminService {
           }
         : {}),
     };
-
     const skip = (query.page - 1) * query.limit;
-
     const [events, total] = await this.prisma.$transaction([
       this.prisma.rawAnalyticsEvent.findMany({
         where,
@@ -182,7 +178,6 @@ export class TrackingAdminService {
         where,
       }),
     ]);
-
     const totalPages = Math.ceil(total / query.limit);
 
     return {

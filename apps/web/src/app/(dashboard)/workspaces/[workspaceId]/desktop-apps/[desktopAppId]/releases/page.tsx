@@ -15,9 +15,7 @@ export default function DesktopReleasesPage() {
       <header>
         <p className='text-sm font-medium text-slate-500'>Desktop Application</p>
         <h1 className='mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl'>Releases & Update Channels</h1>
-        <p className='mt-2 max-w-3xl text-sm text-slate-600'>
-          Track versioned desktop releases across Dev, Alpha, Beta, Stable, and LTS channels while preserving the exact build and artifact source.
-        </p>
+        <p className='mt-2 max-w-3xl text-sm text-slate-600'>Track versioned desktop releases across Dev, Alpha, Beta, Stable, and LTS channels while preserving the exact build and artifact source.</p>
       </header>
 
       <DesktopAppSubNav workspaceId={params.workspaceId} desktopAppId={params.desktopAppId} />

@@ -37,15 +37,11 @@ export class AuthService {
 
   async register(dto: RegisterDto, metadata: AuthRequestMetadata): Promise<AuthResult> {
     const email = dto.email.trim().toLowerCase();
-
     const passwordHash = await this.passwordService.hash(dto.password);
-
     const userId = randomUUID();
     const sessionId = randomUUID();
     const familyId = randomUUID();
-
     const tokens = await this.tokenService.issueTokenPair(userId, sessionId, familyId);
-
     const refreshTokenHash = this.tokenService.hashRefreshToken(tokens.refreshToken);
 
     try {
@@ -75,7 +71,6 @@ export class AuthService {
 
         return createdUser;
       });
-
       const workspaces = await this.workspacesService.listForUser(user.id);
 
       return this.createAuthResult(tokens, user, workspaces);
@@ -102,9 +97,7 @@ export class AuthService {
 
     const sessionId = randomUUID();
     const familyId = randomUUID();
-
     const tokens = await this.tokenService.issueTokenPair(user.id, sessionId, familyId);
-
     const refreshTokenHash = this.tokenService.hashRefreshToken(tokens.refreshToken);
 
     await this.prisma.$transaction(async (transaction) => {
@@ -131,7 +124,6 @@ export class AuthService {
     });
 
     const publicUser = await this.usersService.findByIdOrThrow(user.id);
-
     const workspaces = await this.workspacesService.listForUser(user.id);
 
     return this.createAuthResult(tokens, publicUser, workspaces);
@@ -139,9 +131,7 @@ export class AuthService {
 
   async refresh(rawRefreshToken: string, metadata: AuthRequestMetadata): Promise<AuthResult> {
     const payload = await this.tokenService.verifyRefreshToken(rawRefreshToken);
-
     const tokenHash = this.tokenService.hashRefreshToken(rawRefreshToken);
-
     const currentSession = await this.authSessionsService.findByTokenHash(tokenHash);
 
     if (!currentSession) {
@@ -171,11 +161,8 @@ export class AuthService {
     }
 
     const newSessionId = randomUUID();
-
     const tokens = await this.tokenService.issueTokenPair(user.id, newSessionId, currentSession.familyId);
-
     const newRefreshTokenHash = this.tokenService.hashRefreshToken(tokens.refreshToken);
-
     const rotated = await this.authSessionsService.rotateSession({
       currentSessionId: currentSession.id,
       newSessionId,
@@ -202,7 +189,6 @@ export class AuthService {
     }
 
     const tokenHash = this.tokenService.hashRefreshToken(rawRefreshToken);
-
     const session = await this.authSessionsService.findByTokenHash(tokenHash);
 
     if (!session) {
@@ -218,7 +204,6 @@ export class AuthService {
 
   async getCurrentUser(userId: string) {
     const user = await this.usersService.findByIdOrThrow(userId);
-
     const workspaces = await this.workspacesService.listForUser(userId);
 
     return {

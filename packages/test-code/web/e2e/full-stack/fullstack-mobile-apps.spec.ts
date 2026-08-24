@@ -1,11 +1,8 @@
 import { loginThroughUi, uniqueValue } from './fixtures/helpers';
-
 import { readFullStackState, type FullStackState } from './fixtures/state';
-
 import { expect, test, type Page } from '@playwright/test';
 
 let state: FullStackState;
-
 let page: Page;
 
 test.describe('Mobile application frontend', () => {
@@ -21,7 +18,6 @@ test.describe('Mobile application frontend', () => {
 
   test('completes mobile CRUD through the real frontend', async () => {
     const name = uniqueValue('Phase 3 Android', state.runId);
-
     const workspaceId = state.owner.workspaceId;
 
     await page.goto(`/workspaces/${workspaceId}/mobile-apps`);

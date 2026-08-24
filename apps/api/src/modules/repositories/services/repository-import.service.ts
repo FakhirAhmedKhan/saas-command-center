@@ -7,17 +7,7 @@ import type { ImportWorkspaceFromGithubResult } from '@command-center/shared-typ
 import { BadRequestException, ConflictException, ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { Prisma } from 'src/generated/prisma/client';
-import {
-  ActivityActorType,
-  ActivityEntityType,
-  ApplicationActivityType,
-  ApplicationCategory,
-  ApplicationLinkType,
-  ApplicationStatus,
-  RepositoryProvider,
-  TechnologyType,
-  WorkspaceRole,
-} from 'src/generated/prisma/enums';
+import { ActivityActorType, ActivityEntityType, ApplicationActivityType, ApplicationCategory, ApplicationLinkType, ApplicationStatus, RepositoryProvider, TechnologyType, WorkspaceRole } from 'src/generated/prisma/enums';
 
 const TECHNOLOGY_TYPE_BY_LABEL: Record<string, TechnologyType> = {
   'Next.js': TechnologyType.FRONTEND,
@@ -63,13 +53,9 @@ export class RepositoryImportService {
     await this.personalGithubConnect.assertUserCanAccessInstallation(userId, dto.installationId);
 
     const repository = await this.resolveRepository(dto.installationId, dto.repositoryId);
-
     const workspaceName = this.normalizeRequiredText(dto.workspace.name, 'Workspace name', 2, 120);
-
     const workspaceBaseSlug = this.normalizeSlug(dto.workspace.slug ?? workspaceName, 120);
-
     const applications = this.normalizeApplicationSelections(dto.applications);
-
     const branch = dto.defaultBranch?.trim() || repository.defaultBranch;
 
     for (let attempt = 0; attempt < 25; attempt += 1) {
@@ -105,7 +91,6 @@ export class RepositoryImportService {
               lastSyncedAt: new Date(),
             },
           });
-
           const connection = await transaction.repositoryConnection.create({
             data: {
               workspaceId: workspace.id,
@@ -121,16 +106,12 @@ export class RepositoryImportService {
               lastSyncedAt: new Date(),
             },
           });
-
           const activityEvents: ActivityWriteInput[] = [];
-
           const createdApplications: ImportWorkspaceFromGithubResult['applications'] = [];
-
           let primaryApplicationId: string | null = null;
 
           for (const application of applications) {
             const applicationSlug = await this.generateUniqueApplicationSlug(transaction, workspace.id, application.slug ?? application.name);
-
             const created = await transaction.saasApplication.create({
               data: {
                 workspaceId: workspace.id,
@@ -238,7 +219,6 @@ export class RepositoryImportService {
     htmlUrl: string;
   }> {
     const repositories = await this.githubApp.listImportableInstallationRepositories(installationId);
-
     const match = repositories.find((repository) => repository.id === repositoryId);
 
     if (!match) {
@@ -284,9 +264,7 @@ export class RepositoryImportService {
 
   private async generateUniqueApplicationSlug(transaction: Prisma.TransactionClient, workspaceId: string, requestedName: string): Promise<string> {
     const baseSlug = this.normalizeSlug(requestedName, 160);
-
     let slug = baseSlug;
-
     let suffix = 1;
 
     while (

@@ -27,13 +27,10 @@ export class TeamOperationsCleanupService {
     }
 
     const now = new Date();
-
     const retentionDays = this.config.get('NOTIFICATION_RETENTION_DAYS', {
       infer: true,
     });
-
     const retentionCutoff = new Date(now.getTime() - retentionDays * 86_400_000);
-
     const [expiredInvitations, expiredNotifications, oldReadNotifications] = await Promise.all([
       this.prisma.workspaceInvitation.updateMany({
         where: {

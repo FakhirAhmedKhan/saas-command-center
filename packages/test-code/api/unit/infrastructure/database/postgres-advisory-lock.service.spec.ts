@@ -1,5 +1,8 @@
+import { ConfigService } from '@nestjs/config';
 import { config as loadEnv } from 'dotenv';
+import { randomUUID } from 'node:crypto';
 import { resolve } from 'node:path';
+import { PostgresAdvisoryLockService } from 'src/infrastructure/database/postgres-advisory-lock.service';
 
 /*
  * PostgresAdvisoryLockService needs a real Postgres connection — advisory
@@ -16,10 +19,6 @@ loadEnv({
   quiet: true,
 });
 
-import { PostgresAdvisoryLockService } from 'src/infrastructure/database/postgres-advisory-lock.service';
-import { ConfigService } from '@nestjs/config';
-import { randomUUID } from 'node:crypto';
-
 interface Deferred<T> {
   promise: Promise<T>;
   resolve: (value: T) => void;
@@ -27,7 +26,6 @@ interface Deferred<T> {
 
 function createDeferred<T = void>(): Deferred<T> {
   let resolveFn!: (value: T) => void;
-
   const promise = new Promise<T>((resolve) => {
     resolveFn = resolve;
   });
@@ -60,7 +58,6 @@ describe(PostgresAdvisoryLockService.name, () => {
 
   it('acquires the lock for a single caller and runs its callback', async () => {
     const lockKey = `test-lock:${randomUUID()}`;
-
     const result = await service.withLock(lockKey, async () => 'callback-ran');
 
     expect(result.acquired).toBe(true);
@@ -69,10 +66,8 @@ describe(PostgresAdvisoryLockService.name, () => {
 
   it('does not let a second concurrent caller acquire the same lock key (non-blocking pg_try_advisory_lock)', async () => {
     const lockKey = `test-lock:${randomUUID()}`;
-
     const firstStarted = createDeferred<void>();
     const firstCanFinish = createDeferred<void>();
-
     const firstCall = service.withLock(lockKey, async () => {
       firstStarted.resolve();
       await firstCanFinish.promise;
@@ -99,7 +94,6 @@ describe(PostgresAdvisoryLockService.name, () => {
 
   it('releases the lock after the callback completes successfully, allowing a later acquire to succeed', async () => {
     const lockKey = `test-lock:${randomUUID()}`;
-
     const firstResult = await service.withLock(lockKey, async () => 'done');
 
     expect(firstResult.acquired).toBe(true);
@@ -131,18 +125,15 @@ describe(PostgresAdvisoryLockService.name, () => {
   it('does not let two different lock keys contend with each other', async () => {
     const lockKeyA = `test-lock:${randomUUID()}`;
     const lockKeyB = `test-lock:${randomUUID()}`;
-
     const aStarted = createDeferred<void>();
     const aCanFinish = createDeferred<void>();
     const bStarted = createDeferred<void>();
     const bCanFinish = createDeferred<void>();
-
     const callA = service.withLock(lockKeyA, async () => {
       aStarted.resolve();
       await aCanFinish.promise;
       return 'a';
     });
-
     const callB = service.withLock(lockKeyB, async () => {
       bStarted.resolve();
       await bCanFinish.promise;

@@ -43,9 +43,7 @@ export class MobileTelemetryService {
     }
 
     const projectId = this.providerSecurity.normalizeExternalProjectId(dto.externalProjectId);
-
     const normalizedConfig = this.providerSecurity.normalizeConfig(dto.config);
-
     const adapter = this.registry.get(dto.provider);
 
     adapter.validateConfig(normalizedConfig);
@@ -119,7 +117,6 @@ export class MobileTelemetryService {
 
   async sync(workspaceId: string, mobileAppId: string): Promise<MobileTelemetrySnapshot> {
     const mobileApp = await this.mobileApps.findOne(workspaceId, mobileAppId);
-
     const integration = await this.requireIntegration(workspaceId, mobileAppId);
 
     if (integration.status === MobileTelemetryStatus.DISCONNECTED) {
@@ -131,7 +128,6 @@ export class MobileTelemetryService {
     }
 
     const config = this.secrets.decrypt(integration.encryptedConfig);
-
     const adapter = this.registry.get(integration.provider);
 
     try {
@@ -155,7 +151,6 @@ export class MobileTelemetryService {
           ]),
         3,
       );
-
       const now = new Date();
 
       await this.persistPerformanceSnapshot({
@@ -243,26 +238,17 @@ export class MobileTelemetryService {
     collectedAt: Date;
   }): Promise<void> {
     const crashes = this.asRecord(input.crashes);
-
     const performance = this.asRecord(input.performance);
-
     const firstVersion = this.asRecord(input.versions[0]);
-
     const version = this.text(input.currentVersion) ?? this.text(firstVersion.version) ?? 'unknown';
-
     const buildNumber = this.text(input.currentBuildNumber) ?? this.text(firstVersion.buildNumber);
-
     const crashFreeUsersRate = this.number(crashes.crashFreeUsersRate);
-
     const explicitCrashRate = this.number(crashes.crashRate);
-
     const crashRate = explicitCrashRate ?? (crashFreeUsersRate === null ? null : Math.max(0, Math.min(100, 100 - crashFreeUsersRate)));
-
     const rows: Array<{
       metric: MobilePerformanceMetricType;
       value: number;
     }> = [];
-
     const add = (metric: MobilePerformanceMetricType, value: number | null) => {
       if (value !== null) {
         rows.push({

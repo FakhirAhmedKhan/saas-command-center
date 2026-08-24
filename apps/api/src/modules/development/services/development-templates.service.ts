@@ -64,7 +64,6 @@ export class DevelopmentTemplatesService {
 
       for (let milestoneIndex = 0; milestoneIndex < template.milestones.length; milestoneIndex += 1) {
         const definition = template.milestones[milestoneIndex];
-
         const milestone = await transaction.applicationMilestone.create({
           data: {
             applicationId,

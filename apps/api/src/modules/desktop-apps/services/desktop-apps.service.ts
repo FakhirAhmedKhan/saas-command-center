@@ -23,9 +23,7 @@ export class DesktopAppsService {
 
   async create(workspaceId: string, dto: CreateDesktopAppDto, actorUserId: string): Promise<DesktopApplicationDetails> {
     const name = this.normalizeRequiredText(dto.name, 'Desktop application name');
-
     const requestedSlug = this.normalizeSlug(name);
-
     const slug = await this.generateUniqueSlug(workspaceId, requestedSlug);
 
     try {
@@ -41,7 +39,6 @@ export class DesktopAppsService {
             type: ApplicationType.DESKTOP,
           },
         });
-
         const desktopApplication = await transaction.desktopApplication.create({
           data: {
             applicationId: application.id,
@@ -165,9 +162,7 @@ export class DesktopAppsService {
     }
 
     const applicationData: Prisma.SaasApplicationUpdateInput = {};
-
     const desktopData: Prisma.DesktopApplicationUpdateInput = {};
-
     const changedFields: string[] = [];
 
     if (dto.name !== undefined) {
@@ -369,7 +364,6 @@ export class DesktopAppsService {
 
   private async generateUniqueSlug(workspaceId: string, requestedSlug: string): Promise<string> {
     let slug = requestedSlug;
-
     let suffix = 1;
 
     while (

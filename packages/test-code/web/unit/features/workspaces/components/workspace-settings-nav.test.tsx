@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { WorkspaceSettingsNav } from '@/features/workspaces/components/workspace-settings-nav';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { WorkspaceSettingsNav } from '@/features/workspaces/components/workspace-settings-nav';
 
 const { usePathnameMock } = vi.hoisted(() => ({
   usePathnameMock: vi.fn(),

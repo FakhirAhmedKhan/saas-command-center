@@ -11,9 +11,7 @@ interface ApplicationSubNavProps {
 
 export function ApplicationSubNav({ workspaceId, applicationId }: ApplicationSubNavProps) {
   const pathname = usePathname();
-
   const baseHref = `/workspaces/${workspaceId}/applications/${applicationId}`;
-
   const tabs = [
     { label: 'Overview', href: baseHref },
     { label: 'Development', href: `${baseHref}/development` },
@@ -31,10 +29,7 @@ export function ApplicationSubNav({ workspaceId, applicationId }: ApplicationSub
             key={tab.href}
             href={tab.href}
             aria-current={isActive ? 'page' : undefined}
-            className={cn(
-              'relative flex h-10 items-center px-3 text-sm font-medium transition',
-              isActive ? 'text-brand-700' : 'text-slate-500 hover:text-slate-800',
-            )}
+            className={cn('relative flex h-10 items-center px-3 text-sm font-medium transition', isActive ? 'text-brand-700' : 'text-slate-500 hover:text-slate-800')}
           >
             {tab.label}
             {isActive ? <span className='absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-brand-600' aria-hidden='true' /> : null}

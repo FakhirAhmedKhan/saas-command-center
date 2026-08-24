@@ -130,9 +130,7 @@ export class NotificationService {
    */
   async list(input: ListNotificationsInput) {
     const limit = Math.min(Math.max(input.limit ?? 30, 1), 100);
-
     const now = new Date();
-
     const items = await this.prisma.notification.findMany({
       where: {
         userId: input.userId,
@@ -167,9 +165,7 @@ export class NotificationService {
           }
         : {}),
     });
-
     const hasMore = items.length > limit;
-
     const results = hasMore ? items.slice(0, limit) : items;
 
     return {
@@ -191,7 +187,6 @@ export class NotificationService {
    */
   async getUnreadCount(userId: string, workspaceId?: string) {
     const now = new Date();
-
     const count = await this.prisma.notification.count({
       where: {
         userId,

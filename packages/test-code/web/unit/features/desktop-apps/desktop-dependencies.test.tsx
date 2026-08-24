@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
 
-import { DesktopDependencies } from '@/features/desktop-apps/desktop-dependencies';
-import { listDesktopDependencies, scanDesktopDependencies } from '@/features/desktop-apps/desktop-apps-api';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { listDesktopDependencies, scanDesktopDependencies } from '@/features/desktop-apps/desktop-apps-api';
+import { DesktopDependencies } from '@/features/desktop-apps/desktop-dependencies';
 
 vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
   listDesktopDependencies: vi.fn(),
@@ -13,7 +13,6 @@ vi.mock('@/features/desktop-apps/desktop-apps-api', () => ({
 
 const listMock = vi.mocked(listDesktopDependencies);
 const scanMock = vi.mocked(scanDesktopDependencies);
-
 const dependency = {
   id: 'dependency-1',
   workspaceId: 'workspace-1',

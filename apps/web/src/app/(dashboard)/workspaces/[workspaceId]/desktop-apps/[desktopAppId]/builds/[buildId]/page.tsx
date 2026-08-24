@@ -16,11 +16,8 @@ export default function DesktopBuildDetailsPage() {
     desktopAppId: string;
     buildId: string;
   }>();
-
   const [build, setBuild] = useState<DesktopBuildDetails | null>(null);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -94,12 +91,7 @@ export default function DesktopBuildDetailsPage() {
                 </div>
 
                 {artifact.externalUrl ? (
-                  <a
-                    href={artifact.externalUrl}
-                    target='_blank'
-                    rel='noreferrer'
-                    className='inline-flex items-center gap-2 text-sm font-semibold text-brand-600'
-                  >
+                  <a href={artifact.externalUrl} target='_blank' rel='noreferrer' className='inline-flex items-center gap-2 text-sm font-semibold text-brand-600'>
                     <Download className='size-4' aria-hidden='true' />
                     Open artifact
                   </a>

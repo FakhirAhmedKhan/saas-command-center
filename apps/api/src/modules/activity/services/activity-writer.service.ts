@@ -34,7 +34,6 @@ export class ActivityWriterService {
     }
 
     const createdAt = new Date();
-
     const data: Prisma.ApplicationActivityCreateManyInput[] = inputs.map((input) => {
       const metadata = sanitizeActivityMetadata(input.metadata);
 

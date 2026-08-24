@@ -1,10 +1,10 @@
 ﻿// @vitest-environment jsdom
-import NewWorkspacePage from '@/app/(dashboard)/workspaces/new/new-workspace-client';
-import { listImportableRepositories } from '@/features/workspaces/github-import/github-import-api';
-import { createWorkspace } from '@/features/workspaces/workspace-api';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import NewWorkspacePage from '@/app/(dashboard)/workspaces/new/new-workspace-client';
+import { listImportableRepositories } from '@/features/workspaces/github-import/github-import-api';
+import { createWorkspace } from '@/features/workspaces/workspace-api';
 
 const { useSearchParamsMock } = vi.hoisted(() => ({
   useSearchParamsMock: vi.fn(),

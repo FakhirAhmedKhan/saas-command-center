@@ -23,7 +23,6 @@ export class SentryMobileTelemetryProvider implements MobileTelemetryProviderAda
 
   async getCrashes(context: MobileTelemetryProviderContext) {
     const config = context.config;
-
     const result = await this.explore(
       config,
 
@@ -33,7 +32,6 @@ export class SentryMobileTelemetryProvider implements MobileTelemetryProviderAda
 
       'error.unhandled:true',
     );
-
     const crashCount = this.number(result.data[0]?.['count()']) ?? 0;
 
     return {

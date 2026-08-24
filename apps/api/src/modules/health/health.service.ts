@@ -34,7 +34,6 @@ export class HealthService {
     }
 
     const databaseResponseTimeMs = Math.max(0, Math.round(performance.now() - databaseStartedAt));
-
     const redisStartedAt = performance.now();
 
     try {

@@ -1,11 +1,9 @@
 // @vitest-environment jsdom
-import { MobilePerformanceDashboard } from '@/features/mobile-apps/mobile-performance-dashboard';
-
-import { getMobilePerformanceIssues, getMobilePerformanceSummary, getMobilePerformanceVersions } from '@/features/mobile-apps/mobile-apps-api';
 
 import { render, screen } from '@testing-library/react';
-
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getMobilePerformanceIssues, getMobilePerformanceSummary, getMobilePerformanceVersions } from '@/features/mobile-apps/mobile-apps-api';
+import { MobilePerformanceDashboard } from '@/features/mobile-apps/mobile-performance-dashboard';
 
 vi.mock('@/features/mobile-apps/mobile-apps-api', () => ({
   getMobilePerformanceSummary: vi.fn(),

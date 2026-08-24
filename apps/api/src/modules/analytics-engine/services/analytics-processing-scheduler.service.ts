@@ -77,9 +77,7 @@ export class AnalyticsProcessingSchedulerService implements OnModuleInit, OnModu
 
     try {
       const maxEvents = this.readPositiveInteger(process.env.ANALYTICS_PROCESSING_MAX_EVENTS, DEFAULT_MAX_EVENTS);
-
       const maxWebsites = this.readPositiveInteger(process.env.ANALYTICS_PROCESSING_MAX_WEBSITES, DEFAULT_MAX_WEBSITES);
-
       const websites = await this.prisma.website.findMany({
         where: {
           enabled: true,

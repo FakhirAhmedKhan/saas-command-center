@@ -1,19 +1,11 @@
 // @vitest-environment jsdom
-import { ReleaseDeploymentDashboard } from '@/features/releases/release-deployment-dashboard';
 import type { CurrentEnvironmentVersion, Deployment, DeploymentOptions, Release } from '@/features/releases/release-management.types';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ReleaseDeploymentDashboard } from '@/features/releases/release-deployment-dashboard';
 
-const {
-  getReleaseOptionsMock,
-  getReleasesMock,
-  getDeploymentsMock,
-  getCurrentVersionsMock,
-  createReleaseMock,
-  createDeploymentMock,
-  transitionDeploymentMock,
-} = vi.hoisted(() => ({
+const { getReleaseOptionsMock, getReleasesMock, getDeploymentsMock, getCurrentVersionsMock, createReleaseMock, createDeploymentMock, transitionDeploymentMock } = vi.hoisted(() => ({
   getReleaseOptionsMock: vi.fn(),
   getReleasesMock: vi.fn(),
   getDeploymentsMock: vi.fn(),

@@ -1,14 +1,13 @@
 import { fullStackStateDirectory, fullStackStatePath, readFullStackState, type FullStackState } from './fixtures/state';
-import { Client } from 'pg';
 import { existsSync, rmSync } from 'node:fs';
+import { Client } from 'pg';
 
 /**
  * Mirrors fixtures/database.ts's connection string -- this runs outside the
  * Playwright test context (plain Node), so it can't reuse that helper's
  * request-scoped client pool.
  */
-const FULL_STACK_DATABASE_URL =
-  process.env.FULLSTACK_DATABASE_URL ?? 'postgresql://command_center_full_e2e:command_center_full_e2e@127.0.0.1:5435/command_center_full_e2e?schema=public';
+const FULL_STACK_DATABASE_URL = process.env.FULLSTACK_DATABASE_URL ?? 'postgresql://command_center_full_e2e:command_center_full_e2e@127.0.0.1:5435/command_center_full_e2e?schema=public';
 
 /**
  * Deletes only the records this run's global-setup created (identified by

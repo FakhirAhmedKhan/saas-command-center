@@ -1,6 +1,6 @@
-import { DeploymentTransitionService } from 'src/modules/releases/services/deployment-transition.service';
-import { DeploymentStatus } from 'src/generated/prisma/client';
 import { BadRequestException } from '@nestjs/common';
+import { DeploymentStatus } from 'src/generated/prisma/client';
+import { DeploymentTransitionService } from 'src/modules/releases/services/deployment-transition.service';
 
 describe(DeploymentTransitionService.name, () => {
   const service = new DeploymentTransitionService();

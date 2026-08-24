@@ -13,7 +13,6 @@ export class MobileRepositoryService {
 
   async getLinkedRepository(workspaceId: string, mobileAppId: string) {
     const mobileApp = await this.mobileAppsService.findOne(workspaceId, mobileAppId);
-
     const linked = await this.prisma.repositoryConnection.findFirst({
       where: {
         workspaceId,

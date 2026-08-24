@@ -18,15 +18,10 @@ interface DesktopRepositoryPanelProps {
 
 export function DesktopRepositoryPanel({ workspaceId, desktopApp, onRepositoryChanged }: DesktopRepositoryPanelProps) {
   const [linkedRepository, setLinkedRepository] = useState<RepositoryConnection | null>(null);
-
   const [repositories, setRepositories] = useState<RepositoryConnection[]>([]);
-
   const [selectedRepositoryId, setSelectedRepositoryId] = useState('');
-
   const [loading, setLoading] = useState(true);
-
   const [saving, setSaving] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
 
   /*
@@ -84,11 +79,7 @@ export function DesktopRepositoryPanel({ workspaceId, desktopApp, onRepositoryCh
    * Backend enforcement is still authoritative.
    */
   const selectableRepositories = useMemo(
-    () =>
-      repositories.filter(
-        (repository) =>
-          !repository.archived && repository.isAvailable && (repository.applicationId === null || repository.applicationId === desktopApp.applicationId),
-      ),
+    () => repositories.filter((repository) => !repository.archived && repository.isAvailable && (repository.applicationId === null || repository.applicationId === desktopApp.applicationId)),
 
     [desktopApp.applicationId, repositories],
   );
@@ -153,9 +144,7 @@ export function DesktopRepositoryPanel({ workspaceId, desktopApp, onRepositoryCh
       <div>
         <h2 className='text-lg font-semibold text-slate-950'>Repository</h2>
 
-        <p className='mt-1 max-w-2xl text-sm leading-6 text-slate-500'>
-          Connect this desktop application to a repository already available through the workspace GitHub integration.
-        </p>
+        <p className='mt-1 max-w-2xl text-sm leading-6 text-slate-500'>Connect this desktop application to a repository already available through the workspace GitHub integration.</p>
       </div>
 
       {error ? (
@@ -256,19 +245,14 @@ export function DesktopRepositoryPanel({ workspaceId, desktopApp, onRepositoryCh
           <div className='rounded-xl bg-slate-50 p-4'>
             <p className='text-sm text-slate-600'>No available repositories can currently be linked to this desktop application.</p>
 
-            <Link
-              href={`/workspaces/${workspaceId}/repositories`}
-              className='mt-3 inline-flex text-sm font-semibold text-brand-600 transition hover:text-brand-700'
-            >
+            <Link href={`/workspaces/${workspaceId}/repositories`} className='mt-3 inline-flex text-sm font-semibold text-brand-600 transition hover:text-brand-700'>
               Manage workspace repositories
             </Link>
           </div>
         )}
       </div>
 
-      <p className='mt-4 text-xs leading-5 text-slate-400'>
-        Repository browsing through the internal Code Explorer is added in Phase 7. Phase 4 only creates the repository relationship.
-      </p>
+      <p className='mt-4 text-xs leading-5 text-slate-400'>Repository browsing through the internal Code Explorer is added in Phase 7. Phase 4 only creates the repository relationship.</p>
     </section>
   );
 }

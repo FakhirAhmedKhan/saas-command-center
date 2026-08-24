@@ -12,9 +12,7 @@ interface MobileAppSubNavProps {
 
 export function MobileAppSubNav({ workspaceId, mobileAppId }: MobileAppSubNavProps) {
   const pathname = usePathname();
-
   const base = `/workspaces/${workspaceId}` + `/mobile-apps/${mobileAppId}`;
-
   const items = [
     {
       label: 'Overview',

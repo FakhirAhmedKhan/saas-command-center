@@ -1,18 +1,18 @@
-﻿import { AppModule } from 'src/app.module';
-import { configureApplication } from 'src/bootstrap/configure-application';
-import { createAgent, createTestUser, registerUser, withBearer } from '../helpers/auth';
+﻿import { createAgent, createTestUser, registerUser, withBearer } from '../helpers/auth';
 import { resetDatabase } from '../helpers/database';
 import { readAccessToken } from '../helpers/response';
-import { PrismaService } from 'src/database/prisma.service';
-import { WebhookAttemptOutcome, WebhookDeliveryStatus, WebhookEventType } from 'src/generated/prisma/client';
-import { WEBHOOK_RETRY_BASE_DELAY_MS, WEBHOOK_RETRY_MAX_DELAY_MS } from 'src/modules/webhooks/webhooks.constants';
-import { WebhookDeliveryWorkerService } from 'src/modules/webhooks/services/webhook-delivery-worker.service';
-import { type WebhookHttpResult, WebhookOutboundClientService } from 'src/modules/webhooks/services/webhook-outbound-client.service';
-import { WebhookSecretCryptoService } from 'src/modules/webhooks/services/webhook-secret-crypto.service';
 import { type INestApplication } from '@nestjs/common';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import { randomUUID } from 'node:crypto';
+import { AppModule } from 'src/app.module';
+import { configureApplication } from 'src/bootstrap/configure-application';
+import { PrismaService } from 'src/database/prisma.service';
+import { WebhookAttemptOutcome, WebhookDeliveryStatus, WebhookEventType } from 'src/generated/prisma/client';
+import { WebhookDeliveryWorkerService } from 'src/modules/webhooks/services/webhook-delivery-worker.service';
+import { type WebhookHttpResult, WebhookOutboundClientService } from 'src/modules/webhooks/services/webhook-outbound-client.service';
+import { WebhookSecretCryptoService } from 'src/modules/webhooks/services/webhook-secret-crypto.service';
+import { WEBHOOK_RETRY_BASE_DELAY_MS, WEBHOOK_RETRY_MAX_DELAY_MS } from 'src/modules/webhooks/webhooks.constants';
 import request from 'supertest';
 
 /**
@@ -77,14 +77,12 @@ async function createWorkerTestApp(): Promise<{ app: INestApplication; outbound:
   const outbound: OutboundMock = {
     sendJson: jest.fn(),
   };
-
   const testingModule = await Test.createTestingModule({
     imports: [AppModule],
   })
     .overrideProvider(WebhookOutboundClientService)
     .useValue(outbound)
     .compile();
-
   const app = testingModule.createNestApplication<NestExpressApplication>();
 
   configureApplication(app, {
@@ -110,7 +108,6 @@ describe('Webhook Delivery Worker E2E', () => {
   let prisma: PrismaService;
   let worker: WebhookDeliveryWorkerService;
   let cryptoService: WebhookSecretCryptoService;
-
   let workspaceId: string;
   let ownerId: string;
 
@@ -130,13 +127,11 @@ describe('Webhook Delivery Worker E2E', () => {
       name: 'Webhook Worker Owner',
       workspaceName: 'Webhook Worker Workspace',
     });
-
     const registration = await registerUser(createAgent(app), owner);
 
     expect(registration.status).toBe(201);
 
     const accessToken = readAccessToken(registration);
-
     const workspaceResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces`).set(withBearer(accessToken)).send({
       name: owner.workspaceName,
     });
@@ -168,7 +163,6 @@ describe('Webhook Delivery Worker E2E', () => {
 
   async function createEndpointRecord(overrides: { maxAttempts?: number; enabled?: boolean; name?: string } = {}): Promise<string> {
     const secret = cryptoService.encrypt('worker-test-secret-value');
-
     const endpoint = await prisma.webhookEndpoint.create({
       data: {
         workspaceId,
@@ -210,7 +204,6 @@ describe('Webhook Delivery Worker E2E', () => {
       },
       select: { id: true },
     });
-
     const delivery = await prisma.webhookDelivery.create({
       data: {
         workspaceId,
@@ -249,7 +242,6 @@ describe('Webhook Delivery Worker E2E', () => {
     await runDeliveryDirectly(deliveryId);
 
     const after = Date.now();
-
     const delivery = await prisma.webhookDelivery.findUniqueOrThrow({ where: { id: deliveryId } });
 
     expect(delivery.status).toBe(WebhookDeliveryStatus.RETRY_SCHEDULED);

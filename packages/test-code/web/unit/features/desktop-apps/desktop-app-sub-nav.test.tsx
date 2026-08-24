@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 
-import { DesktopAppSubNav } from '@/features/desktop-apps/desktop-app-sub-nav';
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { DesktopAppSubNav } from '@/features/desktop-apps/desktop-app-sub-nav';
 
 const usePathnameMock = vi.fn();
 

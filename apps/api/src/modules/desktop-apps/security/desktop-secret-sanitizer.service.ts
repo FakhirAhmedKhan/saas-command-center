@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
 const SECRET_KEY = /(secret|token|password|private[_-]?key|api[_-]?key|authorization|credential|certificate|cert|dsn)/i;
-
 const SECRET_VALUE_PATTERNS = [
   /-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/gi,
   /gh[pousr]_[A-Za-z0-9_]{20,}/g,

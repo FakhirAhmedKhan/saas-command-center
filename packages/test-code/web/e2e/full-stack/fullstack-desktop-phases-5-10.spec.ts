@@ -40,11 +40,8 @@ test.describe('Desktop phases 5-10 frontend', () => {
     await loginThroughUi(page, state.owner);
 
     const desktopApp = await createDesktopApplication(request);
-
     const base = `/api/v1/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktopApp.id}`;
-
     const frontendBase = `/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktopApp.id}`;
-
     const build = {
       id: '11111111-1111-4111-8111-111111111111',
       workspaceId: state.owner.workspaceId,
@@ -65,7 +62,6 @@ test.describe('Desktop phases 5-10 frontend', () => {
       createdAt: '2026-08-23T01:00:00.000Z',
       updatedAt: '2026-08-23T01:05:00.000Z',
     };
-
     const desktopDetails = {
       id: desktopApp.id,
       applicationId: desktopApp.applicationId,
@@ -270,9 +266,7 @@ test.describe('Desktop phases 5-10 frontend', () => {
       })
       .click();
 
-    await expect
-      .poll(async () => page.locator('input').evaluateAll((inputs) => inputs.some((input) => (input as HTMLInputElement).value === 'command-center-desktop')))
-      .toBe(true);
+    await expect.poll(async () => page.locator('input').evaluateAll((inputs) => inputs.some((input) => (input as HTMLInputElement).value === 'command-center-desktop'))).toBe(true);
 
     await page.goto(`${frontendBase}/code`);
 

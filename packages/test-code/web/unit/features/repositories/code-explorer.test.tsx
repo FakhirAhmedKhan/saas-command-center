@@ -1,19 +1,18 @@
 // @vitest-environment jsdom
-import { CodeExplorer } from '@/features/repositories/code-explorer';
 import type { RepositoryBranchesResponse, RepositoryTreeResponse } from '@/features/repositories/code-explorer.types';
 import type { RepositoryConnection } from '@/features/repositories/repository.types';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { CodeExplorer } from '@/features/repositories/code-explorer';
 
-const { getRepositoryMock, getRepositoryBranchesMock, getRepositoryTreeMock, getRepositoryCodeFileMock, searchRepositoryFilesMock, getRepositoryFileDiffMock } =
-  vi.hoisted(() => ({
-    getRepositoryMock: vi.fn(),
-    getRepositoryBranchesMock: vi.fn(),
-    getRepositoryTreeMock: vi.fn(),
-    getRepositoryCodeFileMock: vi.fn(),
-    searchRepositoryFilesMock: vi.fn(),
-    getRepositoryFileDiffMock: vi.fn(),
-  }));
+const { getRepositoryMock, getRepositoryBranchesMock, getRepositoryTreeMock, getRepositoryCodeFileMock, searchRepositoryFilesMock, getRepositoryFileDiffMock } = vi.hoisted(() => ({
+  getRepositoryMock: vi.fn(),
+  getRepositoryBranchesMock: vi.fn(),
+  getRepositoryTreeMock: vi.fn(),
+  getRepositoryCodeFileMock: vi.fn(),
+  searchRepositoryFilesMock: vi.fn(),
+  getRepositoryFileDiffMock: vi.fn(),
+}));
 
 vi.mock('@/features/repositories/repositories-api', () => ({
   getRepository: getRepositoryMock,
@@ -94,7 +93,6 @@ function treeFixture(marker: string): RepositoryTreeResponse {
 /** A promise plus its resolve function, so a test can control ordering explicitly. */
 function deferred<T>(): { promise: Promise<T>; resolve: (value: T) => void } {
   let resolve!: (value: T) => void;
-
   const promise = new Promise<T>((res) => {
     resolve = res;
   });
@@ -169,7 +167,6 @@ describe('CodeExplorer', () => {
 
   it('does not update state after unmounting while a request is still in flight', async () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-
     const pendingRepository = deferred<RepositoryConnection>();
 
     getRepositoryMock.mockReturnValueOnce(pendingRepository.promise);

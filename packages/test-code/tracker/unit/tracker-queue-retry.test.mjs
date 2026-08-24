@@ -59,7 +59,6 @@ test('sends no more than 25 events in one batch', async () => {
     url: 'https://app.example.com/',
     eventName: `event_${index}`,
   }));
-
   const harness = await createTrackerHarness({
     localStorage: {
       [`cc_queue_${websiteId}`]: JSON.stringify(initialEvents),

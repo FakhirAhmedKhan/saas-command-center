@@ -1,5 +1,5 @@
-import { getRawTrackingEvents, getTrackingStatus } from '@/features/tracking/tracking-api';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getRawTrackingEvents, getTrackingStatus } from '@/features/tracking/tracking-api';
 
 const { apiRequestMock } = vi.hoisted(() => ({
   apiRequestMock: vi.fn(),

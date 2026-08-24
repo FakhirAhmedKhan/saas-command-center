@@ -22,13 +22,9 @@ interface ProgressMilestone {
 export class ProgressCalculatorService {
   calculateSnapshot(milestones: ProgressMilestone[]): ApplicationProgressExplanation {
     const milestoneResults = milestones.map((milestone) => this.calculateMilestone(milestone));
-
     const included = milestoneResults.filter((milestone) => milestone.included);
-
     const totalMilestoneWeight = included.reduce((total, milestone) => total + milestone.weight, 0);
-
     const weightedProgressPoints = included.reduce((total, milestone) => total + milestone.weight * milestone.progressPercent, 0);
-
     const percentage = totalMilestoneWeight === 0 ? 0 : Math.round(weightedProgressPoints / totalMilestoneWeight);
 
     return {
@@ -74,9 +70,7 @@ export class ProgressCalculatorService {
         },
       },
     });
-
     const explanation = this.calculateSnapshot(milestones);
-
     const calculatedAt = new Date();
 
     for (const result of explanation.milestones) {
@@ -134,13 +128,8 @@ export class ProgressCalculatorService {
     }
 
     const applicableTasks = milestone.tasks.filter((task) => task.status !== ApplicationTaskStatus.SKIPPED);
-
     const applicableTaskWeight = applicableTasks.reduce((total, task) => total + task.weight, 0);
-
-    const completedTaskWeight = applicableTasks
-      .filter((task) => task.status === ApplicationTaskStatus.COMPLETED)
-      .reduce((total, task) => total + task.weight, 0);
-
+    const completedTaskWeight = applicableTasks.filter((task) => task.status === ApplicationTaskStatus.COMPLETED).reduce((total, task) => total + task.weight, 0);
     let progressPercent = 0;
 
     if (applicableTaskWeight > 0) {

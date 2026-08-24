@@ -17,7 +17,6 @@ const DEFAULT_FILTERS: ActivityFilterValue = {
   dateFrom: '',
   dateTo: '',
 };
-
 const DEFAULT_PAGINATION: ActivityPagination = {
   page: 1,
   limit: 20,
@@ -68,25 +67,13 @@ interface ActivityFeedProps {
   showApplication?: boolean;
 }
 
-export function ActivityFeed({
-  workspaceId,
-  applicationId,
-  title = 'Activity history',
-  description = 'Review important changes and the people who made them.',
-  showApplication = false,
-}: ActivityFeedProps) {
+export function ActivityFeed({ workspaceId, applicationId, title = 'Activity history', description = 'Review important changes and the people who made them.', showApplication = false }: ActivityFeedProps) {
   const [filterDraft, setFilterDraft] = useState<ActivityFilterValue>(DEFAULT_FILTERS);
-
   const [query, setQuery] = useState<ActivityListQuery>(filtersToQuery(DEFAULT_FILTERS));
-
   const [activities, setActivities] = useState<ApplicationActivity[]>([]);
-
   const [pagination, setPagination] = useState<ActivityPagination>(DEFAULT_PAGINATION);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
-
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {

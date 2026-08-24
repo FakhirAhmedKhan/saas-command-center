@@ -44,7 +44,6 @@ export class TasksService {
       }
 
       const position = await this.nextTaskPosition(transaction, milestoneId);
-
       const task = await transaction.applicationTask.create({
         data: {
           milestoneId,
@@ -170,9 +169,7 @@ export class TasksService {
       this.shared.ensureApplicationActive(application);
 
       const task = await this.requireTask(transaction, applicationId, taskId);
-
       const status = dto.status as ApplicationTaskStatus;
-
       const updated = await transaction.applicationTask.update({
         where: {
           id: taskId,
@@ -210,7 +207,6 @@ export class TasksService {
       this.shared.ensureApplicationActive(application);
 
       const task = await this.requireTask(transaction, applicationId, taskId);
-
       const openBlockers = await transaction.applicationBlocker.count({
         where: {
           taskId,
@@ -255,7 +251,6 @@ export class TasksService {
       this.shared.ensureApplicationActive(application);
 
       const task = await this.requireTask(transaction, applicationId, taskId);
-
       const updated = await transaction.applicationTask.update({
         where: {
           id: taskId,
@@ -289,7 +284,6 @@ export class TasksService {
       this.shared.ensureApplicationActive(application);
 
       const task = await this.requireTask(transaction, applicationId, taskId);
-
       const updated = await transaction.applicationTask.update({
         where: {
           id: taskId,
@@ -326,7 +320,6 @@ export class TasksService {
       this.shared.ensureApplicationActive(application);
 
       const task = await this.requireTask(transaction, applicationId, taskId);
-
       const targetMilestone = await this.milestones.requireMilestone(transaction, applicationId, dto.targetMilestoneId);
 
       if (targetMilestone.status === MilestoneStatus.SKIPPED) {
@@ -334,7 +327,6 @@ export class TasksService {
       }
 
       const targetPosition = dto.position ?? (await this.nextTaskPosition(transaction, dto.targetMilestoneId));
-
       const updated = await transaction.applicationTask.update({
         where: {
           id: taskId,
@@ -481,7 +473,6 @@ export class TasksService {
         status: BlockerStatus.OPEN,
       },
     });
-
     const task = await transaction.applicationTask.findUnique({
       where: {
         id: taskId,

@@ -1,6 +1,6 @@
 ﻿import { buildLoginPayload, buildRegisterPayload, TEST_ROUTES, type TestUserInput } from './contracts';
 import type { INestApplication } from '@nestjs/common';
-import request, { type Response, type SuperAgentTest } from 'supertest';
+import request, { type Response } from 'supertest';
 
 export interface RegisteredTestUser extends TestUserInput {
   registerResponse: Response;

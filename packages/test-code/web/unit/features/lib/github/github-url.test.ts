@@ -1,5 +1,5 @@
-﻿import { assertTrustedGithubUrl, isTrustedGithubUrl } from '@/features/lib/github/github-url';
-import { describe, expect, it } from 'vitest';
+﻿import { describe, expect, it } from 'vitest';
+import { assertTrustedGithubUrl, isTrustedGithubUrl } from '@/features/lib/github/github-url';
 
 describe('isTrustedGithubUrl', () => {
   it('accepts an https github.com URL', () => {

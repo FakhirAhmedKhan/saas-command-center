@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { ActivityFilters, type ActivityFilterValue } from '@/features/activity/components/activity-filters';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { ActivityFilters, type ActivityFilterValue } from '@/features/activity/components/activity-filters';
 
 const EMPTY_FILTERS: ActivityFilterValue = {
   search: '',
@@ -61,9 +61,7 @@ describe('ActivityFilters', () => {
   });
 
   it('reflects controlled date values back into the date inputs', () => {
-    render(
-      <ActivityFilters value={{ ...EMPTY_FILTERS, dateFrom: '2026-01-01', dateTo: '2026-01-31' }} onChange={vi.fn()} onApply={vi.fn()} onReset={vi.fn()} />,
-    );
+    render(<ActivityFilters value={{ ...EMPTY_FILTERS, dateFrom: '2026-01-01', dateTo: '2026-01-31' }} onChange={vi.fn()} onApply={vi.fn()} onReset={vi.fn()} />);
 
     expect(screen.getByLabelText('From date')).toHaveValue('2026-01-01');
     expect(screen.getByLabelText('To date')).toHaveValue('2026-01-31');

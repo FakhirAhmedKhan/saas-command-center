@@ -7,7 +7,6 @@ test('includes the expected page-view fields', async () => {
     href: 'https://app.example.com/dashboard',
     title: 'Command Center',
   });
-
   const event = harness.payloads()[0].events[0];
 
   assert.equal(event.type, 'PAGE_VIEW');

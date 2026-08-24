@@ -2,7 +2,6 @@ import type { SuggestedWorkspace } from '@command-center/shared-types';
 
 export function suggestWorkspace(repositoryName: string, repositoryDescription: string | null, rootPackageDescription?: string | null): SuggestedWorkspace {
   const name = titleCaseFromSlug(repositoryName);
-
   const slug = normalizeSlug(repositoryName);
 
   return {

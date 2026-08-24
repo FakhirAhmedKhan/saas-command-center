@@ -15,7 +15,6 @@ export class DesktopPerformanceService {
 
     const from = query.from ? new Date(query.from) : null;
     const to = query.to ? new Date(query.to) : null;
-
     const metrics = await this.prisma.desktopMetric.findMany({
       where: {
         workspaceId,
@@ -36,7 +35,6 @@ export class DesktopPerformanceService {
       orderBy: { recordedAt: 'desc' },
       take: 2000,
     });
-
     const average = (type: string): number | null => {
       const values = metrics
         .filter((metric) => metric.type === type)

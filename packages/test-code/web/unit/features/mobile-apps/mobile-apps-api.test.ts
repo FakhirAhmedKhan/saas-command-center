@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { apiRequest } from '@/features/lib/api/api-client';
 import {
   archiveMobileApp,
   connectMobileTelemetry,
@@ -24,16 +26,11 @@ import {
   updateMobileReleaseStatus,
 } from '@/features/mobile-apps/mobile-apps-api';
 
-import { apiRequest } from '@/features/lib/api/api-client';
-
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
 vi.mock('@/features/lib/api/api-client', () => ({
   apiRequest: vi.fn(),
 }));
 
 const mockedApiRequest = vi.mocked(apiRequest);
-
 const WORKSPACE_ID = 'workspace-1';
 const MOBILE_APP_ID = 'mobile-app-1';
 const REPOSITORY_ID = 'repository-1';

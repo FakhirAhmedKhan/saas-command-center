@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   detectDesktopProject,
   getDesktopAppOverview,
@@ -12,14 +13,12 @@ import {
   listDesktopBuilds,
 } from '@/features/desktop-apps/desktop-apps-api';
 import { apiRequest } from '@/features/lib/api/api-client';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/lib/api/api-client', () => ({
   apiRequest: vi.fn(),
 }));
 
 const requestMock = vi.mocked(apiRequest);
-
 const workspaceId = 'workspace-1';
 const desktopAppId = 'desktop-1';
 const buildId = 'build-1';

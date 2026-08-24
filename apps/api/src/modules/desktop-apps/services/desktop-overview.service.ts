@@ -15,7 +15,6 @@ export class DesktopOverviewService {
 
   async get(workspaceId: string, desktopAppId: string) {
     const desktopApp = await this.desktopApps.findOne(workspaceId, desktopAppId);
-
     const [repository, latestBuild, latestRelease] = await Promise.all([
       this.desktopRepositories.getLinkedRepository(workspaceId, desktopAppId),
       this.desktopBuilds.getLatest(workspaceId, desktopAppId),

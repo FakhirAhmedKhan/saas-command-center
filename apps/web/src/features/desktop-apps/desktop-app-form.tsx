@@ -3,13 +3,7 @@
 import { getDesktopFrameworksForPlatform, isDesktopFrameworkAllowed } from './desktop-app-utils';
 import { DESKTOP_ARCHITECTURE_LABELS, DESKTOP_FRAMEWORK_LABELS, DESKTOP_PLATFORM_LABELS } from './desktop-app.constants';
 import { getErrorMessage } from '@/features/lib/api/api-error';
-import type {
-  CreateDesktopApplicationInput,
-  DesktopApplicationDetails,
-  DesktopArchitecture,
-  DesktopFramework,
-  DesktopPlatform,
-} from '@command-center/shared-types';
+import type { CreateDesktopApplicationInput, DesktopApplicationDetails, DesktopArchitecture, DesktopFramework, DesktopPlatform } from '@command-center/shared-types';
 import { Button, Input } from '@command-center/ui';
 import Link from 'next/link';
 import { type FormEvent, useMemo, useState } from 'react';
@@ -35,27 +29,16 @@ function optionalText(value: string): string | undefined {
 
 export function DesktopAppForm({ desktopApp, cancelHref, submitLabel, onSubmit }: DesktopAppFormProps) {
   const [name, setName] = useState(desktopApp?.application.name ?? '');
-
   const [platform, setPlatform] = useState<DesktopPlatform>(desktopApp?.platform ?? 'CROSS_PLATFORM');
-
   const [framework, setFramework] = useState<DesktopFramework>(desktopApp?.framework ?? 'ELECTRON');
-
   const [architecture, setArchitecture] = useState<DesktopArchitecture>(desktopApp?.architecture ?? 'X64');
-
   const [packageName, setPackageName] = useState(desktopApp?.packageName ?? '');
-
   const [currentVersion, setCurrentVersion] = useState(desktopApp?.currentVersion ?? '');
-
   const [currentBuildNumber, setCurrentBuildNumber] = useState(desktopApp?.currentBuildNumber ?? '');
-
   const [minimumOsVersion, setMinimumOsVersion] = useState(desktopApp?.minimumOsVersion ?? '');
-
   const [updateChannel, setUpdateChannel] = useState(desktopApp?.updateChannel ?? '');
-
   const [submitting, setSubmitting] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
-
   const frameworkOptions = useMemo(() => getDesktopFrameworksForPlatform(platform), [platform]);
 
   function handlePlatformChange(nextPlatform: DesktopPlatform): void {
@@ -127,16 +110,7 @@ export function DesktopAppForm({ desktopApp, cancelHref, submitLabel, onSubmit }
 
       <div className='grid gap-5 md:grid-cols-2'>
         <div className='md:col-span-2'>
-          <Input
-            id='desktopApplicationName'
-            label='Application name'
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            placeholder='Command Center Desktop'
-            minLength={2}
-            maxLength={160}
-            required
-          />
+          <Input id='desktopApplicationName' label='Application name' value={name} onChange={(event) => setName(event.target.value)} placeholder='Command Center Desktop' minLength={2} maxLength={160} required />
         </div>
 
         <div>
@@ -144,14 +118,7 @@ export function DesktopAppForm({ desktopApp, cancelHref, submitLabel, onSubmit }
             Platform
           </label>
 
-          <select
-            id='desktopPlatform'
-            aria-label='Platform'
-            className={SELECT_CLASS_NAME}
-            value={platform}
-            disabled={submitting}
-            onChange={(event) => handlePlatformChange(event.target.value as DesktopPlatform)}
-          >
+          <select id='desktopPlatform' aria-label='Platform' className={SELECT_CLASS_NAME} value={platform} disabled={submitting} onChange={(event) => handlePlatformChange(event.target.value as DesktopPlatform)}>
             {Object.entries(DESKTOP_PLATFORM_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
                 {label}
@@ -165,14 +132,7 @@ export function DesktopAppForm({ desktopApp, cancelHref, submitLabel, onSubmit }
             Framework
           </label>
 
-          <select
-            id='desktopFramework'
-            aria-label='Framework'
-            className={SELECT_CLASS_NAME}
-            value={framework}
-            disabled={submitting}
-            onChange={(event) => setFramework(event.target.value as DesktopFramework)}
-          >
+          <select id='desktopFramework' aria-label='Framework' className={SELECT_CLASS_NAME} value={framework} disabled={submitting} onChange={(event) => setFramework(event.target.value as DesktopFramework)}>
             {frameworkOptions.map((value) => (
               <option key={value} value={value}>
                 {DESKTOP_FRAMEWORK_LABELS[value]}
@@ -202,57 +162,19 @@ export function DesktopAppForm({ desktopApp, cancelHref, submitLabel, onSubmit }
           </select>
         </div>
 
-        <Input
-          id='desktopPackageName'
-          label='Package name'
-          value={packageName}
-          onChange={(event) => setPackageName(event.target.value)}
-          placeholder='com.commandcenter.desktop'
-          maxLength={255}
-        />
+        <Input id='desktopPackageName' label='Package name' value={packageName} onChange={(event) => setPackageName(event.target.value)} placeholder='com.commandcenter.desktop' maxLength={255} />
 
-        <Input
-          id='desktopMinimumOsVersion'
-          label='Minimum OS version'
-          value={minimumOsVersion}
-          onChange={(event) => setMinimumOsVersion(event.target.value)}
-          placeholder='Windows 10 / macOS 12'
-          maxLength={64}
-        />
+        <Input id='desktopMinimumOsVersion' label='Minimum OS version' value={minimumOsVersion} onChange={(event) => setMinimumOsVersion(event.target.value)} placeholder='Windows 10 / macOS 12' maxLength={64} />
 
-        <Input
-          id='desktopCurrentVersion'
-          label='Current version'
-          value={currentVersion}
-          onChange={(event) => setCurrentVersion(event.target.value)}
-          placeholder='2.4.0'
-          maxLength={64}
-        />
+        <Input id='desktopCurrentVersion' label='Current version' value={currentVersion} onChange={(event) => setCurrentVersion(event.target.value)} placeholder='2.4.0' maxLength={64} />
 
-        <Input
-          id='desktopCurrentBuildNumber'
-          label='Current build number'
-          value={currentBuildNumber}
-          onChange={(event) => setCurrentBuildNumber(event.target.value)}
-          placeholder='184'
-          maxLength={64}
-        />
+        <Input id='desktopCurrentBuildNumber' label='Current build number' value={currentBuildNumber} onChange={(event) => setCurrentBuildNumber(event.target.value)} placeholder='184' maxLength={64} />
 
-        <Input
-          id='desktopUpdateChannel'
-          label='Update channel'
-          value={updateChannel}
-          onChange={(event) => setUpdateChannel(event.target.value)}
-          placeholder='stable'
-          maxLength={64}
-        />
+        <Input id='desktopUpdateChannel' label='Update channel' value={updateChannel} onChange={(event) => setUpdateChannel(event.target.value)} placeholder='stable' maxLength={64} />
       </div>
 
       <div className='flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:justify-end'>
-        <Link
-          href={cancelHref}
-          className='inline-flex h-10 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50'
-        >
+        <Link href={cancelHref} className='inline-flex h-10 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50'>
           Cancel
         </Link>
 

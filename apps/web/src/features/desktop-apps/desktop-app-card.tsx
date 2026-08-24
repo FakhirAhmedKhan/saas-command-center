@@ -53,18 +53,12 @@ export function DesktopAppCard({ workspaceId, desktopApp }: DesktopAppCardProps)
       </dl>
 
       <div className='mt-auto flex items-center gap-2 border-t border-slate-100 pt-5'>
-        <Link
-          href={detailsHref}
-          className='inline-flex h-9 flex-1 items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 text-sm font-semibold text-white transition hover:bg-slate-800'
-        >
+        <Link href={detailsHref} className='inline-flex h-9 flex-1 items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 text-sm font-semibold text-white transition hover:bg-slate-800'>
           Open
           <ArrowRight className='size-4' aria-hidden='true' />
         </Link>
 
-        <Link
-          href={`${detailsHref}#edit`}
-          className='inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50'
-        >
+        <Link href={`${detailsHref}#edit`} className='inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50'>
           <Pencil className='size-4' aria-hidden='true' />
           Edit
         </Link>

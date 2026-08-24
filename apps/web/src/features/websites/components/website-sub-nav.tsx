@@ -11,9 +11,7 @@ interface WebsiteSubNavProps {
 
 export function WebsiteSubNav({ workspaceId, websiteId }: WebsiteSubNavProps) {
   const pathname = usePathname();
-
   const baseHref = `/workspaces/${workspaceId}/websites/${websiteId}`;
-
   const tabs = [
     { label: 'Overview', href: baseHref },
     { label: 'Analytics', href: `${baseHref}/analytics` },
@@ -33,10 +31,7 @@ export function WebsiteSubNav({ workspaceId, websiteId }: WebsiteSubNavProps) {
             key={tab.href}
             href={tab.href}
             aria-current={isActive ? 'page' : undefined}
-            className={cn(
-              'relative flex h-10 shrink-0 items-center px-3 text-sm font-medium transition',
-              isActive ? 'text-brand-700' : 'text-slate-500 hover:text-slate-800',
-            )}
+            className={cn('relative flex h-10 shrink-0 items-center px-3 text-sm font-medium transition', isActive ? 'text-brand-700' : 'text-slate-500 hover:text-slate-800')}
           >
             {tab.label}
             {isActive ? <span className='absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-brand-600' aria-hidden='true' /> : null}
