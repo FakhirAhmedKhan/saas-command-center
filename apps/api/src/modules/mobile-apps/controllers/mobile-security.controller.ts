@@ -3,9 +3,9 @@ import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.gu
 import { MobilePermissionsService } from '../security/mobile-permissions.service';
 import { Controller, Get, Param, ParseUUIDPipe, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import type { Request } from 'express';
+import type { FastifyRequest } from 'fastify';
 
-interface AuthenticatedRequest extends Request {
+interface AuthenticatedRequest extends FastifyRequest {
   user: {
     id: string;
   };

@@ -6,10 +6,10 @@ import { AnalyzeMobileAppDto } from '../dto/mobile-analysis.dto';
 import { MobileAnalysisService } from '../services/mobile-analysis.service';
 import { Body, Controller, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import type { Request } from 'express';
+import type { FastifyRequest } from 'fastify';
 import { WorkspaceRole } from 'src/generated/prisma/enums';
 
-interface AuthenticatedRequest extends Request {
+interface AuthenticatedRequest extends FastifyRequest {
   user: {
     id: string;
   };

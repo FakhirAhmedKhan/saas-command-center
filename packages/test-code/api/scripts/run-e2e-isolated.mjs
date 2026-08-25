@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const scriptsDirectory = dirname(fileURLToPath(import.meta.url));
 const packageRoot = resolve(scriptsDirectory, '..');
+const jestRunnerPath = resolve(scriptsDirectory, 'run-jest.mjs');
 const repoRoot = resolve(packageRoot, '../../..');
 const appRoot = resolve(repoRoot, 'apps/api');
 const configPath = resolve(packageRoot, 'jest-e2e.config.cjs');
@@ -57,10 +58,9 @@ for (let index = 0; index < files.length; index += 1) {
   line();
 
   const startedAt = performance.now();
-  const result = spawnSync('pnpm', ['exec', 'jest', '--config', configPath, '--runInBand', '--runTestsByPath', file.path], {
+  const result = spawnSync(process.execPath, [jestRunnerPath, '--config', configPath, '--runInBand', '--runTestsByPath', file.path], {
     cwd: appRoot,
     stdio: 'inherit',
-    shell: true,
     env: process.env,
   });
   const elapsed = performance.now() - startedAt;

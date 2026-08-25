@@ -16,7 +16,7 @@ export async function loginThroughUi(page: Page, user: SeedUser): Promise<void> 
 
   await expect(page).toHaveURL(/\/dashboard$/);
 
-  await expect(page.getByText(user.email)).toBeVisible();
+  await expect(page.getByText(user.email).filter({ visible: true })).toBeVisible();
 }
 
 export function uniqueValue(prefix: string, runId: string): string {

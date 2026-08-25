@@ -318,7 +318,7 @@ test.describe('Desktop phases 12-14 UI', () => {
     await page.goto(`${root}/dependencies`);
     await expect(page.getByText('No dependency inventory yet. Run a repository scan.')).toBeVisible();
     await page.getByRole('button', { name: 'Scan Repository' }).click();
-    await expect(page.getByText('electron')).toBeVisible();
+    await expect(page.getByRole('cell', { name: 'electron', exact: true })).toBeVisible();
     await expect(page.getByText('VULNERABLE')).toBeVisible();
 
     // Phase 14: security.

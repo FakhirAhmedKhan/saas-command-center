@@ -1,0 +1,707 @@
+
+==========================================================================================
+FILE: apps/api/src/modules/auth/controllers/auth.controller.ts
+==========================================================================================
+import { CurrentUser } from '../decorators/current-user.decorator';
+import { Public } from '../decorators/public.decorator';
+import { LoginDto } from '../dto/login.dto';
+import { RegisterDto } from '../dto/register.dto';
+import { AuthenticatedUser } from '../interfaces/authenticated-user.interface';
+import { AuthCookieService } from '../services/auth-cookie.service';
+import { AuthService } from '../services/auth.service';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
+import type { Request, Response } from 'express';
+
+/*
+ * These endpoints share the app-wide 100 req/min/IP throttle by default,
+ * which is far too generous for credential-guessing/brute-force resistance.
+ * Override with tighter, endpoint-specific limits (SEC-01).
+ *
+ * Resolved via a function (not a static value) so it's read fresh per
+ * request rather than once at module load — matching the same
+ * env-var-driven, per-request-resolved pattern already used by
+ * IngestionRateLimitService for the analytics collector. This is what lets
+ * environment overrides (e.g. a relaxed test-only limit in .env.test) apply
+ * correctly for a freshly-booted test app without weakening the production
+ * default declared here.
+ */
+function readPositiveInteger(value: string | undefined, fallback: number): number {
+  const parsed = Number(value);
+
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+const REGISTER_THROTTLE = {
+  default: {
+    limit: () => readPositiveInteger(process.env.AUTH_REGISTER_RATE_LIMIT, 5),
+    ttl: () => readPositiveInteger(process.env.AUTH_REGISTER_RATE_WINDOW_MS, 60_000),
+  },
+};
+const LOGIN_THROTTLE = {
+  default: {
+    limit: () => readPositiveInteger(process.env.AUTH_LOGIN_RATE_LIMIT, 5),
+    ttl: () => readPositiveInteger(process.env.AUTH_LOGIN_RATE_WINDOW_MS, 60_000),
+  },
+};
+const REFRESH_THROTTLE = {
+  default: {
+    limit: () => readPositiveInteger(process.env.AUTH_REFRESH_RATE_LIMIT, 10),
+    ttl: () => readPositiveInteger(process.env.AUTH_REFRESH_RATE_WINDOW_MS, 60_000),
+  },
+};
+
+type AuthSessionResult = Awaited<ReturnType<AuthService['login']>>;
+
+type PublicAuthSession = Omit<AuthSessionResult, 'refreshToken'>;
+
+type AuthRequestMetadata = Parameters<AuthService['login']>[1];
+
+function getAuthRequestMetadata(request: Request): AuthRequestMetadata {
+  return {
+    userAgent: request.get('user-agent')?.slice(0, 512),
+    ipAddress: request.ip ?? request.socket.remoteAddress,
+  };
+}
+
+function toPublicAuthSession(result: AuthSessionResult): PublicAuthSession {
+  const { refreshToken, ...publicSession } = result;
+
+  void refreshToken;
+
+  return publicSession;
+}
+@ApiTags('Authentication')
+@Controller('auth')
+export class AuthController {
+  constructor(
+    private readonly authService: AuthService,
+
+    private readonly authCookieService: AuthCookieService,
+  ) {}
+
+  @Public()
+  @Throttle(REGISTER_THROTTLE)
+  @Post('register')
+  @ApiOperation({
+    summary: 'Register and create a user session',
+  })
+  async register(
+    @Body()
+    dto: RegisterDto,
+
+    @Req()
+    request: Request,
+
+    @Res({
+      passthrough: true,
+    })
+    response: Response,
+  ): Promise<PublicAuthSession> {
+    const result = await this.authService.register(dto, getAuthRequestMetadata(request));
+
+    this.authCookieService.setRefreshToken(response, result.refreshToken);
+
+    return toPublicAuthSession(result);
+  }
+
+  @Public()
+  @Throttle(LOGIN_THROTTLE)
+  @Post('login')
+  @ApiOperation({
+    summary: 'Authenticate and create a user session',
+  })
+  async login(
+    @Body()
+    dto: LoginDto,
+
+    @Req()
+    request: Request,
+
+    @Res({
+      passthrough: true,
+    })
+    response: Response,
+  ): Promise<PublicAuthSession> {
+    const result = await this.authService.login(dto, getAuthRequestMetadata(request));
+
+    this.authCookieService.setRefreshToken(response, result.refreshToken);
+
+    return toPublicAuthSession(result);
+  }
+
+  @Public()
+  @Throttle(REFRESH_THROTTLE)
+  @Post('refresh')
+  @ApiOperation({
+    summary: 'Rotate the current refresh session',
+  })
+  async refresh(
+    @Req()
+    request: Request,
+
+    @Res({
+      passthrough: true,
+    })
+    response: Response,
+  ): Promise<PublicAuthSession> {
+    const refreshToken = this.authCookieService.getRefreshToken(request);
+
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token is missing.');
+    }
+
+    const result = await this.authService.refresh(refreshToken, getAuthRequestMetadata(request));
+
+    this.authCookieService.setRefreshToken(response, result.refreshToken);
+
+    return toPublicAuthSession(result);
+  }
+
+  @Public()
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Revoke the current user session',
+  })
+  async logout(
+    @Req()
+    request: Request,
+
+    @Res({
+      passthrough: true,
+    })
+    response: Response,
+  ): Promise<{
+    success: true;
+  }> {
+    const refreshToken = this.authCookieService.getRefreshToken(request);
+
+    try {
+      if (refreshToken) {
+        await this.authService.logout(refreshToken);
+      }
+    } finally {
+      this.authCookieService.clearRefreshToken(response);
+    }
+
+    return {
+      success: true,
+    };
+  }
+
+  @ApiBearerAuth()
+  @Post('logout-all')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Revoke every user session',
+  })
+  async logoutAll(
+    @CurrentUser()
+    user: AuthenticatedUser,
+
+    @Res({
+      passthrough: true,
+    })
+    response: Response,
+  ): Promise<{
+    success: true;
+  }> {
+    await this.authService.logoutAll(user.id);
+
+    this.authCookieService.clearRefreshToken(response);
+
+    return {
+      success: true,
+    };
+  }
+
+  @ApiBearerAuth()
+  @Get('me')
+  @ApiOperation({
+    summary: 'Return the active user',
+  })
+  getCurrentUser(
+    @CurrentUser()
+    user: AuthenticatedUser,
+  ): Promise<unknown> {
+    return this.authService.getCurrentUser(user.id);
+  }
+}
+
+
+==========================================================================================
+FILE: apps/api/src/common/filters/all-exceptions.filter.ts
+==========================================================================================
+import type { RequestWithId } from '../middleware/request-id.middleware';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import type {
+  //   Request,
+  Response,
+} from 'express';
+import { Prisma } from 'src/generated/prisma/client';
+
+interface ErrorResponse {
+  statusCode: number;
+  message: string | string[];
+  error?: string;
+  path: string;
+  timestamp: string;
+  requestId?: string;
+}
+
+interface NormalizedException {
+  message: string | string[];
+  error?: string;
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === 'string');
+}
+
+/*
+ * Express middleware (body-parser, CORS) rejects requests with a plain Error
+ * carrying an HTTP status rather than a Nest HttpException — an oversized body
+ * arrives as `{ status: 413, type: 'entity.too.large' }`. Without this, those
+ * client errors would be reported as 500s.
+ */
+function getExpressErrorStatus(exception: unknown): number | undefined {
+  if (typeof exception !== 'object' || exception === null) {
+    return undefined;
+  }
+
+  const candidate = exception as { status?: unknown; statusCode?: unknown };
+  const status = typeof candidate.status === 'number' ? candidate.status : candidate.statusCode;
+
+  if (typeof status !== 'number' || !Number.isInteger(status)) {
+    return undefined;
+  }
+
+  return status >= 400 && status <= 599 ? status : undefined;
+}
+
+interface PrismaKnownErrorResponse {
+  status: number;
+  message: string;
+  error: string;
+}
+
+/*
+ * Safety net only: most services translate P2002 (and similar) into a
+ * domain-specific ConflictException themselves so callers get a useful
+ * message ("Email is already in use", "Workspace slug already exists",
+ * etc). This map exists for the Prisma errors that slip past every
+ * service-level catch -- it converts them into a safe, generic 4xx
+ * instead of an opaque 500, without ever exposing raw Prisma error text,
+ * table/column names, or the `meta` field to the client.
+ */
+const PRISMA_KNOWN_ERROR_RESPONSES: Partial<Record<string, PrismaKnownErrorResponse>> = {
+  P2002: {
+    status: HttpStatus.CONFLICT,
+    message: 'A record with this value already exists.',
+    error: 'Conflict',
+  },
+
+  P2025: {
+    status: HttpStatus.NOT_FOUND,
+    message: 'The requested resource was not found.',
+    error: 'Not Found',
+  },
+};
+
+function normalizeHttpException(exception: HttpException): NormalizedException {
+  const exceptionResponse = exception.getResponse();
+
+  if (typeof exceptionResponse === 'string') {
+    return {
+      message: exceptionResponse,
+    };
+  }
+
+  if (typeof exceptionResponse !== 'object' || exceptionResponse === null) {
+    return {
+      message: exception.message,
+    };
+  }
+
+  const responseRecord = exceptionResponse as Record<string, unknown>;
+  const rawMessage = responseRecord.message;
+  const message = typeof rawMessage === 'string' || isStringArray(rawMessage) ? rawMessage : exception.message;
+  const rawError = responseRecord.error;
+
+  return {
+    message,
+    error: typeof rawError === 'string' ? rawError : undefined,
+  };
+}
+
+@Catch()
+export class AllExceptionsFilter implements ExceptionFilter {
+  private readonly logger = new Logger(AllExceptionsFilter.name);
+
+  catch(exception: unknown, host: ArgumentsHost): void {
+    const context = host.switchToHttp();
+    const request = context.getRequest<RequestWithId>();
+    const response = context.getResponse<Response>();
+    const isHttpException = exception instanceof HttpException;
+    const isPrismaKnownError = !isHttpException && exception instanceof Prisma.PrismaClientKnownRequestError;
+    const prismaResponse = isPrismaKnownError ? PRISMA_KNOWN_ERROR_RESPONSES[exception.code] : undefined;
+    const expressErrorStatus = isHttpException || isPrismaKnownError ? undefined : getExpressErrorStatus(exception);
+    const statusCode = isHttpException ? exception.getStatus() : (prismaResponse?.status ?? expressErrorStatus ?? HttpStatus.INTERNAL_SERVER_ERROR);
+    const normalizedException = isHttpException
+      ? normalizeHttpException(exception)
+      : prismaResponse
+        ? {
+            message: prismaResponse.message,
+            error: prismaResponse.error,
+          }
+        : expressErrorStatus !== undefined
+          ? {
+              message: exception instanceof Error ? exception.message : 'Request rejected',
+            }
+          : {
+              message: 'Internal server error',
+              error: 'Internal Server Error',
+            };
+
+    if (isPrismaKnownError && prismaResponse) {
+      /*
+       * Handled gracefully, but a service should ideally have caught this
+       * itself with a more specific message -- worth knowing about without
+       * treating it as a genuine 500-level failure.
+       */
+      this.logger.warn(
+        [`${request.method} ${request.originalUrl}`, request.requestId ? `requestId=${request.requestId}` : undefined, `Unhandled Prisma ${exception.code} reached the global filter; consider a service-level catch.`]
+          .filter(Boolean)
+          .join(' | '),
+      );
+    } else if (!isHttpException && expressErrorStatus === undefined) {
+      const stack = exception instanceof Error ? exception.stack : String(exception);
+
+      this.logger.error([`${request.method} ${request.originalUrl}`, request.requestId ? `requestId=${request.requestId}` : undefined, stack].filter(Boolean).join(' | '));
+    }
+
+    const body: ErrorResponse = {
+      statusCode,
+      message: normalizedException.message,
+      error: normalizedException.error,
+      path: request.originalUrl,
+      timestamp: new Date().toISOString(),
+      requestId: request.requestId,
+    };
+
+    response.status(statusCode).json(body);
+  }
+}
+
+
+==========================================================================================
+FILE: apps/api/src/common/middleware/request-id.middleware.ts
+==========================================================================================
+import type { NextFunction, Request, Response } from 'express';
+import { randomUUID } from 'node:crypto';
+
+export const REQUEST_ID_HEADER = 'x-request-id';
+
+export interface RequestWithId extends Request {
+  requestId: string;
+}
+
+/*
+ * This value is echoed into the response header, embedded verbatim into
+ * JSON error bodies, and written into application logs on 500-level errors
+ * (see AllExceptionsFilter) — all before any other validation runs. A
+ * client-supplied value must therefore be bounded and restricted to a safe
+ * character set so it can't carry newlines/control characters (log
+ * injection) or be used to send an oversized value.
+ */
+const MAX_REQUEST_ID_LENGTH = 128;
+const VALID_REQUEST_ID_PATTERN = /^[A-Za-z0-9:_-]+$/;
+
+function getExistingRequestId(value: string | string[] | undefined): string | undefined {
+  const rawValue = Array.isArray(value) ? value[0] : value;
+  const normalizedValue = rawValue?.trim();
+
+  if (!normalizedValue) {
+    return undefined;
+  }
+
+  if (normalizedValue.length > MAX_REQUEST_ID_LENGTH || !VALID_REQUEST_ID_PATTERN.test(normalizedValue)) {
+    return undefined;
+  }
+
+  return normalizedValue;
+}
+
+export function requestIdMiddleware(request: Request, response: Response, next: NextFunction): void {
+  const existingRequestId = getExistingRequestId(request.headers[REQUEST_ID_HEADER]);
+  const requestId = existingRequestId ?? randomUUID();
+
+  (request as RequestWithId).requestId = requestId;
+
+  response.setHeader(REQUEST_ID_HEADER, requestId);
+
+  next();
+}
+
+
+==========================================================================================
+FILE: apps/api/src/bootstrap/configure-application.ts
+==========================================================================================
+import { AllExceptionsFilter } from '../common/filters/all-exceptions.filter';
+import { getAllowedOrigins, type TypedConfigService } from '../config/runtime-config';
+import fastifyCookie from '@fastify/cookie';
+import fastifyHelmet from '@fastify/helmet';
+import { Logger, ValidationPipe, type INestApplication } from '@nestjs/common';
+import type { CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
+import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import type { FastifyInstance, FastifyRequest } from 'fastify';
+
+export interface ConfigureApplicationOptions {
+  enableSwagger?: boolean;
+}
+
+function configureCors(app: INestApplication, config: TypedConfigService): void {
+  const allowedOrigins = getAllowedOrigins(config);
+  const commonOptions = {
+    methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Authorization', 'Content-Type', 'X-Request-Id', 'X-Workspace-Id'],
+    exposedHeaders: ['X-Request-Id'],
+  };
+  const corsOptionsDelegate: CorsOptionsDelegate<FastifyRequest> = (request, callback) => {
+    const requestPath = (request.raw.url ?? request.url ?? '').split('?')[0];
+
+    /*
+     * The analytics collector performs its own tracking-key and
+     * Website.allowedOrigins validation.
+     */
+    if (requestPath === '/api/v1/collect') {
+      callback(null, {
+        ...commonOptions,
+        credentials: false,
+        origin: false,
+      });
+
+      return;
+    }
+
+    const origin = request.headers.origin;
+
+    if (!origin || allowedOrigins.has(origin)) {
+      callback(null, {
+        ...commonOptions,
+        credentials: true,
+        origin: true,
+      });
+
+      return;
+    }
+
+    callback(new Error(`Origin ${origin} is not allowed by CORS.`), {
+      ...commonOptions,
+      credentials: false,
+      origin: false,
+    });
+  };
+
+  app.enableCors((() => corsOptionsDelegate) as unknown as CorsOptionsDelegate<FastifyRequest>);
+}
+
+function configureSwagger(app: INestApplication): void {
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('SaaS Command Center API')
+    .setDescription('Backend API for SaaS Command Center.')
+    .setVersion('0.1.0')
+    .addBearerAuth()
+    .addCookieAuth('command_center_refresh_token')
+    .build();
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+
+  SwaggerModule.setup('api/v1/docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
+}
+
+export function configureApplication(app: INestApplication, options: ConfigureApplicationOptions = {}): void {
+  const logger = new Logger('ApplicationBootstrap');
+  const config = app.get<TypedConfigService>(ConfigService);
+  const fastify = app.getHttpAdapter().getInstance() as FastifyInstance;
+
+  /*
+   * Queue plugins before app.init()/app.listen().
+   * Fastify completes plugin registration during initialization.
+   */
+  fastify.register(fastifyCookie);
+
+  fastify.register(fastifyHelmet, {
+    global: true,
+    contentSecurityPolicy:
+      config.get('NODE_ENV', {
+        infer: true,
+      }) === 'production',
+    crossOriginResourcePolicy: {
+      policy: 'cross-origin',
+    },
+  });
+
+  fastify.addHook('onRequest', (request, reply, done) => {
+    reply.header('X-Request-Id', request.id);
+    done();
+  });
+
+  configureCors(app, config);
+
+  app.setGlobalPrefix('api/v1');
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      forbidUnknownValues: true,
+      stopAtFirstError: false,
+    }),
+  );
+
+  app.useGlobalFilters(new AllExceptionsFilter());
+
+  app.enableShutdownHooks();
+
+  const swaggerEnabled =
+    options.enableSwagger ??
+    config.get('SWAGGER_ENABLED', {
+      infer: true,
+    });
+
+  if (swaggerEnabled) {
+    configureSwagger(app);
+
+    logger.log('Swagger enabled at /api/v1/docs');
+  }
+}
+
+
+==========================================================================================
+FILE: apps/api/src/main.ts
+==========================================================================================
+import { AppModule } from './app.module';
+import { configureApplication } from './bootstrap/configure-application';
+import { assertStartupRequirements } from './bootstrap/startup-checks';
+import { validateEnvironment } from './config/env.validation';
+import { parseBodyLimit, parseTrustProxy, type TypedConfigService } from './config/runtime-config';
+import { type INestApplication, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
+import { config as loadEnvironment } from 'dotenv';
+import { randomUUID } from 'node:crypto';
+
+loadEnvironment({
+  path: ['../../.env', '.env'],
+});
+
+async function bootstrap(): Promise<void> {
+  const environment = validateEnvironment(process.env);
+  const adapter = new FastifyAdapter({
+    trustProxy: parseTrustProxy(environment.TRUST_PROXY),
+    bodyLimit: parseBodyLimit(environment.BODY_LIMIT),
+    requestIdHeader: 'x-request-id',
+    genReqId: () => randomUUID(),
+  });
+  const app: INestApplication = await NestFactory.create<NestFastifyApplication>(AppModule, adapter, {
+    bufferLogs: true,
+
+    // Keeps the original raw payload available for signed webhooks.
+    rawBody: true,
+  });
+
+  configureApplication(app);
+
+  await assertStartupRequirements(app);
+
+  const config = app.get<TypedConfigService>(ConfigService);
+  const port = config.get('PORT', {
+    infer: true,
+  });
+
+  await app.listen(port, '0.0.0.0');
+
+  const logger = new Logger('Bootstrap');
+  logger.log(`Command Center API running on port ${port}.`);
+}
+
+void bootstrap();
+
+
+==========================================================================================
+FILE: packages/test-code/api/helpers/create-test-app.ts
+==========================================================================================
+import { type INestApplication } from '@nestjs/common';
+import { type NestExpressApplication } from '@nestjs/platform-express';
+import { Test } from '@nestjs/testing';
+import { AppModule } from 'src/app.module';
+import { configureApplication } from 'src/bootstrap/configure-application';
+
+export async function createTestApp(): Promise<INestApplication> {
+  const testingModule = await Test.createTestingModule({
+    imports: [AppModule],
+  }).compile();
+  const app = testingModule.createNestApplication<NestExpressApplication>();
+
+  /*
+   * Boot the same way production does so E2E exercises the real filters,
+   * request-id middleware, helmet, CORS and body limits.
+   *
+   * Swagger defaults to enabled outside production; skip the document build
+   * so each suite does not pay for it.
+   */
+  configureApplication(app, {
+    enableSwagger: false,
+  });
+
+  await app.init();
+
+  return app;
+}
+
+
+==========================================================================================
+REMAINING EXPRESS-SPECIFIC USAGE
+==========================================================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\filters\all-exceptions.filter.ts:6: } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\filters\all-exceptions.filter.ts:139: [`${request.method} ${request.originalUrl}`, request.requestId ? `requestId=${request.requestId}` : undefined, `Unhandled Prisma ${exception.code} reached the global filter; consider a service-level catch.`]
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\filters\all-exceptions.filter.ts:146: this.logger.error([`${request.method} ${request.originalUrl}`, request.requestId ? `requestId=${request.requestId}` : undefined, stack].filter(Boolean).join(' | '));
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\filters\all-exceptions.filter.ts:153: path: request.originalUrl,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\filters\all-exceptions.filter.ts:158: response.status(statusCode).json(body);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\middleware\request-id.middleware.ts:1: import type { NextFunction, Request, Response } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\rate-limit\shared-rate-limit.guard.ts:5: import type { Request, Response } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-engine\controllers\analytics-engine.controller.ts:10: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-ingestion\controllers\analytics-ingestion.controller.ts:7: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-reports\controllers\analytics-reports.controller.ts:8: import type { Response } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\applications\controllers\applications.controller.ts:11: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\auth\controllers\auth.controller.ts:11: import type { Request, Response } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\auth\controllers\auth.controller.ts:59: userAgent: request.get('user-agent')?.slice(0, 512),
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\auth\interfaces\request-with-user.interface.ts:2: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\auth\services\auth-cookie.service.ts:4: import type { CookieOptions, Request, Response } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-analysis.controller.ts:9: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-apps.controller.ts:9: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-security.controller.ts:8: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:27: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\controllers\mobile-analysis.controller.ts:9: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\controllers\mobile-apps.controller.ts:9: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\controllers\mobile-security.controller.ts:6: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\controllers\github-connect.controller.ts:9: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\controllers\github-webhook.controller.ts:5: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\team-operations\controllers\invitation-response.controller.ts:6: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\team-operations\controllers\notifications.controller.ts:6: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\team-operations\controllers\workspace-invitations.controller.ts:12: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\websites\controllers\websites.controller.ts:9: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\workspace\controllers\workspace-creation.controller.ts:6: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase19-repository-integrations.e2e-spec.ts:8: import { json, raw, urlencoded } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase21-github-workspace-import.e2e-spec.ts:8: import { json, urlencoded } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\unit\common\middleware\request-id.middleware.spec.ts:1: import type { NextFunction, Request, Response } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\unit\common\rate-limit\shared-rate-limit.guard.spec.ts:1: import type { Request } from 'express';

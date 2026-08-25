@@ -1,11 +1,10 @@
 'use client';
 
-import { DesktopAppSubNav } from '@/features/desktop-apps/desktop-app-sub-nav';
 import { getDesktopAppOverview } from '@/features/desktop-apps/desktop-apps-api';
 import { getErrorMessage } from '@/features/lib/api/api-error';
 import { CodeExplorer } from '@/features/repositories/code-explorer';
 import type { DesktopAppOverview } from '@command-center/shared-types';
-import { ArrowLeft, Code2, GitBranch } from 'lucide-react';
+import { Code2, GitBranch } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -42,48 +41,32 @@ export default function DesktopCodePage() {
   }, [load]);
 
   if (loading) {
-    return (
-      <main className='mx-auto w-full max-w-7xl p-8'>
-        <div className='h-[600px] animate-pulse rounded-2xl bg-slate-100' />
-      </main>
-    );
+    return <div className='h-[600px] animate-pulse rounded-2xl bg-slate-100' />;
   }
 
   if (error || !overview) {
     return (
-      <main className='mx-auto w-full max-w-7xl p-8'>
-        <div role='alert' className='rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700'>
-          {error ?? 'Unable to load desktop application.'}
-        </div>
-      </main>
+      <div role='alert' className='rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700'>
+        {error ?? 'Unable to load desktop application.'}
+      </div>
     );
   }
 
   const repository = overview.repository;
 
   return (
-    <main className='mx-auto w-full max-w-7xl space-y-6 p-4 pt-8 sm:p-6 sm:pt-10 lg:p-8'>
-      <header>
-        <Link href={baseHref} className='inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-900'>
-          <ArrowLeft className='size-4' />
+    <div className='space-y-6'>
+      <header className='flex items-start gap-3'>
+        <div className='flex size-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600'>
+          <Code2 className='size-5' />
+        </div>
 
-          {overview.desktopApp.application.name}
-        </Link>
+        <div>
+          <h1 className='text-2xl font-bold tracking-tight text-slate-950'>Code</h1>
 
-        <div className='mt-5 flex items-start gap-3'>
-          <div className='flex size-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600'>
-            <Code2 className='size-5' />
-          </div>
-
-          <div>
-            <h1 className='text-2xl font-bold tracking-tight text-slate-950'>Code</h1>
-
-            <p className='mt-1 text-sm text-slate-500'>Browse the source repository for {overview.desktopApp.application.name}.</p>
-          </div>
+          <p className='mt-1 text-sm text-slate-500'>Browse the source repository for {overview.desktopApp.application.name}.</p>
         </div>
       </header>
-
-      <DesktopAppSubNav workspaceId={workspaceId} desktopAppId={desktopAppId} />
 
       {!repository ? (
         <section className='flex min-h-80 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 text-center'>
@@ -114,6 +97,6 @@ export default function DesktopCodePage() {
           <CodeExplorer workspaceId={workspaceId} repositoryId={repository.id} />
         </>
       )}
-    </main>
+    </div>
   );
 }

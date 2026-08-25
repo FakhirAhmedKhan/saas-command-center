@@ -1,5 +1,5 @@
-﻿import type { Metadata } from 'next';
-import Image from 'next/image';
+﻿import { LogoMark } from '@/components/brand/logo-mark';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
@@ -93,14 +93,6 @@ const IconCode = ({ className }: IconProps) => (
   </svg>
 );
 
-function LogoMark() {
-  return (
-    <div className='relative h-8 w-8 overflow-hidden rounded-xl'>
-      <Image src='/icon.svg' alt='SaaS Command Center' className='h-full w-full object-contain' width={32} height={32} />
-    </div>
-  );
-}
-
 function SectionEyebrow({ children, center = false }: { children: React.ReactNode; center?: boolean }) {
   return (
     <div className={`mb-5 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-blue-300 ${center ? 'justify-center' : ''}`}>
@@ -115,7 +107,7 @@ function Navbar() {
     <header className='fixed inset-x-0 top-0 z-50 border-b border-white/[0.06] bg-[#05070b]/70 backdrop-blur-2xl'>
       <div className='mx-auto flex h-[72px] max-w-7xl items-center justify-between px-5 sm:px-6 lg:px-8'>
         <Link href='/' className='group flex items-center gap-3'>
-          <LogoMark />
+          <LogoMark className='size-8 shrink-0' />
 
           {/* <Architecture className='h-6 w-auto text-white transition group-hover:text-blue-400' /> */}
           <div className='leading-none'>
@@ -877,7 +869,7 @@ function Architecture() {
         <div className='mx-auto mt-16 max-w-5xl rounded-[24px] border border-white/[0.07] bg-[#080a0f] p-5 sm:p-8'>
           <div className='mx-auto max-w-3xl'>
             <div className='mx-auto flex max-w-sm items-center justify-center gap-3 rounded-2xl border border-blue-400/20 bg-blue-400/[0.06] px-5 py-4 text-sm font-semibold text-white shadow-[0_0_60px_rgba(59,130,246,0.08)]'>
-              <LogoMark />
+              <LogoMark className='size-8 shrink-0' />
               SaaS Command Center
             </div>
 
@@ -1041,7 +1033,7 @@ function FinalCTA() {
 
         <div className='relative mx-auto max-w-3xl'>
           <div className='mx-auto mb-7 flex h-12 w-12 items-center justify-center'>
-            <LogoMark />
+            <LogoMark className='size-12' />
           </div>
 
           <h2 className='text-balance text-4xl font-semibold tracking-[-0.05em] text-white sm:text-5xl md:text-6xl'>Stop switching between dashboards.</h2>
@@ -1071,7 +1063,7 @@ function Footer() {
         <div className='grid gap-10 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr]'>
           <div>
             <Link href='/' className='inline-flex items-center gap-3'>
-              <LogoMark />
+              <LogoMark className='size-8 shrink-0' />
               <span className='text-sm font-semibold text-white'>SaaS Command Center</span>
             </Link>
 

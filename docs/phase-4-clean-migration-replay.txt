@@ -1,0 +1,43 @@
+﻿PHASE 4 — CLEAN PRISMA MIGRATION REPLAY
+SAFE TARGET HOST: 127.0.0.1
+SAFE TARGET DATABASE: command_center_test
+
+==========================================================================================
+RESET AND REPLAY ALL MIGRATIONS
+==========================================================================================
+Loaded Prisma config from prisma.config.ts.
+System.Management.Automation.RemoteException
+System.Management.Automation.RemoteException
+! unknown or unexpected option: --skip-seed
+System.Management.Automation.RemoteException
+Reset your database and apply all migrations, all data will be lost
+System.Management.Automation.RemoteException
+Usage
+System.Management.Automation.RemoteException
+  $ prisma migrate reset [options]
+System.Management.Automation.RemoteException
+  The datasource URL configuration is read from the Prisma config file (e.g., prisma.config.ts).
+System.Management.Automation.RemoteException
+Options
+System.Management.Automation.RemoteException
+       -h, --help   Display this help message
+         --config   Custom path to your Prisma config file
+         --schema   Custom path to your Prisma schema
+      -f, --force   Skip the confirmation prompt
+System.Management.Automation.RemoteException
+Examples
+System.Management.Automation.RemoteException
+  Reset your database and apply all migrations, all data will be lost
+  $ prisma migrate reset
+System.Management.Automation.RemoteException
+  Specify a schema
+  $ prisma migrate reset --schema=./schema.prisma
+System.Management.Automation.RemoteException
+  Use --force to skip the confirmation prompt
+  $ prisma migrate reset --force
+System.Management.Automation.RemoteException
+undefined
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api:
+[ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL] Command failed with exit code 1: prisma migrate reset --force --skip-seed --skip-generate
+
+EXIT CODE: 1

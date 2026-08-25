@@ -5,11 +5,11 @@
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test:unit": "jest --config jest.config.cjs --runInBand",
-    "pretest:e2e": "pnpm --dir ../../../apps/api exec node -e \"require('dotenv').config({path:'.env.test',override:true,quiet:true});const{spawnSync}=require('node:child_process');const r=spawnSync('pnpm',['exec','prisma','migrate','deploy'],{stdio:'inherit',env:process.env,shell:true});process.exit(r.status??1)\"",
+    "test:unit": "node scripts/run-jest.mjs --config ../../packages/test-code/api/jest.config.cjs --runInBand",
+    "pretest:e2e": "pnpm --dir ../../../apps/api exec node -e \"require(\u0027dotenv\u0027).config({path:\u0027.env.test\u0027,override:true,quiet:true});const{spawnSync}=require(\u0027node:child_process\u0027);const r=spawnSync(\u0027pnpm\u0027,[\u0027exec\u0027,\u0027prisma\u0027,\u0027migrate\u0027,\u0027deploy\u0027],{stdio:\u0027inherit\u0027,env:process.env,shell:true});process.exit(r.status??1)\"",
     "test:e2e": "node scripts/run-e2e-isolated.mjs",
-    "test": "pnpm run test:unit && pnpm run test:e2e",
-    "test:e2e:fast": "pnpm --dir ../../../apps/api exec jest --config ../../packages/test-code/api/jest-e2e.config.cjs --runInBand",
+    "test": "pnpm run test:unit \u0026\u0026 pnpm run test:e2e",
+    "test:e2e:fast": "node scripts/run-jest.mjs --config ../../packages/test-code/api/jest-e2e.config.cjs --runInBand",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },

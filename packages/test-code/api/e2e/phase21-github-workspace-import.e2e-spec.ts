@@ -1,12 +1,11 @@
 import { createAgent, createTestUser, registerUser, withBearer } from '../helpers/auth';
 import { resetDatabase } from '../helpers/database';
 import { readAccessToken } from '../helpers/response';
-import { ValidationPipe, type INestApplication } from '@nestjs/common';
-import { type NestExpressApplication } from '@nestjs/platform-express';
+import { type INestApplication } from '@nestjs/common';
+import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
-import cookieParser from 'cookie-parser';
-import { json, urlencoded } from 'express';
 import { AppModule } from 'src/app.module';
+import { configureApplication } from 'src/bootstrap/configure-application';
 import { PrismaService } from 'src/database/prisma.service';
 import { GithubAppService, type GithubImportableRepository, type GithubInstallation } from 'src/modules/repositories/services/github-app.service';
 import { GithubCodeService, type GithubRepositoryContent, type GithubRepositoryTree } from 'src/modules/repositories/services/github-code.service';
@@ -131,30 +130,22 @@ async function createTestApp(): Promise<{
     .overrideProvider(GithubCodeService)
     .useValue(githubCodeMock)
     .compile();
-  const app = testingModule.createNestApplication<NestExpressApplication>({
-    bodyParser: false,
-  });
-  const expressInstance = app.getHttpAdapter().getInstance();
-  expressInstance.set('trust proxy', 1);
-
-  app.use(cookieParser());
-  app.use(json({ limit: '1mb' }));
-  app.use(urlencoded({ extended: true, limit: '1mb' }));
-
-  app.setGlobalPrefix('api/v1');
-
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
+  const app = testingModule.createNestApplication<NestFastifyApplication>(
+    new FastifyAdapter({
+      trustProxy: 1,
+      bodyLimit: 1024 * 1024,
     }),
+    {
+      rawBody: true,
+    },
   );
 
+  configureApplication(app, {
+    enableSwagger: false,
+  });
+
   await app.init();
+  await app.getHttpAdapter().getInstance().ready();
 
   return { app, githubAppMock, githubCodeMock };
 }

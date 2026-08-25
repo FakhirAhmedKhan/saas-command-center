@@ -1,9 +1,5 @@
-import type { RequestWithId } from '../middleware/request-id.middleware';
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common';
-import type {
-  //   Request,
-  Response,
-} from 'express';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 import { Prisma } from 'src/generated/prisma/client';
 
 interface ErrorResponse {
@@ -106,8 +102,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const context = host.switchToHttp();
-    const request = context.getRequest<RequestWithId>();
-    const response = context.getResponse<Response>();
+    const request = context.getRequest<FastifyRequest>();
+    const response = context.getResponse<FastifyReply>();
     const isHttpException = exception instanceof HttpException;
     const isPrismaKnownError = !isHttpException && exception instanceof Prisma.PrismaClientKnownRequestError;
     const prismaResponse = isPrismaKnownError ? PRISMA_KNOWN_ERROR_RESPONSES[exception.code] : undefined;
@@ -136,25 +132,25 @@ export class AllExceptionsFilter implements ExceptionFilter {
        * treating it as a genuine 500-level failure.
        */
       this.logger.warn(
-        [`${request.method} ${request.originalUrl}`, request.requestId ? `requestId=${request.requestId}` : undefined, `Unhandled Prisma ${exception.code} reached the global filter; consider a service-level catch.`]
+        [`${request.method} ${request.url}`, request.id ? `requestId=${request.id}` : undefined, `Unhandled Prisma ${exception.code} reached the global filter; consider a service-level catch.`]
           .filter(Boolean)
           .join(' | '),
       );
     } else if (!isHttpException && expressErrorStatus === undefined) {
       const stack = exception instanceof Error ? exception.stack : String(exception);
 
-      this.logger.error([`${request.method} ${request.originalUrl}`, request.requestId ? `requestId=${request.requestId}` : undefined, stack].filter(Boolean).join(' | '));
+      this.logger.error([`${request.method} ${request.url}`, request.id ? `requestId=${request.id}` : undefined, stack].filter(Boolean).join(' | '));
     }
 
     const body: ErrorResponse = {
       statusCode,
       message: normalizedException.message,
       error: normalizedException.error,
-      path: request.originalUrl,
+      path: request.url,
       timestamp: new Date().toISOString(),
-      requestId: request.requestId,
+      requestId: request.id,
     };
 
-    response.status(statusCode).json(body);
+    response.code(statusCode).send(body);
   }
 }

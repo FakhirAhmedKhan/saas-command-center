@@ -172,7 +172,7 @@ test.describe('Desktop Phase 18 final frontend', () => {
 
     await page.route(`**${apiBase}/overview`, (route) =>
       json(route, {
-        application: {
+        desktopApp: {
           id: desktop.id,
           name: 'Desktop Final',
           platform: 'CROSS_PLATFORM',
@@ -219,7 +219,7 @@ test.describe('Desktop Phase 18 final frontend', () => {
     await page.goto(`/workspaces/${state.owner.workspaceId}/desktop-apps/${desktop.id}`);
 
     await expect(page.getByTestId('desktop-ai-panel')).toBeVisible();
-    await page.getByRole('button', { name: 'Analyze' }).click();
+    await page.getByTestId('desktop-ai-panel').getByRole('button', { name: 'Analyze', exact: true }).click();
 
     await expect(page.getByText('SUPPORTED', { exact: true })).toBeVisible();
     await expect(page.getByText(/Correlation:/)).toBeVisible();

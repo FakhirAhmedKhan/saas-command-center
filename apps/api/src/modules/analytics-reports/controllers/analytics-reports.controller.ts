@@ -5,7 +5,7 @@ import { DimensionReportResponseDto, EventReportResponseDto, PageReportResponseD
 import { AnalyticsReportsService } from '../services/analytics-reports.service';
 import { Controller, Get, Param, ParseEnumPipe, ParseUUIDPipe, Query, Res, StreamableFile, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiProduces, ApiTags } from '@nestjs/swagger';
-import type { Response } from 'express';
+import type { FastifyReply } from 'fastify';
 
 @ApiTags('Analytics Reports')
 @ApiBearerAuth('access-token')
@@ -95,7 +95,7 @@ export class AnalyticsReportsController {
     @Res({
       passthrough: true,
     })
-    response: Response,
+    response: FastifyReply,
   ): Promise<StreamableFile> {
     const exportResult = await this.analyticsReportsService.exportPages(workspaceId, websiteId, query);
 
@@ -120,7 +120,7 @@ export class AnalyticsReportsController {
     @Res({
       passthrough: true,
     })
-    response: Response,
+    response: FastifyReply,
   ): Promise<StreamableFile> {
     const exportResult = await this.analyticsReportsService.exportEvents(workspaceId, websiteId, query);
 
@@ -148,19 +148,19 @@ export class AnalyticsReportsController {
     @Res({
       passthrough: true,
     })
-    response: Response,
+    response: FastifyReply,
   ): Promise<StreamableFile> {
     const exportResult = await this.analyticsReportsService.exportDimension(workspaceId, websiteId, dimension, query);
 
     return this.createCsvResponse(response, exportResult.filename, exportResult.content);
   }
 
-  private createCsvResponse(response: Response, filename: string, content: string): StreamableFile {
-    response.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  private createCsvResponse(response: FastifyReply, filename: string, content: string): StreamableFile {
+    response.header('Content-Type', 'text/csv; charset=utf-8');
 
-    response.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    response.header('Content-Disposition', `attachment; filename="${filename}"`);
 
-    response.setHeader('Cache-Control', 'no-store');
+    response.header('Cache-Control', 'no-store');
 
     return new StreamableFile(Buffer.from(content, 'utf8'));
   }

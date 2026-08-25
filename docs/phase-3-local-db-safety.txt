@@ -1,0 +1,34 @@
+﻿PHASE 3 — LOCAL DISPOSABLE DATABASE SAFETY CHECK
+
+==========================================================================================
+LOCAL POSTGRES CONTAINERS
+==========================================================================================
+NAME                           IMAGE                COMMAND                  SERVICE         CREATED       STATUS                    PORTS
+command-center-postgres        postgres:17-alpine   "docker-entrypoint.sΓÇª"   postgres        2 weeks ago   Up 56 minutes (healthy)   0.0.0.0:55432->5432/tcp, [::]:55432->5432/tcp
+command-center-postgres-test   postgres:17-alpine   "docker-entrypoint.sΓÇª"   postgres-test   2 weeks ago   Up 56 minutes (healthy)   0.0.0.0:5434->5432/tcp, [::]:5434->5432/tcp
+
+EXIT CODE: 0
+
+==========================================================================================
+LOCAL DATABASE ENVIRONMENT FILE NAMES
+==========================================================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\.env
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\.env.example
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\.env.test
+
+EXIT CODE: 0
+
+==========================================================================================
+DATABASE URL HOST AND DATABASE NAME ONLY
+==========================================================================================
+FILE: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\.env
+HOST: ep-patient-field-acxz87sx-pooler.sa-east-1.aws.neon.tech
+DATABASE: neondb_test
+FILE: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\.env.example
+HOST: ep-empty-mouse-athlraz4-pooler.c-9.us-east-1.aws.neon.tech
+DATABASE: neondb
+FILE: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\.env.test
+HOST: 127.0.0.1
+DATABASE: command_center_test
+
+EXIT CODE: 0

@@ -1,5 +1,4 @@
 import { WorkspaceCreationController } from '../controllers/workspace-creation.controller';
-import { WorkspaceMembersController } from '../controllers/workspace-members.controller';
 import { WorkspacesController } from '../controllers/workspaces.controller';
 import { WorkspaceAccessGuard } from '../guards/workspace-access.guard';
 import { WorkspaceRolesGuard } from '../guards/workspace-roles.guard';
@@ -11,7 +10,7 @@ import { UsersModule } from 'src/modules/users/users.module';
 
 @Module({
   imports: [UsersModule],
-  controllers: [WorkspacesController, WorkspaceMembersController, WorkspaceCreationController],
+  controllers: [WorkspacesController, WorkspaceCreationController],
   providers: [WorkspacesService, WorkspaceMembersService, WorkspaceCreationService, WorkspaceAccessGuard, WorkspaceRolesGuard],
   exports: [WorkspacesService, WorkspaceMembersService, WorkspaceCreationService, WorkspaceAccessGuard, WorkspaceRolesGuard],
 })

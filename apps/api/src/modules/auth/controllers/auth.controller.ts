@@ -8,7 +8,7 @@ import { AuthService } from '../services/auth.service';
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
-import type { Request, Response } from 'express';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 
 /*
  * These endpoints share the app-wide 100 req/min/IP throttle by default,
@@ -54,10 +54,10 @@ type PublicAuthSession = Omit<AuthSessionResult, 'refreshToken'>;
 
 type AuthRequestMetadata = Parameters<AuthService['login']>[1];
 
-function getAuthRequestMetadata(request: Request): AuthRequestMetadata {
+function getAuthRequestMetadata(request: FastifyRequest): AuthRequestMetadata {
   return {
-    userAgent: request.get('user-agent')?.slice(0, 512),
-    ipAddress: request.ip ?? request.socket.remoteAddress,
+    userAgent: request.headers['user-agent']?.slice(0, 512),
+    ipAddress: request.ip ?? request.raw.socket.remoteAddress,
   };
 }
 
@@ -88,12 +88,12 @@ export class AuthController {
     dto: RegisterDto,
 
     @Req()
-    request: Request,
+    request: FastifyRequest,
 
     @Res({
       passthrough: true,
     })
-    response: Response,
+    response: FastifyReply,
   ): Promise<PublicAuthSession> {
     const result = await this.authService.register(dto, getAuthRequestMetadata(request));
 
@@ -113,12 +113,12 @@ export class AuthController {
     dto: LoginDto,
 
     @Req()
-    request: Request,
+    request: FastifyRequest,
 
     @Res({
       passthrough: true,
     })
-    response: Response,
+    response: FastifyReply,
   ): Promise<PublicAuthSession> {
     const result = await this.authService.login(dto, getAuthRequestMetadata(request));
 
@@ -135,12 +135,12 @@ export class AuthController {
   })
   async refresh(
     @Req()
-    request: Request,
+    request: FastifyRequest,
 
     @Res({
       passthrough: true,
     })
-    response: Response,
+    response: FastifyReply,
   ): Promise<PublicAuthSession> {
     const refreshToken = this.authCookieService.getRefreshToken(request);
 
@@ -163,12 +163,12 @@ export class AuthController {
   })
   async logout(
     @Req()
-    request: Request,
+    request: FastifyRequest,
 
     @Res({
       passthrough: true,
     })
-    response: Response,
+    response: FastifyReply,
   ): Promise<{
     success: true;
   }> {
@@ -200,7 +200,7 @@ export class AuthController {
     @Res({
       passthrough: true,
     })
-    response: Response,
+    response: FastifyReply,
   ): Promise<{
     success: true;
   }> {

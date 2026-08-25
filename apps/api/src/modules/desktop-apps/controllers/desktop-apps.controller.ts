@@ -6,10 +6,10 @@ import { CreateDesktopAppDto, UpdateDesktopAppDto } from '../dto/desktop-app.dto
 import { DesktopAppsService } from '../services/desktop-apps.service';
 import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { Request } from 'express';
+import type { FastifyRequest } from 'fastify';
 import { WorkspaceRole } from 'src/generated/prisma/enums';
 
-interface AuthenticatedRequest extends Request {
+interface AuthenticatedRequest extends FastifyRequest {
   user: {
     id: string;
 

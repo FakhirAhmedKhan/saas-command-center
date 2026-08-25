@@ -14,8 +14,8 @@ function prismaKnownError(code: string, message = 'Prisma raw internal error tex
 }
 
 interface CapturedResponse {
-  status: jest.Mock<CapturedResponse, [number]>;
-  json: jest.Mock<CapturedResponse, [Record<string, unknown>]>;
+  code: jest.Mock<CapturedResponse, [number]>;
+  send: jest.Mock<CapturedResponse, [Record<string, unknown>]>;
 }
 
 function createHost(requestOverrides: Record<string, unknown> = {}): {
@@ -23,13 +23,13 @@ function createHost(requestOverrides: Record<string, unknown> = {}): {
   response: CapturedResponse;
 } {
   const response: CapturedResponse = {
-    status: jest.fn<CapturedResponse, [number]>().mockReturnThis(),
-    json: jest.fn<CapturedResponse, [Record<string, unknown>]>().mockReturnThis(),
+    code: jest.fn<CapturedResponse, [number]>().mockReturnThis(),
+    send: jest.fn<CapturedResponse, [Record<string, unknown>]>().mockReturnThis(),
   };
   const request = {
     method: 'GET',
-    originalUrl: '/api/v1/things',
-    requestId: 'req-123',
+    url: '/api/v1/things',
+    id: 'req-123',
     ...requestOverrides,
   };
   const host = {
@@ -43,7 +43,7 @@ function createHost(requestOverrides: Record<string, unknown> = {}): {
 }
 
 function bodyFrom(response: CapturedResponse): Record<string, unknown> {
-  const [firstCall] = response.json.mock.calls;
+  const [firstCall] = response.send.mock.calls;
 
   return firstCall?.[0] ?? {};
 }
@@ -68,7 +68,7 @@ describe('AllExceptionsFilter', () => {
 
       filter.catch(new NotFoundException('Thing not found.'), host);
 
-      expect(response.status).toHaveBeenCalledWith(404);
+      expect(response.code).toHaveBeenCalledWith(404);
 
       expect(bodyFrom(response)).toMatchObject({
         statusCode: 404,
@@ -91,7 +91,7 @@ describe('AllExceptionsFilter', () => {
 
       filter.catch(new HttpException('Raw string failure', HttpStatus.FORBIDDEN), host);
 
-      expect(response.status).toHaveBeenCalledWith(403);
+      expect(response.code).toHaveBeenCalledWith(403);
 
       expect(bodyFrom(response).message).toBe('Raw string failure');
     });
@@ -135,7 +135,7 @@ describe('AllExceptionsFilter', () => {
 
       filter.catch(new Error('Sensitive internal detail'), host);
 
-      expect(response.status).toHaveBeenCalledWith(500);
+      expect(response.code).toHaveBeenCalledWith(500);
 
       expect(bodyFrom(response)).toMatchObject({
         statusCode: 500,
@@ -159,14 +159,14 @@ describe('AllExceptionsFilter', () => {
 
       filter.catch('a thrown string', host);
 
-      expect(response.status).toHaveBeenCalledWith(500);
+      expect(response.code).toHaveBeenCalledWith(500);
 
       expect(bodyFrom(response).message).toBe('Internal server error');
     });
   });
 
-  describe('express middleware errors', () => {
-    it('honours a status carried on a plain express error', () => {
+  describe('adapter middleware errors', () => {
+    it('honours a status carried on a plain adapter error', () => {
       const { host, response } = createHost();
       const payloadTooLarge = Object.assign(new Error('request entity too large'), {
         status: 413,
@@ -175,7 +175,7 @@ describe('AllExceptionsFilter', () => {
 
       filter.catch(payloadTooLarge, host);
 
-      expect(response.status).toHaveBeenCalledWith(413);
+      expect(response.code).toHaveBeenCalledWith(413);
 
       expect(bodyFrom(response).message).toBe('request entity too large');
     });
@@ -185,7 +185,7 @@ describe('AllExceptionsFilter', () => {
 
       filter.catch(Object.assign(new Error('bad request'), { statusCode: 400 }), host);
 
-      expect(response.status).toHaveBeenCalledWith(400);
+      expect(response.code).toHaveBeenCalledWith(400);
     });
 
     it('ignores an out-of-range status and falls back to 500', () => {
@@ -193,7 +193,7 @@ describe('AllExceptionsFilter', () => {
 
       filter.catch(Object.assign(new Error('weird'), { status: 999 }), host);
 
-      expect(response.status).toHaveBeenCalledWith(500);
+      expect(response.code).toHaveBeenCalledWith(500);
     });
 
     it('ignores a non-numeric status', () => {
@@ -201,10 +201,10 @@ describe('AllExceptionsFilter', () => {
 
       filter.catch(Object.assign(new Error('weird'), { status: 'nope' }), host);
 
-      expect(response.status).toHaveBeenCalledWith(500);
+      expect(response.code).toHaveBeenCalledWith(500);
     });
 
-    it('does not log express client errors as server errors', () => {
+    it('does not log adapter client errors as server errors', () => {
       const { host } = createHost();
 
       filter.catch(Object.assign(new Error('too large'), { status: 413 }), host);
@@ -226,7 +226,7 @@ describe('AllExceptionsFilter', () => {
 
     it('omits requestId when the middleware did not run', () => {
       const { host, response } = createHost({
-        requestId: undefined,
+        id: undefined,
       });
 
       filter.catch(new NotFoundException('Missing'), host);
@@ -241,7 +241,7 @@ describe('AllExceptionsFilter', () => {
 
       filter.catch(prismaKnownError('P2002', 'Unique constraint failed on the fields: (`email`)'), host);
 
-      expect(response.status).toHaveBeenCalledWith(409);
+      expect(response.code).toHaveBeenCalledWith(409);
 
       expect(bodyFrom(response)).toMatchObject({
         statusCode: 409,
@@ -259,7 +259,7 @@ describe('AllExceptionsFilter', () => {
 
       filter.catch(prismaKnownError('P2025', 'An operation failed because it depends on one or more records that were required but not found.'), host);
 
-      expect(response.status).toHaveBeenCalledWith(404);
+      expect(response.code).toHaveBeenCalledWith(404);
 
       expect(bodyFrom(response)).toMatchObject({
         statusCode: 404,
@@ -271,7 +271,7 @@ describe('AllExceptionsFilter', () => {
     });
 
     it('preserves requestId on a translated Prisma error', () => {
-      const { host, response } = createHost({ requestId: 'req-prisma-1' });
+      const { host, response } = createHost({ id: 'req-prisma-1' });
 
       filter.catch(prismaKnownError('P2002'), host);
 
@@ -291,7 +291,7 @@ describe('AllExceptionsFilter', () => {
 
       filter.catch(prismaKnownError('P2003', 'Foreign key constraint failed on the field: `workspaceId`'), host);
 
-      expect(response.status).toHaveBeenCalledWith(500);
+      expect(response.code).toHaveBeenCalledWith(500);
 
       expect(bodyFrom(response)).toMatchObject({
         statusCode: 500,

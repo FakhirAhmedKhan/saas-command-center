@@ -1,0 +1,1013 @@
+
+====================================================================================================
+FILE: apps/api/src/modules/desktop-apps/controllers/desktop-analysis.controller.ts
+====================================================================================================
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { WorkspaceRoles } from '../../workspace/decorators/workspace-roles.decorator';
+import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
+import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
+import { AnalyzeDesktopAppDto } from '../dto/desktop-analysis.dto';
+import { DesktopAnalysisService } from '../services/desktop-analysis.service';
+import { Body, Controller, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import type { Request } from 'express';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
+
+interface AuthenticatedRequest extends Request {
+  user: { id: string };
+}
+
+@ApiTags('Desktop AI Analysis')
+@ApiBearerAuth('access-token')
+@Controller('workspaces/:workspaceId/desktop-apps/:desktopAppId/analysis')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard, WorkspaceRolesGuard)
+export class DesktopAnalysisController {
+  constructor(private readonly service: DesktopAnalysisService) {}
+
+  @Post()
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  analyze(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) desktopAppId: string, @Req() request: AuthenticatedRequest, @Body() dto: AnalyzeDesktopAppDto) {
+    return this.service.analyze(workspaceId, desktopAppId, request.user.id, dto);
+  }
+}
+
+
+====================================================================================================
+FILE: apps/api/src/modules/desktop-apps/controllers/desktop-apps.controller.ts
+====================================================================================================
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { WorkspaceRoles } from '../../workspace/decorators/workspace-roles.decorator';
+import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
+import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
+import { CreateDesktopAppDto, UpdateDesktopAppDto } from '../dto/desktop-app.dto';
+import { DesktopAppsService } from '../services/desktop-apps.service';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import type { Request } from 'express';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
+
+interface AuthenticatedRequest extends Request {
+  user: {
+    id: string;
+
+    email?: string;
+  };
+}
+
+@ApiTags('Desktop Applications')
+@ApiBearerAuth('access-token')
+@Controller('workspaces/:workspaceId/desktop-apps')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard, WorkspaceRolesGuard)
+export class DesktopAppsController {
+  constructor(private readonly desktopAppsService: DesktopAppsService) {}
+
+  @Post()
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  @ApiOperation({
+    summary: 'Create a desktop application',
+  })
+  create(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Body()
+    dto: CreateDesktopAppDto,
+  ) {
+    return this.desktopAppsService.create(workspaceId, dto, request.user.id);
+  }
+
+  @Get()
+  @ApiOperation({
+    summary: 'List workspace desktop applications',
+  })
+  list(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+  ) {
+    return this.desktopAppsService.list(workspaceId);
+  }
+
+  @Get(':desktopAppId')
+  @ApiOperation({
+    summary: 'Get a desktop application',
+  })
+  findOne(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('desktopAppId', ParseUUIDPipe)
+    desktopAppId: string,
+  ) {
+    return this.desktopAppsService.findOne(workspaceId, desktopAppId);
+  }
+
+  @Patch(':desktopAppId')
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  @ApiOperation({
+    summary: 'Update a desktop application',
+  })
+  update(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('desktopAppId', ParseUUIDPipe)
+    desktopAppId: string,
+
+    @Body()
+    dto: UpdateDesktopAppDto,
+  ) {
+    return this.desktopAppsService.update(workspaceId, desktopAppId, dto, request.user.id);
+  }
+
+  @Delete(':desktopAppId')
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN)
+  @ApiOperation({
+    summary: 'Archive a desktop application',
+  })
+  archive(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('desktopAppId', ParseUUIDPipe)
+    desktopAppId: string,
+  ) {
+    return this.desktopAppsService.archive(workspaceId, desktopAppId, request.user.id);
+  }
+}
+
+
+====================================================================================================
+FILE: apps/api/src/modules/desktop-apps/controllers/desktop-security.controller.ts
+====================================================================================================
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { WorkspaceRoles } from '../../workspace/decorators/workspace-roles.decorator';
+import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
+import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
+import { DesktopPermissionsService } from '../services/desktop-permissions.service';
+import { Controller, Get, Param, ParseUUIDPipe, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import type { Request } from 'express';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
+
+interface AuthenticatedRequest extends Request {
+  user: { id: string };
+}
+
+@ApiTags('Desktop Security')
+@ApiBearerAuth('access-token')
+@Controller('workspaces/:workspaceId/desktop-apps/:desktopAppId')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard, WorkspaceRolesGuard)
+export class DesktopSecurityController {
+  constructor(private readonly permissions: DesktopPermissionsService) {}
+
+  @Get('permissions')
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER, WorkspaceRole.VIEWER)
+  getPermissions(@Param('workspaceId', ParseUUIDPipe) workspaceId: string, @Param('desktopAppId', ParseUUIDPipe) _desktopAppId: string, @Req() request: AuthenticatedRequest) {
+    void _desktopAppId;
+    return this.permissions.get(workspaceId, request.user.id);
+  }
+}
+
+
+====================================================================================================
+FILE: apps/api/src/modules/mobile-apps/controllers/mobile-analysis.controller.ts
+====================================================================================================
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { WorkspaceRoles } from '../../workspace/decorators/workspace-roles.decorator';
+import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
+import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
+import { AnalyzeMobileAppDto } from '../dto/mobile-analysis.dto';
+import { MobileAnalysisService } from '../services/mobile-analysis.service';
+import { Body, Controller, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import type { Request } from 'express';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
+
+interface AuthenticatedRequest extends Request {
+  user: {
+    id: string;
+  };
+}
+
+@ApiTags('Mobile AI Analysis')
+@ApiBearerAuth('access-token')
+@Controller('workspaces/:workspaceId/mobile-apps/:mobileAppId/analysis')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard, WorkspaceRolesGuard)
+export class MobileAnalysisController {
+  constructor(private readonly service: MobileAnalysisService) {}
+
+  @Post()
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  analyze(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('mobileAppId', ParseUUIDPipe)
+    mobileAppId: string,
+
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Body()
+    dto: AnalyzeMobileAppDto,
+  ) {
+    return this.service.analyze(workspaceId, mobileAppId, request.user.id, dto);
+  }
+}
+
+
+====================================================================================================
+FILE: apps/api/src/modules/mobile-apps/controllers/mobile-apps.controller.ts
+====================================================================================================
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { WorkspaceRoles } from '../../workspace/decorators/workspace-roles.decorator';
+import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
+import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
+import { CreateMobileAppDto, UpdateMobileAppDto } from '../dto/mobile-app.dto';
+import { MobileAppsService } from '../services/mobile-apps.service';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import type { Request } from 'express';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
+
+interface AuthenticatedRequest extends Request {
+  user: {
+    id: string;
+    email?: string;
+  };
+}
+
+@ApiTags('Mobile Applications')
+@ApiBearerAuth('access-token')
+@Controller('workspaces/:workspaceId/mobile-apps')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard, WorkspaceRolesGuard)
+export class MobileAppsController {
+  constructor(private readonly mobileAppsService: MobileAppsService) {}
+
+  @Post()
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  @ApiOperation({
+    summary: 'Create a mobile application',
+  })
+  create(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Body()
+    dto: CreateMobileAppDto,
+  ) {
+    return this.mobileAppsService.create(workspaceId, dto, request.user.id);
+  }
+
+  @Get()
+  @ApiOperation({
+    summary: 'List workspace mobile applications',
+  })
+  list(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+  ) {
+    return this.mobileAppsService.list(workspaceId);
+  }
+
+  @Get(':mobileAppId')
+  @ApiOperation({
+    summary: 'Get a mobile application',
+  })
+  findOne(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('mobileAppId', ParseUUIDPipe)
+    mobileAppId: string,
+  ) {
+    return this.mobileAppsService.findOne(workspaceId, mobileAppId);
+  }
+
+  @Patch(':mobileAppId')
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  @ApiOperation({
+    summary: 'Update a mobile application',
+  })
+  update(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('mobileAppId', ParseUUIDPipe)
+    mobileAppId: string,
+
+    @Body()
+    dto: UpdateMobileAppDto,
+  ) {
+    return this.mobileAppsService.update(workspaceId, mobileAppId, dto, request.user.id);
+  }
+
+  @Delete(':mobileAppId')
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN)
+  @ApiOperation({
+    summary: 'Archive a mobile application',
+  })
+  archive(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('mobileAppId', ParseUUIDPipe)
+    mobileAppId: string,
+  ) {
+    return this.mobileAppsService.archive(workspaceId, mobileAppId, request.user.id);
+  }
+}
+
+
+====================================================================================================
+FILE: apps/api/src/modules/mobile-apps/controllers/mobile-security.controller.ts
+====================================================================================================
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
+import { MobilePermissionsService } from '../security/mobile-permissions.service';
+import { Controller, Get, Param, ParseUUIDPipe, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import type { Request } from 'express';
+
+interface AuthenticatedRequest extends Request {
+  user: {
+    id: string;
+  };
+}
+
+@ApiTags('Mobile Security')
+@ApiBearerAuth('access-token')
+@Controller('workspaces/:workspaceId/mobile-security')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard)
+export class MobileSecurityController {
+  constructor(private readonly permissions: MobilePermissionsService) {}
+
+  @Get('permissions')
+  permissionsForCurrentUser(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+  ) {
+    return this.permissions.getForUser(workspaceId, request.user.id);
+  }
+}
+
+
+====================================================================================================
+FILE: apps/api/src/modules/development/controllers/development.controller.ts
+====================================================================================================
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { WorkspaceRoles } from '../../workspace/decorators/workspace-roles.decorator';
+import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
+import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
+import {
+  ApplyDevelopmentTemplateDto,
+  BlockerQueryDto,
+  ChangeTaskStatusDto,
+  CreateBlockerDto,
+  CreateMilestoneDto,
+  CreateTaskDto,
+  MoveTaskDto,
+  ReorderItemsDto,
+  ResolveBlockerDto,
+  SkipWorkItemDto,
+  UpdateBlockerDto,
+  UpdateMilestoneDto,
+  UpdateTaskDto,
+} from '../dto/development.dto';
+import { BlockersService } from '../services/blockers.service';
+import { DevelopmentSummaryService } from '../services/development-summary.service';
+import { DevelopmentTemplatesService } from '../services/development-templates.service';
+import { MilestonesService } from '../services/milestones.service';
+import { TasksService } from '../services/tasks.service';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import type { Request } from 'express';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
+
+interface AuthenticatedRequest extends Request {
+  user: {
+    id: string;
+  };
+}
+
+const WRITE_ROLES = [WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER];
+
+@ApiTags('Development Templates')
+@ApiBearerAuth('access-token')
+@Controller('workspaces/:workspaceId/development/templates')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard)
+export class DevelopmentTemplatesController {
+  constructor(private readonly developmentTemplates: DevelopmentTemplatesService) {}
+
+  @Get()
+  listTemplates() {
+    return this.developmentTemplates.getTemplates();
+  }
+}
+
+@ApiTags('Application Development')
+@ApiBearerAuth('access-token')
+@Controller('workspaces/:workspaceId/applications/:applicationId/development')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard, WorkspaceRolesGuard)
+export class DevelopmentController {
+  constructor(
+    private readonly summary: DevelopmentSummaryService,
+    private readonly developmentTemplates: DevelopmentTemplatesService,
+    private readonly milestones: MilestonesService,
+    private readonly tasks: TasksService,
+    private readonly blockers: BlockersService,
+  ) {}
+
+  @Get('summary')
+  getSummary(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+  ) {
+    return this.summary.getSummary(workspaceId, applicationId);
+  }
+
+  @Post('apply-template')
+  @WorkspaceRoles(...WRITE_ROLES)
+  applyTemplate(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+
+    @Body()
+    dto: ApplyDevelopmentTemplateDto,
+  ) {
+    return this.developmentTemplates.applyTemplate(workspaceId, applicationId, dto, request.user.id);
+  }
+
+  @Get('milestones')
+  listMilestones(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+  ) {
+    return this.milestones.listMilestones(workspaceId, applicationId);
+  }
+
+  @Post('milestones')
+  @WorkspaceRoles(...WRITE_ROLES)
+  createMilestone(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+
+    @Body()
+    dto: CreateMilestoneDto,
+  ) {
+    return this.milestones.createMilestone(workspaceId, applicationId, dto, request.user.id);
+  }
+
+  @Patch('milestones/:milestoneId')
+  @WorkspaceRoles(...WRITE_ROLES)
+  updateMilestone(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+
+    @Param('milestoneId', ParseUUIDPipe)
+    milestoneId: string,
+
+    @Body()
+    dto: UpdateMilestoneDto,
+  ) {
+    return this.milestones.updateMilestone(workspaceId, applicationId, milestoneId, dto, request.user.id);
+  }
+
+  @Post('milestones/:milestoneId/complete')
+  @WorkspaceRoles(...WRITE_ROLES)
+  completeMilestone(
+    @Req()
+    request: AuthenticatedRequest,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+    @Param('milestoneId', ParseUUIDPipe)
+    milestoneId: string,
+  ) {
+    return this.milestones.completeMilestone(workspaceId, applicationId, milestoneId, request.user.id);
+  }
+
+  @Post('milestones/:milestoneId/reopen')
+  @WorkspaceRoles(...WRITE_ROLES)
+  reopenMilestone(
+    @Req()
+    request: AuthenticatedRequest,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+    @Param('milestoneId', ParseUUIDPipe)
+    milestoneId: string,
+  ) {
+    return this.milestones.reopenMilestone(workspaceId, applicationId, milestoneId, request.user.id);
+  }
+
+  @Post('milestones/:milestoneId/skip')
+  @WorkspaceRoles(...WRITE_ROLES)
+  skipMilestone(
+    @Req()
+    request: AuthenticatedRequest,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+    @Param('milestoneId', ParseUUIDPipe)
+    milestoneId: string,
+    @Body()
+    dto: SkipWorkItemDto,
+  ) {
+    return this.milestones.skipMilestone(workspaceId, applicationId, milestoneId, dto, request.user.id);
+  }
+
+  @Delete('milestones/:milestoneId')
+  @WorkspaceRoles(...WRITE_ROLES)
+  async deleteMilestone(
+    @Req()
+    request: AuthenticatedRequest,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+    @Param('milestoneId', ParseUUIDPipe)
+    milestoneId: string,
+  ) {
+    await this.milestones.deleteMilestone(workspaceId, applicationId, milestoneId, request.user.id);
+
+    return {
+      message: 'Milestone deleted',
+    };
+  }
+
+  @Post('milestones/reorder')
+  @WorkspaceRoles(...WRITE_ROLES)
+  reorderMilestones(
+    @Req()
+    request: AuthenticatedRequest,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+    @Body()
+    dto: ReorderItemsDto,
+  ) {
+    return this.milestones.reorderMilestones(workspaceId, applicationId, dto, request.user.id);
+  }
+
+  @Post('milestones/:milestoneId/tasks')
+  @WorkspaceRoles(...WRITE_ROLES)
+  createTask(
+    @Req()
+    request: AuthenticatedRequest,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+    @Param('milestoneId', ParseUUIDPipe)
+    milestoneId: string,
+    @Body()
+    dto: CreateTaskDto,
+  ) {
+    return this.tasks.createTask(workspaceId, applicationId, milestoneId, dto, request.user.id);
+  }
+
+  @Patch('tasks/:taskId')
+  @WorkspaceRoles(...WRITE_ROLES)
+  updateTask(
+    @Req()
+    request: AuthenticatedRequest,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+    @Param('taskId', ParseUUIDPipe)
+    taskId: string,
+    @Body()
+    dto: UpdateTaskDto,
+  ) {
+    return this.tasks.updateTask(workspaceId, applicationId, taskId, dto, request.user.id);
+  }
+
+  @Post('tasks/:taskId/status')
+  @WorkspaceRoles(...WRITE_ROLES)
+  setTaskStatus(
+    @Req()
+    request: AuthenticatedRequest,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+    @Param('taskId', ParseUUIDPipe)
+    taskId: string,
+    @Body()
+    dto: ChangeTaskStatusDto,
+  ) {
+    return this.tasks.setTaskStatus(workspaceId, applicationId, taskId, dto, request.user.id);
+  }
+
+  @Post('tasks/:taskId/complete')
+  @WorkspaceRoles(...WRITE_ROLES)
+  completeTask(
+    @Req()
+    request: AuthenticatedRequest,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+    @Param('taskId', ParseUUIDPipe)
+    taskId: string,
+  ) {
+    return this.tasks.completeTask(workspaceId, applicationId, taskId, request.user.id);
+  }
+
+  @Post('tasks/:taskId/reopen')
+  @WorkspaceRoles(...WRITE_ROLES)
+  reopenTask(
+    @Req()
+    request: AuthenticatedRequest,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+    @Param('taskId', ParseUUIDPipe)
+    taskId: string,
+  ) {
+    return this.tasks.reopenTask(workspaceId, applicationId, taskId, request.user.id);
+  }
+
+  @Post('tasks/:taskId/skip')
+  @WorkspaceRoles(...WRITE_ROLES)
+  skipTask(
+    @Req()
+    request: AuthenticatedRequest,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+    @Param('taskId', ParseUUIDPipe)
+    taskId: string,
+    @Body()
+    dto: SkipWorkItemDto,
+  ) {
+    return this.tasks.skipTask(workspaceId, applicationId, taskId, dto, request.user.id);
+  }
+
+  @Post('tasks/:taskId/move')
+  @WorkspaceRoles(...WRITE_ROLES)
+  moveTask(
+    @Req()
+    request: AuthenticatedRequest,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+    @Param('taskId', ParseUUIDPipe)
+    taskId: string,
+    @Body()
+    dto: MoveTaskDto,
+  ) {
+    return this.tasks.moveTask(workspaceId, applicationId, taskId, dto, request.user.id);
+  }
+
+  @Post('milestones/:milestoneId/tasks/reorder')
+  @WorkspaceRoles(...WRITE_ROLES)
+  reorderTasks(
+    @Req()
+    request: AuthenticatedRequest,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+    @Param('milestoneId', ParseUUIDPipe)
+    milestoneId: string,
+    @Body()
+    dto: ReorderItemsDto,
+  ) {
+    return this.tasks.reorderTasks(workspaceId, applicationId, milestoneId, dto, request.user.id);
+  }
+
+  @Delete('tasks/:taskId')
+  @WorkspaceRoles(...WRITE_ROLES)
+  async deleteTask(
+    @Req()
+    request: AuthenticatedRequest,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+    @Param('taskId', ParseUUIDPipe)
+    taskId: string,
+  ) {
+    await this.tasks.deleteTask(workspaceId, applicationId, taskId, request.user.id);
+
+    return {
+      message: 'Task deleted',
+    };
+  }
+
+  @Get('blockers')
+  listBlockers(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+    @Query()
+    query: BlockerQueryDto,
+  ) {
+    return this.blockers.listBlockers(workspaceId, applicationId, query);
+  }
+
+  @Post('blockers')
+  @WorkspaceRoles(...WRITE_ROLES)
+  createBlocker(
+    @Req()
+    request: AuthenticatedRequest,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+    @Body()
+    dto: CreateBlockerDto,
+  ) {
+    return this.blockers.createBlocker(workspaceId, applicationId, dto, request.user.id);
+  }
+
+  @Patch('blockers/:blockerId')
+  @WorkspaceRoles(...WRITE_ROLES)
+  updateBlocker(
+    @Req()
+    request: AuthenticatedRequest,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+    @Param('blockerId', ParseUUIDPipe)
+    blockerId: string,
+    @Body()
+    dto: UpdateBlockerDto,
+  ) {
+    return this.blockers.updateBlocker(workspaceId, applicationId, blockerId, dto, request.user.id);
+  }
+
+  @Post('blockers/:blockerId/resolve')
+  @WorkspaceRoles(...WRITE_ROLES)
+  resolveBlocker(
+    @Req()
+    request: AuthenticatedRequest,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+    @Param('blockerId', ParseUUIDPipe)
+    blockerId: string,
+    @Body()
+    dto: ResolveBlockerDto,
+  ) {
+    return this.blockers.resolveBlocker(workspaceId, applicationId, blockerId, dto, request.user.id);
+  }
+
+  @Post('blockers/:blockerId/reopen')
+  @WorkspaceRoles(...WRITE_ROLES)
+  reopenBlocker(
+    @Req()
+    request: AuthenticatedRequest,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+    @Param('blockerId', ParseUUIDPipe)
+    blockerId: string,
+  ) {
+    return this.blockers.reopenBlocker(workspaceId, applicationId, blockerId, request.user.id);
+  }
+
+  @Delete('blockers/:blockerId')
+  @WorkspaceRoles(...WRITE_ROLES)
+  async deleteBlocker(
+    @Req()
+    request: AuthenticatedRequest,
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+    @Param('blockerId', ParseUUIDPipe)
+    blockerId: string,
+  ) {
+    await this.blockers.deleteBlocker(workspaceId, applicationId, blockerId, request.user.id);
+
+    return {
+      message: 'Blocker deleted',
+    };
+  }
+}
+
+
+====================================================================================================
+FILE: apps/api/src/modules/repositories/controllers/github-connect.controller.ts
+====================================================================================================
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { WorkspaceRoles } from '../../workspace/decorators/workspace-roles.decorator';
+import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
+import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
+import { CompleteGithubCallbackDto, CompleteGithubSetupDto } from '../dto/repository.dto';
+import { RepositoryConnectService } from '../services/repository-connect.service';
+import { Body, Controller, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import type { Request } from 'express';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
+
+interface AuthenticatedRequest extends Request {
+  user: {
+    id: string;
+  };
+}
+
+@ApiTags('Repository GitHub Connection')
+@ApiBearerAuth('access-token')
+@Controller()
+export class GithubConnectController {
+  constructor(private readonly repositoryConnectService: RepositoryConnectService) {}
+
+  @Post('workspaces/:workspaceId/repositories/github/connect')
+  @UseGuards(JwtAuthGuard, WorkspaceAccessGuard, WorkspaceRolesGuard)
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN)
+  begin(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Req()
+    request: AuthenticatedRequest,
+  ) {
+    return this.repositoryConnectService.begin(workspaceId, request.user.id);
+  }
+
+  @Post('repositories/github/setup')
+  @UseGuards(JwtAuthGuard)
+  completeSetup(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Body()
+    dto: CompleteGithubSetupDto,
+  ) {
+    return this.repositoryConnectService.completeSetup(request.user.id, dto);
+  }
+
+  @Post('repositories/github/callback')
+  @UseGuards(JwtAuthGuard)
+  completeCallback(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Body()
+    dto: CompleteGithubCallbackDto,
+  ) {
+    return this.repositoryConnectService.completeCallback(request.user.id, dto);
+  }
+}
+
+
+====================================================================================================
+FILE: apps/api/src/modules/repositories/controllers/github-webhook.controller.ts
+====================================================================================================
+import { Public } from '../../auth/decorators/public.decorator';
+import { GithubWebhookService } from '../services/github-webhook.service';
+import { Controller, Headers, Post, Req, UnauthorizedException } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import type { Request } from 'express';
+
+type GithubWebhookRequest = Request<Record<string, never>, unknown, Buffer>;
+
+@ApiTags('Repository GitHub Webhook')
+@Public()
+@Controller('repositories/github')
+export class GithubWebhookController {
+  constructor(private readonly githubWebhookService: GithubWebhookService) {}
+
+  @Post('webhook')
+  handle(
+    @Req()
+    request: GithubWebhookRequest,
+
+    @Headers('x-github-delivery')
+    deliveryId?: string,
+
+    @Headers('x-github-event')
+    event?: string,
+
+    @Headers('x-hub-signature-256')
+    signature?: string,
+  ) {
+    if (!deliveryId || !event || !signature) {
+      throw new UnauthorizedException('Required GitHub webhook headers are missing.');
+    }
+
+    if (!Buffer.isBuffer(request.body)) {
+      throw new UnauthorizedException('GitHub webhook raw body is unavailable.');
+    }
+
+    return this.githubWebhookService.handle(request.body, deliveryId, event, signature);
+  }
+}
+
+
+====================================================================================================
+REQUEST AND RESPONSE USAGE
+====================================================================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-analysis.controller.ts:9: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-analysis.controller.ts:26: return this.service.analyze(workspaceId, desktopAppId, request.user.id, dto);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-apps.controller.ts:9: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-apps.controller.ts:42: return this.desktopAppsService.create(workspaceId, dto, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-apps.controller.ts:88: return this.desktopAppsService.update(workspaceId, desktopAppId, dto, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-apps.controller.ts:106: return this.desktopAppsService.archive(workspaceId, desktopAppId, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-security.controller.ts:8: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-security.controller.ts:26: return this.permissions.get(workspaceId, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\controllers\mobile-analysis.controller.ts:9: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\controllers\mobile-analysis.controller.ts:40: return this.service.analyze(workspaceId, mobileAppId, request.user.id, dto);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\controllers\mobile-apps.controller.ts:9: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\controllers\mobile-apps.controller.ts:41: return this.mobileAppsService.create(workspaceId, dto, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\controllers\mobile-apps.controller.ts:87: return this.mobileAppsService.update(workspaceId, mobileAppId, dto, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\controllers\mobile-apps.controller.ts:105: return this.mobileAppsService.archive(workspaceId, mobileAppId, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\controllers\mobile-security.controller.ts:6: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\controllers\mobile-security.controller.ts:29: return this.permissions.getForUser(workspaceId, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:27: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:90: return this.developmentTemplates.applyTemplate(workspaceId, applicationId, dto, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:119: return this.milestones.createMilestone(workspaceId, applicationId, dto, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:140: return this.milestones.updateMilestone(workspaceId, applicationId, milestoneId, dto, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:155: return this.milestones.completeMilestone(workspaceId, applicationId, milestoneId, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:170: return this.milestones.reopenMilestone(workspaceId, applicationId, milestoneId, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:187: return this.milestones.skipMilestone(workspaceId, applicationId, milestoneId, dto, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:202: await this.milestones.deleteMilestone(workspaceId, applicationId, milestoneId, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:221: return this.milestones.reorderMilestones(workspaceId, applicationId, dto, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:238: return this.tasks.createTask(workspaceId, applicationId, milestoneId, dto, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:255: return this.tasks.updateTask(workspaceId, applicationId, taskId, dto, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:272: return this.tasks.setTaskStatus(workspaceId, applicationId, taskId, dto, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:287: return this.tasks.completeTask(workspaceId, applicationId, taskId, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:302: return this.tasks.reopenTask(workspaceId, applicationId, taskId, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:319: return this.tasks.skipTask(workspaceId, applicationId, taskId, dto, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:336: return this.tasks.moveTask(workspaceId, applicationId, taskId, dto, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:353: return this.tasks.reorderTasks(workspaceId, applicationId, milestoneId, dto, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:368: await this.tasks.deleteTask(workspaceId, applicationId, taskId, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:399: return this.blockers.createBlocker(workspaceId, applicationId, dto, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:416: return this.blockers.updateBlocker(workspaceId, applicationId, blockerId, dto, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:433: return this.blockers.resolveBlocker(workspaceId, applicationId, blockerId, dto, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:448: return this.blockers.reopenBlocker(workspaceId, applicationId, blockerId, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:463: await this.blockers.deleteBlocker(workspaceId, applicationId, blockerId, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\controllers\github-connect.controller.ts:9: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\controllers\github-connect.controller.ts:34: return this.repositoryConnectService.begin(workspaceId, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\controllers\github-connect.controller.ts:46: return this.repositoryConnectService.completeSetup(request.user.id, dto);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\controllers\github-connect.controller.ts:58: return this.repositoryConnectService.completeCallback(request.user.id, dto);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\controllers\github-webhook.controller.ts:5: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\controllers\github-webhook.controller.ts:33: if (!Buffer.isBuffer(request.body)) {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\controllers\github-webhook.controller.ts:37: return this.githubWebhookService.handle(request.body, deliveryId, event, signature);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\controllers\repository-import.controller.ts:32: return this.personalGithubConnect.begin(request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\controllers\repository-import.controller.ts:46: return this.personalGithubConnect.completeSetup(request.user.id, dto);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\controllers\repository-import.controller.ts:60: return this.personalGithubConnect.completeCallback(request.user.id, dto);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\controllers\repository-import.controller.ts:71: return this.personalRepositories.list(request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\controllers\repository-import.controller.ts:85: return this.repositoryAnalyzer.analyze(request.user.id, dto.repositoryId);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\controllers\repository-import.controller.ts:99: return this.repositoryImport.importFromGithub(request.user.id, dto);

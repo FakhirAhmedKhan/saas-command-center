@@ -1,6 +1,6 @@
 import { Logger, type INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { assertStartupRequirements } from 'src/bootstrap/startup-checks';
+import { assertStartupRequirements, DATABASE_TIMEOUT_MS } from 'src/bootstrap/startup-checks';
 import { PrismaService } from 'src/database/prisma.service';
 
 interface AppOptions {
@@ -110,7 +110,7 @@ describe('assertStartupRequirements', () => {
     });
     const assertion = expect(assertStartupRequirements(app)).rejects.toThrow('Database startup check timed out.');
 
-    await jest.advanceTimersByTimeAsync(10_000);
+    await jest.advanceTimersByTimeAsync(DATABASE_TIMEOUT_MS);
 
     await assertion;
   });

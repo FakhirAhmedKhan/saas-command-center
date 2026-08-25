@@ -1,0 +1,588 @@
+=== PLAYWRIGHT ERROR CONTEXT ===
+FILE: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\test-results\fullstack-desktop-final-De-86966--and-never-renders-a-secret-chrome-fullstack\error-context.md
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: fullstack-desktop-final.spec.ts >> Desktop Phase 18 final frontend >> renders evidence-grounded AI analysis and never renders a secret
+- Location: e2e\full-stack\fullstack-desktop-final.spec.ts:157:7
+
+# Error details
+
+```
+Error: expect(locator).toBeVisible() failed
+
+Locator: getByTestId('desktop-ai-panel')
+Expected: visible
+Timeout: 10000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" with timeout 10000ms
+  - waiting for getByTestId('desktop-ai-panel')
+
+```
+
+```yaml
+- alert
+- link "Skip to content":
+  - /url: "#main-content"
+- complementary:
+  - button "Collapse navigation"
+  - link "SaaS Command Center SaaS Command Center":
+    - /url: /dashboard
+    - img "SaaS Command Center"
+    - text: SaaS Command Center
+  - button "Select workspace": BA Batch 11 Owner Workspace 1787618082893-e6al9l
+  - navigation "Primary navigation":
+    - link "Dashboard":
+      - /url: /dashboard
+    - region "Workspace":
+      - paragraph: Workspace
+      - link "Overview":
+        - /url: /workspaces/6365ea4a-751b-436d-b061-bf525bf91c4c
+      - link "Applications":
+        - /url: /workspaces/6365ea4a-751b-436d-b061-bf525bf91c4c/applications
+      - link "Websites":
+        - /url: /workspaces/6365ea4a-751b-436d-b061-bf525bf91c4c/websites
+      - link "Mobile Apps":
+        - /url: /workspaces/6365ea4a-751b-436d-b061-bf525bf91c4c/mobile-apps
+      - link "Desktop Apps":
+        - /url: /workspaces/6365ea4a-751b-436d-b061-bf525bf91c4c/desktop-apps
+      - link "Activity":
+        - /url: /workspaces/6365ea4a-751b-436d-b061-bf525bf91c4c/activity
+    - region "Operations":
+      - paragraph: Operations
+      - link "Monitoring":
+        - /url: /workspaces/6365ea4a-751b-436d-b061-bf525bf91c4c/monitoring
+      - link "Repositories":
+        - /url: /workspaces/6365ea4a-751b-436d-b061-bf525bf91c4c/repositories
+    - region "Configuration":
+      - paragraph: Configuration
+      - link "Settings":
+        - /url: /workspaces/6365ea4a-751b-436d-b061-bf525bf91c4c/settings
+  - text: B
+  - paragraph: Batch 11 Owner
+  - paragraph: batch11-owner-1787618082893-e6al9l@example.test
+  - button "Sign out"
+- banner:
+  - link "Notifications, 0 unread":
+    - /url: /notifications
+- main:
+  - alert:
+    - heading "Something went wrong" [level=2]
+    - paragraph: This page hit an unexpected error. Please try again.
+    - button "Try again"
+```
+
+# Test source
+
+```ts
+  121 |           updatedAt: new Date().toISOString(),
+  122 |         },
+  123 |       ];
+  124 | 
+  125 |       await json(
+  126 |         route,
+  127 |         {
+  128 |           rulesEvaluated: 1,
+  129 |           triggered: 1,
+  130 |           resolved: 0,
+  131 |           unchanged: 0,
+  132 |         },
+  133 |         201,
+  134 |       );
+  135 |     });
+  136 | 
+  137 |     await page.goto(`/workspaces/${state.owner.workspaceId}/desktop-apps/${desktop.id}/alerts`);
+  138 | 
+  139 |     await expect(page.getByRole('heading', { name: 'Desktop Alerts' })).toBeVisible();
+  140 |     await expect(page.getByText('No desktop alert rules yet.')).toBeVisible();
+  141 | 
+  142 |     await page.getByLabel('Alert name').fill('Build failed');
+  143 |     await page.getByLabel('Alert type').selectOption('BUILD_FAILED');
+  144 |     await page.getByRole('button', { name: 'Create alert' }).click();
+  145 | 
+  146 |     await expect(page.getByText('Build failed', { exact: true }).last()).toBeVisible();
+  147 | 
+  148 |     await page.getByRole('button', { name: 'Evaluate now' }).click();
+  149 |     await expect(page.getByText('Desktop build failed')).toBeVisible();
+  150 |     await expect(page.getByText('OPEN')).toBeVisible();
+  151 | 
+  152 |     await page.setViewportSize({ width: 390, height: 844 });
+  153 |     await expect(page.getByRole('heading', { name: 'Desktop Alerts' })).toBeVisible();
+  154 |     await expect(page.getByText('Alerts', { exact: true }).first()).toBeVisible();
+  155 |   });
+  156 | 
+  157 |   test('renders evidence-grounded AI analysis and never renders a secret', async ({ page, request }) => {
+  158 |     await loginThroughUi(page, state.owner);
+  159 |     const desktop = await createDesktopApp(request);
+  160 |     const apiBase = `/api/v1/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktop.id}`;
+  161 | 
+  162 |     await page.route(`**${apiBase}/permissions`, (route) =>
+  163 |       json(route, {
+  164 |         role: 'OWNER',
+  165 |         canRead: true,
+  166 |         canWrite: true,
+  167 |         canManage: true,
+  168 |         canAnalyze: true,
+  169 |         canConfigureSecrets: true,
+  170 |       }),
+  171 |     );
+  172 | 
+  173 |     await page.route(`**${apiBase}/overview`, (route) =>
+  174 |       json(route, {
+  175 |         application: {
+  176 |           id: desktop.id,
+  177 |           name: 'Desktop Final',
+  178 |           platform: 'CROSS_PLATFORM',
+  179 |           framework: 'ELECTRON',
+  180 |           architecture: 'X64',
+  181 |         },
+  182 |         repository: null,
+  183 |         latestBuild: null,
+  184 |         latestRelease: null,
+  185 |         runtime: null,
+  186 |       }),
+  187 |     );
+  188 | 
+  189 |     await page.route(`**${apiBase}/analysis`, (route) =>
+  190 |       json(
+  191 |         route,
+  192 |         {
+  193 |           id: '33333333-3333-4333-8333-333333333333',
+  194 |           action: 'RELEASE_HEALTH',
+  195 |           answer: [
+  196 |             'Evidence:',
+  197 |             '- Release metadata is available.',
+  198 |             'Correlation:',
+  199 |             '- No regression is proven.',
+  200 |             'Likely cause:',
+  201 |             '- No likely cause is supported.',
+  202 |             'Unknown cause:',
+  203 |             '- Additional telemetry is required.',
+  204 |           ].join('\n'),
+  205 |           confidence: 'SUPPORTED',
+  206 |           evidence: [
+  207 |             {
+  208 |               type: 'RELEASE',
+  209 |               id: '44444444-4444-4444-8444-444444444444',
+  210 |               label: 'Release 3.0.0',
+  211 |             },
+  212 |           ],
+  213 |           createdAt: new Date().toISOString(),
+  214 |         },
+  215 |         201,
+  216 |       ),
+  217 |     );
+  218 | 
+  219 |     await page.goto(`/workspaces/${state.owner.workspaceId}/desktop-apps/${desktop.id}`);
+  220 | 
+> 221 |     await expect(page.getByTestId('desktop-ai-panel')).toBeVisible();
+      |                                                        ^ Error: expect(locator).toBeVisible() failed
+  222 |     await page.getByRole('button', { name: 'Analyze' }).click();
+  223 | 
+  224 |     await expect(page.getByText('SUPPORTED', { exact: true })).toBeVisible();
+  225 |     await expect(page.getByText(/Correlation:/)).toBeVisible();
+  226 |     await expect(page.getByText('Release 3.0.0')).toBeVisible();
+  227 |     await expect(page.getByText(/SUPER_SECRET|secretCiphertext/i)).toHaveCount(0);
+  228 |   });
+  229 | 
+  230 |   test('shows read-only desktop controls for a viewer', async ({ page, request }) => {
+  231 |     await loginThroughUi(page, state.owner);
+  232 |     const desktop = await createDesktopApp(request);
+  233 |     const apiBase = `/api/v1/workspaces/${state.owner.workspaceId}` + `/desktop-apps/${desktop.id}`;
+  234 | 
+  235 |     await page.route(`**${apiBase}/permissions`, (route) =>
+  236 |       json(route, {
+  237 |         role: 'VIEWER',
+  238 |         canRead: true,
+  239 |         canWrite: false,
+  240 |         canManage: false,
+  241 |         canAnalyze: false,
+  242 |         canConfigureSecrets: false,
+  243 |       }),
+  244 |     );
+  245 |     await page.route(`**${apiBase}/alerts/rules`, (route) => json(route, []));
+  246 |     await page.route(`**${apiBase}/alerts/incidents`, (route) => json(route, []));
+  247 | 
+  248 |     await page.goto(`/workspaces/${state.owner.workspaceId}/desktop-apps/${desktop.id}/alerts`);
+  249 | 
+  250 |     await expect(page.getByRole('heading', { name: 'Desktop Alerts' })).toBeVisible();
+  251 |     await expect(page.getByText('Create alert rule')).toHaveCount(0);
+  252 |     await expect(page.getByRole('button', { name: 'Evaluate now' })).toHaveCount(0);
+  253 |   });
+  254 | });
+  255 | 
+```
+=== CURRENT DESKTOP DETAILS PAGE ===
+'use client';
+
+import { DesktopAnalysisPanel } from '@/features/desktop-apps/desktop-analysis-panel';
+import { DesktopAppForm } from '@/features/desktop-apps/desktop-app-form';
+import { DESKTOP_ARCHITECTURE_LABELS, DESKTOP_FRAMEWORK_LABELS, DESKTOP_PLATFORM_LABELS } from '@/features/desktop-apps/desktop-app.constants';
+import { archiveDesktopApp, getDesktopApp, getDesktopAppOverview, updateDesktopApp } from '@/features/desktop-apps/desktop-apps-api';
+import { DesktopOverview } from '@/features/desktop-apps/desktop-overview';
+import { DesktopProjectDetectionPanel } from '@/features/desktop-apps/desktop-project-detection-panel';
+import { DesktopRepositoryPanel } from '@/features/desktop-apps/desktop-repository-panel';
+import { getErrorMessage } from '@/features/lib/api/api-error';
+import type { CreateDesktopApplicationInput, DesktopApplicationDetails, DesktopAppOverview } from '@command-center/shared-types';
+import { Archive } from 'lucide-react';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
+
+export default function DesktopAppDetailsPage() {
+  const params = useParams<{
+    workspaceId: string;
+    desktopAppId: string;
+  }>();
+  const router = useRouter();
+  const workspaceId = params.workspaceId;
+  const desktopAppId = params.desktopAppId;
+  const listHref = `/workspaces/${workspaceId}/desktop-apps`;
+  const [desktopApp, setDesktopApp] = useState<DesktopApplicationDetails | null>(null);
+  const [overview, setOverview] = useState<DesktopAppOverview | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [archiving, setArchiving] = useState(false);
+  const load = useCallback(async (): Promise<void> => {
+    try {
+      const [detailsResponse, overviewResponse] = await Promise.all([getDesktopApp(workspaceId, desktopAppId), getDesktopAppOverview(workspaceId, desktopAppId)]);
+
+      setDesktopApp(detailsResponse);
+      setOverview(overviewResponse);
+    } catch (loadError: unknown) {
+      setError(getErrorMessage(loadError));
+    } finally {
+      setLoading(false);
+    }
+  }, [workspaceId, desktopAppId]);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void load();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [load]);
+
+  async function handleUpdate(payload: CreateDesktopApplicationInput): Promise<void> {
+    const updated = await updateDesktopApp(workspaceId, desktopAppId, payload);
+
+    setDesktopApp(updated);
+
+    const overviewResponse = await getDesktopAppOverview(workspaceId, desktopAppId);
+
+    setOverview(overviewResponse);
+
+    router.refresh();
+  }
+
+  async function handleArchive(): Promise<void> {
+    if (!desktopApp) {
+      return;
+    }
+
+    const confirmed = window.confirm(`Archive "${desktopApp.application.name}"?`);
+
+    if (!confirmed) {
+      return;
+    }
+
+    setArchiving(true);
+    setError(null);
+
+    try {
+      await archiveDesktopApp(workspaceId, desktopAppId);
+
+      router.replace(listHref);
+
+      router.refresh();
+    } catch (archiveError: unknown) {
+      setError(getErrorMessage(archiveError));
+
+      setArchiving(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div aria-label='Loading desktop application' className='space-y-5'>
+        <div className='h-40 animate-pulse rounded-2xl border border-slate-200 bg-slate-100' />
+
+        <div className='h-80 animate-pulse rounded-2xl border border-slate-200 bg-slate-100' />
+      </div>
+    );
+  }
+
+  if (!desktopApp) {
+    return (
+      <div role='alert' className='rounded-2xl border border-red-200 bg-red-50 p-6'>
+        <h1 className='font-semibold text-red-800'>Unable to load desktop application</h1>
+
+        <p className='mt-2 text-sm text-red-700'>{error ?? 'Desktop application not found.'}</p>
+
+        <Link href={listHref} className='mt-4 inline-flex text-sm font-semibold text-red-700 underline'>
+          Return to Desktop Apps
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className='space-y-6'>
+      <div className='flex justify-end'>
+        <button
+          type='button'
+          disabled={archiving}
+          onClick={() => void handleArchive()}
+          className='inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg border border-red-200 bg-white px-4 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60'
+        >
+          <Archive className='size-4' />
+
+          {archiving ? 'Archiving...' : 'Archive'}
+        </button>
+      </div>
+
+      {error ? (
+        <div role='alert' className='rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700'>
+          {error}
+        </div>
+      ) : null}
+
+      {overview ? <DesktopOverview workspaceId={workspaceId} desktopAppId={desktopAppId} overview={overview} /> : null}
+
+      <DesktopProjectDetectionPanel
+        workspaceId={workspaceId}
+        desktopApp={desktopApp}
+        onApplied={(updatedDesktopApp) => {
+          setDesktopApp(updatedDesktopApp);
+
+          void getDesktopAppOverview(workspaceId, desktopAppId).then(setOverview);
+        }}
+      />
+
+      <section className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6'>
+        <div>
+          <h2 className='text-lg font-semibold text-slate-950'>Application information</h2>
+
+          <p className='mt-1 text-sm text-slate-500'>Current desktop application metadata.</p>
+        </div>
+        <DesktopAnalysisPanel workspaceId={workspaceId} desktopAppId={desktopAppId} />
+
+        <dl className='mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+          <OverviewItem label='Platform' value={DESKTOP_PLATFORM_LABELS[desktopApp.platform]} />
+
+          <OverviewItem label='Framework' value={DESKTOP_FRAMEWORK_LABELS[desktopApp.framework]} />
+
+          <OverviewItem label='Architecture' value={DESKTOP_ARCHITECTURE_LABELS[desktopApp.architecture]} />
+
+          <OverviewItem label='Version' value={desktopApp.currentVersion ?? 'Not set'} />
+
+          <OverviewItem label='Build' value={desktopApp.currentBuildNumber ?? 'Not set'} />
+
+          <OverviewItem label='Update channel' value={desktopApp.updateChannel ?? 'Not set'} />
+
+          <OverviewItem label='Minimum OS' value={desktopApp.minimumOsVersion ?? 'Not set'} />
+
+          <OverviewItem label='Package' value={desktopApp.packageName ?? 'Not set'} />
+        </dl>
+      </section>
+
+      <section id='edit' className='scroll-mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6'>
+        <div className='mb-6'>
+          <h2 className='text-lg font-semibold text-slate-950'>Edit Desktop App</h2>
+
+          <p className='mt-1 text-sm text-slate-500'>Update desktop application metadata.</p>
+        </div>
+
+        <DesktopAppForm desktopApp={desktopApp} cancelHref={listHref} submitLabel='Save Changes' onSubmit={handleUpdate} />
+        <DesktopRepositoryPanel workspaceId={workspaceId} desktopApp={desktopApp} />
+      </section>
+    </div>
+  );
+}
+
+function OverviewItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className='rounded-xl bg-slate-50 p-4'>
+      <dt className='text-xs font-medium uppercase tracking-wide text-slate-400'>{label}</dt>
+
+      <dd className='mt-1 break-words text-sm font-semibold text-slate-900'>{value}</dd>
+    </div>
+  );
+}
+
+=== CURRENT DESKTOP ANALYSIS PANEL ===
+'use client';
+
+import { analyzeDesktopApplication, getDesktopPermissions } from './desktop-apps-api';
+import { DesktopPermissionGate } from './desktop-permission-gate';
+import { getErrorMessage } from '@/features/lib/api/api-error';
+import type { DesktopAnalysisResult, DesktopAnalysisAction, DesktopPermissions } from '@command-center/shared-types';
+import { Bot, ExternalLink } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
+interface Props {
+  workspaceId: string;
+  desktopAppId: string;
+  buildId?: string;
+  releaseId?: string;
+  crashId?: string;
+}
+
+const ACTIONS: Array<{
+  value: DesktopAnalysisAction;
+  label: string;
+}> = [
+  { value: 'BUILD_FAILURE', label: 'Why did this build fail?' },
+  { value: 'CRASH_INCREASE', label: 'Why did crashes increase?' },
+  {
+    value: 'PERFORMANCE_REGRESSION',
+    label: 'What caused the performance regression?',
+  },
+  { value: 'RELEASE_HEALTH', label: 'Is this release healthy?' },
+  { value: 'CUSTOM', label: 'Ask a custom question' },
+];
+
+export function DesktopAnalysisPanel({ workspaceId, desktopAppId, buildId, releaseId, crashId }: Props) {
+  const [permissions, setPermissions] = useState<DesktopPermissions | null>(null);
+  const [action, setAction] = useState<DesktopAnalysisAction>('RELEASE_HEALTH');
+  const [question, setQuestion] = useState('');
+  const [analysis, setAnalysis] = useState<DesktopAnalysisResult | null>(null);
+  const [running, setRunning] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void getDesktopPermissions(workspaceId, desktopAppId)
+      .then((value) => {
+        if (!cancelled) {
+          setPermissions(value);
+        }
+      })
+      .catch((loadError) => {
+        if (!cancelled) {
+          setError(getErrorMessage(loadError));
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [workspaceId, desktopAppId]);
+
+  async function run() {
+    setRunning(true);
+    setError(null);
+
+    try {
+      const result = await analyzeDesktopApplication(workspaceId, desktopAppId, {
+        action,
+        question: question.trim() || undefined,
+        buildId,
+        releaseId,
+        crashId,
+      });
+
+      setAnalysis(result);
+    } catch (runError) {
+      setError(getErrorMessage(runError));
+    } finally {
+      setRunning(false);
+    }
+  }
+
+  return (
+    <section className='rounded-2xl border bg-white p-5' data-testid='desktop-ai-panel'>
+      <div className='flex items-center gap-2'>
+        <Bot className='size-5' aria-hidden='true' />
+        <div>
+          <h2 className='font-semibold'>AI Desktop Analysis</h2>
+          <p className='text-sm text-slate-500'>Evidence-grounded analysis from your desktop engineering data.</p>
+        </div>
+      </div>
+
+      {error ? (
+        <div role='alert' className='mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800'>
+          {error}
+        </div>
+      ) : null}
+
+      <DesktopPermissionGate permissions={permissions} require='analyze' fallback={permissions ? <p className='mt-4 text-sm text-slate-500'>Your workspace role has read-only access to AI analysis.</p> : null}>
+        <div className='mt-4 grid gap-3 md:grid-cols-[280px_1fr]'>
+          <label className='space-y-1 text-sm'>
+            <span>Analysis</span>
+            <select aria-label='Analysis action' value={action} onChange={(event) => setAction(event.target.value as DesktopAnalysisAction)} className='h-10 w-full rounded-lg border px-3'>
+              {ACTIONS.map((item) => (
+                <option key={item.value} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className='space-y-1 text-sm'>
+            <span>Question</span>
+            <input
+              aria-label='AI question'
+              value={question}
+              onChange={(event) => setQuestion(event.target.value)}
+              placeholder='Optional: focus the analysis on a specific symptom or release.'
+              className='h-10 w-full rounded-lg border px-3'
+            />
+          </label>
+        </div>
+
+        <button type='button' onClick={() => void run()} disabled={running} className='mt-3 h-10 rounded-lg bg-slate-950 px-4 text-sm font-medium text-white disabled:opacity-50'>
+          {running ? 'Analyzing…' : 'Analyze'}
+        </button>
+      </DesktopPermissionGate>
+
+      {analysis ? (
+        <div className='mt-5 space-y-4'>
+          <div className='flex items-center gap-2 text-sm'>
+            <span className='rounded-full border px-2 py-0.5'>{analysis.confidence}</span>
+            <span className='text-slate-500'>{analysis.action}</span>
+          </div>
+
+          <pre className='whitespace-pre-wrap rounded-xl bg-slate-950 p-4 text-sm leading-6 text-slate-100'>{analysis.answer}</pre>
+
+          <div>
+            <h3 className='text-sm font-semibold'>Evidence</h3>
+            {analysis.evidence.length === 0 ? (
+              <p className='mt-2 text-sm text-slate-500'>No evidence references were available.</p>
+            ) : (
+              <ul className='mt-2 space-y-2'>
+                {analysis.evidence.map((item) => (
+                  <li key={`${item.type}:${item.id}`} className='flex items-center justify-between gap-3 rounded-lg border px-3 py-2 text-sm'>
+                    <span>
+                      <span className='font-medium'>{item.type}</span>
+                      <span className='ml-2 text-slate-500'>{item.label}</span>
+                    </span>
+
+                    {item.href ? (
+                      <a href={item.href} className='inline-flex items-center gap-1 text-xs font-medium underline'>
+                        Open
+                        <ExternalLink className='size-3' aria-hidden='true' />
+                      </a>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+

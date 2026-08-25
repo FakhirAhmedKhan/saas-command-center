@@ -1,0 +1,651 @@
+
+==========================================================================================
+FILE: apps/api/src/modules/auth/services/auth-cookie.service.ts
+==========================================================================================
+import type { TypedConfigService } from '../../../config/runtime-config';
+import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import type { CookieOptions, Request, Response } from 'express';
+
+@Injectable()
+export class AuthCookieService {
+  constructor(
+    @Inject(ConfigService)
+    private readonly config: TypedConfigService,
+  ) {}
+
+  getRefreshToken(request: Request): string | undefined {
+    const cookies = request.cookies as Record<string, unknown> | undefined;
+    const token = cookies?.[this.getCookieName()];
+
+    return typeof token === 'string' && token.length > 0 ? token : undefined;
+  }
+
+  setRefreshToken(response: Response, refreshToken: string): void {
+    response.cookie(this.getCookieName(), refreshToken, {
+      ...this.getBaseOptions(),
+
+      maxAge: this.config.get('COOKIE_MAX_AGE_MS', {
+        infer: true,
+      }),
+    });
+  }
+
+  clearRefreshToken(response: Response): void {
+    response.clearCookie(this.getCookieName(), this.getBaseOptions());
+  }
+
+  private getCookieName(): string {
+    return this.config.get('COOKIE_NAME', {
+      infer: true,
+    });
+  }
+
+  private getBaseOptions(): CookieOptions {
+    const domain = this.config.get('COOKIE_DOMAIN', {
+      infer: true,
+    });
+
+    return {
+      httpOnly: true,
+      secure: this.config.get('COOKIE_SECURE', {
+        infer: true,
+      }),
+
+      sameSite: this.config.get('COOKIE_SAME_SITE', {
+        infer: true,
+      }),
+
+      path: '/api/v1/auth',
+
+      ...(domain
+        ? {
+            domain,
+          }
+        : {}),
+    };
+  }
+}
+
+
+==========================================================================================
+FILE: apps/api/src/common/rate-limit/shared-rate-limit.guard.ts
+==========================================================================================
+import { SHARED_RATE_LIMIT_KEY, type SharedRateLimitOptions } from './shared-rate-limit.decorator';
+import { SharedRateLimitService } from './shared-rate-limit.service';
+import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import type { Request, Response } from 'express';
+
+interface RequestWithOptionalUser extends Request {
+  user?: {
+    id?: string;
+  };
+}
+
+/**
+ * Resolves the identity a rate-limit bucket is keyed on.
+ *
+ * `JwtAuthGuard` runs before this guard on every non-`@Public()` route (both
+ * as the global `APP_GUARD` and, redundantly, on controllers that also list
+ * it explicitly), so `request.user` is already server-verified by the time
+ * this executes. For those routes we key on that verified identity — plus
+ * the workspace the route operates on, when present — so a caller cannot
+ * reset their bucket by rotating a request header (SEC-02).
+ *
+ * Only requests with no verified user (i.e. genuinely `@Public()` routes,
+ * such as the analytics ingestion collector) fall back to a caller-supplied
+ * tracking/API key, which is the only identity available for them.
+ */
+export function getIdentity(request: Request): string {
+  const userId = (request as RequestWithOptionalUser).user?.id;
+
+  if (userId) {
+    const rawWorkspaceId = request.params?.workspaceId;
+    const workspaceId = typeof rawWorkspaceId === 'string' ? rawWorkspaceId : undefined;
+
+    return workspaceId ? `user:${userId}:workspace:${workspaceId}` : `user:${userId}`;
+  }
+
+  const trackingKey = request.header('x-tracking-key');
+
+  if (trackingKey) {
+    return `tracking:${trackingKey}`;
+  }
+
+  const apiKey = request.header('x-api-key');
+
+  if (apiKey) {
+    return `apikey:${apiKey}`;
+  }
+
+  return `ip:${request.ip || request.socket.remoteAddress || 'unknown'}`;
+}
+
+@Injectable()
+export class SharedRateLimitGuard implements CanActivate {
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly rateLimit: SharedRateLimitService,
+  ) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const options = this.reflector.getAllAndOverride<SharedRateLimitOptions>(SHARED_RATE_LIMIT_KEY, [context.getHandler(), context.getClass()]);
+
+    if (!options) {
+      return true;
+    }
+
+    const httpContext = context.switchToHttp();
+    const request = httpContext.getRequest<Request>();
+    const response = httpContext.getResponse<Response>();
+    const result = await this.rateLimit.consume(options.scope, getIdentity(request), options.limit, options.windowSeconds);
+
+    response.setHeader('X-RateLimit-Limit', String(result.limit));
+    response.setHeader('X-RateLimit-Remaining', String(result.remaining));
+    response.setHeader('X-RateLimit-Reset', String(result.resetAfterSeconds));
+
+    if (!result.allowed) {
+      response.setHeader('Retry-After', String(result.retryAfterSeconds));
+
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.TOO_MANY_REQUESTS,
+          error: 'Too Many Requests',
+          message: 'Analytics ingestion rate limit exceeded.',
+          retryAfterSeconds: result.retryAfterSeconds,
+        },
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+    }
+    return true;
+  }
+}
+
+
+==========================================================================================
+FILE: apps/api/src/modules/auth/interfaces/request-with-user.interface.ts
+==========================================================================================
+import type { AuthenticatedUser } from './authenticated-user.interface';
+import type { Request } from 'express';
+
+export interface RequestWithUser extends Request {
+  user: AuthenticatedUser;
+}
+
+
+==========================================================================================
+FILE: apps/api/src/app.module.ts
+==========================================================================================
+import { validateEnvironment } from './config/env.validation';
+import { DatabaseModule } from './database/database.module';
+import { RedisModule } from './infrastructure/redis/redis.module';
+import { ActivityModule } from './modules/activity/activity.module';
+import { AnalyticsEngineModule } from './modules/analytics-engine/analytics-engine.module';
+import { AnalyticsIngestionModule } from './modules/analytics-ingestion/analytics-ingestion.module';
+import { AnalyticsOverviewModule } from './modules/analytics-overview/analytics-overview.module';
+import { AnalyticsProcessingModule } from './modules/analytics-processing/analytics-processing.module';
+import { AnalyticsReportsModule } from './modules/analytics-reports/analytics-reports.module';
+import { ApplicationsModule } from './modules/applications/applications.module';
+import { AuthSessionsModule } from './modules/auth/module/auth-sessions.module';
+import { AuthModule } from './modules/auth/module/auth.module';
+import { DesktopAppsModule } from './modules/desktop-apps/desktop-apps.module';
+import { DevelopmentModule } from './modules/development/development.module';
+import { HealthModule } from './modules/health/health.module';
+import { MobileAppsModule } from './modules/mobile-apps/mobile-apps.module';
+import { MonitoringModule } from './modules/monitoring/monitoring.module';
+import { ReleasesModule } from './modules/releases/releases.module';
+import { RepositoriesModule } from './modules/repositories/repositories.module';
+import { TeamOperationsModule } from './modules/team-operations/team-operations.module';
+import { UsersModule } from './modules/users/users.module';
+import { WebhooksModule } from './modules/webhooks/webhooks.module';
+import { WebsitesModule } from './modules/websites/websites.module';
+import { WorkspaceMembersModule } from './modules/workspace/modules/workspace-members.module';
+import { WorkspaceModule } from './modules/workspace/modules/workspaces.module';
+import { VersionModule } from './version/version.module';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      cache: true,
+      envFilePath: ['../../.env', '.env'],
+      isGlobal: true,
+      validate: validateEnvironment,
+    }),
+
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60_000,
+        limit: 100,
+      },
+    ]),
+    ScheduleModule.forRoot(),
+    RepositoriesModule,
+    ReleasesModule,
+    ApplicationsModule,
+    DatabaseModule,
+    UsersModule,
+    WebsitesModule,
+    WorkspaceModule,
+    WorkspaceMembersModule,
+    AuthSessionsModule,
+    AuthModule,
+    HealthModule,
+    VersionModule,
+    ActivityModule,
+    DevelopmentModule,
+    AnalyticsIngestionModule,
+    AnalyticsEngineModule,
+    AnalyticsOverviewModule,
+    AnalyticsReportsModule,
+
+    MobileAppsModule,
+    RedisModule,
+    MonitoringModule,
+    TeamOperationsModule,
+    WebhooksModule,
+    DesktopAppsModule,
+    AnalyticsProcessingModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
+})
+export class AppModule {}
+
+
+==========================================================================================
+FILE: packages/test-code/api/unit/common/middleware/request-id.middleware.spec.ts
+==========================================================================================
+import type { NextFunction, Request, Response } from 'express';
+import { REQUEST_ID_HEADER, requestIdMiddleware, type RequestWithId } from 'src/common/middleware/request-id.middleware';
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function run(headerValue?: string | string[]): {
+  request: RequestWithId;
+  setHeader: jest.Mock;
+  next: NextFunction;
+} {
+  const request = {
+    headers: headerValue === undefined ? {} : { [REQUEST_ID_HEADER]: headerValue },
+  } as unknown as RequestWithId;
+  const setHeader = jest.fn();
+  const response = {
+    setHeader,
+  } as unknown as Response;
+  const next = jest.fn() as unknown as NextFunction;
+
+  requestIdMiddleware(request as Request, response, next);
+
+  return { request, setHeader, next };
+}
+
+describe('requestIdMiddleware', () => {
+  it('generates a UUID when no header is supplied', () => {
+    const { request } = run();
+
+    expect(request.requestId).toMatch(UUID_PATTERN);
+  });
+
+  it('mirrors the id onto the response header', () => {
+    const { request, setHeader } = run();
+
+    expect(setHeader).toHaveBeenCalledWith(REQUEST_ID_HEADER, request.requestId);
+  });
+
+  it('always calls next', () => {
+    const { next } = run();
+
+    expect(next).toHaveBeenCalledTimes(1);
+  });
+
+  it('reuses a client supplied id', () => {
+    const { request } = run('client-id-1');
+
+    expect(request.requestId).toBe('client-id-1');
+  });
+
+  it('trims a client supplied id', () => {
+    const { request } = run('  client-id-2  ');
+
+    expect(request.requestId).toBe('client-id-2');
+  });
+
+  it('generates a fresh id when the header is blank', () => {
+    const { request } = run('   ');
+
+    expect(request.requestId).toMatch(UUID_PATTERN);
+  });
+
+  it('takes the first entry when the header repeats', () => {
+    const { request } = run(['first-id', 'second-id']);
+
+    expect(request.requestId).toBe('first-id');
+  });
+
+  it('generates a fresh id when the repeated header is blank', () => {
+    const { request } = run(['   ', 'second-id']);
+
+    expect(request.requestId).toMatch(UUID_PATTERN);
+  });
+
+  it('generates a fresh id for an empty header array', () => {
+    const { request } = run([]);
+
+    expect(request.requestId).toMatch(UUID_PATTERN);
+  });
+
+  it('issues distinct ids across requests', () => {
+    expect(run().request.requestId).not.toBe(run().request.requestId);
+  });
+
+  describe('input hardening (bounded length + safe character set)', () => {
+    it('generates a fresh id when the client value exceeds the maximum length', () => {
+      const { request } = run('a'.repeat(129));
+
+      expect(request.requestId).toMatch(UUID_PATTERN);
+    });
+
+    it('accepts a client value at exactly the maximum length', () => {
+      const maxLengthId = 'a'.repeat(128);
+      const { request } = run(maxLengthId);
+
+      expect(request.requestId).toBe(maxLengthId);
+    });
+
+    it('generates a fresh id when the client value contains a newline (log injection attempt)', () => {
+      const { request } = run('legit-id\nFAKE LOG LINE: admin escalated');
+
+      expect(request.requestId).toMatch(UUID_PATTERN);
+    });
+
+    it('generates a fresh id when the client value contains control characters', () => {
+      const { request } = run('legit-id [31m');
+
+      expect(request.requestId).toMatch(UUID_PATTERN);
+    });
+
+    it('generates a fresh id when the client value contains spaces or other disallowed characters', () => {
+      const { request } = run('not a valid id!');
+
+      expect(request.requestId).toMatch(UUID_PATTERN);
+    });
+
+    it('preserves a valid UUID-shaped client id unchanged', () => {
+      const validId = '11111111-2222-3333-4444-555555555555';
+      const { request } = run(validId);
+
+      expect(request.requestId).toBe(validId);
+    });
+
+    it('preserves a valid colon-delimited trace-id-shaped client id unchanged', () => {
+      const validId = 'trace-id:span-id:1';
+      const { request } = run(validId);
+
+      expect(request.requestId).toBe(validId);
+    });
+  });
+});
+
+
+==========================================================================================
+FILE: packages/test-code/api/unit/common/rate-limit/shared-rate-limit.guard.spec.ts
+==========================================================================================
+import type { Request } from 'express';
+import { getIdentity } from 'src/common/rate-limit/shared-rate-limit.guard';
+
+function buildRequest(overrides: { userId?: string; workspaceId?: string; headers?: Record<string, string>; ip?: string }): Request {
+  const headers = overrides.headers ?? {};
+
+  return {
+    user: overrides.userId ? { id: overrides.userId } : undefined,
+    params: overrides.workspaceId ? { workspaceId: overrides.workspaceId } : {},
+    header(name: string) {
+      return headers[name.toLowerCase()];
+    },
+    ip: overrides.ip,
+    socket: {},
+  } as unknown as Request;
+}
+
+describe('getIdentity (SharedRateLimitGuard)', () => {
+  describe('authenticated requests (request.user set by JwtAuthGuard)', () => {
+    it('keys on the server-verified user id, ignoring any tracking/API key header', () => {
+      const request = buildRequest({
+        userId: 'user-1',
+        headers: { 'x-tracking-key': 'attacker-supplied-key', 'x-api-key': 'attacker-supplied-key' },
+      });
+
+      expect(getIdentity(request)).toBe('user:user-1');
+    });
+
+    it('cannot be reset by rotating X-Tracking-Key between calls', () => {
+      const first = getIdentity(buildRequest({ userId: 'user-1', headers: { 'x-tracking-key': 'key-a' } }));
+      const second = getIdentity(buildRequest({ userId: 'user-1', headers: { 'x-tracking-key': 'key-b' } }));
+
+      expect(first).toBe(second);
+    });
+
+    it('cannot be reset by rotating X-Api-Key between calls', () => {
+      const first = getIdentity(buildRequest({ userId: 'user-1', headers: { 'x-api-key': 'key-a' } }));
+      const second = getIdentity(buildRequest({ userId: 'user-1', headers: { 'x-api-key': 'key-b' } }));
+
+      expect(first).toBe(second);
+    });
+
+    it('gives different authenticated users independent identities', () => {
+      const first = getIdentity(buildRequest({ userId: 'user-1' }));
+      const second = getIdentity(buildRequest({ userId: 'user-2' }));
+
+      expect(first).not.toBe(second);
+    });
+
+    it('includes the workspace route param so the same user is isolated per workspace', () => {
+      const workspaceA = getIdentity(buildRequest({ userId: 'user-1', workspaceId: 'workspace-a' }));
+      const workspaceB = getIdentity(buildRequest({ userId: 'user-1', workspaceId: 'workspace-b' }));
+      const noWorkspace = getIdentity(buildRequest({ userId: 'user-1' }));
+
+      expect(workspaceA).not.toBe(workspaceB);
+
+      expect(workspaceA).not.toBe(noWorkspace);
+
+      expect(workspaceA).toBe('user:user-1:workspace:workspace-a');
+    });
+
+    it('gives the same user in the same workspace the same identity across calls', () => {
+      const first = getIdentity(buildRequest({ userId: 'user-1', workspaceId: 'workspace-a' }));
+      const second = getIdentity(buildRequest({ userId: 'user-1', workspaceId: 'workspace-a' }));
+
+      expect(first).toBe(second);
+    });
+  });
+
+  describe('unauthenticated requests (e.g. the public analytics collector)', () => {
+    it('falls back to the tracking key when no verified user is present', () => {
+      expect(getIdentity(buildRequest({ headers: { 'x-tracking-key': 'cc_live_abc' } }))).toBe('tracking:cc_live_abc');
+    });
+
+    it('falls back to the API key when no tracking key or user is present', () => {
+      expect(getIdentity(buildRequest({ headers: { 'x-api-key': 'some-api-key' } }))).toBe('apikey:some-api-key');
+    });
+
+    it('falls back to the request IP when no user or header identity is available', () => {
+      expect(getIdentity(buildRequest({ ip: '203.0.113.7' }))).toBe('ip:203.0.113.7');
+    });
+
+    it('falls back to "unknown" when neither IP nor socket address is available', () => {
+      expect(getIdentity(buildRequest({}))).toBe('ip:unknown');
+    });
+  });
+});
+
+
+==========================================================================================
+FILE: packages/test-code/api/jest-e2e.config.cjs
+==========================================================================================
+const path = require('node:path');
+
+const repoRoot = path.resolve(__dirname, '../../..');
+
+module.exports = {
+  moduleFileExtensions: ['js', 'json', 'ts'],
+
+  rootDir: repoRoot,
+
+  testEnvironment: 'node',
+
+  roots: ['<rootDir>/apps/api/src', '<rootDir>/packages/test-code/api'],
+
+  testRegex: 'packages/test-code/api/e2e/.*\\.e2e-spec\\.ts$',
+
+  transform: {
+    '^.+\\.(t|j)s$': [
+      require.resolve('ts-jest'),
+      {
+        tsconfig: path.join(__dirname, 'tsconfig.json'),
+      },
+    ],
+  },
+
+  moduleNameMapper: {
+    '^src/(.*)$': '<rootDir>/apps/api/src/$1',
+  },
+
+  setupFiles: [path.join(__dirname, 'setup-env.ts')],
+
+  collectCoverageFrom: ['apps/api/src/**/*.ts', '!apps/api/src/generated/**', '!apps/api/src/**/*.spec.ts', '!apps/api/src/**/*.test.ts'],
+
+  coveragePathIgnorePatterns: ['/node_modules/', '/dist/', '/apps/api/src/generated/', '\\.spec\\.ts$', '\\.test\\.ts$'],
+
+  coverageDirectory: '<rootDir>/apps/api/coverage/e2e',
+
+  testTimeout: 30000,
+
+  maxWorkers: 1,
+
+  detectOpenHandles: true,
+
+  forceExit: false,
+};
+
+
+==========================================================================================
+EXPRESS RUNTIME METHOD SEARCH
+==========================================================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\main.ts:37: const port = config.get('PORT', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\bootstrap\configure-application.ts:92: config.get('NODE_ENV', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\bootstrap\configure-application.ts:125: config.get('SWAGGER_ENABLED', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\bootstrap\startup-checks.ts:28: const prisma = app.get(PrismaService);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\bootstrap\startup-checks.ts:29: const nodeEnvironment = config.get('NODE_ENV', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\bootstrap\startup-checks.ts:32: const cookieSecure = config.get('COOKIE_SECURE', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\filters\all-exceptions.filter.ts:139: [`${request.method} ${request.originalUrl}`, request.requestId ? `requestId=${request.requestId}` : undefined, `Unhandled Prisma ${exception.code} reached the global filter; consider a service-level catch.`]
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\filters\all-exceptions.filter.ts:146: this.logger.error([`${request.method} ${request.originalUrl}`, request.requestId ? `requestId=${request.requestId}` : undefined, stack].filter(Boolean).join(' | '));
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\filters\all-exceptions.filter.ts:153: path: request.originalUrl,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\filters\all-exceptions.filter.ts:158: response.status(statusCode).json(body);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\middleware\request-id.middleware.ts:42: response.setHeader(REQUEST_ID_HEADER, requestId);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\rate-limit\shared-rate-limit.guard.ts:49: return `ip:${request.ip || request.socket.remoteAddress || 'unknown'}`;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\rate-limit\shared-rate-limit.guard.ts:71: response.setHeader('X-RateLimit-Limit', String(result.limit));
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\rate-limit\shared-rate-limit.guard.ts:72: response.setHeader('X-RateLimit-Remaining', String(result.remaining));
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\rate-limit\shared-rate-limit.guard.ts:73: response.setHeader('X-RateLimit-Reset', String(result.resetAfterSeconds));
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\rate-limit\shared-rate-limit.guard.ts:76: response.setHeader('Retry-After', String(result.retryAfterSeconds));
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\config\runtime-config.ts:8: .get('CORS_ORIGINS', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\infrastructure\database\postgres-advisory-lock.service.ts:27: connectionString: config.get('DATABASE_URL', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\infrastructure\redis\redis.service.ts:17: config.get('REDIS_URL', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-engine\services\analytics-aggregation.service.ts:259: const existing = collection.get(key);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-engine\services\analytics-processing.service.ts:920: const existing = collection.get(key);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-ingestion\controllers\analytics-ingestion.controller.ts:27: ipAddress: request.ip ?? request.socket.remoteAddress,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-ingestion\services\analytics-ingestion.service.ts:51: this.trustCountryHeader = this.isEnabled(this.configService.get('ANALYTICS_TRUST_COUNTRY_HEADER'));
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-ingestion\services\ingestion-rate-limit.service.ts:24: const existing = this.buckets.get(key);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-overview\services\analytics-overview.service.ts:370: const existing = grouped.get(key);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-overview\utils\analytics-date-range.ts:66: year: Number(values.get('year')),
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-overview\utils\analytics-date-range.ts:67: month: Number(values.get('month')),
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-overview\utils\analytics-date-range.ts:68: day: Number(values.get('day')),
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-overview\utils\analytics-date-range.ts:69: hour: Number(values.get('hour')),
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-overview\utils\analytics-date-range.ts:70: minute: Number(values.get('minute')),
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-overview\utils\analytics-date-range.ts:71: second: Number(values.get('second')),
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-processing\services\analytics-processing-queue.service.ts:70: maxRetries: this.config.get('ANALYTICS_MAX_RETRIES', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-processing\services\analytics-processing-queue.service.ts:145: const maximumDays = this.config.get('ANALYTICS_REPROCESS_MAX_DAYS', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-processing\services\analytics-processing-scheduler.service.ts:35: !this.config.get('ANALYTICS_SCHEDULER_ENABLED', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-processing\services\analytics-processing-scheduler.service.ts:111: const workspaceId = workspaceByWebsiteId.get(group.websiteId);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-processing\services\analytics-processing-worker.service.ts:32: !this.config.get('ANALYTICS_WORKER_ENABLED', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-processing\services\analytics-range-processor.service.ts:39: const timeout = this.config.get('ANALYTICS_PROCESSING_TIMEOUT_MS', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-reports\controllers\analytics-reports.controller.ts:159: response.setHeader('Content-Type', 'text/csv; charset=utf-8');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-reports\controllers\analytics-reports.controller.ts:161: response.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-reports\controllers\analytics-reports.controller.ts:163: response.setHeader('Cache-Control', 'no-store');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\auth\controllers\auth.controller.ts:59: userAgent: request.get('user-agent')?.slice(0, 512),
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\auth\controllers\auth.controller.ts:60: ipAddress: request.ip ?? request.socket.remoteAddress,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\auth\services\auth-cookie.service.ts:21: response.cookie(this.getCookieName(), refreshToken, {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\auth\services\auth-cookie.service.ts:24: maxAge: this.config.get('COOKIE_MAX_AGE_MS', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\auth\services\auth-cookie.service.ts:31: response.clearCookie(this.getCookieName(), this.getBaseOptions());
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\auth\services\auth-cookie.service.ts:35: return this.config.get('COOKIE_NAME', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\auth\services\auth-cookie.service.ts:41: const domain = this.config.get('COOKIE_DOMAIN', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\auth\services\auth-cookie.service.ts:47: secure: this.config.get('COOKIE_SECURE', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\auth\services\auth-cookie.service.ts:51: sameSite: this.config.get('COOKIE_SAME_SITE', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\analysis\desktop-analysis.provider.ts:43: const data = (await response.json()) as { text?: unknown };
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-overview.controller.ts:25: return this.service.get(workspaceId, desktopAppId);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-performance.controller.ts:24: return this.performance.get(workspaceId, desktopAppId, query);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-security-health.controller.ts:34: return this.security.get(workspaceId, desktopAppId);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-security.controller.ts:26: return this.permissions.get(workspaceId, request.user.id);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-alerts.service.ts:218: const result = await this.performance.get(workspaceId, desktopAppId, {});
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-alerts.service.ts:324: const security = await this.security.get(workspaceId, desktopAppId);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-dependency-health.service.ts:58: const vulnerability = vulnerabilityByName.get(dependency.name.toLowerCase());
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-project-detector.ts:347: const existing = grouped.get(key);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-security.service.ts:90: return this.get(workspaceId, desktopAppId);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-telemetry.service.ts:78: const adapter = this.providers.get();
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-telemetry.service.ts:155: const snapshot = await this.providers.get().getSnapshot({
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\telemetry\normalized-http-desktop-telemetry.provider.ts:65: raw = await response.json();
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\health\health.service.ts:54: version: this.config.get('APP_VERSION', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\health\health.service.ts:58: environment: this.config.get('NODE_ENV', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\analysis\mobile-analysis.provider.ts:43: const data = (await response.json()) as {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\services\mobile-performance-dashboard.service.ts:54: const metrics = Object.fromEntries(ALL_METRICS.map((metric) => [metric, this.aggregate(metric, grouped.get(metric) ?? [])])) as Record<MobilePerformanceMetricName, MobilePerformanceValue>;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\services\mobile-performance-dashboard.service.ts:89: const bucket = byVersion.get(row.version || 'unknown') ?? [];
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\services\mobile-performance-dashboard.service.ts:171: const beforeValue = this.aggregate(metric, before.get(metric) ?? []).value;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\services\mobile-performance-dashboard.service.ts:172: const afterValue = this.aggregate(metric, after.get(metric) ?? []).value;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\services\mobile-performance-dashboard.service.ts:208: const values = grouped.get(row.metric) ?? [];
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\services\mobile-performance-dashboard.service.ts:247: const value = (metric: MobilePerformanceMetricName) => this.aggregate(metric, grouped.get(metric) ?? []).value;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\services\mobile-telemetry.service.ts:47: const adapter = this.registry.get(dto.provider);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\services\mobile-telemetry.service.ts:131: const adapter = this.registry.get(integration.provider);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\telemetry\mobile-telemetry-provider.registry.ts:25: const adapter = this.providers.get(provider);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\telemetry\provider-http.service.ts:42: return (await response.json()) as T;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\telemetry\providers\datadog-mobile-telemetry.provider.ts:139: const item = grouped.get(version) ?? {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\telemetry\providers\firebase-mobile-telemetry.provider.ts:135: const current = versions.get(version) ?? {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\monitoring\services\health-monitoring-scheduler.service.ts:29: !this.config.get('HEALTH_MONITOR_ENABLED', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\monitoring\services\health-monitoring-scheduler.service.ts:40: const batchSize = this.config.get('HEALTH_MONITOR_BATCH_SIZE', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\monitoring\services\health-monitoring-scheduler.service.ts:43: const concurrency = this.config.get('HEALTH_MONITOR_CONCURRENCY', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\monitoring\services\health-monitoring-scheduler.service.ts:78: const retentionDays = this.config.get('HEALTH_HISTORY_RETENTION_DAYS', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\monitoring\services\monitoring.service.ts:259: const healthy = counts.get(HealthCheckStatus.HEALTHY) ?? 0;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\monitoring\services\monitoring.service.ts:260: const degraded = counts.get(HealthCheckStatus.DEGRADED) ?? 0;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\monitoring\services\monitoring.service.ts:261: const down = counts.get(HealthCheckStatus.DOWN) ?? 0;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\monitoring\services\monitoring.service.ts:262: const unknown = counts.get(HealthCheckStatus.UNKNOWN) ?? 0;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\monitoring\services\monitoring.service.ts:263: const disabled = counts.get(HealthCheckStatus.DISABLED) ?? 0;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\monitoring\services\monitoring.service.ts:421: const minimumInterval = this.config.get('HEALTH_MIN_INTERVAL_SECONDS', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\monitoring\services\monitoring.service.ts:424: const maximumInterval = this.config.get('HEALTH_MAX_INTERVAL_SECONDS', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\monitoring\services\monitoring.service.ts:432: const minimumTimeout = this.config.get('HEALTH_MIN_TIMEOUT_MS', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\monitoring\services\monitoring.service.ts:435: const maximumTimeout = this.config.get('HEALTH_MAX_TIMEOUT_MS', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\services\code-explorer.service.ts:286: const parent = directoryMap.get(parentPath);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\services\github-app.service.ts:148: const data = (await response.json()) as GithubOauthResponse;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\services\github-connect-intent-cleanup.service.ts:30: !this.config.get('GITHUB_CONNECT_INTENT_CLEANUP_ENABLED', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\services\repository-analyzer.service.ts:48: const rootPackageJson = packageJsonByPath.get('package.json') ?? null;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\team-operations\services\invitation-token.service.ts:32: this.config.get('INVITATION_TOKEN_PEPPER', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\team-operations\services\invitation-token.service.ts:41: const ttlHours = this.config.get('INVITATION_TTL_HOURS', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\team-operations\services\invitation-token.service.ts:49: const frontendUrl = this.config.get('FRONTEND_URL', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\team-operations\services\team-operations-cleanup.service.ts:22: !this.config.get('NOTIFICATION_CLEANUP_ENABLED', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\team-operations\services\team-operations-cleanup.service.ts:30: const retentionDays = this.config.get('NOTIFICATION_RETENTION_DAYS', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\webhooks\services\webhook-cleanup.service.ts:22: !this.config.get('WEBHOOK_CLEANUP_ENABLED', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\webhooks\services\webhook-cleanup.service.ts:29: const retentionDays = this.config.get('WEBHOOK_RETENTION_DAYS', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\webhooks\services\webhook-delivery-worker.service.ts:37: !this.config.get('WEBHOOK_WORKER_ENABLED', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\webhooks\services\webhook-delivery-worker.service.ts:50: const batchSize = this.config.get('WEBHOOK_WORKER_BATCH_SIZE', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\webhooks\services\webhook-delivery-worker.service.ts:53: const concurrency = this.config.get('WEBHOOK_WORKER_CONCURRENCY', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\webhooks\services\webhook-delivery-worker.service.ts:290: const timeoutMs = this.config.get('WEBHOOK_PROCESSING_TIMEOUT_MS', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\webhooks\services\webhook-management.service.ts:103: this.config.get('WEBHOOK_DEFAULT_TIMEOUT_MS', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\webhooks\services\webhook-management.service.ts:109: this.config.get('WEBHOOK_DEFAULT_MAX_ATTEMPTS', {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\webhooks\services\webhook-secret-crypto.service.ts:24: const encryptionKey = config.get('WEBHOOK_ENCRYPTION_KEY', {

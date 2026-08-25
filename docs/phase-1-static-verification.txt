@@ -1,0 +1,73 @@
+﻿PHASE 1 — STATIC VERIFICATION
+
+==========================================================================================
+GIT DIFF CHECK
+==========================================================================================
+warning: in the working copy of 'apps/web/next-env.d.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/web/src/app/(auth)/layout.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/web/src/app/icon.svg', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/web/src/app/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/web/src/components/layout/app-shell.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/web/src/features/landingpage.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'packages/test-code/web/playwright-report-fullstack/index.html', LF will be replaced by CRLF the next time Git touches it
+
+EXIT CODE: 0
+
+==========================================================================================
+WEB TYPECHECK
+==========================================================================================
+$ next typegen && tsc --noEmit
+Generating route types...
+Γ£ô Types generated successfully
+
+EXIT CODE: 0
+
+==========================================================================================
+WEB LINT
+==========================================================================================
+$ eslint .
+
+EXIT CODE: 0
+
+==========================================================================================
+API TYPECHECK
+==========================================================================================
+$ tsc -p tsconfig.json --noEmit
+
+EXIT CODE: 0
+
+==========================================================================================
+API LINT
+==========================================================================================
+$ eslint .
+
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\services\desktop-analysis-context.service.ts
+  1:1  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-unsafe-assignment')
+
+Γ£û 1 problem (0 errors, 1 warning)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+
+
+EXIT CODE: 0
+
+==========================================================================================
+PRISMA VALIDATE
+==========================================================================================
+Loaded Prisma config from prisma.config.ts.
+System.Management.Automation.RemoteException
+Prisma schema loaded from prisma.
+The schemas at prisma are valid ≡ƒÜÇ
+
+EXIT CODE: 0
+
+==========================================================================================
+PRISMA GENERATE
+==========================================================================================
+Loaded Prisma config from prisma.config.ts.
+System.Management.Automation.RemoteException
+Prisma schema loaded from prisma.
+
+Γ£ö Generated Prisma Client (7.9.1) to .\src\generated\prisma in 1.36s
+
+
+EXIT CODE: 0

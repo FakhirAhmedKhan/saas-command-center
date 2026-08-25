@@ -1,26 +1,19 @@
-import type { NextFunction, Request, Response } from 'express';
 import { randomUUID } from 'node:crypto';
 
 export const REQUEST_ID_HEADER = 'x-request-id';
 
-export interface RequestWithId extends Request {
-  requestId: string;
-}
-
-/*
- * This value is echoed into the response header, embedded verbatim into
- * JSON error bodies, and written into application logs on 500-level errors
- * (see AllExceptionsFilter) — all before any other validation runs. A
- * client-supplied value must therefore be bounded and restricted to a safe
- * character set so it can't carry newlines/control characters (log
- * injection) or be used to send an oversized value.
- */
 const MAX_REQUEST_ID_LENGTH = 128;
 const VALID_REQUEST_ID_PATTERN = /^[A-Za-z0-9:_-]+$/;
 
-function getExistingRequestId(value: string | string[] | undefined): string | undefined {
+function getExistingRequestId(value: unknown): string | undefined {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const rawValue = Array.isArray(value) ? value[0] : value;
-  const normalizedValue = rawValue?.trim();
+
+  if (typeof rawValue !== 'string') {
+    return undefined;
+  }
+
+  const normalizedValue = rawValue.trim();
 
   if (!normalizedValue) {
     return undefined;
@@ -33,13 +26,13 @@ function getExistingRequestId(value: string | string[] | undefined): string | un
   return normalizedValue;
 }
 
-export function requestIdMiddleware(request: Request, response: Response, next: NextFunction): void {
-  const existingRequestId = getExistingRequestId(request.headers[REQUEST_ID_HEADER]);
-  const requestId = existingRequestId ?? randomUUID();
-
-  (request as RequestWithId).requestId = requestId;
-
-  response.setHeader(REQUEST_ID_HEADER, requestId);
-
-  next();
+/**
+ * Returns a validated client request ID or generates a safe UUID.
+ *
+ * Fastify calls this function before application hooks, filters and
+ * controllers execute. This prevents untrusted request-ID values from
+ * reaching response headers or logs.
+ */
+export function createRequestId(value: unknown): string {
+  return getExistingRequestId(value) ?? randomUUID();
 }

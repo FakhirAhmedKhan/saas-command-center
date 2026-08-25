@@ -1,11 +1,11 @@
 import { createAgent, createTestUser, registerUser, withBearer } from '../helpers/auth';
 import { resetDatabase } from '../helpers/database';
 import { readAccessToken } from '../helpers/response';
-import { ValidationPipe, type INestApplication } from '@nestjs/common';
-import { type NestExpressApplication } from '@nestjs/platform-express';
+import type { INestApplication } from '@nestjs/common';
+import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
-import cookieParser from 'cookie-parser';
 import { AppModule } from 'src/app.module';
+import { configureApplication } from 'src/bootstrap/configure-application';
 import { PrismaService } from 'src/database/prisma.service';
 import { WorkspaceRole } from 'src/generated/prisma/enums';
 import { GithubAppService } from 'src/modules/repositories/services/github-app.service';
@@ -302,24 +302,19 @@ async function createPhase20TestApp(): Promise<INestApplication> {
     .overrideProvider(GithubCodeService)
     .useValue(githubCodeMock)
     .compile();
-  const app = testingModule.createNestApplication<NestExpressApplication>();
-  const expressInstance = app.getHttpAdapter().getInstance();
-  expressInstance.set('trust proxy', 1);
-
-  app.use(cookieParser());
-  app.setGlobalPrefix('api/v1');
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
+  const app = testingModule.createNestApplication<NestFastifyApplication>(
+    new FastifyAdapter({
+      trustProxy: 1,
     }),
   );
 
+  configureApplication(app, {
+    enableSwagger: false,
+  });
+
   await app.init();
+  await app.getHttpAdapter().getInstance().ready();
+
   return app;
 }
 

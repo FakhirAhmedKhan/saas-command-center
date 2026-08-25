@@ -1,13 +1,12 @@
 import { createAgent, createTestUser, registerUser, withBearer } from '../helpers/auth';
 import { resetDatabase } from '../helpers/database';
 import { readAccessToken } from '../helpers/response';
-import { ValidationPipe, type INestApplication } from '@nestjs/common';
-import { type NestExpressApplication } from '@nestjs/platform-express';
+import { type INestApplication } from '@nestjs/common';
+import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
-import cookieParser from 'cookie-parser';
-import { json, raw, urlencoded } from 'express';
 import { createHmac } from 'node:crypto';
 import { AppModule } from 'src/app.module';
+import { configureApplication } from 'src/bootstrap/configure-application';
 import { PrismaService } from 'src/database/prisma.service';
 import { ApplicationCategory, ApplicationPriority, ApplicationStatus, WorkspaceRole } from 'src/generated/prisma/enums';
 import { GithubAppService } from 'src/modules/repositories/services/github-app.service';
@@ -176,50 +175,22 @@ async function createRepositoryTestApp(): Promise<INestApplication> {
     .overrideProvider(GithubAppService)
     .useValue(githubAppMock)
     .compile();
-  const app = testingModule.createNestApplication<NestExpressApplication>({
-    bodyParser: false,
+  const app = testingModule.createNestApplication<NestFastifyApplication>(
+    new FastifyAdapter({
+      trustProxy: 1,
+      bodyLimit: 1024 * 1024,
+    }),
+    {
+      rawBody: true,
+    },
+  );
+
+  configureApplication(app, {
+    enableSwagger: false,
   });
-  const expressInstance = app.getHttpAdapter().getInstance();
-  expressInstance.set('trust proxy', 1);
-
-  app.use(cookieParser());
-
-  // The webhook must receive the exact bytes GitHub signed.
-  app.use(
-    `${API_PREFIX}/repositories/github/webhook`,
-    raw({
-      type: 'application/json',
-      limit: '1mb',
-    }),
-  );
-
-  app.use(
-    json({
-      limit: '1mb',
-    }),
-  );
-
-  app.use(
-    urlencoded({
-      extended: true,
-      limit: '1mb',
-    }),
-  );
-
-  app.setGlobalPrefix('api/v1');
-
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
-    }),
-  );
 
   await app.init();
+  await app.getHttpAdapter().getInstance().ready();
 
   return app;
 }

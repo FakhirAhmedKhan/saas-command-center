@@ -1,0 +1,767 @@
+PHASE — COMPLETE FASTIFY API E2E
+SAFE HOST: 127.0.0.1
+SAFE DATABASE: command_center_test
+
+PRISMA MIGRATION STATUS
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma.
+Datasource "db": PostgreSQL database "neondb_test", schema "public" at "ep-patient-field-acxz87sx-pooler.sa-east-1.aws.neon.tech"
+
+7 migrations found in prisma/migrations
+
+Database schema is up to date!
+MIGRATION STATUS EXIT CODE: 0
+COMPLETE ISOLATED API E2E
+
+========================================================================
+API E2E - ISOLATED SUITE RUNNER
+========================================================================
+Suites: 81
+Mode: sequential / fresh Jest process per suite
+========================================================================
+
+========================================================================
+[1/81] activity.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL activity.e2e-spec.ts (0s)
+
+========================================================================
+[2/81] analytics-aggregates.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL analytics-aggregates.e2e-spec.ts (0s)
+
+========================================================================
+[3/81] analytics-engine-processing.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL analytics-engine-processing.e2e-spec.ts (0s)
+
+========================================================================
+[4/81] analytics-engine-status.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL analytics-engine-status.e2e-spec.ts (0s)
+
+========================================================================
+[5/81] analytics-ingestion-rate-limit.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL analytics-ingestion-rate-limit.e2e-spec.ts (0s)
+
+========================================================================
+[6/81] analytics-ingestion-security.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL analytics-ingestion-security.e2e-spec.ts (0s)
+
+========================================================================
+[7/81] analytics-ingestion.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL analytics-ingestion.e2e-spec.ts (0s)
+
+========================================================================
+[8/81] analytics-late-events.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL analytics-late-events.e2e-spec.ts (0s)
+
+========================================================================
+[9/81] analytics-pageviews.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL analytics-pageviews.e2e-spec.ts (0s)
+
+========================================================================
+[10/81] analytics-reprocessing.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL analytics-reprocessing.e2e-spec.ts (0s)
+
+========================================================================
+[11/81] analytics-retention.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL analytics-retention.e2e-spec.ts (0s)
+
+========================================================================
+[12/81] analytics-sessions.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL analytics-sessions.e2e-spec.ts (0s)
+
+========================================================================
+[13/81] analytics-timezones.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL analytics-timezones.e2e-spec.ts (0s)
+
+========================================================================
+[14/81] analytics-visitors.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL analytics-visitors.e2e-spec.ts (0s)
+
+========================================================================
+[15/81] application-links.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL application-links.e2e-spec.ts (0s)
+
+========================================================================
+[16/81] application-roles.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL application-roles.e2e-spec.ts (0s)
+
+========================================================================
+[17/81] application-technologies.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL application-technologies.e2e-spec.ts (0s)
+
+========================================================================
+[18/81] applications.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL applications.e2e-spec.ts (0s)
+
+========================================================================
+[19/81] auth-rate-limit.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL auth-rate-limit.e2e-spec.ts (0s)
+
+========================================================================
+[20/81] auth.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL auth.e2e-spec.ts (0s)
+
+========================================================================
+[21/81] desktop-ai-analysis.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL desktop-ai-analysis.e2e-spec.ts (0s)
+
+========================================================================
+[22/81] desktop-alerts.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL desktop-alerts.e2e-spec.ts (0s)
+
+========================================================================
+[23/81] desktop-apps.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL desktop-apps.e2e-spec.ts (0s)
+
+========================================================================
+[24/81] desktop-build-artifacts.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL desktop-build-artifacts.e2e-spec.ts (0s)
+
+========================================================================
+[25/81] desktop-builds.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL desktop-builds.e2e-spec.ts (0s)
+
+========================================================================
+[26/81] desktop-foundation.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL desktop-foundation.e2e-spec.ts (0s)
+
+========================================================================
+[27/81] desktop-full-flow.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL desktop-full-flow.e2e-spec.ts (0s)
+
+========================================================================
+[28/81] desktop-overview.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL desktop-overview.e2e-spec.ts (0s)
+
+========================================================================
+[29/81] desktop-performance.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL desktop-performance.e2e-spec.ts (0s)
+
+========================================================================
+[30/81] desktop-project-detection.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL desktop-project-detection.e2e-spec.ts (0s)
+
+========================================================================
+[31/81] desktop-releases.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL desktop-releases.e2e-spec.ts (0s)
+
+========================================================================
+[32/81] desktop-repository-linking.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL desktop-repository-linking.e2e-spec.ts (0s)
+
+========================================================================
+[33/81] desktop-security-health.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL desktop-security-health.e2e-spec.ts (0s)
+
+========================================================================
+[34/81] desktop-security.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL desktop-security.e2e-spec.ts (0s)
+
+========================================================================
+[35/81] desktop-telemetry.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL desktop-telemetry.e2e-spec.ts (0s)
+
+========================================================================
+[36/81] desktop-tests.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL desktop-tests.e2e-spec.ts (0s)
+
+========================================================================
+[37/81] development-activity.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL development-activity.e2e-spec.ts (0s)
+
+========================================================================
+[38/81] development-progress.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL development-progress.e2e-spec.ts (0s)
+
+========================================================================
+[39/81] development-roles.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL development-roles.e2e-spec.ts (0s)
+
+========================================================================
+[40/81] development.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL development.e2e-spec.ts (0s)
+
+========================================================================
+[41/81] github-connect-intent-cleanup.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL github-connect-intent-cleanup.e2e-spec.ts (0s)
+
+========================================================================
+[42/81] infrastructure.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL infrastructure.e2e-spec.ts (0s)
+
+========================================================================
+[43/81] mobile-ai-analysis.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL mobile-ai-analysis.e2e-spec.ts (0s)
+
+========================================================================
+[44/81] mobile-alerts.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL mobile-alerts.e2e-spec.ts (0s)
+
+========================================================================
+[45/81] mobile-apps.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL mobile-apps.e2e-spec.ts (0s)
+
+========================================================================
+[46/81] mobile-builds.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL mobile-builds.e2e-spec.ts (0s)
+
+========================================================================
+[47/81] mobile-foundation.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL mobile-foundation.e2e-spec.ts (0s)
+
+========================================================================
+[48/81] mobile-full-flow.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL mobile-full-flow.e2e-spec.ts (0s)
+
+========================================================================
+[49/81] mobile-ios-performance.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL mobile-ios-performance.e2e-spec.ts (0s)
+
+========================================================================
+[50/81] mobile-overview.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL mobile-overview.e2e-spec.ts (0s)
+
+========================================================================
+[51/81] mobile-performance.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL mobile-performance.e2e-spec.ts (0s)
+
+========================================================================
+[52/81] mobile-project-detection.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL mobile-project-detection.e2e-spec.ts (0s)
+
+========================================================================
+[53/81] mobile-releases.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL mobile-releases.e2e-spec.ts (0s)
+
+========================================================================
+[54/81] mobile-repository-linking.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL mobile-repository-linking.e2e-spec.ts (0s)
+
+========================================================================
+[55/81] mobile-security.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL mobile-security.e2e-spec.ts (0s)
+
+========================================================================
+[56/81] mobile-telemetry.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL mobile-telemetry.e2e-spec.ts (0s)
+
+========================================================================
+[57/81] mobile-tests.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL mobile-tests.e2e-spec.ts (0s)
+
+========================================================================
+[58/81] mobile-unified-performance.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL mobile-unified-performance.e2e-spec.ts (0s)
+
+========================================================================
+[59/81] phase13-analytics-reports.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL phase13-analytics-reports.e2e-spec.ts (0s)
+
+========================================================================
+[60/81] phase14-analytics-processing.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL phase14-analytics-processing.e2e-spec.ts (0s)
+
+========================================================================
+[61/81] phase15-monitoring.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL phase15-monitoring.e2e-spec.ts (0s)
+
+========================================================================
+[62/81] phase16-releases-deployments.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL phase16-releases-deployments.e2e-spec.ts (0s)
+
+========================================================================
+[63/81] phase17-team-operations.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL phase17-team-operations.e2e-spec.ts (0s)
+
+========================================================================
+[64/81] phase18-webhook-integrations.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL phase18-webhook-integrations.e2e-spec.ts (0s)
+
+========================================================================
+[65/81] phase19-repository-integrations.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL phase19-repository-integrations.e2e-spec.ts (0s)
+
+========================================================================
+[66/81] phase20-code-explorer.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL phase20-code-explorer.e2e-spec.ts (0s)
+
+========================================================================
+[67/81] phase21-github-workspace-import.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL phase21-github-workspace-import.e2e-spec.ts (0s)
+
+========================================================================
+[68/81] raw-events.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL raw-events.e2e-spec.ts (0s)
+
+========================================================================
+[69/81] tracker-analytics-processing.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL tracker-analytics-processing.e2e-spec.ts (0s)
+
+========================================================================
+[70/81] tracker-bundle-integration.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL tracker-bundle-integration.e2e-spec.ts (0s)
+
+========================================================================
+[71/81] tracker-production-bootstrap.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL tracker-production-bootstrap.e2e-spec.ts (0s)
+
+========================================================================
+[72/81] tracker-transport.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL tracker-transport.e2e-spec.ts (0s)
+
+========================================================================
+[73/81] tracking-admin.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL tracking-admin.e2e-spec.ts (0s)
+
+========================================================================
+[74/81] webhook-delivery-worker.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL webhook-delivery-worker.e2e-spec.ts (0s)
+
+========================================================================
+[75/81] website-activity.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL website-activity.e2e-spec.ts (0s)
+
+========================================================================
+[76/81] website-environments.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL website-environments.e2e-spec.ts (0s)
+
+========================================================================
+[77/81] website-roles.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL website-roles.e2e-spec.ts (0s)
+
+========================================================================
+[78/81] websites.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL websites.e2e-spec.ts (0s)
+
+========================================================================
+[79/81] workspace-members.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL workspace-members.e2e-spec.ts (0s)
+
+========================================================================
+[80/81] workspace-roles.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL workspace-roles.e2e-spec.ts (0s)
+
+========================================================================
+[81/81] workspaces.e2e-spec.ts
+========================================================================
+npm_execpath is unavailable. Run this launcher through pnpm.
+
+FAIL workspaces.e2e-spec.ts (0s)
+
+========================================================================
+API E2E SUMMARY
+========================================================================
+FAIL        0s  activity.e2e-spec.ts
+FAIL        0s  analytics-aggregates.e2e-spec.ts
+FAIL        0s  analytics-engine-processing.e2e-spec.ts
+FAIL        0s  analytics-engine-status.e2e-spec.ts
+FAIL        0s  analytics-ingestion-rate-limit.e2e-spec.ts
+FAIL        0s  analytics-ingestion-security.e2e-spec.ts
+FAIL        0s  analytics-ingestion.e2e-spec.ts
+FAIL        0s  analytics-late-events.e2e-spec.ts
+FAIL        0s  analytics-pageviews.e2e-spec.ts
+FAIL        0s  analytics-reprocessing.e2e-spec.ts
+FAIL        0s  analytics-retention.e2e-spec.ts
+FAIL        0s  analytics-sessions.e2e-spec.ts
+FAIL        0s  analytics-timezones.e2e-spec.ts
+FAIL        0s  analytics-visitors.e2e-spec.ts
+FAIL        0s  application-links.e2e-spec.ts
+FAIL        0s  application-roles.e2e-spec.ts
+FAIL        0s  application-technologies.e2e-spec.ts
+FAIL        0s  applications.e2e-spec.ts
+FAIL        0s  auth-rate-limit.e2e-spec.ts
+FAIL        0s  auth.e2e-spec.ts
+FAIL        0s  desktop-ai-analysis.e2e-spec.ts
+FAIL        0s  desktop-alerts.e2e-spec.ts
+FAIL        0s  desktop-apps.e2e-spec.ts
+FAIL        0s  desktop-build-artifacts.e2e-spec.ts
+FAIL        0s  desktop-builds.e2e-spec.ts
+FAIL        0s  desktop-foundation.e2e-spec.ts
+FAIL        0s  desktop-full-flow.e2e-spec.ts
+FAIL        0s  desktop-overview.e2e-spec.ts
+FAIL        0s  desktop-performance.e2e-spec.ts
+FAIL        0s  desktop-project-detection.e2e-spec.ts
+FAIL        0s  desktop-releases.e2e-spec.ts
+FAIL        0s  desktop-repository-linking.e2e-spec.ts
+FAIL        0s  desktop-security-health.e2e-spec.ts
+FAIL        0s  desktop-security.e2e-spec.ts
+FAIL        0s  desktop-telemetry.e2e-spec.ts
+FAIL        0s  desktop-tests.e2e-spec.ts
+FAIL        0s  development-activity.e2e-spec.ts
+FAIL        0s  development-progress.e2e-spec.ts
+FAIL        0s  development-roles.e2e-spec.ts
+FAIL        0s  development.e2e-spec.ts
+FAIL        0s  github-connect-intent-cleanup.e2e-spec.ts
+FAIL        0s  infrastructure.e2e-spec.ts
+FAIL        0s  mobile-ai-analysis.e2e-spec.ts
+FAIL        0s  mobile-alerts.e2e-spec.ts
+FAIL        0s  mobile-apps.e2e-spec.ts
+FAIL        0s  mobile-builds.e2e-spec.ts
+FAIL        0s  mobile-foundation.e2e-spec.ts
+FAIL        0s  mobile-full-flow.e2e-spec.ts
+FAIL        0s  mobile-ios-performance.e2e-spec.ts
+FAIL        0s  mobile-overview.e2e-spec.ts
+FAIL        0s  mobile-performance.e2e-spec.ts
+FAIL        0s  mobile-project-detection.e2e-spec.ts
+FAIL        0s  mobile-releases.e2e-spec.ts
+FAIL        0s  mobile-repository-linking.e2e-spec.ts
+FAIL        0s  mobile-security.e2e-spec.ts
+FAIL        0s  mobile-telemetry.e2e-spec.ts
+FAIL        0s  mobile-tests.e2e-spec.ts
+FAIL        0s  mobile-unified-performance.e2e-spec.ts
+FAIL        0s  phase13-analytics-reports.e2e-spec.ts
+FAIL        0s  phase14-analytics-processing.e2e-spec.ts
+FAIL        0s  phase15-monitoring.e2e-spec.ts
+FAIL        0s  phase16-releases-deployments.e2e-spec.ts
+FAIL        0s  phase17-team-operations.e2e-spec.ts
+FAIL        0s  phase18-webhook-integrations.e2e-spec.ts
+FAIL        0s  phase19-repository-integrations.e2e-spec.ts
+FAIL        0s  phase20-code-explorer.e2e-spec.ts
+FAIL        0s  phase21-github-workspace-import.e2e-spec.ts
+FAIL        0s  raw-events.e2e-spec.ts
+FAIL        0s  tracker-analytics-processing.e2e-spec.ts
+FAIL        0s  tracker-bundle-integration.e2e-spec.ts
+FAIL        0s  tracker-production-bootstrap.e2e-spec.ts
+FAIL        0s  tracker-transport.e2e-spec.ts
+FAIL        0s  tracking-admin.e2e-spec.ts
+FAIL        0s  webhook-delivery-worker.e2e-spec.ts
+FAIL        0s  website-activity.e2e-spec.ts
+FAIL        0s  website-environments.e2e-spec.ts
+FAIL        0s  website-roles.e2e-spec.ts
+FAIL        0s  websites.e2e-spec.ts
+FAIL        0s  workspace-members.e2e-spec.ts
+FAIL        0s  workspace-roles.e2e-spec.ts
+FAIL        0s  workspaces.e2e-spec.ts
+========================================================================
+Suites : 81
+Passed : 0
+Failed : 81
+Time   : 11s
+========================================================================
+
+Failed suites:
+ - activity.e2e-spec.ts
+ - analytics-aggregates.e2e-spec.ts
+ - analytics-engine-processing.e2e-spec.ts
+ - analytics-engine-status.e2e-spec.ts
+ - analytics-ingestion-rate-limit.e2e-spec.ts
+ - analytics-ingestion-security.e2e-spec.ts
+ - analytics-ingestion.e2e-spec.ts
+ - analytics-late-events.e2e-spec.ts
+ - analytics-pageviews.e2e-spec.ts
+ - analytics-reprocessing.e2e-spec.ts
+ - analytics-retention.e2e-spec.ts
+ - analytics-sessions.e2e-spec.ts
+ - analytics-timezones.e2e-spec.ts
+ - analytics-visitors.e2e-spec.ts
+ - application-links.e2e-spec.ts
+ - application-roles.e2e-spec.ts
+ - application-technologies.e2e-spec.ts
+ - applications.e2e-spec.ts
+ - auth-rate-limit.e2e-spec.ts
+ - auth.e2e-spec.ts
+ - desktop-ai-analysis.e2e-spec.ts
+ - desktop-alerts.e2e-spec.ts
+ - desktop-apps.e2e-spec.ts
+ - desktop-build-artifacts.e2e-spec.ts
+ - desktop-builds.e2e-spec.ts
+ - desktop-foundation.e2e-spec.ts
+ - desktop-full-flow.e2e-spec.ts
+ - desktop-overview.e2e-spec.ts
+ - desktop-performance.e2e-spec.ts
+ - desktop-project-detection.e2e-spec.ts
+ - desktop-releases.e2e-spec.ts
+ - desktop-repository-linking.e2e-spec.ts
+ - desktop-security-health.e2e-spec.ts
+ - desktop-security.e2e-spec.ts
+ - desktop-telemetry.e2e-spec.ts
+ - desktop-tests.e2e-spec.ts
+ - development-activity.e2e-spec.ts
+ - development-progress.e2e-spec.ts
+ - development-roles.e2e-spec.ts
+ - development.e2e-spec.ts
+ - github-connect-intent-cleanup.e2e-spec.ts
+ - infrastructure.e2e-spec.ts
+ - mobile-ai-analysis.e2e-spec.ts
+ - mobile-alerts.e2e-spec.ts
+ - mobile-apps.e2e-spec.ts
+ - mobile-builds.e2e-spec.ts
+ - mobile-foundation.e2e-spec.ts
+ - mobile-full-flow.e2e-spec.ts
+ - mobile-ios-performance.e2e-spec.ts
+ - mobile-overview.e2e-spec.ts
+ - mobile-performance.e2e-spec.ts
+ - mobile-project-detection.e2e-spec.ts
+ - mobile-releases.e2e-spec.ts
+ - mobile-repository-linking.e2e-spec.ts
+ - mobile-security.e2e-spec.ts
+ - mobile-telemetry.e2e-spec.ts
+ - mobile-tests.e2e-spec.ts
+ - mobile-unified-performance.e2e-spec.ts
+ - phase13-analytics-reports.e2e-spec.ts
+ - phase14-analytics-processing.e2e-spec.ts
+ - phase15-monitoring.e2e-spec.ts
+ - phase16-releases-deployments.e2e-spec.ts
+ - phase17-team-operations.e2e-spec.ts
+ - phase18-webhook-integrations.e2e-spec.ts
+ - phase19-repository-integrations.e2e-spec.ts
+ - phase20-code-explorer.e2e-spec.ts
+ - phase21-github-workspace-import.e2e-spec.ts
+ - raw-events.e2e-spec.ts
+ - tracker-analytics-processing.e2e-spec.ts
+ - tracker-bundle-integration.e2e-spec.ts
+ - tracker-production-bootstrap.e2e-spec.ts
+ - tracker-transport.e2e-spec.ts
+ - tracking-admin.e2e-spec.ts
+ - webhook-delivery-worker.e2e-spec.ts
+ - website-activity.e2e-spec.ts
+ - website-environments.e2e-spec.ts
+ - website-roles.e2e-spec.ts
+ - websites.e2e-spec.ts
+ - workspace-members.e2e-spec.ts
+ - workspace-roles.e2e-spec.ts
+ - workspaces.e2e-spec.ts
+
+Overall: FAIL
+
+FULL E2E EXIT CODE: 1

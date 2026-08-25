@@ -1,0 +1,3 @@
+SAFE HOST: 127.0.0.1
+SAFE DATABASE: command_center_test
+RESET EXIT CODE: 

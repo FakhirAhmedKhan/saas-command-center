@@ -24,10 +24,10 @@ import { MilestonesService } from '../services/milestones.service';
 import { TasksService } from '../services/tasks.service';
 import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import type { Request } from 'express';
+import type { FastifyRequest } from 'fastify';
 import { WorkspaceRole } from 'src/generated/prisma/enums';
 
-interface AuthenticatedRequest extends Request {
+interface AuthenticatedRequest extends FastifyRequest {
   user: {
     id: string;
   };

@@ -7,10 +7,10 @@ import { AnalyticsEngineQueryService } from '../services/analytics-engine-query.
 import { AnalyticsProcessingService } from '../services/analytics-processing.service';
 import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { Request } from 'express';
+import type { FastifyRequest } from 'fastify';
 import { WorkspaceRole } from 'src/generated/prisma/enums';
 
-interface AuthenticatedRequest extends Request {
+interface AuthenticatedRequest extends FastifyRequest {
   user: {
     id: string;
   };

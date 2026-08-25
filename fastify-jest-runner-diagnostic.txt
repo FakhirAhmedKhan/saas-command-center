@@ -1,0 +1,370 @@
+
+==========================================================================================
+FILE: packages/test-code/api/scripts/run-e2e-isolated.mjs
+==========================================================================================
+import { spawnSync } from 'node:child_process';
+import { readdirSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { performance } from 'node:perf_hooks';
+import { fileURLToPath } from 'node:url';
+
+const scriptsDirectory = dirname(fileURLToPath(import.meta.url));
+const packageRoot = resolve(scriptsDirectory, '..');
+const repoRoot = resolve(packageRoot, '../../..');
+const appRoot = resolve(repoRoot, 'apps/api');
+const configPath = resolve(packageRoot, 'jest-e2e.config.cjs');
+const e2eDirectory = resolve(packageRoot, 'e2e');
+const files = readdirSync(e2eDirectory)
+  .filter((name) => name.endsWith('.e2e-spec.ts'))
+  .sort()
+  .map((name) => ({
+    name,
+    path: resolve(e2eDirectory, name),
+  }));
+
+if (files.length === 0) {
+  console.error('No API E2E test files found.');
+  process.exit(2);
+}
+
+function formatDuration(milliseconds) {
+  const seconds = Math.round(milliseconds / 1000);
+
+  if (seconds < 60) {
+    return `${seconds}s`;
+  }
+
+  return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+}
+
+function line() {
+  console.log('='.repeat(72));
+}
+
+console.log();
+line();
+console.log('API E2E - ISOLATED SUITE RUNNER');
+line();
+console.log(`Suites: ${files.length}`);
+console.log('Mode: sequential / fresh Jest process per suite');
+line();
+
+const results = [];
+const totalStartedAt = performance.now();
+
+for (let index = 0; index < files.length; index += 1) {
+  const file = files[index];
+
+  console.log();
+  line();
+  console.log(`[${index + 1}/${files.length}] ${file.name}`);
+  line();
+
+  const startedAt = performance.now();
+  const result = spawnSync('pnpm', ['exec', 'jest', '--config', configPath, '--runInBand', '--runTestsByPath', file.path], {
+    cwd: appRoot,
+    stdio: 'inherit',
+    shell: true,
+    env: process.env,
+  });
+  const elapsed = performance.now() - startedAt;
+  const passed = result.status === 0 && !result.error && !result.signal;
+
+  results.push({
+    name: file.name,
+    passed,
+    elapsed,
+    exitCode: result.status,
+  });
+
+  console.log();
+  console.log(`${passed ? 'PASS' : 'FAIL'} ${file.name} (${formatDuration(elapsed)})`);
+
+  if (result.error) {
+    console.error(result.error.message);
+  }
+
+  if (result.signal) {
+    console.error(`Interrupted by ${result.signal}`);
+    process.exit(130);
+  }
+}
+
+const totalElapsed = performance.now() - totalStartedAt;
+const passed = results.filter((result) => result.passed);
+const failed = results.filter((result) => !result.passed);
+
+console.log();
+line();
+console.log('API E2E SUMMARY');
+line();
+
+for (const result of results) {
+  console.log(`${result.passed ? 'PASS' : 'FAIL'}  ${formatDuration(result.elapsed).padStart(8)}  ${result.name}`);
+}
+
+line();
+console.log(`Suites : ${results.length}`);
+console.log(`Passed : ${passed.length}`);
+console.log(`Failed : ${failed.length}`);
+console.log(`Time   : ${formatDuration(totalElapsed)}`);
+line();
+
+if (failed.length > 0) {
+  console.log('\nFailed suites:');
+
+  for (const result of failed) {
+    console.log(` - ${result.name}`);
+  }
+}
+
+console.log(`\nOverall: ${failed.length === 0 ? 'PASS' : 'FAIL'}\n`);
+
+process.exit(failed.length === 0 ? 0 : 1);
+
+
+==========================================================================================
+FILE: packages/test-code/api/jest.config.cjs
+==========================================================================================
+const path = require('node:path');
+
+const testRoot = __dirname;
+const repoRoot = path.resolve(testRoot, '../../..');
+const apiRoot = path.join(repoRoot, 'apps/api');
+
+module.exports = {
+  rootDir: repoRoot,
+
+  testEnvironment: 'node',
+
+  roots: [path.join(testRoot, 'unit'), path.join(apiRoot, 'src')],
+
+  testMatch: ['<rootDir>/packages/test-code/api/unit/**/*.spec.ts'],
+
+  transform: {
+    '^.+\\.ts$': [
+      'ts-jest',
+      {
+        tsconfig: path.join(apiRoot, 'tsconfig.json'),
+      },
+    ],
+  },
+
+  moduleNameMapper: {
+    '^src/(.*)$': '<rootDir>/apps/api/src/$1',
+  },
+
+  moduleFileExtensions: ['ts', 'js', 'json'],
+
+  clearMocks: true,
+
+  collectCoverageFrom: ['<rootDir>/apps/api/src/**/*.ts', '!<rootDir>/apps/api/src/generated/**', '!<rootDir>/apps/api/src/**/*.spec.ts', '!<rootDir>/apps/api/src/main.ts'],
+};
+
+
+==========================================================================================
+FILE: packages/test-code/api/jest-e2e.config.cjs
+==========================================================================================
+const path = require('node:path');
+
+const repoRoot = path.resolve(__dirname, '../../..');
+
+module.exports = {
+  moduleFileExtensions: ['js', 'json', 'ts'],
+
+  rootDir: repoRoot,
+
+  testEnvironment: 'node',
+
+  roots: ['<rootDir>/apps/api/src', '<rootDir>/packages/test-code/api'],
+
+  testRegex: 'packages/test-code/api/e2e/.*\\.e2e-spec\\.ts$',
+
+  transform: {
+    '^.+\\.(t|j)s$': [
+      require.resolve('ts-jest'),
+      {
+        tsconfig: path.join(__dirname, 'tsconfig.json'),
+      },
+    ],
+  },
+
+  moduleNameMapper: {
+    '^src/(.*)$': '<rootDir>/apps/api/src/$1',
+  },
+
+  setupFiles: [path.join(__dirname, 'setup-env.ts')],
+
+  collectCoverageFrom: ['apps/api/src/**/*.ts', '!apps/api/src/generated/**', '!apps/api/src/**/*.spec.ts', '!apps/api/src/**/*.test.ts'],
+
+  coveragePathIgnorePatterns: ['/node_modules/', '/dist/', '/apps/api/src/generated/', '\\.spec\\.ts$', '\\.test\\.ts$'],
+
+  coverageDirectory: '<rootDir>/apps/api/coverage/e2e',
+
+  testTimeout: 30000,
+
+  maxWorkers: 1,
+
+  detectOpenHandles: true,
+
+  forceExit: false,
+};
+
+
+==========================================================================================
+FILE: packages/test-code/scripts/run-all.mjs
+==========================================================================================
+import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { performance } from 'node:perf_hooks';
+
+const allSteps = [
+  ['api-unit', 'API Unit', 'test:api:unit'],
+  ['api-e2e', 'API E2E', 'test:api:e2e'],
+  ['tracker', 'Tracker', 'test:tracker'],
+  ['web-unit', 'Web Unit', 'test:web:unit'],
+  ['web-e2e', 'Web E2E', 'test:web:e2e'],
+  ['web-fullstack', 'Web Fullstack', 'test:web:fullstack'],
+];
+
+const args = process.argv.slice(2);
+const failFast = args.includes('--fail-fast');
+
+const only = args
+  .find((arg) => arg.startsWith('--only='))
+  ?.slice('--only='.length)
+  .split(',')
+  .map((value) => value.trim());
+
+const steps = only ? allSteps.filter(([key]) => only.includes(key)) : allSteps;
+
+function duration(ms) {
+  const seconds = Math.round(ms / 1000);
+
+  if (seconds < 60) {
+    return `${seconds}s`;
+  }
+
+  return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+}
+
+function line() {
+  console.log('='.repeat(64));
+}
+
+const rootPackage = JSON.parse(readFileSync(new URL('../../../package.json', import.meta.url), 'utf8').replace(/^\uFEFF/, ''));
+
+const scripts = rootPackage.scripts ?? {};
+
+if (steps.length === 0) {
+  console.error('No test stages selected.');
+  console.error(`Available: ${allSteps.map(([key]) => key).join(', ')}`);
+  process.exit(2);
+}
+
+const missing = steps.filter(([, , script]) => !scripts[script]);
+
+if (missing.length > 0) {
+  console.error('\nTEST RUNNER CONFIG ERROR');
+
+  for (const [, label, script] of missing) {
+    console.error(`${label}: missing root script "${script}"`);
+  }
+
+  process.exit(2);
+}
+
+console.log();
+line();
+console.log('SAAS COMMAND CENTER - TEST RUN');
+line();
+console.log(`Stages: ${steps.length}`);
+console.log(`Mode: ${failFast ? 'FAIL FAST' : 'RUN ALL'}`);
+line();
+
+const results = [];
+const totalStart = performance.now();
+
+for (let index = 0; index < steps.length; index += 1) {
+  const [key, label, script] = steps[index];
+
+  console.log();
+  line();
+  console.log(`[${index + 1}/${steps.length}] ${label.toUpperCase()}`);
+  line();
+  console.log(`pnpm run ${script}`);
+  console.log();
+
+  const start = performance.now();
+
+  const result = spawnSync('pnpm', ['run', script], {
+    stdio: 'inherit',
+    shell: true,
+    env: process.env,
+  });
+
+  const elapsed = performance.now() - start;
+  const passed = result.status === 0 && !result.error && !result.signal;
+
+  results.push({
+    key,
+    label,
+    passed,
+    elapsed,
+    exitCode: result.status,
+  });
+
+  console.log();
+  console.log(`${label}: ${passed ? 'PASS' : 'FAIL'} (${duration(elapsed)})`);
+
+  if (result.error) {
+    console.error(result.error.message);
+  }
+
+  if (result.signal) {
+    console.error(`Interrupted by ${result.signal}`);
+    process.exit(130);
+  }
+
+  if (!passed && failFast) {
+    console.log('\nFail-fast enabled. Stopping.');
+    break;
+  }
+}
+
+const totalElapsed = performance.now() - totalStart;
+
+console.log();
+line();
+console.log('FULL TEST SUMMARY');
+line();
+
+for (const result of results) {
+  console.log(`${result.label.padEnd(20)} ${result.passed ? 'PASS' : 'FAIL'}  ${duration(result.elapsed)}`);
+}
+
+const skipped = steps.length - results.length;
+
+if (skipped > 0) {
+  for (const [, label] of steps.slice(results.length)) {
+    console.log(`${label.padEnd(20)} SKIP`);
+  }
+}
+
+line();
+
+const passedCount = results.filter((result) => result.passed).length;
+const failedCount = results.filter((result) => !result.passed).length;
+
+console.log(`Passed:   ${passedCount}`);
+console.log(`Failed:   ${failedCount}`);
+console.log(`Skipped:  ${skipped}`);
+console.log(`Duration: ${duration(totalElapsed)}`);
+line();
+
+const success = failedCount === 0 && skipped === 0 && results.length === steps.length;
+
+console.log(`\nOverall: ${success ? 'PASS' : 'FAIL'}\n`);
+
+process.exit(success ? 0 : 1);
+

@@ -1,0 +1,2366 @@
+COMPLETE FASTIFY API E2E � CORRECTED LAUNCH
+SAFE HOST: 127.0.0.1
+SAFE DATABASE: command_center_test
+$ pnpm --dir ../../../apps/api exec node -e "require('dotenv').config({path:'.env.test',override:true,quiet:true});const{spawnSync}=require('node:child_process');const r=spawnSync('pnpm',['exec','prisma','migrate','deploy'],{stdio:'inherit',env:process.env,shell:true});process.exit(r.status??1)"
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma.
+Datasource "db": PostgreSQL database "command_center_test", schema "public" at "127.0.0.1:55432"
+
+7 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+$ node scripts/run-e2e-isolated.mjs
+
+========================================================================
+API E2E - ISOLATED SUITE RUNNER
+========================================================================
+Suites: 81
+Mode: sequential / fresh Jest process per suite
+========================================================================
+
+========================================================================
+[1/81] activity.e2e-spec.ts
+========================================================================
+(node:9084) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:9084) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+PASS ../../packages/test-code/api/e2e/activity.e2e-spec.ts (15.129 s)
+  Application Activity E2E
+    √ writes application create and update activities (2095 ms)
+    √ writes technology, link, archive, and restore activities (1692 ms)
+    √ does not create activity for rejected operation (1091 ms)
+    √ supports filters and pagination (1615 ms)
+    √ keeps workspace activity isolated (1753 ms)
+    √ does not expose authentication secrets (981 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       6 passed, 6 total
+Snapshots:   0 total
+Time:        15.758 s, estimated 18 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\activity.e2e-spec.ts".
+
+PASS activity.e2e-spec.ts (19s)
+
+========================================================================
+[2/81] analytics-aggregates.e2e-spec.ts
+========================================================================
+(node:27260) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts (23.312 s)
+  Analytics Aggregates E2E
+    √ builds correct hourly and daily overview totals (2401 ms)
+    √ builds PAGE and CUSTOM_EVENT dimensions (1385 ms)
+    √ builds SOURCE, COUNTRY, DEVICE, BROWSER, and OPERATING_SYSTEM dimensions (1865 ms)
+    √ filters by period, dimension, date range, and limit (1226 ms)
+    √ rebuilds aggregates idempotently (1462 ms)
+    √ allows VIEWER reads and denies outsider and anonymous reads (1668 ms)
+    √ rejects malformed aggregate queries and hides foreign websites (1351 ms)
+    √ serializes BigInt duration without precision loss (911 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        23.932 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-aggregates.e2e-spec.ts".
+
+PASS analytics-aggregates.e2e-spec.ts (27s)
+
+========================================================================
+[3/81] analytics-engine-processing.e2e-spec.ts
+========================================================================
+(node:23376) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/analytics-engine-processing.e2e-spec.ts (21.046 s)
+  Analytics Engine Processing E2E
+    √ processes pending raw events through the protected endpoint (2889 ms)
+    √ honors maxEvents and leaves the remaining raw events pending (1555 ms)
+    √ creates a completed zero-work run when no events are pending (892 ms)
+    √ validates maxEvents boundaries (1206 ms)
+    √ allows DEVELOPER processing but denies VIEWER processing (2222 ms)
+    √ rejects processing for disabled and archived websites (1372 ms)
+    √ marks the run and processing state as FAILED when a session ID is reused by another visitor (1360 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       7 passed, 7 total
+Snapshots:   0 total
+Time:        21.86 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-engine-processing.e2e-spec.ts".
+
+PASS analytics-engine-processing.e2e-spec.ts (24s)
+
+========================================================================
+[4/81] analytics-engine-status.e2e-spec.ts
+========================================================================
+(node:21808) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/analytics-engine-status.e2e-spec.ts (18.402 s)
+  Analytics Engine Status E2E
+    √ returns an empty status before analytics processing (1709 ms)
+    √ returns processed counts, latest run, and recent sessions (1756 ms)
+    √ allows a VIEWER to read analytics-engine status (1477 ms)
+    √ prevents outsider and anonymous access (1283 ms)
+    √ rejects malformed IDs and hides a foreign website (1281 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        19.073 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-engine-status.e2e-spec.ts".
+
+PASS analytics-engine-status.e2e-spec.ts (22s)
+
+========================================================================
+[5/81] analytics-ingestion-rate-limit.e2e-spec.ts
+========================================================================
+(node:11104) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/analytics-ingestion-rate-limit.e2e-spec.ts (19.953 s)
+  Analytics Ingestion Rate Limit E2E
+    √ accepts events up to the configured limit and rejects the next event (4499 ms)
+    √ rejects a single request whose event count exceeds the limit (2204 ms)
+    √ maintains independent buckets for different websites (2596 ms)
+    √ counts duplicate submissions toward the request rate (2697 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       4 passed, 4 total
+Snapshots:   0 total
+Time:        20.476 s, estimated 22 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-ingestion-rate-limit.e2e-spec.ts".
+
+PASS analytics-ingestion-rate-limit.e2e-spec.ts (23s)
+
+========================================================================
+[6/81] analytics-ingestion-security.e2e-spec.ts
+========================================================================
+(node:23040) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/analytics-ingestion-security.e2e-spec.ts (19.466 s)
+  Analytics Ingestion Security E2E
+    √ rejects invalid, malformed, and mismatched tracking credentials (2739 ms)
+    √ requires an allowed HTTP or HTTPS Origin header (1665 ms)
+    √ rejects collection for disabled and archived websites (1967 ms)
+    √ rejects tracked URLs that are invalid, unsafe, or from another origin (2123 ms)
+    √ validates timestamps and custom-event names (2243 ms)
+    √ rejects invalid payload shapes, oversized batches, and oversized bodies (2147 ms)
+    √ sanitizes tracked URLs, referrers, properties, time zones, and IP addresses (2119 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       7 passed, 7 total
+Snapshots:   0 total
+Time:        20.172 s, estimated 27 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-ingestion-security.e2e-spec.ts".
+
+PASS analytics-ingestion-security.e2e-spec.ts (23s)
+
+========================================================================
+[7/81] analytics-ingestion.e2e-spec.ts
+========================================================================
+(node:27228) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/analytics-ingestion.e2e-spec.ts (15.126 s)
+  Analytics Ingestion E2E
+    √ accepts page-view, heartbeat, and custom events in one batch (1660 ms)
+    √ deduplicates repeated event IDs per website (1052 ms)
+    √ allows the same event ID on different websites (1022 ms)
+    √ updates website lastEventAt and tracking status after collection (1015 ms)
+    √ stores request metadata and optional event dimensions (834 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        15.744 s, estimated 16 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-ingestion.e2e-spec.ts".
+
+PASS analytics-ingestion.e2e-spec.ts (18s)
+
+========================================================================
+[8/81] analytics-late-events.e2e-spec.ts
+========================================================================
+(node:19904) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/analytics-late-events.e2e-spec.ts (19.654 s)
+  Analytics Late Events E2E
+    √ moves the session start and entry page when an earlier page view arrives (2858 ms)
+    √ rebuilds both the previous and new session-start buckets (1624 ms)
+    √ updates duration in the original session-start bucket when a later heartbeat arrives (1494 ms)
+    √ adds late custom-event aggregates without duplicating existing rows (1497 ms)
+    √ does not rebuild unrelated daily buckets (1630 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        20.11 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-late-events.e2e-spec.ts".
+
+PASS analytics-late-events.e2e-spec.ts (23s)
+
+========================================================================
+[9/81] analytics-pageviews.e2e-spec.ts
+========================================================================
+(node:8584) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/analytics-pageviews.e2e-spec.ts (19.815 s)
+  Analytics Page Views E2E
+    √ normalizes paths, removes tracking parameters, and sorts retained query parameters (2211 ms)
+    √ marks one page as both entry and exit (1315 ms)
+    √ derives direct, internal, search, social, and referral sources (2028 ms)
+    √ creates page views only for PAGE_VIEW events (1343 ms)
+    √ does not duplicate normalized events or page views on repeated processing (1258 ms)
+    √ keeps normalized event IDs isolated between websites (1601 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       6 passed, 6 total
+Snapshots:   0 total
+Time:        20.159 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-pageviews.e2e-spec.ts".
+
+PASS analytics-pageviews.e2e-spec.ts (22s)
+
+========================================================================
+[10/81] analytics-reprocessing.e2e-spec.ts
+========================================================================
+(node:21576) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/analytics-reprocessing.e2e-spec.ts (19.477 s)
+  Analytics Reprocessing E2E
+    √ rebuilds only the selected range and preserves events outside it (2353 ms)
+    √ is idempotent across repeated reprocessing of the same range (1983 ms)
+    √ rejects invalid and oversized date ranges (824 ms)
+    √ rejects invalid maxEvents and a range larger than maxEvents (642 ms)
+    √ allows OWNER and ADMIN but denies DEVELOPER and VIEWER (2303 ms)
+    √ does not increment the processing total or move the normal cursor (1583 ms)
+    √ rejects disabled and archived websites without deleting valid normalized data (2019 ms)
+    √ requires authentication and hides foreign websites (1374 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        19.931 s, estimated 26 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-reprocessing.e2e-spec.ts".
+
+PASS analytics-reprocessing.e2e-spec.ts (22s)
+
+========================================================================
+[11/81] analytics-retention.e2e-spec.ts
+========================================================================
+(node:23612) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/analytics-retention.e2e-spec.ts (21.864 s)
+  Analytics Retention E2E
+    √ deletes only processed raw events older than the raw cutoff (3372 ms)
+    √ deletes expired sessions and removes only orphaned visitors (1845 ms)
+    √ deletes expired hourly and daily aggregates while preserving recent buckets (1720 ms)
+    √ limits retention changes to the requested website (1800 ms)
+    √ allows OWNER and ADMIN but denies DEVELOPER and VIEWER (2942 ms)
+    √ requires authentication and hides foreign websites (2470 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       6 passed, 6 total
+Snapshots:   0 total
+Time:        22.61 s, estimated 25 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-retention.e2e-spec.ts".
+
+PASS analytics-retention.e2e-spec.ts (25s)
+
+========================================================================
+[12/81] analytics-sessions.e2e-spec.ts
+========================================================================
+(node:25268) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/analytics-sessions.e2e-spec.ts (21.371 s)
+  Analytics Sessions E2E
+    √ marks a single unengaged page view as a bounce (1944 ms)
+    √ marks a page view plus ten seconds of engagement as not bounced (1356 ms)
+    √ marks two page views as not bounced and sets entry and exit paths (1322 ms)
+    √ supports a custom-event-only session with null entry and exit (1190 ms)
+    √ rebuilds session start and end when late events arrive (1724 ms)
+    √ caps overlapping engagement at the session wall duration (1200 ms)
+    √ classifies bot user agents (1328 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       7 passed, 7 total
+Snapshots:   0 total
+Time:        22.033 s, estimated 23 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-sessions.e2e-spec.ts".
+
+PASS analytics-sessions.e2e-spec.ts (25s)
+
+========================================================================
+[13/81] analytics-timezones.e2e-spec.ts
+========================================================================
+(node:2580) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/analytics-timezones.e2e-spec.ts (18.681 s)
+  Analytics Time Zones E2E
+    √ uses UTC midnight for UTC daily buckets (2291 ms)
+    √ uses Asia/Dubai local midnight for daily buckets (1329 ms)
+    √ creates a 23-hour daily bucket across DST spring-forward (1378 ms)
+    √ creates a 25-hour daily bucket across DST fall-back (1217 ms)
+    √ splits events across Asia/Dubai local midnight (1710 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        19.356 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-timezones.e2e-spec.ts".
+
+PASS analytics-timezones.e2e-spec.ts (22s)
+
+========================================================================
+[14/81] analytics-visitors.e2e-spec.ts
+========================================================================
+(node:2652) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/analytics-visitors.e2e-spec.ts (18.367 s)
+  Analytics Visitors E2E
+    √ creates one visitor per website and external visitor ID (2256 ms)
+    √ isolates the same external visitor ID between websites (2167 ms)
+    √ rebuilds firstSeenAt and lastSeenAt from out-of-order events (1403 ms)
+    √ keeps visitor counts idempotent across repeated processing runs (1437 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       4 passed, 4 total
+Snapshots:   0 total
+Time:        18.866 s, estimated 19 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-visitors.e2e-spec.ts".
+
+PASS analytics-visitors.e2e-spec.ts (22s)
+
+========================================================================
+[15/81] application-links.e2e-spec.ts
+========================================================================
+(node:5648) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:5648) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+PASS ../../packages/test-code/api/e2e/application-links.e2e-spec.ts (18.019 s)
+  Application Links E2E
+    √ adds, updates, and removes a link (2376 ms)
+    √ rejects invalid and unsafe URLs (1025 ms)
+    √ rejects invalid link type and empty label (968 ms)
+    √ rejects link ID from another application (1164 ms)
+    √ rejects link changes on archived application (1111 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        18.868 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\application-links.e2e-spec.ts".
+
+PASS application-links.e2e-spec.ts (22s)
+
+========================================================================
+[16/81] application-roles.e2e-spec.ts
+========================================================================
+(node:7308) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:7308) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+PASS ../../packages/test-code/api/e2e/application-roles.e2e-spec.ts (29.281 s)
+  Application Roles E2E
+    √ allows OWNER, ADMIN, and DEVELOPER to create and update (3674 ms)
+    √ allows OWNER, ADMIN, and DEVELOPER to manage technologies and links (3082 ms)
+    √ allows VIEWER to read but prevents mutations (2714 ms)
+    √ prevents DEVELOPER from archive, restore, and delete (2228 ms)
+    √ allows ADMIN to archive and restore but not permanently delete (2461 ms)
+    √ allows OWNER to permanently delete archived application (2457 ms)
+    √ prevents outsider and anonymous access (2213 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       7 passed, 7 total
+Snapshots:   0 total
+Time:        30.007 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\application-roles.e2e-spec.ts".
+
+PASS application-roles.e2e-spec.ts (33s)
+
+========================================================================
+[17/81] application-technologies.e2e-spec.ts
+========================================================================
+(node:25276) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:25276) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+PASS ../../packages/test-code/api/e2e/application-technologies.e2e-spec.ts (16.364 s)
+  Application Technologies E2E
+    √ adds, updates, and removes a technology (2137 ms)
+    √ rejects invalid technology payloads (1079 ms)
+    √ rejects technology ID from another application (1271 ms)
+    √ rejects technology changes on archived application (1055 ms)
+    √ rejects malformed technology UUID (896 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        16.856 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\application-technologies.e2e-spec.ts".
+
+PASS application-technologies.e2e-spec.ts (19s)
+
+========================================================================
+[18/81] applications.e2e-spec.ts
+========================================================================
+(node:26628) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:26628) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+PASS ../../packages/test-code/api/e2e/applications.e2e-spec.ts (20.943 s)
+  Applications E2E
+    √ creates an application with all supported fields (2038 ms)
+    √ creates an application using only required fields (1039 ms)
+    √ rejects invalid application payloads (787 ms)
+    √ updates application fields (919 ms)
+    √ supports search and filters (1022 ms)
+    √ supports sorting and pagination (1182 ms)
+    √ archives and restores an application (1015 ms)
+    √ rejects changes to an archived application (757 ms)
+    √ permanently deletes an archived application (1056 ms)
+    √ prevents cross-workspace access (848 ms)
+    √ rejects malformed application UUID (780 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       11 passed, 11 total
+Snapshots:   0 total
+Time:        21.413 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\applications.e2e-spec.ts".
+
+PASS applications.e2e-spec.ts (24s)
+
+========================================================================
+[19/81] auth-rate-limit.e2e-spec.ts
+========================================================================
+(node:17244) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/auth-rate-limit.e2e-spec.ts (20.468 s)
+  Auth Endpoint Rate Limiting E2E (SEC-01)
+    √ allows login up to the configured limit and throttles the next attempt (4637 ms)
+    √ allows register up to the configured limit and throttles the next attempt (2516 ms)
+    √ allows refresh up to the configured limit, without breaking legitimate rotation, then throttles (3035 ms)
+    √ keeps login throttling independent of registration throttling (different routes, same window) (3073 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       4 passed, 4 total
+Snapshots:   0 total
+Time:        20.836 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\auth-rate-limit.e2e-spec.ts".
+
+PASS auth-rate-limit.e2e-spec.ts (23s)
+
+========================================================================
+[20/81] auth.e2e-spec.ts
+========================================================================
+(node:1632) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/auth.e2e-spec.ts (25.573 s)
+  Phase 11 - Foundation & Authentication E2E
+    registration
+      √ registers a new user and creates an authenticated session (1352 ms)
+      √ registers the user without automatically creating a workspace (519 ms)
+      √ does not expose a refresh token or password hash in the registration body (560 ms)
+      √ rejects duplicate email registration with 409 conflict (910 ms)
+      √ rejects invalid registration input (501 ms)
+    login and protected-route authorization
+      √ logs in using valid credentials (929 ms)
+      √ rejects an invalid password without exposing account internals (737 ms)
+      √ rejects an unknown email with the same generic authentication failure (510 ms)
+      √ rejects access to protected routes without an access token (369 ms)
+      √ rejects a tampered access token (501 ms)
+      √ rejects a refresh token when it is presented as a Bearer access token (499 ms)
+    refresh cookie security
+      √ sets HttpOnly, SameSite, and Path attributes on the refresh cookie (530 ms)
+      √ stores only the SHA-256 hash of the refresh token (578 ms)
+      √ rejects refresh when the refresh cookie is missing (290 ms)
+      √ rejects a tampered refresh token (677 ms)
+    refresh rotation and replay protection
+      √ rotates the refresh session and returns a new access token (823 ms)
+      √ rejects old refresh-token reuse and revokes the whole refresh-token family (1145 ms)
+      √ rejects an expired refresh session and records EXPIRED revocation (647 ms)
+    logout
+      √ revokes the current refresh session and clears the refresh cookie (917 ms)
+      √ keeps logout idempotent when no refresh cookie exists (615 ms)
+    logout-all
+      √ rejects logout-all without a valid access token (538 ms)
+      √ revokes every active refresh session for the authenticated user (1197 ms)
+    public health
+      √ returns minimal public health without authentication or secret leakage (446 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       23 passed, 23 total
+Snapshots:   0 total
+Time:        26.028 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\auth.e2e-spec.ts".
+
+PASS auth.e2e-spec.ts (28s)
+
+========================================================================
+[21/81] desktop-ai-analysis.e2e-spec.ts
+========================================================================
+(node:6528) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/desktop-ai-analysis.e2e-spec.ts (19.013 s)
+  Desktop AI Analysis E2E
+    √ runs deterministic build-failure analysis and stores evidence (4006 ms)
+    √ never sends telemetry credentials to the AI provider (2061 ms)
+    √ rejects an analysis resource id from another desktop app (2417 ms)
+    √ does not allow a viewer to invoke AI analysis (2418 ms)
+    √ converts provider failure to a safe 502 response (2476 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        19.47 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-ai-analysis.e2e-spec.ts".
+
+PASS desktop-ai-analysis.e2e-spec.ts (22s)
+
+========================================================================
+[22/81] desktop-alerts.e2e-spec.ts
+========================================================================
+(node:2036) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/desktop-alerts.e2e-spec.ts (23.457 s)
+  Desktop Alerts E2E
+    √ does not create an incident below a crash-rate threshold (3085 ms)
+    √ creates one incident above threshold and does not spam duplicates (2016 ms)
+    √ resolves an open incident after the metric recovers (2186 ms)
+    √ does not evaluate a disabled rule (2349 ms)
+    √ creates a failed-build alert (2296 ms)
+    √ creates a signing-failure alert from Phase 14 security findings (2480 ms)
+    √ prevents cross-workspace alert access (2336 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       7 passed, 7 total
+Snapshots:   0 total
+Time:        23.797 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-alerts.e2e-spec.ts".
+
+PASS desktop-alerts.e2e-spec.ts (26s)
+
+========================================================================
+[23/81] desktop-apps.e2e-spec.ts
+========================================================================
+(node:9320) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/desktop-apps.e2e-spec.ts (57.462 s)
+  Desktop Applications E2E
+    √ allows an owner to create a desktop application (3835 ms)
+    √ persists parent SaasApplication as DESKTOP (1863 ms)
+    √ allows an admin to create a desktop application (2622 ms)
+    √ rejects unauthenticated desktop application creation (1937 ms)
+    √ rejects invalid desktop platform (2174 ms)
+    √ rejects invalid desktop framework (2082 ms)
+    √ rejects invalid desktop architecture (2130 ms)
+    √ rejects missing required fields (2157 ms)
+    √ lists only active desktop applications from the current workspace (2716 ms)
+    √ returns desktop application details (2055 ms)
+    √ returns 404 for unknown desktop application (2003 ms)
+    √ updates desktop application metadata (1995 ms)
+    √ allows optional metadata to be cleared (2114 ms)
+    √ archives desktop application and removes it from active list (2076 ms)
+    √ does not destructively delete desktop metadata when archived (1694 ms)
+    √ prevents one workspace from reading another workspace desktop application (2034 ms)
+    √ prevents a non-member from using another workspace route (2223 ms)
+    √ allows a viewer to read desktop applications (2576 ms)
+    √ prevents viewer from creating desktop applications (2379 ms)
+    √ prevents viewer from updating desktop applications (2171 ms)
+    √ prevents viewer from archiving desktop applications (2584 ms)
+    √ prevents updating an archived desktop application (2399 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       22 passed, 22 total
+Snapshots:   0 total
+Time:        58.03 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-apps.e2e-spec.ts".
+
+PASS desktop-apps.e2e-spec.ts (1m 0s)
+
+========================================================================
+[24/81] desktop-build-artifacts.e2e-spec.ts
+========================================================================
+(node:24872) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/desktop-build-artifacts.e2e-spec.ts (20.859 s)
+  Desktop Build Artifacts E2E
+    √ stores multiple artifact types for a build (4589 ms)
+    √ is idempotent for duplicate provider artifact ID (2472 ms)
+    √ rejects artifact matrix metadata that does not match the build (2169 ms)
+    √ returns 404 for an unknown build (1866 ms)
+    √ allows artifact metadata without a remote URL (2247 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        21.479 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-build-artifacts.e2e-spec.ts".
+
+PASS desktop-build-artifacts.e2e-spec.ts (24s)
+
+========================================================================
+[25/81] desktop-builds.e2e-spec.ts
+========================================================================
+(node:26880) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/desktop-builds.e2e-spec.ts (25.97 s)
+  Desktop Builds E2E
+    √ tracks queued -> building -> success idempotently (4714 ms)
+    √ tracks failed build (1672 ms)
+    √ keeps matrix builds separate by platform and architecture (2043 ms)
+    √ ignores an unrelated repository (2536 ms)
+    √ filters builds by platform, architecture and status (3113 ms)
+    √ rejects cross-workspace build reads (2820 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       6 passed, 6 total
+Snapshots:   0 total
+Time:        26.553 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-builds.e2e-spec.ts".
+
+PASS desktop-builds.e2e-spec.ts (30s)
+
+========================================================================
+[26/81] desktop-foundation.e2e-spec.ts
+========================================================================
+(node:14684) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/desktop-foundation.e2e-spec.ts (33.837 s)
+  Desktop Application Foundation E2E
+    √ exposes DESKTOP as an application type (3476 ms)
+    √ keeps existing application types available (2099 ms)
+    √ creates a DESKTOP application with desktop metadata (2684 ms)
+    √ persists the one-to-one application relationship (2422 ms)
+    √ rejects duplicate desktop metadata for one application (2566 ms)
+    √ rejects invalid desktop enum values (2139 ms)
+    √ deletes desktop metadata when the parent application is deleted (2454 ms)
+    √ does not break existing WEB applications (2373 ms)
+    √ does not break existing MOBILE applications (2175 ms)
+    √ keeps desktop applications isolated by workspace relationship (2340 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       10 passed, 10 total
+Snapshots:   0 total
+Time:        34.525 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-foundation.e2e-spec.ts".
+
+PASS desktop-foundation.e2e-spec.ts (38s)
+
+========================================================================
+[27/81] desktop-full-flow.e2e-spec.ts
+========================================================================
+(node:23640) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/desktop-full-flow.e2e-spec.ts (21.989 s)
+  Desktop Phase 18 full flow E2E
+    √ runs an Electron desktop engineering lifecycle from app to alert and AI analysis (5703 ms)
+    √ creates and reads TAURI desktop metadata without breaking workspace isolation (2527 ms)
+    √ creates and reads DOTNET desktop metadata without breaking workspace isolation (2501 ms)
+    √ creates and reads NATIVE_MACOS desktop metadata without breaking workspace isolation (2309 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       4 passed, 4 total
+Snapshots:   0 total
+Time:        22.506 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-full-flow.e2e-spec.ts".
+
+PASS desktop-full-flow.e2e-spec.ts (26s)
+
+========================================================================
+[28/81] desktop-overview.e2e-spec.ts
+========================================================================
+(node:26220) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/desktop-overview.e2e-spec.ts (16.611 s)
+  Desktop Overview E2E
+    √ returns desktop metadata and linked repository (4610 ms)
+    √ returns null optional overview sections safely (2227 ms)
+    √ rejects cross-workspace overview access (2114 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       3 passed, 3 total
+Snapshots:   0 total
+Time:        17.238 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-overview.e2e-spec.ts".
+
+PASS desktop-overview.e2e-spec.ts (20s)
+
+========================================================================
+[29/81] desktop-performance.e2e-spec.ts
+========================================================================
+(node:20980) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/desktop-performance.e2e-spec.ts (20.786 s)
+  Desktop Performance and Crashes E2E
+    √ syncs provider metrics and crash groups (3854 ms)
+    √ is idempotent when the same provider snapshot is synced twice (2752 ms)
+    √ returns normalized performance summary (2834 ms)
+    √ filters performance and crashes by version/platform (3069 ms)
+    √ keeps runtime data isolated between workspaces (3300 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        21.217 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-performance.e2e-spec.ts".
+
+PASS desktop-performance.e2e-spec.ts (23s)
+
+========================================================================
+[30/81] desktop-project-detection.e2e-spec.ts
+========================================================================
+(node:19580) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/desktop-project-detection.e2e-spec.ts (21.455 s)
+  Desktop Project Detection E2E
+    √ detects Electron from the linked repository (4441 ms)
+    √ returns safe empty detection for a non-desktop repository (2733 ms)
+    √ does not fail the detection pass when one metadata file disappears (2416 ms)
+    √ requires authentication (2360 ms)
+    √ rejects cross-workspace desktop application access (2525 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        22.024 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-project-detection.e2e-spec.ts".
+
+PASS desktop-project-detection.e2e-spec.ts (24s)
+
+========================================================================
+[31/81] desktop-releases.e2e-spec.ts
+========================================================================
+(node:10136) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/desktop-releases.e2e-spec.ts (48.206 s)
+  Desktop Releases E2E
+    √ rejects anonymous release access (4039 ms)
+    √ creates a release from a successful build and inherits target metadata (2484 ms)
+    √ returns source build and artifact traceability (2360 ms)
+    √ rejects a failed build (2192 ms)
+    √ rejects a nonexistent build (2165 ms)
+    √ persists explicit version, build number, and update channel (2208 ms)
+    √ rejects an invalid update channel (2304 ms)
+    √ allows the same build in different channels and rejects duplicate build/channel (2413 ms)
+    √ transitions DRAFT -> READY -> PUBLISHED -> ROLLED_BACK (2287 ms)
+    √ rejects invalid lifecycle transitions (2236 ms)
+    √ keeps repeated same-status updates idempotent (2312 ms)
+    √ rejects a build belonging to another workspace (2708 ms)
+    √ rejects a user from another workspace (2667 ms)
+    √ rejects cross-workspace release lookup (2677 ms)
+    √ orders release history newest first (2385 ms)
+    √ filters release history by channel/status/platform/architecture (2223 ms)
+    √ rejects release creation for an archived desktop application (2115 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       17 passed, 17 total
+Snapshots:   0 total
+Time:        48.695 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-releases.e2e-spec.ts".
+
+PASS desktop-releases.e2e-spec.ts (51s)
+
+========================================================================
+[32/81] desktop-repository-linking.e2e-spec.ts
+========================================================================
+(node:23816) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/desktop-repository-linking.e2e-spec.ts (34.658 s)
+  Desktop Repository Linking E2E
+    √ links repository to desktop application (4052 ms)
+    √ returns linked repository after reload/read (2456 ms)
+    √ changes repository without leaving duplicate desktop links (2165 ms)
+    √ unlinks repository (2683 ms)
+    √ rejects repository from another workspace (2601 ms)
+    √ rejects missing repository (1846 ms)
+    √ rejects malformed repository ID (1903 ms)
+    √ rejects archived repository (1836 ms)
+    √ rejects unavailable repository (1840 ms)
+    √ prevents viewer from linking repository (2378 ms)
+    √ prevents viewer from unlinking repository (2443 ms)
+    √ requires authentication for repository modification (2001 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       12 passed, 12 total
+Snapshots:   0 total
+Time:        35.196 s, estimated 40 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-repository-linking.e2e-spec.ts".
+
+PASS desktop-repository-linking.e2e-spec.ts (38s)
+
+========================================================================
+[33/81] desktop-security-health.e2e-spec.ts
+========================================================================
+(node:12764) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/desktop-security-health.e2e-spec.ts (17.231 s)
+  Desktop Dependency and Security Health E2E
+    √ scans dependency manifests and persists vulnerability metadata (4186 ms)
+    √ detects signing and notarization configuration without exposing secrets (2804 ms)
+    √ handles malformed package.json without crashing the scan (2752 ms)
+    √ rejects cross-workspace security access (2582 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       4 passed, 4 total
+Snapshots:   0 total
+Time:        17.805 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-security-health.e2e-spec.ts".
+
+PASS desktop-security-health.e2e-spec.ts (20s)
+
+========================================================================
+[34/81] desktop-security.e2e-spec.ts
+========================================================================
+(node:27368) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/desktop-security.e2e-spec.ts (23.705 s)
+  Desktop Phase 17 Security E2E
+    √ requires authentication for every desktop read surface (4976 ms)
+    √ does not allow workspace A to read desktop resources in workspace B (3884 ms)
+    √ gives viewer read capabilities but no write/manage/AI/secret capability (2893 ms)
+    √ does not expose encrypted telemetry secrets in permissions or alert responses (2292 ms)
+    √ rejects a forged GitHub webhook signature (1747 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        24.307 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-security.e2e-spec.ts".
+
+PASS desktop-security.e2e-spec.ts (27s)
+
+========================================================================
+[35/81] desktop-telemetry.e2e-spec.ts
+========================================================================
+(node:12584) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/desktop-telemetry.e2e-spec.ts (27.903 s)
+  Desktop Telemetry E2E
+    √ connects provider and never returns the secret (4401 ms)
+    √ previews normalized provider output (2468 ms)
+    √ records provider failure without breaking the desktop app (2483 ms)
+    √ disconnects and removes stored secret material (2415 ms)
+    √ rejects unsafe localhost endpoint outside test mock protocol (2454 ms)
+    √ viewer can read integrations but cannot configure them (2978 ms)
+    √ rejects cross-workspace telemetry access (2566 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       7 passed, 7 total
+Snapshots:   0 total
+Time:        28.394 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-telemetry.e2e-spec.ts".
+
+PASS desktop-telemetry.e2e-spec.ts (31s)
+
+========================================================================
+[36/81] desktop-tests.e2e-spec.ts
+========================================================================
+(node:564) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/desktop-tests.e2e-spec.ts (22.826 s)
+  Desktop Tests E2E
+    √ stores counts and failure details (4775 ms)
+    √ re-ingestion replaces duplicate run/failures instead of duplicating them (2741 ms)
+    √ returns aggregate app test summary (3228 ms)
+    √ cannot attach tests to a build from another desktop app (3435 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       4 passed, 4 total
+Snapshots:   0 total
+Time:        23.414 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\desktop-tests.e2e-spec.ts".
+
+PASS desktop-tests.e2e-spec.ts (26s)
+
+========================================================================
+[37/81] development-activity.e2e-spec.ts
+========================================================================
+(node:26224) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:26224) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+PASS ../../packages/test-code/api/e2e/development-activity.e2e-spec.ts (19.565 s)
+  Development Activity E2E
+    √ writes activity for milestone, task, and blocker creation (2731 ms)
+    √ writes activity for updates, completion, and blocker resolution (2257 ms)
+    √ does not create activity for rejected validation (1245 ms)
+    √ keeps development activity isolated between workspaces (1699 ms)
+    √ does not expose authentication secrets in development activity (968 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        20.031 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\development-activity.e2e-spec.ts".
+
+PASS development-activity.e2e-spec.ts (24s)
+
+========================================================================
+[38/81] development-progress.e2e-spec.ts
+========================================================================
+(node:1776) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:1776) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+PASS ../../packages/test-code/api/e2e/development-progress.e2e-spec.ts (23.769 s)
+  Development Progress E2E
+    √ starts at zero progress (1649 ms)
+    √ calculates weighted task and milestone progress (1807 ms)
+    √ calculates milestone progress from weighted tasks (1734 ms)
+    √ excludes skipped tasks from applicable task weight (1747 ms)
+    √ excludes skipped milestones from application progress (1506 ms)
+    √ recalculates progress after task reopen (1807 ms)
+    √ supports manual milestone complete and reopen when it has no tasks (1482 ms)
+    √ derives milestone status from task progress (1770 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        24.221 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\development-progress.e2e-spec.ts".
+
+PASS development-progress.e2e-spec.ts (26s)
+
+========================================================================
+[39/81] development-roles.e2e-spec.ts
+========================================================================
+(node:24780) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:24780) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+PASS ../../packages/test-code/api/e2e/development-roles.e2e-spec.ts (23.311 s)
+  Development Roles E2E
+    √ allows all workspace members to read templates, summary, milestones, and blockers (3201 ms)
+    √ allows OWNER, ADMIN, and DEVELOPER to mutate development data (3131 ms)
+    √ prevents VIEWER from all development mutations (2006 ms)
+    √ prevents outsider and anonymous access (2409 ms)
+    √ prevents development access through a foreign application ID (990 ms)
+    √ rejects development mutations on archived applications (2691 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       6 passed, 6 total
+Snapshots:   0 total
+Time:        23.774 s, estimated 27 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\development-roles.e2e-spec.ts".
+
+PASS development-roles.e2e-spec.ts (27s)
+
+========================================================================
+[40/81] development.e2e-spec.ts
+========================================================================
+(node:5048) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:5048) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+PASS ../../packages/test-code/api/e2e/development.e2e-spec.ts (30.181 s)
+  Development E2E
+    √ lists available development templates (1360 ms)
+    √ creates, lists, and updates a milestone (1443 ms)
+    √ creates and updates a task inside a milestone (1629 ms)
+    √ moves and reorders tasks and milestones (2182 ms)
+    √ creates, updates, resolves, reopens, filters, and deletes a blocker (2290 ms)
+    √ deletes tasks and milestones (1591 ms)
+    √ rejects invalid milestone, task, blocker, and reorder payloads (1467 ms)
+    √ rejects child IDs belonging to another application (1428 ms)
+    √ creates a blocker referencing a valid milestone and task combination (DB-05) (1128 ms)
+    √ rejects a blocker referencing a milestone from another application (DB-05) (1263 ms)
+    √ rejects a blocker referencing a task from another application (DB-05) (1261 ms)
+    √ rejects a blocker whose task does not belong to the supplied milestone (DB-05) (1370 ms)
+    √ rejects a blocker referencing milestone/task IDs from a foreign workspace (DB-05) (1823 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       13 passed, 13 total
+Snapshots:   0 total
+Time:        30.815 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\development.e2e-spec.ts".
+
+PASS development.e2e-spec.ts (33s)
+
+========================================================================
+[41/81] github-connect-intent-cleanup.e2e-spec.ts
+========================================================================
+(node:8744) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/github-connect-intent-cleanup.e2e-spec.ts (14.583 s)
+  GitHub Connect Intent Cleanup (BE-06)
+    √ removes an expired, never-consumed personal intent (1394 ms)
+    √ retains a personal intent that has not expired yet (959 ms)
+    √ retains a consumed personal intent even after its expiry, since it is the durable installation-access record (669 ms)
+    √ removes an expired repository (workspace-scoped) connect intent regardless of consumption state (836 ms)
+    √ is idempotent across repeated runs and safe to call concurrently (699 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        15.042 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\github-connect-intent-cleanup.e2e-spec.ts".
+
+PASS github-connect-intent-cleanup.e2e-spec.ts (18s)
+
+========================================================================
+[42/81] infrastructure.e2e-spec.ts
+========================================================================
+(node:25348) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+[31m[Nest] 25348  - [39m08/26/2026, 1:46:03 AM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mGET /api/v1/health | requestId=req-v | Error: Origin https://attacker.example.com is not allowed by CORS.
+    at corsOptionsDelegate (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\bootstrap\configure-application.ts:51:14)
+    at handleCorsOptionsCallbackDelegator (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\@fastify\cors\index.js:131:3)
+    at Object.handleCors (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\@fastify\cors\index.js:102:9)
+    at hookIterator (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\fastify\lib\hooks.js:412:10)
+    at next (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\fastify\lib\hooks.js:242:18)
+    at Object.<anonymous> (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\bootstrap\configure-application.ts:102:5)
+    at hookIterator (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\fastify\lib\hooks.js:412:10)
+    at next (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\fastify\lib\hooks.js:242:18)
+    at handleResolve (C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\fastify\lib\hooks.js:253:7)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+FAIL ../../packages/test-code/api/e2e/infrastructure.e2e-spec.ts (22.832 s)
+  Infrastructure E2E
+    error envelope
+      √ returns the full production envelope for a 404 (1234 ms)
+      × reports the requestId in the body and matches the response header (614 ms)
+      × returns a validation envelope with an array message for a bad payload (565 ms)
+      √ rejects unknown body fields under forbidNonWhitelisted (750 ms)
+      √ does not leak a stack trace in the error body (746 ms)
+    request id middleware
+      × sets a generated request id on successful responses (608 ms)
+      × echoes a client supplied request id (659 ms)
+      × generates a fresh id when the supplied header is blank (826 ms)
+      √ issues a different id per request (676 ms)
+    helmet security headers
+      √ applies helmet defaults to responses (705 ms)
+      √ disables the CSP outside production (492 ms)
+      √ sets a cross-origin resource policy so the tracker can load (641 ms)
+      √ removes the express fingerprint header (590 ms)
+    cors
+      √ allows a configured origin with credentials (552 ms)
+      √ does not grant credentials to a disallowed origin (730 ms)
+      √ exposes the request id header to browsers (645 ms)
+    body limits
+      √ accepts a payload within the configured limit (699 ms)
+      √ rejects a JSON payload larger than BODY_LIMIT (589 ms)
+
+  ● Infrastructure E2E › error envelope › reports the requestId in the body and matches the response header
+
+    expect(received).toMatch(expected)
+
+    Expected pattern: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    Received string:  "req-4"
+
+    [0m [90m 62 |[39m       [36mconst[39m response [33m=[39m [36mawait[39m request(app[33m.[39mgetHttpServer())[33m.[39m[36mget[39m([32m`${API_PREFIX}/this-route-does-not-exist`[39m)[33m;[39m
+     [90m 63 |[39m
+    [31m[1m>[22m[39m[90m 64 |[39m       expect(response[33m.[39mbody[33m.[39mrequestId)[33m.[39mtoMatch([33mUUID_PATTERN[39m)[33m;[39m
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 65 |[39m
+     [90m 66 |[39m       expect(response[33m.[39mheaders[[33mREQUEST_ID_HEADER[39m])[33m.[39mtoBe(response[33m.[39mbody[33m.[39mrequestId)[33m;[39m
+     [90m 67 |[39m     })[33m;[39m[0m
+
+      at Object.<anonymous> (packages/test-code/api/e2e/infrastructure.e2e-spec.ts:64:39)
+
+  ● Infrastructure E2E › error envelope › returns a validation envelope with an array message for a bad payload
+
+    expect(received).toMatch(expected)
+
+    Expected pattern: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    Received string:  "req-6"
+
+    [0m [90m 80 |[39m       expect(response[33m.[39mbody[33m.[39mpath)[33m.[39mtoBe([33mTEST_ROUTES[39m[33m.[39mworkspaces[33m.[39mroot)[33m;[39m
+     [90m 81 |[39m
+    [31m[1m>[22m[39m[90m 82 |[39m       expect(response[33m.[39mbody[33m.[39mrequestId)[33m.[39mtoMatch([33mUUID_PATTERN[39m)[33m;[39m
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 83 |[39m     })[33m;[39m
+     [90m 84 |[39m
+     [90m 85 |[39m     it([32m'rejects unknown body fields under forbidNonWhitelisted'[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (packages/test-code/api/e2e/infrastructure.e2e-spec.ts:82:39)
+
+  ● Infrastructure E2E › request id middleware › sets a generated request id on successful responses
+
+    expect(received).toMatch(expected)
+
+    Expected pattern: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    Received string:  "req-c"
+
+    [0m [90m 110 |[39m       [36mconst[39m response [33m=[39m [36mawait[39m request(app[33m.[39mgetHttpServer())[33m.[39m[36mget[39m([33mTEST_ROUTES[39m[33m.[39msystem[33m.[39mhealth)[33m;[39m
+     [90m 111 |[39m
+    [31m[1m>[22m[39m[90m 112 |[39m       expect(response[33m.[39mheaders[[33mREQUEST_ID_HEADER[39m])[33m.[39mtoMatch([33mUUID_PATTERN[39m)[33m;[39m
+     [90m     |[39m                                                   [31m[1m^[22m[39m
+     [90m 113 |[39m     })[33m;[39m
+     [90m 114 |[39m
+     [90m 115 |[39m     it([32m'echoes a client supplied request id'[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (packages/test-code/api/e2e/infrastructure.e2e-spec.ts:112:51)
+
+  ● Infrastructure E2E › request id middleware › echoes a client supplied request id
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "client-supplied-request-id"
+    Received: "req-e"
+
+    [0m [90m 117 |[39m       [36mconst[39m response [33m=[39m [36mawait[39m request(app[33m.[39mgetHttpServer())[33m.[39m[36mget[39m([33mTEST_ROUTES[39m[33m.[39msystem[33m.[39mhealth)[33m.[39m[36mset[39m([33mREQUEST_ID_HEADER[39m[33m,[39m suppliedId)[33m;[39m
+     [90m 118 |[39m
+    [31m[1m>[22m[39m[90m 119 |[39m       expect(response[33m.[39mheaders[[33mREQUEST_ID_HEADER[39m])[33m.[39mtoBe(suppliedId)[33m;[39m
+     [90m     |[39m                                                   [31m[1m^[22m[39m
+     [90m 120 |[39m     })[33m;[39m
+     [90m 121 |[39m
+     [90m 122 |[39m     it([32m'generates a fresh id when the supplied header is blank'[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (packages/test-code/api/e2e/infrastructure.e2e-spec.ts:119:51)
+
+  ● Infrastructure E2E › request id middleware › generates a fresh id when the supplied header is blank
+
+    expect(received).toMatch(expected)
+
+    Expected pattern: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    Received string:  "req-g"
+
+    [0m [90m 123 |[39m       [36mconst[39m response [33m=[39m [36mawait[39m request(app[33m.[39mgetHttpServer())[33m.[39m[36mget[39m([33mTEST_ROUTES[39m[33m.[39msystem[33m.[39mhealth)[33m.[39m[36mset[39m([33mREQUEST_ID_HEADER[39m[33m,[39m [32m'   '[39m)[33m;[39m
+     [90m 124 |[39m
+    [31m[1m>[22m[39m[90m 125 |[39m       expect(response[33m.[39mheaders[[33mREQUEST_ID_HEADER[39m])[33m.[39mtoMatch([33mUUID_PATTERN[39m)[33m;[39m
+     [90m     |[39m                                                   [31m[1m^[22m[39m
+     [90m 126 |[39m     })[33m;[39m
+     [90m 127 |[39m
+     [90m 128 |[39m     it([32m'issues a different id per request'[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (packages/test-code/api/e2e/infrastructure.e2e-spec.ts:125:51)
+
+Test Suites: 1 failed, 1 total
+Tests:       5 failed, 13 passed, 18 total
+Snapshots:   0 total
+Time:        23.461 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\infrastructure.e2e-spec.ts".
+
+FAIL infrastructure.e2e-spec.ts (26s)
+
+========================================================================
+[43/81] mobile-ai-analysis.e2e-spec.ts
+========================================================================
+(node:22264) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/mobile-ai-analysis.e2e-spec.ts (15.318 s)
+  Mobile AI Analysis E2E
+    √ build analysis receives build/test context (4001 ms)
+    √ telemetry credentials are excluded from AI prompt (2207 ms)
+    √ provider failure returns safe error (2183 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       3 passed, 3 total
+Snapshots:   0 total
+Time:        15.772 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-ai-analysis.e2e-spec.ts".
+
+PASS mobile-ai-analysis.e2e-spec.ts (18s)
+
+========================================================================
+[44/81] mobile-alerts.e2e-spec.ts
+========================================================================
+(node:20812) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/mobile-alerts.e2e-spec.ts (23.716 s)
+  Mobile Alerts E2E
+    √ metric below threshold creates no incident (4596 ms)
+    √ metric above threshold creates one incident and notifications (2313 ms)
+    √ duplicate evaluation does not duplicate active incident (2302 ms)
+    √ recovery resolves incident (2567 ms)
+    √ disabled rule does not trigger (2763 ms)
+    √ failed build triggers build-failure incident (2594 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       6 passed, 6 total
+Snapshots:   0 total
+Time:        24.213 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-alerts.e2e-spec.ts".
+
+PASS mobile-alerts.e2e-spec.ts (27s)
+
+========================================================================
+[45/81] mobile-apps.e2e-spec.ts
+========================================================================
+(node:27088) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/mobile-apps.e2e-spec.ts (37.323 s)
+  Mobile Applications E2E
+    √ allows an owner to create a mobile application (4111 ms)
+    √ allows an admin to create a mobile application (2371 ms)
+    √ rejects unauthenticated mobile application creation (2070 ms)
+    √ rejects invalid mobile platform (1962 ms)
+    √ rejects invalid mobile framework (1705 ms)
+    √ rejects missing required fields (1948 ms)
+    √ lists only active mobile applications from the current workspace (2517 ms)
+    √ returns mobile application details (2071 ms)
+    √ updates mobile application metadata (2375 ms)
+    √ archives a mobile application and removes it from active list (1942 ms)
+    √ prevents one workspace from reading another workspace mobile application (2391 ms)
+    √ prevents a non-member from using another workspace route (2250 ms)
+    √ prevents viewer from modifying mobile applications (2022 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       13 passed, 13 total
+Snapshots:   0 total
+Time:        38.013 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-apps.e2e-spec.ts".
+
+PASS mobile-apps.e2e-spec.ts (41s)
+
+========================================================================
+[46/81] mobile-builds.e2e-spec.ts
+========================================================================
+(node:2204) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/mobile-builds.e2e-spec.ts (23.502 s)
+  Mobile Builds E2E
+    √ creates build from GitHub ingestion (4361 ms)
+    √ does not duplicate repeated workflow delivery (2544 ms)
+    √ transitions queued to building to success (2571 ms)
+    √ stores failed build (2264 ms)
+    √ ignores unrelated repository (2410 ms)
+    √ lists only current app builds (2243 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       6 passed, 6 total
+Snapshots:   0 total
+Time:        23.895 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-builds.e2e-spec.ts".
+
+PASS mobile-builds.e2e-spec.ts (27s)
+
+========================================================================
+[47/81] mobile-foundation.e2e-spec.ts
+========================================================================
+(node:13120) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/mobile-foundation.e2e-spec.ts (17.707 s)
+  Mobile Application Foundation E2E
+    √ keeps existing applications valid using OTHER as the default type (3317 ms)
+    √ stores a MOBILE application with mobile metadata (2068 ms)
+    √ allows only one mobile metadata record per parent application (2123 ms)
+    √ deletes mobile metadata when the parent application is deleted (2005 ms)
+    √ preserves workspace ownership through the parent application (1897 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        18.243 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-foundation.e2e-spec.ts".
+
+PASS mobile-foundation.e2e-spec.ts (21s)
+
+========================================================================
+[48/81] mobile-full-flow.e2e-spec.ts
+========================================================================
+(node:25992) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/mobile-full-flow.e2e-spec.ts (13.313 s)
+  Mobile Full Flow E2E
+    √ completes create, repository, build, tests, and release lifecycle (1956 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+Snapshots:   0 total
+Time:        13.978 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-full-flow.e2e-spec.ts".
+
+PASS mobile-full-flow.e2e-spec.ts (17s)
+
+========================================================================
+[49/81] mobile-ios-performance.e2e-spec.ts
+========================================================================
+(node:23420) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/mobile-ios-performance.e2e-spec.ts (21.54 s)
+  iOS Mobile Performance E2E
+    √ creates native iOS application with bundle identifier (3785 ms)
+    √ persists normalized iOS telemetry metrics (2357 ms)
+    √ returns normalized iOS performance summary (2627 ms)
+    √ detects iOS hang and startup performance problems (2465 ms)
+    √ compares iOS versions correctly (1882 ms)
+    √ returns iOS version summaries (1953 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       6 passed, 6 total
+Snapshots:   0 total
+Time:        21.919 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-ios-performance.e2e-spec.ts".
+
+PASS mobile-ios-performance.e2e-spec.ts (24s)
+
+========================================================================
+[50/81] mobile-overview.e2e-spec.ts
+========================================================================
+(node:25088) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/mobile-overview.e2e-spec.ts (23.852 s)
+  Mobile Overview E2E
+    √ returns mobile overview metadata (4033 ms)
+    √ returns linked repository data (2274 ms)
+    √ handles missing optional metadata (2537 ms)
+    √ prevents another workspace from opening overview (2523 ms)
+    √ keeps archived mobile application available for historical overview (2398 ms)
+    √ rejects unauthenticated overview access (2292 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       6 passed, 6 total
+Snapshots:   0 total
+Time:        24.435 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-overview.e2e-spec.ts".
+
+PASS mobile-overview.e2e-spec.ts (28s)
+
+========================================================================
+[51/81] mobile-performance.e2e-spec.ts
+========================================================================
+(node:17916) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/mobile-performance.e2e-spec.ts (17.809 s)
+  Mobile Performance E2E
+    √ calculates normalized Android summary (3322 ms)
+    √ compares Android versions correctly (1936 ms)
+    √ aggregates multiple samples (2039 ms)
+    √ detects Android performance issues (2063 ms)
+    √ prevents cross-workspace performance access (2132 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        18.338 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-performance.e2e-spec.ts".
+
+PASS mobile-performance.e2e-spec.ts (21s)
+
+========================================================================
+[52/81] mobile-project-detection.e2e-spec.ts
+========================================================================
+(node:27108) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/mobile-project-detection.e2e-spec.ts (17.581 s)
+  Mobile Project Detection E2E
+    √ detects Android metadata from linked repository (4112 ms)
+    √ rejects detection when no repository is linked (2086 ms)
+    √ does not crash when metadata file exceeds limit (1755 ms)
+    √ protects detection by workspace (2574 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       4 passed, 4 total
+Snapshots:   0 total
+Time:        18.097 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-project-detection.e2e-spec.ts".
+
+PASS mobile-project-detection.e2e-spec.ts (20s)
+
+========================================================================
+[53/81] mobile-releases.e2e-spec.ts
+========================================================================
+(node:24728) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/mobile-releases.e2e-spec.ts (26.209 s)
+  Mobile Releases E2E
+    √ creates release from successful build (4995 ms)
+    √ rejects failed build (2513 ms)
+    √ rejects nonexistent build (2495 ms)
+    √ transitions DRAFT to READY to RELEASED to ROLLED_BACK (2661 ms)
+    √ rejects invalid lifecycle transition (2245 ms)
+    √ prevents cross-workspace build release (2643 ms)
+    √ prevents archived app from creating a release (2132 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       7 passed, 7 total
+Snapshots:   0 total
+Time:        26.634 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-releases.e2e-spec.ts".
+
+PASS mobile-releases.e2e-spec.ts (29s)
+
+========================================================================
+[54/81] mobile-repository-linking.e2e-spec.ts
+========================================================================
+(node:24604) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/mobile-repository-linking.e2e-spec.ts (25.576 s)
+  Mobile Repository Linking E2E
+    √ links repository to mobile application (4431 ms)
+    √ changes repository without leaving duplicate mobile links (2451 ms)
+    √ unlinks repository (2596 ms)
+    √ rejects repository from another workspace (2597 ms)
+    √ rejects archived repository (2768 ms)
+    √ prevents viewer from changing repository (2580 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       6 passed, 6 total
+Snapshots:   0 total
+Time:        26.3 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-repository-linking.e2e-spec.ts".
+
+PASS mobile-repository-linking.e2e-spec.ts (29s)
+
+========================================================================
+[55/81] mobile-security.e2e-spec.ts
+========================================================================
+(node:10932) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/mobile-security.e2e-spec.ts (46.817 s)
+  Mobile Security E2E
+    √ returns role-aware permissions (4387 ms)
+    √ viewer gets read-only permissions (3064 ms)
+    √ workspace A cannot read workspace B mobile app (2601 ms)
+    √ workspace A repository cannot link to workspace B app (2986 ms)
+    √ build from workspace A cannot create workspace B release (3216 ms)
+    √ workspace A cannot query workspace B performance (2716 ms)
+    √ viewer cannot modify mobile app (2443 ms)
+    √ viewer cannot create alert rule (2709 ms)
+    √ unauthenticated request returns 401 (2152 ms)
+    √ telemetry secret is encrypted and never returned (1985 ms)
+    √ rejects custom provider SSRF host (2605 ms)
+    √ rejects oversized provider config (2555 ms)
+    √ duplicate build delivery remains idempotent (2425 ms)
+    √ forged GitHub webhook signature is rejected (2066 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       14 passed, 14 total
+Snapshots:   0 total
+Time:        47.551 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-security.e2e-spec.ts".
+
+PASS mobile-security.e2e-spec.ts (51s)
+
+========================================================================
+[56/81] mobile-telemetry.e2e-spec.ts
+========================================================================
+(node:3112) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/mobile-telemetry.e2e-spec.ts (33.052 s)
+  Mobile Telemetry E2E
+    √ returns null when no telemetry integration exists (4391 ms)
+    √ connects provider and never returns credentials (2770 ms)
+    √ syncs telemetry through registered provider (2708 ms)
+    √ persists normalized performance metrics after telemetry sync (2817 ms)
+    √ retries transient provider failures (2235 ms)
+    √ marks integration ERROR when provider repeatedly fails (2627 ms)
+    √ disconnect removes stored credentials and prevents sync (2686 ms)
+    √ prevents archived app from connecting telemetry (2315 ms)
+    √ cannot resolve another workspace mobile app through current workspace (2598 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       9 passed, 9 total
+Snapshots:   0 total
+Time:        33.586 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-telemetry.e2e-spec.ts".
+
+PASS mobile-telemetry.e2e-spec.ts (36s)
+
+========================================================================
+[57/81] mobile-tests.e2e-spec.ts
+========================================================================
+(node:26680) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/mobile-tests.e2e-spec.ts (24.4 s)
+  Mobile Tests E2E
+    √ stores test run counts (4998 ms)
+    √ stores test failure details (2506 ms)
+    √ duplicate ingestion updates rather than duplicates (2626 ms)
+    √ build detail aggregates test status (3011 ms)
+    √ cannot attach tests to another app build (2839 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        25.223 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-tests.e2e-spec.ts".
+
+PASS mobile-tests.e2e-spec.ts (28s)
+
+========================================================================
+[58/81] mobile-unified-performance.e2e-spec.ts
+========================================================================
+(node:21184) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/mobile-unified-performance.e2e-spec.ts (26.232 s)
+  Unified Mobile Performance E2E
+    √ keeps Android and iOS performance isolated (4677 ms)
+    √ filters performance by platform (2748 ms)
+    √ filters performance by build number (2517 ms)
+    √ filters metrics by date range (2398 ms)
+    √ compares versions using normalized metrics (2747 ms)
+    √ lists versions independently for Android and iOS (2879 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       6 passed, 6 total
+Snapshots:   0 total
+Time:        26.62 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\mobile-unified-performance.e2e-spec.ts".
+
+PASS mobile-unified-performance.e2e-spec.ts (29s)
+
+========================================================================
+[59/81] phase13-analytics-reports.e2e-spec.ts
+========================================================================
+(node:23292) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/phase13-analytics-reports.e2e-spec.ts (16.887 s)
+  Phase 13 Analytics Reports E2E
+    √ rejects anonymous report access (57 ms)
+    √ allows an authenticated OWNER to read the pages report (142 ms)
+    √ allows a VIEWER to read the pages report (no WorkspaceRolesGuard on this controller) (111 ms)
+    √ blocks an outsider (non-member) from reading another workspace pages report (71 ms)
+    √ returns page report rows with correct totals reconciling to 40 page views (92 ms)
+    √ filters the page report by search text (68 ms)
+    √ sorts the page report by views ascending (72 ms)
+    √ sorts the page report by views descending (77 ms)
+    √ paginates the page report without duplicate or skipped rows (131 ms)
+    √ returns custom event names, counts, and a deterministic sort (139 ms)
+    √ returns the sources dimension report reconciling total page views to 40 (103 ms)
+    √ returns the countries dimension report (147 ms)
+    √ returns the devices dimension report (80 ms)
+    √ returns the browsers dimension report (68 ms)
+    √ returns the operating-systems dimension report (111 ms)
+    √ sorts the sources dimension report by sessions with a deterministic tie-break (107 ms)
+    √ paginates the sources dimension report without duplicate or skipped rows (DB-02) (160 ms)
+    √ reports the same total sessions percentage baseline across dimension report pages (DB-02) (158 ms)
+    √ filters the sources dimension report by search text (DB-02) (94 ms)
+    √ returns an empty dimension report page for a search term matching nothing (DB-02) (93 ms)
+    √ sorts the sources dimension report by sessions ascending as well as descending (DB-02) (89 ms)
+    √ rejects an unsupported dimension path parameter (53 ms)
+    √ rejects an unsupported sort field on the pages report (73 ms)
+    √ rejects page 0 (59 ms)
+    √ rejects limit 0 (79 ms)
+    √ rejects limit above the maximum of 100 (45 ms)
+    √ rejects a malformed date (not YYYY-MM-DD) (79 ms)
+    √ rejects supplying only "from" without "to" (77 ms)
+    √ rejects from > to (64 ms)
+    √ rejects a range that exceeds the maximum of 366 days (98 ms)
+    √ rejects a malformed website ID (57 ms)
+    √ returns 404 for a nonexistent website (45 ms)
+    √ blocks an outsider from reading the dimensions report of a foreign website (71 ms)
+    √ blocks an outsider from reading the events report of a foreign website (65 ms)
+    √ never returns raw event secret fields in the JSON report payloads (124 ms)
+    √ exports the pages report as CSV with the correct headers and content type (135 ms)
+    √ exported page CSV rows match the JSON pages-report data (139 ms)
+    √ exports the events report as CSV (268 ms)
+    √ exports a dimension report as CSV (93 ms)
+    √ neutralizes spreadsheet formula injection in exported CSV cells (126 ms)
+    √ never exports tracking keys, IP hashes, or private raw-event properties (63 ms)
+    √ rejects unauthenticated CSV export requests (21 ms)
+    √ blocks an outsider from exporting a foreign website CSV report (59 ms)
+    √ enforces the maximum CSV export date range of 90 days (86 ms)
+    √ bounds the CSV export at ANALYTICS_EXPORT_MAX_ROWS regardless of requested limit (87 ms)
+    √ rejects a limit above the DTO maximum on the export route too (68 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       46 passed, 46 total
+Snapshots:   0 total
+Time:        17.378 s, estimated 19 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase13-analytics-reports.e2e-spec.ts".
+
+PASS phase13-analytics-reports.e2e-spec.ts (20s)
+
+========================================================================
+[60/81] phase14-analytics-processing.e2e-spec.ts
+========================================================================
+(node:22344) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/phase14-analytics-processing.e2e-spec.ts (13.331 s)
+  Phase 14 Analytics Processing E2E
+    √ rejects anonymous access to the status endpoint (41 ms)
+    √ allows a VIEWER to read processing status (no role restriction on GET status) (281 ms)
+    √ blocks an outsider from reading another workspace processing status (57 ms)
+    √ rejects a VIEWER triggering manual reprocessing (requires OWNER or ADMIN) (75 ms)
+    √ rejects a DEVELOPER triggering manual reprocessing (requires OWNER or ADMIN) (62 ms)
+    √ rejects an outsider triggering manual reprocessing on a foreign website (44 ms)
+    √ reports zero pending events, zero dead letters, and no runs for a fresh website (113 ms)
+    √ reports canReprocess=false for a VIEWER (140 ms)
+    √ counts pending (unprocessed) raw events for the requested website (136 ms)
+    √ returns 404 for a nonexistent website (68 ms)
+    √ rejects a reprocess request where to <= from (74 ms)
+    √ rejects a reprocess request exceeding the maximum of 31 days (64 ms)
+    √ rejects a reprocess request with a malformed date (62 ms)
+    √ rejects a reprocess request missing required fields (58 ms)
+    √ queues a manual processing run and persists it with QUEUED status (194 ms)
+    √ returns the same run when the identical range is queued twice (idempotent enqueue) (393 ms)
+    √ claims and successfully processes a queued analytics run (643 ms)
+    √ rejects retry from a VIEWER (requires OWNER or ADMIN) (107 ms)
+    √ rejects retry for a run that is not dead-lettered (96 ms)
+    √ retries a dead-lettered run: creates a new QUEUED run and resolves the dead letter (142 ms)
+    √ prevents retrying a dead-lettered run from another workspace (163 ms)
+    √ never mixes pending-event counts or runs between two different websites (81 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       22 passed, 22 total
+Snapshots:   0 total
+Time:        13.88 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase14-analytics-processing.e2e-spec.ts".
+
+PASS phase14-analytics-processing.e2e-spec.ts (17s)
+
+========================================================================
+[61/81] phase15-monitoring.e2e-spec.ts
+========================================================================
+(node:18004) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/phase15-monitoring.e2e-spec.ts (14.49 s)
+  Phase 15 Monitoring E2E
+    √ rejects anonymous access to list checks (35 ms)
+    √ creates an APPLICATION health check as OWNER and persists the full configuration (216 ms)
+    √ creates a WEBSITE health check (115 ms)
+    √ lists checks scoped to the workspace (121 ms)
+    √ retrieves a single check by id (201 ms)
+    √ updates a check and reflects the new configuration (250 ms)
+    √ disables a check via PATCH { enabled: false } and auto-resolves its open incident (178 ms)
+    √ returns 404 for a nonexistent check (43 ms)
+    √ rejects an invalid (malformed) URL (44 ms)
+    √ rejects a URL without a protocol (35 ms)
+    √ rejects an interval below the minimum of 60 seconds (33 ms)
+    √ rejects an interval above the maximum of 86400 seconds (42 ms)
+    √ rejects a timeout below the minimum of 1000ms (34 ms)
+    √ rejects a timeout above the maximum of 30000ms (32 ms)
+    √ rejects expectedStatusMax below expectedStatusMin (51 ms)
+    √ rejects degradedAfterMs greater than timeoutMs (37 ms)
+    √ rejects a malformed check ID (37 ms)
+    √ rejects an APPLICATION target check missing applicationId (46 ms)
+    √ rejects a check referencing an application from a different workspace (112 ms)
+    √ blocks the private/internal health-check destination: http://localhost:4000/health (localhost hostname) (38 ms)
+    √ blocks the private/internal health-check destination: http://127.0.0.1:4000/health (IPv4 loopback) (49 ms)
+    √ blocks the private/internal health-check destination: http://[::1]:4000/health (IPv6 loopback) (37 ms)
+    √ blocks the private/internal health-check destination: http://169.254.169.254/latest/meta-data/ (cloud metadata IP) (43 ms)
+    √ blocks the private/internal health-check destination: http://10.0.0.5/health (RFC1918 private range) (37 ms)
+    √ blocks the private/internal health-check destination: http://192.168.1.10/health (RFC1918 private range) (41 ms)
+    √ blocks the private/internal health-check destination: http://internal-service.internal/health (blocked .internal suffix) (51 ms)
+    √ blocks the private/internal health-check destination: http://box.local/health (blocked .local suffix) (44 ms)
+    √ blocks the private/internal health-check destination: http://host.docker.internal/health (blocked docker-internal hostname) (52 ms)
+    √ rejects a URL containing embedded credentials (47 ms)
+    √ rejects a non-HTTP(S) protocol (52 ms)
+    √ re-validates the URL on update when the URL changes, blocking a switch to a private target (155 ms)
+    √ allows a DEVELOPER to create and manage health checks (249 ms)
+    √ rejects a VIEWER creating a health check (157 ms)
+    √ rejects a VIEWER updating a health check (152 ms)
+    √ allows a VIEWER to read checks, history, and incidents (read-only access) (111 ms)
+    √ rejects a VIEWER manually running a health check (112 ms)
+    √ blocks an outsider from listing another workspace health checks (37 ms)
+    √ blocks an outsider from reading the monitoring summary (34 ms)
+    √ blocks an outsider from reading incidents (38 ms)
+    √ recording a failed health-check run: writes history, updates the check, and increments consecutiveFailures (176 ms)
+    √ rejects a VIEWER manually running a check even when other reads succeed (140 ms)
+    √ opens an incident once consecutive failures reach failureThreshold, and does not duplicate it on further failures (249 ms)
+    √ recovery: a successful run resolves the open incident with a timestamp (245 ms)
+    √ filters incidents by status (55 ms)
+    √ rejects an invalid incident status filter (38 ms)
+    √ never leaks environment variables, secrets, or credentials in health-check responses (103 ms)
+    √ history entries never include request/response headers or authentication material (179 ms)
+    √ filters checks by targetType (65 ms)
+    √ filters checks by enabled=false (60 ms)
+    √ filters checks by applicationId (64 ms)
+    √ gets the workspace-wide summary with correct roll-up counts (74 ms)
+    √ lists available monitoring targets (applications and websites) (56 ms)
+    √ returns a rolled-up application summary (56 ms)
+    √ returns 404 for an application summary of a nonexistent application (46 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       54 passed, 54 total
+Snapshots:   0 total
+Time:        14.837 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase15-monitoring.e2e-spec.ts".
+
+PASS phase15-monitoring.e2e-spec.ts (17s)
+
+========================================================================
+[62/81] phase16-releases-deployments.e2e-spec.ts
+========================================================================
+(node:11412) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:11412) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+PASS ../../packages/test-code/api/e2e/phase16-releases-deployments.e2e-spec.ts (23.92 s)
+  Phase 16 Releases & Deployments E2E
+    √ rejects anonymous access to list releases (36 ms)
+    √ creates a DRAFT release as OWNER when no scheduledAt is supplied (177 ms)
+    √ creates a SCHEDULED release when scheduledAt is supplied (108 ms)
+    √ lists releases scoped to the application (143 ms)
+    √ searches releases by version (114 ms)
+    √ retrieves a single release by id, including its (empty) deployment list (202 ms)
+    √ updates a DRAFT release, including its version (208 ms)
+    √ returns 404 for a nonexistent release (54 ms)
+    √ rejects creating a second release with a duplicate version for the same application (409) (376 ms)
+    √ allows the same version string across two DIFFERENT applications (108 ms)
+    √ rejects a version string that fails the pattern (spaces / invalid characters) (50 ms)
+    √ rejects changing the version of a release that is no longer DRAFT (956 ms)
+    √ creates a deployment in DRAFT status with attempt=1, and records a CREATED activity entry (267 ms)
+    √ increments the attempt number for a second deployment of the same release+environment (445 ms)
+    √ rejects a deployment referencing a release from a different application (139 ms)
+    √ rejects a deployment referencing an environment from a different application (201 ms)
+    √ returns 404 for a nonexistent deployment (94 ms)
+    √ walks the full valid DRAFT -> IN_PROGRESS -> SUCCESSFUL path with correct timestamps (604 ms)
+    √ rejects an invalid transition (DRAFT -> SUCCESSFUL is not a legal transition) (309 ms)
+    √ rejects transitioning a deployment to its own current status (365 ms)
+    √ rejects transitioning out of the terminal ROLLED_BACK status (1216 ms)
+    √ requires scheduledAt when transitioning to SCHEDULED (309 ms)
+    √ accepts a SCHEDULED transition when scheduledAt is provided (477 ms)
+    √ requires failureReason when transitioning to FAILED (502 ms)
+    √ records a FAILED deployment with its failure reason, then allows retry via IN_PROGRESS (741 ms)
+    √ rejects a rollback whose target belongs to a different environment (1209 ms)
+    √ rejects a rollback whose target is not SUCCESSFUL (743 ms)
+    √ rejects a deployment rolling back to itself (677 ms)
+    √ never returns a deployment whose environment belongs to a different application (140 ms)
+    √ getCurrentVersions resolves the effective version through a rollback correctly (1476 ms)
+    √ allows a DEVELOPER to create releases and deployments (99 ms)
+    √ rejects a VIEWER creating a release (58 ms)
+    √ rejects a VIEWER creating a deployment (163 ms)
+    √ rejects a VIEWER transitioning a deployment (298 ms)
+    √ allows a VIEWER to read releases and deployments (233 ms)
+    √ blocks an outsider from listing releases (57 ms)
+    √ blocks an outsider from creating a release (61 ms)
+    √ blocks an outsider from reading a specific deployment (328 ms)
+    √ filters deployments by environmentId (104 ms)
+    √ filters deployments by status (122 ms)
+    √ paginates deployments (108 ms)
+    √ rejects a transition whose precondition status no longer matches (optimistic concurrency) (391 ms)
+    √ preserves deployment history: transitions never delete or overwrite prior activity entries (593 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       43 passed, 43 total
+Snapshots:   0 total
+Time:        24.291 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase16-releases-deployments.e2e-spec.ts".
+
+PASS phase16-releases-deployments.e2e-spec.ts (26s)
+
+========================================================================
+[63/81] phase17-team-operations.e2e-spec.ts
+========================================================================
+(node:16568) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16568) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+PASS ../../packages/test-code/api/e2e/phase17-team-operations.e2e-spec.ts (18.446 s)
+  Phase 17 Team Operations E2E
+    √ rejects anonymous access to list invitations (42 ms)
+    √ allows an OWNER to create an invitation (246 ms)
+    √ allows an ADMIN to create an invitation (189 ms)
+    √ rejects a DEVELOPER creating an invitation (only OWNER/ADMIN may manage invitations) (58 ms)
+    √ rejects a DEVELOPER listing invitations (no read access for lower roles on this controller) (51 ms)
+    √ rejects an invalid email (61 ms)
+    √ rejects an invalid workspace role (57 ms)
+    √ rejects inviting an email that already belongs to a workspace member (409) (107 ms)
+    √ allows inviting an email belonging to an existing platform user who is not yet a member (376 ms)
+    √ lists invitations scoped to the workspace, filterable by status (88 ms)
+    √ rejects an invalid status filter (44 ms)
+    √ resends a pending invitation, rotating the token and incrementing sendCount (268 ms)
+    √ rejects resending an already-revoked invitation (299 ms)
+    √ returns 404 when revoking an invitation that is not pending (321 ms)
+    √ returns 404 for a nonexistent invitation id (66 ms)
+    √ rejects an invitation-management call scoped to a workspace the invitation does not belong to (547 ms)
+    √ allows anonymous preview of a pending invitation by token (157 ms)
+    √ returns 404 for an unknown/garbage token (20 ms)
+    √ requires authentication to accept an invitation (112 ms)
+    √ rejects accepting an invitation whose email does not match the authenticated user (157 ms)
+    √ accepts a matching invitation: creates the workspace membership with the invited role (439 ms)
+    √ rejects accepting the same invitation a second time (already consumed) (396 ms)
+    √ accepting an invitation when already a member does not duplicate membership or change role (156 ms)
+    √ requires authentication to decline an invitation (196 ms)
+    √ declines a matching invitation without creating a workspace membership (680 ms)
+    √ lazily expires a PENDING invitation once past expiresAt, surfacing EXPIRED on preview (231 ms)
+    √ rejects accepting an expired invitation with a 409 (472 ms)
+    √ enforces the invitation resend rate limit of 5 per 15 minutes (775 ms)
+    √ rejects anonymous access to notifications (18 ms)
+    √ lists only the authenticated user own notifications (66 ms)
+    √ reports an accurate unread count and reduces it after marking all as read (138 ms)
+    √ marks a single notification as read and persists readAt (98 ms)
+    √ rejects marking as read a notification that does not belong to the caller (102 ms)
+    √ returns 400 for a malformed notification id (41 ms)
+    √ filters notifications by type (63 ms)
+    √ rejects an invalid notification type filter (39 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       36 passed, 36 total
+Snapshots:   0 total
+Time:        18.85 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase17-team-operations.e2e-spec.ts".
+
+PASS phase17-team-operations.e2e-spec.ts (31s)
+
+========================================================================
+[64/81] phase18-webhook-integrations.e2e-spec.ts
+========================================================================
+(node:1112) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/phase18-webhook-integrations.e2e-spec.ts (16.982 s)
+  Phase 18 Webhook Integrations E2E
+    √ rejects anonymous access to list endpoints (23 ms)
+    √ creates a webhook endpoint as OWNER and returns the raw secret exactly once (185 ms)
+    √ lists endpoints scoped to the workspace, including the event catalog and canManage flag (116 ms)
+    √ updates an endpoint name and event subscriptions (227 ms)
+    √ disables an endpoint and cancels its pending/retry-scheduled deliveries (277 ms)
+    √ returns 404 for a nonexistent endpoint (57 ms)
+    √ rejects creating a duplicate endpoint name within the same workspace (409) (383 ms)
+    √ rejects a malformed URL (62 ms)
+    √ blocks the private/internal webhook destination: http://localhost:4000/hook (localhost hostname) (77 ms)
+    √ blocks the private/internal webhook destination: http://127.0.0.1:4000/hook (IPv4 loopback) (82 ms)
+    √ blocks the private/internal webhook destination: http://[::1]:4000/hook (IPv6 loopback) (84 ms)
+    √ blocks the private/internal webhook destination: http://169.254.169.254/latest/meta-data/ (cloud metadata IP) (80 ms)
+    √ blocks the private/internal webhook destination: http://10.0.0.5/hook (RFC1918 private range) (88 ms)
+    √ blocks the private/internal webhook destination: http://192.168.1.10/hook (RFC1918 private range) (83 ms)
+    √ blocks the private/internal webhook destination: http://internal-service.internal/hook (blocked .internal suffix) (63 ms)
+    √ blocks the private/internal webhook destination: http://box.local/hook (blocked .local suffix) (83 ms)
+    √ blocks the private/internal webhook destination: http://host.docker.internal/hook (blocked docker-internal hostname) (71 ms)
+    √ re-validates the URL on update when it changes, blocking a switch to a private target (180 ms)
+    √ rejects a non-HTTP(S) protocol (51 ms)
+    √ rejects an empty eventTypes array (84 ms)
+    √ rejects an invalid event type (59 ms)
+    √ rejects duplicate event types in the same subscription list (142 ms)
+    √ rejects manually subscribing to the reserved WEBHOOK_TEST event type (77 ms)
+    √ rejects timeoutMs outside the 1000-30000 range (146 ms)
+    √ rejects maxAttempts outside the 1-8 range (116 ms)
+    √ never includes the secret, ciphertext, or IV in the list response (271 ms)
+    √ rotates the secret, invalidating the previous one, and returns the new raw secret exactly once (202 ms)
+    √ never logs or echoes the secret in activity/error responses on a failed rotation attempt (82 ms)
+    √ produces a deterministic canonical signature for the same secret/timestamp/body (3 ms)
+    √ accepts a valid signature and rejects a tampered payload (2 ms)
+    √ rejects a signature verified with the wrong secret (1 ms)
+    √ rejects a signature computed against a different timestamp (replay protection input) (3 ms)
+    √ a manual test delivery creates a WEBHOOK_TEST event and a PENDING delivery row (252 ms)
+    √ rejects a test delivery to a disabled endpoint (171 ms)
+    √ lists deliveries including their attempt history, bounded response, and captured HTTP status (234 ms)
+    √ filters deliveries by status (212 ms)
+    √ paginates deliveries (289 ms)
+    √ never creates two delivery rows for the same (endpoint, event) pair (140 ms)
+    √ blocks an outsider from listing endpoints (41 ms)
+    √ blocks an outsider from creating an endpoint (46 ms)
+    √ blocks an outsider from reading another workspace deliveries (146 ms)
+    √ allows a DEVELOPER to create and manage webhooks (88 ms)
+    √ rejects a VIEWER creating an endpoint but allows reading (149 ms)
+    √ rejects a VIEWER rotating a secret or sending a test delivery (237 ms)
+    √ never exposes internal error stacks on a failed create request (92 ms)
+    √ rejects a webhook name exceeding the maximum length (73 ms)
+    √ rejects a URL exceeding the maximum length (68 ms)
+    √ rejects more than 20 event-type subscriptions (65 ms)
+    √ enforces the webhook secret rotation rate limit of 5 per hour (651 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       49 passed, 49 total
+Snapshots:   0 total
+Time:        17.454 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase18-webhook-integrations.e2e-spec.ts".
+
+PASS phase18-webhook-integrations.e2e-spec.ts (20s)
+
+========================================================================
+[65/81] phase19-repository-integrations.e2e-spec.ts
+========================================================================
+(node:27248) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/phase19-repository-integrations.e2e-spec.ts (34.449 s)
+  Phase 19 - Repository Integrations E2E
+    GitHub connection authorization
+      √ rejects anonymous GitHub connection attempts (1320 ms)
+      √ rejects a malformed workspace identifier (562 ms)
+      √ allows OWNER to start a GitHub App installation and stores only hashed state (632 ms)
+      √ allows ADMIN to start a GitHub connection (879 ms)
+      √ prevents DEVELOPER from starting a GitHub connection (843 ms)
+      √ prevents VIEWER from starting a GitHub connection (1041 ms)
+    GitHub setup and OAuth callback
+      √ rejects setup without authentication (499 ms)
+      √ rejects an unknown installation state (734 ms)
+      √ does not allow another user to consume an installation state (1004 ms)
+      √ creates OAuth authorization state without storing the raw state (758 ms)
+      √ rejects callback when the authenticated GitHub user cannot access the installation (811 ms)
+      √ persists the installation and repositories after a valid callback (1121 ms)
+      √ prevents OAuth callback replay after the intent has been consumed (842 ms)
+    Repository read, tenant isolation, linking, and sync
+      √ lists only repositories in the requested workspace (892 ms)
+      √ allows VIEWER to read repository metadata (1246 ms)
+      √ prevents an outsider from reading repository metadata (1242 ms)
+      √ returns 404 when a repository belongs to a different workspace (1586 ms)
+      √ links a repository to an application in the same workspace (1282 ms)
+      √ rejects linking a repository to an application from another workspace (1475 ms)
+      √ unlinks an application from a repository (1243 ms)
+      √ allows DEVELOPER to synchronize an already-connected repository (1351 ms)
+    Disconnect authorization and cascade behavior
+      √ prevents DEVELOPER from disconnecting a GitHub installation (1247 ms)
+      √ allows OWNER to disconnect an installation and removes its repositories (1165 ms)
+    GitHub webhook security and idempotency
+      √ rejects a webhook when GitHub delivery headers are missing (396 ms)
+      √ rejects a webhook with an invalid signature (517 ms)
+      √ accepts a correctly signed webhook and records the delivery (559 ms)
+      √ treats duplicate GitHub delivery IDs idempotently (489 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       27 passed, 27 total
+Snapshots:   0 total
+Time:        34.85 s, estimated 38 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase19-repository-integrations.e2e-spec.ts".
+
+PASS phase19-repository-integrations.e2e-spec.ts (37s)
+
+========================================================================
+[66/81] phase20-code-explorer.e2e-spec.ts
+========================================================================
+(node:16456) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/phase20-code-explorer.e2e-spec.ts (42.044 s)
+  Phase 20 - Code Explorer E2E
+    authorization and tenant isolation
+      √ rejects anonymous code access (2066 ms)
+      √ rejects an outsider who is not a workspace member (1337 ms)
+      √ returns 404 for a repository ID from another workspace (1338 ms)
+      √ allows VIEWER to use read-only Code Explorer endpoints (1602 ms)
+      √ rejects a malformed repository UUID (876 ms)
+    branches and tree
+      √ returns repository branches (1075 ms)
+      √ loads the recursive tree using the repository default branch (1079 ms)
+      √ forwards an explicit branch to GitHub (1175 ms)
+      √ preserves GitHub truncated-tree state (1170 ms)
+      √ rejects a blank branch after normalization (1119 ms)
+    repository search
+      √ searches repository paths case-insensitively (1287 ms)
+      √ caps search results at 100 entries (1028 ms)
+      √ rejects a blank search query (1038 ms)
+    file viewing and file safety
+      √ decodes a UTF-8 text file from GitHub base64 content (1092 ms)
+      √ returns image files as base64 image content (939 ms)
+      √ does not decode an arbitrary binary file as text (974 ms)
+      √ returns 404 when GitHub reports that a file does not exist (1304 ms)
+      √ rejects files larger than the Code Explorer limit (1256 ms)
+      √ rejects parent-directory traversal (1057 ms)
+      √ rejects absolute repository paths (1153 ms)
+      √ uses repository owner and name from the database instead of client input (1224 ms)
+    diff viewer
+      √ returns decoded text for both sides of a text diff (1184 ms)
+      √ supports a file that exists only on the base side (1019 ms)
+      √ returns 404 when the file is absent from both refs (1116 ms)
+      √ marks a binary comparison as non-text instead of decoding it (1348 ms)
+      √ rejects traversal paths before making either GitHub file request (1223 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       26 passed, 26 total
+Snapshots:   0 total
+Time:        42.419 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase20-code-explorer.e2e-spec.ts".
+
+PASS phase20-code-explorer.e2e-spec.ts (45s)
+
+========================================================================
+[67/81] phase21-github-workspace-import.e2e-spec.ts
+========================================================================
+(node:17976) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/phase21-github-workspace-import.e2e-spec.ts (22.033 s)
+  Phase 21 - GitHub Workspace Import E2E
+    Personal GitHub connect authorization
+      √ rejects an anonymous connect attempt (657 ms)
+      √ allows any authenticated user to begin a personal connect without an existing workspace (799 ms)
+      √ rejects the callback when the GitHub user cannot access the installation (599 ms)
+      √ never persists a raw GitHub user token (783 ms)
+    Repository listing
+      √ rejects listing repositories before GitHub is connected (740 ms)
+      √ lists repositories once the user has connected an installation (838 ms)
+    Repository analysis
+      √ rejects analyzing a repository the user has not connected (602 ms)
+      √ rejects analyzing a repository ID belonging to another installation the caller never connected (698 ms)
+      √ detects a single-app Next.js repository (668 ms)
+      √ detects a monorepo with an app and a library, and does not mark the library runnable (701 ms)
+      √ rejects a repository with no package.json (759 ms)
+      √ tolerates a malformed package.json in a nested package while still analyzing the rest (738 ms)
+    Workspace import transaction
+      √ rejects importing a repository through an installation the user never connected (566 ms)
+      √ creates a workspace, application, and repository connection atomically (1059 ms)
+      √ creates a separate workspace when the same repository is imported twice, avoiding silent duplicate application collisions (1507 ms)
+      √ rejects an import request with no selected applications (840 ms)
+      √ rolls back and creates nothing when the repository is no longer accessible mid-import (770 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       17 passed, 17 total
+Snapshots:   0 total
+Time:        22.719 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase21-github-workspace-import.e2e-spec.ts".
+
+PASS phase21-github-workspace-import.e2e-spec.ts (25s)
+
+========================================================================
+[68/81] raw-events.e2e-spec.ts
+========================================================================
+(node:24420) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/raw-events.e2e-spec.ts (19.238 s)
+  Raw Events E2E
+    √ lists raw events with pagination metadata (2149 ms)
+    √ filters by type and case-insensitive custom event name (1252 ms)
+    √ filters by visitor and session identifiers (1107 ms)
+    √ filters by occurred-at date range (1154 ms)
+    √ keeps raw events isolated between websites and workspaces (1766 ms)
+    √ rejects invalid raw-event query parameters (993 ms)
+    √ does not expose IP hashes, country codes, or user agents through the admin API (714 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       7 passed, 7 total
+Snapshots:   0 total
+Time:        19.897 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\raw-events.e2e-spec.ts".
+
+PASS raw-events.e2e-spec.ts (23s)
+
+========================================================================
+[69/81] tracker-analytics-processing.e2e-spec.ts
+========================================================================
+(node:25240) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/tracker-analytics-processing.e2e-spec.ts (12.399 s)
+  Tracker -> Analytics Processing E2E
+    √ processes a Tracker-compatible PAGE_VIEW, HEARTBEAT, and CUSTOM batch into analytics records (5255 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+Snapshots:   0 total
+Time:        13.12 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\tracker-analytics-processing.e2e-spec.ts".
+
+PASS tracker-analytics-processing.e2e-spec.ts (16s)
+
+========================================================================
+[70/81] tracker-bundle-integration.e2e-spec.ts
+========================================================================
+(node:21944) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/tracker-bundle-integration.e2e-spec.ts (14.089 s)
+  Actual Tracker Bundle -> API -> Analytics E2E
+    √ executes the built Tracker bundle and processes its real HTTP payload end to end (5474 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+Snapshots:   0 total
+Time:        14.551 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\tracker-bundle-integration.e2e-spec.ts".
+
+PASS tracker-bundle-integration.e2e-spec.ts (18s)
+
+========================================================================
+[71/81] tracker-production-bootstrap.e2e-spec.ts
+========================================================================
+(node:27300) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/tracker-production-bootstrap.e2e-spec.ts (16.993 s)
+  Tracker -> Production HTTP Bootstrap E2E
+    √ accepts a real Tracker text/plain request through the production HTTP pipeline (4484 ms)
+    √ rejects Tracker requests whose Origin is not allowed for the website (2274 ms)
+    √ does not expose normal API responses to arbitrary browser origins (1591 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       3 passed, 3 total
+Snapshots:   0 total
+Time:        17.609 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\tracker-production-bootstrap.e2e-spec.ts".
+
+PASS tracker-production-bootstrap.e2e-spec.ts (21s)
+
+========================================================================
+[72/81] tracker-transport.e2e-spec.ts
+========================================================================
+(node:22860) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/tracker-transport.e2e-spec.ts (13.149 s)
+  Tracker -> API Transport E2E
+    √ accepts the Tracker text/plain wire format and persists the event (1737 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+Snapshots:   0 total
+Time:        13.825 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\tracker-transport.e2e-spec.ts".
+
+PASS tracker-transport.e2e-spec.ts (17s)
+
+========================================================================
+[73/81] tracking-admin.e2e-spec.ts
+========================================================================
+(node:24272) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/tracking-admin.e2e-spec.ts (16.652 s)
+  Tracking Admin E2E
+    √ returns empty tracking status before the first event (1745 ms)
+    √ returns grouped counts and at most five recent events (1121 ms)
+    √ allows VIEWER to inspect tracking status (1449 ms)
+    √ prevents outsider and anonymous tracking-admin access (1257 ms)
+    √ rejects malformed, unknown, and foreign website IDs (1640 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        17.16 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\tracking-admin.e2e-spec.ts".
+
+PASS tracking-admin.e2e-spec.ts (20s)
+
+========================================================================
+[74/81] webhook-delivery-worker.e2e-spec.ts
+========================================================================
+(node:5016) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/webhook-delivery-worker.e2e-spec.ts (9.786 s)
+  Webhook Delivery Worker E2E
+    √ schedules a retry with attemptNumber incremented and nextAttemptAt in the future on a retriable failure (276 ms)
+    √ follows the exponential backoff formula (base * 2^(attemptNumber-1), capped at the max delay) for a later attempt (102 ms)
+    √ caps the backoff delay at WEBHOOK_RETRY_MAX_DELAY_MS for a high attempt number (80 ms)
+    √ transitions to SUCCEEDED when a retry-scheduled delivery succeeds (83 ms)
+    √ dead-letters the delivery once attemptNumber reaches maxAttempts and the attempt still fails (88 ms)
+    √ does not retry a non-retriable failure even with attempts remaining (dead-letters immediately) (63 ms)
+    √ does not double-process the same due delivery when invoked twice concurrently (146 ms)
+    √ cancels a delivery for a disabled endpoint instead of attempting delivery or retry (45 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        10.55 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\webhook-delivery-worker.e2e-spec.ts".
+
+PASS webhook-delivery-worker.e2e-spec.ts (13s)
+
+========================================================================
+[75/81] website-activity.e2e-spec.ts
+========================================================================
+(node:16676) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16676) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+PASS ../../packages/test-code/api/e2e/website-activity.e2e-spec.ts (13.742 s)
+  Website Activity E2E
+    √ writes activity for website creation and update (1868 ms)
+    √ writes activity for state, connection, and key-management actions (1690 ms)
+    √ does not write activity for rejected validation (922 ms)
+    √ keeps website activity isolated across workspaces (1384 ms)
+    √ does not expose raw tracking keys or authentication secrets in activity (1013 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        14.113 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\website-activity.e2e-spec.ts".
+
+PASS website-activity.e2e-spec.ts (16s)
+
+========================================================================
+[76/81] website-environments.e2e-spec.ts
+========================================================================
+(node:19768) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:19768) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+PASS ../../packages/test-code/api/e2e/website-environments.e2e-spec.ts (27.315 s)
+  Website Operational State E2E
+    √ disables and enables a website (4702 ms)
+    √ archives and restores a website (2758 ms)
+    √ rejects regular mutations while archived (2699 ms)
+    √ rotates the tracking key and returns a new raw key (2598 ms)
+    √ connects and disconnects a website from an application (2905 ms)
+    √ rejects connection to a foreign or invalid application (3306 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       6 passed, 6 total
+Snapshots:   0 total
+Time:        27.795 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\website-environments.e2e-spec.ts".
+
+PASS website-environments.e2e-spec.ts (30s)
+
+========================================================================
+[77/81] website-roles.e2e-spec.ts
+========================================================================
+(node:27188) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27188) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+PASS ../../packages/test-code/api/e2e/website-roles.e2e-spec.ts (34.755 s)
+  Website Roles E2E
+    √ allows OWNER, ADMIN, and DEVELOPER to create and update websites (7173 ms)
+    √ allows OWNER, ADMIN, and DEVELOPER to connect and disconnect websites (4407 ms)
+    √ allows VIEWER to read but prevents website mutations (4074 ms)
+    √ allows OWNER and ADMIN to archive, restore, and rotate keys (3935 ms)
+    √ prevents DEVELOPER from archive, restore, and key rotation (3573 ms)
+    √ prevents outsider and anonymous access (3824 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       6 passed, 6 total
+Snapshots:   0 total
+Time:        35.288 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\website-roles.e2e-spec.ts".
+
+PASS website-roles.e2e-spec.ts (38s)
+
+========================================================================
+[78/81] websites.e2e-spec.ts
+========================================================================
+(node:19476) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/websites.e2e-spec.ts (29.314 s)
+  Websites E2E
+    √ creates a website and normalizes its domain (4022 ms)
+    √ creates a website using only required fields and applies defaults (2245 ms)
+    √ rejects invalid domains and invalid DTO fields (2795 ms)
+    √ rejects duplicate domains within a workspace but allows them across workspaces (2595 ms)
+    √ updates website configuration (2341 ms)
+    √ supports search, enabled filtering, and pagination (3032 ms)
+    √ prevents cross-workspace website access (2433 ms)
+    √ rejects malformed and unknown website IDs (1773 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        30.094 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\websites.e2e-spec.ts".
+
+PASS websites.e2e-spec.ts (33s)
+
+========================================================================
+[79/81] workspace-members.e2e-spec.ts
+========================================================================
+(node:20492) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/workspace-members.e2e-spec.ts (29.527 s)
+  Workspace Members E2E
+    √ lists the workspace owner and added members (4476 ms)
+    √ uses VIEWER as the default role when role is omitted (2585 ms)
+    √ returns 404 when adding an unregistered email (1988 ms)
+    √ rejects duplicate workspace membership (2386 ms)
+    √ allows the owner to update a member role (2621 ms)
+    √ allows the owner to remove a member and immediately revokes access (2832 ms)
+    √ rejects a foreign user ID when updating a workspace member (2716 ms)
+    √ rejects malformed member role values (2151 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        30.282 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\workspace-members.e2e-spec.ts".
+
+PASS workspace-members.e2e-spec.ts (33s)
+
+========================================================================
+[80/81] workspace-roles.e2e-spec.ts
+========================================================================
+(node:6444) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/workspace-roles.e2e-spec.ts (42.447 s)
+  Workspace Roles and Ownership E2E
+    √ allows OWNER and ADMIN to update a workspace (4944 ms)
+    √ prevents DEVELOPER and VIEWER from updating a workspace (3519 ms)
+    √ prevents DEVELOPER and VIEWER from adding members (3500 ms)
+    √ allows ADMIN to manage non-owner members but not create another OWNER (3159 ms)
+    √ prevents ADMIN from changing or removing the workspace OWNER (2669 ms)
+    √ allows OWNER to transfer ownership to an existing member (2532 ms)
+    √ prevents ADMIN from transferring workspace ownership (2491 ms)
+    √ rejects ownership transfer to a user who is not a workspace member (2529 ms)
+    √ prevents the only OWNER from being demoted or removed (1968 ms)
+    √ prevents members from managing a foreign workspace (2445 ms)
+    √ creates exactly one OWNER membership matching workspace.ownerId on workspace creation (DB-03) (2007 ms)
+    √ keeps ownership transfer isolated to the target workspace (DB-03) (2921 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       12 passed, 12 total
+Snapshots:   0 total
+Time:        43.007 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\workspace-roles.e2e-spec.ts".
+
+PASS workspace-roles.e2e-spec.ts (46s)
+
+========================================================================
+[81/81] workspaces.e2e-spec.ts
+========================================================================
+(node:25976) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/workspaces.e2e-spec.ts (21.436 s)
+  Workspaces E2E
+    √ creates an additional workspace for an authenticated user (4479 ms)
+    √ lists multiple explicitly created workspaces (2302 ms)
+    √ rejects anonymous workspace creation (2088 ms)
+    √ rejects invalid workspace names (1899 ms)
+    √ prevents a user from accessing another workspace applications (2529 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        21.896 s
+Ran all test suites within paths "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\workspaces.e2e-spec.ts".
+
+PASS workspaces.e2e-spec.ts (25s)
+
+========================================================================
+API E2E SUMMARY
+========================================================================
+PASS       19s  activity.e2e-spec.ts
+PASS       27s  analytics-aggregates.e2e-spec.ts
+PASS       24s  analytics-engine-processing.e2e-spec.ts
+PASS       22s  analytics-engine-status.e2e-spec.ts
+PASS       23s  analytics-ingestion-rate-limit.e2e-spec.ts
+PASS       23s  analytics-ingestion-security.e2e-spec.ts
+PASS       18s  analytics-ingestion.e2e-spec.ts
+PASS       23s  analytics-late-events.e2e-spec.ts
+PASS       22s  analytics-pageviews.e2e-spec.ts
+PASS       22s  analytics-reprocessing.e2e-spec.ts
+PASS       25s  analytics-retention.e2e-spec.ts
+PASS       25s  analytics-sessions.e2e-spec.ts
+PASS       22s  analytics-timezones.e2e-spec.ts
+PASS       22s  analytics-visitors.e2e-spec.ts
+PASS       22s  application-links.e2e-spec.ts
+PASS       33s  application-roles.e2e-spec.ts
+PASS       19s  application-technologies.e2e-spec.ts
+PASS       24s  applications.e2e-spec.ts
+PASS       23s  auth-rate-limit.e2e-spec.ts
+PASS       28s  auth.e2e-spec.ts
+PASS       22s  desktop-ai-analysis.e2e-spec.ts
+PASS       26s  desktop-alerts.e2e-spec.ts
+PASS     1m 0s  desktop-apps.e2e-spec.ts
+PASS       24s  desktop-build-artifacts.e2e-spec.ts
+PASS       30s  desktop-builds.e2e-spec.ts
+PASS       38s  desktop-foundation.e2e-spec.ts
+PASS       26s  desktop-full-flow.e2e-spec.ts
+PASS       20s  desktop-overview.e2e-spec.ts
+PASS       23s  desktop-performance.e2e-spec.ts
+PASS       24s  desktop-project-detection.e2e-spec.ts
+PASS       51s  desktop-releases.e2e-spec.ts
+PASS       38s  desktop-repository-linking.e2e-spec.ts
+PASS       20s  desktop-security-health.e2e-spec.ts
+PASS       27s  desktop-security.e2e-spec.ts
+PASS       31s  desktop-telemetry.e2e-spec.ts
+PASS       26s  desktop-tests.e2e-spec.ts
+PASS       24s  development-activity.e2e-spec.ts
+PASS       26s  development-progress.e2e-spec.ts
+PASS       27s  development-roles.e2e-spec.ts
+PASS       33s  development.e2e-spec.ts
+PASS       18s  github-connect-intent-cleanup.e2e-spec.ts
+FAIL       26s  infrastructure.e2e-spec.ts
+PASS       18s  mobile-ai-analysis.e2e-spec.ts
+PASS       27s  mobile-alerts.e2e-spec.ts
+PASS       41s  mobile-apps.e2e-spec.ts
+PASS       27s  mobile-builds.e2e-spec.ts
+PASS       21s  mobile-foundation.e2e-spec.ts
+PASS       17s  mobile-full-flow.e2e-spec.ts
+PASS       24s  mobile-ios-performance.e2e-spec.ts
+PASS       28s  mobile-overview.e2e-spec.ts
+PASS       21s  mobile-performance.e2e-spec.ts
+PASS       20s  mobile-project-detection.e2e-spec.ts
+PASS       29s  mobile-releases.e2e-spec.ts
+PASS       29s  mobile-repository-linking.e2e-spec.ts
+PASS       51s  mobile-security.e2e-spec.ts
+PASS       36s  mobile-telemetry.e2e-spec.ts
+PASS       28s  mobile-tests.e2e-spec.ts
+PASS       29s  mobile-unified-performance.e2e-spec.ts
+PASS       20s  phase13-analytics-reports.e2e-spec.ts
+PASS       17s  phase14-analytics-processing.e2e-spec.ts
+PASS       17s  phase15-monitoring.e2e-spec.ts
+PASS       26s  phase16-releases-deployments.e2e-spec.ts
+PASS       31s  phase17-team-operations.e2e-spec.ts
+PASS       20s  phase18-webhook-integrations.e2e-spec.ts
+PASS       37s  phase19-repository-integrations.e2e-spec.ts
+PASS       45s  phase20-code-explorer.e2e-spec.ts
+PASS       25s  phase21-github-workspace-import.e2e-spec.ts
+PASS       23s  raw-events.e2e-spec.ts
+PASS       16s  tracker-analytics-processing.e2e-spec.ts
+PASS       18s  tracker-bundle-integration.e2e-spec.ts
+PASS       21s  tracker-production-bootstrap.e2e-spec.ts
+PASS       17s  tracker-transport.e2e-spec.ts
+PASS       20s  tracking-admin.e2e-spec.ts
+PASS       13s  webhook-delivery-worker.e2e-spec.ts
+PASS       16s  website-activity.e2e-spec.ts
+PASS       30s  website-environments.e2e-spec.ts
+PASS       38s  website-roles.e2e-spec.ts
+PASS       33s  websites.e2e-spec.ts
+PASS       33s  workspace-members.e2e-spec.ts
+PASS       46s  workspace-roles.e2e-spec.ts
+PASS       25s  workspaces.e2e-spec.ts
+========================================================================
+Suites : 81
+Passed : 80
+Failed : 1
+Time   : 35m 39s
+========================================================================
+
+Failed suites:
+ - infrastructure.e2e-spec.ts
+
+Overall: FAIL
+
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @command-center/api-tests@0.1.0 test:e2e: `node scripts/run-e2e-isolated.mjs`
+Exit status 1
+FULL E2E EXIT CODE: 1

@@ -1,0 +1,2449 @@
+
+====================================================================================================
+API TYPECHECK
+====================================================================================================
+$ tsc -p tsconfig.json --noEmit
+
+EXIT CODE: 0
+
+====================================================================================================
+API TEST TYPECHECK
+====================================================================================================
+$ tsc -p tsconfig.json --noEmit
+
+EXIT CODE: 0
+
+====================================================================================================
+REMAINING EXPRESS IMPORTS
+====================================================================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\middleware\request-id.middleware.ts:1: import type { NextFunction, Request, Response } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-engine\controllers\analytics-engine.controller.ts:10: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-ingestion\controllers\analytics-ingestion.controller.ts:7: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-reports\controllers\analytics-reports.controller.ts:8: import type { Response } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\applications\controllers\applications.controller.ts:11: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-analysis.controller.ts:9: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-apps.controller.ts:9: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\controllers\desktop-security.controller.ts:8: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\development\controllers\development.controller.ts:27: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\controllers\mobile-analysis.controller.ts:9: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\controllers\mobile-apps.controller.ts:9: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\controllers\mobile-security.controller.ts:6: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\controllers\github-connect.controller.ts:9: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\controllers\github-webhook.controller.ts:5: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\team-operations\controllers\invitation-response.controller.ts:6: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\team-operations\controllers\notifications.controller.ts:6: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\team-operations\controllers\workspace-invitations.controller.ts:12: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\websites\controllers\websites.controller.ts:9: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\workspace\controllers\workspace-creation.controller.ts:6: import type { Request } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase19-repository-integrations.e2e-spec.ts:8: import { json, raw, urlencoded } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase21-github-workspace-import.e2e-spec.ts:8: import { json, urlencoded } from 'express';
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\unit\common\middleware\request-id.middleware.spec.ts:1: import type { NextFunction, Request, Response } from 'express';
+
+====================================================================================================
+REMAINING EXPRESS RUNTIME METHODS
+====================================================================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\middleware\request-id.middleware.ts:42: response.setHeader(REQUEST_ID_HEADER, requestId);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-ingestion\controllers\analytics-ingestion.controller.ts:27: ipAddress: request.ip ?? request.socket.remoteAddress,
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-reports\controllers\analytics-reports.controller.ts:159: response.setHeader('Content-Type', 'text/csv; charset=utf-8');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-reports\controllers\analytics-reports.controller.ts:161: response.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-reports\controllers\analytics-reports.controller.ts:163: response.setHeader('Cache-Control', 'no-store');
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\analysis\desktop-analysis.provider.ts:43: const data = (await response.json()) as { text?: unknown };
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\desktop-apps\telemetry\normalized-http-desktop-telemetry.provider.ts:65: raw = await response.json();
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\analysis\mobile-analysis.provider.ts:43: const data = (await response.json()) as {
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\mobile-apps\telemetry\provider-http.service.ts:42: return (await response.json()) as T;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\repositories\services\github-app.service.ts:148: const data = (await response.json()) as GithubOauthResponse;
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase21-github-workspace-import.e2e-spec.ts:141: app.use(json({ limit: '1mb' }));
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\phase21-github-workspace-import.e2e-spec.ts:142: app.use(urlencoded({ extended: true, limit: '1mb' }));
+
+====================================================================================================
+FILE: apps/api/src/common/middleware/request-id.middleware.ts
+====================================================================================================
+import type { NextFunction, Request, Response } from 'express';
+import { randomUUID } from 'node:crypto';
+
+export const REQUEST_ID_HEADER = 'x-request-id';
+
+export interface RequestWithId extends Request {
+  requestId: string;
+}
+
+/*
+ * This value is echoed into the response header, embedded verbatim into
+ * JSON error bodies, and written into application logs on 500-level errors
+ * (see AllExceptionsFilter) — all before any other validation runs. A
+ * client-supplied value must therefore be bounded and restricted to a safe
+ * character set so it can't carry newlines/control characters (log
+ * injection) or be used to send an oversized value.
+ */
+const MAX_REQUEST_ID_LENGTH = 128;
+const VALID_REQUEST_ID_PATTERN = /^[A-Za-z0-9:_-]+$/;
+
+function getExistingRequestId(value: string | string[] | undefined): string | undefined {
+  const rawValue = Array.isArray(value) ? value[0] : value;
+  const normalizedValue = rawValue?.trim();
+
+  if (!normalizedValue) {
+    return undefined;
+  }
+
+  if (normalizedValue.length > MAX_REQUEST_ID_LENGTH || !VALID_REQUEST_ID_PATTERN.test(normalizedValue)) {
+    return undefined;
+  }
+
+  return normalizedValue;
+}
+
+export function requestIdMiddleware(request: Request, response: Response, next: NextFunction): void {
+  const existingRequestId = getExistingRequestId(request.headers[REQUEST_ID_HEADER]);
+  const requestId = existingRequestId ?? randomUUID();
+
+  (request as RequestWithId).requestId = requestId;
+
+  response.setHeader(REQUEST_ID_HEADER, requestId);
+
+  next();
+}
+
+
+====================================================================================================
+FILE: packages/test-code/api/unit/common/middleware/request-id.middleware.spec.ts
+====================================================================================================
+import type { NextFunction, Request, Response } from 'express';
+import { REQUEST_ID_HEADER, requestIdMiddleware, type RequestWithId } from 'src/common/middleware/request-id.middleware';
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function run(headerValue?: string | string[]): {
+  request: RequestWithId;
+  setHeader: jest.Mock;
+  next: NextFunction;
+} {
+  const request = {
+    headers: headerValue === undefined ? {} : { [REQUEST_ID_HEADER]: headerValue },
+  } as unknown as RequestWithId;
+  const setHeader = jest.fn();
+  const response = {
+    setHeader,
+  } as unknown as Response;
+  const next = jest.fn() as unknown as NextFunction;
+
+  requestIdMiddleware(request as Request, response, next);
+
+  return { request, setHeader, next };
+}
+
+describe('requestIdMiddleware', () => {
+  it('generates a UUID when no header is supplied', () => {
+    const { request } = run();
+
+    expect(request.requestId).toMatch(UUID_PATTERN);
+  });
+
+  it('mirrors the id onto the response header', () => {
+    const { request, setHeader } = run();
+
+    expect(setHeader).toHaveBeenCalledWith(REQUEST_ID_HEADER, request.requestId);
+  });
+
+  it('always calls next', () => {
+    const { next } = run();
+
+    expect(next).toHaveBeenCalledTimes(1);
+  });
+
+  it('reuses a client supplied id', () => {
+    const { request } = run('client-id-1');
+
+    expect(request.requestId).toBe('client-id-1');
+  });
+
+  it('trims a client supplied id', () => {
+    const { request } = run('  client-id-2  ');
+
+    expect(request.requestId).toBe('client-id-2');
+  });
+
+  it('generates a fresh id when the header is blank', () => {
+    const { request } = run('   ');
+
+    expect(request.requestId).toMatch(UUID_PATTERN);
+  });
+
+  it('takes the first entry when the header repeats', () => {
+    const { request } = run(['first-id', 'second-id']);
+
+    expect(request.requestId).toBe('first-id');
+  });
+
+  it('generates a fresh id when the repeated header is blank', () => {
+    const { request } = run(['   ', 'second-id']);
+
+    expect(request.requestId).toMatch(UUID_PATTERN);
+  });
+
+  it('generates a fresh id for an empty header array', () => {
+    const { request } = run([]);
+
+    expect(request.requestId).toMatch(UUID_PATTERN);
+  });
+
+  it('issues distinct ids across requests', () => {
+    expect(run().request.requestId).not.toBe(run().request.requestId);
+  });
+
+  describe('input hardening (bounded length + safe character set)', () => {
+    it('generates a fresh id when the client value exceeds the maximum length', () => {
+      const { request } = run('a'.repeat(129));
+
+      expect(request.requestId).toMatch(UUID_PATTERN);
+    });
+
+    it('accepts a client value at exactly the maximum length', () => {
+      const maxLengthId = 'a'.repeat(128);
+      const { request } = run(maxLengthId);
+
+      expect(request.requestId).toBe(maxLengthId);
+    });
+
+    it('generates a fresh id when the client value contains a newline (log injection attempt)', () => {
+      const { request } = run('legit-id\nFAKE LOG LINE: admin escalated');
+
+      expect(request.requestId).toMatch(UUID_PATTERN);
+    });
+
+    it('generates a fresh id when the client value contains control characters', () => {
+      const { request } = run('legit-id [31m');
+
+      expect(request.requestId).toMatch(UUID_PATTERN);
+    });
+
+    it('generates a fresh id when the client value contains spaces or other disallowed characters', () => {
+      const { request } = run('not a valid id!');
+
+      expect(request.requestId).toMatch(UUID_PATTERN);
+    });
+
+    it('preserves a valid UUID-shaped client id unchanged', () => {
+      const validId = '11111111-2222-3333-4444-555555555555';
+      const { request } = run(validId);
+
+      expect(request.requestId).toBe(validId);
+    });
+
+    it('preserves a valid colon-delimited trace-id-shaped client id unchanged', () => {
+      const validId = 'trace-id:span-id:1';
+      const { request } = run(validId);
+
+      expect(request.requestId).toBe(validId);
+    });
+  });
+});
+
+
+====================================================================================================
+FILE: apps/api/src/modules/analytics-engine/controllers/analytics-engine.controller.ts
+====================================================================================================
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { WorkspaceRoles } from '../../workspace/decorators/workspace-roles.decorator';
+import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
+import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
+import { AnalyticsAggregateQueryDto, ProcessAnalyticsDto, ReprocessAnalyticsDto } from '../dto/analytics-engine.dto';
+import { AnalyticsEngineQueryService } from '../services/analytics-engine-query.service';
+import { AnalyticsProcessingService } from '../services/analytics-processing.service';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import type { Request } from 'express';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
+
+interface AuthenticatedRequest extends Request {
+  user: {
+    id: string;
+  };
+}
+
+const WRITE_ROLES = [WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER];
+const ADMIN_ROLES = [WorkspaceRole.OWNER, WorkspaceRole.ADMIN];
+
+@ApiTags('Analytics Engine')
+@ApiBearerAuth('access-token')
+@Controller('workspaces/:workspaceId/websites/:websiteId/analytics-engine')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard, WorkspaceRolesGuard)
+export class AnalyticsEngineController {
+  constructor(
+    private readonly queryService: AnalyticsEngineQueryService,
+
+    private readonly processingService: AnalyticsProcessingService,
+  ) {}
+
+  @Get('status')
+  @ApiOperation({
+    summary: 'Get analytics-engine processing status',
+  })
+  getStatus(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('websiteId', ParseUUIDPipe)
+    websiteId: string,
+  ) {
+    return this.queryService.getStatus(workspaceId, websiteId);
+  }
+
+  @Get('aggregates')
+  @ApiOperation({
+    summary: 'Inspect hourly or daily aggregates',
+  })
+  getAggregates(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('websiteId', ParseUUIDPipe)
+    websiteId: string,
+
+    @Query()
+    query: AnalyticsAggregateQueryDto,
+  ) {
+    return this.queryService.listAggregates(workspaceId, websiteId, query);
+  }
+
+  @Post('process')
+  @WorkspaceRoles(...WRITE_ROLES)
+  async process(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('websiteId', ParseUUIDPipe)
+    websiteId: string,
+
+    @Body()
+    dto: ProcessAnalyticsDto,
+  ) {
+    const run = await this.processingService.processForWorkspace(workspaceId, websiteId, request.user.id, dto.maxEvents);
+    const status = await this.queryService.getStatus(workspaceId, websiteId);
+
+    return {
+      run,
+      status,
+    };
+  }
+
+  @Post('reprocess')
+  @WorkspaceRoles(...ADMIN_ROLES)
+  async reprocess(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('websiteId', ParseUUIDPipe)
+    websiteId: string,
+
+    @Body()
+    dto: ReprocessAnalyticsDto,
+  ) {
+    const run = await this.processingService.reprocessRange(workspaceId, websiteId, dto, request.user.id);
+    const status = await this.queryService.getStatus(workspaceId, websiteId);
+
+    return {
+      run,
+      status,
+    };
+  }
+
+  @Post('retention')
+  @WorkspaceRoles(...ADMIN_ROLES)
+  runRetention(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('websiteId', ParseUUIDPipe)
+    websiteId: string,
+  ) {
+    return this.processingService.runRetention(workspaceId, websiteId);
+  }
+}
+
+
+====================================================================================================
+FILE: apps/api/src/modules/analytics-ingestion/controllers/analytics-ingestion.controller.ts
+====================================================================================================
+import { SharedRateLimit } from '../../../common/rate-limit/shared-rate-limit.decorator';
+import { SharedRateLimitGuard } from '../../../common/rate-limit/shared-rate-limit.guard';
+import { Public } from '../../auth/decorators/public.decorator';
+import { AnalyticsIngestionService } from '../services/analytics-ingestion.service';
+import { Body, Controller, Headers, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
+import { ApiExcludeController } from '@nestjs/swagger';
+import type { Request } from 'express';
+
+@ApiExcludeController()
+@Public()
+@Controller('collect')
+@UseGuards(SharedRateLimitGuard)
+@SharedRateLimit({
+  scope: 'analytics-ingestion',
+  limit: 120,
+  windowSeconds: 60,
+})
+export class AnalyticsIngestionController {
+  constructor(private readonly ingestionService: AnalyticsIngestionService) {}
+
+  @Post()
+  @HttpCode(202)
+  collect(@Body() body: unknown, @Headers('origin') origin: string | undefined, @Headers('user-agent') userAgent: string | undefined, @Req() request: Request) {
+    return this.ingestionService.collect(body, {
+      origin,
+      userAgent,
+      ipAddress: request.ip ?? request.socket.remoteAddress,
+    });
+  }
+}
+
+
+====================================================================================================
+FILE: apps/api/src/modules/analytics-reports/controllers/analytics-reports.controller.ts
+====================================================================================================
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
+import { AnalyticsReportDimension, DimensionReportQueryDto, EventReportQueryDto, PageReportQueryDto } from '../dto/analytics-report-query.dto';
+import { DimensionReportResponseDto, EventReportResponseDto, PageReportResponseDto } from '../dto/analytics-report-response.dto';
+import { AnalyticsReportsService } from '../services/analytics-reports.service';
+import { Controller, Get, Param, ParseEnumPipe, ParseUUIDPipe, Query, Res, StreamableFile, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiProduces, ApiTags } from '@nestjs/swagger';
+import type { Response } from 'express';
+
+@ApiTags('Analytics Reports')
+@ApiBearerAuth('access-token')
+@Controller('workspaces/:workspaceId/websites/:websiteId/analytics/reports')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard)
+export class AnalyticsReportsController {
+  constructor(private readonly analyticsReportsService: AnalyticsReportsService) {}
+
+  @Get('pages')
+  @ApiOperation({
+    summary: 'Get the detailed pages report',
+  })
+  @ApiOkResponse({
+    type: PageReportResponseDto,
+  })
+  getPages(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('websiteId', ParseUUIDPipe)
+    websiteId: string,
+
+    @Query()
+    query: PageReportQueryDto,
+  ): Promise<PageReportResponseDto> {
+    return this.analyticsReportsService.getPagesReport(workspaceId, websiteId, query);
+  }
+
+  @Get('events')
+  @ApiOperation({
+    summary: 'Get the custom events report',
+  })
+  @ApiOkResponse({
+    type: EventReportResponseDto,
+  })
+  getEvents(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('websiteId', ParseUUIDPipe)
+    websiteId: string,
+
+    @Query()
+    query: EventReportQueryDto,
+  ): Promise<EventReportResponseDto> {
+    return this.analyticsReportsService.getEventsReport(workspaceId, websiteId, query);
+  }
+
+  @Get('dimensions/:dimension')
+  @ApiOperation({
+    summary: 'Get a dimension report',
+  })
+  @ApiOkResponse({
+    type: DimensionReportResponseDto,
+  })
+  getDimension(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('websiteId', ParseUUIDPipe)
+    websiteId: string,
+
+    @Param('dimension', new ParseEnumPipe(AnalyticsReportDimension))
+    dimension: AnalyticsReportDimension,
+
+    @Query()
+    query: DimensionReportQueryDto,
+  ): Promise<DimensionReportResponseDto> {
+    return this.analyticsReportsService.getDimensionReport(workspaceId, websiteId, dimension, query);
+  }
+
+  @Get('exports/pages')
+  @ApiProduces('text/csv')
+  @ApiOperation({
+    summary: 'Export the pages report as CSV',
+  })
+  async exportPages(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('websiteId', ParseUUIDPipe)
+    websiteId: string,
+
+    @Query()
+    query: PageReportQueryDto,
+
+    @Res({
+      passthrough: true,
+    })
+    response: Response,
+  ): Promise<StreamableFile> {
+    const exportResult = await this.analyticsReportsService.exportPages(workspaceId, websiteId, query);
+
+    return this.createCsvResponse(response, exportResult.filename, exportResult.content);
+  }
+
+  @Get('exports/events')
+  @ApiProduces('text/csv')
+  @ApiOperation({
+    summary: 'Export the events report as CSV',
+  })
+  async exportEvents(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('websiteId', ParseUUIDPipe)
+    websiteId: string,
+
+    @Query()
+    query: EventReportQueryDto,
+
+    @Res({
+      passthrough: true,
+    })
+    response: Response,
+  ): Promise<StreamableFile> {
+    const exportResult = await this.analyticsReportsService.exportEvents(workspaceId, websiteId, query);
+
+    return this.createCsvResponse(response, exportResult.filename, exportResult.content);
+  }
+
+  @Get('exports/dimensions/:dimension')
+  @ApiProduces('text/csv')
+  @ApiOperation({
+    summary: 'Export a dimension report as CSV',
+  })
+  async exportDimension(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('websiteId', ParseUUIDPipe)
+    websiteId: string,
+
+    @Param('dimension', new ParseEnumPipe(AnalyticsReportDimension))
+    dimension: AnalyticsReportDimension,
+
+    @Query()
+    query: DimensionReportQueryDto,
+
+    @Res({
+      passthrough: true,
+    })
+    response: Response,
+  ): Promise<StreamableFile> {
+    const exportResult = await this.analyticsReportsService.exportDimension(workspaceId, websiteId, dimension, query);
+
+    return this.createCsvResponse(response, exportResult.filename, exportResult.content);
+  }
+
+  private createCsvResponse(response: Response, filename: string, content: string): StreamableFile {
+    response.setHeader('Content-Type', 'text/csv; charset=utf-8');
+
+    response.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+    response.setHeader('Cache-Control', 'no-store');
+
+    return new StreamableFile(Buffer.from(content, 'utf8'));
+  }
+}
+
+
+====================================================================================================
+FILE: apps/api/src/modules/applications/controllers/applications.controller.ts
+====================================================================================================
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { WorkspaceRoles } from '../../workspace/decorators/workspace-roles.decorator';
+import { WorkspaceAccessGuard } from '../../workspace/guards/workspace-access.guard';
+import { WorkspaceRolesGuard } from '../../workspace/guards/workspace-roles.guard';
+import { CreateApplicationLinkDto, UpdateApplicationLinkDto } from '../dto/application-link.dto';
+import { CreateApplicationTechnologyDto, UpdateApplicationTechnologyDto } from '../dto/application-technology.dto';
+import { ApplicationListQueryDto, CreateApplicationDto, UpdateApplicationDto } from '../dto/application.dto';
+import { ApplicationsService } from '../services/applications.service';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import type { Request } from 'express';
+import { WorkspaceRole } from 'src/generated/prisma/enums';
+
+interface AuthenticatedRequest extends Request {
+  user: {
+    id: string;
+    email?: string;
+  };
+}
+
+@ApiTags('SaaS Applications')
+@ApiBearerAuth('access-token')
+@Controller('workspaces/:workspaceId/applications')
+@UseGuards(JwtAuthGuard, WorkspaceAccessGuard, WorkspaceRolesGuard)
+export class ApplicationsController {
+  constructor(private readonly applicationsService: ApplicationsService) {}
+
+  @Post()
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  @ApiOperation({
+    summary: 'Create a SaaS application',
+  })
+  create(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Body()
+    dto: CreateApplicationDto,
+  ) {
+    return this.applicationsService.create(workspaceId, dto, request.user.id);
+  }
+
+  @Get()
+  @ApiOperation({
+    summary: 'List workspace SaaS applications',
+  })
+  list(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Query()
+    query: ApplicationListQueryDto,
+  ) {
+    return this.applicationsService.list(workspaceId, query);
+  }
+
+  @Get(':applicationId')
+  @ApiOperation({
+    summary: 'Get a SaaS application',
+  })
+  findOne(
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+  ) {
+    return this.applicationsService.findOne(workspaceId, applicationId);
+  }
+
+  @Patch(':applicationId')
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  @ApiOperation({
+    summary: 'Update a SaaS application',
+  })
+  update(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+
+    @Body()
+    dto: UpdateApplicationDto,
+  ) {
+    return this.applicationsService.update(workspaceId, applicationId, dto, request.user.id);
+  }
+
+  @Post(':applicationId/archive')
+  @HttpCode(HttpStatus.OK)
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN)
+  archive(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+  ) {
+    return this.applicationsService.archive(workspaceId, applicationId, request.user.id);
+  }
+
+  @Post(':applicationId/restore')
+  @HttpCode(HttpStatus.OK)
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN)
+  restore(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+  ) {
+    return this.applicationsService.restore(workspaceId, applicationId, request.user.id);
+  }
+
+  @Delete(':applicationId')
+  @WorkspaceRoles(WorkspaceRole.OWNER)
+  async permanentDelete(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+  ) {
+    await this.applicationsService.permanentDelete(workspaceId, applicationId, request.user.id);
+
+    return {
+      message: 'SaaS application permanently deleted',
+    };
+  }
+
+  @Post(':applicationId/technologies')
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  addTechnology(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+
+    @Body()
+    dto: CreateApplicationTechnologyDto,
+  ) {
+    return this.applicationsService.addTechnology(workspaceId, applicationId, dto, request.user.id);
+  }
+
+  @Patch(':applicationId/technologies/:technologyId')
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  updateTechnology(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+
+    @Param('technologyId', ParseUUIDPipe)
+    technologyId: string,
+
+    @Body()
+    dto: UpdateApplicationTechnologyDto,
+  ) {
+    return this.applicationsService.updateTechnology(workspaceId, applicationId, technologyId, dto, request.user.id);
+  }
+
+  @Delete(':applicationId/technologies/:technologyId')
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  async removeTechnology(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+
+    @Param('technologyId', ParseUUIDPipe)
+    technologyId: string,
+  ) {
+    await this.applicationsService.removeTechnology(workspaceId, applicationId, technologyId, request.user.id);
+
+    return {
+      message: 'Technology removed',
+    };
+  }
+
+  @Post(':applicationId/links')
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  addLink(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+
+    @Body()
+    dto: CreateApplicationLinkDto,
+  ) {
+    return this.applicationsService.addLink(workspaceId, applicationId, dto, request.user.id);
+  }
+
+  @Patch(':applicationId/links/:linkId')
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  updateLink(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+
+    @Param('linkId', ParseUUIDPipe)
+    linkId: string,
+
+    @Body()
+    dto: UpdateApplicationLinkDto,
+  ) {
+    return this.applicationsService.updateLink(workspaceId, applicationId, linkId, dto, request.user.id);
+  }
+
+  @Delete(':applicationId/links/:linkId')
+  @WorkspaceRoles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.DEVELOPER)
+  async removeLink(
+    @Req()
+    request: AuthenticatedRequest,
+
+    @Param('workspaceId', ParseUUIDPipe)
+    workspaceId: string,
+
+    @Param('applicationId', ParseUUIDPipe)
+    applicationId: string,
+
+    @Param('linkId', ParseUUIDPipe)
+    linkId: string,
+  ) {
+    await this.applicationsService.removeLink(workspaceId, applicationId, linkId, request.user.id);
+
+    return {
+      message: 'Application link removed',
+    };
+  }
+}
+
+
+====================================================================================================
+FILE: packages/test-code/api/e2e/phase19-repository-integrations.e2e-spec.ts
+====================================================================================================
+import { createAgent, createTestUser, registerUser, withBearer } from '../helpers/auth';
+import { resetDatabase } from '../helpers/database';
+import { readAccessToken } from '../helpers/response';
+import { ValidationPipe, type INestApplication } from '@nestjs/common';
+import { type NestExpressApplication } from '@nestjs/platform-express';
+import { Test } from '@nestjs/testing';
+import cookieParser from 'cookie-parser';
+import { json, raw, urlencoded } from 'express';
+import { createHmac } from 'node:crypto';
+import { AppModule } from 'src/app.module';
+import { PrismaService } from 'src/database/prisma.service';
+import { ApplicationCategory, ApplicationPriority, ApplicationStatus, WorkspaceRole } from 'src/generated/prisma/enums';
+import { GithubAppService } from 'src/modules/repositories/services/github-app.service';
+import request, { type Response } from 'supertest';
+
+const API_PREFIX = '/api/v1';
+const WEBHOOK_SECRET = 'phase19-e2e-webhook-secret';
+
+interface Identity {
+  token: string;
+  userId: string;
+  workspaceId: string;
+  email: string;
+}
+
+interface GithubFixture {
+  installationId: string;
+  repositoryId: string;
+  owner: string;
+  name: string;
+  fullName: string;
+}
+
+const DEFAULT_GITHUB_FIXTURE: GithubFixture = {
+  installationId: '910001',
+  repositoryId: '920001',
+  owner: 'phase19-org',
+  name: 'saas-command-center',
+  fullName: 'phase19-org/saas-command-center',
+};
+const githubAppMock = {
+  buildInstallationUrl: jest.fn((state: string): string => {
+    return `https://github.test/apps/command-center/installations/new?state=${encodeURIComponent(state)}`;
+  }),
+
+  buildUserAuthorizationUrl: jest.fn((state: string, codeChallenge: string): string => {
+    const url = new URL('https://github.test/login/oauth/authorize');
+    url.searchParams.set('state', state);
+    url.searchParams.set('code_challenge', codeChallenge);
+    return url.toString();
+  }),
+
+  exchangeUserCode: jest.fn(async (_code: string, _codeVerifier: string): Promise<string> => {
+    return 'ghu_phase19_test_user_token';
+  }),
+
+  getInstallation: jest.fn(async (installationId: string) => {
+    return {
+      id: installationId,
+      externalInstallationId: installationId,
+      accountLogin: DEFAULT_GITHUB_FIXTURE.owner,
+      accountType: 'Organization',
+      account: {
+        login: DEFAULT_GITHUB_FIXTURE.owner,
+        type: 'Organization',
+      },
+    };
+  }),
+
+  userCanAccessInstallation: jest.fn(async (_userAccessToken: string, _installationId: string): Promise<boolean> => true),
+  listInstallationRepositories: jest.fn(async (_installationId: string) => {
+    return [
+      {
+        id: DEFAULT_GITHUB_FIXTURE.repositoryId,
+        externalRepoId: DEFAULT_GITHUB_FIXTURE.repositoryId,
+        owner: DEFAULT_GITHUB_FIXTURE.owner,
+        name: DEFAULT_GITHUB_FIXTURE.name,
+        fullName: DEFAULT_GITHUB_FIXTURE.fullName,
+        defaultBranch: 'main',
+        private: true,
+        isPrivate: true,
+        htmlUrl: `https://github.com/${DEFAULT_GITHUB_FIXTURE.fullName}`,
+        archived: false,
+        pushedAt: '2026-08-09T12:00:00.000Z',
+      },
+    ];
+  }),
+
+  getRepository: jest.fn(async (_installationId: string, _owner: string, _repository: string) => {
+    return {
+      id: DEFAULT_GITHUB_FIXTURE.repositoryId,
+      externalRepoId: DEFAULT_GITHUB_FIXTURE.repositoryId,
+      owner: DEFAULT_GITHUB_FIXTURE.owner,
+      name: DEFAULT_GITHUB_FIXTURE.name,
+      fullName: DEFAULT_GITHUB_FIXTURE.fullName,
+      defaultBranch: 'main',
+      private: true,
+      isPrivate: true,
+      htmlUrl: `https://github.com/${DEFAULT_GITHUB_FIXTURE.fullName}`,
+      archived: false,
+      pushedAt: '2026-08-09T12:00:00.000Z',
+    };
+  }),
+
+  getInstallationAccessToken: jest.fn(async (_installationId: string): Promise<string> => {
+    return 'ghs_phase19_test_installation_token';
+  }),
+
+  getWebhookSecret: jest.fn((): string => WEBHOOK_SECRET),
+  verifyWebhookSignature: jest.fn((body: Buffer | string, signature: string): boolean => {
+    const rawBody = Buffer.isBuffer(body) ? body : Buffer.from(body, 'utf8');
+    const expected = `sha256=${createHmac('sha256', WEBHOOK_SECRET).update(rawBody).digest('hex')}`;
+
+    return signature === expected;
+  }),
+};
+
+function routeForWorkspace(workspaceId: string): string {
+  return `${API_PREFIX}/workspaces/${workspaceId}/repositories`;
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error(`Expected an object, received: ${JSON.stringify(value)}`);
+  }
+
+  return value as Record<string, unknown>;
+}
+
+function responseRecord(response: Response): Record<string, unknown> {
+  return asRecord(response.body as unknown);
+}
+
+function requireString(record: Record<string, unknown>, key: string): string {
+  const value = record[key];
+
+  if (typeof value !== 'string' || value.length === 0) {
+    throw new Error(`Expected response field "${key}" to be a non-empty string.`);
+  }
+
+  return value;
+}
+
+function responseItems(response: Response): Record<string, unknown>[] {
+  const body = response.body as unknown;
+
+  if (Array.isArray(body)) {
+    return body.map(asRecord);
+  }
+
+  const record = asRecord(body);
+  const candidates = [record.data, record.items, record.repositories];
+  const array = candidates.find(Array.isArray);
+
+  if (!array) {
+    throw new Error(`Expected an array response. Body: ${JSON.stringify(body)}`);
+  }
+
+  return array.map(asRecord);
+}
+
+function queryParameter(urlValue: string, key: string): string {
+  const value = new URL(urlValue).searchParams.get(key);
+
+  if (!value) {
+    throw new Error(`Expected ${key} query parameter in ${urlValue}`);
+  }
+
+  return value;
+}
+
+async function createRepositoryTestApp(): Promise<INestApplication> {
+  const testingModule = await Test.createTestingModule({
+    imports: [AppModule],
+  })
+    .overrideProvider(GithubAppService)
+    .useValue(githubAppMock)
+    .compile();
+  const app = testingModule.createNestApplication<NestExpressApplication>({
+    bodyParser: false,
+  });
+  const expressInstance = app.getHttpAdapter().getInstance();
+  expressInstance.set('trust proxy', 1);
+
+  app.use(cookieParser());
+
+  // The webhook must receive the exact bytes GitHub signed.
+  app.use(
+    `${API_PREFIX}/repositories/github/webhook`,
+    raw({
+      type: 'application/json',
+      limit: '1mb',
+    }),
+  );
+
+  app.use(
+    json({
+      limit: '1mb',
+    }),
+  );
+
+  app.use(
+    urlencoded({
+      extended: true,
+      limit: '1mb',
+    }),
+  );
+
+  app.setGlobalPrefix('api/v1');
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    }),
+  );
+
+  await app.init();
+
+  return app;
+}
+
+async function registerIdentity(app: INestApplication, prisma: PrismaService, label: string): Promise<Identity> {
+  const userInput = createTestUser({
+    name: `${label} User`,
+    workspaceName: `${label} Workspace`,
+  });
+  const response = await registerUser(createAgent(app), userInput);
+
+  expect(response.status).toBe(201);
+
+  const token = readAccessToken(response);
+  const user = await prisma.user.findUnique({
+    where: {
+      email: userInput.email,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!user) {
+    throw new Error(`Registered user ${userInput.email} was not persisted.`);
+  }
+
+  const workspaceResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces`).set(withBearer(token)).send({
+    name: userInput.workspaceName,
+  });
+
+  expect(workspaceResponse.status).toBe(201);
+
+  const ownerMembership = await prisma.workspaceMember.findFirst({
+    where: {
+      userId: user.id,
+      role: WorkspaceRole.OWNER,
+    },
+    select: {
+      workspaceId: true,
+    },
+  });
+
+  if (!ownerMembership) {
+    throw new Error(`Explicit workspace for ${userInput.email} was not persisted.`);
+  }
+
+  return {
+    token,
+    userId: user.id,
+    workspaceId: ownerMembership.workspaceId,
+    email: userInput.email,
+  };
+}
+
+async function addWorkspaceRole(prisma: PrismaService, workspaceId: string, identity: Identity, role: WorkspaceRole): Promise<void> {
+  await prisma.workspaceMember.create({
+    data: {
+      workspaceId,
+      userId: identity.userId,
+      role,
+    },
+  });
+}
+
+function configureGithubFixture(fixture: GithubFixture): void {
+  githubAppMock.getInstallation.mockResolvedValue({
+    id: fixture.installationId,
+    externalInstallationId: fixture.installationId,
+    accountLogin: fixture.owner,
+    accountType: 'Organization',
+    account: {
+      login: fixture.owner,
+      type: 'Organization',
+    },
+  });
+
+  const repository = {
+    id: fixture.repositoryId,
+    externalRepoId: fixture.repositoryId,
+    owner: fixture.owner,
+    name: fixture.name,
+    fullName: fixture.fullName,
+    defaultBranch: 'main',
+    private: true,
+    isPrivate: true,
+    htmlUrl: `https://github.com/${fixture.fullName}`,
+    archived: false,
+    pushedAt: '2026-08-09T12:00:00.000Z',
+  };
+
+  githubAppMock.listInstallationRepositories.mockResolvedValue([repository]);
+  githubAppMock.getRepository.mockResolvedValue(repository);
+  githubAppMock.userCanAccessInstallation.mockResolvedValue(true);
+  githubAppMock.exchangeUserCode.mockResolvedValue('ghu_phase19_test_user_token');
+}
+
+async function beginGithubConnect(app: INestApplication, identity: Identity, workspaceId: string): Promise<string> {
+  const response = await request(app.getHttpServer())
+    .post(`${routeForWorkspace(workspaceId)}/github/connect`)
+    .set(withBearer(identity.token));
+
+  expect(response.status).toBe(201);
+
+  const installationUrl = requireString(responseRecord(response), 'installationUrl');
+  return queryParameter(installationUrl, 'state');
+}
+
+async function completeGithubSetup(app: INestApplication, identity: Identity, installationState: string, installationId: string): Promise<string> {
+  const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/setup`).set(withBearer(identity.token)).send({
+    installState: installationState,
+    installationId,
+  });
+
+  expect(response.status).toBe(201);
+
+  const authorizationUrl = requireString(responseRecord(response), 'authorizationUrl');
+  return queryParameter(authorizationUrl, 'state');
+}
+
+async function finishGithubCallback(app: INestApplication, identity: Identity, oauthState: string): Promise<Response> {
+  return request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/callback`).set(withBearer(identity.token)).send({
+    code: 'phase19-oauth-code',
+    state: oauthState,
+  });
+}
+
+async function connectRepository(
+  app: INestApplication,
+  prisma: PrismaService,
+  identity: Identity,
+  workspaceId: string,
+  fixture: GithubFixture = DEFAULT_GITHUB_FIXTURE,
+): Promise<{
+  repositoryId: string;
+  installationRecordId: string;
+}> {
+  configureGithubFixture(fixture);
+
+  const installationState = await beginGithubConnect(app, identity, workspaceId);
+  const oauthState = await completeGithubSetup(app, identity, installationState, fixture.installationId);
+  const callbackResponse = await finishGithubCallback(app, identity, oauthState);
+  expect(callbackResponse.status).toBe(201);
+
+  const installation = await prisma.repositoryInstallation.findFirst({
+    where: {
+      workspaceId,
+    },
+    select: {
+      id: true,
+    },
+  });
+  const repository = await prisma.repositoryConnection.findFirst({
+    where: {
+      workspaceId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!installation || !repository) {
+    throw new Error('GitHub callback did not persist the installation and repository.');
+  }
+
+  return {
+    repositoryId: repository.id,
+    installationRecordId: installation.id,
+  };
+}
+
+describe('Phase 19 - Repository Integrations E2E', () => {
+  let app: INestApplication;
+  let prisma: PrismaService;
+
+  beforeAll(async () => {
+    process.env.GITHUB_APP_WEBHOOK_SECRET = WEBHOOK_SECRET;
+    app = await createRepositoryTestApp();
+    prisma = app.get(PrismaService);
+  });
+
+  beforeEach(async () => {
+    jest.clearAllMocks();
+    configureGithubFixture(DEFAULT_GITHUB_FIXTURE);
+    await resetDatabase(prisma);
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  describe('GitHub connection authorization', () => {
+    it('rejects anonymous GitHub connection attempts', async () => {
+      const owner = await registerIdentity(app, prisma, 'Anonymous Connect Owner');
+      const response = await request(app.getHttpServer()).post(`${routeForWorkspace(owner.workspaceId)}/github/connect`);
+
+      expect(response.status).toBe(401);
+    });
+
+    it('rejects a malformed workspace identifier', async () => {
+      const owner = await registerIdentity(app, prisma, 'Malformed Workspace Owner');
+      const response = await request(app.getHttpServer())
+        .post(`${routeForWorkspace('not-a-uuid')}/github/connect`)
+        .set(withBearer(owner.token));
+
+      expect(response.status).toBe(400);
+    });
+
+    it('allows OWNER to start a GitHub App installation and stores only hashed state', async () => {
+      const owner = await registerIdentity(app, prisma, 'Connect Owner');
+      const state = await beginGithubConnect(app, owner, owner.workspaceId);
+
+      expect(state.length).toBeGreaterThan(20);
+      expect(githubAppMock.buildInstallationUrl).toHaveBeenCalledTimes(1);
+
+      const intent = await prisma.repositoryConnectIntent.findFirst({
+        where: {
+          workspaceId: owner.workspaceId,
+        },
+      });
+
+      expect(intent).not.toBeNull();
+      expect(JSON.stringify(intent)).not.toContain(state);
+    });
+
+    it('allows ADMIN to start a GitHub connection', async () => {
+      const owner = await registerIdentity(app, prisma, 'Admin Connect Owner');
+      const admin = await registerIdentity(app, prisma, 'Repository Admin');
+      await addWorkspaceRole(prisma, owner.workspaceId, admin, WorkspaceRole.ADMIN);
+
+      const response = await request(app.getHttpServer())
+        .post(`${routeForWorkspace(owner.workspaceId)}/github/connect`)
+        .set(withBearer(admin.token));
+
+      expect(response.status).toBe(201);
+    });
+
+    it('prevents DEVELOPER from starting a GitHub connection', async () => {
+      const owner = await registerIdentity(app, prisma, 'Developer Connect Owner');
+      const developer = await registerIdentity(app, prisma, 'Repository Developer');
+      await addWorkspaceRole(prisma, owner.workspaceId, developer, WorkspaceRole.DEVELOPER);
+
+      const response = await request(app.getHttpServer())
+        .post(`${routeForWorkspace(owner.workspaceId)}/github/connect`)
+        .set(withBearer(developer.token));
+
+      expect(response.status).toBe(403);
+    });
+
+    it('prevents VIEWER from starting a GitHub connection', async () => {
+      const owner = await registerIdentity(app, prisma, 'Viewer Connect Owner');
+      const viewer = await registerIdentity(app, prisma, 'Repository Viewer');
+      await addWorkspaceRole(prisma, owner.workspaceId, viewer, WorkspaceRole.VIEWER);
+
+      const response = await request(app.getHttpServer())
+        .post(`${routeForWorkspace(owner.workspaceId)}/github/connect`)
+        .set(withBearer(viewer.token));
+
+      expect(response.status).toBe(403);
+    });
+  });
+
+  describe('GitHub setup and OAuth callback', () => {
+    it('rejects setup without authentication', async () => {
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/setup`).send({
+        installState: 'missing-authentication-state-value-1234567890',
+        installationId: DEFAULT_GITHUB_FIXTURE.installationId,
+      });
+
+      expect(response.status).toBe(401);
+    });
+
+    it('rejects an unknown installation state', async () => {
+      const owner = await registerIdentity(app, prisma, 'Unknown State Owner');
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/setup`).set(withBearer(owner.token)).send({
+        installState: 'unknown-installation-state-value-1234567890',
+        installationId: DEFAULT_GITHUB_FIXTURE.installationId,
+      });
+
+      expect(response.status).toBe(401);
+    });
+
+    it('does not allow another user to consume an installation state', async () => {
+      const owner = await registerIdentity(app, prisma, 'State Owner');
+      const attacker = await registerIdentity(app, prisma, 'State Attacker');
+      const installationState = await beginGithubConnect(app, owner, owner.workspaceId);
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/setup`).set(withBearer(attacker.token)).send({
+        installState: installationState,
+        installationId: DEFAULT_GITHUB_FIXTURE.installationId,
+      });
+
+      expect(response.status).toBe(401);
+    });
+
+    it('creates OAuth authorization state without storing the raw state', async () => {
+      const owner = await registerIdentity(app, prisma, 'OAuth State Owner');
+      const installationState = await beginGithubConnect(app, owner, owner.workspaceId);
+      const oauthState = await completeGithubSetup(app, owner, installationState, DEFAULT_GITHUB_FIXTURE.installationId);
+
+      expect(oauthState.length).toBeGreaterThan(20);
+      expect(githubAppMock.buildUserAuthorizationUrl).toHaveBeenCalledTimes(1);
+
+      const intent = await prisma.repositoryConnectIntent.findFirst({
+        where: {
+          workspaceId: owner.workspaceId,
+        },
+      });
+
+      expect(intent).not.toBeNull();
+      expect(JSON.stringify(intent)).not.toContain(oauthState);
+      expect(JSON.stringify(intent)).toContain(DEFAULT_GITHUB_FIXTURE.installationId);
+    });
+
+    it('rejects callback when the authenticated GitHub user cannot access the installation', async () => {
+      const owner = await registerIdentity(app, prisma, 'Denied Callback Owner');
+      const installationState = await beginGithubConnect(app, owner, owner.workspaceId);
+      const oauthState = await completeGithubSetup(app, owner, installationState, DEFAULT_GITHUB_FIXTURE.installationId);
+
+      githubAppMock.userCanAccessInstallation.mockResolvedValueOnce(false);
+
+      const response = await finishGithubCallback(app, owner, oauthState);
+
+      expect(response.status).toBe(403);
+      expect(
+        await prisma.repositoryInstallation.count({
+          where: {
+            workspaceId: owner.workspaceId,
+          },
+        }),
+      ).toBe(0);
+      expect(
+        await prisma.repositoryConnection.count({
+          where: {
+            workspaceId: owner.workspaceId,
+          },
+        }),
+      ).toBe(0);
+    });
+
+    it('persists the installation and repositories after a valid callback', async () => {
+      const owner = await registerIdentity(app, prisma, 'Successful Callback Owner');
+      await connectRepository(app, prisma, owner, owner.workspaceId);
+
+      const installation = await prisma.repositoryInstallation.findFirst({
+        where: {
+          workspaceId: owner.workspaceId,
+        },
+      });
+      const repository = await prisma.repositoryConnection.findFirst({
+        where: {
+          workspaceId: owner.workspaceId,
+        },
+      });
+
+      expect(installation).not.toBeNull();
+      expect(repository).not.toBeNull();
+      expect(JSON.stringify(repository)).toContain(DEFAULT_GITHUB_FIXTURE.fullName);
+
+      const persistedText = JSON.stringify({ installation, repository });
+      expect(persistedText).not.toContain('ghu_phase19_test_user_token');
+      expect(persistedText).not.toContain('ghs_phase19_test_installation_token');
+      expect(persistedText).not.toContain(WEBHOOK_SECRET);
+    });
+
+    it('prevents OAuth callback replay after the intent has been consumed', async () => {
+      const owner = await registerIdentity(app, prisma, 'Replay Owner');
+      const installationState = await beginGithubConnect(app, owner, owner.workspaceId);
+      const oauthState = await completeGithubSetup(app, owner, installationState, DEFAULT_GITHUB_FIXTURE.installationId);
+      const first = await finishGithubCallback(app, owner, oauthState);
+      const second = await finishGithubCallback(app, owner, oauthState);
+
+      expect(first.status).toBe(201);
+      expect(second.status).toBe(401);
+    });
+  });
+
+  describe('Repository read, tenant isolation, linking, and sync', () => {
+    it('lists only repositories in the requested workspace', async () => {
+      const owner = await registerIdentity(app, prisma, 'List Owner');
+      const connected = await connectRepository(app, prisma, owner, owner.workspaceId);
+      const response = await request(app.getHttpServer()).get(routeForWorkspace(owner.workspaceId)).set(withBearer(owner.token));
+
+      expect(response.status).toBe(200);
+
+      const items = responseItems(response);
+      expect(items).toHaveLength(1);
+      expect(items[0]?.id).toBe(connected.repositoryId);
+      expect(JSON.stringify(items[0])).toContain(DEFAULT_GITHUB_FIXTURE.fullName);
+    });
+
+    it('allows VIEWER to read repository metadata', async () => {
+      const owner = await registerIdentity(app, prisma, 'Viewer Read Owner');
+      const viewer = await registerIdentity(app, prisma, 'Viewer Read User');
+      await addWorkspaceRole(prisma, owner.workspaceId, viewer, WorkspaceRole.VIEWER);
+      await connectRepository(app, prisma, owner, owner.workspaceId);
+
+      const response = await request(app.getHttpServer()).get(routeForWorkspace(owner.workspaceId)).set(withBearer(viewer.token));
+
+      expect(response.status).toBe(200);
+      expect(responseItems(response)).toHaveLength(1);
+    });
+
+    it('prevents an outsider from reading repository metadata', async () => {
+      const owner = await registerIdentity(app, prisma, 'Outsider Read Owner');
+      const outsider = await registerIdentity(app, prisma, 'Repository Outsider');
+      await connectRepository(app, prisma, owner, owner.workspaceId);
+
+      const response = await request(app.getHttpServer()).get(routeForWorkspace(owner.workspaceId)).set(withBearer(outsider.token));
+
+      expect(response.status).toBe(403);
+    });
+
+    it('returns 404 when a repository belongs to a different workspace', async () => {
+      const ownerA = await registerIdentity(app, prisma, 'Tenant A Owner');
+      const ownerB = await registerIdentity(app, prisma, 'Tenant B Owner');
+      const fixtureB: GithubFixture = {
+        installationId: '910002',
+        repositoryId: '920002',
+        owner: 'phase19-org-b',
+        name: 'private-b',
+        fullName: 'phase19-org-b/private-b',
+      };
+      const repositoryB = await connectRepository(app, prisma, ownerB, ownerB.workspaceId, fixtureB);
+      const response = await request(app.getHttpServer())
+        .get(`${routeForWorkspace(ownerA.workspaceId)}/${repositoryB.repositoryId}`)
+        .set(withBearer(ownerA.token));
+
+      expect(response.status).toBe(404);
+    });
+
+    it('links a repository to an application in the same workspace', async () => {
+      const owner = await registerIdentity(app, prisma, 'Application Link Owner');
+      const connected = await connectRepository(app, prisma, owner, owner.workspaceId);
+      const application = await prisma.saasApplication.create({
+        data: {
+          workspaceId: owner.workspaceId,
+          name: 'Phase 19 Repository App',
+          slug: `phase19-repository-app-${Date.now()}`,
+          category: ApplicationCategory.SAAS,
+          status: ApplicationStatus.LIVE,
+          priority: ApplicationPriority.MEDIUM,
+        },
+      });
+      const response = await request(app.getHttpServer())
+        .patch(`${routeForWorkspace(owner.workspaceId)}/${connected.repositoryId}/application`)
+        .set(withBearer(owner.token))
+        .send({
+          applicationId: application.id,
+        });
+
+      expect(response.status).toBe(200);
+
+      const repository = await prisma.repositoryConnection.findUnique({
+        where: {
+          id: connected.repositoryId,
+        },
+        select: {
+          applicationId: true,
+        },
+      });
+
+      expect(repository?.applicationId).toBe(application.id);
+    });
+
+    it('rejects linking a repository to an application from another workspace', async () => {
+      const ownerA = await registerIdentity(app, prisma, 'Foreign App Owner A');
+      const ownerB = await registerIdentity(app, prisma, 'Foreign App Owner B');
+      const connected = await connectRepository(app, prisma, ownerA, ownerA.workspaceId);
+      const foreignApplication = await prisma.saasApplication.create({
+        data: {
+          workspaceId: ownerB.workspaceId,
+          name: 'Foreign Application',
+          slug: `foreign-application-${Date.now()}`,
+          category: ApplicationCategory.SAAS,
+          status: ApplicationStatus.LIVE,
+          priority: ApplicationPriority.MEDIUM,
+        },
+      });
+      const response = await request(app.getHttpServer())
+        .patch(`${routeForWorkspace(ownerA.workspaceId)}/${connected.repositoryId}/application`)
+        .set(withBearer(ownerA.token))
+        .send({
+          applicationId: foreignApplication.id,
+        });
+
+      expect(response.status).toBe(404);
+    });
+
+    it('unlinks an application from a repository', async () => {
+      const owner = await registerIdentity(app, prisma, 'Application Unlink Owner');
+      const connected = await connectRepository(app, prisma, owner, owner.workspaceId);
+      const application = await prisma.saasApplication.create({
+        data: {
+          workspaceId: owner.workspaceId,
+          name: 'Phase 19 Unlink App',
+          slug: `phase19-unlink-app-${Date.now()}`,
+          category: ApplicationCategory.SAAS,
+          status: ApplicationStatus.LIVE,
+          priority: ApplicationPriority.MEDIUM,
+        },
+      });
+
+      await request(app.getHttpServer())
+        .patch(`${routeForWorkspace(owner.workspaceId)}/${connected.repositoryId}/application`)
+        .set(withBearer(owner.token))
+        .send({
+          applicationId: application.id,
+        })
+        .expect(200);
+
+      const response = await request(app.getHttpServer())
+        .delete(`${routeForWorkspace(owner.workspaceId)}/${connected.repositoryId}/application`)
+        .set(withBearer(owner.token));
+
+      expect(response.status).toBe(200);
+
+      const repository = await prisma.repositoryConnection.findUnique({
+        where: {
+          id: connected.repositoryId,
+        },
+        select: {
+          applicationId: true,
+        },
+      });
+
+      expect(repository?.applicationId).toBeNull();
+    });
+
+    it('allows DEVELOPER to synchronize an already-connected repository', async () => {
+      const owner = await registerIdentity(app, prisma, 'Sync Owner');
+      const developer = await registerIdentity(app, prisma, 'Sync Developer');
+      await addWorkspaceRole(prisma, owner.workspaceId, developer, WorkspaceRole.DEVELOPER);
+      const connected = await connectRepository(app, prisma, owner, owner.workspaceId);
+      const response = await request(app.getHttpServer())
+        .post(`${routeForWorkspace(owner.workspaceId)}/${connected.repositoryId}/sync`)
+        .set(withBearer(developer.token));
+
+      expect(response.status).toBe(201);
+
+      const repository = await prisma.repositoryConnection.findUnique({
+        where: {
+          id: connected.repositoryId,
+        },
+        select: {
+          lastSyncedAt: true,
+        },
+      });
+
+      expect(repository?.lastSyncedAt).toBeInstanceOf(Date);
+    });
+  });
+
+  describe('Disconnect authorization and cascade behavior', () => {
+    it('prevents DEVELOPER from disconnecting a GitHub installation', async () => {
+      const owner = await registerIdentity(app, prisma, 'Disconnect Role Owner');
+      const developer = await registerIdentity(app, prisma, 'Disconnect Developer');
+      await addWorkspaceRole(prisma, owner.workspaceId, developer, WorkspaceRole.DEVELOPER);
+      const connected = await connectRepository(app, prisma, owner, owner.workspaceId);
+      const response = await request(app.getHttpServer())
+        .delete(`${routeForWorkspace(owner.workspaceId)}/github/installations/${connected.installationRecordId}`)
+        .set(withBearer(developer.token));
+
+      expect(response.status).toBe(403);
+    });
+
+    it('allows OWNER to disconnect an installation and removes its repositories', async () => {
+      const owner = await registerIdentity(app, prisma, 'Disconnect Owner');
+      const connected = await connectRepository(app, prisma, owner, owner.workspaceId);
+      const response = await request(app.getHttpServer())
+        .delete(`${routeForWorkspace(owner.workspaceId)}/github/installations/${connected.installationRecordId}`)
+        .set(withBearer(owner.token));
+
+      expect(response.status).toBe(200);
+      expect(
+        await prisma.repositoryInstallation.count({
+          where: {
+            workspaceId: owner.workspaceId,
+          },
+        }),
+      ).toBe(0);
+      expect(
+        await prisma.repositoryConnection.count({
+          where: {
+            workspaceId: owner.workspaceId,
+          },
+        }),
+      ).toBe(0);
+    });
+  });
+
+  describe('GitHub webhook security and idempotency', () => {
+    const webhookRoute = `${API_PREFIX}/repositories/github/webhook`;
+
+    function webhookPayload(): Record<string, unknown> {
+      return {
+        action: 'synchronize',
+        installation: {
+          id: Number(DEFAULT_GITHUB_FIXTURE.installationId),
+          account: {
+            login: DEFAULT_GITHUB_FIXTURE.owner,
+            type: 'Organization',
+          },
+        },
+        repository: {
+          id: Number(DEFAULT_GITHUB_FIXTURE.repositoryId),
+          name: DEFAULT_GITHUB_FIXTURE.name,
+          full_name: DEFAULT_GITHUB_FIXTURE.fullName,
+          private: true,
+          default_branch: 'main',
+          archived: false,
+        },
+      };
+    }
+
+    function sign(body: string): string {
+      return `sha256=${createHmac('sha256', WEBHOOK_SECRET).update(body).digest('hex')}`;
+    }
+
+    it('rejects a webhook when GitHub delivery headers are missing', async () => {
+      const rawBody = JSON.stringify(webhookPayload());
+      const response = await request(app.getHttpServer()).post(webhookRoute).set('content-type', 'application/json').send(rawBody);
+
+      expect(response.status).toBe(401);
+    });
+
+    it('rejects a webhook with an invalid signature', async () => {
+      const rawBody = JSON.stringify(webhookPayload());
+      const response = await request(app.getHttpServer())
+        .post(webhookRoute)
+        .set('content-type', 'application/json')
+        .set('x-github-delivery', 'phase19-invalid-signature')
+        .set('x-github-event', 'push')
+        .set('x-hub-signature-256', 'sha256=invalid')
+        .send(rawBody);
+
+      expect(response.status).toBe(401);
+      expect(await prisma.repositoryWebhookDelivery.count()).toBe(0);
+    });
+
+    it('accepts a correctly signed webhook and records the delivery', async () => {
+      const rawBody = JSON.stringify(webhookPayload());
+      const deliveryId = 'phase19-valid-delivery';
+      const response = await request(app.getHttpServer())
+        .post(webhookRoute)
+        .set('content-type', 'application/json')
+        .set('x-github-delivery', deliveryId)
+        .set('x-github-event', 'pull_request')
+        .set('x-hub-signature-256', sign(rawBody))
+        .send(rawBody);
+
+      expect(response.status).toBe(201);
+      expect(
+        await prisma.repositoryWebhookDelivery.count({
+          where: {
+            deliveryId,
+          },
+        }),
+      ).toBe(1);
+
+      const responseText = JSON.stringify(response.body);
+      expect(responseText).not.toContain(WEBHOOK_SECRET);
+      expect(responseText).not.toContain('ghu_phase19_test_user_token');
+      expect(responseText).not.toContain('ghs_phase19_test_installation_token');
+    });
+
+    it('treats duplicate GitHub delivery IDs idempotently', async () => {
+      const rawBody = JSON.stringify(webhookPayload());
+      const deliveryId = 'phase19-duplicate-delivery';
+      const headers = {
+        'content-type': 'application/json',
+        'x-github-delivery': deliveryId,
+        'x-github-event': 'push',
+        'x-hub-signature-256': sign(rawBody),
+      };
+      const first = await request(app.getHttpServer()).post(webhookRoute).set(headers).send(rawBody);
+      const second = await request(app.getHttpServer()).post(webhookRoute).set(headers).send(rawBody);
+
+      expect(first.status).toBe(201);
+      expect(second.status).toBe(201);
+      expect(
+        await prisma.repositoryWebhookDelivery.count({
+          where: {
+            deliveryId,
+          },
+        }),
+      ).toBe(1);
+    });
+  });
+});
+
+
+====================================================================================================
+FILE: packages/test-code/api/e2e/phase21-github-workspace-import.e2e-spec.ts
+====================================================================================================
+import { createAgent, createTestUser, registerUser, withBearer } from '../helpers/auth';
+import { resetDatabase } from '../helpers/database';
+import { readAccessToken } from '../helpers/response';
+import { ValidationPipe, type INestApplication } from '@nestjs/common';
+import { type NestExpressApplication } from '@nestjs/platform-express';
+import { Test } from '@nestjs/testing';
+import cookieParser from 'cookie-parser';
+import { json, urlencoded } from 'express';
+import { AppModule } from 'src/app.module';
+import { PrismaService } from 'src/database/prisma.service';
+import { GithubAppService, type GithubImportableRepository, type GithubInstallation } from 'src/modules/repositories/services/github-app.service';
+import { GithubCodeService, type GithubRepositoryContent, type GithubRepositoryTree } from 'src/modules/repositories/services/github-code.service';
+import request, { type Response } from 'supertest';
+
+const API_PREFIX = '/api/v1';
+
+interface Identity {
+  token: string;
+  userId: string;
+  email: string;
+}
+
+const DEFAULT_INSTALLATION_ID = '930001';
+const DEFAULT_OWNER = 'phase21-org';
+
+function githubAppMockFactory() {
+  return {
+    buildInstallationUrl: jest.fn((state: string): string => `https://github.test/apps/command-center/installations/new?state=${encodeURIComponent(state)}`),
+    buildUserAuthorizationUrl: jest.fn((state: string, codeChallenge: string): string => {
+      const url = new URL('https://github.test/login/oauth/authorize');
+      url.searchParams.set('state', state);
+      url.searchParams.set('code_challenge', codeChallenge);
+      return url.toString();
+    }),
+
+    exchangeUserCode: jest.fn(async (): Promise<string> => 'ghu_phase21_test_user_token'),
+    getInstallation: jest.fn(async (installationId: string): Promise<GithubInstallation> => ({
+      id: installationId,
+      accountLogin: DEFAULT_OWNER,
+      accountType: 'Organization',
+    })),
+
+    userCanAccessInstallation: jest.fn(async (): Promise<boolean> => true),
+    listImportableInstallationRepositories: jest.fn(async (): Promise<GithubImportableRepository[]> => []),
+    listInstallationRepositories: jest.fn(async () => []),
+    getInstallationAccessToken: jest.fn(async (): Promise<string> => 'ghs_phase21_test_installation_token'),
+    getWebhookSecret: jest.fn((): string => 'phase21-e2e-webhook-secret'),
+  };
+}
+
+function githubCodeMockFactory() {
+  return {
+    listBranches: jest.fn(),
+    getTree: jest.fn(async (): Promise<GithubRepositoryTree> => ({
+      sha: 'tree-sha',
+      truncated: false,
+      entries: [],
+    })),
+
+    getFile: jest.fn(async (): Promise<GithubRepositoryContent | null> => null),
+  };
+}
+
+function encodePackageJson(value: Record<string, unknown>): string {
+  return Buffer.from(JSON.stringify(value), 'utf8').toString('base64');
+}
+
+function repositoryFixture(overrides: Partial<GithubImportableRepository> = {}): GithubImportableRepository {
+  return {
+    id: 940001,
+    name: 'demo-app',
+    fullName: `${DEFAULT_OWNER}/demo-app`,
+    description: 'A demo application',
+    isPrivate: true,
+    defaultBranch: 'main',
+    htmlUrl: `https://github.com/${DEFAULT_OWNER}/demo-app`,
+    updatedAt: '2026-08-09T12:00:00.000Z',
+    owner: {
+      login: DEFAULT_OWNER,
+      avatarUrl: 'https://avatars.githubusercontent.com/u/1',
+    },
+
+    ...overrides,
+  };
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error(`Expected an object, received: ${JSON.stringify(value)}`);
+  }
+
+  return value as Record<string, unknown>;
+}
+
+function responseRecord(response: Response): Record<string, unknown> {
+  return asRecord(response.body as unknown);
+}
+
+function requireString(record: Record<string, unknown>, key: string): string {
+  const value = record[key];
+
+  if (typeof value !== 'string' || value.length === 0) {
+    throw new Error(`Expected response field "${key}" to be a non-empty string.`);
+  }
+
+  return value;
+}
+
+function queryParameter(urlValue: string, key: string): string {
+  const value = new URL(urlValue).searchParams.get(key);
+
+  if (!value) {
+    throw new Error(`Expected ${key} query parameter in ${urlValue}`);
+  }
+
+  return value;
+}
+
+async function createTestApp(): Promise<{
+  app: INestApplication;
+  githubAppMock: ReturnType<typeof githubAppMockFactory>;
+  githubCodeMock: ReturnType<typeof githubCodeMockFactory>;
+}> {
+  const githubAppMock = githubAppMockFactory();
+  const githubCodeMock = githubCodeMockFactory();
+  const testingModule = await Test.createTestingModule({
+    imports: [AppModule],
+  })
+    .overrideProvider(GithubAppService)
+    .useValue(githubAppMock)
+    .overrideProvider(GithubCodeService)
+    .useValue(githubCodeMock)
+    .compile();
+  const app = testingModule.createNestApplication<NestExpressApplication>({
+    bodyParser: false,
+  });
+  const expressInstance = app.getHttpAdapter().getInstance();
+  expressInstance.set('trust proxy', 1);
+
+  app.use(cookieParser());
+  app.use(json({ limit: '1mb' }));
+  app.use(urlencoded({ extended: true, limit: '1mb' }));
+
+  app.setGlobalPrefix('api/v1');
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    }),
+  );
+
+  await app.init();
+
+  return { app, githubAppMock, githubCodeMock };
+}
+
+async function registerIdentity(app: INestApplication, label: string): Promise<Identity> {
+  const userInput = createTestUser({
+    name: `${label} User`,
+    workspaceName: `${label} Workspace`,
+  });
+  const response = await registerUser(createAgent(app), userInput);
+
+  expect(response.status).toBe(201);
+
+  const token = readAccessToken(response);
+  const prisma = app.get(PrismaService);
+  const user = await prisma.user.findUnique({
+    where: { email: userInput.email },
+    select: { id: true },
+  });
+
+  if (!user) {
+    throw new Error(`Registered user ${userInput.email} was not persisted.`);
+  }
+
+  return { token, userId: user.id, email: userInput.email };
+}
+
+async function connectPersonalGithub(app: INestApplication, identity: Identity, installationId: string = DEFAULT_INSTALLATION_ID): Promise<void> {
+  const beginResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/connect`).set(withBearer(identity.token));
+
+  expect(beginResponse.status).toBe(201);
+
+  const installationUrl = requireString(responseRecord(beginResponse), 'installationUrl');
+  const installState = queryParameter(installationUrl, 'state');
+  const setupResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/setup`).set(withBearer(identity.token)).send({ installState, installationId });
+
+  expect(setupResponse.status).toBe(201);
+
+  const authorizationUrl = requireString(responseRecord(setupResponse), 'authorizationUrl');
+  const oauthState = queryParameter(authorizationUrl, 'state');
+  const callbackResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/callback`).set(withBearer(identity.token)).send({ code: 'phase21-oauth-code', state: oauthState });
+
+  expect(callbackResponse.status).toBe(201);
+}
+
+describe('Phase 21 - GitHub Workspace Import E2E', () => {
+  let app: INestApplication;
+  let prisma: PrismaService;
+  let githubAppMock: ReturnType<typeof githubAppMockFactory>;
+  let githubCodeMock: ReturnType<typeof githubCodeMockFactory>;
+
+  beforeAll(async () => {
+    const created = await createTestApp();
+    app = created.app;
+    githubAppMock = created.githubAppMock;
+    githubCodeMock = created.githubCodeMock;
+    prisma = app.get(PrismaService);
+  });
+
+  beforeEach(async () => {
+    jest.clearAllMocks();
+    githubAppMock.getInstallation.mockResolvedValue({
+      id: DEFAULT_INSTALLATION_ID,
+      accountLogin: DEFAULT_OWNER,
+      accountType: 'Organization',
+    });
+    githubAppMock.userCanAccessInstallation.mockResolvedValue(true);
+    githubAppMock.exchangeUserCode.mockResolvedValue('ghu_phase21_test_user_token');
+    githubAppMock.listImportableInstallationRepositories.mockResolvedValue([repositoryFixture()]);
+    await resetDatabase(prisma);
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  describe('Personal GitHub connect authorization', () => {
+    it('rejects an anonymous connect attempt', async () => {
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/connect`);
+
+      expect(response.status).toBe(401);
+    });
+
+    it('allows any authenticated user to begin a personal connect without an existing workspace', async () => {
+      const identity = await registerIdentity(app, 'Personal Connect');
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/connect`).set(withBearer(identity.token));
+
+      expect(response.status).toBe(201);
+
+      const intent = await prisma.personalGithubConnectIntent.findFirst({
+        where: { userId: identity.userId },
+      });
+
+      expect(intent).not.toBeNull();
+    });
+
+    it('rejects the callback when the GitHub user cannot access the installation', async () => {
+      const identity = await registerIdentity(app, 'Denied Personal Connect');
+      const beginResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/connect`).set(withBearer(identity.token));
+      const installState = queryParameter(requireString(responseRecord(beginResponse), 'installationUrl'), 'state');
+      const setupResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/setup`).set(withBearer(identity.token)).send({ installState, installationId: DEFAULT_INSTALLATION_ID });
+      const oauthState = queryParameter(requireString(responseRecord(setupResponse), 'authorizationUrl'), 'state');
+
+      githubAppMock.userCanAccessInstallation.mockResolvedValueOnce(false);
+
+      const callbackResponse = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/callback`).set(withBearer(identity.token)).send({ code: 'denied-code', state: oauthState });
+
+      expect(callbackResponse.status).toBe(403);
+    });
+
+    it('never persists a raw GitHub user token', async () => {
+      const identity = await registerIdentity(app, 'Token Leak Check');
+
+      await connectPersonalGithub(app, identity);
+
+      const intents = await prisma.personalGithubConnectIntent.findMany({
+        where: { userId: identity.userId },
+      });
+
+      expect(JSON.stringify(intents)).not.toContain('ghu_phase21_test_user_token');
+    });
+  });
+
+  describe('Repository listing', () => {
+    it('rejects listing repositories before GitHub is connected', async () => {
+      const identity = await registerIdentity(app, 'No Repos Yet');
+      const response = await request(app.getHttpServer()).get(`${API_PREFIX}/repositories/github/personal`).set(withBearer(identity.token));
+
+      expect(response.status).toBe(200);
+      expect(responseRecord(response)).toEqual({
+        installations: [],
+        repositories: [],
+      });
+    });
+
+    it('lists repositories once the user has connected an installation', async () => {
+      const identity = await registerIdentity(app, 'List Repos');
+
+      await connectPersonalGithub(app, identity);
+
+      const response = await request(app.getHttpServer()).get(`${API_PREFIX}/repositories/github/personal`).set(withBearer(identity.token));
+
+      expect(response.status).toBe(200);
+
+      const body = responseRecord(response);
+      const repositories = body.repositories as unknown[];
+
+      expect(repositories).toHaveLength(1);
+      expect(JSON.stringify(repositories)).toContain('demo-app');
+      expect(JSON.stringify(body)).not.toContain('ghu_phase21_test_user_token');
+      expect(JSON.stringify(body)).not.toContain('ghs_phase21_test_installation_token');
+    });
+  });
+
+  describe('Repository analysis', () => {
+    it('rejects analyzing a repository the user has not connected', async () => {
+      const identity = await registerIdentity(app, 'Unauthorized Analyze');
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/analyze`).set(withBearer(identity.token)).send({ repositoryId: 940001 });
+
+      expect(response.status).toBe(403);
+    });
+
+    it('rejects analyzing a repository ID belonging to another installation the caller never connected', async () => {
+      const identity = await registerIdentity(app, 'Cross Repo Analyze');
+      await connectPersonalGithub(app, identity);
+
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/analyze`).set(withBearer(identity.token)).send({ repositoryId: 999999 });
+
+      expect(response.status).toBe(403);
+    });
+
+    it('detects a single-app Next.js repository', async () => {
+      const identity = await registerIdentity(app, 'Single App Analyze');
+      await connectPersonalGithub(app, identity);
+
+      githubCodeMock.getTree.mockResolvedValueOnce({
+        sha: 'tree-sha',
+        truncated: false,
+        entries: [
+          { path: 'package.json', type: 'file', sha: 's1', size: 200 },
+          { path: 'tsconfig.json', type: 'file', sha: 's2', size: 50 },
+          { path: 'src/index.tsx', type: 'file', sha: 's3', size: 500 },
+        ],
+      });
+
+      githubCodeMock.getFile.mockImplementation(async (...args: unknown[]) => {
+        const path = args[3] as string;
+        if (path === 'package.json') {
+          return {
+            name: 'package.json',
+            path: 'package.json',
+            sha: 's1',
+            size: 200,
+            encoding: 'base64',
+            content: encodePackageJson({
+              name: 'demo-app',
+              dependencies: { next: '^15.0.0', react: '^19.0.0' },
+              scripts: { dev: 'next dev', build: 'next build', start: 'next start' },
+            }),
+          };
+        }
+
+        return null;
+      });
+
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/analyze`).set(withBearer(identity.token)).send({ repositoryId: 940001 });
+
+      expect(response.status).toBe(201);
+
+      const body = responseRecord(response);
+
+      expect(body.repositoryType).toBe('single-app');
+      expect(body.packageManager).toBe('unknown');
+
+      const applications = body.applications as Array<Record<string, unknown>>;
+
+      expect(applications).toHaveLength(1);
+      expect(applications[0]?.framework).toBe('Next.js');
+      expect(applications[0]?.runnable).toBe(true);
+    });
+
+    it('detects a monorepo with an app and a library, and does not mark the library runnable', async () => {
+      const identity = await registerIdentity(app, 'Monorepo Analyze');
+      await connectPersonalGithub(app, identity);
+
+      githubCodeMock.getTree.mockResolvedValueOnce({
+        sha: 'tree-sha',
+        truncated: false,
+        entries: [
+          { path: 'package.json', type: 'file', sha: 'r1', size: 100 },
+          { path: 'pnpm-workspace.yaml', type: 'file', sha: 'r2', size: 60 },
+          { path: 'pnpm-lock.yaml', type: 'file', sha: 'r3', size: 1000 },
+          { path: 'apps/api/package.json', type: 'file', sha: 'a1', size: 200 },
+          { path: 'packages/shared-types/package.json', type: 'file', sha: 'p1', size: 80 },
+        ],
+      });
+
+      githubCodeMock.getFile.mockImplementation(async (...args: unknown[]) => {
+        const path = args[3] as string;
+        const files: Record<string, { content: string } | undefined> = {
+          'pnpm-workspace.yaml': {
+            content: Buffer.from("packages:\n  - 'apps/*'\n  - 'packages/*'\n", 'utf8').toString('base64'),
+          },
+
+          'package.json': {
+            content: encodePackageJson({ name: 'root', private: true }),
+          },
+
+          'apps/api/package.json': {
+            content: encodePackageJson({
+              name: '@acme/api',
+              dependencies: { '@nestjs/core': '^11.0.0' },
+              scripts: { 'start:dev': 'nest start --watch', build: 'nest build' },
+            }),
+          },
+
+          'packages/shared-types/package.json': {
+            content: encodePackageJson({
+              name: '@acme/shared-types',
+              scripts: { build: 'tsc' },
+            }),
+          },
+        };
+        const match = files[path];
+
+        if (!match) {
+          return null;
+        }
+
+        return {
+          name: path.split('/').pop() ?? path,
+          path,
+          sha: 'sha',
+          size: 100,
+          encoding: 'base64',
+          content: match.content,
+        };
+      });
+
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/analyze`).set(withBearer(identity.token)).send({ repositoryId: 940001 });
+
+      expect(response.status).toBe(201);
+
+      const body = responseRecord(response);
+
+      expect(body.repositoryType).toBe('monorepo');
+      expect(body.packageManager).toBe('pnpm');
+
+      const applications = body.applications as Array<Record<string, unknown>>;
+      const api = applications.find((application) => application.rootDirectory === 'apps/api');
+      const sharedTypes = applications.find((application) => application.rootDirectory === 'packages/shared-types');
+
+      expect(api?.runnable).toBe(true);
+      expect(api?.framework).toBe('NestJS');
+      expect(sharedTypes?.runnable).toBe(false);
+    });
+
+    it('rejects a repository with no package.json', async () => {
+      const identity = await registerIdentity(app, 'No Package Json');
+      await connectPersonalGithub(app, identity);
+
+      githubCodeMock.getTree.mockResolvedValueOnce({
+        sha: 'tree-sha',
+        truncated: false,
+        entries: [{ path: 'README.md', type: 'file', sha: 'r1', size: 10 }],
+      });
+
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/analyze`).set(withBearer(identity.token)).send({ repositoryId: 940001 });
+
+      expect(response.status).toBe(422);
+    });
+
+    it('tolerates a malformed package.json in a nested package while still analyzing the rest', async () => {
+      const identity = await registerIdentity(app, 'Malformed Package Json');
+      await connectPersonalGithub(app, identity);
+
+      githubCodeMock.getTree.mockResolvedValueOnce({
+        sha: 'tree-sha',
+        truncated: false,
+        entries: [
+          { path: 'package.json', type: 'file', sha: 'r1', size: 100 },
+          { path: 'apps/broken/package.json', type: 'file', sha: 'b1', size: 40 },
+        ],
+      });
+
+      githubCodeMock.getFile.mockImplementation(async (...args: unknown[]) => {
+        const path = args[3] as string;
+        if (path === 'package.json') {
+          return {
+            name: 'package.json',
+            path,
+            sha: 'r1',
+            size: 100,
+            encoding: 'base64',
+            content: encodePackageJson({
+              name: 'root-app',
+              scripts: { start: 'node index.js' },
+            }),
+          };
+        }
+
+        if (path === 'apps/broken/package.json') {
+          return {
+            name: 'package.json',
+            path,
+            sha: 'b1',
+            size: 40,
+            encoding: 'base64',
+            content: Buffer.from('{ this is not valid json', 'utf8').toString('base64'),
+          };
+        }
+
+        return null;
+      });
+
+      const response = await request(app.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/analyze`).set(withBearer(identity.token)).send({ repositoryId: 940001 });
+
+      expect(response.status).toBe(201);
+
+      const body = responseRecord(response);
+      const applications = body.applications as Array<Record<string, unknown>>;
+
+      expect(applications).toHaveLength(1);
+      expect(applications[0]?.rootDirectory).toBe('.');
+    });
+  });
+
+  describe('Workspace import transaction', () => {
+    async function analyzedApplications(app_: INestApplication, identity: Identity) {
+      githubCodeMock.getTree.mockResolvedValueOnce({
+        sha: 'tree-sha',
+        truncated: false,
+        entries: [{ path: 'package.json', type: 'file', sha: 'r1', size: 100 }],
+      });
+
+      githubCodeMock.getFile.mockResolvedValueOnce({
+        name: 'package.json',
+        path: 'package.json',
+        sha: 'r1',
+        size: 100,
+        encoding: 'base64',
+        content: encodePackageJson({
+          name: 'demo-app',
+          dependencies: { next: '^15.0.0' },
+          scripts: { dev: 'next dev', build: 'next build', start: 'next start' },
+        }),
+      });
+
+      const response = await request(app_.getHttpServer()).post(`${API_PREFIX}/repositories/github/personal/analyze`).set(withBearer(identity.token)).send({ repositoryId: 940001 });
+
+      return responseRecord(response);
+    }
+
+    it('rejects importing a repository through an installation the user never connected', async () => {
+      const identity = await registerIdentity(app, 'Unauthorized Import');
+      const response = await request(app.getHttpServer())
+        .post(`${API_PREFIX}/workspaces/import/github`)
+        .set(withBearer(identity.token))
+        .send({
+          installationId: DEFAULT_INSTALLATION_ID,
+          repositoryId: 940001,
+          workspace: { name: 'Demo Workspace' },
+          applications: [{ name: 'Demo App', rootDirectory: '.' }],
+        });
+
+      expect(response.status).toBe(403);
+    });
+
+    it('creates a workspace, application, and repository connection atomically', async () => {
+      const identity = await registerIdentity(app, 'Successful Import');
+      await connectPersonalGithub(app, identity);
+
+      const analysis = await analyzedApplications(app, identity);
+      const response = await request(app.getHttpServer())
+        .post(`${API_PREFIX}/workspaces/import/github`)
+        .set(withBearer(identity.token))
+        .send({
+          installationId: DEFAULT_INSTALLATION_ID,
+          repositoryId: 940001,
+          workspace: {
+            name: 'Demo Workspace',
+            description: 'Imported from GitHub',
+          },
+          applications: [
+            {
+              name: 'Demo App',
+              rootDirectory: '.',
+              framework: 'Next.js',
+              technologies: ['TypeScript'],
+            },
+          ],
+        });
+
+      expect(response.status).toBe(201);
+      expect(analysis.repositoryType).toBe('single-app');
+
+      const body = responseRecord(response);
+      const workspaceId = requireString(body, 'workspaceId');
+      const workspace = await prisma.workspace.findUnique({ where: { id: workspaceId } });
+      expect(workspace).not.toBeNull();
+
+      const member = await prisma.workspaceMember.findFirst({
+        where: { workspaceId, userId: identity.userId, role: 'OWNER' },
+      });
+      expect(member).not.toBeNull();
+
+      const application = await prisma.saasApplication.findFirst({ where: { workspaceId } });
+      expect(application?.name).toBe('Demo App');
+
+      const connection = await prisma.repositoryConnection.findFirst({ where: { workspaceId } });
+      expect(connection?.fullName).toBe(`${DEFAULT_OWNER}/demo-app`);
+      expect(connection?.applicationId).toBe(application?.id);
+    });
+
+    it('creates a separate workspace when the same repository is imported twice, avoiding silent duplicate application collisions', async () => {
+      const identity = await registerIdentity(app, 'Duplicate Import');
+      await connectPersonalGithub(app, identity);
+
+      const importPayload = {
+        installationId: DEFAULT_INSTALLATION_ID,
+        repositoryId: 940001,
+        workspace: { name: 'Duplicate Workspace' },
+        applications: [{ name: 'Duplicate App', rootDirectory: '.' }],
+      };
+      const first = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces/import/github`).set(withBearer(identity.token)).send(importPayload);
+
+      expect(first.status).toBe(201);
+
+      const second = await request(app.getHttpServer()).post(`${API_PREFIX}/workspaces/import/github`).set(withBearer(identity.token)).send(importPayload);
+
+      expect(second.status).toBe(201);
+
+      const firstWorkspaceId = requireString(responseRecord(first), 'workspaceId');
+      const secondWorkspaceId = requireString(responseRecord(second), 'workspaceId');
+
+      expect(firstWorkspaceId).not.toBe(secondWorkspaceId);
+
+      const firstWorkspace = await prisma.workspace.findUnique({ where: { id: firstWorkspaceId } });
+      const secondWorkspace = await prisma.workspace.findUnique({ where: { id: secondWorkspaceId } });
+
+      expect(firstWorkspace?.slug).not.toBe(secondWorkspace?.slug);
+    });
+
+    it('rejects an import request with no selected applications', async () => {
+      const identity = await registerIdentity(app, 'Empty Applications Import');
+      await connectPersonalGithub(app, identity);
+
+      const response = await request(app.getHttpServer())
+        .post(`${API_PREFIX}/workspaces/import/github`)
+        .set(withBearer(identity.token))
+        .send({
+          installationId: DEFAULT_INSTALLATION_ID,
+          repositoryId: 940001,
+          workspace: { name: 'No Apps Workspace' },
+          applications: [],
+        });
+
+      expect(response.status).toBe(400);
+    });
+
+    it('rolls back and creates nothing when the repository is no longer accessible mid-import', async () => {
+      const identity = await registerIdentity(app, 'Rollback Import');
+      await connectPersonalGithub(app, identity);
+
+      githubAppMock.listImportableInstallationRepositories.mockResolvedValueOnce([]);
+
+      const response = await request(app.getHttpServer())
+        .post(`${API_PREFIX}/workspaces/import/github`)
+        .set(withBearer(identity.token))
+        .send({
+          installationId: DEFAULT_INSTALLATION_ID,
+          repositoryId: 940001,
+          workspace: { name: 'Rollback Workspace' },
+          applications: [{ name: 'Rollback App', rootDirectory: '.' }],
+        });
+
+      expect(response.status).toBe(403);
+
+      const workspace = await prisma.workspace.findFirst({ where: { name: 'Rollback Workspace' } });
+      expect(workspace).toBeNull();
+    });
+  });
+});
+

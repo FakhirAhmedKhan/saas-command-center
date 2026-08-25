@@ -3,6 +3,7 @@ import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
 import type { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
 import { AppModule } from 'src/app.module';
 import { configureApplication } from 'src/bootstrap/configure-application';
 import { PrismaService } from 'src/database/prisma.service';
@@ -13,8 +14,8 @@ describe('Tracker -> Production HTTP Bootstrap E2E', () => {
   let prisma: PrismaService;
 
   beforeEach(async () => {
-    app = await NestFactory.create(AppModule, {
-      bodyParser: false,
+    app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
+      rawBody: true,
       logger: false,
     });
 
@@ -23,6 +24,7 @@ describe('Tracker -> Production HTTP Bootstrap E2E', () => {
     });
 
     await app.init();
+    await app.getHttpAdapter().getInstance().ready();
 
     prisma = app.get(PrismaService);
 

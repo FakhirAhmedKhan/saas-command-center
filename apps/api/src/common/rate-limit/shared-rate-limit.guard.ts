@@ -2,9 +2,9 @@ import { SHARED_RATE_LIMIT_KEY, type SharedRateLimitOptions } from './shared-rat
 import { SharedRateLimitService } from './shared-rate-limit.service';
 import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import type { Request, Response } from 'express';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 
-interface RequestWithOptionalUser extends Request {
+interface RequestWithOptionalUser extends FastifyRequest {
   user?: {
     id?: string;
   };
@@ -24,29 +24,31 @@ interface RequestWithOptionalUser extends Request {
  * such as the analytics ingestion collector) fall back to a caller-supplied
  * tracking/API key, which is the only identity available for them.
  */
-export function getIdentity(request: Request): string {
+export function getIdentity(request: FastifyRequest): string {
   const userId = (request as RequestWithOptionalUser).user?.id;
 
   if (userId) {
-    const rawWorkspaceId = request.params?.workspaceId;
+    const rawWorkspaceId = (request.params as { workspaceId?: unknown }).workspaceId;
     const workspaceId = typeof rawWorkspaceId === 'string' ? rawWorkspaceId : undefined;
 
     return workspaceId ? `user:${userId}:workspace:${workspaceId}` : `user:${userId}`;
   }
 
-  const trackingKey = request.header('x-tracking-key');
+  const trackingKey = request.headers['x-tracking-key'];
 
   if (trackingKey) {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     return `tracking:${trackingKey}`;
   }
 
-  const apiKey = request.header('x-api-key');
+  const apiKey = request.headers['x-api-key'];
 
   if (apiKey) {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     return `apikey:${apiKey}`;
   }
 
-  return `ip:${request.ip || request.socket.remoteAddress || 'unknown'}`;
+  return `ip:${request.ip || request.raw.socket.remoteAddress || 'unknown'}`;
 }
 
 @Injectable()
@@ -64,16 +66,16 @@ export class SharedRateLimitGuard implements CanActivate {
     }
 
     const httpContext = context.switchToHttp();
-    const request = httpContext.getRequest<Request>();
-    const response = httpContext.getResponse<Response>();
+    const request = httpContext.getRequest<FastifyRequest>();
+    const response = httpContext.getResponse<FastifyReply>();
     const result = await this.rateLimit.consume(options.scope, getIdentity(request), options.limit, options.windowSeconds);
 
-    response.setHeader('X-RateLimit-Limit', String(result.limit));
-    response.setHeader('X-RateLimit-Remaining', String(result.remaining));
-    response.setHeader('X-RateLimit-Reset', String(result.resetAfterSeconds));
+    response.header('X-RateLimit-Limit', String(result.limit));
+    response.header('X-RateLimit-Remaining', String(result.remaining));
+    response.header('X-RateLimit-Reset', String(result.resetAfterSeconds));
 
     if (!result.allowed) {
-      response.setHeader('Retry-After', String(result.retryAfterSeconds));
+      response.header('Retry-After', String(result.retryAfterSeconds));
 
       throw new HttpException(
         {

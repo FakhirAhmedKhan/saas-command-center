@@ -1,10 +1,10 @@
 import { Public } from '../../auth/decorators/public.decorator';
 import { GithubWebhookService } from '../services/github-webhook.service';
-import { Controller, Headers, Post, Req, UnauthorizedException } from '@nestjs/common';
+import { Controller, Headers, Post, Req, UnauthorizedException ,type  RawBodyRequest } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import type { Request } from 'express';
+import type { FastifyRequest } from 'fastify';
 
-type GithubWebhookRequest = Request<Record<string, never>, unknown, Buffer>;
+type GithubWebhookRequest = RawBodyRequest<FastifyRequest>;
 
 @ApiTags('Repository GitHub Webhook')
 @Public()
@@ -30,10 +30,10 @@ export class GithubWebhookController {
       throw new UnauthorizedException('Required GitHub webhook headers are missing.');
     }
 
-    if (!Buffer.isBuffer(request.body)) {
+    if (!Buffer.isBuffer(request.rawBody)) {
       throw new UnauthorizedException('GitHub webhook raw body is unavailable.');
     }
 
-    return this.githubWebhookService.handle(request.body, deliveryId, event, signature);
+    return this.githubWebhookService.handle(request.rawBody, deliveryId, event, signature);
   }
 }

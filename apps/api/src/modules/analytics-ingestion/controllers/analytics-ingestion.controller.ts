@@ -4,7 +4,7 @@ import { Public } from '../../auth/decorators/public.decorator';
 import { AnalyticsIngestionService } from '../services/analytics-ingestion.service';
 import { Body, Controller, Headers, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
-import type { Request } from 'express';
+import type { FastifyRequest } from 'fastify';
 
 @ApiExcludeController()
 @Public()
@@ -20,11 +20,11 @@ export class AnalyticsIngestionController {
 
   @Post()
   @HttpCode(202)
-  collect(@Body() body: unknown, @Headers('origin') origin: string | undefined, @Headers('user-agent') userAgent: string | undefined, @Req() request: Request) {
+  collect(@Body() body: unknown, @Headers('origin') origin: string | undefined, @Headers('user-agent') userAgent: string | undefined, @Req() request: FastifyRequest) {
     return this.ingestionService.collect(body, {
       origin,
       userAgent,
-      ipAddress: request.ip ?? request.socket.remoteAddress,
+      ipAddress: request.ip ?? request.raw.socket.remoteAddress,
     });
   }
 }

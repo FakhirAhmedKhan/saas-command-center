@@ -248,8 +248,7 @@ describe('Desktop Repository Linking E2E', () => {
 
     expect(readResponse.status).toBe(200);
 
-    expect(readResponse.text).toBe('');
-    expect(readResponse.body).toEqual({});
+    expect(readResponse.body).toBeNull();
   });
 
   it('rejects repository from another workspace', async () => {

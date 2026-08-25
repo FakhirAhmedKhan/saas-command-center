@@ -3,6 +3,7 @@
 import { PageError } from '@/components/states/page-error';
 import { PageLoading } from '@/components/states/page-loading';
 import { getApplications } from '@/features/applications/application-api';
+import { useAuth } from '@/features/auth/auth-provider';
 import type { Workspace } from '@/features/auth/auth.types';
 import { apiRequest } from '@/features/lib/api/api-client';
 import { getErrorMessage } from '@/features/lib/api/api-error';
@@ -16,9 +17,23 @@ export default function WorkspacePage() {
     workspaceId: string;
   }>();
   const workspaceId = params.workspaceId;
-  const [workspace, setWorkspace] = useState<Workspace | null>(null);
+  const { workspaces } = useAuth();
+  /*
+   * The user's workspace list is already fetched once at session restore
+   * (auth-provider.tsx) and kept in context, so it survives navigation
+   * between tabs. Seeding state from it avoids the full-page "Loading
+   * workspace…" flash every time this page remounts (switching away and
+   * back), while the effect below still fetches the authoritative record
+   * in the background so applicationCount and any newer fields stay correct.
+   */
+  const [workspace, setWorkspace] = useState<Workspace | null>(() => workspaces.find((candidate) => candidate.id === workspaceId) ?? null);
   const [applicationCount, setApplicationCount] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- see comment above `workspace`'s initializer
+    setWorkspace(workspaces.find((candidate) => candidate.id === workspaceId) ?? null);
+  }, [workspaceId, workspaces]);
 
   useEffect(() => {
     let active = true;

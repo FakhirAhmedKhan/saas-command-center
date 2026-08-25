@@ -1,9 +1,10 @@
-﻿import { processAnalytics } from '../helpers/analytics-engine-old';
+import { processAnalytics } from '../helpers/analytics-engine-old';
 import { createTrackedWebsite } from '../helpers/analytics-ingestion';
 import { resetDatabase } from '../helpers/database';
 import { registerWorkspaceTestUser } from '../helpers/workspace';
 import type { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { AppModule } from 'src/app.module';
@@ -45,8 +46,8 @@ describe('Actual Tracker Bundle -> API -> Analytics E2E', () => {
   let prisma: PrismaService;
 
   beforeEach(async () => {
-    app = await NestFactory.create(AppModule, {
-      bodyParser: false,
+    app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
+      rawBody: true,
       logger: false,
     });
 
@@ -55,6 +56,7 @@ describe('Actual Tracker Bundle -> API -> Analytics E2E', () => {
     });
 
     await app.init();
+    await app.getHttpAdapter().getInstance().ready();
 
     prisma = app.get(PrismaService);
 

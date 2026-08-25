@@ -1,0 +1,419 @@
+=== GIT STATUS ===
+M  apps/api/package.json
+M  apps/api/prisma/migrations/20260823224500_desktop_support_and_mobile_performance_reconcile/migration.sql
+A  apps/api/src/app.module.ts.backup
+M  apps/api/src/bootstrap/configure-application.ts
+M  apps/api/src/bootstrap/startup-checks.ts
+M  apps/api/src/config/runtime-config.ts
+M  apps/api/src/main.ts
+M  apps/api/src/modules/desktop-apps/services/desktop-analysis-context.service.ts
+M  apps/api/src/modules/workspace/modules/workspaces.module.ts
+A  apps/api/src/modules/workspace/modules/workspaces.module.ts.backup
+ M apps/web/next-env.d.ts
+M  apps/web/src/app/(auth)/layout.tsx
+M  apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/alerts/page.tsx
+M  apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/builds/page.tsx
+M  apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/code/page.tsx
+M  apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/crashes/page.tsx
+M  apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/dependencies/page.tsx
+A  apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/layout.tsx
+M  apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/page.tsx
+M  apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/performance/page.tsx
+M  apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/releases/page.tsx
+M  apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/security/page.tsx
+M  apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/settings/page.tsx
+M  apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/tests/page.tsx
+M  apps/web/src/app/(dashboard)/workspaces/[workspaceId]/page.tsx
+A  apps/web/src/app/DynmicIndex.tsx
+M  apps/web/src/app/icon.svg
+M  apps/web/src/app/page.tsx
+A  apps/web/src/components/brand/logo-mark.tsx
+M  apps/web/src/components/layout/app-shell.tsx
+D  apps/web/src/components/layout/app-shell.tsx.before-app-shell-redesign.bak
+A  apps/web/src/components/layout/sideBar.tsx
+M  apps/web/src/features/landingpage.tsx
+M  apps/web/tsconfig.tsbuildinfo
+R  DESKTOP-API-FIX-DIAGNOSTIC.txt -> docs/DESKTOP-API-FIX-DIAGNOSTIC.txt
+R  DESKTOP-E2E-INFRA-DIAGNOSTIC.txt -> docs/DESKTOP-E2E-INFRA-DIAGNOSTIC.txt
+R  DESKTOP-TEST-HARNESS-DIAGNOSTIC.txt -> docs/DESKTOP-TEST-HARNESS-DIAGNOSTIC.txt
+R  DESKTOP-TYPECHECK-AFTER-FIX.txt -> docs/DESKTOP-TYPECHECK-AFTER-FIX.txt
+R  DESKTOP-WEB-LINT-SOURCE.txt -> docs/DESKTOP-WEB-LINT-SOURCE.txt
+R  FULL-PRISMA-DIAGNOSTIC-V2.txt -> docs/FULL-PRISMA-DIAGNOSTIC-V2.txt
+R  FULL-PRISMA-DIAGNOSTIC.txt -> docs/FULL-PRISMA-DIAGNOSTIC.txt
+R  desktop-prisma-diagnostic-2.txt -> docs/desktop-prisma-diagnostic-2.txt
+R  desktop-prisma-diagnostic.txt -> docs/desktop-prisma-diagnostic.txt
+A  docs/guided-workspace-builder-implementation-plan.md
+A  docs/mobile-desktop-pass-a.txt
+A  docs/phase-1-static-verification.txt
+A  docs/phase-2-migration-status.txt
+A  docs/phase-3-local-db-safety.txt
+A  docs/phase-4-clean-migration-replay.txt
+A  docs/phase-4-reset-result.txt
+M  packages/test-code/api/e2e/mobile-full-flow.e2e-spec.ts
+M  packages/test-code/web/e2e/full-stack/fixtures/helpers.ts
+M  packages/test-code/web/e2e/full-stack/fullstack-desktop-apps.spec.ts
+M  packages/test-code/web/e2e/full-stack/fullstack-desktop-final.spec.ts
+M  packages/test-code/web/e2e/full-stack/fullstack-desktop-phases-12-14.spec.ts
+M  packages/test-code/web/playwright-report-fullstack/index.html
+M  packages/test-code/web/tsconfig.tsbuildinfo
+A  phase-1-baseline.txt
+A  phase-1-db-performance-trace.txt
+A  phase-1-post-fix-runtime.txt
+A  phase-1-production-build.txt
+A  phase-1-runtime-errors-2.txt
+A  phase-1-runtime-errors.txt
+A  phase-5-desktop-ai-diagnostic.txt
+A  phase-5-web-build-error.txt
+M  pnpm-lock.yaml
+
+=== RELEVANT DIFF ===
+
+=== FILE: apps/api/src/main.ts ===
+import { AppModule } from './app.module';
+import { configureApplication } from './bootstrap/configure-application';
+import { assertStartupRequirements } from './bootstrap/startup-checks';
+import { validateEnvironment } from './config/env.validation';
+import { parseBodyLimit, parseTrustProxy, type TypedConfigService } from './config/runtime-config';
+import { type INestApplication, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
+import { config as loadEnvironment } from 'dotenv';
+import { randomUUID } from 'node:crypto';
+
+loadEnvironment({
+  path: ['../../.env', '.env'],
+});
+
+async function bootstrap(): Promise<void> {
+  const environment = validateEnvironment(process.env);
+  const adapter = new FastifyAdapter({
+    trustProxy: parseTrustProxy(environment.TRUST_PROXY),
+    bodyLimit: parseBodyLimit(environment.BODY_LIMIT),
+    requestIdHeader: 'x-request-id',
+    genReqId: () => randomUUID(),
+  });
+  const app: INestApplication = await NestFactory.create<NestFastifyApplication>(AppModule, adapter, {
+    bufferLogs: true,
+
+    // Keeps the original raw payload available for signed webhooks.
+    rawBody: true,
+  });
+
+  configureApplication(app);
+
+  await assertStartupRequirements(app);
+
+  const config = app.get<TypedConfigService>(ConfigService);
+  const port = config.get('PORT', {
+    infer: true,
+  });
+
+  await app.listen(port, '0.0.0.0');
+
+  const logger = new Logger('Bootstrap');
+  logger.log(`Command Center API running on port ${port}.`);
+}
+
+void bootstrap();
+
+=== FILE: apps/api/src/bootstrap/configure-application.ts ===
+import { AllExceptionsFilter } from '../common/filters/all-exceptions.filter';
+import { getAllowedOrigins, type TypedConfigService } from '../config/runtime-config';
+import fastifyCookie from '@fastify/cookie';
+import fastifyHelmet from '@fastify/helmet';
+import { Logger, ValidationPipe, type INestApplication } from '@nestjs/common';
+import type { CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
+import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import type { FastifyInstance, FastifyRequest } from 'fastify';
+
+export interface ConfigureApplicationOptions {
+  enableSwagger?: boolean;
+}
+
+function configureCors(app: INestApplication, config: TypedConfigService): void {
+  const allowedOrigins = getAllowedOrigins(config);
+  const commonOptions = {
+    methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Authorization', 'Content-Type', 'X-Request-Id', 'X-Workspace-Id'],
+    exposedHeaders: ['X-Request-Id'],
+  };
+  const corsOptionsDelegate: CorsOptionsDelegate<FastifyRequest> = (request, callback) => {
+    const requestPath = (request.raw.url ?? request.url ?? '').split('?')[0];
+
+    /*
+     * The analytics collector performs its own tracking-key and
+     * Website.allowedOrigins validation.
+     */
+    if (requestPath === '/api/v1/collect') {
+      callback(null, {
+        ...commonOptions,
+        credentials: false,
+        origin: false,
+      });
+
+      return;
+    }
+
+    const origin = request.headers.origin;
+
+    if (!origin || allowedOrigins.has(origin)) {
+      callback(null, {
+        ...commonOptions,
+        credentials: true,
+        origin: true,
+      });
+
+      return;
+    }
+
+    callback(new Error(`Origin ${origin} is not allowed by CORS.`), {
+      ...commonOptions,
+      credentials: false,
+      origin: false,
+    });
+  };
+
+  app.enableCors((() => corsOptionsDelegate) as unknown as CorsOptionsDelegate<FastifyRequest>);
+}
+
+function configureSwagger(app: INestApplication): void {
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('SaaS Command Center API')
+    .setDescription('Backend API for SaaS Command Center.')
+    .setVersion('0.1.0')
+    .addBearerAuth()
+    .addCookieAuth('command_center_refresh_token')
+    .build();
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+
+  SwaggerModule.setup('api/v1/docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
+}
+
+export function configureApplication(app: INestApplication, options: ConfigureApplicationOptions = {}): void {
+  const logger = new Logger('ApplicationBootstrap');
+  const config = app.get<TypedConfigService>(ConfigService);
+  const fastify = app.getHttpAdapter().getInstance() as FastifyInstance;
+
+  /*
+   * Queue plugins before app.init()/app.listen().
+   * Fastify completes plugin registration during initialization.
+   */
+  fastify.register(fastifyCookie);
+
+  fastify.register(fastifyHelmet, {
+    global: true,
+    contentSecurityPolicy:
+      config.get('NODE_ENV', {
+        infer: true,
+      }) === 'production',
+    crossOriginResourcePolicy: {
+      policy: 'cross-origin',
+    },
+  });
+
+  fastify.addHook('onRequest', (request, reply, done) => {
+    reply.header('X-Request-Id', request.id);
+    done();
+  });
+
+  configureCors(app, config);
+
+  app.setGlobalPrefix('api/v1');
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      forbidUnknownValues: true,
+      stopAtFirstError: false,
+    }),
+  );
+
+  app.useGlobalFilters(new AllExceptionsFilter());
+
+  app.enableShutdownHooks();
+
+  const swaggerEnabled =
+    options.enableSwagger ??
+    config.get('SWAGGER_ENABLED', {
+      infer: true,
+    });
+
+  if (swaggerEnabled) {
+    configureSwagger(app);
+
+    logger.log('Swagger enabled at /api/v1/docs');
+  }
+}
+
+=== FILE: packages/test-code/api/helpers/create-test-app.ts ===
+import { type INestApplication } from '@nestjs/common';
+import { type NestExpressApplication } from '@nestjs/platform-express';
+import { Test } from '@nestjs/testing';
+import { AppModule } from 'src/app.module';
+import { configureApplication } from 'src/bootstrap/configure-application';
+
+export async function createTestApp(): Promise<INestApplication> {
+  const testingModule = await Test.createTestingModule({
+    imports: [AppModule],
+  }).compile();
+  const app = testingModule.createNestApplication<NestExpressApplication>();
+
+  /*
+   * Boot the same way production does so E2E exercises the real filters,
+   * request-id middleware, helmet, CORS and body limits.
+   *
+   * Swagger defaults to enabled outside production; skip the document build
+   * so each suite does not pay for it.
+   */
+  configureApplication(app, {
+    enableSwagger: false,
+  });
+
+  await app.init();
+
+  return app;
+}
+
+=== FILE: packages/test-code/api/jest-e2e.config.cjs ===
+const path = require('node:path');
+
+const repoRoot = path.resolve(__dirname, '../../..');
+
+module.exports = {
+  moduleFileExtensions: ['js', 'json', 'ts'],
+
+  rootDir: repoRoot,
+
+  testEnvironment: 'node',
+
+  roots: ['<rootDir>/apps/api/src', '<rootDir>/packages/test-code/api'],
+
+  testRegex: 'packages/test-code/api/e2e/.*\\.e2e-spec\\.ts$',
+
+  transform: {
+    '^.+\\.(t|j)s$': [
+      require.resolve('ts-jest'),
+      {
+        tsconfig: path.join(__dirname, 'tsconfig.json'),
+      },
+    ],
+  },
+
+  moduleNameMapper: {
+    '^src/(.*)$': '<rootDir>/apps/api/src/$1',
+  },
+
+  setupFiles: [path.join(__dirname, 'setup-env.ts')],
+
+  collectCoverageFrom: ['apps/api/src/**/*.ts', '!apps/api/src/generated/**', '!apps/api/src/**/*.spec.ts', '!apps/api/src/**/*.test.ts'],
+
+  coveragePathIgnorePatterns: ['/node_modules/', '/dist/', '/apps/api/src/generated/', '\\.spec\\.ts$', '\\.test\\.ts$'],
+
+  coverageDirectory: '<rootDir>/apps/api/coverage/e2e',
+
+  testTimeout: 30000,
+
+  maxWorkers: 1,
+
+  detectOpenHandles: true,
+
+  forceExit: false,
+};
+
+=== FILE: apps/api/package.json ===
+{
+  "name": "@command-center/api",
+  "version": "0.1.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "prebuild": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "nest build",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:prod": "node dist/main.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prisma:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:seed": "prisma db seed",
+    "db:reset": "prisma migrate reset",
+    "db:studio": "prisma studio",
+    "demo:seed": "prisma generate && tsx scripts/demo-data.ts seed",
+    "demo:reset": "prisma generate && tsx scripts/demo-data.ts reset",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@command-center/shared-types": "workspace:*",
+    "@fastify/cookie": "^11.1.2",
+    "@fastify/helmet": "^13.1.1",
+    "@fastify/static": "^10.1.3",
+    "@nestjs/common": "^11.2.1",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.2.1",
+    "@nestjs/jwt": "^11.0.2",
+    "@nestjs/passport": "^11.0.5",
+    "@nestjs/platform-express": "^11.2.1",
+    "@nestjs/platform-fastify": "^11.2.1",
+    "@nestjs/schedule": "^6.1.3",
+    "@nestjs/swagger": "^11.2.0",
+    "@nestjs/throttler": "^6.5.0",
+    "@prisma/adapter-pg": "^7.9.1",
+    "@prisma/client": "7.9.1",
+    "argon2": "^0.45.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "dotenv": "^17.4.2",
+    "fastify": "^5.11.3",
+    "google-auth-library": "^11.0.2",
+    "ioredis": "^6.0.0",
+    "ipaddr.js": "^2.5.0",
+    "luxon": "^3.7.2",
+    "nestjs-throttler-storage-redis": "^0.5.1",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "pg": "^8.23.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "undici": "^8.10.0"
+  },
+  "devDependencies": {
+    "@command-center/eslint-config": "workspace:*",
+    "@eslint/js": "^9.34.0",
+    "@nestjs/cli": "^11.0.10",
+    "@nestjs/schematics": "^11.0.7",
+    "@nestjs/testing": "^11.2.1",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/express": "^5.0.3",
+    "@types/jest": "29.5.14",
+    "@types/luxon": "^3.7.4",
+    "@types/node": "^24.3.0",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/pg": "^8.20.3",
+    "@types/supertest": "^6.0.3",
+    "cross-env": "^10.1.0",
+    "eslint": "^9.34.0",
+    "globals": "^17.11.0",
+    "jest": "29.7.0",
+    "prisma": "7.9.1",
+    "source-map-support": "^0.5.21",
+    "supertest": "^7.1.4",
+    "ts-jest": "29.4.12",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.23.12",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.67.0"
+  }
+}
+

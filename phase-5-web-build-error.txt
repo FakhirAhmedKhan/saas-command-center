@@ -1,0 +1,16 @@
+$ next build
+▲ Next.js 16.3.1 (Turbopack)
+- Environments: .env.local
+✓ Running next.config.ts took 68ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 4.0s
+  Running TypeScript ...
+.next/dev/types/validator.ts(242,67): error TS1005: ';' expected.
+.next/dev/types/validator.ts(242,69): error TS1002: Unterminated string literal.
+.next/dev/types/validator.ts(246,1): error TS1128: Declaration or statement expected.
+Failed to type check.
+
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @command-center/web@0.1.0 build: `next build`
+Exit status 1

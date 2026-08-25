@@ -9,9 +9,9 @@ import { CreateWorkspaceInvitationDto, InvitationListQueryDto } from '../dto/wor
 import { WorkspaceInvitationService } from '../services/workspace-invitation.service';
 import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import type { Request } from 'express';
+import type { FastifyRequest } from 'fastify';
 
-interface AuthenticatedRequest extends Request {
+interface AuthenticatedRequest extends FastifyRequest {
   user: {
     id: string;
   };

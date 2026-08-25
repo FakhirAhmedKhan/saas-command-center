@@ -4,6 +4,7 @@ import { createTestApp } from '../helpers/create-test-app';
 import { resetDatabase } from '../helpers/database';
 import { readAccessToken } from '../helpers/response';
 import type { INestApplication } from '@nestjs/common';
+import type { FastifyInstance } from 'fastify';
 import { REQUEST_ID_HEADER } from 'src/common/middleware/request-id.middleware';
 import { PrismaService } from 'src/database/prisma.service';
 import request from 'supertest';
@@ -199,9 +200,15 @@ describe('Infrastructure E2E', () => {
         ...buildWorkspacePayload('Oversized Workspace'),
         padding: 'x'.repeat(2 * 1024 * 1024),
       };
-      const response = await request(app.getHttpServer()).post(TEST_ROUTES.workspaces.root).set(withBearer(accessToken)).send(oversizedPayload);
+      const fastify = app.getHttpAdapter().getInstance() as FastifyInstance;
+      const response = await fastify.inject({
+        method: 'POST',
+        url: TEST_ROUTES.workspaces.root,
+        headers: withBearer(accessToken),
+        payload: oversizedPayload,
+      });
 
-      expect(response.status).toBe(413);
+      expect(response.statusCode).toBe(413);
     });
   });
 });

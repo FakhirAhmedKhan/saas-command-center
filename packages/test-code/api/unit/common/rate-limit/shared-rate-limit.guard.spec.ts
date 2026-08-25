@@ -1,18 +1,18 @@
-import type { Request } from 'express';
+import type { FastifyRequest } from 'fastify';
 import { getIdentity } from 'src/common/rate-limit/shared-rate-limit.guard';
 
-function buildRequest(overrides: { userId?: string; workspaceId?: string; headers?: Record<string, string>; ip?: string }): Request {
+function buildRequest(overrides: { userId?: string; workspaceId?: string; headers?: Record<string, string>; ip?: string }): FastifyRequest {
   const headers = overrides.headers ?? {};
 
   return {
     user: overrides.userId ? { id: overrides.userId } : undefined,
     params: overrides.workspaceId ? { workspaceId: overrides.workspaceId } : {},
-    header(name: string) {
-      return headers[name.toLowerCase()];
-    },
+    headers,
     ip: overrides.ip,
-    socket: {},
-  } as unknown as Request;
+    raw: {
+      socket: {},
+    },
+  } as unknown as FastifyRequest;
 }
 
 describe('getIdentity (SharedRateLimitGuard)', () => {

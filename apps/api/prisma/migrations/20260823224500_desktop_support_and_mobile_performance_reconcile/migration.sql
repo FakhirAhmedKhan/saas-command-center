@@ -67,9 +67,6 @@ CREATE TYPE "DesktopTestType" AS ENUM ('UNIT', 'INTEGRATION', 'UI', 'E2E', 'INST
 -- CreateEnum
 CREATE TYPE "DesktopTestStatus" AS ENUM ('PENDING', 'RUNNING', 'PASSED', 'FAILED', 'SKIPPED', 'CANCELLED');
 
--- CreateEnum
-CREATE TYPE "MobilePerformanceMetricType" AS ENUM ('CRASH_FREE_USERS_RATE', 'CRASH_RATE', 'CRASH_COUNT', 'ANR_COUNT', 'HANG_COUNT', 'COLD_STARTUP_MS', 'WARM_STARTUP_MS', 'MEMORY_MB', 'NETWORK_LATENCY_MS', 'API_FAILURE_RATE', 'VERSION_ADOPTION_RATE', 'SLOW_SCREEN_COUNT');
-
 -- AlterEnum
 ALTER TYPE "ApplicationType" ADD VALUE 'DESKTOP';
 
@@ -345,23 +342,6 @@ CREATE TABLE "desktop_test_failures" (
     CONSTRAINT "desktop_test_failures_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "mobile_performance_metrics" (
-    "id" UUID NOT NULL,
-    "workspace_id" UUID NOT NULL,
-    "mobile_app_id" UUID NOT NULL,
-    "platform" "MobilePlatform" NOT NULL,
-    "version" VARCHAR(64) NOT NULL,
-    "build_number" VARCHAR(64),
-    "period_start" TIMESTAMP(3),
-    "period_end" TIMESTAMP(3),
-    "collected_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "metric" "MobilePerformanceMetricType" NOT NULL,
-    "value" DOUBLE PRECISION NOT NULL,
-
-    CONSTRAINT "mobile_performance_metrics_pkey" PRIMARY KEY ("id")
-);
-
 -- CreateIndex
 CREATE INDEX "desktop_ai_analyses_workspace_id_desktop_app_id_created_at_idx" ON "desktop_ai_analyses"("workspace_id", "desktop_app_id", "created_at" DESC);
 
@@ -518,18 +498,6 @@ CREATE UNIQUE INDEX "desktop_test_runs_build_id_type_key" ON "desktop_test_runs"
 -- CreateIndex
 CREATE INDEX "desktop_test_failures_test_run_id_idx" ON "desktop_test_failures"("test_run_id");
 
--- CreateIndex
-CREATE INDEX "mobile_performance_metrics_workspace_id_mobile_app_id_colle_idx" ON "mobile_performance_metrics"("workspace_id", "mobile_app_id", "collected_at");
-
--- CreateIndex
-CREATE INDEX "mobile_performance_metrics_mobile_app_id_version_idx" ON "mobile_performance_metrics"("mobile_app_id", "version");
-
--- CreateIndex
-CREATE INDEX "mobile_performance_metrics_mobile_app_id_metric_collected_a_idx" ON "mobile_performance_metrics"("mobile_app_id", "metric", "collected_at");
-
--- CreateIndex
-CREATE INDEX "mobile_performance_metrics_platform_idx" ON "mobile_performance_metrics"("platform");
-
 -- AddForeignKey
 ALTER TABLE "desktop_ai_analyses" ADD CONSTRAINT "desktop_ai_analyses_desktop_app_id_fkey" FOREIGN KEY ("desktop_app_id") REFERENCES "desktop_applications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -587,5 +555,3 @@ ALTER TABLE "desktop_test_runs" ADD CONSTRAINT "desktop_test_runs_build_id_fkey"
 -- AddForeignKey
 ALTER TABLE "desktop_test_failures" ADD CONSTRAINT "desktop_test_failures_test_run_id_fkey" FOREIGN KEY ("test_run_id") REFERENCES "desktop_test_runs"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
-ALTER TABLE "mobile_performance_metrics" ADD CONSTRAINT "mobile_performance_metrics_mobile_app_id_fkey" FOREIGN KEY ("mobile_app_id") REFERENCES "mobile_applications"("id") ON DELETE CASCADE ON UPDATE CASCADE;

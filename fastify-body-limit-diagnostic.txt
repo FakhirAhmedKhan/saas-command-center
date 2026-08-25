@@ -1,0 +1,532 @@
+
+====================================================================================================
+FILE: packages/test-code/api/helpers/create-test-app.ts
+====================================================================================================
+import { type INestApplication } from '@nestjs/common';
+import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
+import { Test } from '@nestjs/testing';
+import { AppModule } from 'src/app.module';
+import { configureApplication } from 'src/bootstrap/configure-application';
+import type { IncomingMessage } from 'node:http';
+import type { Http2ServerRequest } from 'node:http2';
+import { createRequestId, REQUEST_ID_HEADER } from 'src/common/middleware/request-id.middleware';
+
+export async function createTestApp(): Promise<INestApplication> {
+  const testingModule = await Test.createTestingModule({
+    imports: [AppModule],
+  }).compile();
+  const app = testingModule.createNestApplication<NestFastifyApplication>(
+    new FastifyAdapter({
+      genReqId: (request: IncomingMessage | Http2ServerRequest) => createRequestId(request.headers[REQUEST_ID_HEADER]),
+    }),
+  );
+
+  /*
+   * Boot the same way production does so E2E exercises the real filters,
+   * request-id middleware, helmet, CORS and body limits.
+   *
+   * Swagger defaults to enabled outside production; skip the document build
+   * so each suite does not pay for it.
+   */
+  configureApplication(app, {
+    enableSwagger: false,
+  });
+
+  await app.init();
+  await app.getHttpAdapter().getInstance().ready();
+
+  return app;
+}
+
+
+====================================================================================================
+FILE: packages/test-code/api/e2e/infrastructure.e2e-spec.ts
+====================================================================================================
+import { createAgent, createTestUser, registerUser, withBearer } from '../helpers/auth';
+import { API_PREFIX, buildWorkspacePayload, TEST_ROUTES } from '../helpers/contracts';
+import { createTestApp } from '../helpers/create-test-app';
+import { resetDatabase } from '../helpers/database';
+import { readAccessToken } from '../helpers/response';
+import type { INestApplication } from '@nestjs/common';
+import { REQUEST_ID_HEADER } from 'src/common/middleware/request-id.middleware';
+import { PrismaService } from 'src/database/prisma.service';
+import request from 'supertest';
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Covers the production bootstrap wiring applied by configureApplication():
+ * the global exception filter, request-id middleware, helmet, CORS and body
+ * limits. These are only reachable now that the E2E harness boots the app the
+ * same way production does.
+ */
+describe('Infrastructure E2E', () => {
+  let app: INestApplication;
+  let prisma: PrismaService;
+  let accessToken: string;
+
+  beforeAll(async () => {
+    app = await createTestApp();
+
+    prisma = app.get(PrismaService);
+  });
+
+  beforeEach(async () => {
+    await resetDatabase(prisma);
+
+    const agent = createAgent(app);
+    const user = createTestUser();
+
+    accessToken = readAccessToken(await registerUser(agent, user));
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  describe('error envelope', () => {
+    it('returns the full production envelope for a 404', async () => {
+      const response = await request(app.getHttpServer()).get(`${API_PREFIX}/this-route-does-not-exist`);
+
+      expect(response.status).toBe(404);
+
+      expect(response.body).toMatchObject({
+        statusCode: 404,
+        path: `${API_PREFIX}/this-route-does-not-exist`,
+      });
+
+      expect(typeof response.body.message).toBe('string');
+
+      expect(response.body.timestamp).toEqual(expect.any(String));
+
+      expect(Number.isNaN(Date.parse(response.body.timestamp))).toBe(false);
+    });
+
+    it('reports the requestId in the body and matches the response header', async () => {
+      const response = await request(app.getHttpServer()).get(`${API_PREFIX}/this-route-does-not-exist`);
+
+      expect(response.body.requestId).toMatch(UUID_PATTERN);
+
+      expect(response.headers[REQUEST_ID_HEADER]).toBe(response.body.requestId);
+    });
+
+    it('returns a validation envelope with an array message for a bad payload', async () => {
+      const response = await request(app.getHttpServer()).post(TEST_ROUTES.workspaces.root).set(withBearer(accessToken)).send({
+        name: '',
+      });
+
+      expect(response.status).toBe(400);
+
+      expect(response.body.statusCode).toBe(400);
+
+      expect(Array.isArray(response.body.message)).toBe(true);
+
+      expect(response.body.path).toBe(TEST_ROUTES.workspaces.root);
+
+      expect(response.body.requestId).toMatch(UUID_PATTERN);
+    });
+
+    it('rejects unknown body fields under forbidNonWhitelisted', async () => {
+      const response = await request(app.getHttpServer())
+        .post(TEST_ROUTES.workspaces.root)
+        .set(withBearer(accessToken))
+        .send({
+          ...buildWorkspacePayload('Envelope Workspace'),
+          unexpectedField: 'should be rejected',
+        });
+
+      expect(response.status).toBe(400);
+
+      expect(JSON.stringify(response.body.message)).toMatch(/unexpectedField/);
+    });
+
+    it('does not leak a stack trace in the error body', async () => {
+      const response = await request(app.getHttpServer()).get(`${API_PREFIX}/this-route-does-not-exist`);
+
+      expect(response.body.stack).toBeUndefined();
+
+      expect(JSON.stringify(response.body)).not.toMatch(/at .*\(.*\.ts:/);
+    });
+  });
+
+  describe('request id middleware', () => {
+    it('sets a generated request id on successful responses', async () => {
+      const response = await request(app.getHttpServer()).get(TEST_ROUTES.system.health);
+
+      expect(response.headers[REQUEST_ID_HEADER]).toMatch(UUID_PATTERN);
+    });
+
+    it('echoes a client supplied request id', async () => {
+      const suppliedId = 'client-supplied-request-id';
+      const response = await request(app.getHttpServer()).get(TEST_ROUTES.system.health).set(REQUEST_ID_HEADER, suppliedId);
+
+      expect(response.headers[REQUEST_ID_HEADER]).toBe(suppliedId);
+    });
+
+    it('generates a fresh id when the supplied header is blank', async () => {
+      const response = await request(app.getHttpServer()).get(TEST_ROUTES.system.health).set(REQUEST_ID_HEADER, '   ');
+
+      expect(response.headers[REQUEST_ID_HEADER]).toMatch(UUID_PATTERN);
+    });
+
+    it('issues a different id per request', async () => {
+      const first = await request(app.getHttpServer()).get(TEST_ROUTES.system.health);
+      const second = await request(app.getHttpServer()).get(TEST_ROUTES.system.health);
+
+      expect(first.headers[REQUEST_ID_HEADER]).not.toBe(second.headers[REQUEST_ID_HEADER]);
+    });
+  });
+
+  describe('helmet security headers', () => {
+    it('applies helmet defaults to responses', async () => {
+      const response = await request(app.getHttpServer()).get(TEST_ROUTES.system.health);
+
+      expect(response.headers['x-content-type-options']).toBe('nosniff');
+
+      expect(response.headers['x-dns-prefetch-control']).toBe('off');
+
+      expect(response.headers['referrer-policy']).toBeDefined();
+    });
+
+    it('disables the CSP outside production', async () => {
+      const response = await request(app.getHttpServer()).get(TEST_ROUTES.system.health);
+
+      expect(response.headers['content-security-policy']).toBeUndefined();
+    });
+
+    it('sets a cross-origin resource policy so the tracker can load', async () => {
+      const response = await request(app.getHttpServer()).get(TEST_ROUTES.system.health);
+
+      expect(response.headers['cross-origin-resource-policy']).toBe('cross-origin');
+    });
+
+    it('removes the express fingerprint header', async () => {
+      const response = await request(app.getHttpServer()).get(TEST_ROUTES.system.health);
+
+      expect(response.headers['x-powered-by']).toBeUndefined();
+    });
+  });
+
+  describe('cors', () => {
+    it('allows a configured origin with credentials', async () => {
+      const response = await request(app.getHttpServer()).get(TEST_ROUTES.system.health).set('Origin', 'http://localhost:3000');
+
+      expect(response.headers['access-control-allow-origin']).toBe('http://localhost:3000');
+
+      expect(response.headers['access-control-allow-credentials']).toBe('true');
+    });
+
+    it('does not grant credentials to a disallowed origin', async () => {
+      const response = await request(app.getHttpServer()).get(TEST_ROUTES.system.health).set('Origin', 'https://attacker.example.com');
+
+      expect(response.headers['access-control-allow-origin']).toBeUndefined();
+
+      expect(response.headers['access-control-allow-credentials']).toBeUndefined();
+    });
+
+    it('exposes the request id header to browsers', async () => {
+      const response = await request(app.getHttpServer()).get(TEST_ROUTES.system.health).set('Origin', 'http://localhost:3000');
+
+      expect(response.headers['access-control-expose-headers']).toMatch(/X-Request-Id/i);
+    });
+  });
+
+  describe('body limits', () => {
+    it('accepts a payload within the configured limit', async () => {
+      const response = await request(app.getHttpServer()).post(TEST_ROUTES.workspaces.root).set(withBearer(accessToken)).send(buildWorkspacePayload('Body Limit Workspace'));
+
+      expect(response.status).toBeLessThan(400);
+    });
+
+    it('rejects a JSON payload larger than BODY_LIMIT', async () => {
+      const oversizedPayload = {
+        ...buildWorkspacePayload('Oversized Workspace'),
+        padding: 'x'.repeat(2 * 1024 * 1024),
+      };
+      const response = await request(app.getHttpServer()).post(TEST_ROUTES.workspaces.root).set(withBearer(accessToken)).send(oversizedPayload);
+
+      expect(response.status).toBe(413);
+    });
+  });
+});
+
+
+====================================================================================================
+FILE: apps/api/src/main.ts
+====================================================================================================
+import { AppModule } from './app.module';
+import { createRequestId, REQUEST_ID_HEADER } from './common/middleware/request-id.middleware';
+import { configureApplication } from './bootstrap/configure-application';
+import { assertStartupRequirements } from './bootstrap/startup-checks';
+import { validateEnvironment } from './config/env.validation';
+import { parseBodyLimit, parseTrustProxy, type TypedConfigService } from './config/runtime-config';
+import { type INestApplication, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
+import { config as loadEnvironment } from 'dotenv';
+import type { IncomingMessage } from 'node:http';
+
+loadEnvironment({
+  path: ['../../.env', '.env'],
+});
+
+async function bootstrap(): Promise<void> {
+  const environment = validateEnvironment(process.env);
+  const adapter = new FastifyAdapter({
+    trustProxy: parseTrustProxy(environment.TRUST_PROXY),
+    bodyLimit: parseBodyLimit(environment.BODY_LIMIT),
+    genReqId: (request: IncomingMessage) => createRequestId(request.headers[REQUEST_ID_HEADER]),
+  });
+  const app: INestApplication = await NestFactory.create<NestFastifyApplication>(AppModule, adapter, {
+    bufferLogs: true,
+
+    // Keeps the original raw payload available for signed webhooks.
+    rawBody: true,
+  });
+
+  configureApplication(app);
+
+  await assertStartupRequirements(app);
+
+  const config = app.get<TypedConfigService>(ConfigService);
+  const port = config.get('PORT', {
+    infer: true,
+  });
+
+  await app.listen(port, '0.0.0.0');
+
+  const logger = new Logger('Bootstrap');
+  logger.log(`Command Center API running on port ${port}.`);
+}
+
+void bootstrap();
+
+
+====================================================================================================
+FILE: apps/api/src/bootstrap/configure-application.ts
+====================================================================================================
+import { AllExceptionsFilter } from '../common/filters/all-exceptions.filter';
+import { getAllowedOrigins, type TypedConfigService } from '../config/runtime-config';
+import fastifyCookie from '@fastify/cookie';
+import fastifyHelmet from '@fastify/helmet';
+import { Logger, ValidationPipe, type INestApplication } from '@nestjs/common';
+import type { CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
+import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import type { FastifyInstance, FastifyRequest } from 'fastify';
+
+export interface ConfigureApplicationOptions {
+  enableSwagger?: boolean;
+}
+
+function configureCors(app: INestApplication, config: TypedConfigService): void {
+  const allowedOrigins = getAllowedOrigins(config);
+  const commonOptions = {
+    methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Authorization', 'Content-Type', 'X-Request-Id', 'X-Workspace-Id'],
+    exposedHeaders: ['X-Request-Id'],
+  };
+  const corsOptionsDelegate: CorsOptionsDelegate<FastifyRequest> = (request, callback) => {
+    const requestPath = (request.raw.url ?? request.url ?? '').split('?')[0];
+
+    /*
+     * The analytics collector performs its own tracking-key and
+     * Website.allowedOrigins validation.
+     */
+    if (requestPath === '/api/v1/collect') {
+      callback(null, {
+        ...commonOptions,
+        credentials: false,
+        origin: false,
+      });
+
+      return;
+    }
+
+    const origin = request.headers.origin;
+
+    if (!origin || allowedOrigins.has(origin)) {
+      callback(null, {
+        ...commonOptions,
+        credentials: true,
+        origin: true,
+      });
+
+      return;
+    }
+
+    callback(new Error(`Origin ${origin} is not allowed by CORS.`), {
+      ...commonOptions,
+      credentials: false,
+      origin: false,
+    });
+  };
+
+  app.enableCors((() => corsOptionsDelegate));
+}
+
+function configureSwagger(app: INestApplication): void {
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('SaaS Command Center API')
+    .setDescription('Backend API for SaaS Command Center.')
+    .setVersion('0.1.0')
+    .addBearerAuth()
+    .addCookieAuth('command_center_refresh_token')
+    .build();
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+
+  SwaggerModule.setup('api/v1/docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
+}
+
+export function configureApplication(app: INestApplication, options: ConfigureApplicationOptions = {}): void {
+  const logger = new Logger('ApplicationBootstrap');
+  const config = app.get<TypedConfigService>(ConfigService);
+  const fastify = app.getHttpAdapter().getInstance() as FastifyInstance;
+
+  /*
+   * Queue plugins before app.init()/app.listen().
+   * Fastify completes plugin registration during initialization.
+   */
+  fastify.register(fastifyCookie);
+
+  fastify.register(fastifyHelmet, {
+    global: true,
+    contentSecurityPolicy:
+      config.get('NODE_ENV', {
+        infer: true,
+      }) === 'production',
+    crossOriginResourcePolicy: {
+      policy: 'cross-origin',
+    },
+  });
+
+  fastify.addHook('onRequest', (request, reply, done) => {
+    reply.header('X-Request-Id', request.id);
+    done();
+  });
+
+  configureCors(app, config);
+
+  app.setGlobalPrefix('api/v1');
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      forbidUnknownValues: true,
+      stopAtFirstError: false,
+    }),
+  );
+
+  app.useGlobalFilters(new AllExceptionsFilter());
+
+  app.enableShutdownHooks();
+
+  const swaggerEnabled =
+    options.enableSwagger ??
+    config.get('SWAGGER_ENABLED', {
+      infer: true,
+    });
+
+  if (swaggerEnabled) {
+    configureSwagger(app);
+
+    logger.log('Swagger enabled at /api/v1/docs');
+  }
+}
+
+
+====================================================================================================
+FILE: apps/api/src/config/runtime-config.ts
+====================================================================================================
+import type { EnvironmentVariables } from './env.validation';
+import { ConfigService } from '@nestjs/config';
+
+export type TypedConfigService = ConfigService<EnvironmentVariables, true>;
+
+export function getAllowedOrigins(config: TypedConfigService): Set<string> {
+  const origins = config
+    .get('CORS_ORIGINS', {
+      infer: true,
+    })
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter((origin) => origin.length > 0);
+
+  return new Set(origins);
+}
+
+export function parseTrustProxy(value: string): boolean | number | string {
+  if (value === 'true') {
+    return true;
+  }
+
+  if (value === 'false') {
+    return false;
+  }
+
+  const numericValue = Number(value);
+
+  if (Number.isInteger(numericValue) && numericValue >= 0) {
+    return numericValue;
+  }
+
+  return value;
+}
+
+export function parseBodyLimit(value: string | number): number {
+  if (typeof value === 'number') {
+    if (!Number.isSafeInteger(value) || value <= 0) {
+      throw new Error('BODY_LIMIT must be a positive integer.');
+    }
+
+    return value;
+  }
+
+  const match = value
+    .trim()
+    .toLowerCase()
+    .match(/^(\d+)\s*(b|kb|mb|gb)?$/);
+
+  if (!match) {
+    throw new Error('BODY_LIMIT must use a format such as 1048576, 1mb, 10mb, or 1gb.');
+  }
+
+  const amount = Number(match[1]);
+  const unit = match[2] ?? 'b';
+  const multipliers: Record<string, number> = {
+    b: 1,
+    kb: 1024,
+    mb: 1024 ** 2,
+    gb: 1024 ** 3,
+  };
+  const multiplier = multipliers[unit];
+
+  if (multiplier === undefined) {
+    throw new Error(`Unsupported BODY_LIMIT unit: ${unit}`);
+  }
+
+  const bytes = amount * multiplier;
+
+  if (!Number.isSafeInteger(bytes) || bytes <= 0) {
+    throw new Error('BODY_LIMIT is outside the supported range.');
+  }
+
+  return bytes;
+}
+
+
+====================================================================================================
+BODY LIMIT ENVIRONMENT VALUES
+====================================================================================================
+FILE: apps/api/.env.test
+NO BODY_LIMIT/NODE_ENV VALUES
+FILE: apps/api/.env.example
+NODE_ENV=development
+BODY_LIMIT=1mb

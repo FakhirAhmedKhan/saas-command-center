@@ -1,8 +1,8 @@
-﻿import { createAgent, createTestUser, registerUser, withBearer } from '../helpers/auth';
+import { createAgent, createTestUser, registerUser, withBearer } from '../helpers/auth';
 import { resetDatabase } from '../helpers/database';
 import { readAccessToken } from '../helpers/response';
 import { type INestApplication } from '@nestjs/common';
-import { type NestExpressApplication } from '@nestjs/platform-express';
+import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
 import { randomUUID } from 'node:crypto';
 import { AppModule } from 'src/app.module';
@@ -83,13 +83,14 @@ async function createWorkerTestApp(): Promise<{ app: INestApplication; outbound:
     .overrideProvider(WebhookOutboundClientService)
     .useValue(outbound)
     .compile();
-  const app = testingModule.createNestApplication<NestExpressApplication>();
+  const app = testingModule.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
 
   configureApplication(app, {
     enableSwagger: false,
   });
 
   await app.init();
+  await app.getHttpAdapter().getInstance().ready();
 
   return { app, outbound };
 }

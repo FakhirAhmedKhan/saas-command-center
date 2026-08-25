@@ -1,13 +1,12 @@
 import { AllExceptionsFilter } from '../common/filters/all-exceptions.filter';
-import { requestIdMiddleware } from '../common/middleware/request-id.middleware';
-import { getAllowedOrigins, parseTrustProxy, type TypedConfigService } from '../config/runtime-config';
+import { getAllowedOrigins, type TypedConfigService } from '../config/runtime-config';
+import fastifyCookie from '@fastify/cookie';
+import fastifyHelmet from '@fastify/helmet';
 import { Logger, ValidationPipe, type INestApplication } from '@nestjs/common';
 import type { CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import cookieParser from 'cookie-parser';
-import { json, text, urlencoded, type Express, type Request } from 'express';
-import helmet from 'helmet';
+import type { FastifyInstance, FastifyRequest } from 'fastify';
 
 export interface ConfigureApplicationOptions {
   enableSwagger?: boolean;
@@ -20,15 +19,12 @@ function configureCors(app: INestApplication, config: TypedConfigService): void 
     allowedHeaders: ['Authorization', 'Content-Type', 'X-Request-Id', 'X-Workspace-Id'],
     exposedHeaders: ['X-Request-Id'],
   };
-  const corsOptionsDelegate: CorsOptionsDelegate<Request> = (request, callback) => {
-    const requestPath = (request.originalUrl ?? request.url ?? '').split('?')[0];
+  const corsOptionsDelegate: CorsOptionsDelegate<FastifyRequest> = (request, callback) => {
+    const requestPath = (request.raw.url ?? request.url ?? '').split('?')[0];
 
     /*
-     * Tracker requests intentionally use fetch(..., { mode: 'no-cors' }).
-     *
-     * Do not apply the dashboard/API CORS allowlist to the public analytics
-     * collector. Analytics ingestion authenticates the tracking key and then
-     * validates Origin against Website.allowedOrigins.
+     * The analytics collector performs its own tracking-key and
+     * Website.allowedOrigins validation.
      */
     if (requestPath === '/api/v1/collect') {
       callback(null, {
@@ -59,8 +55,9 @@ function configureCors(app: INestApplication, config: TypedConfigService): void 
     });
   };
 
-  app.enableCors(corsOptionsDelegate);
+  app.enableCors((() => corsOptionsDelegate));
 }
+
 function configureSwagger(app: INestApplication): void {
   const swaggerConfig = new DocumentBuilder()
     .setTitle('SaaS Command Center API')
@@ -81,57 +78,29 @@ function configureSwagger(app: INestApplication): void {
 export function configureApplication(app: INestApplication, options: ConfigureApplicationOptions = {}): void {
   const logger = new Logger('ApplicationBootstrap');
   const config = app.get<TypedConfigService>(ConfigService);
-  const expressApplication = app.getHttpAdapter().getInstance() as Express;
+  const fastify = app.getHttpAdapter().getInstance() as FastifyInstance;
 
-  expressApplication.set(
-    'trust proxy',
-    parseTrustProxy(
-      config.get('TRUST_PROXY', {
+  /*
+   * Queue plugins before app.init()/app.listen().
+   * Fastify completes plugin registration during initialization.
+   */
+  fastify.register(fastifyCookie);
+
+  fastify.register(fastifyHelmet, {
+    global: true,
+    contentSecurityPolicy:
+      config.get('NODE_ENV', {
         infer: true,
-      }),
-    ),
-  );
-
-  app.use(requestIdMiddleware);
-
-  app.use(
-    helmet({
-      contentSecurityPolicy:
-        config.get('NODE_ENV', {
-          infer: true,
-        }) === 'production',
-
-      crossOriginResourcePolicy: {
-        policy: 'cross-origin',
-      },
-    }),
-  );
-
-  app.use(cookieParser());
-
-  const bodyLimit = config.get('BODY_LIMIT', {
-    infer: true,
+      }) === 'production',
+    crossOriginResourcePolicy: {
+      policy: 'cross-origin',
+    },
   });
 
-  app.use(
-    text({
-      type: 'text/plain',
-      limit: bodyLimit,
-    }),
-  );
-
-  app.use(
-    json({
-      limit: bodyLimit,
-    }),
-  );
-
-  app.use(
-    urlencoded({
-      extended: true,
-      limit: bodyLimit,
-    }),
-  );
+  fastify.addHook('onRequest', (request, reply, done) => {
+    reply.header('X-Request-Id', request.id);
+    done();
+  });
 
   configureCors(app, config);
 

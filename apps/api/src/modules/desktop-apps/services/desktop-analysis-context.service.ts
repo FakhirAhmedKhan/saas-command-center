@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { DesktopAppsService } from './desktop-apps.service';
 import { PrismaService } from '../../../database/prisma.service';
 import { DesktopSecretSanitizerService } from '../security/desktop-secret-sanitizer.service';

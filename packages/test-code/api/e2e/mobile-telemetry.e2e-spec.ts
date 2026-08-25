@@ -132,7 +132,7 @@ describe('Mobile Telemetry E2E', () => {
     const data = await fixture();
     const response = await data.owner.agent.get(`${API}/workspaces/${data.owner.workspaceId}/mobile-apps/${data.mobile.id}/telemetry`).set(withBearer(data.owner.accessToken)).expect(200);
 
-    expect(response.body).toEqual({});
+    expect(response.body).toBeNull();
   });
 
   it('connects provider and never returns credentials', async () => {

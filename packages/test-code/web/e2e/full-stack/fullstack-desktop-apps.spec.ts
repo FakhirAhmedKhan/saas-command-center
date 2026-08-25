@@ -74,7 +74,7 @@ test.describe('Desktop application frontend', () => {
       }),
     ).toBeVisible();
 
-    await expect(page.getByRole('definition').filter({ hasText: 'com.commandcenter.phase3.desktop' })).toBeVisible();
+    await expect(page.getByRole('definition').filter({ hasText: 'com.commandcenter.phase3.desktop' }).nth(1)).toBeVisible();
 
     /*
      * Verify card appears in

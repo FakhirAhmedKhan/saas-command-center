@@ -1,0 +1,766 @@
+==========================================================================================
+FULL API UNIT TESTS
+==========================================================================================
+$ node scripts/run-jest.mjs --config ../../packages/test-code/api/jest.config.cjs --runInBand
+PASS ../../packages/test-code/api/unit/modules/desktop-apps/desktop-app-foundation.dto.spec.ts
+PASS ../../packages/test-code/api/unit/modules/auth/services/password.service.spec.ts
+PASS ../../packages/test-code/api/unit/common/rate-limit/shared-rate-limit.guard.spec.ts
+PASS ../../packages/test-code/api/unit/infrastructure/database/postgres-advisory-lock.service.spec.ts
+PASS ../../packages/test-code/api/unit/modules/analytics-overview/utils/analytics-date-range.spec.ts
+PASS ../../packages/test-code/api/unit/modules/health/health.controller.spec.ts
+PASS ../../packages/test-code/api/unit/modules/repositories/services/github-app.service.spec.ts
+PASS ../../packages/test-code/api/unit/modules/desktop-apps/desktop-security-parsers.spec.ts
+PASS ../../packages/test-code/api/unit/modules/webhooks/services/webhook-outbound-client.service.spec.ts
+FAIL ../../packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts
+  ΓùÅ AllExceptionsFilter ΓÇ║ HttpException handling ΓÇ║ preserves the status and message
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:69:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ HttpException handling ΓÇ║ keeps an array message from validation errors
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:84:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ HttpException handling ΓÇ║ normalizes a plain string exception response
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:92:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ HttpException handling ΓÇ║ carries through the error label when present
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:102:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ HttpException handling ΓÇ║ falls back to the exception message for a non-string, non-array message field
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:118:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ HttpException handling ΓÇ║ does not log HTTP exceptions as server errors
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:126:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ unknown exception handling ΓÇ║ maps an arbitrary Error to a 500 without leaking the message
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:136:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ unknown exception handling ΓÇ║ logs the stack for unknown exceptions
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:152:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ unknown exception handling ΓÇ║ handles a thrown non-Error value
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:160:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ express middleware errors ΓÇ║ honours a status carried on a plain express error
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:176:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ express middleware errors ΓÇ║ accepts statusCode as well as status
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:186:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ express middleware errors ΓÇ║ ignores an out-of-range status and falls back to 500
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:194:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ express middleware errors ΓÇ║ ignores a non-numeric status
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:202:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ express middleware errors ΓÇ║ does not log express client errors as server errors
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:210:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ envelope fields ΓÇ║ emits an ISO timestamp
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:220:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ envelope fields ΓÇ║ omits requestId when the middleware did not run
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:232:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ Prisma error translation (BE-02 safety net) ΓÇ║ translates an uncaught P2002 into a 409 Conflict without leaking Prisma internals
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:242:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ Prisma error translation (BE-02 safety net) ΓÇ║ translates an uncaught P2025 into a 404 Not Found without leaking Prisma internals
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:260:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ Prisma error translation (BE-02 safety net) ΓÇ║ preserves requestId on a translated Prisma error
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:276:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ Prisma error translation (BE-02 safety net) ΓÇ║ logs a warning (not an error) for a P2002/P2025 that reaches the filter unhandled
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:284:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ Prisma error translation (BE-02 safety net) ΓÇ║ falls back to a safe 500 for a Prisma error code with no explicit mapping, and still logs it
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:292:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ Prisma error translation (BE-02 safety net) ΓÇ║ never includes the Prisma error meta field in the response body
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:310:19)
+System.Management.Automation.RemoteException
+[33m[Nest] 17316  - [39m08/26/2026, 12:23:50 AM [33m   WARN[39m [38;5;3m[AllExceptionsFilter] [39m[33mGET undefined | Unhandled Prisma P2002 reached the global filter; consider a service-level catch.[39m
+[33m[Nest] 17316  - [39m08/26/2026, 12:23:50 AM [33m   WARN[39m [38;5;3m[AllExceptionsFilter] [39m[33mGET undefined | Unhandled Prisma P2025 reached the global filter; consider a service-level catch.[39m
+[33m[Nest] 17316  - [39m08/26/2026, 12:23:50 AM [33m   WARN[39m [38;5;3m[AllExceptionsFilter] [39m[33mGET undefined | Unhandled Prisma P2002 reached the global filter; consider a service-level catch.[39m
+[33m[Nest] 17316  - [39m08/26/2026, 12:23:50 AM [33m   WARN[39m [38;5;3m[AllExceptionsFilter] [39m[33mGET undefined | Unhandled Prisma P2002 reached the global filter; consider a service-level catch.[39m
+[33m[Nest] 17316  - [39m08/26/2026, 12:23:50 AM [33m   WARN[39m [38;5;3m[AllExceptionsFilter] [39m[33mGET undefined | Unhandled Prisma P2002 reached the global filter; consider a service-level catch.[39m
+PASS ../../packages/test-code/api/unit/modules/team-operations/services/invitation-token.service.spec.ts
+PASS ../../packages/test-code/api/unit/modules/analytics-processing/services/safe-http-client.service.spec.ts
+FAIL ../../packages/test-code/api/unit/bootstrap/startup-checks.spec.ts (5.526 s)
+  ΓùÅ assertStartupRequirements ΓÇ║ times out when the database never responds
+System.Management.Automation.RemoteException
+    thrown: "Exceeded timeout of 5000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+System.Management.Automation.RemoteException
+    [0m [90m 103 |[39m   })[33m;[39m
+     [90m 104 |[39m
+    [31m[1m>[22m[39m[90m 105 |[39m   it([32m'times out when the database never responds'[39m[33m,[39m [36masync[39m () [33m=>[39m {
+     [90m     |[39m   [31m[1m^[22m[39m
+     [90m 106 |[39m     jest[33m.[39museFakeTimers()[33m;[39m
+     [90m 107 |[39m
+     [90m 108 |[39m     [36mconst[39m { app } [33m=[39m createApp({[0m
+System.Management.Automation.RemoteException
+      at packages/test-code/api/unit/bootstrap/startup-checks.spec.ts:105:3
+      at Object.<anonymous> (packages/test-code/api/unit/bootstrap/startup-checks.spec.ts:39:1)
+System.Management.Automation.RemoteException
+PASS ../../packages/test-code/api/unit/config/env.validation.spec.ts
+PASS ../../packages/test-code/api/unit/modules/webhooks/services/webhook-signature.service.spec.ts
+PASS ../../packages/test-code/api/unit/common/middleware/request-id.middleware.spec.ts
+PASS ../../packages/test-code/api/unit/modules/releases/services/deployment-transition.service.spec.ts
+PASS ../../packages/test-code/api/unit/modules/webhooks/services/webhook-secret-crypto.service.spec.ts
+PASS ../../packages/test-code/api/unit/modules/desktop-apps/desktop-secret-sanitizer.service.spec.ts
+PASS ../../packages/test-code/api/unit/modules/desktop-apps/desktop-telemetry-secret.service.spec.ts
+PASS ../../packages/test-code/api/unit/modules/mobile-apps/mobile-secret-sanitizer.service.spec.ts
+PASS ../../packages/test-code/api/unit/modules/analytics-ingestion/utils/ingestion-sanitizer.spec.ts
+PASS ../../packages/test-code/api/unit/modules/mobile-apps/mobile-provider-security.service.spec.ts
+PASS ../../packages/test-code/api/unit/modules/repositories/services/analyzer/framework-detector.spec.ts
+PASS ../../packages/test-code/api/unit/modules/repositories/services/analyzer/application-detector.spec.ts
+PASS ../../packages/test-code/api/unit/modules/mobile-apps/mobile-project-detector.spec.ts
+PASS ../../packages/test-code/api/unit/config/runtime-config.spec.ts
+PASS ../../packages/test-code/api/unit/modules/repositories/services/analyzer/command-detector.spec.ts
+PASS ../../packages/test-code/api/unit/modules/desktop-apps/desktop-project-detector.spec.ts
+PASS ../../packages/test-code/api/unit/modules/repositories/services/analyzer/repository-tree-analyzer.spec.ts
+PASS ../../packages/test-code/api/unit/modules/repositories/services/analyzer/package-manager-detector.spec.ts
+PASS ../../packages/test-code/api/unit/modules/repositories/services/analyzer/technology-detector.spec.ts
+PASS ../../packages/test-code/api/unit/modules/repositories/services/analyzer/workspace-manifest-parser.spec.ts
+PASS ../../packages/test-code/api/unit/modules/analytics-engine/utils/analytics-metrics.spec.ts
+PASS ../../packages/test-code/api/unit/modules/analytics-reports/utils/analytics-csv.spec.ts
+System.Management.Automation.RemoteException
+Summary of all failing tests
+FAIL packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts
+  ΓùÅ AllExceptionsFilter ΓÇ║ HttpException handling ΓÇ║ preserves the status and message
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:69:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ HttpException handling ΓÇ║ keeps an array message from validation errors
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:84:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ HttpException handling ΓÇ║ normalizes a plain string exception response
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:92:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ HttpException handling ΓÇ║ carries through the error label when present
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:102:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ HttpException handling ΓÇ║ falls back to the exception message for a non-string, non-array message field
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:118:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ HttpException handling ΓÇ║ does not log HTTP exceptions as server errors
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:126:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ unknown exception handling ΓÇ║ maps an arbitrary Error to a 500 without leaking the message
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:136:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ unknown exception handling ΓÇ║ logs the stack for unknown exceptions
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:152:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ unknown exception handling ΓÇ║ handles a thrown non-Error value
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:160:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ express middleware errors ΓÇ║ honours a status carried on a plain express error
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:176:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ express middleware errors ΓÇ║ accepts statusCode as well as status
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:186:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ express middleware errors ΓÇ║ ignores an out-of-range status and falls back to 500
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:194:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ express middleware errors ΓÇ║ ignores a non-numeric status
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:202:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ express middleware errors ΓÇ║ does not log express client errors as server errors
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:210:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ envelope fields ΓÇ║ emits an ISO timestamp
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:220:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ envelope fields ΓÇ║ omits requestId when the middleware did not run
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:232:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ Prisma error translation (BE-02 safety net) ΓÇ║ translates an uncaught P2002 into a 409 Conflict without leaking Prisma internals
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:242:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ Prisma error translation (BE-02 safety net) ΓÇ║ translates an uncaught P2025 into a 404 Not Found without leaking Prisma internals
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:260:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ Prisma error translation (BE-02 safety net) ΓÇ║ preserves requestId on a translated Prisma error
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:276:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ Prisma error translation (BE-02 safety net) ΓÇ║ logs a warning (not an error) for a P2002/P2025 that reaches the filter unhandled
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:284:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ Prisma error translation (BE-02 safety net) ΓÇ║ falls back to a safe 500 for a Prisma error code with no explicit mapping, and still logs it
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:292:19)
+System.Management.Automation.RemoteException
+  ΓùÅ AllExceptionsFilter ΓÇ║ Prisma error translation (BE-02 safety net) ΓÇ║ never includes the Prisma error meta field in the response body
+System.Management.Automation.RemoteException
+    TypeError: response.code is not a function
+System.Management.Automation.RemoteException
+    [0m [90m 152 |[39m     }[33m;[39m
+     [90m 153 |[39m
+    [31m[1m>[22m[39m[90m 154 |[39m     response[33m.[39mcode(statusCode)[33m.[39msend(body)[33m;[39m
+     [90m     |[39m              [31m[1m^[22m[39m
+     [90m 155 |[39m   }
+     [90m 156 |[39m }
+     [90m 157 |[39m[0m
+System.Management.Automation.RemoteException
+      at AllExceptionsFilter.catch (apps/api/src/common/filters/all-exceptions.filter.ts:154:14)
+      at Object.<anonymous> (packages/test-code/api/unit/common/filters/all-exceptions.filter.spec.ts:310:19)
+System.Management.Automation.RemoteException
+FAIL packages/test-code/api/unit/bootstrap/startup-checks.spec.ts (5.526 s)
+  ΓùÅ assertStartupRequirements ΓÇ║ times out when the database never responds
+System.Management.Automation.RemoteException
+    thrown: "Exceeded timeout of 5000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+System.Management.Automation.RemoteException
+    [0m [90m 103 |[39m   })[33m;[39m
+     [90m 104 |[39m
+    [31m[1m>[22m[39m[90m 105 |[39m   it([32m'times out when the database never responds'[39m[33m,[39m [36masync[39m () [33m=>[39m {
+     [90m     |[39m   [31m[1m^[22m[39m
+     [90m 106 |[39m     jest[33m.[39museFakeTimers()[33m;[39m
+     [90m 107 |[39m
+     [90m 108 |[39m     [36mconst[39m { app } [33m=[39m createApp({[0m
+System.Management.Automation.RemoteException
+      at packages/test-code/api/unit/bootstrap/startup-checks.spec.ts:105:3
+      at Object.<anonymous> (packages/test-code/api/unit/bootstrap/startup-checks.spec.ts:39:1)
+System.Management.Automation.RemoteException
+System.Management.Automation.RemoteException
+Test Suites: 2 failed, 33 passed, 35 total
+Tests:       23 failed, 229 passed, 252 total
+Snapshots:   0 total
+Time:        23.214 s
+Ran all test suites.
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @command-center/api-tests@0.1.0 test:unit: `node scripts/run-jest.mjs --config ../../packages/test-code/api/jest.config.cjs --runInBand`
+Exit status 1
+UNIT EXIT CODE: 1
+
+==========================================================================================
+AUTHENTICATION E2E TESTS
+==========================================================================================
+$ node scripts/run-jest.mjs --config ../../packages/test-code/api/jest-e2e.config.cjs --runInBand "auth"
+(node:22664) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS ../../packages/test-code/api/e2e/auth.e2e-spec.ts (17.08 s)
+PASS ../../packages/test-code/api/e2e/auth-rate-limit.e2e-spec.ts (9.792 s)
+System.Management.Automation.RemoteException
+Test Suites: 2 passed, 2 total
+Tests:       27 passed, 27 total
+Snapshots:   0 total
+Time:        27.242 s, estimated 42 s
+Ran all test suites matching /auth/i.
+AUTH E2E EXIT CODE: 0
