@@ -1,6 +1,7 @@
 import { PrismaService } from 'src/database/prisma.service';
 
 interface PostgreSqlTable {
+  schemaname: string;
   tablename: string;
 }
 
@@ -13,9 +14,8 @@ function assertTestDatabase(): void {
 
   const parsed = new URL(databaseUrl);
   const databaseName = parsed.pathname.replace(/^\//, '').toLowerCase();
-  const safe = databaseName.includes('test');
 
-  if (!safe) {
+  if (!databaseName.includes('test')) {
     throw new Error(`Refusing to reset non-test database "${databaseName}"`);
   }
 }
@@ -28,17 +28,19 @@ export async function resetDatabase(prisma: PrismaService): Promise<void> {
   assertTestDatabase();
 
   const tables = await prisma.$queryRaw<PostgreSqlTable[]>`
-        SELECT tablename
-        FROM pg_tables
-        WHERE schemaname = 'public'
-          AND tablename <> '_prisma_migrations'
-      `;
+    SELECT
+      current_schema() AS schemaname,
+      tablename
+    FROM pg_tables
+    WHERE schemaname = current_schema()
+      AND tablename <> '_prisma_migrations'
+  `;
 
   if (tables.length === 0) {
     return;
   }
 
-  const tableNames = tables.map(({ tablename }) => `public.${quoteIdentifier(tablename)}`).join(', ');
+  const tableNames = tables.map(({ schemaname, tablename }) => `${quoteIdentifier(schemaname)}.${quoteIdentifier(tablename)}`).join(', ');
 
   await prisma.$executeRawUnsafe(`TRUNCATE TABLE ${tableNames} RESTART IDENTITY CASCADE`);
 }

@@ -1,0 +1,66 @@
+PARALLEL E2E REDIS SAFETY
+DATE: 2026-08-26 03:02:21
+
+====================================================================================================
+REDIS REFERENCES
+====================================================================================================
+apps/api/src/app.module.ts:3:import { RedisModule } from './infrastructure/redis/redis.module';
+apps/api/src/app.module.ts.backup:3:import { RedisModule } from './infrastructure/redis/redis.module';
+apps/api/src/common/rate-limit/shared-rate-limit.service.ts:1:import { RedisService } from '../../infrastructure/redis/redis.service';
+apps/api/src/common/rate-limit/shared-rate-limit.service.ts:17:local count = redis.call(
+apps/api/src/common/rate-limit/shared-rate-limit.service.ts:23:  redis.call(
+apps/api/src/common/rate-limit/shared-rate-limit.service.ts:30:local ttl = redis.call(
+apps/api/src/common/rate-limit/shared-rate-limit.service.ts:48:    const result = await this.redis.getClient().eval(FIXED_WINDOW_SCRIPT, 1, key, String(windowMs));
+apps/api/src/config/env.validation.ts:14:  REDIS_URL: string;
+apps/api/src/config/env.validation.ts:391:    REDIS_URL: getRequiredString(config, 'REDIS_URL'),
+apps/api/src/infrastructure/redis/redis.module.ts:1:import { RedisService } from './redis.service';
+apps/api/src/infrastructure/redis/redis.service.ts:4:import Redis from 'ioredis';
+apps/api/src/infrastructure/redis/redis.service.ts:16:    this.client = new Redis(
+apps/api/src/infrastructure/redis/redis.service.ts:17:      config.get('REDIS_URL', {
+apps/api/src/modules/health/health.service.ts:6:import { RedisService } from 'src/infrastructure/redis/redis.service';
+apps/api/src/modules/health/health.service.ts:40:      const result = await this.redis.getClient().ping();
+apps/api/src/modules/repositories/services/analyzer/technology-detector.ts:31:    match: (deps) => deps.has('ioredis') || deps.has('redis'),
+packages/test-code/api/e2e/phase17-team-operations.e2e-spec.ts:10:import { RedisService } from 'src/infrastructure/redis/redis.service';
+packages/test-code/api/e2e/phase18-webhook-integrations.e2e-spec.ts:10:import { RedisService } from 'src/infrastructure/redis/redis.service';
+packages/test-code/api/helpers/redis.ts:1:import { RedisService } from 'src/infrastructure/redis/redis.service';
+packages/test-code/api/helpers/redis.ts:8:  const testRedisUrl = process.env.TEST_REDIS_URL;
+packages/test-code/api/helpers/redis.ts:11:    throw new Error('TEST_REDIS_URL is required before resetting test Redis.');
+packages/test-code/api/helpers/redis.ts:17:  const client = redis.getClient();
+packages/test-code/api/helpers/redis.ts:21:    throw new Error(`Refusing to reset Redis. Expected safe test DB ${expectedDatabase}, connected to DB ${actualDatabase}.`);
+packages/test-code/api/helpers/redis.ts:24:  await client.flushdb();
+packages/test-code/api/setup-env.ts:35:const testRedisUrl = process.env.TEST_REDIS_URL;
+packages/test-code/api/setup-env.ts:38:  throw new Error('TEST_REDIS_URL is required for E2E tests');
+packages/test-code/api/setup-env.ts:46:  throw new Error('TEST_REDIS_URL must be a valid Redis URL');
+packages/test-code/api/setup-env.ts:53:  throw new Error(['E2E tests refused to start.', 'TEST_REDIS_URL must use a dedicated non-zero Redis database.', `Redis database: ${redisDatabase}`].join(' '));
+packages/test-code/api/setup-env.ts:56:process.env.REDIS_URL = testRedisUrl;
+packages/test-code/api/unit/config/env.validation.spec.ts:22:    REDIS_URL: 'redis://127.0.0.1:6379',
+
+====================================================================================================
+REDIS-RELATED FILES
+====================================================================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\rate-limit\shared-rate-limit.decorator.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\rate-limit\shared-rate-limit.guard.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\rate-limit\shared-rate-limit.module.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\common\rate-limit\shared-rate-limit.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\infrastructure\redis\redis.module.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\infrastructure\redis\redis.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\src\modules\analytics-ingestion\services\ingestion-rate-limit.service.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\analytics-ingestion-rate-limit.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\e2e\auth-rate-limit.e2e-spec.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\helpers\redis.ts
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api\unit\common\rate-limit\shared-rate-limit.guard.spec.ts
+
+====================================================================================================
+TEST REDIS TARGET — NO PASSWORD
+====================================================================================================
+SCHEME: redis
+HOST: 127.0.0.1
+PORT: 6379
+DATABASE: 1
+
+====================================================================================================
+LOCAL REDIS CONTAINERS
+====================================================================================================
+NAMES                             IMAGE                STATUS                  PORTS
+scc-ci-redis                      redis:7-alpine       Up 10 hours             6379/tcp
+command-center-redis              redis:7-alpine       Up 10 hours             0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp

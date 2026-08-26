@@ -1,0 +1,505 @@
+
+====================================================================================================
+FILE: packages/test-code/api/scripts/run-e2e-isolated.mjs
+====================================================================================================
+import { spawnSync } from 'node:child_process';
+import { readdirSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { performance } from 'node:perf_hooks';
+import { fileURLToPath } from 'node:url';
+
+const scriptsDirectory = dirname(fileURLToPath(import.meta.url));
+const packageRoot = resolve(scriptsDirectory, '..');
+const jestRunnerPath = resolve(scriptsDirectory, 'run-jest.mjs');
+const repoRoot = resolve(packageRoot, '../../..');
+const appRoot = resolve(repoRoot, 'apps/api');
+const configPath = resolve(packageRoot, 'jest-e2e.config.cjs');
+const e2eDirectory = resolve(packageRoot, 'e2e');
+const files = readdirSync(e2eDirectory)
+  .filter((name) => name.endsWith('.e2e-spec.ts'))
+  .sort()
+  .map((name) => ({
+    name,
+    path: resolve(e2eDirectory, name),
+  }));
+
+if (files.length === 0) {
+  console.error('No API E2E test files found.');
+  process.exit(2);
+}
+
+function formatDuration(milliseconds) {
+  const seconds = Math.round(milliseconds / 1000);
+
+  if (seconds < 60) {
+    return `${seconds}s`;
+  }
+
+  return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+}
+
+function line() {
+  console.log('='.repeat(72));
+}
+
+console.log();
+line();
+console.log('API E2E - ISOLATED SUITE RUNNER');
+line();
+console.log(`Suites: ${files.length}`);
+console.log('Mode: sequential / fresh Jest process per suite');
+line();
+
+const results = [];
+const totalStartedAt = performance.now();
+
+for (let index = 0; index < files.length; index += 1) {
+  const file = files[index];
+
+  console.log();
+  line();
+  console.log(`[${index + 1}/${files.length}] ${file.name}`);
+  line();
+
+  const startedAt = performance.now();
+  const result = spawnSync(process.execPath, [jestRunnerPath, '--config', configPath, '--runInBand', '--runTestsByPath', file.path], {
+    cwd: appRoot,
+    stdio: 'inherit',
+    env: process.env,
+  });
+  const elapsed = performance.now() - startedAt;
+  const passed = result.status === 0 && !result.error && !result.signal;
+
+  results.push({
+    name: file.name,
+    passed,
+    elapsed,
+    exitCode: result.status,
+  });
+
+  console.log();
+  console.log(`${passed ? 'PASS' : 'FAIL'} ${file.name} (${formatDuration(elapsed)})`);
+
+  if (result.error) {
+    console.error(result.error.message);
+  }
+
+  if (result.signal) {
+    console.error(`Interrupted by ${result.signal}`);
+    process.exit(130);
+  }
+}
+
+const totalElapsed = performance.now() - totalStartedAt;
+const passed = results.filter((result) => result.passed);
+const failed = results.filter((result) => !result.passed);
+
+console.log();
+line();
+console.log('API E2E SUMMARY');
+line();
+
+for (const result of results) {
+  console.log(`${result.passed ? 'PASS' : 'FAIL'}  ${formatDuration(result.elapsed).padStart(8)}  ${result.name}`);
+}
+
+line();
+console.log(`Suites : ${results.length}`);
+console.log(`Passed : ${passed.length}`);
+console.log(`Failed : ${failed.length}`);
+console.log(`Time   : ${formatDuration(totalElapsed)}`);
+line();
+
+if (failed.length > 0) {
+  console.log('\nFailed suites:');
+
+  for (const result of failed) {
+    console.log(` - ${result.name}`);
+  }
+}
+
+console.log(`\nOverall: ${failed.length === 0 ? 'PASS' : 'FAIL'}\n`);
+
+process.exit(failed.length === 0 ? 0 : 1);
+
+
+====================================================================================================
+FILE: packages/test-code/api/scripts/run-jest.mjs
+====================================================================================================
+import { spawnSync } from 'node:child_process';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const scriptsDirectory = dirname(fileURLToPath(import.meta.url));
+const packageRoot = resolve(scriptsDirectory, '..');
+const repoRoot = resolve(packageRoot, '../../..');
+const appRoot = resolve(repoRoot, 'apps/api');
+const args = process.argv.slice(2);
+
+if (args.length === 0) {
+  console.error('No Jest arguments were provided.');
+  process.exit(2);
+}
+
+const existingNodeOptions = process.env.NODE_OPTIONS?.trim() ?? '';
+const vmModulesFlag = '--experimental-vm-modules';
+const nodeOptions = existingNodeOptions.includes(vmModulesFlag) ? existingNodeOptions : `${existingNodeOptions} ${vmModulesFlag}`.trim();
+const packageManagerPath = process.env.npm_execpath;
+
+if (!packageManagerPath) {
+  console.error('npm_execpath is unavailable. Run this launcher through pnpm.');
+  process.exit(2);
+}
+
+const result = spawnSync(process.execPath, [packageManagerPath, 'exec', 'jest', ...args], {
+  cwd: appRoot,
+  stdio: 'inherit',
+  env: {
+    ...process.env,
+    NODE_OPTIONS: nodeOptions,
+  },
+});
+
+if (result.error) {
+  console.error(result.error.message);
+  process.exit(1);
+}
+
+if (result.signal) {
+  console.error(`Jest was interrupted by ${result.signal}.`);
+  process.exit(130);
+}
+
+process.exit(result.status ?? 1);
+
+
+====================================================================================================
+FILE: packages/test-code/api/package.json
+====================================================================================================
+{
+  "name": "@command-center/api-tests",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:unit": "node scripts/run-jest.mjs --config ../../packages/test-code/api/jest.config.cjs --runInBand",
+    "pretest:e2e": "pnpm --dir ../../../apps/api exec node -e \"require(\u0027dotenv\u0027).config({path:\u0027.env.test\u0027,override:true,quiet:true});const{spawnSync}=require(\u0027node:child_process\u0027);const r=spawnSync(\u0027pnpm\u0027,[\u0027exec\u0027,\u0027prisma\u0027,\u0027migrate\u0027,\u0027deploy\u0027],{stdio:\u0027inherit\u0027,env:process.env,shell:true});process.exit(r.status??1)\"",
+    "test:e2e": "node scripts/run-e2e-isolated.mjs",
+    "test": "pnpm run test:unit \u0026\u0026 pnpm run test:e2e",
+    "test:e2e:fast": "node scripts/run-jest.mjs --config ../../packages/test-code/api/jest-e2e.config.cjs --runInBand",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "devDependencies": {
+    "@command-center/eslint-config": "workspace:*",
+    "globals": "^17.11.0"
+  }
+}
+
+
+====================================================================================================
+FILE: packages/test-code/api/helpers/database.ts
+====================================================================================================
+import { PrismaService } from 'src/database/prisma.service';
+
+interface PostgreSqlTable {
+  tablename: string;
+}
+
+function assertTestDatabase(): void {
+  const databaseUrl = process.env.DATABASE_URL;
+
+  if (!databaseUrl) {
+    throw new Error('DATABASE_URL is missing');
+  }
+
+  const parsed = new URL(databaseUrl);
+  const databaseName = parsed.pathname.replace(/^\//, '').toLowerCase();
+  const safe = databaseName.includes('test');
+
+  if (!safe) {
+    throw new Error(`Refusing to reset non-test database "${databaseName}"`);
+  }
+}
+
+function quoteIdentifier(value: string): string {
+  return `"${value.replace(/"/g, '""')}"`;
+}
+
+export async function resetDatabase(prisma: PrismaService): Promise<void> {
+  assertTestDatabase();
+
+  const tables = await prisma.$queryRaw<PostgreSqlTable[]>`
+        SELECT tablename
+        FROM pg_tables
+        WHERE schemaname = 'public'
+          AND tablename <> '_prisma_migrations'
+      `;
+
+  if (tables.length === 0) {
+    return;
+  }
+
+  const tableNames = tables.map(({ tablename }) => `public.${quoteIdentifier(tablename)}`).join(', ');
+
+  await prisma.$executeRawUnsafe(`TRUNCATE TABLE ${tableNames} RESTART IDENTITY CASCADE`);
+}
+
+
+====================================================================================================
+FILE: apps/api/prisma.config.ts
+====================================================================================================
+import 'dotenv/config';
+import { defineConfig, env } from 'prisma/config';
+
+export default defineConfig({
+  schema: 'prisma',
+  migrations: {
+    path: 'prisma/migrations',
+  },
+
+  datasource: {
+    url: process.env.DIRECT_URL ?? env('DATABASE_URL'),
+  },
+});
+
+
+====================================================================================================
+FILE: prisma.config.ts
+====================================================================================================
+FILE NOT FOUND
+
+====================================================================================================
+FILE: infrastructure/docker-compose.yml
+====================================================================================================
+name: saas-command-center
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: command-center-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: command_center
+      POSTGRES_PASSWORD: <redacted>
+      POSTGRES_DB: command_center
+    ports:
+      - '55432:5432'
+    volumes:
+      - command_center_postgres_data:/var/lib/postgresql/data
+      - ./init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U command_center -d command_center']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  command_center_postgres_data:
+
+
+====================================================================================================
+DATABASE TARGET — PASSWORD OMITTED
+====================================================================================================
+HOST: 127.0.0.1
+PORT: 55432
+USER: command_center_test
+DATABASE: command_center_test
+QUERY: 
+
+====================================================================================================
+DATABASE AND RUNNER REFERENCES
+====================================================================================================
+apps/api/prisma.config.ts:11:    url: process.env.DIRECT_URL ?? env('DATABASE_URL'),
+packages/test-code/api/e2e/activity.e2e-spec.ts:4:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/activity.e2e-spec.ts:20:    await resetDatabase(prisma);
+packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:4:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:45:    await resetDatabase(prisma);
+packages/test-code/api/e2e/analytics-engine-processing.e2e-spec.ts:4:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/analytics-engine-processing.e2e-spec.ts:26:    await resetDatabase(prisma);
+packages/test-code/api/e2e/analytics-engine-status.e2e-spec.ts:5:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/analytics-engine-status.e2e-spec.ts:26:    await resetDatabase(prisma);
+packages/test-code/api/e2e/analytics-ingestion-rate-limit.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/analytics-ingestion-rate-limit.e2e-spec.ts:27:    await resetDatabase(prisma);
+packages/test-code/api/e2e/analytics-ingestion-security.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/analytics-ingestion-security.e2e-spec.ts:25:    await resetDatabase(prisma);
+packages/test-code/api/e2e/analytics-ingestion.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/analytics-ingestion.e2e-spec.ts:20:    await resetDatabase(prisma);
+packages/test-code/api/e2e/analytics-late-events.e2e-spec.ts:4:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/analytics-late-events.e2e-spec.ts:25:    await resetDatabase(prisma);
+packages/test-code/api/e2e/analytics-pageviews.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/analytics-pageviews.e2e-spec.ts:24:    await resetDatabase(prisma);
+packages/test-code/api/e2e/analytics-reprocessing.e2e-spec.ts:4:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/analytics-reprocessing.e2e-spec.ts:28:    await resetDatabase(prisma);
+packages/test-code/api/e2e/analytics-retention.e2e-spec.ts:4:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/analytics-retention.e2e-spec.ts:40:    await resetDatabase(prisma);
+packages/test-code/api/e2e/analytics-sessions.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/analytics-sessions.e2e-spec.ts:24:    await resetDatabase(prisma);
+packages/test-code/api/e2e/analytics-timezones.e2e-spec.ts:4:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/analytics-timezones.e2e-spec.ts:25:    await resetDatabase(prisma);
+packages/test-code/api/e2e/analytics-visitors.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/analytics-visitors.e2e-spec.ts:24:    await resetDatabase(prisma);
+packages/test-code/api/e2e/application-links.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/application-links.e2e-spec.ts:20:    await resetDatabase(prisma);
+packages/test-code/api/e2e/application-roles.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/application-roles.e2e-spec.ts:28:    await resetDatabase(prisma);
+packages/test-code/api/e2e/application-technologies.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/application-technologies.e2e-spec.ts:20:    await resetDatabase(prisma);
+packages/test-code/api/e2e/applications.e2e-spec.ts:18:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/applications.e2e-spec.ts:35:    await resetDatabase(prisma);
+packages/test-code/api/e2e/auth-rate-limit.e2e-spec.ts:4:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/auth-rate-limit.e2e-spec.ts:39:    await resetDatabase(prisma);
+packages/test-code/api/e2e/auth.e2e-spec.ts:5:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/auth.e2e-spec.ts:61:    await resetDatabase(prisma);
+packages/test-code/api/e2e/desktop-ai-analysis.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/desktop-ai-analysis.e2e-spec.ts:52:    await resetDatabase(prisma);
+packages/test-code/api/e2e/desktop-alerts.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/desktop-alerts.e2e-spec.ts:51:    await resetDatabase(prisma);
+packages/test-code/api/e2e/desktop-apps.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/desktop-apps.e2e-spec.ts:49:    await resetDatabase(prisma);
+packages/test-code/api/e2e/desktop-build-artifacts.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/desktop-build-artifacts.e2e-spec.ts:17:    await resetDatabase(prisma);
+packages/test-code/api/e2e/desktop-builds.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/desktop-builds.e2e-spec.ts:18:    await resetDatabase(prisma);
+packages/test-code/api/e2e/desktop-foundation.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/desktop-foundation.e2e-spec.ts:18:    await resetDatabase(prisma);
+packages/test-code/api/e2e/desktop-full-flow.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/desktop-full-flow.e2e-spec.ts:59:    await resetDatabase(prisma);
+packages/test-code/api/e2e/desktop-overview.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/desktop-overview.e2e-spec.ts:18:    await resetDatabase(prisma);
+packages/test-code/api/e2e/desktop-performance.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/desktop-performance.e2e-spec.ts:23:    await resetDatabase(prisma);
+packages/test-code/api/e2e/desktop-project-detection.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/desktop-project-detection.e2e-spec.ts:21:    await resetDatabase(prisma);
+packages/test-code/api/e2e/desktop-releases.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/desktop-releases.e2e-spec.ts:20:    await resetDatabase(prisma);
+packages/test-code/api/e2e/desktop-repository-linking.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/desktop-repository-linking.e2e-spec.ts:23:    await resetDatabase(prisma);
+packages/test-code/api/e2e/desktop-security-health.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/desktop-security-health.e2e-spec.ts:26:    await resetDatabase(prisma);
+packages/test-code/api/e2e/desktop-security.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/desktop-security.e2e-spec.ts:23:    await resetDatabase(prisma);
+packages/test-code/api/e2e/desktop-telemetry.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/desktop-telemetry.e2e-spec.ts:25:    await resetDatabase(prisma);
+packages/test-code/api/e2e/desktop-tests.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/desktop-tests.e2e-spec.ts:17:    await resetDatabase(prisma);
+packages/test-code/api/e2e/development-activity.e2e-spec.ts:4:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/development-activity.e2e-spec.ts:21:    await resetDatabase(prisma);
+packages/test-code/api/e2e/development-progress.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/development-progress.e2e-spec.ts:36:    await resetDatabase(prisma);
+packages/test-code/api/e2e/development-roles.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/development-roles.e2e-spec.ts:29:    await resetDatabase(prisma);
+packages/test-code/api/e2e/development.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/development.e2e-spec.ts:45:    await resetDatabase(prisma);
+packages/test-code/api/e2e/github-connect-intent-cleanup.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/github-connect-intent-cleanup.e2e-spec.ts:31:    await resetDatabase(prisma);
+packages/test-code/api/e2e/infrastructure.e2e-spec.ts:4:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/infrastructure.e2e-spec.ts:32:    await resetDatabase(prisma);
+packages/test-code/api/e2e/mobile-ai-analysis.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/mobile-ai-analysis.e2e-spec.ts:45:    await resetDatabase(prisma);
+packages/test-code/api/e2e/mobile-alerts.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/mobile-alerts.e2e-spec.ts:25:    await resetDatabase(prisma);
+packages/test-code/api/e2e/mobile-apps.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/mobile-apps.e2e-spec.ts:39:    await resetDatabase(prisma);
+packages/test-code/api/e2e/mobile-builds.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/mobile-builds.e2e-spec.ts:20:    await resetDatabase(prisma);
+packages/test-code/api/e2e/mobile-foundation.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/mobile-foundation.e2e-spec.ts:15:    await resetDatabase(prisma);
+packages/test-code/api/e2e/mobile-full-flow.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/mobile-full-flow.e2e-spec.ts:18:    await resetDatabase(prisma);
+packages/test-code/api/e2e/mobile-ios-performance.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/mobile-ios-performance.e2e-spec.ts:78:    await resetDatabase(prisma);
+packages/test-code/api/e2e/mobile-overview.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/mobile-overview.e2e-spec.ts:20:    await resetDatabase(prisma);
+packages/test-code/api/e2e/mobile-performance.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/mobile-performance.e2e-spec.ts:24:    await resetDatabase(prisma);
+packages/test-code/api/e2e/mobile-project-detection.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/mobile-project-detection.e2e-spec.ts:24:    await resetDatabase(prisma);
+packages/test-code/api/e2e/mobile-releases.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/mobile-releases.e2e-spec.ts:21:    await resetDatabase(prisma);
+packages/test-code/api/e2e/mobile-repository-linking.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/mobile-repository-linking.e2e-spec.ts:20:    await resetDatabase(prisma);
+packages/test-code/api/e2e/mobile-security.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/mobile-security.e2e-spec.ts:25:    await resetDatabase(prisma);
+packages/test-code/api/e2e/mobile-telemetry.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/mobile-telemetry.e2e-spec.ts:79:    await resetDatabase(prisma);
+packages/test-code/api/e2e/mobile-tests.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/mobile-tests.e2e-spec.ts:20:    await resetDatabase(prisma);
+packages/test-code/api/e2e/mobile-unified-performance.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/mobile-unified-performance.e2e-spec.ts:24:    await resetDatabase(prisma);
+packages/test-code/api/e2e/phase13-analytics-reports.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/phase13-analytics-reports.e2e-spec.ts:658:    await resetDatabase(prisma);
+packages/test-code/api/e2e/phase14-analytics-processing.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/phase14-analytics-processing.e2e-spec.ts:170:    await resetDatabase(prisma);
+packages/test-code/api/e2e/phase15-monitoring.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/phase15-monitoring.e2e-spec.ts:235:    await resetDatabase(prisma);
+packages/test-code/api/e2e/phase15-monitoring.e2e-spec.ts:911:    expect(raw).not.toContain('DATABASE_URL');
+packages/test-code/api/e2e/phase16-releases-deployments.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/phase16-releases-deployments.e2e-spec.ts:154:    await resetDatabase(prisma);
+packages/test-code/api/e2e/phase17-team-operations.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/phase17-team-operations.e2e-spec.ts:179:    await resetDatabase(prisma);
+packages/test-code/api/e2e/phase18-webhook-integrations.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/phase18-webhook-integrations.e2e-spec.ts:158:    await resetDatabase(prisma);
+packages/test-code/api/e2e/phase19-repository-integrations.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/phase19-repository-integrations.e2e-spec.ts:378:    await resetDatabase(prisma);
+packages/test-code/api/e2e/phase20-code-explorer.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/phase20-code-explorer.e2e-spec.ts:488:    await resetDatabase(prisma);
+packages/test-code/api/e2e/phase21-github-workspace-import.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/phase21-github-workspace-import.e2e-spec.ts:218:    await resetDatabase(prisma);
+packages/test-code/api/e2e/raw-events.e2e-spec.ts:4:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/raw-events.e2e-spec.ts:21:    await resetDatabase(prisma);
+packages/test-code/api/e2e/tracker-analytics-processing.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/tracker-analytics-processing.e2e-spec.ts:33:    await resetDatabase(prisma);
+packages/test-code/api/e2e/tracker-bundle-integration.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/tracker-bundle-integration.e2e-spec.ts:63:    await resetDatabase(prisma);
+packages/test-code/api/e2e/tracker-production-bootstrap.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/tracker-production-bootstrap.e2e-spec.ts:31:    await resetDatabase(prisma);
+packages/test-code/api/e2e/tracker-transport.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/tracker-transport.e2e-spec.ts:19:    await resetDatabase(prisma);
+packages/test-code/api/e2e/tracking-admin.e2e-spec.ts:4:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/tracking-admin.e2e-spec.ts:22:    await resetDatabase(prisma);
+packages/test-code/api/e2e/webhook-delivery-worker.e2e-spec.ts:2:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/webhook-delivery-worker.e2e-spec.ts:125:    await resetDatabase(prisma);
+packages/test-code/api/e2e/website-activity.e2e-spec.ts:4:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/website-activity.e2e-spec.ts:21:    await resetDatabase(prisma);
+packages/test-code/api/e2e/website-environments.e2e-spec.ts:4:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/website-environments.e2e-spec.ts:37:    await resetDatabase(prisma);
+packages/test-code/api/e2e/website-roles.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/website-roles.e2e-spec.ts:41:    await resetDatabase(prisma);
+packages/test-code/api/e2e/websites.e2e-spec.ts:4:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/websites.e2e-spec.ts:20:    await resetDatabase(prisma);
+packages/test-code/api/e2e/workspace-members.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/workspace-members.e2e-spec.ts:28:    await resetDatabase(prisma);
+packages/test-code/api/e2e/workspace-roles.e2e-spec.ts:3:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/workspace-roles.e2e-spec.ts:27:    await resetDatabase(prisma);
+packages/test-code/api/e2e/workspaces.e2e-spec.ts:4:import { resetDatabase } from '../helpers/database';
+packages/test-code/api/e2e/workspaces.e2e-spec.ts:25:    await resetDatabase(prisma);
+packages/test-code/api/helpers/database.ts:8:  const databaseUrl = process.env.DATABASE_URL;
+packages/test-code/api/helpers/database.ts:11:    throw new Error('DATABASE_URL is missing');
+packages/test-code/api/helpers/database.ts:27:export async function resetDatabase(prisma: PrismaService): Promise<void> {
+packages/test-code/api/setup-env.ts:12:const testDatabaseUrl = process.env.TEST_DATABASE_URL;
+packages/test-code/api/setup-env.ts:15:  throw new Error('TEST_DATABASE_URL is required for E2E tests');
+packages/test-code/api/setup-env.ts:23:  throw new Error('TEST_DATABASE_URL must be a valid PostgreSQL URL');
+packages/test-code/api/setup-env.ts:30:  throw new Error(['E2E tests refused to start.', 'TEST_DATABASE_URL does not look like a test database.', `Database: ${databaseName}`, `Port: ${parsedDatabaseUrl.port}`].join(' '));
+packages/test-code/api/setup-env.ts:33:process.env.DATABASE_URL = testDatabaseUrl;
+packages/test-code/api/unit/config/env.validation.spec.ts:16:    DATABASE_URL: 'postgresql://user:<redacted>@localhost:5432/db',
+packages/test-code/api/unit/config/env.validation.spec.ts:102:      TEST_DATABASE_URL: 'postgresql://user:<redacted>@localhost:5432/db_test',
+packages/test-code/api/unit/infrastructure/database/postgres-advisory-lock.service.spec.ts:13: * e2e suite's setup-env.ts uses so DATABASE_URL points at the test database
+packages/test-code/api/unit/infrastructure/database/postgres-advisory-lock.service.spec.ts:38:    DATABASE_URL: process.env.DATABASE_URL,
+packages/test-code/api/unit/infrastructure/database/postgres-advisory-lock.service.spec.ts:48:    if (!process.env.DATABASE_URL) {
+packages/test-code/api/unit/infrastructure/database/postgres-advisory-lock.service.spec.ts:49:      throw new Error('DATABASE_URL is required for PostgresAdvisoryLockService tests');
+
+====================================================================================================
+LOCAL POSTGRES CONTAINERS
+====================================================================================================
+NAMES                             IMAGE                STATUS                  PORTS
+scc-ci-redis                      redis:7-alpine       Up 10 hours             6379/tcp
+scc-ci-postgres-fullstack         postgres:17-alpine   Up 10 hours             5432/tcp
+scc-ci-postgres                   postgres:17-alpine   Up 10 hours             0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp
+command-center-fullstack-e2e-db   postgres:16-alpine   Up 10 hours (healthy)   0.0.0.0:5435->5432/tcp, [::]:5435->5432/tcp
+command-center-full-e2e-db        postgres:16-alpine   Up 10 hours             5432/tcp
+blogger-platform-postgres         postgres:17-alpine   Up 10 hours             0.0.0.0:5433->5432/tcp, [::]:5433->5432/tcp
+command-center-postgres-test      postgres:17-alpine   Up 10 hours (healthy)   0.0.0.0:5434->5432/tcp, [::]:5434->5432/tcp
+command-center-postgres           postgres:17-alpine   Up 10 hours (healthy)   0.0.0.0:55432->5432/tcp, [::]:55432->5432/tcp
+command-center-redis              redis:7-alpine       Up 10 hours             0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp
