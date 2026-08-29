@@ -30,6 +30,9 @@ importers:
       '@command-center/shared-types':
         specifier: workspace:*
         version: link:../../packages/shared-types
+      '@command-center/validation':
+        specifier: workspace:*
+        version: link:../../packages/validation
       '@fastify/cookie':
         specifier: ^11.1.2
         version: 11.1.2
@@ -123,6 +126,9 @@ importers:
       undici:
         specifier: ^8.10.0
         version: 8.10.0
+      zod:
+        specifier: ^4.1.5
+        version: 4.4.3
     devDependencies:
       '@command-center/eslint-config':
         specifier: workspace:*
@@ -361,6 +367,12 @@ importers:
       '@command-center/eslint-config':
         specifier: workspace:*
         version: link:../../eslint-config
+      '@command-center/shared-types':
+        specifier: workspace:*
+        version: link:../../shared-types
+      '@command-center/validation':
+        specifier: workspace:*
+        version: link:../../validation
       globals:
         specifier: ^17.11.0
         version: 17.11.0
@@ -424,6 +436,25 @@ importers:
       typescript-eslint:
         specifier: ^8.67.0
         version: 8.67.0(eslint@9.39.5(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.3)
+
+  packages/validation:
+    dependencies:
+      '@command-center/shared-types':
+        specifier: workspace:*
+        version: link:../shared-types
+      zod:
+        specifier: ^4.1.5
+        version: 4.4.3
+    devDependencies:
+      '@command-center/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      eslint:
+        specifier: ^9.34.0
+        version: 9.39.5(jiti@2.7.0)(supports-color@8.1.1)
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.3
 
 packages:
 

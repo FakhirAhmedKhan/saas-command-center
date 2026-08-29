@@ -55,7 +55,7 @@ function configureCors(app: INestApplication, config: TypedConfigService): void 
     });
   };
 
-  app.enableCors((() => corsOptionsDelegate));
+  app.enableCors(() => corsOptionsDelegate);
 }
 
 function configureSwagger(app: INestApplication): void {

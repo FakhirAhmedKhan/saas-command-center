@@ -85,6 +85,21 @@ export interface EnvironmentVariables {
   WEBHOOK_CLEANUP_ENABLED: boolean;
 
   GITHUB_CONNECT_INTENT_CLEANUP_ENABLED: boolean;
+
+  GUIDED_WORKSPACE_BUILDER_ENABLED: boolean;
+  WORKSPACE_GENERATOR_PROVIDER: 'rules' | 'ai';
+  WORKSPACE_ONBOARDING_SESSION_TTL_HOURS: number;
+  WORKSPACE_ONBOARDING_MAX_ANSWER_BYTES: number;
+  WORKSPACE_ONBOARDING_MAX_BLUEPRINT_BYTES: number;
+  WORKSPACE_ONBOARDING_RETENTION_DAYS: number;
+  WORKSPACE_ONBOARDING_CLEANUP_BATCH_SIZE: number;
+  WORKSPACE_ONBOARDING_AI_REQUEST_TIMEOUT_MS: number;
+  WORKSPACE_ONBOARDING_AI_MAX_RETRIES: number;
+  WORKSPACE_ONBOARDING_AI_CIRCUIT_FAILURE_THRESHOLD: number;
+  WORKSPACE_ONBOARDING_AI_CIRCUIT_RESET_MS: number;
+  WORKSPACE_AI_BASE_URL?: string;
+  WORKSPACE_AI_API_KEY?: string;
+  WORKSPACE_AI_MODEL?: string;
 }
 function getOptionalString(config: Record<string, unknown>, key: string): string | undefined {
   const value = config[key];
@@ -151,6 +166,16 @@ function parseNodeEnvironment(value: string | undefined): NodeEnvironment {
 
   throw new Error('NODE_ENV must be development, test, or production.');
 }
+function parseWorkspaceGeneratorProvider(value: string | undefined): 'rules' | 'ai' {
+  const provider = value ?? 'rules';
+
+  if (provider === 'rules' || provider === 'ai') {
+    return provider;
+  }
+
+  throw new Error('WORKSPACE_GENERATOR_PROVIDER must be rules or ai.');
+}
+
 function parseCookieSameSite(value: string | undefined): CookieSameSite {
   const sameSite = value ?? 'lax';
 
@@ -275,6 +300,19 @@ function validateCorsOrigins(value: string): void {
 
 export function validateEnvironment(config: Record<string, unknown>): EnvironmentVariables {
   const nodeEnvironment = parseNodeEnvironment(getOptionalString(config, 'NODE_ENV'));
+  const workspaceGeneratorProvider = parseWorkspaceGeneratorProvider(getOptionalString(config, 'WORKSPACE_GENERATOR_PROVIDER'));
+  const workspaceAiBaseUrl = getOptionalString(config, 'WORKSPACE_AI_BASE_URL');
+  const workspaceAiApiKey = getOptionalString(config, 'WORKSPACE_AI_API_KEY');
+  const workspaceAiModel = getOptionalString(config, 'WORKSPACE_AI_MODEL');
+
+  if (workspaceGeneratorProvider === 'ai') {
+    if (!workspaceAiBaseUrl || !workspaceAiApiKey || !workspaceAiModel) {
+      throw new Error('WORKSPACE_AI_BASE_URL, WORKSPACE_AI_API_KEY, and WORKSPACE_AI_MODEL are required when the workspace generator provider is ai.');
+    }
+
+    validateUrl('WORKSPACE_AI_BASE_URL', workspaceAiBaseUrl, ['http:', 'https:']);
+  }
+
   const databaseUrl = getRequiredString(config, 'DATABASE_URL');
   const testDatabaseUrl = getOptionalString(config, 'TEST_DATABASE_URL');
   const jwtAccessSecret = getRequiredString(config, 'JWT_ACCESS_SECRET');
@@ -415,5 +453,19 @@ export function validateEnvironment(config: Record<string, unknown>): Environmen
     BODY_LIMIT: getOptionalString(config, 'BODY_LIMIT') ?? '1mb',
     SWAGGER_ENABLED: getBoolean(config, 'SWAGGER_ENABLED', nodeEnvironment !== 'production'),
     APP_VERSION: getOptionalString(config, 'APP_VERSION') ?? '0.1.0',
+    GUIDED_WORKSPACE_BUILDER_ENABLED: getBoolean(config, 'GUIDED_WORKSPACE_BUILDER_ENABLED', false),
+    WORKSPACE_GENERATOR_PROVIDER: workspaceGeneratorProvider,
+    WORKSPACE_ONBOARDING_SESSION_TTL_HOURS: getPositiveInteger(config, 'WORKSPACE_ONBOARDING_SESSION_TTL_HOURS', 168),
+    WORKSPACE_ONBOARDING_MAX_ANSWER_BYTES: getPositiveInteger(config, 'WORKSPACE_ONBOARDING_MAX_ANSWER_BYTES', 32_768),
+    WORKSPACE_ONBOARDING_MAX_BLUEPRINT_BYTES: getPositiveInteger(config, 'WORKSPACE_ONBOARDING_MAX_BLUEPRINT_BYTES', 131_072),
+    WORKSPACE_ONBOARDING_RETENTION_DAYS: getPositiveInteger(config, 'WORKSPACE_ONBOARDING_RETENTION_DAYS', 30),
+    WORKSPACE_ONBOARDING_CLEANUP_BATCH_SIZE: getPositiveInteger(config, 'WORKSPACE_ONBOARDING_CLEANUP_BATCH_SIZE', 100),
+    WORKSPACE_ONBOARDING_AI_REQUEST_TIMEOUT_MS: getPositiveInteger(config, 'WORKSPACE_ONBOARDING_AI_REQUEST_TIMEOUT_MS', 15_000),
+    WORKSPACE_ONBOARDING_AI_MAX_RETRIES: getPositiveInteger(config, 'WORKSPACE_ONBOARDING_AI_MAX_RETRIES', 2),
+    WORKSPACE_ONBOARDING_AI_CIRCUIT_FAILURE_THRESHOLD: getPositiveInteger(config, 'WORKSPACE_ONBOARDING_AI_CIRCUIT_FAILURE_THRESHOLD', 5),
+    WORKSPACE_ONBOARDING_AI_CIRCUIT_RESET_MS: getPositiveInteger(config, 'WORKSPACE_ONBOARDING_AI_CIRCUIT_RESET_MS', 60_000),
+    WORKSPACE_AI_BASE_URL: workspaceAiBaseUrl,
+    WORKSPACE_AI_API_KEY: workspaceAiApiKey,
+    WORKSPACE_AI_MODEL: workspaceAiModel,
   };
 }

@@ -20,13 +20,13 @@ The implementation uses:
 
 ## Delivery map
 
-| Phase | Deliverable |
-| --- | --- |
-| 1 | Existing-domain audit, compatibility map, regression baseline |
-| 2 | Shared answers, questions, session, and blueprint contracts plus validation |
-| 3 | Prisma session persistence and authenticated lifecycle API |
-| 4 | Versioned question catalog, conditional flow, API client, and guided UI |
-| 5 | Generator interface, deterministic rule engine, blueprint endpoint, and tests |
+| Phase | Deliverable                                                                   |
+| ----- | ----------------------------------------------------------------------------- |
+| 1     | Existing-domain audit, compatibility map, regression baseline                 |
+| 2     | Shared answers, questions, session, and blueprint contracts plus validation   |
+| 3     | Prisma session persistence and authenticated lifecycle API                    |
+| 4     | Versioned question catalog, conditional flow, API client, and guided UI       |
+| 5     | Generator interface, deterministic rule engine, blueprint endpoint, and tests |
 
 ---
 
@@ -125,17 +125,17 @@ Phase 1 changes no production behavior. Run this command from the project root a
 
 Complete this mapping before integration:
 
-| Required concept | Resolve from repository |
-| --- | --- |
-| Authenticated user ID | Existing Fastify request-user type or decorator |
-| Workspace creation | Existing workspace service method and required DTO |
-| Owner membership | Whether workspace service creates it automatically |
-| Web application | Existing application model and creation service |
-| Mobile application | Existing mobile model and creation service |
-| Desktop application | Existing desktop model and creation service |
-| API client | Existing authenticated web fetch wrapper |
-| Shared exports | Existing package barrel-file conventions |
-| Validation library | Confirm Zod is already installed and exported |
+| Required concept      | Resolve from repository                            |
+| --------------------- | -------------------------------------------------- |
+| Authenticated user ID | Existing Fastify request-user type or decorator    |
+| Workspace creation    | Existing workspace service method and required DTO |
+| Owner membership      | Whether workspace service creates it automatically |
+| Web application       | Existing application model and creation service    |
+| Mobile application    | Existing mobile model and creation service         |
+| Desktop application   | Existing desktop model and creation service        |
+| API client            | Existing authenticated web fetch wrapper           |
+| Shared exports        | Existing package barrel-file conventions           |
+| Validation library    | Confirm Zod is already installed and exported      |
 
 Phase 1 exits only when the regression tests pass and every row above has an exact source file and symbol.
 
@@ -151,67 +151,22 @@ Create `packages/shared-types/src/workspace-onboarding/workspace-onboarding.type
 export const workspaceApplicationTypes = ['WEB', 'MOBILE', 'DESKTOP'] as const;
 export type WorkspaceApplicationType = (typeof workspaceApplicationTypes)[number];
 
-export const workspaceProductTypes = [
-  'PRODUCTIVITY_SAAS',
-  'ECOMMERCE',
-  'MARKETPLACE',
-  'SOCIAL',
-  'INTERNAL_TOOL',
-  'OTHER',
-] as const;
+export const workspaceProductTypes = ['PRODUCTIVITY_SAAS', 'ECOMMERCE', 'MARKETPLACE', 'SOCIAL', 'INTERNAL_TOOL', 'OTHER'] as const;
 export type WorkspaceProductType = (typeof workspaceProductTypes)[number];
 
-export const workspacePlatforms = [
-  'WEB',
-  'ANDROID',
-  'IOS',
-  'WINDOWS',
-  'MACOS',
-  'LINUX',
-] as const;
+export const workspacePlatforms = ['WEB', 'ANDROID', 'IOS', 'WINDOWS', 'MACOS', 'LINUX'] as const;
 export type WorkspacePlatform = (typeof workspacePlatforms)[number];
 
-export const workspaceTechnologies = [
-  'NEXT_JS',
-  'TYPESCRIPT',
-  'KOTLIN',
-  'JETPACK_COMPOSE',
-  'SWIFT',
-  'SWIFTUI',
-  'REACT_NATIVE',
-  'FLUTTER',
-  'TAURI',
-  'ELECTRON',
-  'NEST_JS',
-  'POSTGRESQL',
-  'REDIS',
-] as const;
+export const workspaceTechnologies = ['NEXT_JS', 'TYPESCRIPT', 'KOTLIN', 'JETPACK_COMPOSE', 'SWIFT', 'SWIFTUI', 'REACT_NATIVE', 'FLUTTER', 'TAURI', 'ELECTRON', 'NEST_JS', 'POSTGRESQL', 'REDIS'] as const;
 export type WorkspaceTechnology = (typeof workspaceTechnologies)[number];
 
-export const workspaceEnvironments = [
-  'DEVELOPMENT',
-  'STAGING',
-  'PRODUCTION',
-] as const;
+export const workspaceEnvironments = ['DEVELOPMENT', 'STAGING', 'PRODUCTION'] as const;
 export type WorkspaceEnvironment = (typeof workspaceEnvironments)[number];
 
-export const engineeringSystems = [
-  'CI_CD',
-  'MONITORING',
-  'ANALYTICS',
-  'PERFORMANCE',
-  'ALERTS',
-  'SECURITY',
-  'BACKUPS',
-] as const;
+export const engineeringSystems = ['CI_CD', 'MONITORING', 'ANALYTICS', 'PERFORMANCE', 'ALERTS', 'SECURITY', 'BACKUPS'] as const;
 export type EngineeringSystem = (typeof engineeringSystems)[number];
 
-export type WorkspaceQuestionType =
-  | 'TEXT'
-  | 'SINGLE_SELECT'
-  | 'MULTI_SELECT'
-  | 'BOOLEAN'
-  | 'TECHNOLOGY';
+export type WorkspaceQuestionType = 'TEXT' | 'SINGLE_SELECT' | 'MULTI_SELECT' | 'BOOLEAN' | 'TECHNOLOGY';
 
 export type WorkspaceGeneratorProvider = 'rules';
 export type RepositoryStrategy = 'NONE' | 'CONNECT_LATER' | 'CONNECT_NOW';
@@ -226,14 +181,9 @@ export interface WorkspaceOnboardingAnswers {
   authentication?: boolean;
   collaboration?: boolean;
   notifications?: string[];
-  technologyPreference?: Partial<
-    Record<WorkspaceApplicationType, WorkspaceTechnology[]>
-  >;
+  technologyPreference?: Partial<Record<WorkspaceApplicationType, WorkspaceTechnology[]>>;
   mobilePlatforms?: Extract<WorkspacePlatform, 'ANDROID' | 'IOS'>[];
-  desktopPlatforms?: Extract<
-    WorkspacePlatform,
-    'WINDOWS' | 'MACOS' | 'LINUX'
-  >[];
+  desktopPlatforms?: Extract<WorkspacePlatform, 'WINDOWS' | 'MACOS' | 'LINUX'>[];
   repositories?: RepositoryStrategy;
   environments?: WorkspaceEnvironment[];
   qualityRequirements?: EngineeringSystem[];
@@ -302,13 +252,7 @@ export interface WorkspaceBlueprint {
 
 export interface WorkspaceOnboardingSessionResponse {
   id: string;
-  status:
-    | 'IN_PROGRESS'
-    | 'BLUEPRINT_READY'
-    | 'CREATING'
-    | 'COMPLETED'
-    | 'FAILED'
-    | 'EXPIRED';
+  status: 'IN_PROGRESS' | 'BLUEPRINT_READY' | 'CREATING' | 'COMPLETED' | 'FAILED' | 'EXPIRED';
   currentStep: string | null;
   answers: WorkspaceOnboardingAnswers;
   blueprint: WorkspaceBlueprint | null;
@@ -339,23 +283,12 @@ export * from './workspace-onboarding';
 Create `packages/validation/src/workspace-onboarding/workspace-onboarding.schemas.ts`:
 
 ```ts
-import {
-  engineeringSystems,
-  workspaceApplicationTypes,
-  workspaceEnvironments,
-  workspacePlatforms,
-  workspaceProductTypes,
-  workspaceTechnologies,
-} from '@command-center/shared-types';
+import { engineeringSystems, workspaceApplicationTypes, workspaceEnvironments, workspacePlatforms, workspaceProductTypes, workspaceTechnologies } from '@command-center/shared-types';
 import { z } from 'zod';
 
 const unique = <T>(values: T[]) => new Set(values).size === values.length;
 
-const uniqueArray = <T extends z.ZodTypeAny>(schema: T, maximum: number) =>
-  z
-    .array(schema)
-    .max(maximum)
-    .refine(unique, 'Duplicate values are not allowed');
+const uniqueArray = <T extends z.ZodTypeAny>(schema: T, maximum: number) => z.array(schema).max(maximum).refine(unique, 'Duplicate values are not allowed');
 
 export const workspaceOnboardingAnswersSchema = z
   .object({
@@ -368,30 +301,16 @@ export const workspaceOnboardingAnswersSchema = z
     authentication: z.boolean().optional(),
     collaboration: z.boolean().optional(),
     notifications: uniqueArray(z.string().trim().min(1).max(50), 10).optional(),
-    technologyPreference: z
-      .record(
-        z.enum(workspaceApplicationTypes),
-        uniqueArray(z.enum(workspaceTechnologies), 12),
-      )
-      .optional(),
-    mobilePlatforms: uniqueArray(
-      z.enum(['ANDROID', 'IOS'] as const),
-      2,
-    ).optional(),
-    desktopPlatforms: uniqueArray(
-      z.enum(['WINDOWS', 'MACOS', 'LINUX'] as const),
-      3,
-    ).optional(),
+    technologyPreference: z.record(z.enum(workspaceApplicationTypes), uniqueArray(z.enum(workspaceTechnologies), 12)).optional(),
+    mobilePlatforms: uniqueArray(z.enum(['ANDROID', 'IOS'] as const), 2).optional(),
+    desktopPlatforms: uniqueArray(z.enum(['WINDOWS', 'MACOS', 'LINUX'] as const), 3).optional(),
     repositories: z.enum(['NONE', 'CONNECT_LATER', 'CONNECT_NOW']).optional(),
     environments: uniqueArray(z.enum(workspaceEnvironments), 3).optional(),
     qualityRequirements: uniqueArray(z.enum(engineeringSystems), 7).optional(),
   })
   .strict()
   .superRefine((answers, context) => {
-    if (
-      answers.mobilePlatforms?.length &&
-      !answers.applicationTypes?.includes('MOBILE')
-    ) {
+    if (answers.mobilePlatforms?.length && !answers.applicationTypes?.includes('MOBILE')) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['mobilePlatforms'],
@@ -399,10 +318,7 @@ export const workspaceOnboardingAnswersSchema = z
       });
     }
 
-    if (
-      answers.desktopPlatforms?.length &&
-      !answers.applicationTypes?.includes('DESKTOP')
-    ) {
+    if (answers.desktopPlatforms?.length && !answers.applicationTypes?.includes('DESKTOP')) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['desktopPlatforms'],
@@ -446,16 +362,16 @@ export const workspaceBlueprintSchema = z
     }),
     workspace: z.object({
       name: z.string().trim().min(2).max(80),
-      slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(80),
+      slug: z
+        .string()
+        .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+        .max(80),
       description: z.string().trim().min(3).max(500),
       productType: z.enum(workspaceProductTypes),
     }),
     applications: uniqueArray(applicationSchema, 3)
       .min(1)
-      .refine(
-        (applications) => unique(applications.map(({ type }) => type)),
-        'Only one application blueprint per type is allowed',
-      ),
+      .refine((applications) => unique(applications.map(({ type }) => type)), 'Only one application blueprint per type is allowed'),
     services: z.object({
       backend: uniqueArray(z.enum(workspaceTechnologies), 8),
       database: uniqueArray(z.enum(workspaceTechnologies), 4),
@@ -476,33 +392,21 @@ export const workspaceBlueprintSchema = z
   })
   .strict();
 
-export const completeWorkspaceOnboardingAnswersSchema =
-  workspaceOnboardingAnswersSchema.superRefine((answers, context) => {
-    const required = [
-      'productIdea',
-      'workspaceName',
-      'productType',
-      'targetUsers',
-      'applicationTypes',
-      'coreFeatures',
-      'authentication',
-      'repositories',
-      'environments',
-      'qualityRequirements',
-    ] as const;
+export const completeWorkspaceOnboardingAnswersSchema = workspaceOnboardingAnswersSchema.superRefine((answers, context) => {
+  const required = ['productIdea', 'workspaceName', 'productType', 'targetUsers', 'applicationTypes', 'coreFeatures', 'authentication', 'repositories', 'environments', 'qualityRequirements'] as const;
 
-    for (const key of required) {
-      const value = answers[key];
+  for (const key of required) {
+    const value = answers[key];
 
-      if (value === undefined || (Array.isArray(value) && value.length === 0)) {
-        context.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: [key],
-          message: 'This answer is required before blueprint generation',
-        });
-      }
+    if (value === undefined || (Array.isArray(value) && value.length === 0)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [key],
+        message: 'This answer is required before blueprint generation',
+      });
     }
-  });
+  }
+});
 ```
 
 Create the local and root barrel exports following the package's existing export convention.
@@ -512,11 +416,7 @@ Create the local and root barrel exports following the package's existing export
 Create `packages/test-code/api/unit/workspace-onboarding/workspace-onboarding.schemas.spec.ts`:
 
 ```ts
-import {
-  completeWorkspaceOnboardingAnswersSchema,
-  workspaceBlueprintSchema,
-  workspaceOnboardingAnswersSchema,
-} from '@command-center/validation';
+import { completeWorkspaceOnboardingAnswersSchema, workspaceBlueprintSchema, workspaceOnboardingAnswersSchema } from '@command-center/validation';
 
 describe('workspace onboarding schemas', () => {
   it('rejects duplicate application types', () => {
@@ -688,11 +588,7 @@ export class WorkspaceOnboardingRepository {
     });
   }
 
-  updateAnswers(
-    id: string,
-    answers: Prisma.InputJsonValue,
-    currentStep: string | null,
-  ) {
+  updateAnswers(id: string, answers: Prisma.InputJsonValue, currentStep: string | null) {
     return this.prisma.workspaceOnboardingSession.update({
       where: { id },
       data: {
@@ -712,11 +608,7 @@ export class WorkspaceOnboardingRepository {
     });
   }
 
-  saveBlueprint(
-    id: string,
-    blueprint: Prisma.InputJsonValue,
-    ruleSetVersion: string,
-  ) {
+  saveBlueprint(id: string, blueprint: Prisma.InputJsonValue, ruleSetVersion: string) {
     return this.prisma.workspaceOnboardingSession.update({
       where: { id },
       data: {
@@ -740,30 +632,19 @@ export class WorkspaceOnboardingRepository {
 Create `apps/api/src/modules/workspace-onboarding/workspace-onboarding.service.ts`:
 
 ```ts
-import type {
-  WorkspaceOnboardingAnswers,
-  WorkspaceOnboardingSessionResponse,
-} from '@command-center/shared-types';
+import type { WorkspaceOnboardingAnswers, WorkspaceOnboardingSessionResponse } from '@command-center/shared-types';
 import { workspaceOnboardingAnswersSchema } from '@command-center/validation';
-import {
-  GoneException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { GoneException, Injectable, NotFoundException } from '@nestjs/common';
 import { WorkspaceOnboardingRepository } from './workspace-onboarding.repository';
 
 const SESSION_TTL_HOURS = 168;
 
 @Injectable()
 export class WorkspaceOnboardingService {
-  constructor(
-    private readonly repository: WorkspaceOnboardingRepository,
-  ) {}
+  constructor(private readonly repository: WorkspaceOnboardingRepository) {}
 
   async create(userId: string): Promise<WorkspaceOnboardingSessionResponse> {
-    const expiresAt = new Date(
-      Date.now() + SESSION_TTL_HOURS * 60 * 60 * 1000,
-    );
+    const expiresAt = new Date(Date.now() + SESSION_TTL_HOURS * 60 * 60 * 1000);
 
     return this.toResponse(await this.repository.create(userId, expiresAt));
   }
@@ -790,11 +671,7 @@ export class WorkspaceOnboardingService {
     return this.toResponse(await this.getOwned(id, userId));
   }
 
-  async updateAnswers(
-    id: string,
-    userId: string,
-    patch: Partial<WorkspaceOnboardingAnswers>,
-  ) {
+  async updateAnswers(id: string, userId: string, patch: Partial<WorkspaceOnboardingAnswers>) {
     const session = await this.getOwned(id, userId);
     const previous = workspaceOnboardingAnswersSchema.parse(session.answers);
     const answers = workspaceOnboardingAnswersSchema.parse({
@@ -802,11 +679,7 @@ export class WorkspaceOnboardingService {
       ...patch,
     });
 
-    const updated = await this.repository.updateAnswers(
-      id,
-      answers,
-      Object.keys(patch).at(-1) ?? session.currentStep,
-    );
+    const updated = await this.repository.updateAnswers(id, answers, Object.keys(patch).at(-1) ?? session.currentStep);
 
     return this.toResponse(updated);
   }
@@ -854,17 +727,7 @@ Create `apps/api/src/modules/workspace-onboarding/workspace-onboarding.controlle
 
 ```ts
 import type { FastifyRequest } from 'fastify';
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  Param,
-  Patch,
-  Post,
-  Req,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Req } from '@nestjs/common';
 import type { RequestWithUser } from '../auth/interfaces/request-with-user.interface';
 import { UpdateOnboardingAnswersDto } from './dto/update-onboarding-answers.dto';
 import { WorkspaceOnboardingService } from './workspace-onboarding.service';
@@ -886,21 +749,14 @@ export class WorkspaceOnboardingController {
   }
 
   @Patch(':id/answers')
-  updateAnswers(
-    @Param('id') id: string,
-    @Body() input: unknown,
-    @Req() request: AuthenticatedRequest,
-  ) {
+  updateAnswers(@Param('id') id: string, @Body() input: unknown, @Req() request: AuthenticatedRequest) {
     const body = UpdateOnboardingAnswersDto.parse(input);
     return this.service.updateAnswers(id, request.user.id, body.answers);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  async remove(
-    @Param('id') id: string,
-    @Req() request: AuthenticatedRequest,
-  ) {
+  async remove(@Param('id') id: string, @Req() request: AuthenticatedRequest) {
     await this.service.delete(id, request.user.id);
   }
 }
@@ -1016,10 +872,7 @@ The placeholder fixture functions must be replaced by the exact helpers found du
 Create `apps/api/src/modules/workspace-onboarding/questions/question-catalog.ts`:
 
 ```ts
-import type {
-  WorkspaceOnboardingAnswers,
-  WorkspaceQuestionDefinition,
-} from '@command-center/shared-types';
+import type { WorkspaceOnboardingAnswers, WorkspaceQuestionDefinition } from '@command-center/shared-types';
 
 interface CatalogQuestion extends WorkspaceQuestionDefinition {
   visibleWhen?: (answers: WorkspaceOnboardingAnswers) => boolean;
@@ -1183,56 +1036,36 @@ export const questionCatalog: readonly CatalogQuestion[] = [
 Create `apps/api/src/modules/workspace-onboarding/questions/question-flow.service.ts`:
 
 ```ts
-import type {
-  WorkspaceOnboardingAnswers,
-  WorkspaceQuestionFlowResponse,
-} from '@command-center/shared-types';
+import type { WorkspaceOnboardingAnswers, WorkspaceQuestionFlowResponse } from '@command-center/shared-types';
 import { Injectable } from '@nestjs/common';
 import { questionCatalog } from './question-catalog';
 
-const dependentKeys: Partial<
-  Record<keyof WorkspaceOnboardingAnswers, (keyof WorkspaceOnboardingAnswers)[]>
-> = {
-  applicationTypes: [
-    'mobilePlatforms',
-    'desktopPlatforms',
-    'technologyPreference',
-  ],
+const dependentKeys: Partial<Record<keyof WorkspaceOnboardingAnswers, (keyof WorkspaceOnboardingAnswers)[]>> = {
+  applicationTypes: ['mobilePlatforms', 'desktopPlatforms', 'technologyPreference'],
   coreFeatures: ['collaboration', 'notifications'],
 };
 
 @Injectable()
 export class QuestionFlowService {
   applicable(answers: WorkspaceOnboardingAnswers) {
-    return questionCatalog
-      .filter((question) => !question.visibleWhen || question.visibleWhen(answers))
-      .map(({ visibleWhen: _visibleWhen, ...question }) => question);
+    return questionCatalog.filter((question) => !question.visibleWhen || question.visibleWhen(answers)).map(({ visibleWhen: _visibleWhen, ...question }) => question);
   }
 
   flow(answers: WorkspaceOnboardingAnswers): WorkspaceQuestionFlowResponse {
     const questions = this.applicable(answers);
-    const answered = questions.filter(
-      ({ key }) => answers[key] !== undefined,
-    );
-    const currentQuestion =
-      questions.find(({ key }) => answers[key] === undefined) ?? null;
+    const answered = questions.filter(({ key }) => answers[key] !== undefined);
+    const currentQuestion = questions.find(({ key }) => answers[key] === undefined) ?? null;
 
     return {
       questions,
       currentQuestion,
       completed: answered.length,
       total: questions.length,
-      percent:
-        questions.length === 0
-          ? 100
-          : Math.round((answered.length / questions.length) * 100),
+      percent: questions.length === 0 ? 100 : Math.round((answered.length / questions.length) * 100),
     };
   }
 
-  removeInvalidDependents(
-    previous: WorkspaceOnboardingAnswers,
-    patch: Partial<WorkspaceOnboardingAnswers>,
-  ): WorkspaceOnboardingAnswers {
+  removeInvalidDependents(previous: WorkspaceOnboardingAnswers, patch: Partial<WorkspaceOnboardingAnswers>): WorkspaceOnboardingAnswers {
     const next = { ...previous, ...patch };
 
     for (const changedKey of Object.keys(patch) as (keyof WorkspaceOnboardingAnswers)[]) {
@@ -1274,11 +1107,7 @@ async questions(
 Create `apps/web/src/features/workspace-onboarding/api/workspace-onboarding-api.ts`:
 
 ```ts
-import type {
-  WorkspaceOnboardingAnswers,
-  WorkspaceOnboardingSessionResponse,
-  WorkspaceQuestionFlowResponse,
-} from '@command-center/shared-types';
+import type { WorkspaceOnboardingAnswers, WorkspaceOnboardingSessionResponse, WorkspaceQuestionFlowResponse } from '@command-center/shared-types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api/v1';
 
@@ -1309,22 +1138,13 @@ export const workspaceOnboardingApi = {
     request<WorkspaceOnboardingSessionResponse>('/workspace-onboarding/sessions', {
       method: 'POST',
     }),
-  get: (id: string) =>
-    request<WorkspaceOnboardingSessionResponse>(
-      `/workspace-onboarding/sessions/${id}`,
-    ),
-  questions: (id: string) =>
-    request<WorkspaceQuestionFlowResponse>(
-      `/workspace-onboarding/sessions/${id}/questions`,
-    ),
+  get: (id: string) => request<WorkspaceOnboardingSessionResponse>(`/workspace-onboarding/sessions/${id}`),
+  questions: (id: string) => request<WorkspaceQuestionFlowResponse>(`/workspace-onboarding/sessions/${id}/questions`),
   updateAnswers: (id: string, answers: Partial<WorkspaceOnboardingAnswers>) =>
-    request<WorkspaceOnboardingSessionResponse>(
-      `/workspace-onboarding/sessions/${id}/answers`,
-      {
-        method: 'PATCH',
-        body: JSON.stringify({ answers }),
-      },
-    ),
+    request<WorkspaceOnboardingSessionResponse>(`/workspace-onboarding/sessions/${id}/answers`, {
+      method: 'PATCH',
+      body: JSON.stringify({ answers }),
+    }),
 };
 ```
 
@@ -1346,87 +1166,50 @@ interface Props {
   onSubmit: (value: unknown) => Promise<void>;
 }
 
-export function OnboardingQuestionCard({
-  question,
-  disabled = false,
-  onSubmit,
-}: Props) {
-  const [value, setValue] = useState<unknown>(
-    question.type === 'MULTI_SELECT' ? [] : '',
-  );
+export function OnboardingQuestionCard({ question, disabled = false, onSubmit }: Props) {
+  const [value, setValue] = useState<unknown>(question.type === 'MULTI_SELECT' ? [] : '');
 
   const toggle = (option: string) => {
     const selected = Array.isArray(value) ? (value as string[]) : [];
-    setValue(
-      selected.includes(option)
-        ? selected.filter((item) => item !== option)
-        : [...selected, option],
-    );
+    setValue(selected.includes(option) ? selected.filter((item) => item !== option) : [...selected, option]);
   };
 
   return (
-    <section
-      aria-labelledby={`question-${question.key}`}
-      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-    >
-      <h2 id={`question-${question.key}`} className="text-lg font-semibold">
+    <section aria-labelledby={`question-${question.key}`} className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+      <h2 id={`question-${question.key}`} className='text-lg font-semibold'>
         {question.prompt}
       </h2>
 
       {question.type === 'TEXT' && (
-        <textarea
-          aria-label={question.prompt}
-          className="mt-4 min-h-28 w-full rounded-xl border p-3"
-          disabled={disabled}
-          maxLength={500}
-          onChange={(event) => setValue(event.target.value)}
-          value={String(value)}
-        />
+        <textarea aria-label={question.prompt} className='mt-4 min-h-28 w-full rounded-xl border p-3' disabled={disabled} maxLength={500} onChange={(event) => setValue(event.target.value)} value={String(value)} />
       )}
 
       {question.type === 'BOOLEAN' && (
-        <div className="mt-4 grid grid-cols-2 gap-3">
+        <div className='mt-4 grid grid-cols-2 gap-3'>
           {[true, false].map((option) => (
-            <button
-              className="rounded-xl border p-3"
-              disabled={disabled}
-              key={String(option)}
-              onClick={() => setValue(option)}
-              type="button"
-            >
+            <button className='rounded-xl border p-3' disabled={disabled} key={String(option)} onClick={() => setValue(option)} type='button'>
               {option ? 'Yes' : 'No'}
             </button>
           ))}
         </div>
       )}
 
-      {(question.type === 'SINGLE_SELECT' ||
-        question.type === 'MULTI_SELECT') && (
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+      {(question.type === 'SINGLE_SELECT' || question.type === 'MULTI_SELECT') && (
+        <div className='mt-4 grid gap-3 sm:grid-cols-2'>
           {question.options?.map((option) => {
-            const selected = Array.isArray(value)
-              ? value.includes(option.value)
-              : value === option.value;
+            const selected = Array.isArray(value) ? value.includes(option.value) : value === option.value;
 
             return (
               <button
                 aria-pressed={selected}
-                className="rounded-xl border p-3 text-left aria-pressed:border-slate-900 aria-pressed:bg-slate-50"
+                className='rounded-xl border p-3 text-left aria-pressed:border-slate-900 aria-pressed:bg-slate-50'
                 disabled={disabled}
                 key={option.value}
-                onClick={() =>
-                  question.type === 'MULTI_SELECT'
-                    ? toggle(option.value)
-                    : setValue(option.value)
-                }
-                type="button"
+                onClick={() => (question.type === 'MULTI_SELECT' ? toggle(option.value) : setValue(option.value))}
+                type='button'
               >
-                <span className="block font-medium">{option.label}</span>
-                {option.description && (
-                  <span className="text-sm text-slate-600">
-                    {option.description}
-                  </span>
-                )}
+                <span className='block font-medium'>{option.label}</span>
+                {option.description && <span className='text-sm text-slate-600'>{option.description}</span>}
               </button>
             );
           })}
@@ -1434,14 +1217,10 @@ export function OnboardingQuestionCard({
       )}
 
       <button
-        className="mt-5 rounded-xl bg-slate-950 px-5 py-3 font-medium text-white disabled:opacity-50"
-        disabled={
-          disabled ||
-          value === '' ||
-          (Array.isArray(value) && value.length === 0)
-        }
+        className='mt-5 rounded-xl bg-slate-950 px-5 py-3 font-medium text-white disabled:opacity-50'
+        disabled={disabled || value === '' || (Array.isArray(value) && value.length === 0)}
         onClick={() => onSubmit(value)}
-        type="button"
+        type='button'
       >
         Continue
       </button>
@@ -1455,27 +1234,20 @@ Create `apps/web/src/features/workspace-onboarding/components/guided-workspace-b
 ```tsx
 'use client';
 
-import type {
-  WorkspaceOnboardingSessionResponse,
-  WorkspaceQuestionFlowResponse,
-} from '@command-center/shared-types';
+import type { WorkspaceOnboardingSessionResponse, WorkspaceQuestionFlowResponse } from '@command-center/shared-types';
 import { useCallback, useEffect, useState } from 'react';
 import { workspaceOnboardingApi } from '../api/workspace-onboarding-api';
 import { OnboardingQuestionCard } from './onboarding-question-card';
 
 export function GuidedWorkspaceBuilder({ sessionId }: { sessionId: string }) {
-  const [session, setSession] =
-    useState<WorkspaceOnboardingSessionResponse | null>(null);
+  const [session, setSession] = useState<WorkspaceOnboardingSessionResponse | null>(null);
   const [flow, setFlow] = useState<WorkspaceQuestionFlowResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
     try {
-      const [nextSession, nextFlow] = await Promise.all([
-        workspaceOnboardingApi.get(sessionId),
-        workspaceOnboardingApi.questions(sessionId),
-      ]);
+      const [nextSession, nextFlow] = await Promise.all([workspaceOnboardingApi.get(sessionId), workspaceOnboardingApi.questions(sessionId)]);
       setSession(nextSession);
       setFlow(nextFlow);
       setError(null);
@@ -1489,24 +1261,24 @@ export function GuidedWorkspaceBuilder({ sessionId }: { sessionId: string }) {
   }, [load]);
 
   if (error) {
-    return <div role="alert">{error}</div>;
+    return <div role='alert'>{error}</div>;
   }
 
   if (!session || !flow) {
-    return <div aria-live="polite">Loading guided builder…</div>;
+    return <div aria-live='polite'>Loading guided builder…</div>;
   }
 
   if (!flow.currentQuestion) {
-    return <div data-testid="answers-complete">Answers complete</div>;
+    return <div data-testid='answers-complete'>Answers complete</div>;
   }
 
   return (
-    <main className="mx-auto w-full max-w-3xl p-4 sm:p-8">
-      <header className="mb-6">
-        <p className="text-sm text-slate-600">
+    <main className='mx-auto w-full max-w-3xl p-4 sm:p-8'>
+      <header className='mb-6'>
+        <p className='text-sm text-slate-600'>
           {flow.completed} of {flow.total} completed
         </p>
-        <progress className="mt-2 w-full" max={100} value={flow.percent} />
+        <progress className='mt-2 w-full' max={100} value={flow.percent} />
       </header>
 
       <OnboardingQuestionCard
@@ -1539,11 +1311,7 @@ Create the route using the repository's actual dynamic-parameter convention:
 ```tsx
 import { GuidedWorkspaceBuilder } from '@/features/workspace-onboarding/components/guided-workspace-builder';
 
-export default async function GuidedSessionPage({
-  params,
-}: {
-  params: Promise<{ sessionId: string }>;
-}) {
+export default async function GuidedSessionPage({ params }: { params: Promise<{ sessionId: string }> }) {
   const { sessionId } = await params;
   return <GuidedWorkspaceBuilder sessionId={sessionId} />;
 }
@@ -1558,13 +1326,9 @@ describe('QuestionFlowService', () => {
   const service = new QuestionFlowService();
 
   it('shows mobile questions only when mobile is selected', () => {
-    expect(
-      service.applicable({ applicationTypes: ['WEB'] }).map(({ key }) => key),
-    ).not.toContain('mobilePlatforms');
+    expect(service.applicable({ applicationTypes: ['WEB'] }).map(({ key }) => key)).not.toContain('mobilePlatforms');
 
-    expect(
-      service.applicable({ applicationTypes: ['MOBILE'] }).map(({ key }) => key),
-    ).toContain('mobilePlatforms');
+    expect(service.applicable({ applicationTypes: ['MOBILE'] }).map(({ key }) => key)).toContain('mobilePlatforms');
   });
 
   it('removes answers made irrelevant by an earlier change', () => {
@@ -1623,14 +1387,9 @@ it('submits a multi-select answer', async () => {
 Create `apps/api/src/modules/workspace-onboarding/generators/workspace-blueprint-generator.interface.ts`:
 
 ```ts
-import type {
-  WorkspaceBlueprint,
-  WorkspaceOnboardingAnswers,
-} from '@command-center/shared-types';
+import type { WorkspaceBlueprint, WorkspaceOnboardingAnswers } from '@command-center/shared-types';
 
-export const WORKSPACE_BLUEPRINT_GENERATOR = Symbol(
-  'WORKSPACE_BLUEPRINT_GENERATOR',
-);
+export const WORKSPACE_BLUEPRINT_GENERATOR = Symbol('WORKSPACE_BLUEPRINT_GENERATOR');
 
 export interface WorkspaceBlueprintGenerator {
   generate(input: WorkspaceOnboardingAnswers): Promise<WorkspaceBlueprint>;
@@ -1642,11 +1401,7 @@ export interface WorkspaceBlueprintGenerator {
 Create `apps/api/src/modules/workspace-onboarding/rules/rule-engine.ts`:
 
 ```ts
-import type {
-  WorkspaceBlueprint,
-  WorkspaceBlueprintRecommendation,
-  WorkspaceOnboardingAnswers,
-} from '@command-center/shared-types';
+import type { WorkspaceBlueprint, WorkspaceBlueprintRecommendation, WorkspaceOnboardingAnswers } from '@command-center/shared-types';
 import { Injectable } from '@nestjs/common';
 
 export interface RuleContext {
@@ -1666,24 +1421,15 @@ export interface WorkspaceRule {
 
 @Injectable()
 export class WorkspaceRuleEngine {
-  apply(
-    initial: WorkspaceBlueprintDraft,
-    context: RuleContext,
-    rules: readonly WorkspaceRule[],
-  ): WorkspaceBlueprintDraft {
+  apply(initial: WorkspaceBlueprintDraft, context: RuleContext, rules: readonly WorkspaceRule[]): WorkspaceBlueprintDraft {
     const seenPriorities = new Map<number, string>();
-    const ordered = [...rules].sort(
-      (left, right) =>
-        left.priority - right.priority || left.id.localeCompare(right.id),
-    );
+    const ordered = [...rules].sort((left, right) => left.priority - right.priority || left.id.localeCompare(right.id));
 
     for (const rule of ordered) {
       const previousRule = seenPriorities.get(rule.priority);
 
       if (previousRule && previousRule !== rule.id) {
-        throw new Error(
-          `Rule priority conflict: ${previousRule} and ${rule.id} both use ${rule.priority}`,
-        );
+        throw new Error(`Rule priority conflict: ${previousRule} and ${rule.id} both use ${rule.priority}`);
       }
 
       seenPriorities.set(rule.priority, rule.id);
@@ -1738,17 +1484,8 @@ export const foundationRules: readonly WorkspaceRule[] = [
     priority: 200,
     when: ({ answers }) => answers.applicationTypes?.includes('MOBILE') === true,
     apply: (draft, { answers }) => {
-      const platforms = answers.mobilePlatforms?.length
-        ? answers.mobilePlatforms
-        : (['ANDROID', 'IOS'] as const);
-      const stack = [
-        ...(platforms.includes('ANDROID')
-          ? (['KOTLIN', 'JETPACK_COMPOSE'] as const)
-          : []),
-        ...(platforms.includes('IOS')
-          ? (['SWIFT', 'SWIFTUI'] as const)
-          : []),
-      ];
+      const platforms = answers.mobilePlatforms?.length ? answers.mobilePlatforms : (['ANDROID', 'IOS'] as const);
+      const stack = [...(platforms.includes('ANDROID') ? (['KOTLIN', 'JETPACK_COMPOSE'] as const) : []), ...(platforms.includes('IOS') ? (['SWIFT', 'SWIFTUI'] as const) : [])];
 
       draft.applications.push({
         type: 'MOBILE',
@@ -1768,9 +1505,7 @@ export const foundationRules: readonly WorkspaceRule[] = [
       draft.applications.push({
         type: 'DESKTOP',
         name: `${draft.workspace.name} Desktop`,
-        platforms: answers.desktopPlatforms?.length
-          ? answers.desktopPlatforms
-          : ['WINDOWS'],
+        platforms: answers.desktopPlatforms?.length ? answers.desktopPlatforms : ['WINDOWS'],
         stack: ['TAURI', 'TYPESCRIPT'],
       });
     },
@@ -1815,14 +1550,8 @@ export const foundationRules: readonly WorkspaceRule[] = [
 Create `apps/api/src/modules/workspace-onboarding/generators/rule-based-workspace-blueprint.generator.ts`:
 
 ```ts
-import type {
-  WorkspaceBlueprint,
-  WorkspaceOnboardingAnswers,
-} from '@command-center/shared-types';
-import {
-  completeWorkspaceOnboardingAnswersSchema,
-  workspaceBlueprintSchema,
-} from '@command-center/validation';
+import type { WorkspaceBlueprint, WorkspaceOnboardingAnswers } from '@command-center/shared-types';
+import { completeWorkspaceOnboardingAnswersSchema, workspaceBlueprintSchema } from '@command-center/validation';
 import { Injectable } from '@nestjs/common';
 import type { WorkspaceBlueprintGenerator } from './workspace-blueprint-generator.interface';
 import { foundationRules } from '../rules/foundation.rules';
@@ -1841,9 +1570,7 @@ function slugify(value: string): string {
 }
 
 @Injectable()
-export class RuleBasedWorkspaceBlueprintGenerator
-  implements WorkspaceBlueprintGenerator
-{
+export class RuleBasedWorkspaceBlueprintGenerator implements WorkspaceBlueprintGenerator {
   constructor(private readonly ruleEngine: WorkspaceRuleEngine) {}
 
   async generate(input: WorkspaceOnboardingAnswers): Promise<WorkspaceBlueprint> {
@@ -1874,11 +1601,7 @@ export class RuleBasedWorkspaceBlueprintGenerator
       recommendations: [],
     };
 
-    const generated = this.ruleEngine.apply(
-      initial,
-      { answers },
-      foundationRules,
-    );
+    const generated = this.ruleEngine.apply(initial, { answers }, foundationRules);
 
     return workspaceBlueprintSchema.parse(generated);
   }
@@ -1969,9 +1692,7 @@ import { RuleBasedWorkspaceBlueprintGenerator } from 'src/modules/workspace-onbo
 import { WorkspaceRuleEngine } from 'src/modules/workspace-onboarding/rules/rule-engine';
 
 describe('RuleBasedWorkspaceBlueprintGenerator', () => {
-  const generator = new RuleBasedWorkspaceBlueprintGenerator(
-    new WorkspaceRuleEngine(),
-  );
+  const generator = new RuleBasedWorkspaceBlueprintGenerator(new WorkspaceRuleEngine());
 
   const answers = {
     productIdea: 'A cross-platform task management product',
@@ -2000,22 +1721,14 @@ describe('RuleBasedWorkspaceBlueprintGenerator', () => {
   it('generates one application for each requested type', async () => {
     const blueprint = await generator.generate(answers);
 
-    expect(blueprint.applications.map(({ type }) => type)).toEqual([
-      'WEB',
-      'MOBILE',
-      'DESKTOP',
-    ]);
+    expect(blueprint.applications.map(({ type }) => type)).toEqual(['WEB', 'MOBILE', 'DESKTOP']);
   });
 
   it('adds an explanation for every applied rule', async () => {
     const blueprint = await generator.generate(answers);
 
     expect(blueprint.recommendations.length).toBeGreaterThan(0);
-    expect(
-      blueprint.recommendations.every(
-        ({ ruleId, explanation }) => ruleId && explanation,
-      ),
-    ).toBe(true);
+    expect(blueprint.recommendations.every(({ ruleId, explanation }) => ruleId && explanation)).toBe(true);
   });
 });
 
@@ -2083,11 +1796,7 @@ it('generates a deterministic schema-valid blueprint', async () => {
     qualityRequirements: ['CI_CD', 'MONITORING', 'SECURITY'],
   });
 
-  const response = await generateBlueprint(
-    app,
-    session.id,
-    owner.accessToken,
-  );
+  const response = await generateBlueprint(app, session.id, owner.accessToken);
 
   expect(response.statusCode).toBe(201);
   expect(response.json()).toMatchObject({

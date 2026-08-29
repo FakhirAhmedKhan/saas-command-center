@@ -1,6 +1,6 @@
 import { Public } from '../../auth/decorators/public.decorator';
 import { GithubWebhookService } from '../services/github-webhook.service';
-import { Controller, Headers, Post, Req, UnauthorizedException ,type  RawBodyRequest } from '@nestjs/common';
+import { Controller, Headers, Post, Req, UnauthorizedException, type RawBodyRequest } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import type { FastifyRequest } from 'fastify';
 

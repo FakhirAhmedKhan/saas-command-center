@@ -1,0 +1,83 @@
+﻿GUIDED BUILDER API TEST VERIFICATION
+DATE: 2026-08-27 02:08:20
+DATABASE: command_center_test
+
+==================================================
+FORMAT ONBOARDING TESTS
+==================================================
+packages/test-code/api/e2e/workspace-onboarding-sessions.e2e-spec.ts 239ms
+packages/test-code/api/unit/modules/workspace-onboarding/rule-based-generator.spec.ts 43ms
+packages/test-code/api/unit/modules/workspace-onboarding/workspace-onboarding.schemas.spec.ts 17ms
+packages/test-code/web/e2e/full-stack/guided-workspace-builder.ts 19ms
+packages/test-code/web/e2e/full-stack/fullstack-workspace-onboarding.spec.ts 10ms
+EXIT CODE: 0
+
+==================================================
+API TEST TYPECHECK
+==================================================
+$ tsc -p tsconfig.json --noEmit
+EXIT CODE: 0
+
+==================================================
+ONBOARDING UNIT TESTS
+==================================================
+$ node scripts/run-jest.mjs --config ../../packages/test-code/api/jest.config.cjs --runInBand "--" "workspace-onboarding"
+PASS ../../packages/test-code/api/unit/modules/workspace-onboarding/workspace-onboarding.schemas.spec.ts
+PASS ../../packages/test-code/api/unit/modules/workspace-onboarding/rule-based-generator.spec.ts
+
+Test Suites: 2 passed, 2 total
+Tests:       10 passed, 10 total
+Snapshots:   0 total
+Time:        3.302 s
+Ran all test suites matching /workspace-onboarding/i.
+EXIT CODE: 0
+
+==================================================
+ONBOARDING API E2E
+==================================================
+$ node scripts/run-jest.mjs --config ../../packages/test-code/api/jest-e2e.config.cjs --runInBand "--" "workspace-onboarding-sessions.e2e-spec.ts"
+(node:30500) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL ../../packages/test-code/api/e2e/workspace-onboarding-sessions.e2e-spec.ts (36.066 s)
+  Workspace onboarding sessions E2E
+    √ creates, resumes, updates and deletes an owned session (5928 ms)
+    √ generates a deterministic schema-valid blueprint (3224 ms)
+    √ does not expose a session to another user (3209 ms)
+    √ rejects stale blueprint edits (3042 ms)
+    × transactionally creates web, mobile and desktop applications and handles an idempotent retry (3881 ms)
+    √ refuses CONNECT_NOW until verified repositories are selected (3315 ms)
+
+  ● Workspace onboarding sessions E2E › transactionally creates web, mobile and desktop applications and handles an idempotent retry
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 2
+    + Received  + 2
+
+      Array [
+    -   "DESKTOP",
+    -   "MOBILE",
+        "WEB",
+    +   "MOBILE",
+    +   "DESKTOP",
+      ]
+
+    [0m [90m 256 |[39m     expect(workspace[33m?[39m[33m.[39msaasApplications)[33m.[39mtoHaveLength([35m3[39m)[33m;[39m
+     [90m 257 |[39m
+    [31m[1m>[22m[39m[90m 258 |[39m     expect(workspace[33m?[39m[33m.[39msaasApplications[33m.[39mmap(({ type }) [33m=>[39m type))[33m.[39mtoEqual([[32m'DESKTOP'[39m[33m,[39m [32m'MOBILE'[39m[33m,[39m [32m'WEB'[39m])[33m;[39m
+     [90m     |[39m                                                                 [31m[1m^[22m[39m
+     [90m 259 |[39m
+     [90m 260 |[39m     [36mconst[39m mobile [33m=[39m workspace[33m?[39m[33m.[39msaasApplications[33m.[39mfind(({ type }) [33m=>[39m type [33m===[39m [32m'MOBILE'[39m)[33m;[39m
+     [90m 261 |[39m[0m
+
+      at Object.<anonymous> (packages/test-code/api/e2e/workspace-onboarding-sessions.e2e-spec.ts:258:65)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 5 passed, 6 total
+Snapshots:   0 total
+Time:        36.551 s
+Ran all test suites matching /workspace-onboarding-sessions.e2e-spec.ts/i.
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @command-center/api-tests@0.1.0 test:e2e:fast: `node scripts/run-jest.mjs --config ../../packages/test-code/api/jest-e2e.config.cjs --runInBand "--" "workspace-onboarding-sessions.e2e-spec.ts"`
+Exit status 1
+EXIT CODE: 1

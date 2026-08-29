@@ -1,0 +1,138 @@
+﻿GUIDED BUILDER DATABASE VERIFICATION
+DATE: 2026-08-27 01:59:15
+HOST: 127.0.0.1
+PORT: 55432
+DATABASE: command_center_test
+
+==================================================
+MIGRATION STATUS BEFORE RESET
+==================================================
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma.
+Datasource "db": PostgreSQL database "command_center_test", schema "public" at "127.0.0.1:55432"
+
+8 migrations found in prisma/migrations
+Following migration have not yet been applied:
+20260826190454_workspace_onboarding_sessions
+
+To apply migrations in development run prisma migrate dev.
+To apply migrations in production run prisma migrate deploy.
+undefined
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api:
+[ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL] Command failed with exit code 1: prisma migrate status
+EXIT CODE: 1
+
+==================================================
+CLEAN MIGRATION REPLAY
+==================================================
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma.
+Datasource "db": PostgreSQL database "command_center_test", schema "public" at "127.0.0.1:55432"
+
+Applying migration `20260808231107_initial_schema`
+Applying migration `20260812214000_repository_integrations`
+Applying migration `20260815220213_personal_github_connect_intents`
+Applying migration `20260817165240_add_raw_analytics_event_processed_index`
+Applying migration `20260821183511_mobile_application_foundation`
+Applying migration `20260823062811_mobile_feature_completion`
+Applying migration `20260823224500_desktop_support_and_mobile_performance_reconcile`
+Applying migration `20260826190454_workspace_onboarding_sessions`
+
+Database reset successful
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20260808231107_initial_schema/
+    └─ migration.sql
+  └─ 20260812214000_repository_integrations/
+    └─ migration.sql
+  └─ 20260815220213_personal_github_connect_intents/
+    └─ migration.sql
+  └─ 20260817165240_add_raw_analytics_event_processed_index/
+    └─ migration.sql
+  └─ 20260821183511_mobile_application_foundation/
+    └─ migration.sql
+  └─ 20260823062811_mobile_feature_completion/
+    └─ migration.sql
+  └─ 20260823224500_desktop_support_and_mobile_performance_reconcile/
+    └─ migration.sql
+  └─ 20260826190454_workspace_onboarding_sessions/
+    └─ migration.sql
+
+EXIT CODE: 0
+
+==================================================
+MIGRATION STATUS AFTER RESET
+==================================================
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma.
+Datasource "db": PostgreSQL database "command_center_test", schema "public" at "127.0.0.1:55432"
+
+8 migrations found in prisma/migrations
+
+Database schema is up to date!
+EXIT CODE: 0
+
+==================================================
+PRISMA VALIDATE
+==================================================
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma.
+The schemas at prisma are valid 🚀
+EXIT CODE: 0
+
+==================================================
+PRISMA GENERATE
+==================================================
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma.
+
+✔ Generated Prisma Client (7.9.1) to .\src\generated\prisma in 2.22s
+
+EXIT CODE: 0
+
+==================================================
+API TYPECHECK
+==================================================
+$ tsc -p tsconfig.json --noEmit
+EXIT CODE: 0
+
+==================================================
+API PRODUCTION BUILD
+==================================================
+$ node -e "require('fs').rmSync('dist',{recursive:true,force:true})"
+$ nest build
+EXIT CODE: 0
+
+==================================================
+GIT WHITESPACE CHECK
+==================================================
+warning: in the working copy of 'apps/api/src/app.module.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/config/env.validation.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/modules/workspace-onboarding/ai-blueprint-provider.client.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/modules/workspace-onboarding/generators/rule-based-workspace-blueprint.generator.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/modules/workspace-onboarding/rules/foundation.rules.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/modules/workspace-onboarding/workspace-ai-circuit-breaker.service.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/modules/workspace-onboarding/workspace-creation.port.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/modules/workspace-onboarding/workspace-onboarding-cleanup.service.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/modules/workspace-onboarding/workspace-onboarding-feature.service.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/modules/workspace-onboarding/workspace-onboarding-telemetry.service.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/modules/workspace-onboarding/workspace-onboarding.controller.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/modules/workspace-onboarding/workspace-onboarding.repository.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/modules/workspace-onboarding/workspace-onboarding.service.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/web/next-env.d.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/web/src/features/workspace-onboarding/components/blueprint-review.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/web/src/features/workspace-onboarding/components/guided-workspace-builder.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/web/src/features/workspace-onboarding/components/onboarding-question-card.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/web/src/features/workspace-onboarding/components/workspace-creation-progress.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'guided-builder-foundation-fix-result.txt', LF will be replaced by CRLF the next time Git touches it
+EXIT CODE: 0

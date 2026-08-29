@@ -8,7 +8,7 @@
     "pnpm": ">=11.0.0"
   },
   "scripts": {
-    "build:packages": "pnpm --filter @command-center/shared-types build",
+    "build:packages": "pnpm --filter @command-center/shared-types build && pnpm --filter @command-center/validation build",
     "build": "pnpm build:packages && pnpm -r --if-present build && pnpm size",
     "lint": "pnpm -r --if-present lint",
     "lint:fix": "pnpm -r --if-present lint:fix",

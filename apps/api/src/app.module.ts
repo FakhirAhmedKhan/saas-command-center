@@ -1,4 +1,4 @@
-﻿import { validateEnvironment } from './config/env.validation';
+import { validateEnvironment } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
 import { RedisModule } from './infrastructure/redis/redis.module';
 import { ActivityModule } from './modules/activity/activity.module';
@@ -23,6 +23,7 @@ import { WebhooksModule } from './modules/webhooks/webhooks.module';
 import { WebsitesModule } from './modules/websites/websites.module';
 import { WorkspaceMembersModule } from './modules/workspace/modules/workspace-members.module';
 import { WorkspaceModule } from './modules/workspace/modules/workspaces.module';
+import { WorkspaceOnboardingModule } from './modules/workspace-onboarding/workspace-onboarding.module';
 import { VersionModule } from './version/version.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -53,6 +54,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     UsersModule,
     WebsitesModule,
     WorkspaceModule,
+    WorkspaceOnboardingModule,
     WorkspaceMembersModule,
     AuthSessionsModule,
     AuthModule,

@@ -1,0 +1,12 @@
+$ tsc -p tsconfig.json --noEmit
+src/modules/workspace-onboarding/generators/rule-based-workspace-blueprint.generator.ts(31,92): error TS2345: Argument of type '(this: undefined, applicationType: "WEB" | "MOBILE" | "DESKTOP") => { applicationType: "WEB" | "MOBILE" | "DESKTOP"; strategy: "CONNECT_LATER"; placeholderName: string; }[] | { ...; }[]' is not assignable to parameter of type '(this: undefined, value: "WEB" | "MOBILE" | "DESKTOP", index: number, array: ("WEB" | "MOBILE" | "DESKTOP")[]) => { applicationType: "WEB" | "MOBILE" | "DESKTOP"; strategy: "CONNECT_LATER"; placeholderName: string; } | readonly { ...; }[]'.
+  Type '{ applicationType: "WEB" | "MOBILE" | "DESKTOP"; strategy: "CONNECT_LATER"; placeholderName: string; }[] | { applicationType: "WEB" | "MOBILE" | "DESKTOP"; strategy: "NONE"; }[]' is not assignable to type '{ applicationType: "WEB" | "MOBILE" | "DESKTOP"; strategy: "CONNECT_LATER"; placeholderName: string; } | readonly { applicationType: "WEB" | "MOBILE" | "DESKTOP"; strategy: "CONNECT_LATER"; placeholderName: string; }[]'.
+    Type '{ applicationType: "WEB" | "MOBILE" | "DESKTOP"; strategy: "NONE"; }[]' is not assignable to type '{ applicationType: "WEB" | "MOBILE" | "DESKTOP"; strategy: "CONNECT_LATER"; placeholderName: string; } | readonly { applicationType: "WEB" | "MOBILE" | "DESKTOP"; strategy: "CONNECT_LATER"; placeholderName: string; }[]'.
+      Type '{ applicationType: "WEB" | "MOBILE" | "DESKTOP"; strategy: "NONE"; }[]' is not assignable to type 'readonly { applicationType: "WEB" | "MOBILE" | "DESKTOP"; strategy: "CONNECT_LATER"; placeholderName: string; }[]'.
+        Property 'placeholderName' is missing in type '{ applicationType: "WEB" | "MOBILE" | "DESKTOP"; strategy: "NONE"; }' but required in type '{ applicationType: "WEB" | "MOBILE" | "DESKTOP"; strategy: "CONNECT_LATER"; placeholderName: string; }'.
+src/modules/workspace-onboarding/workspace-onboarding.module.ts(50,7): error TS2353: Object literal may only specify known properties, and 'useExistingExisting' does not exist in type 'Provider'.
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @command-center/api@0.1.0 typecheck: `tsc -p tsconfig.json --noEmit`
+Exit status 2
+
+API TYPECHECK EXIT CODE: 2

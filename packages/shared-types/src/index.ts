@@ -35,6 +35,7 @@ export * from './team-operations/index.js';
 export * from './tracking/index.js';
 export * from './mobile-apps';
 export * from './desktop-apps';
+export * from './workspace-onboarding';
 export type {
   GithubMobileBuildInput,
   MobileAnalysisAction,

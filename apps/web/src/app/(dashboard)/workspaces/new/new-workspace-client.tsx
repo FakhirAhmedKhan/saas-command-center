@@ -1,16 +1,41 @@
 'use client';
 
+import { workspaceOnboardingApi } from '@/features/workspace-onboarding/api/workspace-onboarding-api';
+import { GuidedBuilderEntry } from '@/features/workspace-onboarding/components/guided-builder-entry';
 import { ManualWorkspaceForm } from '@/features/workspaces/components/manual-workspace-form';
 import { WorkspaceCreationMethod } from '@/features/workspaces/components/workspace-creation-method';
 import { GithubImportWizard } from '@/features/workspaces/github-import/github-import-wizard';
-import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 type CreationMethod = 'select' | 'manual' | 'github';
 
 export default function NewWorkspacePage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const [guidedEnabled, setGuidedEnabled] = useState(false);
   const [method, setMethod] = useState<CreationMethod>(() => (searchParams.get('method') === 'github' ? 'github' : 'select'));
+
+  useEffect(() => {
+    let active = true;
+
+    void workspaceOnboardingApi
+      .featureState()
+      .then((state) => {
+        if (active) {
+          setGuidedEnabled(state.guidedWorkspaceBuilderEnabled);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setGuidedEnabled(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   if (method === 'manual') {
     return <ManualWorkspaceForm onBack={() => setMethod('select')} />;
@@ -21,12 +46,21 @@ export default function NewWorkspacePage() {
       <GithubImportWizard
         onCancel={() => setMethod('select')}
         onImported={(workspaceId) => {
-          // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-          window.location.assign(`/workspaces/${workspaceId}/applications`);
+          router.push(`/workspaces/${workspaceId}/applications`);
         }}
       />
     );
   }
 
-  return <WorkspaceCreationMethod onSelectManual={() => setMethod('manual')} onSelectGithub={() => setMethod('github')} />;
+  return (
+    <>
+      <WorkspaceCreationMethod onSelectGithub={() => setMethod('github')} onSelectManual={() => setMethod('manual')} />
+
+      {guidedEnabled ? (
+        <div className='mx-auto mt-6 w-full max-w-xl px-4 pb-16 sm:px-6'>
+          <GuidedBuilderEntry enabled />
+        </div>
+      ) : null}
+    </>
+  );
 }

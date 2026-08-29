@@ -14,6 +14,8 @@
   },
   "devDependencies": {
     "@command-center/eslint-config": "workspace:*",
+    "@command-center/shared-types": "workspace:*",
+    "@command-center/validation": "workspace:*",
     "globals": "^17.11.0"
   }
 }

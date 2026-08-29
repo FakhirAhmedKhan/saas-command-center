@@ -1,0 +1,136 @@
+$ tsc -p tsconfig.json --noEmit
+src/modules/workspace-onboarding/ai-blueprint-provider.client.ts(15,30): error TS2304: Cannot find name 'TypedConfigService'.
+src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts(5,48): error TS2307: Cannot find module '../rules/technology-compatibility.service' or its corresponding type declarations.
+src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts(6,43): error TS2307: Cannot find module './ai-blueprint-provider.client' or its corresponding type declarations.
+src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts(22,30): error TS2304: Cannot find name 'TypedConfigService'.
+src/modules/workspace-onboarding/generators/rule-based-workspace-blueprint.generator.ts(27,11): error TS2739: Type '{ schemaVersion: 1; generator: { provider: "rules"; version: string; }; workspace: { name: string; slug: string; description: string; productType: "PRODUCTIVITY_SAAS" | "ECOMMERCE" | "MARKETPLACE" | "SOCIAL" | "INTERNAL_TOOL" | "OTHER"; }; ... 5 more ...; recommendations: never[]; }' is missing the following properties from type 'WorkspaceBlueprint': repositories, engineeringConfigurations
+src/modules/workspace-onboarding/rules/foundation.rules.ts(10,31): error TS2345: Argument of type '{ type: "WEB"; name: string; platforms: "WEB"[]; stack: ("NEXT_JS" | "TYPESCRIPT")[]; }' is not assignable to parameter of type 'WorkspaceBlueprintApplication'.
+  Property 'source' is missing in type '{ type: "WEB"; name: string; platforms: "WEB"[]; stack: ("NEXT_JS" | "TYPESCRIPT")[]; }' but required in type 'WorkspaceBlueprintApplication'.
+src/modules/workspace-onboarding/rules/foundation.rules.ts(28,31): error TS2345: Argument of type '{ type: "MOBILE"; name: string; platforms: ("ANDROID" | "IOS")[]; stack: ("KOTLIN" | "JETPACK_COMPOSE" | "SWIFT" | "SWIFTUI")[]; }' is not assignable to parameter of type 'WorkspaceBlueprintApplication'.
+  Property 'source' is missing in type '{ type: "MOBILE"; name: string; platforms: ("ANDROID" | "IOS")[]; stack: ("KOTLIN" | "JETPACK_COMPOSE" | "SWIFT" | "SWIFTUI")[]; }' but required in type 'WorkspaceBlueprintApplication'.
+src/modules/workspace-onboarding/rules/foundation.rules.ts(43,31): error TS2345: Argument of type '{ type: "DESKTOP"; name: string; platforms: ("WINDOWS" | "MACOS" | "LINUX")[]; stack: ("TYPESCRIPT" | "TAURI")[]; }' is not assignable to parameter of type 'WorkspaceBlueprintApplication'.
+  Property 'source' is missing in type '{ type: "DESKTOP"; name: string; platforms: ("WINDOWS" | "MACOS" | "LINUX")[]; stack: ("TYPESCRIPT" | "TAURI")[]; }' but required in type 'WorkspaceBlueprintApplication'.
+src/modules/workspace-onboarding/workspace-ai-circuit-breaker.service.ts(8,40): error TS2304: Cannot find name 'TypedConfigService'.
+src/modules/workspace-onboarding/workspace-blueprint.service.ts(4,48): error TS2307: Cannot find module './rules/technology-compatibility.service' or its corresponding type declarations.
+src/modules/workspace-onboarding/workspace-blueprint.service.ts(78,28): error TS2339: Property 'updateBlueprintRevision' does not exist on type 'WorkspaceOnboardingRepository'.
+src/modules/workspace-onboarding/workspace-creation.port.ts(2,15): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
+src/modules/workspace-onboarding/workspace-onboarding-cleanup.service.ts(14,37): error TS2304: Cannot find name 'TypedConfigService'.
+src/modules/workspace-onboarding/workspace-onboarding-cleanup.service.ts(18,35): error TS2551: Property 'tryWithLock' does not exist on type 'PostgresAdvisoryLockService'. Did you mean 'withLock'?
+src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts(3,10): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
+src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts(6,69): error TS2307: Cannot find module './ports/workspace-creation.port' or its corresponding type declarations.
+src/modules/workspace-onboarding/workspace-onboarding-feature.service.ts(5,40): error TS2304: Cannot find name 'TypedConfigService'.
+src/modules/workspace-onboarding/workspace-onboarding-telemetry.service.ts(1,107): error TS2307: Cannot find module './workspace-onboarding-observability.port' or its corresponding type declarations.
+src/modules/workspace-onboarding/workspace-onboarding-telemetry.service.ts(3,52): error TS2307: Cannot find module './workspace-onboarding-observability.port' or its corresponding type declarations.
+src/modules/workspace-onboarding/workspace-onboarding.repository.ts(1,15): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
+src/modules/workspace-onboarding/workspace-onboarding.repository.ts(1,23): error TS2305: Module '"@prisma/client"' has no exported member 'WorkspaceOnboardingStatus'.
+src/modules/workspace-onboarding/workspace-onboarding.repository.ts(31,20): error TS1361: 'Prisma' cannot be used as a value because it was imported using 'import type'.
+src/modules/workspace-onboarding/workspace-onboarding.service.ts(60,34): error TS2339: Property 'generator' does not exist on type 'WorkspaceOnboardingService'.
+src/modules/workspace-onboarding/workspace-onboarding.service.ts(79,5): error TS2739: Type '{ id: string; status: "IN_PROGRESS" | "BLUEPRINT_READY" | "CREATING" | "COMPLETED" | "FAILED" | "EXPIRED"; currentStep: string | null; answers: { productIdea?: string | undefined; ... 13 more ...; qualityRequirements?: ("CI_CD" | ... 5 more ... | "BACKUPS")[] | undefined; }; ... 7 more ...; updatedAt: string; }' is missing the following properties from type 'WorkspaceOnboardingSessionResponse': blueprintRevision, blueprintHash
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @command-center/api@0.1.0 typecheck: `tsc -p tsconfig.json --noEmit`
+Exit status 2
+
+API TYPECHECK EXIT CODE: 2
+$ next typegen && tsc --noEmit
+Generating route types...
+✓ Types generated successfully
+src/app/(dashboard)/workspaces/new/new-workspace-client.tsx(21,47): error TS2304: Cannot find name 'sessionId'.
+src/app/(dashboard)/workspaces/new/new-workspace-client.tsx(23,7): error TS2367: This comparison appears to be unintentional because the types '"select"' and '"github"' have no overlap.
+src/features/workspace-onboarding/components/blueprint-review.tsx(18,52): error TS2339: Property 'updateBlueprint' does not exist on type '{ create: () => Promise<WorkspaceOnboardingSessionResponse>; get: (id: string) => Promise<WorkspaceOnboardingSessionResponse>; questions: (id: string) => Promise<...>; updateAnswers: (id: string, answers: Partial<...>) => Promise<...>; }'.
+src/features/workspace-onboarding/components/blueprint-review.tsx(22,55): error TS2339: Property 'validateBlueprint' does not exist on type '{ create: () => Promise<WorkspaceOnboardingSessionResponse>; get: (id: string) => Promise<WorkspaceOnboardingSessionResponse>; questions: (id: string) => Promise<...>; updateAnswers: (id: string, answers: Partial<...>) => Promise<...>; }'.
+src/features/workspace-onboarding/components/guided-builder-error.tsx(1,41): error TS2307: Cannot find module '../workspace-onboarding-errors' or its corresponding type declarations.
+src/features/workspace-onboarding/components/workspace-creation-progress.tsx(24,51): error TS2339: Property 'confirm' does not exist on type '{ create: () => Promise<WorkspaceOnboardingSessionResponse>; get: (id: string) => Promise<WorkspaceOnboardingSessionResponse>; questions: (id: string) => Promise<...>; updateAnswers: (id: string, answers: Partial<...>) => Promise<...>; }'.
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @command-center/web@0.1.0 typecheck: `next typegen && tsc --noEmit`
+Exit status 2
+
+WEB TYPECHECK EXIT CODE: 2
+$ tsc -p tsconfig.json --noEmit
+../../../apps/api/src/modules/workspace-onboarding/ai-blueprint-provider.client.ts(15,30): error TS2304: Cannot find name 'TypedConfigService'.
+../../../apps/api/src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts(5,48): error TS2307: Cannot find module '../rules/technology-compatibility.service' or its corresponding type declarations.
+../../../apps/api/src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts(6,43): error TS2307: Cannot find module './ai-blueprint-provider.client' or its corresponding type declarations.
+../../../apps/api/src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts(22,30): error TS2304: Cannot find name 'TypedConfigService'.
+../../../apps/api/src/modules/workspace-onboarding/generators/rule-based-workspace-blueprint.generator.ts(27,11): error TS2739: Type '{ schemaVersion: 1; generator: { provider: "rules"; version: string; }; workspace: { name: string; slug: string; description: string; productType: "ECOMMERCE" | "INTERNAL_TOOL" | "OTHER" | "SOCIAL" | "PRODUCTIVITY_SAAS" | "MARKETPLACE"; }; ... 5 more ...; recommendations: never[]; }' is missing the following properties from type 'WorkspaceBlueprint': repositories, engineeringConfigurations
+../../../apps/api/src/modules/workspace-onboarding/rules/foundation.rules.ts(10,31): error TS2345: Argument of type '{ type: "WEB"; name: string; platforms: "WEB"[]; stack: ("NEXT_JS" | "TYPESCRIPT")[]; }' is not assignable to parameter of type 'WorkspaceBlueprintApplication'.
+  Property 'source' is missing in type '{ type: "WEB"; name: string; platforms: "WEB"[]; stack: ("NEXT_JS" | "TYPESCRIPT")[]; }' but required in type 'WorkspaceBlueprintApplication'.
+../../../apps/api/src/modules/workspace-onboarding/rules/foundation.rules.ts(28,31): error TS2345: Argument of type '{ type: "MOBILE"; name: string; platforms: ("ANDROID" | "IOS")[]; stack: ("KOTLIN" | "JETPACK_COMPOSE" | "SWIFT" | "SWIFTUI")[]; }' is not assignable to parameter of type 'WorkspaceBlueprintApplication'.
+  Property 'source' is missing in type '{ type: "MOBILE"; name: string; platforms: ("ANDROID" | "IOS")[]; stack: ("KOTLIN" | "JETPACK_COMPOSE" | "SWIFT" | "SWIFTUI")[]; }' but required in type 'WorkspaceBlueprintApplication'.
+../../../apps/api/src/modules/workspace-onboarding/rules/foundation.rules.ts(43,31): error TS2345: Argument of type '{ type: "DESKTOP"; name: string; platforms: ("WINDOWS" | "MACOS" | "LINUX")[]; stack: ("TAURI" | "TYPESCRIPT")[]; }' is not assignable to parameter of type 'WorkspaceBlueprintApplication'.
+  Property 'source' is missing in type '{ type: "DESKTOP"; name: string; platforms: ("WINDOWS" | "MACOS" | "LINUX")[]; stack: ("TAURI" | "TYPESCRIPT")[]; }' but required in type 'WorkspaceBlueprintApplication'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-ai-circuit-breaker.service.ts(8,40): error TS2304: Cannot find name 'TypedConfigService'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts(4,48): error TS2307: Cannot find module './rules/technology-compatibility.service' or its corresponding type declarations.
+../../../apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts(78,28): error TS2339: Property 'updateBlueprintRevision' does not exist on type 'WorkspaceOnboardingRepository'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-creation.port.ts(2,15): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding-cleanup.service.ts(14,37): error TS2304: Cannot find name 'TypedConfigService'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding-cleanup.service.ts(18,35): error TS2551: Property 'tryWithLock' does not exist on type 'PostgresAdvisoryLockService'. Did you mean 'withLock'?
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts(3,10): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts(6,69): error TS2307: Cannot find module './ports/workspace-creation.port' or its corresponding type declarations.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding-feature.service.ts(5,40): error TS2304: Cannot find name 'TypedConfigService'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding-telemetry.service.ts(1,107): error TS2307: Cannot find module './workspace-onboarding-observability.port' or its corresponding type declarations.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding-telemetry.service.ts(3,52): error TS2307: Cannot find module './workspace-onboarding-observability.port' or its corresponding type declarations.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding.repository.ts(1,15): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding.repository.ts(1,23): error TS2305: Module '"@prisma/client"' has no exported member 'WorkspaceOnboardingStatus'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding.repository.ts(31,20): error TS1361: 'Prisma' cannot be used as a value because it was imported using 'import type'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding.service.ts(60,34): error TS2339: Property 'generator' does not exist on type 'WorkspaceOnboardingService'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding.service.ts(79,5): error TS2739: Type '{ id: string; status: "COMPLETED" | "FAILED" | "EXPIRED" | "IN_PROGRESS" | "BLUEPRINT_READY" | "CREATING"; currentStep: string | null; answers: { productIdea?: string | undefined; ... 13 more ...; qualityRequirements?: ("PERFORMANCE" | ... 5 more ... | "BACKUPS")[] | undefined; }; ... 7 more ...; updatedAt: string; }' is missing the following properties from type 'WorkspaceOnboardingSessionResponse': blueprintRevision, blueprintHash
+e2e/fullstack-workspace-onboarding.spec.ts(4,9): error TS2304: Cannot find name 'loginAsOwner'.
+e2e/fullstack-workspace-onboarding.spec.ts(7,9): error TS2304: Cannot find name 'answerText'.
+e2e/fullstack-workspace-onboarding.spec.ts(8,9): error TS2304: Cannot find name 'answerText'.
+e2e/fullstack-workspace-onboarding.spec.ts(9,9): error TS2304: Cannot find name 'choose'.
+e2e/fullstack-workspace-onboarding.spec.ts(10,9): error TS2304: Cannot find name 'chooseMany'.
+e2e/fullstack-workspace-onboarding.spec.ts(11,9): error TS2304: Cannot find name 'chooseMany'.
+e2e/fullstack-workspace-onboarding.spec.ts(12,9): error TS2304: Cannot find name 'chooseMany'.
+e2e/fullstack-workspace-onboarding.spec.ts(13,9): error TS2304: Cannot find name 'chooseMany'.
+e2e/fullstack-workspace-onboarding.spec.ts(14,9): error TS2304: Cannot find name 'chooseMany'.
+e2e/fullstack-workspace-onboarding.spec.ts(15,9): error TS2304: Cannot find name 'chooseBoolean'.
+e2e/fullstack-workspace-onboarding.spec.ts(16,9): error TS2304: Cannot find name 'choose'.
+e2e/fullstack-workspace-onboarding.spec.ts(17,9): error TS2304: Cannot find name 'chooseMany'.
+e2e/fullstack-workspace-onboarding.spec.ts(18,9): error TS2304: Cannot find name 'chooseMany'.
+e2e/fullstack-workspace-onboarding.spec.ts(51,9): error TS2304: Cannot find name 'loginAsOwner'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(22,53): error TS2558: Expected 0 type arguments, but got 1.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(27,49): error TS2339: Property 'accessToken' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(36,49): error TS2339: Property 'accessToken' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(51,49): error TS2339: Property 'accessToken' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(60,49): error TS2339: Property 'accessToken' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(67,52): error TS2339: Property 'accessToken' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(69,38): error TS2339: Property 'id' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(69,48): error TS2339: Property 'accessToken' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(82,59): error TS2339: Property 'id' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(82,69): error TS2339: Property 'accessToken' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(84,21): error TS2339: Property 'statusCode' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(85,21): error TS2339: Property 'json' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(104,52): error TS2339: Property 'accessToken' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(105,28): error TS2304: Cannot find name 'getSession'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(105,52): error TS2339: Property 'id' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(105,65): error TS2339: Property 'accessToken' does not exist on type 'void'.
+unit/modules/workspace-onboarding/rule-based-generator.spec.ts(25,44): error TS2345: Argument of type '{ productIdea: string; workspaceName: string; productType: "PRODUCTIVITY_SAAS"; targetUsers: string[]; applicationTypes: readonly ["WEB", "MOBILE", "DESKTOP"]; coreFeatures: string[]; authentication: boolean; ... 6 more ...; qualityRequirements: readonly [...]; }' is not assignable to parameter of type 'WorkspaceOnboardingAnswers'.
+  Types of property 'applicationTypes' are incompatible.
+    The type 'readonly ["WEB", "MOBILE", "DESKTOP"]' is 'readonly' and cannot be assigned to the mutable type '("MOBILE" | "DESKTOP" | "WEB")[]'.
+unit/modules/workspace-onboarding/rule-based-generator.spec.ts(26,45): error TS2345: Argument of type '{ productIdea: string; workspaceName: string; productType: "PRODUCTIVITY_SAAS"; targetUsers: string[]; applicationTypes: readonly ["WEB", "MOBILE", "DESKTOP"]; coreFeatures: string[]; authentication: boolean; ... 6 more ...; qualityRequirements: readonly [...]; }' is not assignable to parameter of type 'WorkspaceOnboardingAnswers'.
+  Types of property 'applicationTypes' are incompatible.
+    The type 'readonly ["WEB", "MOBILE", "DESKTOP"]' is 'readonly' and cannot be assigned to the mutable type '("MOBILE" | "DESKTOP" | "WEB")[]'.
+unit/modules/workspace-onboarding/rule-based-generator.spec.ts(32,48): error TS2345: Argument of type '{ productIdea: string; workspaceName: string; productType: "PRODUCTIVITY_SAAS"; targetUsers: string[]; applicationTypes: readonly ["WEB", "MOBILE", "DESKTOP"]; coreFeatures: string[]; authentication: boolean; ... 6 more ...; qualityRequirements: readonly [...]; }' is not assignable to parameter of type 'WorkspaceOnboardingAnswers'.
+  Types of property 'applicationTypes' are incompatible.
+    The type 'readonly ["WEB", "MOBILE", "DESKTOP"]' is 'readonly' and cannot be assigned to the mutable type '("MOBILE" | "DESKTOP" | "WEB")[]'.
+unit/modules/workspace-onboarding/rule-based-generator.spec.ts(38,48): error TS2345: Argument of type '{ productIdea: string; workspaceName: string; productType: "PRODUCTIVITY_SAAS"; targetUsers: string[]; applicationTypes: readonly ["WEB", "MOBILE", "DESKTOP"]; coreFeatures: string[]; authentication: boolean; ... 6 more ...; qualityRequirements: readonly [...]; }' is not assignable to parameter of type 'WorkspaceOnboardingAnswers'.
+  Types of property 'applicationTypes' are incompatible.
+    The type 'readonly ["WEB", "MOBILE", "DESKTOP"]' is 'readonly' and cannot be assigned to the mutable type '("MOBILE" | "DESKTOP" | "WEB")[]'.
+unit/modules/workspace-onboarding/rule-based-generator.spec.ts(66,20): error TS2345: Argument of type '{ schemaVersion: 1; generator: { provider: "rules"; version: string; }; workspace: { name: string; slug: string; description: string; productType: "OTHER"; }; applications: never[]; services: { backend: never[]; database: never[]; cache: never[]; authentication: never[]; }; features: never[]; environments: "DEVELOPM...' is not assignable to parameter of type 'WorkspaceBlueprint'.
+  Type '{ schemaVersion: 1; generator: { provider: "rules"; version: string; }; workspace: { name: string; slug: string; description: string; productType: "OTHER"; }; applications: never[]; services: { backend: never[]; database: never[]; cache: never[]; authentication: never[]; }; features: never[]; environments: "DEVELOPM...' is missing the following properties from type 'WorkspaceBlueprint': repositories, engineeringConfigurations
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @command-center/api-tests@0.1.0 typecheck: `tsc -p tsconfig.json --noEmit`
+Exit status 2
+
+API TEST TYPECHECK EXIT CODE: 2
+$ tsc -p tsconfig.json --noEmit
+../../../apps/web/src/app/(dashboard)/workspaces/new/new-workspace-client.tsx(21,47): error TS2304: Cannot find name 'sessionId'.
+../../../apps/web/src/app/(dashboard)/workspaces/new/new-workspace-client.tsx(23,7): error TS2367: This comparison appears to be unintentional because the types '"select"' and '"github"' have no overlap.
+../../../apps/web/src/features/workspace-onboarding/components/blueprint-review.tsx(18,52): error TS2339: Property 'updateBlueprint' does not exist on type '{ create: () => Promise<WorkspaceOnboardingSessionResponse>; get: (id: string) => Promise<WorkspaceOnboardingSessionResponse>; questions: (id: string) => Promise<...>; updateAnswers: (id: string, answers: Partial<...>) => Promise<...>; }'.
+../../../apps/web/src/features/workspace-onboarding/components/blueprint-review.tsx(22,55): error TS2339: Property 'validateBlueprint' does not exist on type '{ create: () => Promise<WorkspaceOnboardingSessionResponse>; get: (id: string) => Promise<WorkspaceOnboardingSessionResponse>; questions: (id: string) => Promise<...>; updateAnswers: (id: string, answers: Partial<...>) => Promise<...>; }'.
+../../../apps/web/src/features/workspace-onboarding/components/guided-builder-error.tsx(1,41): error TS2307: Cannot find module '../workspace-onboarding-errors' or its corresponding type declarations.
+../../../apps/web/src/features/workspace-onboarding/components/workspace-creation-progress.tsx(24,51): error TS2339: Property 'confirm' does not exist on type '{ create: () => Promise<WorkspaceOnboardingSessionResponse>; get: (id: string) => Promise<WorkspaceOnboardingSessionResponse>; questions: (id: string) => Promise<...>; updateAnswers: (id: string, answers: Partial<...>) => Promise<...>; }'.
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @command-center/web-tests@0.1.0 typecheck: `tsc -p tsconfig.json --noEmit`
+Exit status 2
+
+WEB TEST TYPECHECK EXIT CODE: 2

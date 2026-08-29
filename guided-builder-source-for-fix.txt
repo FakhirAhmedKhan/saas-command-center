@@ -1,0 +1,4615 @@
+GUIDED BUILDER SOURCE FOR GUARDED FIX
+DATE: 2026-08-27 01:01:55
+FILES: 74
+
+==============================================================================================================
+FILE: apps/api/package.json
+==============================================================================================================
+{
+  "name": "@command-center/api",
+  "version": "0.1.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "prebuild": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "nest build",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:prod": "node dist/main.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prisma:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:seed": "prisma db seed",
+    "db:reset": "prisma migrate reset",
+    "db:studio": "prisma studio",
+    "demo:seed": "prisma generate && tsx scripts/demo-data.ts seed",
+    "demo:reset": "prisma generate && tsx scripts/demo-data.ts reset",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@command-center/shared-types": "workspace:*",
+    "@fastify/cookie": "^11.1.2",
+    "@fastify/helmet": "^13.1.1",
+    "@fastify/static": "^10.1.3",
+    "@nestjs/common": "^11.2.1",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.2.1",
+    "@nestjs/jwt": "^11.0.2",
+    "@nestjs/passport": "^11.0.5",
+    "@nestjs/platform-express": "^11.2.1",
+    "@nestjs/platform-fastify": "^11.2.1",
+    "@nestjs/schedule": "^6.1.3",
+    "@nestjs/swagger": "^11.2.0",
+    "@nestjs/throttler": "^6.5.0",
+    "@prisma/adapter-pg": "^7.9.1",
+    "@prisma/client": "7.9.1",
+    "argon2": "^0.45.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "dotenv": "^17.4.2",
+    "fastify": "^5.11.3",
+    "google-auth-library": "^11.0.2",
+    "ioredis": "^6.0.0",
+    "ipaddr.js": "^2.5.0",
+    "luxon": "^3.7.2",
+    "nestjs-throttler-storage-redis": "^0.5.1",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "pg": "^8.23.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "undici": "^8.10.0"
+  },
+  "devDependencies": {
+    "@command-center/eslint-config": "workspace:*",
+    "@eslint/js": "^9.34.0",
+    "@nestjs/cli": "^11.0.10",
+    "@nestjs/schematics": "^11.0.7",
+    "@nestjs/testing": "^11.2.1",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/express": "^5.0.3",
+    "@types/jest": "29.5.14",
+    "@types/luxon": "^3.7.4",
+    "@types/node": "^24.3.0",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/pg": "^8.20.3",
+    "@types/supertest": "^6.0.3",
+    "cross-env": "^10.1.0",
+    "eslint": "^9.34.0",
+    "globals": "^17.11.0",
+    "jest": "29.7.0",
+    "prisma": "7.9.1",
+    "source-map-support": "^0.5.21",
+    "supertest": "^7.1.4",
+    "ts-jest": "29.4.12",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.23.12",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.67.0"
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/prisma/enums/WorkspaceOnboardingStatus.prisma
+==============================================================================================================
+enum WorkspaceOnboardingStatus {
+  IN_PROGRESS
+  BLUEPRINT_READY
+  CREATING
+  COMPLETED
+  FAILED
+  EXPIRED
+}
+
+
+==============================================================================================================
+FILE: apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql
+==============================================================================================================
+-- CreateEnum
+CREATE TYPE "WorkspaceOnboardingStatus" AS ENUM ('IN_PROGRESS', 'BLUEPRINT_READY', 'CREATING', 'COMPLETED', 'FAILED', 'EXPIRED');
+
+-- CreateTable
+CREATE TABLE "workspace_onboarding_sessions" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "status" "WorkspaceOnboardingStatus" NOT NULL DEFAULT 'IN_PROGRESS',
+    "currentStep" TEXT,
+    "answers" JSONB NOT NULL,
+    "blueprint" JSONB,
+    "schemaVersion" INTEGER NOT NULL DEFAULT 1,
+    "ruleSetVersion" TEXT,
+    "generatorProvider" TEXT NOT NULL DEFAULT 'rules',
+    "workspaceId" TEXT,
+    "idempotencyKey" TEXT,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "completedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "workspace_onboarding_sessions_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "workspace_onboarding_sessions_workspaceId_key" ON "workspace_onboarding_sessions"("workspaceId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "workspace_onboarding_sessions_idempotencyKey_key" ON "workspace_onboarding_sessions"("idempotencyKey");
+
+-- CreateIndex
+CREATE INDEX "workspace_onboarding_sessions_userId_status_idx" ON "workspace_onboarding_sessions"("userId", "status");
+
+-- CreateIndex
+CREATE INDEX "workspace_onboarding_sessions_expiresAt_idx" ON "workspace_onboarding_sessions"("expiresAt");
+
+-- AddForeignKey
+ALTER TABLE "workspace_onboarding_sessions" ADD CONSTRAINT "workspace_onboarding_sessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "workspace_onboarding_sessions" ADD CONSTRAINT "workspace_onboarding_sessions_workspaceId_fkey" FOREIGN KEY ("workspaceId") REFERENCES "workspaces"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+
+==============================================================================================================
+FILE: apps/api/prisma/models/WorkspaceOnboardingSession.prisma
+==============================================================================================================
+model WorkspaceOnboardingSession {
+  id                String                    @id @default(cuid())
+  userId            String
+  status            WorkspaceOnboardingStatus @default(IN_PROGRESS)
+  currentStep       String?
+  answers           Json
+  blueprint         Json?
+  schemaVersion     Int                       @default(1)
+  ruleSetVersion    String?
+  generatorProvider String                    @default("rules")
+  workspaceId       String?                   @unique
+  idempotencyKey    String?                   @unique
+  expiresAt         DateTime
+  completedAt       DateTime?
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+
+  @@index([userId, status])
+  @@index([expiresAt])
+  @@map("workspace_onboarding_sessions")
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/app.module.ts
+==============================================================================================================
+import { validateEnvironment } from './config/env.validation';
+import { DatabaseModule } from './database/database.module';
+import { RedisModule } from './infrastructure/redis/redis.module';
+import { ActivityModule } from './modules/activity/activity.module';
+import { AnalyticsEngineModule } from './modules/analytics-engine/analytics-engine.module';
+import { AnalyticsIngestionModule } from './modules/analytics-ingestion/analytics-ingestion.module';
+import { AnalyticsOverviewModule } from './modules/analytics-overview/analytics-overview.module';
+import { AnalyticsProcessingModule } from './modules/analytics-processing/analytics-processing.module';
+import { AnalyticsReportsModule } from './modules/analytics-reports/analytics-reports.module';
+import { ApplicationsModule } from './modules/applications/applications.module';
+import { AuthSessionsModule } from './modules/auth/module/auth-sessions.module';
+import { AuthModule } from './modules/auth/module/auth.module';
+import { DesktopAppsModule } from './modules/desktop-apps/desktop-apps.module';
+import { DevelopmentModule } from './modules/development/development.module';
+import { HealthModule } from './modules/health/health.module';
+import { MobileAppsModule } from './modules/mobile-apps/mobile-apps.module';
+import { MonitoringModule } from './modules/monitoring/monitoring.module';
+import { ReleasesModule } from './modules/releases/releases.module';
+import { RepositoriesModule } from './modules/repositories/repositories.module';
+import { TeamOperationsModule } from './modules/team-operations/team-operations.module';
+import { UsersModule } from './modules/users/users.module';
+import { WebhooksModule } from './modules/webhooks/webhooks.module';
+import { WebsitesModule } from './modules/websites/websites.module';
+import { WorkspaceMembersModule } from './modules/workspace/modules/workspace-members.module';
+import { WorkspaceModule } from './modules/workspace/modules/workspaces.module';
+import { VersionModule } from './version/version.module';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      cache: true,
+      envFilePath: ['../../.env', '.env'],
+      isGlobal: true,
+      validate: validateEnvironment,
+    }),
+
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60_000,
+        limit: 100,
+      },
+    ]),
+    ScheduleModule.forRoot(),
+    RepositoriesModule,
+    ReleasesModule,
+    ApplicationsModule,
+    DatabaseModule,
+    UsersModule,
+    WebsitesModule,
+    WorkspaceModule,
+    WorkspaceMembersModule,
+    AuthSessionsModule,
+    AuthModule,
+    HealthModule,
+    VersionModule,
+    ActivityModule,
+    DevelopmentModule,
+    AnalyticsIngestionModule,
+    AnalyticsEngineModule,
+    AnalyticsOverviewModule,
+    AnalyticsReportsModule,
+
+    MobileAppsModule,
+    RedisModule,
+    MonitoringModule,
+    TeamOperationsModule,
+    WebhooksModule,
+    DesktopAppsModule,
+    AnalyticsProcessingModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
+})
+export class AppModule {}
+
+
+==============================================================================================================
+FILE: apps/api/src/bootstrap/configure-application.ts
+==============================================================================================================
+import { AllExceptionsFilter } from '../common/filters/all-exceptions.filter';
+import { getAllowedOrigins, type TypedConfigService } from '../config/runtime-config';
+import fastifyCookie from '@fastify/cookie';
+import fastifyHelmet from '@fastify/helmet';
+import { Logger, ValidationPipe, type INestApplication } from '@nestjs/common';
+import type { CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
+import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import type { FastifyInstance, FastifyRequest } from 'fastify';
+
+export interface ConfigureApplicationOptions {
+  enableSwagger?: boolean;
+}
+
+function configureCors(app: INestApplication, config: TypedConfigService): void {
+  const allowedOrigins = getAllowedOrigins(config);
+  const commonOptions = {
+    methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Authorization', 'Content-Type', 'X-Request-Id', 'X-Workspace-Id'],
+    exposedHeaders: ['X-Request-Id'],
+  };
+  const corsOptionsDelegate: CorsOptionsDelegate<FastifyRequest> = (request, callback) => {
+    const requestPath = (request.raw.url ?? request.url ?? '').split('?')[0];
+
+    /*
+     * The analytics collector performs its own tracking-key and
+     * Website.allowedOrigins validation.
+     */
+    if (requestPath === '/api/v1/collect') {
+      callback(null, {
+        ...commonOptions,
+        credentials: false,
+        origin: false,
+      });
+
+      return;
+    }
+
+    const origin = request.headers.origin;
+
+    if (!origin || allowedOrigins.has(origin)) {
+      callback(null, {
+        ...commonOptions,
+        credentials: true,
+        origin: true,
+      });
+
+      return;
+    }
+
+    callback(new Error(`Origin ${origin} is not allowed by CORS.`), {
+      ...commonOptions,
+      credentials: false,
+      origin: false,
+    });
+  };
+
+  app.enableCors(() => corsOptionsDelegate);
+}
+
+function configureSwagger(app: INestApplication): void {
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('SaaS Command Center API')
+    .setDescription('Backend API for SaaS Command Center.')
+    .setVersion('0.1.0')
+    .addBearerAuth()
+    .addCookieAuth('command_center_refresh_token')
+    .build();
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+
+  SwaggerModule.setup('api/v1/docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
+}
+
+export function configureApplication(app: INestApplication, options: ConfigureApplicationOptions = {}): void {
+  const logger = new Logger('ApplicationBootstrap');
+  const config = app.get<TypedConfigService>(ConfigService);
+  const fastify = app.getHttpAdapter().getInstance() as FastifyInstance;
+
+  /*
+   * Queue plugins before app.init()/app.listen().
+   * Fastify completes plugin registration during initialization.
+   */
+  fastify.register(fastifyCookie);
+
+  fastify.register(fastifyHelmet, {
+    global: true,
+    contentSecurityPolicy:
+      config.get('NODE_ENV', {
+        infer: true,
+      }) === 'production',
+    crossOriginResourcePolicy: {
+      policy: 'cross-origin',
+    },
+  });
+
+  fastify.addHook('onRequest', (request, reply, done) => {
+    reply.header('X-Request-Id', request.id);
+    done();
+  });
+
+  configureCors(app, config);
+
+  app.setGlobalPrefix('api/v1');
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      forbidUnknownValues: true,
+      stopAtFirstError: false,
+    }),
+  );
+
+  app.useGlobalFilters(new AllExceptionsFilter());
+
+  app.enableShutdownHooks();
+
+  const swaggerEnabled =
+    options.enableSwagger ??
+    config.get('SWAGGER_ENABLED', {
+      infer: true,
+    });
+
+  if (swaggerEnabled) {
+    configureSwagger(app);
+
+    logger.log('Swagger enabled at /api/v1/docs');
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/common/rate-limit/shared-rate-limit.decorator.ts
+==============================================================================================================
+import { SetMetadata } from '@nestjs/common';
+
+export const SHARED_RATE_LIMIT_KEY = 'shared-rate-limit';
+
+export interface SharedRateLimitOptions {
+  scope: string;
+
+  limit: number;
+
+  windowSeconds: number;
+}
+
+export function SharedRateLimit(options: SharedRateLimitOptions): MethodDecorator & ClassDecorator {
+  return SetMetadata(SHARED_RATE_LIMIT_KEY, options);
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/common/rate-limit/shared-rate-limit.guard.ts
+==============================================================================================================
+import { SHARED_RATE_LIMIT_KEY, type SharedRateLimitOptions } from './shared-rate-limit.decorator';
+import { SharedRateLimitService } from './shared-rate-limit.service';
+import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import type { FastifyReply, FastifyRequest } from 'fastify';
+
+interface RequestWithOptionalUser extends FastifyRequest {
+  user?: {
+    id?: string;
+  };
+}
+
+/**
+ * Resolves the identity a rate-limit bucket is keyed on.
+ *
+ * `JwtAuthGuard` runs before this guard on every non-`@Public()` route (both
+ * as the global `APP_GUARD` and, redundantly, on controllers that also list
+ * it explicitly), so `request.user` is already server-verified by the time
+ * this executes. For those routes we key on that verified identity — plus
+ * the workspace the route operates on, when present — so a caller cannot
+ * reset their bucket by rotating a request header (SEC-02).
+ *
+ * Only requests with no verified user (i.e. genuinely `@Public()` routes,
+ * such as the analytics ingestion collector) fall back to a caller-supplied
+ * tracking/API key, which is the only identity available for them.
+ */
+export function getIdentity(request: FastifyRequest): string {
+  const userId = (request as RequestWithOptionalUser).user?.id;
+
+  if (userId) {
+    const rawWorkspaceId = (request.params as { workspaceId?: unknown }).workspaceId;
+    const workspaceId = typeof rawWorkspaceId === 'string' ? rawWorkspaceId : undefined;
+
+    return workspaceId ? `user:${userId}:workspace:${workspaceId}` : `user:${userId}`;
+  }
+
+  const trackingKey = request.headers['x-tracking-key'];
+
+  if (trackingKey) {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    return `tracking:${trackingKey}`;
+  }
+
+  const apiKey = request.headers['x-api-key'];
+
+  if (apiKey) {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    return `apikey:${apiKey}`;
+  }
+
+  return `ip:${request.ip || request.raw.socket.remoteAddress || 'unknown'}`;
+}
+
+@Injectable()
+export class SharedRateLimitGuard implements CanActivate {
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly rateLimit: SharedRateLimitService,
+  ) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const options = this.reflector.getAllAndOverride<SharedRateLimitOptions>(SHARED_RATE_LIMIT_KEY, [context.getHandler(), context.getClass()]);
+
+    if (!options) {
+      return true;
+    }
+
+    const httpContext = context.switchToHttp();
+    const request = httpContext.getRequest<FastifyRequest>();
+    const response = httpContext.getResponse<FastifyReply>();
+    const result = await this.rateLimit.consume(options.scope, getIdentity(request), options.limit, options.windowSeconds);
+
+    response.header('X-RateLimit-Limit', String(result.limit));
+    response.header('X-RateLimit-Remaining', String(result.remaining));
+    response.header('X-RateLimit-Reset', String(result.resetAfterSeconds));
+
+    if (!result.allowed) {
+      response.header('Retry-After', String(result.retryAfterSeconds));
+
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.TOO_MANY_REQUESTS,
+          error: 'Too Many Requests',
+          message: 'Analytics ingestion rate limit exceeded.',
+          retryAfterSeconds: result.retryAfterSeconds,
+        },
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+    }
+    return true;
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/common/rate-limit/shared-rate-limit.module.ts
+==============================================================================================================
+import { SharedRateLimitGuard } from './shared-rate-limit.guard';
+import { SharedRateLimitService } from './shared-rate-limit.service';
+import { Module } from '@nestjs/common';
+
+@Module({
+  providers: [SharedRateLimitService, SharedRateLimitGuard],
+  exports: [SharedRateLimitService, SharedRateLimitGuard],
+})
+export class SharedRateLimitModule {}
+
+
+==============================================================================================================
+FILE: apps/api/src/common/rate-limit/shared-rate-limit.service.ts
+==============================================================================================================
+import { RedisService } from '../../infrastructure/redis/redis.service';
+import { Injectable } from '@nestjs/common';
+
+export interface RateLimitResult {
+  allowed: boolean;
+
+  limit: number;
+
+  remaining: number;
+
+  retryAfterSeconds: number;
+
+  resetAfterSeconds: number;
+}
+
+const FIXED_WINDOW_SCRIPT = `
+local count = redis.call(
+  'INCR',
+  KEYS[1]
+)
+
+if count == 1 then
+  redis.call(
+    'PEXPIRE',
+    KEYS[1],
+    ARGV[1]
+  )
+end
+
+local ttl = redis.call(
+  'PTTL',
+  KEYS[1]
+)
+
+return {
+  count,
+  ttl
+}
+`;
+
+@Injectable()
+export class SharedRateLimitService {
+  constructor(private readonly redis: RedisService) {}
+
+  async consume(scope: string, identity: string, limit: number, windowSeconds: number): Promise<RateLimitResult> {
+    const windowMs = windowSeconds * 1_000;
+    const key = ['rate-limit', scope, identity].join(':');
+    const result = await this.redis.getClient().eval(FIXED_WINDOW_SCRIPT, 1, key, String(windowMs));
+
+    if (!Array.isArray(result)) {
+      throw new Error('Invalid Redis rate-limit result.');
+    }
+
+    const count = Number(result[0]);
+    const ttlMs = Math.max(Number(result[1]), 0);
+    const resetAfterSeconds = Math.max(1, Math.ceil(ttlMs / 1_000));
+
+    return {
+      allowed: count <= limit,
+
+      limit,
+
+      remaining: Math.max(limit - count, 0),
+      retryAfterSeconds: count > limit ? resetAfterSeconds : 0,
+
+      resetAfterSeconds,
+    };
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/config/env.validation.ts
+==============================================================================================================
+import { createPrivateKey } from 'node:crypto';
+
+export type NodeEnvironment = 'development' | 'test' | 'production';
+
+export type CookieSameSite = 'lax' | 'strict' | 'none';
+
+export interface EnvironmentVariables {
+  GITHUB_APP_CALLBACK_URL?: string;
+  GITHUB_APP_CLIENT_ID?: string;
+  GITHUB_APP_CLIENT_SECRET?: string;
+  GITHUB_APP_PRIVATE_KEY_BASE64?: string;
+  GITHUB_APP_SLUG?: string;
+  GITHUB_APP_WEBHOOK_SECRET?: string;
+  REDIS_URL: string;
+
+  ANALYTICS_WORKER_ENABLED: boolean;
+  ANALYTICS_WORKER_INTERVAL_MS: number;
+  ANALYTICS_SCHEDULER_ENABLED: boolean;
+
+  ANALYTICS_MAX_RETRIES: number;
+  ANALYTICS_REPROCESS_MAX_DAYS: number;
+  ANALYTICS_PROCESSING_TIMEOUT_MS: number;
+
+  ANALYTICS_INGESTION_LIMIT: number;
+  ANALYTICS_INGESTION_WINDOW_SECONDS: number;
+  ANALYTICS_IP_HASH_SALT: string;
+  NODE_ENV: NodeEnvironment;
+  PORT: number;
+
+  DATABASE_URL: string;
+  TEST_DATABASE_URL?: string;
+
+  JWT_ACCESS_SECRET: string;
+  JWT_REFRESH_SECRET: string;
+
+  FRONTEND_URL: string;
+  CORS_ORIGINS: string;
+
+  TRUST_PROXY: string;
+
+  COOKIE_NAME: string;
+  COOKIE_DOMAIN?: string;
+  COOKIE_SECURE: boolean;
+  COOKIE_SAME_SITE: CookieSameSite;
+  COOKIE_MAX_AGE_MS: number;
+
+  BODY_LIMIT: string;
+  SWAGGER_ENABLED: boolean;
+  APP_VERSION: string;
+
+  HEALTH_MONITOR_ENABLED: boolean;
+
+  HEALTH_MONITOR_BATCH_SIZE: number;
+  HEALTH_MONITOR_CONCURRENCY: number;
+
+  HEALTH_MIN_INTERVAL_SECONDS: number;
+  HEALTH_MAX_INTERVAL_SECONDS: number;
+
+  HEALTH_MIN_TIMEOUT_MS: number;
+  HEALTH_MAX_TIMEOUT_MS: number;
+
+  HEALTH_HISTORY_RETENTION_DAYS: number;
+  HEALTH_DEFAULT_FAILURE_THRESHOLD: number;
+  INVITATION_TOKEN_PEPPER: string;
+  INVITATION_TTL_HOURS: number;
+
+  INVITATION_EMAIL_ENABLED: boolean;
+
+  NOTIFICATION_RETENTION_DAYS: number;
+  NOTIFICATION_CLEANUP_ENABLED: boolean;
+  WEBHOOK_ENCRYPTION_KEY: string;
+
+  WEBHOOK_WORKER_ENABLED: boolean;
+  WEBHOOK_WORKER_BATCH_SIZE: number;
+  WEBHOOK_WORKER_CONCURRENCY: number;
+  WEBHOOK_PROCESSING_TIMEOUT_MS: number;
+
+  WEBHOOK_DEFAULT_TIMEOUT_MS: number;
+  WEBHOOK_MAX_TIMEOUT_MS: number;
+
+  WEBHOOK_DEFAULT_MAX_ATTEMPTS: number;
+  WEBHOOK_MAX_ATTEMPTS: number;
+
+  WEBHOOK_RETENTION_DAYS: number;
+  WEBHOOK_CLEANUP_ENABLED: boolean;
+
+  GITHUB_CONNECT_INTENT_CLEANUP_ENABLED: boolean;
+}
+function getOptionalString(config: Record<string, unknown>, key: string): string | undefined {
+  const value = config[key];
+
+  if (typeof value !== 'string') {
+    return undefined;
+  }
+
+  const normalizedValue = value.trim();
+
+  return normalizedValue.length > 0 ? normalizedValue : undefined;
+}
+
+function getRequiredString(config: Record<string, unknown>, key: string): string {
+  const value = getOptionalString(config, key);
+
+  if (!value) {
+    throw new Error(`Environment variable ${key} is required.`);
+  }
+
+  return value;
+}
+
+function getBoolean(config: Record<string, unknown>, key: string, defaultValue: boolean): boolean {
+  const value = getOptionalString(config, key);
+
+  if (value === undefined) {
+    return defaultValue;
+  }
+
+  if (value === 'true') {
+    return true;
+  }
+
+  if (value === 'false') {
+    return false;
+  }
+
+  throw new Error(`Environment variable ${key} must be "true" or "false".`);
+}
+
+function getPositiveInteger(config: Record<string, unknown>, key: string, defaultValue: number): number {
+  const value = getOptionalString(config, key);
+
+  if (value === undefined) {
+    return defaultValue;
+  }
+
+  const parsedValue = Number(value);
+
+  if (!Number.isInteger(parsedValue) || parsedValue <= 0) {
+    throw new Error(`Environment variable ${key} must be a positive integer.`);
+  }
+
+  return parsedValue;
+}
+
+function parseNodeEnvironment(value: string | undefined): NodeEnvironment {
+  const environment = value ?? 'development';
+
+  if (environment === 'development' || environment === 'test' || environment === 'production') {
+    return environment;
+  }
+
+  throw new Error('NODE_ENV must be development, test, or production.');
+}
+function parseCookieSameSite(value: string | undefined): CookieSameSite {
+  const sameSite = value ?? 'lax';
+
+  if (sameSite === 'lax' || sameSite === 'strict' || sameSite === 'none') {
+    return sameSite;
+  }
+
+  throw new Error('COOKIE_SAME_SITE must be lax, strict, or none.');
+}
+
+function validateUrl(key: string, value: string, allowedProtocols: string[]): void {
+  let parsedUrl: URL;
+
+  try {
+    parsedUrl = new URL(value);
+  } catch {
+    throw new Error(`${key} must be a valid URL.`);
+  }
+
+  if (!allowedProtocols.includes(parsedUrl.protocol)) {
+    throw new Error(`${key} must use ${allowedProtocols.join(' or ')}.`);
+  }
+}
+
+function validateSecret(key: string, value: string, environment: NodeEnvironment): void {
+  if (value.length < 32) {
+    throw new Error(`${key} must contain at least 32 characters.`);
+  }
+
+  if (environment === 'production' && /change-me|change-this|replace-me|replace-with|default|secret123|password123/i.test(value)) {
+    throw new Error(`${key} contains an unsafe production placeholder.`);
+  }
+}
+
+/*
+ * Only ever used when NODE_ENV is not "production" and no explicit salt was
+ * configured. Deliberately unusable as a real secret (short, obviously
+ * labeled) so it cannot be mistaken for a production-safe value and cannot
+ * satisfy validateSecret's own length check if someone copies it forward.
+ */
+const DEV_ONLY_ANALYTICS_IP_HASH_SALT = 'dev-only-analytics-ip-hash-salt';
+
+function resolveAnalyticsIpHashSalt(config: Record<string, unknown>, environment: NodeEnvironment): string {
+  const configuredValue = getOptionalString(config, 'ANALYTICS_IP_HASH_SALT');
+
+  if (environment === 'production') {
+    if (!configuredValue) {
+      throw new Error('Environment variable ANALYTICS_IP_HASH_SALT is required in production.');
+    }
+
+    validateSecret('ANALYTICS_IP_HASH_SALT', configuredValue, environment);
+
+    return configuredValue;
+  }
+
+  if (configuredValue) {
+    validateSecret('ANALYTICS_IP_HASH_SALT', configuredValue, environment);
+
+    return configuredValue;
+  }
+
+  return DEV_ONLY_ANALYTICS_IP_HASH_SALT;
+}
+
+function validateProductionGithubConfiguration(config: Record<string, unknown>, environment: NodeEnvironment, frontendUrl: string): void {
+  if (environment !== 'production') {
+    return;
+  }
+
+  const githubAppSlug = getRequiredString(config, 'GITHUB_APP_SLUG');
+  const githubClientId = getRequiredString(config, 'GITHUB_APP_CLIENT_ID');
+  const githubClientSecret = getRequiredString(config, 'GITHUB_APP_CLIENT_SECRET');
+  const githubCallbackUrl = getRequiredString(config, 'GITHUB_APP_CALLBACK_URL');
+  const githubWebhookSecret = getRequiredString(config, 'GITHUB_APP_WEBHOOK_SECRET');
+  const githubPrivateKeyBase64 = getRequiredString(config, 'GITHUB_APP_PRIVATE_KEY_BASE64');
+
+  // Keep these reads explicit so missing/blank values always fail startup.
+  void githubAppSlug;
+  void githubClientId;
+
+  validateSecret('GITHUB_APP_CLIENT_SECRET', githubClientSecret, environment);
+  validateSecret('GITHUB_APP_WEBHOOK_SECRET', githubWebhookSecret, environment);
+
+  validateUrl('GITHUB_APP_CALLBACK_URL', githubCallbackUrl, ['https:']);
+
+  const frontend = new URL(frontendUrl);
+  const callback = new URL(githubCallbackUrl);
+
+  if (frontend.origin !== callback.origin) {
+    throw new Error('GITHUB_APP_CALLBACK_URL must use the same origin as FRONTEND_URL in production.');
+  }
+
+  let privateKey: string;
+
+  try {
+    privateKey = Buffer.from(githubPrivateKeyBase64, 'base64').toString('utf8');
+
+    if (!privateKey.includes('BEGIN') || !privateKey.includes('PRIVATE KEY')) {
+      throw new Error('Invalid private key.');
+    }
+
+    createPrivateKey(privateKey);
+  } catch {
+    throw new Error('GITHUB_APP_PRIVATE_KEY_BASE64 must contain a valid Base64-encoded private key in production.');
+  }
+}
+
+function validateCorsOrigins(value: string): void {
+  const origins = value
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter((origin) => origin.length > 0);
+
+  if (origins.length === 0) {
+    throw new Error('CORS_ORIGINS must contain at least one origin.');
+  }
+
+  for (const origin of origins) {
+    validateUrl('CORS_ORIGINS', origin, ['http:', 'https:']);
+  }
+}
+
+export function validateEnvironment(config: Record<string, unknown>): EnvironmentVariables {
+  const nodeEnvironment = parseNodeEnvironment(getOptionalString(config, 'NODE_ENV'));
+  const databaseUrl = getRequiredString(config, 'DATABASE_URL');
+  const testDatabaseUrl = getOptionalString(config, 'TEST_DATABASE_URL');
+  const jwtAccessSecret = getRequiredString(config, 'JWT_ACCESS_SECRET');
+  const jwtRefreshSecret = getRequiredString(config, 'JWT_REFRESH_SECRET');
+  const frontendUrl = getRequiredString(config, 'FRONTEND_URL');
+  const invitationTokenPepper = getRequiredString(config, 'INVITATION_TOKEN_PEPPER');
+
+  validateSecret('INVITATION_TOKEN_PEPPER', invitationTokenPepper, nodeEnvironment);
+
+  const webhookEncryptionKey = getRequiredString(config, 'WEBHOOK_ENCRYPTION_KEY');
+  let decodedWebhookKey: Buffer;
+
+  try {
+    decodedWebhookKey = Buffer.from(webhookEncryptionKey, 'base64');
+  } catch {
+    throw new Error('WEBHOOK_ENCRYPTION_KEY must be valid base64.');
+  }
+
+  if (decodedWebhookKey.length !== 32) {
+    throw new Error('WEBHOOK_ENCRYPTION_KEY must decode to exactly 32 bytes.');
+  }
+
+  const webhookDefaultTimeoutMs = getPositiveInteger(config, 'WEBHOOK_DEFAULT_TIMEOUT_MS', 10_000);
+  const webhookMaxTimeoutMs = getPositiveInteger(config, 'WEBHOOK_MAX_TIMEOUT_MS', 30_000);
+
+  if (webhookDefaultTimeoutMs > webhookMaxTimeoutMs) {
+    throw new Error('WEBHOOK_DEFAULT_TIMEOUT_MS cannot exceed WEBHOOK_MAX_TIMEOUT_MS.');
+  }
+
+  const webhookDefaultMaxAttempts = getPositiveInteger(config, 'WEBHOOK_DEFAULT_MAX_ATTEMPTS', 5);
+  const webhookMaxAttempts = getPositiveInteger(config, 'WEBHOOK_MAX_ATTEMPTS', 8);
+
+  if (webhookDefaultMaxAttempts > webhookMaxAttempts) {
+    throw new Error('WEBHOOK_DEFAULT_MAX_ATTEMPTS cannot exceed WEBHOOK_MAX_ATTEMPTS.');
+  }
+  const minimumInterval = getPositiveInteger(config, 'HEALTH_MIN_INTERVAL_SECONDS', 60);
+  const maximumInterval = getPositiveInteger(config, 'HEALTH_MAX_INTERVAL_SECONDS', 86_400);
+
+  if (maximumInterval < minimumInterval) {
+    throw new Error('HEALTH_MAX_INTERVAL_SECONDS must be greater than or equal to HEALTH_MIN_INTERVAL_SECONDS.');
+  }
+
+  const minimumTimeout = getPositiveInteger(config, 'HEALTH_MIN_TIMEOUT_MS', 1_000);
+  const maximumTimeout = getPositiveInteger(config, 'HEALTH_MAX_TIMEOUT_MS', 30_000);
+
+  if (maximumTimeout < minimumTimeout) {
+    throw new Error('HEALTH_MAX_TIMEOUT_MS must be greater than or equal to HEALTH_MIN_TIMEOUT_MS.');
+  }
+  const corsOrigins = getOptionalString(config, 'CORS_ORIGINS') ?? frontendUrl;
+  const cookieSameSite = parseCookieSameSite(getOptionalString(config, 'COOKIE_SAME_SITE'));
+  const cookieSecure = getBoolean(config, 'COOKIE_SECURE', nodeEnvironment === 'production');
+
+  validateUrl('DATABASE_URL', databaseUrl, ['postgres:', 'postgresql:']);
+
+  if (testDatabaseUrl) {
+    validateUrl('TEST_DATABASE_URL', testDatabaseUrl, ['postgres:', 'postgresql:']);
+  }
+
+  validateUrl('FRONTEND_URL', frontendUrl, ['http:', 'https:']);
+
+  validateProductionGithubConfiguration(config, nodeEnvironment, frontendUrl);
+
+  validateCorsOrigins(corsOrigins);
+
+  validateSecret('JWT_ACCESS_SECRET', jwtAccessSecret, nodeEnvironment);
+
+  validateSecret('JWT_REFRESH_SECRET', jwtRefreshSecret, nodeEnvironment);
+
+  if (nodeEnvironment === 'test' && !testDatabaseUrl) {
+    throw new Error('TEST_DATABASE_URL is required when NODE_ENV=test.');
+  }
+
+  if (cookieSameSite === 'none' && !cookieSecure) {
+    throw new Error('COOKIE_SECURE must be true when COOKIE_SAME_SITE is none.');
+  }
+
+  if (nodeEnvironment === 'production' && !cookieSecure) {
+    throw new Error('COOKIE_SECURE must be true in production.');
+  }
+
+  return {
+    GITHUB_APP_CALLBACK_URL: getOptionalString(config, 'GITHUB_APP_CALLBACK_URL'),
+    GITHUB_APP_CLIENT_ID: getOptionalString(config, 'GITHUB_APP_CLIENT_ID'),
+    GITHUB_APP_CLIENT_SECRET: getOptionalString(config, 'GITHUB_APP_CLIENT_SECRET'),
+    GITHUB_APP_PRIVATE_KEY_BASE64: getOptionalString(config, 'GITHUB_APP_PRIVATE_KEY_BASE64'),
+    GITHUB_APP_SLUG: getOptionalString(config, 'GITHUB_APP_SLUG'),
+    GITHUB_APP_WEBHOOK_SECRET: getOptionalString(config, 'GITHUB_APP_WEBHOOK_SECRET'),
+    WEBHOOK_ENCRYPTION_KEY: webhookEncryptionKey,
+    WEBHOOK_WORKER_ENABLED: getBoolean(config, 'WEBHOOK_WORKER_ENABLED', true),
+    WEBHOOK_WORKER_BATCH_SIZE: getPositiveInteger(config, 'WEBHOOK_WORKER_BATCH_SIZE', 20),
+    WEBHOOK_WORKER_CONCURRENCY: getPositiveInteger(config, 'WEBHOOK_WORKER_CONCURRENCY', 5),
+    WEBHOOK_PROCESSING_TIMEOUT_MS: getPositiveInteger(config, 'WEBHOOK_PROCESSING_TIMEOUT_MS', 120_000),
+    WEBHOOK_DEFAULT_TIMEOUT_MS: webhookDefaultTimeoutMs,
+    WEBHOOK_MAX_TIMEOUT_MS: webhookMaxTimeoutMs,
+    WEBHOOK_DEFAULT_MAX_ATTEMPTS: webhookDefaultMaxAttempts,
+    WEBHOOK_MAX_ATTEMPTS: webhookMaxAttempts,
+    WEBHOOK_RETENTION_DAYS: getPositiveInteger(config, 'WEBHOOK_RETENTION_DAYS', 90),
+    WEBHOOK_CLEANUP_ENABLED: getBoolean(config, 'WEBHOOK_CLEANUP_ENABLED', true),
+    GITHUB_CONNECT_INTENT_CLEANUP_ENABLED: getBoolean(config, 'GITHUB_CONNECT_INTENT_CLEANUP_ENABLED', true),
+    INVITATION_TOKEN_PEPPER: invitationTokenPepper,
+    INVITATION_TTL_HOURS: getPositiveInteger(config, 'INVITATION_TTL_HOURS', 72),
+    INVITATION_EMAIL_ENABLED: getBoolean(config, 'INVITATION_EMAIL_ENABLED', false),
+    NOTIFICATION_RETENTION_DAYS: getPositiveInteger(config, 'NOTIFICATION_RETENTION_DAYS', 90),
+    NOTIFICATION_CLEANUP_ENABLED: getBoolean(config, 'NOTIFICATION_CLEANUP_ENABLED', true),
+    HEALTH_MONITOR_ENABLED: getBoolean(config, 'HEALTH_MONITOR_ENABLED', true),
+    HEALTH_MONITOR_BATCH_SIZE: getPositiveInteger(config, 'HEALTH_MONITOR_BATCH_SIZE', 20),
+    HEALTH_MONITOR_CONCURRENCY: getPositiveInteger(config, 'HEALTH_MONITOR_CONCURRENCY', 5),
+    HEALTH_MIN_INTERVAL_SECONDS: getPositiveInteger(config, 'HEALTH_MIN_INTERVAL_SECONDS', 60),
+    HEALTH_MAX_INTERVAL_SECONDS: getPositiveInteger(config, 'HEALTH_MAX_INTERVAL_SECONDS', 86_400),
+    HEALTH_MIN_TIMEOUT_MS: getPositiveInteger(config, 'HEALTH_MIN_TIMEOUT_MS', 1_000),
+    HEALTH_MAX_TIMEOUT_MS: getPositiveInteger(config, 'HEALTH_MAX_TIMEOUT_MS', 30_000),
+    HEALTH_HISTORY_RETENTION_DAYS: getPositiveInteger(config, 'HEALTH_HISTORY_RETENTION_DAYS', 30),
+    HEALTH_DEFAULT_FAILURE_THRESHOLD: getPositiveInteger(config, 'HEALTH_DEFAULT_FAILURE_THRESHOLD', 3),
+    REDIS_URL: getRequiredString(config, 'REDIS_URL'),
+    ANALYTICS_WORKER_ENABLED: getBoolean(config, 'ANALYTICS_WORKER_ENABLED', true),
+    ANALYTICS_WORKER_INTERVAL_MS: getPositiveInteger(config, 'ANALYTICS_WORKER_INTERVAL_MS', 5_000),
+    ANALYTICS_SCHEDULER_ENABLED: getBoolean(config, 'ANALYTICS_SCHEDULER_ENABLED', true),
+    ANALYTICS_MAX_RETRIES: getPositiveInteger(config, 'ANALYTICS_MAX_RETRIES', 3),
+    ANALYTICS_REPROCESS_MAX_DAYS: getPositiveInteger(config, 'ANALYTICS_REPROCESS_MAX_DAYS', 31),
+    ANALYTICS_PROCESSING_TIMEOUT_MS: getPositiveInteger(config, 'ANALYTICS_PROCESSING_TIMEOUT_MS', 120_000),
+    ANALYTICS_INGESTION_LIMIT: getPositiveInteger(config, 'ANALYTICS_INGESTION_LIMIT', 120),
+    ANALYTICS_INGESTION_WINDOW_SECONDS: getPositiveInteger(config, 'ANALYTICS_INGESTION_WINDOW_SECONDS', 60),
+    ANALYTICS_IP_HASH_SALT: resolveAnalyticsIpHashSalt(config, nodeEnvironment),
+    NODE_ENV: nodeEnvironment,
+    PORT: getPositiveInteger(config, 'PORT', 4000),
+    DATABASE_URL: databaseUrl,
+    TEST_DATABASE_URL: testDatabaseUrl,
+    JWT_ACCESS_SECRET: jwtAccessSecret,
+    JWT_REFRESH_SECRET: jwtRefreshSecret,
+    FRONTEND_URL: frontendUrl,
+    CORS_ORIGINS: corsOrigins,
+    TRUST_PROXY: getOptionalString(config, 'TRUST_PROXY') ?? 'false',
+    COOKIE_NAME: getOptionalString(config, 'COOKIE_NAME') ?? 'command_center_refresh_token',
+    COOKIE_DOMAIN: getOptionalString(config, 'COOKIE_DOMAIN'),
+    COOKIE_SECURE: cookieSecure,
+    COOKIE_SAME_SITE: cookieSameSite,
+    COOKIE_MAX_AGE_MS: getPositiveInteger(config, 'COOKIE_MAX_AGE_MS', 30 * 24 * 60 * 60 * 1000),
+    BODY_LIMIT: getOptionalString(config, 'BODY_LIMIT') ?? '1mb',
+    SWAGGER_ENABLED: getBoolean(config, 'SWAGGER_ENABLED', nodeEnvironment !== 'production'),
+    APP_VERSION: getOptionalString(config, 'APP_VERSION') ?? '0.1.0',
+  };
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/config/runtime-config.ts
+==============================================================================================================
+import type { EnvironmentVariables } from './env.validation';
+import { ConfigService } from '@nestjs/config';
+
+export type TypedConfigService = ConfigService<EnvironmentVariables, true>;
+
+export function getAllowedOrigins(config: TypedConfigService): Set<string> {
+  const origins = config
+    .get('CORS_ORIGINS', {
+      infer: true,
+    })
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter((origin) => origin.length > 0);
+
+  return new Set(origins);
+}
+
+export function parseTrustProxy(value: string): boolean | number | string {
+  if (value === 'true') {
+    return true;
+  }
+
+  if (value === 'false') {
+    return false;
+  }
+
+  const numericValue = Number(value);
+
+  if (Number.isInteger(numericValue) && numericValue >= 0) {
+    return numericValue;
+  }
+
+  return value;
+}
+
+export function parseBodyLimit(value: string | number): number {
+  if (typeof value === 'number') {
+    if (!Number.isSafeInteger(value) || value <= 0) {
+      throw new Error('BODY_LIMIT must be a positive integer.');
+    }
+
+    return value;
+  }
+
+  const match = value
+    .trim()
+    .toLowerCase()
+    .match(/^(\d+)\s*(b|kb|mb|gb)?$/);
+
+  if (!match) {
+    throw new Error('BODY_LIMIT must use a format such as 1048576, 1mb, 10mb, or 1gb.');
+  }
+
+  const amount = Number(match[1]);
+  const unit = match[2] ?? 'b';
+  const multipliers: Record<string, number> = {
+    b: 1,
+    kb: 1024,
+    mb: 1024 ** 2,
+    gb: 1024 ** 3,
+  };
+  const multiplier = multipliers[unit];
+
+  if (multiplier === undefined) {
+    throw new Error(`Unsupported BODY_LIMIT unit: ${unit}`);
+  }
+
+  const bytes = amount * multiplier;
+
+  if (!Number.isSafeInteger(bytes) || bytes <= 0) {
+    throw new Error('BODY_LIMIT is outside the supported range.');
+  }
+
+  return bytes;
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/infrastructure/database/postgres-advisory-lock.service.ts
+==============================================================================================================
+import type { TypedConfigService } from '../../config/runtime-config';
+import { Inject, Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Pool, type PoolClient } from 'pg';
+
+export interface DistributedLockResult<T> {
+  acquired: boolean;
+
+  value?: T;
+}
+
+interface AdvisoryLockRow {
+  acquired: boolean;
+}
+
+@Injectable()
+export class PostgresAdvisoryLockService implements OnModuleDestroy {
+  private readonly logger = new Logger(PostgresAdvisoryLockService.name);
+
+  private readonly pool: Pool;
+
+  constructor(
+    @Inject(ConfigService)
+    config: TypedConfigService,
+  ) {
+    this.pool = new Pool({
+      connectionString: config.get('DATABASE_URL', {
+        infer: true,
+      }),
+
+      max: 5,
+      idleTimeoutMillis: 30_000,
+      connectionTimeoutMillis: 10_000,
+    });
+  }
+
+  async withLock<T>(lockKey: string, callback: (client: PoolClient) => Promise<T>): Promise<DistributedLockResult<T>> {
+    const client = await this.pool.connect();
+    let acquired = false;
+
+    try {
+      const result = await client.query<AdvisoryLockRow>(
+        `
+            SELECT
+              pg_try_advisory_lock(
+                hashtextextended(
+                  $1,
+                  0
+                )
+              ) AS acquired
+          `,
+        [lockKey],
+      );
+
+      acquired = result.rows[0]?.acquired === true;
+
+      if (!acquired) {
+        return {
+          acquired: false,
+        };
+      }
+
+      const value = await callback(client);
+
+      return {
+        acquired: true,
+        value,
+      };
+    } finally {
+      if (acquired) {
+        try {
+          await client.query(
+            `
+              SELECT
+                pg_advisory_unlock(
+                  hashtextextended(
+                    $1,
+                    0
+                  )
+                )
+            `,
+            [lockKey],
+          );
+        } catch (error) {
+          this.logger.error(
+            'Unable to release advisory lock.',
+
+            error instanceof Error ? error.stack : undefined,
+          );
+        }
+      }
+
+      client.release();
+    }
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await this.pool.end();
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/ai-blueprint-provider.client.ts
+==============================================================================================================
+import { Injectable, ServiceUnavailableException } from '@nestjs/common';
+import { WorkspaceAiCircuitBreakerService } from './workspace-ai-circuit-breaker.service';
+
+interface ProviderResponse {
+  choices?: Array<{
+    message?: {
+      content?: string;
+    };
+  }>;
+}
+
+@Injectable()
+export class AiBlueprintProviderClient {
+  constructor(
+    private readonly config: TypedConfigService,
+    private readonly circuit: WorkspaceAiCircuitBreakerService,
+  ) {}
+
+  async generate(messages: Array<{ role: 'system' | 'user'; content: string }>): Promise<unknown> {
+    this.circuit.assertAvailable();
+    const ai = this.config.workspaceAi;
+    const attempts = this.config.workspaceOnboarding.aiMaxRetries + 1;
+    let lastError: unknown;
+
+    for (let attempt = 0; attempt < attempts; attempt += 1) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), this.config.workspaceOnboarding.aiRequestTimeoutMs);
+
+      try {
+        const response = await fetch(`${ai.baseUrl.replace(/\/$/, '')}/chat/completions`, {
+          method: 'POST',
+          signal: controller.signal,
+          headers: {
+            authorization: `Bearer ${ai.apiKey}`,
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: ai.model,
+            temperature: 0,
+            response_format: { type: 'json_object' },
+            messages,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Provider returned ${response.status}`);
+        }
+
+        const payload = (await response.json()) as ProviderResponse;
+        const content = payload.choices?.[0]?.message?.content;
+
+        if (!content) throw new Error('Provider returned no structured content');
+
+        const parsed = JSON.parse(content) as unknown;
+        this.circuit.success();
+        return parsed;
+      } catch (error) {
+        lastError = error;
+        this.circuit.failure();
+
+        if (attempt + 1 < attempts) {
+          await new Promise((resolve) => setTimeout(resolve, 150 * 2 ** attempt));
+        }
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+
+    throw new ServiceUnavailableException(lastError instanceof Error ? lastError.message : 'AI provider failed');
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/dto/confirm-workspace-blueprint.dto.ts
+==============================================================================================================
+import type { ConfirmWorkspaceBlueprintInput } from '@command-center/shared-types';
+import { BadRequestException } from '@nestjs/common';
+import { z } from 'zod';
+
+const schema = z
+  .object({
+    expectedRevision: z.number().int().positive(),
+    blueprintHash: z.string().regex(/^[a-f0-9]{64}$/),
+    idempotencyKey: z.string().uuid(),
+  })
+  .strict();
+
+export class ConfirmWorkspaceBlueprintDto {
+  static parse(value: unknown): ConfirmWorkspaceBlueprintInput {
+    const result = schema.safeParse(value);
+
+    if (!result.success) {
+      throw new BadRequestException({
+        message: 'Invalid confirmation request',
+        errors: result.error.flatten(),
+      });
+    }
+
+    return result.data;
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/dto/update-onboarding-answers.dto.ts
+==============================================================================================================
+import type { WorkspaceOnboardingAnswers } from '@command-center/shared-types';
+import { workspaceOnboardingAnswersSchema } from '@command-center/validation';
+import { BadRequestException } from '@nestjs/common';
+
+export class UpdateOnboardingAnswersDto {
+  answers!: Partial<WorkspaceOnboardingAnswers>;
+
+  static parse(input: unknown): UpdateOnboardingAnswersDto {
+    const body = input as { answers?: unknown };
+    const result = workspaceOnboardingAnswersSchema.safeParse(body?.answers);
+
+    if (!result.success) {
+      throw new BadRequestException({
+        message: 'Invalid onboarding answers',
+        errors: result.error.flatten().fieldErrors,
+      });
+    }
+
+    return { answers: result.data };
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/dto/update-workspace-blueprint.dto.ts
+==============================================================================================================
+import type { UpdateWorkspaceBlueprintInput } from '@command-center/shared-types';
+import { workspaceBlueprintSchema } from '@command-center/validation';
+import { BadRequestException } from '@nestjs/common';
+import { z } from 'zod';
+
+const schema = z
+  .object({
+    expectedRevision: z.number().int().nonnegative(),
+    blueprint: workspaceBlueprintSchema,
+  })
+  .strict();
+
+export class UpdateWorkspaceBlueprintDto {
+  static parse(value: unknown): UpdateWorkspaceBlueprintInput {
+    const result = schema.safeParse(value);
+
+    if (!result.success) {
+      throw new BadRequestException({
+        message: 'Invalid blueprint update',
+        errors: result.error.flatten(),
+      });
+    }
+
+    return result.data;
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/generator-orchestrator.service.ts
+==============================================================================================================
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts
+==============================================================================================================
+import type { WorkspaceBlueprint, WorkspaceOnboardingAnswers } from '@command-center/shared-types';
+import { completeWorkspaceOnboardingAnswersSchema, workspaceBlueprintSchema } from '@command-center/validation';
+import { Injectable } from '@nestjs/common';
+import type { WorkspaceBlueprintGenerator } from '../generators/workspace-blueprint-generator.interface';
+import { TechnologyCompatibilityService } from '../rules/technology-compatibility.service';
+import { AiBlueprintProviderClient } from './ai-blueprint-provider.client';
+
+const systemInstruction = `
+You generate a SaaS Command Center workspace blueprint.
+Return one JSON object only. Do not include markdown or commentary.
+Use only enum values present in the supplied catalog.
+Never include credentials, tokens, secrets, executable commands, HTML, or hidden reasoning.
+Every recommendation must contain a short explanation and a stable ruleId beginning with ai-.
+The output must use schemaVersion 1 and generator.provider "ai".
+`;
+
+@Injectable()
+export class AiWorkspaceBlueprintGenerator implements WorkspaceBlueprintGenerator {
+  constructor(
+    private readonly client: AiBlueprintProviderClient,
+    private readonly compatibility: TechnologyCompatibilityService,
+    private readonly config: TypedConfigService,
+  ) {}
+
+  async generate(input: WorkspaceOnboardingAnswers): Promise<WorkspaceBlueprint> {
+    const answers = completeWorkspaceOnboardingAnswersSchema.parse(input);
+    const raw = await this.client.generate([
+      { role: 'system', content: systemInstruction },
+      {
+        role: 'user',
+        content: JSON.stringify({
+          answers,
+          supported: {
+            applicationTypes: ['WEB', 'MOBILE', 'DESKTOP'],
+            platforms: ['WEB', 'ANDROID', 'IOS', 'WINDOWS', 'MACOS', 'LINUX'],
+            technologies: ['NEXT_JS', 'TYPESCRIPT', 'KOTLIN', 'JETPACK_COMPOSE', 'SWIFT', 'SWIFTUI', 'REACT_NATIVE', 'FLUTTER', 'TAURI', 'ELECTRON', 'NEST_JS', 'POSTGRESQL', 'REDIS'],
+          },
+        }),
+      },
+    ]);
+
+    const candidate = workspaceBlueprintSchema.parse({
+      ...(raw as Record<string, unknown>),
+      schemaVersion: 1,
+      generator: {
+        provider: 'ai',
+        version: this.config.workspaceAi.model,
+      },
+    });
+
+    for (const application of candidate.applications) {
+      this.compatibility.assertApplication(application.type, application.platforms, application.stack);
+    }
+
+    return candidate;
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/generators/rule-based-workspace-blueprint.generator.ts
+==============================================================================================================
+import type { WorkspaceBlueprint, WorkspaceOnboardingAnswers } from '@command-center/shared-types';
+import { completeWorkspaceOnboardingAnswersSchema, workspaceBlueprintSchema } from '@command-center/validation';
+import { Injectable } from '@nestjs/common';
+import type { WorkspaceBlueprintGenerator } from './workspace-blueprint-generator.interface';
+import { foundationRules } from '../rules/foundation.rules';
+import { WorkspaceRuleEngine } from '../rules/rule-engine';
+
+export const RULE_SET_VERSION = '1.0.0';
+
+function slugify(value: string): string {
+  return value
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80);
+}
+
+@Injectable()
+export class RuleBasedWorkspaceBlueprintGenerator implements WorkspaceBlueprintGenerator {
+  constructor(private readonly ruleEngine: WorkspaceRuleEngine) {}
+
+  async generate(input: WorkspaceOnboardingAnswers): Promise<WorkspaceBlueprint> {
+    const answers = completeWorkspaceOnboardingAnswersSchema.parse(input);
+
+    const initial: WorkspaceBlueprint = {
+      schemaVersion: 1,
+      generator: {
+        provider: 'rules',
+        version: RULE_SET_VERSION,
+      },
+      workspace: {
+        name: answers.workspaceName!,
+        slug: slugify(answers.workspaceName!),
+        description: answers.productIdea!,
+        productType: answers.productType!,
+      },
+      applications: [],
+      services: {
+        backend: [],
+        database: [],
+        cache: [],
+        authentication: [],
+      },
+      features: answers.coreFeatures!,
+      environments: answers.environments!,
+      engineeringSystems: answers.qualityRequirements!,
+      recommendations: [],
+    };
+
+    const generated = this.ruleEngine.apply(initial, { answers }, foundationRules);
+
+    return workspaceBlueprintSchema.parse(generated);
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/generators/workspace-blueprint-generator.interface.ts
+==============================================================================================================
+import type { WorkspaceBlueprint, WorkspaceOnboardingAnswers } from '@command-center/shared-types';
+
+export const WORKSPACE_BLUEPRINT_GENERATOR = Symbol('WORKSPACE_BLUEPRINT_GENERATOR');
+
+export interface WorkspaceBlueprintGenerator {
+  generate(input: WorkspaceOnboardingAnswers): Promise<WorkspaceBlueprint>;
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/observability/workspace-onboarding-observability.port.ts
+==============================================================================================================
+export const WORKSPACE_ONBOARDING_OBSERVABILITY = Symbol('WORKSPACE_ONBOARDING_OBSERVABILITY');
+
+export type GuidedBuilderEvent =
+  | 'guided_builder_started'
+  | 'guided_builder_question_answered'
+  | 'guided_builder_step_back'
+  | 'guided_builder_abandoned'
+  | 'guided_builder_resumed'
+  | 'guided_builder_blueprint_generated'
+  | 'guided_builder_blueprint_edited'
+  | 'guided_builder_validation_failed'
+  | 'guided_builder_creation_started'
+  | 'guided_builder_creation_succeeded'
+  | 'guided_builder_creation_failed';
+
+export interface GuidedBuilderEventMetadata {
+  sessionId: string;
+  userId?: string;
+  requestId?: string;
+  ruleSetVersion?: string;
+  generatorProvider?: 'rules' | 'ai';
+  applicationTypeCount?: number;
+  validationIssueCode?: string;
+  durationMs?: number;
+  idempotentRetry?: boolean;
+}
+
+export interface WorkspaceOnboardingObservabilityPort {
+  event(name: GuidedBuilderEvent, metadata: GuidedBuilderEventMetadata): Promise<void>;
+  increment(metric: string, labels?: Record<string, string>): void;
+  observe(metric: string, value: number, labels?: Record<string, string>): void;
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/questions/question-catalog.ts
+==============================================================================================================
+import type { WorkspaceOnboardingAnswers, WorkspaceQuestionDefinition } from '@command-center/shared-types';
+
+interface CatalogQuestion extends WorkspaceQuestionDefinition {
+  visibleWhen?: (answers: WorkspaceOnboardingAnswers) => boolean;
+}
+
+export const QUESTION_CATALOG_VERSION = '1.0.0';
+
+export const questionCatalog: readonly CatalogQuestion[] = [
+  {
+    key: 'productIdea',
+    prompt: 'What are you building?',
+    type: 'TEXT',
+    required: true,
+  },
+  {
+    key: 'workspaceName',
+    prompt: 'What should the workspace be called?',
+    type: 'TEXT',
+    required: true,
+  },
+  {
+    key: 'productType',
+    prompt: 'What type of product is it?',
+    type: 'SINGLE_SELECT',
+    required: true,
+    options: [
+      { label: 'Productivity SaaS', value: 'PRODUCTIVITY_SAAS' },
+      { label: 'E-commerce', value: 'ECOMMERCE' },
+      { label: 'Marketplace', value: 'MARKETPLACE' },
+      { label: 'Social product', value: 'SOCIAL' },
+      { label: 'Internal tool', value: 'INTERNAL_TOOL' },
+      { label: 'Other', value: 'OTHER' },
+    ],
+  },
+  {
+    key: 'targetUsers',
+    prompt: 'Who will use the product?',
+    type: 'MULTI_SELECT',
+    required: true,
+    options: [
+      { label: 'Consumers', value: 'CONSUMERS' },
+      { label: 'Businesses', value: 'BUSINESSES' },
+      { label: 'Internal teams', value: 'INTERNAL_TEAMS' },
+      { label: 'Developers', value: 'DEVELOPERS' },
+    ],
+  },
+  {
+    key: 'applicationTypes',
+    prompt: 'Which applications do you need?',
+    type: 'MULTI_SELECT',
+    required: true,
+    options: [
+      { label: 'Web', value: 'WEB' },
+      { label: 'Mobile', value: 'MOBILE' },
+      { label: 'Desktop', value: 'DESKTOP' },
+    ],
+  },
+  {
+    key: 'mobilePlatforms',
+    prompt: 'Which mobile platforms do you need?',
+    type: 'MULTI_SELECT',
+    required: true,
+    options: [
+      { label: 'Android', value: 'ANDROID' },
+      { label: 'iOS', value: 'IOS' },
+    ],
+    visibleWhen: (answers) => answers.applicationTypes?.includes('MOBILE') === true,
+  },
+  {
+    key: 'desktopPlatforms',
+    prompt: 'Which desktop platforms do you need?',
+    type: 'MULTI_SELECT',
+    required: true,
+    options: [
+      { label: 'Windows', value: 'WINDOWS' },
+      { label: 'macOS', value: 'MACOS' },
+      { label: 'Linux', value: 'LINUX' },
+    ],
+    visibleWhen: (answers) => answers.applicationTypes?.includes('DESKTOP') === true,
+  },
+  {
+    key: 'coreFeatures',
+    prompt: 'Which core features are required?',
+    type: 'MULTI_SELECT',
+    required: true,
+    options: [
+      { label: 'Dashboard', value: 'DASHBOARD' },
+      { label: 'Search', value: 'SEARCH' },
+      { label: 'Payments', value: 'PAYMENTS' },
+      { label: 'Notifications', value: 'NOTIFICATIONS' },
+      { label: 'Real-time collaboration', value: 'COLLABORATION' },
+    ],
+  },
+  {
+    key: 'authentication',
+    prompt: 'Does the product require user accounts?',
+    type: 'BOOLEAN',
+    required: true,
+  },
+  {
+    key: 'collaboration',
+    prompt: 'Does it require real-time collaboration?',
+    type: 'BOOLEAN',
+    required: false,
+    visibleWhen: (answers) => answers.coreFeatures?.includes('COLLABORATION') === true,
+  },
+  {
+    key: 'notifications',
+    prompt: 'Which notification channels are required?',
+    type: 'MULTI_SELECT',
+    required: false,
+    options: [
+      { label: 'Email', value: 'EMAIL' },
+      { label: 'Push', value: 'PUSH' },
+      { label: 'In-app', value: 'IN_APP' },
+    ],
+    visibleWhen: (answers) => answers.coreFeatures?.includes('NOTIFICATIONS') === true,
+  },
+  {
+    key: 'repositories',
+    prompt: 'Do repositories already exist?',
+    type: 'SINGLE_SELECT',
+    required: true,
+    options: [
+      { label: 'No repositories', value: 'NONE' },
+      { label: 'Connect later', value: 'CONNECT_LATER' },
+      { label: 'Connect now', value: 'CONNECT_NOW' },
+    ],
+  },
+  {
+    key: 'environments',
+    prompt: 'Which environments are required?',
+    type: 'MULTI_SELECT',
+    required: true,
+    options: [
+      { label: 'Development', value: 'DEVELOPMENT' },
+      { label: 'Staging', value: 'STAGING' },
+      { label: 'Production', value: 'PRODUCTION' },
+    ],
+  },
+  {
+    key: 'qualityRequirements',
+    prompt: 'Which engineering systems are required?',
+    type: 'MULTI_SELECT',
+    required: true,
+    options: [
+      { label: 'CI/CD', value: 'CI_CD' },
+      { label: 'Monitoring', value: 'MONITORING' },
+      { label: 'Analytics', value: 'ANALYTICS' },
+      { label: 'Performance', value: 'PERFORMANCE' },
+      { label: 'Alerts', value: 'ALERTS' },
+      { label: 'Security', value: 'SECURITY' },
+      { label: 'Backups', value: 'BACKUPS' },
+    ],
+  },
+];
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/questions/question-flow.service.ts
+==============================================================================================================
+import type { WorkspaceOnboardingAnswers, WorkspaceQuestionFlowResponse } from '@command-center/shared-types';
+import { Injectable } from '@nestjs/common';
+import { questionCatalog } from './question-catalog';
+
+const dependentKeys: Partial<Record<keyof WorkspaceOnboardingAnswers, (keyof WorkspaceOnboardingAnswers)[]>> = {
+  applicationTypes: ['mobilePlatforms', 'desktopPlatforms', 'technologyPreference'],
+  coreFeatures: ['collaboration', 'notifications'],
+};
+
+@Injectable()
+export class QuestionFlowService {
+  applicable(answers: WorkspaceOnboardingAnswers) {
+    return questionCatalog.filter((question) => !question.visibleWhen || question.visibleWhen(answers)).map(({ visibleWhen: _visibleWhen, ...question }) => question);
+  }
+
+  flow(answers: WorkspaceOnboardingAnswers): WorkspaceQuestionFlowResponse {
+    const questions = this.applicable(answers);
+    const answered = questions.filter(({ key }) => answers[key] !== undefined);
+    const currentQuestion = questions.find(({ key }) => answers[key] === undefined) ?? null;
+
+    return {
+      questions,
+      currentQuestion,
+      completed: answered.length,
+      total: questions.length,
+      percent: questions.length === 0 ? 100 : Math.round((answered.length / questions.length) * 100),
+    };
+  }
+
+  removeInvalidDependents(previous: WorkspaceOnboardingAnswers, patch: Partial<WorkspaceOnboardingAnswers>): WorkspaceOnboardingAnswers {
+    const next = { ...previous, ...patch };
+
+    for (const changedKey of Object.keys(patch) as (keyof WorkspaceOnboardingAnswers)[]) {
+      for (const dependentKey of dependentKeys[changedKey] ?? []) {
+        delete next[dependentKey];
+      }
+    }
+
+    const visibleKeys = new Set(this.applicable(next).map(({ key }) => key));
+
+    for (const key of Object.keys(next) as (keyof WorkspaceOnboardingAnswers)[]) {
+      if (!visibleKeys.has(key)) {
+        delete next[key];
+      }
+    }
+
+    return next;
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/repository-connection.port.ts
+==============================================================================================================
+import type { WorkspaceApplicationType, WorkspaceBlueprintRepository } from '@command-center/shared-types';
+
+export const REPOSITORY_CONNECTION_PORT = Symbol('REPOSITORY_CONNECTION_PORT');
+
+export interface VerifiedRepositorySelection {
+  repositoryId: string;
+  applicationType: WorkspaceApplicationType;
+  fullName: string;
+}
+
+export interface RepositoryConnectionPort {
+  listAvailable(userId: string): Promise<VerifiedRepositorySelection[]>;
+  verifySelection(userId: string, repositories: WorkspaceBlueprintRepository[]): Promise<VerifiedRepositorySelection[]>;
+  enqueueLinks(input: { userId: string; workspaceId: string; repositories: VerifiedRepositorySelection[] }): Promise<void>;
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/rules/application-technology.rules.ts
+==============================================================================================================
+import type { WorkspaceBlueprintApplication, WorkspacePlatform, WorkspaceTechnology } from '@command-center/shared-types';
+import type { WorkspaceRule } from './rule-engine';
+
+function preferred(values: WorkspaceTechnology[] | undefined, fallback: WorkspaceTechnology[]) {
+  return values?.length ? [...values] : fallback;
+}
+
+function upsert(applications: WorkspaceBlueprintApplication[], application: WorkspaceBlueprintApplication) {
+  const index = applications.findIndex(({ type }) => type === application.type);
+
+  if (index === -1) {
+    applications.push(application);
+  } else {
+    applications[index] = application;
+  }
+}
+
+export const applicationTechnologyRules: readonly WorkspaceRule[] = [
+  {
+    id: 'web-application-stack',
+    version: '2.0.0',
+    priority: 110,
+    when: ({ answers }) => answers.applicationTypes?.includes('WEB') === true,
+    apply: (draft, { answers }) => {
+      const preference = answers.technologyPreference?.WEB;
+      upsert(draft.applications, {
+        type: 'WEB',
+        name: `${draft.workspace.name} Web`,
+        platforms: ['WEB'],
+        stack: preferred(preference, ['NEXT_JS', 'TYPESCRIPT']),
+        source: preference?.length ? 'USER' : 'RULE',
+      });
+    },
+    explanation: 'Creates the supported web stack while preserving valid user preferences.',
+  },
+  {
+    id: 'mobile-application-stack',
+    version: '2.0.0',
+    priority: 210,
+    when: ({ answers }) => answers.applicationTypes?.includes('MOBILE') === true,
+    apply: (draft, { answers }) => {
+      const platforms: WorkspacePlatform[] = answers.mobilePlatforms?.length ? [...answers.mobilePlatforms] : ['ANDROID', 'IOS'];
+      const preference = answers.technologyPreference?.MOBILE;
+      const defaults: WorkspaceTechnology[] = [...(platforms.includes('ANDROID') ? (['KOTLIN', 'JETPACK_COMPOSE'] as const) : []), ...(platforms.includes('IOS') ? (['SWIFT', 'SWIFTUI'] as const) : [])];
+
+      upsert(draft.applications, {
+        type: 'MOBILE',
+        name: `${draft.workspace.name} Mobile`,
+        platforms: [...platforms],
+        stack: preferred(preference, defaults),
+        source: preference?.length ? 'USER' : 'RULE',
+      });
+    },
+    explanation: 'Builds a native or explicitly selected mobile stack for the requested platforms.',
+  },
+  {
+    id: 'desktop-application-stack',
+    version: '2.0.0',
+    priority: 310,
+    when: ({ answers }) => answers.applicationTypes?.includes('DESKTOP') === true,
+    apply: (draft, { answers }) => {
+      const preference = answers.technologyPreference?.DESKTOP;
+      upsert(draft.applications, {
+        type: 'DESKTOP',
+        name: `${draft.workspace.name} Desktop`,
+        platforms: answers.desktopPlatforms?.length ? [...answers.desktopPlatforms] : ['WINDOWS'],
+        stack: preferred(preference, ['TAURI', 'TYPESCRIPT']),
+        source: preference?.length ? 'USER' : 'RULE',
+      });
+    },
+    explanation: 'Creates a supported desktop stack while preserving valid user preferences.',
+  },
+];
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/rules/engineering-system.rules.ts
+==============================================================================================================
+import type { EngineeringSystem, WorkspaceBlueprintEngineeringConfiguration } from '@command-center/shared-types';
+import type { WorkspaceRule } from './rule-engine';
+
+const explanations: Record<EngineeringSystem, string> = {
+  CI_CD: 'Proposes build and deployment automation for selected environments.',
+  MONITORING: 'Proposes runtime health monitoring without activating an external provider.',
+  ANALYTICS: 'Proposes product analytics without inventing a tracking credential.',
+  PERFORMANCE: 'Proposes performance collection for selected application types.',
+  ALERTS: 'Proposes alert rules that remain inactive until delivery channels are configured.',
+  SECURITY: 'Proposes dependency, signing, and configuration security checks.',
+  BACKUPS: 'Proposes database backup policy for production environments.',
+};
+
+function proposed(system: EngineeringSystem): WorkspaceBlueprintEngineeringConfiguration {
+  return {
+    system,
+    state: 'PROPOSED',
+    enabledByDefault: false,
+    explanation: explanations[system],
+  };
+}
+
+export const engineeringSystemRules: readonly WorkspaceRule[] = [
+  {
+    id: 'requested-engineering-systems',
+    version: '1.0.0',
+    priority: 700,
+    when: ({ answers }) => (answers.qualityRequirements?.length ?? 0) > 0,
+    apply: (draft, { answers }) => {
+      draft.engineeringConfigurations = answers.qualityRequirements!.map(proposed);
+    },
+    explanation: 'Requested engineering systems are stored as proposals until configured and verified.',
+  },
+  {
+    id: 'production-security-baseline',
+    version: '1.0.0',
+    priority: 710,
+    when: ({ answers }) => answers.environments?.includes('PRODUCTION') === true,
+    apply: (draft) => {
+      for (const system of ['CI_CD', 'MONITORING', 'SECURITY', 'BACKUPS'] as const) {
+        if (!draft.engineeringConfigurations.some((item) => item.system === system)) {
+          draft.engineeringConfigurations.push(proposed(system));
+        }
+      }
+    },
+    explanation: 'Production environments require CI/CD, monitoring, security, and backup proposals.',
+  },
+];
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/rules/foundation.rules.ts
+==============================================================================================================
+import type { WorkspaceRule } from './rule-engine';
+
+export const foundationRules: readonly WorkspaceRule[] = [
+  {
+    id: 'web-next-typescript',
+    version: '1.0.0',
+    priority: 100,
+    when: ({ answers }) => answers.applicationTypes?.includes('WEB') === true,
+    apply: (draft) => {
+      draft.applications.push({
+        type: 'WEB',
+        name: `${draft.workspace.name} Web`,
+        platforms: ['WEB'],
+        stack: ['NEXT_JS', 'TYPESCRIPT'],
+      });
+    },
+    explanation: 'Web products use the supported Next.js and TypeScript baseline.',
+  },
+  {
+    id: 'mobile-native-defaults',
+    version: '1.0.0',
+    priority: 200,
+    when: ({ answers }) => answers.applicationTypes?.includes('MOBILE') === true,
+    apply: (draft, { answers }) => {
+      const platforms = answers.mobilePlatforms?.length ? answers.mobilePlatforms : (['ANDROID', 'IOS'] as const);
+      const stack = [...(platforms.includes('ANDROID') ? (['KOTLIN', 'JETPACK_COMPOSE'] as const) : []), ...(platforms.includes('IOS') ? (['SWIFT', 'SWIFTUI'] as const) : [])];
+
+      draft.applications.push({
+        type: 'MOBILE',
+        name: `${draft.workspace.name} Mobile`,
+        platforms: [...platforms],
+        stack,
+      });
+    },
+    explanation: 'Native mobile defaults follow the selected Android and iOS platforms.',
+  },
+  {
+    id: 'desktop-tauri-default',
+    version: '1.0.0',
+    priority: 300,
+    when: ({ answers }) => answers.applicationTypes?.includes('DESKTOP') === true,
+    apply: (draft, { answers }) => {
+      draft.applications.push({
+        type: 'DESKTOP',
+        name: `${draft.workspace.name} Desktop`,
+        platforms: answers.desktopPlatforms?.length ? answers.desktopPlatforms : ['WINDOWS'],
+        stack: ['TAURI', 'TYPESCRIPT'],
+      });
+    },
+    explanation: 'Tauri provides the supported lightweight desktop baseline.',
+  },
+  {
+    id: 'core-services',
+    version: '1.0.0',
+    priority: 400,
+    when: () => true,
+    apply: (draft) => {
+      draft.services.backend = ['NEST_JS'];
+      draft.services.database = ['POSTGRESQL'];
+    },
+    explanation: 'The platform baseline uses NestJS and PostgreSQL.',
+  },
+  {
+    id: 'authentication-service',
+    version: '1.0.0',
+    priority: 500,
+    when: ({ answers }) => answers.authentication === true,
+    apply: (draft) => {
+      draft.services.authentication = ['EMAIL_PASSWORD'];
+    },
+    explanation: 'User accounts require an initial email and password authentication method.',
+  },
+  {
+    id: 'realtime-cache',
+    version: '1.0.0',
+    priority: 600,
+    when: ({ answers }) => answers.collaboration === true,
+    apply: (draft) => {
+      draft.services.cache = ['REDIS'];
+    },
+    explanation: 'Real-time collaboration uses Redis coordination.',
+  },
+];
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/rules/rule-engine.ts
+==============================================================================================================
+import type { WorkspaceBlueprint, WorkspaceBlueprintRecommendation, WorkspaceOnboardingAnswers } from '@command-center/shared-types';
+import { Injectable } from '@nestjs/common';
+
+export interface RuleContext {
+  answers: WorkspaceOnboardingAnswers;
+}
+
+export type WorkspaceBlueprintDraft = WorkspaceBlueprint;
+
+export interface WorkspaceRule {
+  id: string;
+  version: string;
+  priority: number;
+  when(context: RuleContext): boolean;
+  apply(draft: WorkspaceBlueprintDraft, context: RuleContext): void;
+  explanation: string;
+}
+
+@Injectable()
+export class WorkspaceRuleEngine {
+  apply(initial: WorkspaceBlueprintDraft, context: RuleContext, rules: readonly WorkspaceRule[]): WorkspaceBlueprintDraft {
+    const seenPriorities = new Map<number, string>();
+    const ordered = [...rules].sort((left, right) => left.priority - right.priority || left.id.localeCompare(right.id));
+
+    for (const rule of ordered) {
+      const previousRule = seenPriorities.get(rule.priority);
+
+      if (previousRule && previousRule !== rule.id) {
+        throw new Error(`Rule priority conflict: ${previousRule} and ${rule.id} both use ${rule.priority}`);
+      }
+
+      seenPriorities.set(rule.priority, rule.id);
+
+      if (!rule.when(context)) {
+        continue;
+      }
+
+      rule.apply(initial, context);
+
+      const recommendation: WorkspaceBlueprintRecommendation = {
+        id: `${rule.id}:${initial.recommendations.length + 1}`,
+        ruleId: rule.id,
+        title: rule.id.replaceAll('-', ' '),
+        explanation: rule.explanation,
+      };
+
+      initial.recommendations.push(recommendation);
+    }
+
+    return initial;
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/security/guided-workspace-builder-enabled.guard.ts
+==============================================================================================================
+import type { CanActivate } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { WorkspaceOnboardingFeatureService } from '../workspace-onboarding-feature.service';
+
+@Injectable()
+export class GuidedWorkspaceBuilderEnabledGuard implements CanActivate {
+  constructor(private readonly feature: WorkspaceOnboardingFeatureService) {}
+
+  canActivate(): true {
+    if (!this.feature.isEnabled()) {
+      throw new NotFoundException('Resource not found');
+    }
+    return true;
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/security/workspace-onboarding-payload.service.ts
+==============================================================================================================
+import { PayloadTooLargeException, BadRequestException, Injectable } from '@nestjs/common';
+
+const forbiddenKeyPattern = /^(?:access[_-]?token|refresh[_-]?token|client[_-]?secret|webhook[_-]?secret|private[_-]?key|password)$/i;
+
+@Injectable()
+export class WorkspaceOnboardingPayloadService {
+  byteLength(value: unknown): number {
+    return Buffer.byteLength(JSON.stringify(value), 'utf8');
+  }
+
+  assertWithinLimit(value: unknown, maximumBytes: number, label: string): void {
+    const bytes = this.byteLength(value);
+
+    if (bytes > maximumBytes) {
+      throw new PayloadTooLargeException(`${label} exceeds the ${maximumBytes}-byte limit`);
+    }
+  }
+
+  assertNoForbiddenKeys(value: unknown): void {
+    const stack: unknown[] = [value];
+
+    while (stack.length > 0) {
+      const current = stack.pop();
+
+      if (!current || typeof current !== 'object') continue;
+
+      if (Array.isArray(current)) {
+        stack.push(...current);
+        continue;
+      }
+
+      for (const [key, child] of Object.entries(current as Record<string, unknown>)) {
+        if (forbiddenKeyPattern.test(key)) {
+          throw new BadRequestException(`Sensitive field "${key}" is not allowed in onboarding data`);
+        }
+
+        stack.push(child);
+      }
+    }
+  }
+
+  validateAnswers(value: unknown, maximumBytes: number): void {
+    this.assertWithinLimit(value, maximumBytes, 'Answers');
+    this.assertNoForbiddenKeys(value);
+  }
+
+  validateBlueprint(value: unknown, maximumBytes: number): void {
+    this.assertWithinLimit(value, maximumBytes, 'Blueprint');
+    this.assertNoForbiddenKeys(value);
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/technology-compatibility.service.ts
+==============================================================================================================
+import type { WorkspaceApplicationType, WorkspacePlatform, WorkspaceTechnology } from '@command-center/shared-types';
+import { BadRequestException, Injectable } from '@nestjs/common';
+
+const technologyPlatforms: Record<WorkspaceTechnology, WorkspacePlatform[]> = {
+  NEXT_JS: ['WEB'],
+  TYPESCRIPT: ['WEB', 'WINDOWS', 'MACOS', 'LINUX'],
+  KOTLIN: ['ANDROID'],
+  JETPACK_COMPOSE: ['ANDROID'],
+  SWIFT: ['IOS'],
+  SWIFTUI: ['IOS'],
+  REACT_NATIVE: ['ANDROID', 'IOS'],
+  FLUTTER: ['ANDROID', 'IOS'],
+  TAURI: ['WINDOWS', 'MACOS', 'LINUX'],
+  ELECTRON: ['WINDOWS', 'MACOS', 'LINUX'],
+  NEST_JS: [],
+  POSTGRESQL: [],
+  REDIS: [],
+};
+
+const applicationPlatforms: Record<WorkspaceApplicationType, WorkspacePlatform[]> = {
+  WEB: ['WEB'],
+  MOBILE: ['ANDROID', 'IOS'],
+  DESKTOP: ['WINDOWS', 'MACOS', 'LINUX'],
+};
+
+@Injectable()
+export class TechnologyCompatibilityService {
+  assertApplication(type: WorkspaceApplicationType, platforms: WorkspacePlatform[], stack: WorkspaceTechnology[]): void {
+    const allowedPlatforms = applicationPlatforms[type];
+
+    for (const platform of platforms) {
+      if (!allowedPlatforms.includes(platform)) {
+        throw new BadRequestException(`${platform} is not compatible with ${type}`);
+      }
+    }
+
+    for (const technology of stack) {
+      const supportedPlatforms = technologyPlatforms[technology];
+
+      if (supportedPlatforms.length > 0 && !platforms.some((platform) => supportedPlatforms.includes(platform))) {
+        throw new BadRequestException(`${technology} is not compatible with the selected platforms`);
+      }
+    }
+
+    this.assertRequiredPairs(stack);
+  }
+
+  private assertRequiredPairs(stack: WorkspaceTechnology[]): void {
+    const requirements: Partial<Record<WorkspaceTechnology, WorkspaceTechnology>> = {
+      JETPACK_COMPOSE: 'KOTLIN',
+      SWIFTUI: 'SWIFT',
+    };
+
+    for (const technology of stack) {
+      const required = requirements[technology];
+
+      if (required && !stack.includes(required)) {
+        throw new BadRequestException(`${technology} requires ${required}`);
+      }
+    }
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/workspace-ai-circuit-breaker.service.ts
+==============================================================================================================
+import { Injectable, ServiceUnavailableException } from '@nestjs/common';
+
+@Injectable()
+export class WorkspaceAiCircuitBreakerService {
+  private failures = 0;
+  private openedAt: number | null = null;
+
+  constructor(private readonly config: TypedConfigService) {}
+
+  assertAvailable(now = Date.now()): void {
+    if (this.openedAt === null) return;
+
+    if (now - this.openedAt >= this.config.workspaceOnboarding.aiCircuitResetMs) {
+      this.failures = 0;
+      this.openedAt = null;
+      return;
+    }
+
+    throw new ServiceUnavailableException('Workspace AI provider circuit is open');
+  }
+
+  success(): void {
+    this.failures = 0;
+    this.openedAt = null;
+  }
+
+  failure(now = Date.now()): void {
+    this.failures += 1;
+
+    if (this.failures >= this.config.workspaceOnboarding.aiCircuitFailureThreshold) {
+      this.openedAt = now;
+    }
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts
+==============================================================================================================
+import type { UpdateWorkspaceBlueprintInput, WorkspaceBlueprint, WorkspaceBlueprintValidationIssue, WorkspaceBlueprintValidationResult } from '@command-center/shared-types';
+import { workspaceBlueprintSchema } from '@command-center/validation';
+import { ConflictException, Injectable, UnprocessableEntityException } from '@nestjs/common';
+import { TechnologyCompatibilityService } from './rules/technology-compatibility.service';
+import { hashWorkspaceBlueprint } from './workspace-blueprint-hash';
+import { WorkspaceOnboardingRepository } from './workspace-onboarding.repository';
+import { WorkspaceOnboardingService } from './workspace-onboarding.service';
+
+@Injectable()
+export class WorkspaceBlueprintService {
+  constructor(
+    private readonly sessions: WorkspaceOnboardingService,
+    private readonly repository: WorkspaceOnboardingRepository,
+    private readonly compatibility: TechnologyCompatibilityService,
+  ) {}
+
+  validateBlueprint(blueprint: unknown, revision: number): WorkspaceBlueprintValidationResult {
+    const parsed = workspaceBlueprintSchema.safeParse(blueprint);
+    const issues: WorkspaceBlueprintValidationIssue[] = [];
+
+    if (!parsed.success) {
+      for (const issue of parsed.error.issues) {
+        issues.push({
+          path: issue.path.join('.'),
+          code: issue.code,
+          message: issue.message,
+        });
+      }
+
+      return { valid: false, revision, hash: '', issues };
+    }
+
+    for (const application of parsed.data.applications) {
+      try {
+        this.compatibility.assertApplication(application.type, application.platforms, application.stack);
+      } catch (error) {
+        issues.push({
+          path: `applications.${application.type}`,
+          code: 'INCOMPATIBLE_STACK',
+          message: error instanceof Error ? error.message : 'Invalid stack',
+        });
+      }
+    }
+
+    return {
+      valid: issues.length === 0,
+      revision,
+      hash: issues.length === 0 ? hashWorkspaceBlueprint(parsed.data) : '',
+      issues,
+    };
+  }
+
+  async validateOwned(id: string, userId: string) {
+    const session = await this.sessions.getOwned(id, userId);
+    return this.validateBlueprint(session.blueprint, session.blueprintRevision);
+  }
+
+  async updateOwned(id: string, userId: string, input: UpdateWorkspaceBlueprintInput) {
+    const session = await this.sessions.getOwned(id, userId);
+
+    if (session.status !== 'BLUEPRINT_READY') {
+      throw new ConflictException('Blueprint is not editable in this state');
+    }
+
+    if (session.blueprintRevision !== input.expectedRevision) {
+      throw new ConflictException('Blueprint revision is stale');
+    }
+
+    const validation = this.validateBlueprint(input.blueprint, session.blueprintRevision + 1);
+
+    if (!validation.valid) {
+      throw new UnprocessableEntityException({
+        message: 'Blueprint validation failed',
+        issues: validation.issues,
+      });
+    }
+
+    return this.repository.updateBlueprintRevision({
+      id,
+      expectedRevision: input.expectedRevision,
+      blueprint: workspaceBlueprintSchema.parse(input.blueprint),
+      blueprintHash: validation.hash,
+    });
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/workspace-blueprint-hash.ts
+==============================================================================================================
+import type { WorkspaceBlueprint } from '@command-center/shared-types';
+import { createHash } from 'node:crypto';
+
+function stable(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map(stable);
+  }
+
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, child]) => [key, stable(child)]),
+    );
+  }
+
+  return value;
+}
+
+export function hashWorkspaceBlueprint(blueprint: WorkspaceBlueprint): string {
+  return createHash('sha256')
+    .update(JSON.stringify(stable(blueprint)))
+    .digest('hex');
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/workspace-creation.port.ts
+==============================================================================================================
+import type { WorkspaceBlueprint } from '@command-center/shared-types';
+import type { Prisma } from '@prisma/client';
+
+export const WORKSPACE_CREATION_PORT = Symbol('WORKSPACE_CREATION_PORT');
+
+export interface WorkspaceCreationPort {
+  createFromBlueprint(input: { transaction: Prisma.TransactionClient; ownerUserId: string; blueprint: WorkspaceBlueprint }): Promise<{ workspaceId: string }>;
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/workspace-onboarding.controller.ts
+==============================================================================================================
+import type { FastifyRequest } from 'fastify';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Req } from '@nestjs/common';
+import type { RequestWithUser } from '../auth/interfaces/request-with-user.interface';
+import { UpdateOnboardingAnswersDto } from './dto/update-onboarding-answers.dto';
+import { WorkspaceOnboardingService } from './workspace-onboarding.service';
+
+type AuthenticatedRequest = FastifyRequest & RequestWithUser;
+
+@Controller('workspace-onboarding/sessions')
+export class WorkspaceOnboardingController {
+  constructor(private readonly service: WorkspaceOnboardingService) {}
+
+  @Post()
+  create(@Req() request: AuthenticatedRequest) {
+    return this.service.create(request.user.id);
+  }
+
+  @Get(':id')
+  get(@Param('id') id: string, @Req() request: AuthenticatedRequest) {
+    return this.service.get(id, request.user.id);
+  }
+
+  @Patch(':id/answers')
+  updateAnswers(@Param('id') id: string, @Body() input: unknown, @Req() request: AuthenticatedRequest) {
+    const body = UpdateOnboardingAnswersDto.parse(input);
+    return this.service.updateAnswers(id, request.user.id, body.answers);
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  async remove(@Param('id') id: string, @Req() request: AuthenticatedRequest) {
+    await this.service.delete(id, request.user.id);
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/workspace-onboarding.repository.ts
+==============================================================================================================
+import type { Prisma, WorkspaceOnboardingStatus } from '@prisma/client';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../database/prisma.service';
+
+@Injectable()
+export class WorkspaceOnboardingRepository {
+  constructor(private readonly prisma: PrismaService) {}
+
+  create(userId: string, expiresAt: Date) {
+    return this.prisma.workspaceOnboardingSession.create({
+      data: {
+        userId,
+        expiresAt,
+        answers: {},
+      },
+    });
+  }
+
+  findOwned(id: string, userId: string) {
+    return this.prisma.workspaceOnboardingSession.findFirst({
+      where: { id, userId },
+    });
+  }
+
+  updateAnswers(id: string, answers: Prisma.InputJsonValue, currentStep: string | null) {
+    return this.prisma.workspaceOnboardingSession.update({
+      where: { id },
+      data: {
+        answers,
+        currentStep,
+        blueprint: Prisma.JsonNull,
+        ruleSetVersion: null,
+        status: 'IN_PROGRESS',
+      },
+    });
+  }
+
+  updateStatus(id: string, status: WorkspaceOnboardingStatus) {
+    return this.prisma.workspaceOnboardingSession.update({
+      where: { id },
+      data: { status },
+    });
+  }
+
+  saveBlueprint(id: string, blueprint: Prisma.InputJsonValue, ruleSetVersion: string) {
+    return this.prisma.workspaceOnboardingSession.update({
+      where: { id },
+      data: {
+        blueprint,
+        ruleSetVersion,
+        status: 'BLUEPRINT_READY',
+      },
+    });
+  }
+
+  deleteOwned(id: string, userId: string) {
+    return this.prisma.workspaceOnboardingSession.deleteMany({
+      where: { id, userId },
+    });
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/workspace-onboarding.service.ts
+==============================================================================================================
+import type { WorkspaceOnboardingAnswers, WorkspaceOnboardingSessionResponse } from '@command-center/shared-types';
+import { workspaceOnboardingAnswersSchema } from '@command-center/validation';
+import { GoneException, Injectable, NotFoundException } from '@nestjs/common';
+import { WorkspaceOnboardingRepository } from './workspace-onboarding.repository';
+
+const SESSION_TTL_HOURS = 168;
+
+@Injectable()
+export class WorkspaceOnboardingService {
+  constructor(private readonly repository: WorkspaceOnboardingRepository) {}
+
+  async create(userId: string): Promise<WorkspaceOnboardingSessionResponse> {
+    const expiresAt = new Date(Date.now() + SESSION_TTL_HOURS * 60 * 60 * 1000);
+
+    return this.toResponse(await this.repository.create(userId, expiresAt));
+  }
+
+  async getOwned(id: string, userId: string) {
+    const session = await this.repository.findOwned(id, userId);
+
+    if (!session) {
+      throw new NotFoundException('Onboarding session not found');
+    }
+
+    if (session.expiresAt.getTime() <= Date.now()) {
+      if (session.status !== 'EXPIRED') {
+        await this.repository.updateStatus(id, 'EXPIRED');
+      }
+
+      throw new GoneException('Onboarding session has expired');
+    }
+
+    return session;
+  }
+
+  async get(id: string, userId: string) {
+    return this.toResponse(await this.getOwned(id, userId));
+  }
+
+  async updateAnswers(id: string, userId: string, patch: Partial<WorkspaceOnboardingAnswers>) {
+    const session = await this.getOwned(id, userId);
+    const previous = workspaceOnboardingAnswersSchema.parse(session.answers);
+    const answers = workspaceOnboardingAnswersSchema.parse({
+      ...previous,
+      ...patch,
+    });
+
+    const updated = await this.repository.updateAnswers(id, answers, Object.keys(patch).at(-1) ?? session.currentStep);
+
+    return this.toResponse(updated);
+  }
+
+  async delete(id: string, userId: string) {
+    await this.getOwned(id, userId);
+    await this.repository.deleteOwned(id, userId);
+  }
+  async generateBlueprint(id: string, userId: string) {
+    const session = await this.getOwned(id, userId);
+    const answers = workspaceOnboardingAnswersSchema.parse(session.answers);
+    const blueprint = await this.generator.generate(answers);
+    const updated = await this.repository.saveBlueprint(id, blueprint, blueprint.generator.version);
+
+    return this.toResponse(updated);
+  }
+  toResponse(session: {
+    id: string;
+    status: string;
+    currentStep: string | null;
+    answers: unknown;
+    blueprint: unknown;
+    schemaVersion: number;
+    ruleSetVersion: string | null;
+    generatorProvider: string;
+    workspaceId: string | null;
+    expiresAt: Date;
+    createdAt: Date;
+    updatedAt: Date;
+  }): WorkspaceOnboardingSessionResponse {
+    return {
+      id: session.id,
+      status: session.status as WorkspaceOnboardingSessionResponse['status'],
+      currentStep: session.currentStep,
+      answers: workspaceOnboardingAnswersSchema.parse(session.answers),
+      blueprint: session.blueprint as WorkspaceOnboardingSessionResponse['blueprint'],
+      schemaVersion: session.schemaVersion,
+      ruleSetVersion: session.ruleSetVersion,
+      generatorProvider: 'rules',
+      workspaceId: session.workspaceId,
+      expiresAt: session.expiresAt.toISOString(),
+      createdAt: session.createdAt.toISOString(),
+      updatedAt: session.updatedAt.toISOString(),
+    };
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/workspace-onboarding-cleanup.service.ts
+==============================================================================================================
+import { Injectable, Logger } from '@nestjs/common';
+import { PrismaService } from '../../database/prisma.service';
+import { PostgresAdvisoryLockService } from '../../infrastructure/database/postgres-advisory-lock.service';
+
+const CLEANUP_LOCK_KEY = 'workspace-onboarding-retention-cleanup';
+
+@Injectable()
+export class WorkspaceOnboardingCleanupService {
+  private readonly logger = new Logger(WorkspaceOnboardingCleanupService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly locks: PostgresAdvisoryLockService,
+    private readonly runtimeConfig: TypedConfigService,
+  ) {}
+
+  async run(): Promise<{ expired: number; deleted: number; skipped: boolean }> {
+    const lock = await this.locks.tryWithLock(CLEANUP_LOCK_KEY, async () => {
+      const config = this.runtimeConfig.workspaceOnboarding;
+      const now = new Date();
+      const retentionCutoff = new Date(now.getTime() - config.retentionDays * 24 * 60 * 60 * 1000);
+
+      const expired = await this.prisma.workspaceOnboardingSession.updateMany({
+        where: {
+          status: { in: ['IN_PROGRESS', 'BLUEPRINT_READY', 'FAILED'] },
+          expiresAt: { lte: now },
+        },
+        data: { status: 'EXPIRED' },
+      });
+
+      const candidates = await this.prisma.workspaceOnboardingSession.findMany({
+        where: {
+          status: 'EXPIRED',
+          updatedAt: { lte: retentionCutoff },
+        },
+        orderBy: { updatedAt: 'asc' },
+        select: { id: true },
+        take: config.cleanupBatchSize,
+      });
+
+      const removed = candidates.length
+        ? await this.prisma.workspaceOnboardingSession.deleteMany({
+            where: { id: { in: candidates.map(({ id }) => id) } },
+          })
+        : { count: 0 };
+
+      return {
+        expired: expired.count,
+        deleted: removed.count,
+        skipped: false,
+      };
+    });
+
+    if (!lock.acquired) {
+      this.logger.debug('Workspace onboarding cleanup skipped; lock not acquired');
+      return { expired: 0, deleted: 0, skipped: true };
+    }
+
+    return lock.value ?? { expired: 0, deleted: 0, skipped: false };
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts
+==============================================================================================================
+import type { ConfirmWorkspaceBlueprintInput, WorkspaceCreationResult } from '@command-center/shared-types';
+import { workspaceBlueprintSchema } from '@command-center/validation';
+import { Prisma } from '@prisma/client';
+import { ConflictException, Inject, Injectable, UnprocessableEntityException } from '@nestjs/common';
+import { PrismaService } from '../../database/prisma.service';
+import { WORKSPACE_CREATION_PORT, type WorkspaceCreationPort } from './ports/workspace-creation.port';
+import { WorkspaceBlueprintService } from './workspace-blueprint.service';
+import { WorkspaceOnboardingService } from './workspace-onboarding.service';
+
+@Injectable()
+export class WorkspaceOnboardingCreationService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly sessions: WorkspaceOnboardingService,
+    private readonly blueprints: WorkspaceBlueprintService,
+    @Inject(WORKSPACE_CREATION_PORT)
+    private readonly creationPort: WorkspaceCreationPort,
+  ) {}
+
+  async confirm(sessionId: string, userId: string, input: ConfirmWorkspaceBlueprintInput): Promise<WorkspaceCreationResult> {
+    const owned = await this.sessions.getOwned(sessionId, userId);
+
+    if (owned.status === 'COMPLETED' && owned.idempotencyKey === input.idempotencyKey && owned.workspaceId) {
+      return {
+        sessionId,
+        workspaceId: owned.workspaceId,
+        status: 'COMPLETED',
+        createdAt: (owned.completedAt ?? owned.updatedAt).toISOString(),
+      };
+    }
+
+    if (owned.status !== 'BLUEPRINT_READY') {
+      throw new ConflictException('Session is not ready for confirmation');
+    }
+
+    if (owned.blueprintRevision !== input.expectedRevision || owned.blueprintHash !== input.blueprintHash) {
+      throw new ConflictException('Blueprint changed before confirmation');
+    }
+
+    const validation = this.blueprints.validateBlueprint(owned.blueprint, owned.blueprintRevision);
+
+    if (!validation.valid || validation.hash !== input.blueprintHash) {
+      throw new UnprocessableEntityException({
+        message: 'Blueprint is invalid',
+        issues: validation.issues,
+      });
+    }
+
+    const blueprint = workspaceBlueprintSchema.parse(owned.blueprint);
+
+    return this.prisma.$transaction(
+      async (transaction) => {
+        const locked = await transaction.$queryRaw<
+          Array<{
+            id: string;
+            status: string;
+            workspace_id: string | null;
+            idempotency_key: string | null;
+          }>
+        >(Prisma.sql`
+          SELECT id, status, workspace_id, idempotency_key
+          FROM workspace_onboarding_sessions
+          WHERE id = ${sessionId} AND user_id = ${userId}
+          FOR UPDATE
+        `);
+
+        const session = locked[0];
+
+        if (!session) {
+          throw new ConflictException('Session is unavailable');
+        }
+
+        if (session.status === 'COMPLETED' && session.idempotency_key === input.idempotencyKey && session.workspace_id) {
+          return {
+            sessionId,
+            workspaceId: session.workspace_id,
+            status: 'COMPLETED' as const,
+            createdAt: new Date().toISOString(),
+          };
+        }
+
+        if (session.status !== 'BLUEPRINT_READY') {
+          throw new ConflictException('Confirmation is already in progress');
+        }
+
+        await transaction.workspaceOnboardingSession.update({
+          where: { id: sessionId },
+          data: {
+            status: 'CREATING',
+            idempotencyKey: input.idempotencyKey,
+          },
+        });
+
+        const created = await this.creationPort.createFromBlueprint({
+          transaction,
+          ownerUserId: userId,
+          blueprint,
+        });
+        const completedAt = new Date();
+
+        await transaction.workspaceOnboardingSession.update({
+          where: { id: sessionId },
+          data: {
+            status: 'COMPLETED',
+            workspaceId: created.workspaceId,
+            completedAt,
+          },
+        });
+
+        return {
+          sessionId,
+          workspaceId: created.workspaceId,
+          status: 'COMPLETED' as const,
+          createdAt: completedAt.toISOString(),
+        };
+      },
+      {
+        isolationLevel: 'Serializable',
+        maxWait: 10_000,
+        timeout: 30_000,
+      },
+    );
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/workspace-onboarding-errors.ts
+==============================================================================================================
+export type GuidedBuilderErrorKind = 'EXPIRED' | 'RATE_LIMITED' | 'FORBIDDEN' | 'STALE' | 'VALIDATION' | 'UNAVAILABLE' | 'UNKNOWN';
+
+export interface GuidedBuilderError {
+  kind: GuidedBuilderErrorKind;
+  message: string;
+  retryable: boolean;
+}
+
+export function normalizeGuidedBuilderError(error: unknown): GuidedBuilderError {
+  const status = typeof error === 'object' && error && 'status' in error ? Number((error as { status: unknown }).status) : 0;
+
+  if (status === 410) {
+    return { kind: 'EXPIRED', message: 'This guided session expired.', retryable: false };
+  }
+  if (status === 429) {
+    return { kind: 'RATE_LIMITED', message: 'Too many requests. Try again shortly.', retryable: true };
+  }
+  if (status === 401 || status === 403 || status === 404) {
+    return { kind: 'FORBIDDEN', message: 'This guided session is unavailable.', retryable: false };
+  }
+  if (status === 409) {
+    return { kind: 'STALE', message: 'The blueprint changed. Reload before continuing.', retryable: true };
+  }
+  if (status === 422 || status === 400) {
+    return { kind: 'VALIDATION', message: 'Some guided configuration is invalid.', retryable: false };
+  }
+  if (status >= 500) {
+    return { kind: 'UNAVAILABLE', message: 'The guided builder is temporarily unavailable.', retryable: true };
+  }
+
+  return { kind: 'UNKNOWN', message: 'Something went wrong.', retryable: true };
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/workspace-onboarding-feature.service.ts
+==============================================================================================================
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class WorkspaceOnboardingFeatureService {
+  constructor(private readonly config: TypedConfigService) {}
+
+  isEnabled(): boolean {
+    return this.config.workspaceOnboarding.enabled;
+  }
+
+  publicState() {
+    return {
+      guidedWorkspaceBuilderEnabled: this.isEnabled(),
+    };
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/workspace-onboarding-public.controller.ts
+==============================================================================================================
+import { Controller, Get } from '@nestjs/common';
+import { Public } from '../auth/decorators/public.decorator';
+import { WorkspaceOnboardingFeatureService } from './workspace-onboarding-feature.service';
+
+@Controller('features')
+export class WorkspaceOnboardingPublicController {
+  constructor(private readonly feature: WorkspaceOnboardingFeatureService) {}
+
+  @Public()
+  @Get('guided-workspace-builder')
+  state() {
+    return this.feature.publicState();
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/workspace-onboarding-telemetry.service.ts
+==============================================================================================================
+import type { GuidedBuilderEvent, GuidedBuilderEventMetadata, WorkspaceOnboardingObservabilityPort } from './workspace-onboarding-observability.port';
+import { Inject, Injectable } from '@nestjs/common';
+import { WORKSPACE_ONBOARDING_OBSERVABILITY } from './workspace-onboarding-observability.port';
+
+const allowedMetadataKeys = new Set<keyof GuidedBuilderEventMetadata>([
+  'sessionId',
+  'userId',
+  'requestId',
+  'ruleSetVersion',
+  'generatorProvider',
+  'applicationTypeCount',
+  'validationIssueCode',
+  'durationMs',
+  'idempotentRetry',
+]);
+
+@Injectable()
+export class WorkspaceOnboardingTelemetryService {
+  constructor(
+    @Inject(WORKSPACE_ONBOARDING_OBSERVABILITY)
+    private readonly observability: WorkspaceOnboardingObservabilityPort,
+  ) {}
+
+  async event(name: GuidedBuilderEvent, metadata: GuidedBuilderEventMetadata) {
+    const sanitized = Object.fromEntries(Object.entries(metadata).filter(([key]) => allowedMetadataKeys.has(key as keyof GuidedBuilderEventMetadata))) as unknown as GuidedBuilderEventMetadata;
+
+    await this.observability.event(name, sanitized);
+  }
+
+  generation(durationMs: number, provider: 'rules' | 'ai', succeeded: boolean) {
+    const labels = { provider, result: succeeded ? 'success' : 'failure' };
+    this.observability.observe('guided_builder_generation_duration_ms', durationMs, labels);
+    this.observability.increment('guided_builder_generation_total', labels);
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/web/package.json
+==============================================================================================================
+{
+  "name": "@command-center/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "next typegen && tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "verify": "pnpm typecheck && pnpm build"
+  },
+  "dependencies": {
+    "@command-center/shared-types": "workspace:*",
+    "@command-center/ui": "workspace:*",
+    "@monaco-editor/react": "4.8.0-rc.3",
+    "lucide-react": "^1.28.0",
+    "monaco-editor": "^0.56.0",
+    "next": "16.3.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@command-center/eslint-config": "workspace:*",
+    "@eslint/js": "^9.34.0",
+    "@playwright/test": "^1.62.1",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@testing-library/jest-dom": "^6",
+    "@testing-library/react": "^16",
+    "@testing-library/user-event": "^14",
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^24.3.0",
+    "@types/pg": "^8.20.3",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.0.5",
+    "@vitest/coverage-v8": "^4.1.10",
+    "eslint": "^9.34.0",
+    "eslint-config-next": "16.3.1",
+    "jsdom": "^30.0.1",
+    "pg": "^8.22.0",
+    "postcss": "^8.5.26",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.67.0",
+    "vitest": "^4.1.10"
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/web/src/app/(dashboard)/workspaces/new/loading.tsx
+==============================================================================================================
+export default function Loading() {
+  return (
+    <div className='flex min-h-75 items-center justify-center'>
+      <p className='text-sm text-muted-foreground'>Loading workspace...</p>
+    </div>
+  );
+}
+
+
+==============================================================================================================
+FILE: apps/web/src/app/(dashboard)/workspaces/new/new-workspace-client.tsx
+==============================================================================================================
+'use client';
+
+import { GuidedWorkspaceBuilder } from '@/features/workspace-onboarding/components/guided-workspace-builder';
+import { ManualWorkspaceForm } from '@/features/workspaces/components/manual-workspace-form';
+import { WorkspaceCreationMethod } from '@/features/workspaces/components/workspace-creation-method';
+import { GithubImportWizard } from '@/features/workspaces/github-import/github-import-wizard';
+import { useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+
+type CreationMethod = 'select' | 'manual' | 'github';
+
+export default function NewWorkspacePage() {
+  const searchParams = useSearchParams();
+  const [method, setMethod] = useState<CreationMethod>(() => (searchParams.get('method') === 'github' ? 'github' : 'select'));
+  params: Promise<{ sessionId: string }>;
+
+  if (method === 'manual') {
+    return <ManualWorkspaceForm onBack={() => setMethod('select')} />;
+  }
+  if (method === 'github') {
+    return <GuidedWorkspaceBuilder sessionId={sessionId} />;
+  }
+  if (method === 'github') {
+    return (
+      <GithubImportWizard
+        onCancel={() => setMethod('select')}
+        onImported={(workspaceId) => {
+          // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+          window.location.assign(`/workspaces/${workspaceId}/applications`);
+        }}
+      />
+    );
+  }
+
+  return <WorkspaceCreationMethod onSelectManual={() => setMethod('manual')} onSelectGithub={() => setMethod('github')} />;
+}
+
+
+==============================================================================================================
+FILE: apps/web/src/app/(dashboard)/workspaces/new/page.tsx
+==============================================================================================================
+import NewWorkspaceClient from './new-workspace-client';
+import { Suspense } from 'react';
+
+export default function NewWorkspacePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className='flex min-h-[300px] items-center justify-center'>
+          <p className='text-sm text-muted-foreground'>Loading workspace...</p>
+        </div>
+      }
+    >
+      <NewWorkspaceClient />
+    </Suspense>
+  );
+}
+
+
+==============================================================================================================
+FILE: apps/web/src/features/workspace-onboarding/api/workspace-onboarding-api.ts
+==============================================================================================================
+import type { WorkspaceOnboardingAnswers, WorkspaceOnboardingSessionResponse, WorkspaceQuestionFlowResponse } from '@command-center/shared-types';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api/v1';
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(`${API_URL}${path}`, {
+    ...init,
+    credentials: 'include',
+    headers: {
+      'content-type': 'application/json',
+      ...init?.headers,
+    },
+  });
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    throw new Error(body?.message ?? `Request failed with ${response.status}`);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  return response.json() as Promise<T>;
+}
+
+export const workspaceOnboardingApi = {
+  create: () =>
+    request<WorkspaceOnboardingSessionResponse>('/workspace-onboarding/sessions', {
+      method: 'POST',
+    }),
+  get: (id: string) => request<WorkspaceOnboardingSessionResponse>(`/workspace-onboarding/sessions/${id}`),
+  questions: (id: string) => request<WorkspaceQuestionFlowResponse>(`/workspace-onboarding/sessions/${id}/questions`),
+  updateAnswers: (id: string, answers: Partial<WorkspaceOnboardingAnswers>) =>
+    request<WorkspaceOnboardingSessionResponse>(`/workspace-onboarding/sessions/${id}/answers`, {
+      method: 'PATCH',
+      body: JSON.stringify({ answers }),
+    }),
+};
+
+
+==============================================================================================================
+FILE: apps/web/src/features/workspace-onboarding/components/blueprint-application-editor.tsx
+==============================================================================================================
+'use client';
+
+import type { WorkspaceBlueprintApplication, WorkspaceTechnology } from '@command-center/shared-types';
+
+const choices: Record<WorkspaceBlueprintApplication['type'], WorkspaceTechnology[]> = {
+  WEB: ['NEXT_JS', 'TYPESCRIPT'],
+  MOBILE: ['KOTLIN', 'JETPACK_COMPOSE', 'SWIFT', 'SWIFTUI', 'REACT_NATIVE', 'FLUTTER', 'TYPESCRIPT'],
+  DESKTOP: ['TAURI', 'ELECTRON', 'TYPESCRIPT'],
+};
+
+export function BlueprintApplicationEditor({ application, disabled, onChange }: { application: WorkspaceBlueprintApplication; disabled: boolean; onChange(application: WorkspaceBlueprintApplication): void }) {
+  const toggle = (technology: WorkspaceTechnology) => {
+    const stack = application.stack.includes(technology) ? application.stack.filter((value) => value !== technology) : [...application.stack, technology];
+
+    onChange({ ...application, stack, source: 'USER' });
+  };
+
+  return (
+    <fieldset className='rounded-2xl border border-slate-200 p-5' disabled={disabled}>
+      <legend className='px-2 text-base font-semibold'>{application.name}</legend>
+      <p className='text-sm text-slate-600'>Platforms: {application.platforms.join(', ')}</p>
+      <div className='mt-4 flex flex-wrap gap-2'>
+        {choices[application.type].map((technology) => (
+          <button
+            aria-pressed={application.stack.includes(technology)}
+            className='rounded-full border px-3 py-2 text-sm aria-pressed:bg-slate-950 aria-pressed:text-white'
+            key={technology}
+            onClick={() => toggle(technology)}
+            type='button'
+          >
+            {technology.replaceAll('_', ' ')}
+          </button>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
+
+==============================================================================================================
+FILE: apps/web/src/features/workspace-onboarding/components/blueprint-review.tsx
+==============================================================================================================
+'use client';
+
+import type { WorkspaceBlueprint, WorkspaceBlueprintValidationIssue, WorkspaceOnboardingSessionResponse } from '@command-center/shared-types';
+import { useState } from 'react';
+import { workspaceOnboardingApi } from '../api/workspace-onboarding-api';
+import { BlueprintApplicationEditor } from './blueprint-application-editor';
+import { BlueprintValidationSummary } from './blueprint-validation-summary';
+
+export function BlueprintReview({ initialSession, onReady }: { initialSession: WorkspaceOnboardingSessionResponse; onReady(session: WorkspaceOnboardingSessionResponse): void }) {
+  const [blueprint, setBlueprint] = useState<WorkspaceBlueprint>(initialSession.blueprint!);
+  const [issues, setIssues] = useState<WorkspaceBlueprintValidationIssue[]>([]);
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    setSaving(true);
+
+    try {
+      const session = await workspaceOnboardingApi.updateBlueprint(initialSession.id, {
+        expectedRevision: initialSession.blueprintRevision,
+        blueprint,
+      });
+      const validation = await workspaceOnboardingApi.validateBlueprint(initialSession.id);
+      setIssues(validation.issues);
+
+      if (validation.valid) onReady(session);
+    } catch (error) {
+      setIssues([
+        {
+          path: 'blueprint',
+          code: 'SAVE_FAILED',
+          message: error instanceof Error ? error.message : 'Save failed',
+        },
+      ]);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <main className='mx-auto grid max-w-5xl gap-6 p-4 lg:grid-cols-[1fr_18rem] lg:p-8'>
+      <section className='space-y-4'>
+        <h1 className='text-2xl font-bold'>Review guided recommendations</h1>
+        <BlueprintValidationSummary issues={issues} />
+        {blueprint.applications.map((application, index) => (
+          <BlueprintApplicationEditor
+            application={application}
+            disabled={saving}
+            key={application.type}
+            onChange={(next) => {
+              const applications = [...blueprint.applications];
+              applications[index] = next;
+              setBlueprint({ ...blueprint, applications });
+            }}
+          />
+        ))}
+      </section>
+
+      <aside className='h-fit rounded-2xl border p-5 lg:sticky lg:top-6'>
+        <p className='text-sm text-slate-600'>Revision {initialSession.blueprintRevision}</p>
+        <button className='mt-4 w-full rounded-xl bg-slate-950 px-4 py-3 text-white disabled:opacity-50' disabled={saving} onClick={save} type='button'>
+          {saving ? 'Validating…' : 'Save and continue'}
+        </button>
+      </aside>
+    </main>
+  );
+}
+
+
+==============================================================================================================
+FILE: apps/web/src/features/workspace-onboarding/components/blueprint-validation-summary.tsx
+==============================================================================================================
+import type { WorkspaceBlueprintValidationIssue } from '@command-center/shared-types';
+
+export function BlueprintValidationSummary({ issues }: { issues: WorkspaceBlueprintValidationIssue[] }) {
+  if (issues.length === 0) return null;
+
+  return (
+    <section aria-labelledby='validation-title' className='rounded-xl bg-red-50 p-4'>
+      <h2 id='validation-title' className='font-semibold text-red-900'>
+        Resolve these blueprint issues
+      </h2>
+      <ul className='mt-2 list-disc pl-5 text-sm text-red-800'>
+        {issues.map((issue) => (
+          <li key={`${issue.path}:${issue.code}`}>
+            {issue.path}: {issue.message}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+
+==============================================================================================================
+FILE: apps/web/src/features/workspace-onboarding/components/generator-badge.tsx
+==============================================================================================================
+import type { WorkspaceGeneratorProvider } from '@command-center/shared-types';
+
+export function GeneratorBadge({ provider }: { provider: WorkspaceGeneratorProvider }) {
+  const ai = provider === 'ai';
+
+  return <span className='inline-flex rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-800'>{ai ? 'AI-assisted recommendations' : 'Guided recommendations'}</span>;
+}
+
+
+==============================================================================================================
+FILE: apps/web/src/features/workspace-onboarding/components/guided-builder-entry.tsx
+==============================================================================================================
+import Link from 'next/link';
+
+export function GuidedBuilderEntry({ enabled }: { enabled: boolean }) {
+  if (!enabled) return null;
+
+  return (
+    <article className='flex h-full flex-col rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 to-white p-6'>
+      <span className='w-fit rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-800'>Guided recommendations</span>
+      <h2 className='mt-4 text-xl font-semibold'>Build from your product idea</h2>
+      <p className='mt-2 flex-1 text-sm text-slate-600'>Answer focused questions, review a deterministic blueprint, and create web, mobile, and desktop applications together.</p>
+      <Link className='mt-6 rounded-xl bg-slate-950 px-4 py-3 text-center font-medium text-white' href='/workspaces/new/guided'>
+        Start guided builder
+      </Link>
+    </article>
+  );
+}
+
+
+==============================================================================================================
+FILE: apps/web/src/features/workspace-onboarding/components/guided-builder-error.tsx
+==============================================================================================================
+import type { GuidedBuilderError } from '../workspace-onboarding-errors';
+
+export function GuidedBuilderErrorState({ error, onRetry }: { error: GuidedBuilderError; onRetry?: () => void }) {
+  return (
+    <section className='rounded-2xl border border-red-200 bg-red-50 p-5' role='alert'>
+      <h2 className='font-semibold text-red-950'>Unable to continue</h2>
+      <p className='mt-2 text-sm text-red-800'>{error.message}</p>
+      {error.retryable && onRetry && (
+        <button className='mt-4 rounded-lg bg-red-950 px-4 py-2 text-white' onClick={onRetry} type='button'>
+          Try again
+        </button>
+      )}
+    </section>
+  );
+}
+
+
+==============================================================================================================
+FILE: apps/web/src/features/workspace-onboarding/components/guided-workspace-builder.tsx
+==============================================================================================================
+'use client';
+
+import type { WorkspaceOnboardingSessionResponse, WorkspaceQuestionFlowResponse } from '@command-center/shared-types';
+import { useCallback, useEffect, useState } from 'react';
+import { workspaceOnboardingApi } from '../api/workspace-onboarding-api';
+import { OnboardingQuestionCard } from './onboarding-question-card';
+
+export function GuidedWorkspaceBuilder({ sessionId }: { sessionId: string }) {
+  const [session, setSession] = useState<WorkspaceOnboardingSessionResponse | null>(null);
+  const [flow, setFlow] = useState<WorkspaceQuestionFlowResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const load = useCallback(async () => {
+    try {
+      const [nextSession, nextFlow] = await Promise.all([workspaceOnboardingApi.get(sessionId), workspaceOnboardingApi.questions(sessionId)]);
+      setSession(nextSession);
+      setFlow(nextFlow);
+      setError(null);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to load session');
+    }
+  }, [sessionId]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  if (error) {
+    return <div role='alert'>{error}</div>;
+  }
+
+  if (!session || !flow) {
+    return <div aria-live='polite'>Loading guided builder…</div>;
+  }
+
+  if (!flow.currentQuestion) {
+    return <div data-testid='answers-complete'>Answers complete</div>;
+  }
+
+  return (
+    <main className='mx-auto w-full max-w-3xl p-4 sm:p-8'>
+      <header className='mb-6'>
+        <p className='text-sm text-slate-600'>
+          {flow.completed} of {flow.total} completed
+        </p>
+        <progress className='mt-2 w-full' max={100} value={flow.percent} />
+      </header>
+
+      <OnboardingQuestionCard
+        disabled={saving}
+        key={flow.currentQuestion.key}
+        onSubmit={async (value) => {
+          setSaving(true);
+          setError(null);
+
+          try {
+            await workspaceOnboardingApi.updateAnswers(sessionId, {
+              [flow.currentQuestion!.key]: value,
+            });
+            await load();
+          } catch (cause) {
+            setError(cause instanceof Error ? cause.message : 'Save failed');
+          } finally {
+            setSaving(false);
+          }
+        }}
+        question={flow.currentQuestion}
+      />
+    </main>
+  );
+}
+
+
+==============================================================================================================
+FILE: apps/web/src/features/workspace-onboarding/components/onboarding-question-card.tsx
+==============================================================================================================
+'use client';
+
+import type { WorkspaceQuestionDefinition } from '@command-center/shared-types';
+import { useState } from 'react';
+
+interface Props {
+  question: WorkspaceQuestionDefinition;
+  disabled?: boolean;
+  onSubmit: (value: unknown) => Promise<void>;
+}
+
+export function OnboardingQuestionCard({ question, disabled = false, onSubmit }: Props) {
+  const [value, setValue] = useState<unknown>(question.type === 'MULTI_SELECT' ? [] : '');
+
+  const toggle = (option: string) => {
+    const selected = Array.isArray(value) ? (value as string[]) : [];
+    setValue(selected.includes(option) ? selected.filter((item) => item !== option) : [...selected, option]);
+  };
+
+  return (
+    <section aria-labelledby={`question-${question.key}`} className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+      <h2 id={`question-${question.key}`} className='text-lg font-semibold'>
+        {question.prompt}
+      </h2>
+
+      {question.type === 'TEXT' && (
+        <textarea aria-label={question.prompt} className='mt-4 min-h-28 w-full rounded-xl border p-3' disabled={disabled} maxLength={500} onChange={(event) => setValue(event.target.value)} value={String(value)} />
+      )}
+
+      {question.type === 'BOOLEAN' && (
+        <div className='mt-4 grid grid-cols-2 gap-3'>
+          {[true, false].map((option) => (
+            <button className='rounded-xl border p-3' disabled={disabled} key={String(option)} onClick={() => setValue(option)} type='button'>
+              {option ? 'Yes' : 'No'}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {(question.type === 'SINGLE_SELECT' || question.type === 'MULTI_SELECT') && (
+        <div className='mt-4 grid gap-3 sm:grid-cols-2'>
+          {question.options?.map((option) => {
+            const selected = Array.isArray(value) ? value.includes(option.value) : value === option.value;
+
+            return (
+              <button
+                aria-pressed={selected}
+                className='rounded-xl border p-3 text-left aria-pressed:border-slate-900 aria-pressed:bg-slate-50'
+                disabled={disabled}
+                key={option.value}
+                onClick={() => (question.type === 'MULTI_SELECT' ? toggle(option.value) : setValue(option.value))}
+                type='button'
+              >
+                <span className='block font-medium'>{option.label}</span>
+                {option.description && <span className='text-sm text-slate-600'>{option.description}</span>}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      <button
+        className='mt-5 rounded-xl bg-slate-950 px-5 py-3 font-medium text-white disabled:opacity-50'
+        disabled={disabled || value === '' || (Array.isArray(value) && value.length === 0)}
+        onClick={() => onSubmit(value)}
+        type='button'
+      >
+        Continue
+      </button>
+    </section>
+  );
+}
+
+
+==============================================================================================================
+FILE: apps/web/src/features/workspace-onboarding/components/workspace-creation-progress.tsx
+==============================================================================================================
+'use client';
+
+import type { WorkspaceOnboardingSessionResponse } from '@command-center/shared-types';
+import { useRouter } from 'next/navigation';
+import { useRef, useState } from 'react';
+import { workspaceOnboardingApi } from '../api/workspace-onboarding-api';
+
+export function WorkspaceCreationProgress({ session }: { session: WorkspaceOnboardingSessionResponse }) {
+  const router = useRouter();
+  const idempotencyKey = useRef(crypto.randomUUID());
+  const [error, setError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+
+  const confirm = async () => {
+    if (!session.blueprintHash) {
+      setError('Blueprint must be validated before confirmation');
+      return;
+    }
+
+    setCreating(true);
+    setError(null);
+
+    try {
+      const result = await workspaceOnboardingApi.confirm(session.id, {
+        expectedRevision: session.blueprintRevision,
+        blueprintHash: session.blueprintHash,
+        idempotencyKey: idempotencyKey.current,
+      });
+      router.replace(`/workspaces/${result.workspaceId}`);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Creation failed');
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  return (
+    <section className='mx-auto max-w-xl p-6 text-center'>
+      <h1 className='text-2xl font-bold'>Create this workspace?</h1>
+      <p className='mt-2 text-slate-600'>Creation is transactional. A failed database operation will not leave a partial workspace.</p>
+      {error && (
+        <p className='mt-4 text-red-700' role='alert'>
+          {error}
+        </p>
+      )}
+      <button className='mt-6 rounded-xl bg-slate-950 px-6 py-3 text-white disabled:opacity-50' disabled={creating} onClick={confirm} type='button'>
+        {creating ? 'Creating workspace…' : 'Confirm and create'}
+      </button>
+    </section>
+  );
+}
+
+
+==============================================================================================================
+FILE: package.json
+==============================================================================================================
+{
+  "name": "saas-command-center",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.22.0+sha512.1ff870c4c6133dfd88fb2afc46dd13d47f09c9794b438c6fdb47ca98caf3bc16381ee0be93a091b8e3824cf01f889f46d7d9e20910fb0be1ab0fb5baa80dd621",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=11.0.0"
+  },
+  "scripts": {
+    "build:packages": "pnpm --filter @command-center/shared-types build",
+    "build": "pnpm build:packages && pnpm -r --if-present build && pnpm size",
+    "lint": "pnpm -r --if-present lint",
+    "lint:fix": "pnpm -r --if-present lint:fix",
+    "typecheck": "pnpm build:packages && pnpm -r --if-present typecheck",
+    "test": "pnpm run test:all",
+    "test:api": "pnpm run test:api:unit && pnpm run test:api:e2e",
+    "test:tracker": "pnpm --filter @command-center/tracker-tests --fail-if-no-match test",
+    "test:web": "pnpm run test:web:unit && pnpm run test:web:e2e && pnpm run test:web:fullstack",
+    "test:web:fullstack": "pnpm --filter @command-center/web-tests --fail-if-no-match test:fullstack",
+    "test:all": "node packages/test-code/scripts/run-all.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:up": "docker compose -f infrastructure/docker-compose.yml up -d",
+    "db:down": "docker compose -f infrastructure/docker-compose.yml down",
+    "db:logs": "docker compose -f infrastructure/docker-compose.yml logs -f",
+    "db:status": "docker compose -f infrastructure/docker-compose.yml ps",
+    "dev": "concurrently -k --names API,WEB,TRACKER --prefix-colors cyan.bold,magenta.bold,yellow.bold --prefix \"[{name}]\" \"pnpm run dev:api\" \"pnpm run dev:web\" \"pnpm run dev:tracker\"",
+    "dev:api": "pnpm --filter @command-center/api start:dev",
+    "dev:web": "pnpm --filter @command-center/web dev",
+    "dev:tracker": "pnpm --filter @command-center/tracker dev",
+    "style:fix": "pnpm lint:fix && pnpm format",
+    "size": "node scripts/build-size-report.mjs",
+    "analyze:web": "pnpm --filter @command-center/web exec next experimental-analyze",
+    "build:tests": "pnpm --filter @command-center/test-code build",
+    "typecheck:tests": "pnpm --filter @command-center/test-code typecheck",
+    "test:api:unit": "pnpm --filter @command-center/api-tests --fail-if-no-match test:unit",
+    "test:api:e2e": "pnpm --filter @command-center/api-tests --fail-if-no-match test:e2e",
+    "test:web:unit": "pnpm --filter @command-center/web-tests --fail-if-no-match test:unit",
+    "test:web:e2e": "pnpm --filter @command-center/web-tests --fail-if-no-match test:e2e",
+    "verify:lint-config": "node scripts/verify-eslint-prettier-config.mjs",
+    "lint:all": "pnpm -r --if-present run lint",
+    "lint:fix:all": "pnpm -r --if-present run lint:fix"
+  },
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "concurrently": "^9.2.1",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2"
+  }
+}
+
+
+==============================================================================================================
+FILE: packages/shared-types/package.json
+==============================================================================================================
+{
+  "name": "@command-center/shared-types",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist-cjs/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "dist-cjs"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.cjs.json && node ../../scripts/write-cjs-marker.mjs dist-cjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "test": "node --test",
+    "lint:fix": "eslint . --fix"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.34.0",
+    "eslint": "^9.34.0",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.67.0",
+    "@command-center/eslint-config": "workspace:*"
+  }
+}
+
+
+==============================================================================================================
+FILE: packages/shared-types/src/index.ts
+==============================================================================================================
+export interface ApiErrorResponse {
+  statusCode: number;
+  code: string;
+  message: string;
+  path: string;
+  requestId: string;
+  timestamp: string;
+  details?: unknown;
+}
+
+export interface HealthResponse {
+  status: 'ok' | 'error';
+  service: string;
+  version: string;
+  environment: string;
+  timestamp: string;
+  database: {
+    status: 'up' | 'down';
+    responseTimeMs: number;
+  };
+}
+export * from './analytics/index.js';
+export * from './repositories/index.js';
+export * from './common/index.js';
+export * from './auth/index.js';
+export * from './workspaces/index.js';
+export * from './applications/index.js';
+export * from './websites/index.js';
+export * from './activity/index.js';
+export * from './development/index.js';
+export * from './monitoring/index.js';
+export * from './releases/index.js';
+export * from './integrations/index.js';
+export * from './team-operations/index.js';
+export * from './tracking/index.js';
+export * from './mobile-apps';
+export * from './desktop-apps';
+export * from './workspace-onboarding';
+export type {
+  GithubMobileBuildInput,
+  MobileAnalysisAction,
+  MobileAnalysisEvidenceItem,
+  MobileAnalysisRequest,
+  MobileAnalysisResult,
+  MobileBuildDetails,
+  MobileBuildFilters,
+  MobileBuildIngestionResult,
+  MobileBuildStatus,
+  MobileTelemetryIntegration,
+  MobileTelemetryProvider,
+  MobileTestFailure,
+  MobileTestRun,
+  MobileTestRunInput,
+  MobileTestStatus,
+  MobileTestSummary,
+  MobileTestType,
+} from './mobile-apps/mobile-runtime.types';
+
+
+==============================================================================================================
+FILE: packages/shared-types/src/workspace-onboarding/index.ts
+==============================================================================================================
+export * from './workspace-onboarding.types';
+
+
+==============================================================================================================
+FILE: packages/shared-types/src/workspace-onboarding/workspace-onboarding.types.ts
+==============================================================================================================
+export const workspaceApplicationTypes = ['WEB', 'MOBILE', 'DESKTOP'] as const;
+export type WorkspaceApplicationType = (typeof workspaceApplicationTypes)[number];
+
+export const workspaceProductTypes = ['PRODUCTIVITY_SAAS', 'ECOMMERCE', 'MARKETPLACE', 'SOCIAL', 'INTERNAL_TOOL', 'OTHER'] as const;
+export type WorkspaceProductType = (typeof workspaceProductTypes)[number];
+
+export const workspacePlatforms = ['WEB', 'ANDROID', 'IOS', 'WINDOWS', 'MACOS', 'LINUX'] as const;
+export type WorkspacePlatform = (typeof workspacePlatforms)[number];
+
+export const workspaceTechnologies = ['NEXT_JS', 'TYPESCRIPT', 'KOTLIN', 'JETPACK_COMPOSE', 'SWIFT', 'SWIFTUI', 'REACT_NATIVE', 'FLUTTER', 'TAURI', 'ELECTRON', 'NEST_JS', 'POSTGRESQL', 'REDIS'] as const;
+export type WorkspaceTechnology = (typeof workspaceTechnologies)[number];
+
+export const workspaceEnvironments = ['DEVELOPMENT', 'STAGING', 'PRODUCTION'] as const;
+export type WorkspaceEnvironment = (typeof workspaceEnvironments)[number];
+
+export const engineeringSystems = ['CI_CD', 'MONITORING', 'ANALYTICS', 'PERFORMANCE', 'ALERTS', 'SECURITY', 'BACKUPS'] as const;
+export type EngineeringSystem = (typeof engineeringSystems)[number];
+
+export type WorkspaceQuestionType = 'TEXT' | 'SINGLE_SELECT' | 'MULTI_SELECT' | 'BOOLEAN' | 'TECHNOLOGY';
+
+export type WorkspaceGeneratorProvider = 'rules';
+export type RepositoryStrategy = 'NONE' | 'CONNECT_LATER' | 'CONNECT_NOW';
+
+export interface WorkspaceOnboardingAnswers {
+  productIdea?: string;
+  workspaceName?: string;
+  productType?: WorkspaceProductType;
+  targetUsers?: string[];
+  applicationTypes?: WorkspaceApplicationType[];
+  coreFeatures?: string[];
+  authentication?: boolean;
+  collaboration?: boolean;
+  notifications?: string[];
+  technologyPreference?: Partial<Record<WorkspaceApplicationType, WorkspaceTechnology[]>>;
+  mobilePlatforms?: Extract<WorkspacePlatform, 'ANDROID' | 'IOS'>[];
+  desktopPlatforms?: Extract<WorkspacePlatform, 'WINDOWS' | 'MACOS' | 'LINUX'>[];
+  repositories?: RepositoryStrategy;
+  environments?: WorkspaceEnvironment[];
+  qualityRequirements?: EngineeringSystem[];
+}
+
+export interface WorkspaceQuestionOption {
+  label: string;
+  value: string;
+  description?: string;
+}
+
+export interface WorkspaceQuestionDefinition {
+  key: keyof WorkspaceOnboardingAnswers;
+  prompt: string;
+  type: WorkspaceQuestionType;
+  required: boolean;
+  options?: WorkspaceQuestionOption[];
+}
+
+export interface WorkspaceQuestionFlowResponse {
+  questions: WorkspaceQuestionDefinition[];
+  currentQuestion: WorkspaceQuestionDefinition | null;
+  completed: number;
+  total: number;
+  percent: number;
+}
+
+export interface WorkspaceBlueprintRecommendation {
+  id: string;
+  ruleId: string;
+  title: string;
+  explanation: string;
+}
+
+export interface WorkspaceBlueprintApplication {
+  type: WorkspaceApplicationType;
+  name: string;
+  platforms: WorkspacePlatform[];
+  stack: WorkspaceTechnology[];
+  source: BlueprintValueSource;
+}
+
+export interface WorkspaceBlueprint {
+  schemaVersion: 1;
+  generator: {
+    provider: WorkspaceGeneratorProvider;
+    version: string;
+  };
+  workspace: {
+    name: string;
+    slug: string;
+    description: string;
+    productType: WorkspaceProductType;
+  };
+  applications: WorkspaceBlueprintApplication[];
+  services: {
+    backend: WorkspaceTechnology[];
+    database: WorkspaceTechnology[];
+    cache: WorkspaceTechnology[];
+    authentication: string[];
+  };
+  features: string[];
+  environments: WorkspaceEnvironment[];
+  engineeringSystems: EngineeringSystem[];
+  recommendations: WorkspaceBlueprintRecommendation[];
+  repositories: WorkspaceBlueprintRepository[];
+  engineeringConfigurations: WorkspaceBlueprintEngineeringConfiguration[];
+}
+
+export interface WorkspaceOnboardingSessionResponse {
+  id: string;
+  status: 'IN_PROGRESS' | 'BLUEPRINT_READY' | 'CREATING' | 'COMPLETED' | 'FAILED' | 'EXPIRED';
+  currentStep: string | null;
+  answers: WorkspaceOnboardingAnswers;
+  blueprint: WorkspaceBlueprint | null;
+  schemaVersion: number;
+  ruleSetVersion: string | null;
+  generatorProvider: WorkspaceGeneratorProvider;
+  workspaceId: string | null;
+  expiresAt: string;
+  createdAt: string;
+  blueprintRevision: number;
+  blueprintHash: string | null;
+  updatedAt: string;
+}
+
+export type BlueprintValueSource = 'USER' | 'RULE';
+
+export interface WorkspaceBlueprintRepository {
+  applicationType: WorkspaceApplicationType;
+  strategy: RepositoryStrategy;
+  repositoryId?: string;
+  placeholderName?: string;
+}
+
+export type EngineeringConfigurationState = 'PROPOSED' | 'ACTIVE' | 'UNAVAILABLE';
+
+export interface WorkspaceBlueprintEngineeringConfiguration {
+  system: EngineeringSystem;
+  state: EngineeringConfigurationState;
+  enabledByDefault: boolean;
+  explanation: string;
+}
+
+export interface WorkspaceBlueprintValidationIssue {
+  path: string;
+  code: string;
+  message: string;
+}
+
+export interface WorkspaceBlueprintValidationResult {
+  valid: boolean;
+  revision: number;
+  hash: string;
+  issues: WorkspaceBlueprintValidationIssue[];
+}
+
+export interface UpdateWorkspaceBlueprintInput {
+  expectedRevision: number;
+  blueprint: WorkspaceBlueprint;
+}
+
+export interface ConfirmWorkspaceBlueprintInput {
+  expectedRevision: number;
+  blueprintHash: string;
+  idempotencyKey: string;
+}
+
+export interface WorkspaceCreationResult {
+  sessionId: string;
+  workspaceId: string;
+  status: 'COMPLETED';
+  createdAt: string;
+}
+
+
+==============================================================================================================
+FILE: packages/test-code/api/e2e/fullstack-workspace-onboarding.spec.ts
+==============================================================================================================
+import { expect, test } from '@playwright/test';
+
+test('reviews, edits and transactionally creates a multi-application workspace', async ({ page }) => {
+  await loginAsOwner(page);
+  await page.goto('/workspaces/new/guided');
+
+  await answerText(page, 'What are you building?', 'Cross-platform task management');
+  await answerText(page, 'What should the workspace be called?', 'TodoFlow');
+  await choose(page, 'What type of product is it?', 'Productivity SaaS');
+  await chooseMany(page, 'Who will use the product?', ['Consumers']);
+  await chooseMany(page, 'Which applications do you need?', ['Web', 'Mobile', 'Desktop']);
+  await chooseMany(page, 'Which mobile platforms do you need?', ['Android', 'iOS']);
+  await chooseMany(page, 'Which desktop platforms do you need?', ['Windows']);
+  await chooseMany(page, 'Which core features are required?', ['Dashboard']);
+  await chooseBoolean(page, 'Does the product require user accounts?', true);
+  await choose(page, 'Do repositories already exist?', 'Connect later');
+  await chooseMany(page, 'Which environments are required?', ['Development', 'Production']);
+  await chooseMany(page, 'Which engineering systems are required?', ['CI/CD', 'Monitoring', 'Security']);
+
+  await page
+    .getByRole('button', {
+      name: 'Generate guided recommendations',
+    })
+    .click();
+
+  await expect(
+    page.getByRole('heading', {
+      name: 'Review guided recommendations',
+    }),
+  ).toBeVisible();
+  await expect(page.getByText('TodoFlow Web')).toBeVisible();
+  await expect(page.getByText('TodoFlow Mobile')).toBeVisible();
+  await expect(page.getByText('TodoFlow Desktop')).toBeVisible();
+
+  await page.getByRole('group', { name: 'TodoFlow Desktop' }).getByRole('button', { name: 'ELECTRON' }).click();
+
+  await page.getByRole('button', { name: 'Save and continue' }).click();
+  await expect(page.getByText('Resolve these blueprint issues')).not.toBeVisible();
+
+  await page.getByRole('button', { name: 'Confirm and create' }).click();
+  await expect(page).toHaveURL(/\/workspaces\/[a-z0-9-]+$/);
+
+  await expect(page.getByText('TodoFlow')).toBeVisible();
+  await expect(page.getByText('Web')).toBeVisible();
+  await expect(page.getByText('Mobile')).toBeVisible();
+  await expect(page.getByText('Desktop')).toBeVisible();
+});
+
+test('remains usable on a mobile viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await loginAsOwner(page);
+  await page.goto('/workspaces/new/guided');
+
+  await expect(page.getByRole('main')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Continue' })).toBeVisible();
+});
+
+
+==============================================================================================================
+FILE: packages/test-code/api/e2e/guided-workspace-builder.ts
+==============================================================================================================
+import type { Page } from '@playwright/test';
+import { expect } from '@playwright/test';
+
+export interface GuidedFlowOptions {
+  name: string;
+  applications: Array<'Web' | 'Mobile' | 'Desktop'>;
+  mobilePlatforms?: Array<'Android' | 'iOS'>;
+  desktopPlatforms?: Array<'Windows' | 'macOS' | 'Linux'>;
+  repositories?: 'No repositories' | 'Connect later' | 'Connect now';
+}
+
+async function choose(page: Page, prompt: string, labels: string[]) {
+  await expect(page.getByRole('heading', { name: prompt })).toBeVisible();
+  for (const label of labels) {
+    await page.getByRole('button', { name: label, exact: true }).click();
+  }
+  await page.getByRole('button', { name: 'Continue', exact: true }).click();
+}
+
+export async function text(page: Page, prompt: string, value: string) {
+  await page.getByRole('textbox', { name: prompt }).fill(value);
+  await page.getByRole('button', { name: 'Continue', exact: true }).click();
+}
+
+export async function answerGuidedFlow(page: Page, options: GuidedFlowOptions) {
+  await text(page, 'What are you building?', `${options.name} product`);
+  await text(page, 'What should the workspace be called?', options.name);
+  await choose(page, 'What type of product is it?', ['Productivity SaaS']);
+  await choose(page, 'Who will use the product?', ['Consumers']);
+  await choose(page, 'Which applications do you need?', options.applications);
+
+  if (options.applications.includes('Mobile')) {
+    await choose(page, 'Which mobile platforms do you need?', options.mobilePlatforms ?? ['Android']);
+  }
+
+  if (options.applications.includes('Desktop')) {
+    await choose(page, 'Which desktop platforms do you need?', options.desktopPlatforms ?? ['Windows']);
+  }
+
+  await choose(page, 'Which core features are required?', ['Dashboard']);
+  await choose(page, 'Does the product require user accounts?', ['Yes']);
+  await choose(page, 'Do repositories already exist?', [options.repositories ?? 'Connect later']);
+  await choose(page, 'Which environments are required?', ['Development', 'Production']);
+  await choose(page, 'Which engineering systems are required?', ['CI/CD', 'Monitoring', 'Security']);
+}
+
+export async function generateAndConfirm(page: Page) {
+  await page
+    .getByRole('button', {
+      name: 'Generate guided recommendations',
+    })
+    .click();
+  await expect(
+    page.getByRole('heading', {
+      name: 'Review guided recommendations',
+    }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Save and continue' }).click();
+  await page.getByRole('button', { name: 'Confirm and create' }).click();
+  await expect(page).toHaveURL(/\/workspaces\/[a-z0-9-]+$/);
+}
+
+
+==============================================================================================================
+FILE: packages/test-code/api/e2e/workspace-onboarding-sessions.e2e-spec.ts
+==============================================================================================================
+import type { INestApplication } from '@nestjs/common';
+import type { FastifyAdapter } from '@nestjs/platform-fastify';
+import { PrismaService } from 'src/database/prisma.service';
+import { createTestApp } from '../helpers/create-test-app';
+import { resetDatabase } from '../helpers/database';
+
+describe('Workspace onboarding sessions E2E', () => {
+  let app: INestApplication;
+  let prisma: PrismaService;
+
+  beforeAll(async () => {
+    app = await createTestApp();
+    prisma = app.get(PrismaService);
+  });
+
+  beforeEach(async () => resetDatabase(prisma));
+  afterAll(async () => app.close());
+
+  it('creates, resumes, updates and deletes an owned session', async () => {
+    // Replace registerUser with the repository's existing authenticated fixture.
+    const owner = await registerUser(app, 'guided-owner@example.test');
+    const server = app.getHttpAdapter().getInstance<FastifyAdapter>();
+
+    const created = await server.inject({
+      method: 'POST',
+      url: '/api/v1/workspace-onboarding/sessions',
+      headers: { authorization: `Bearer ${owner.accessToken}` },
+    });
+
+    expect(created.statusCode).toBe(201);
+    const session = created.json();
+
+    const updated = await server.inject({
+      method: 'PATCH',
+      url: `/api/v1/workspace-onboarding/sessions/${session.id}/answers`,
+      headers: { authorization: `Bearer ${owner.accessToken}` },
+      payload: {
+        answers: {
+          workspaceName: 'TodoFlow',
+          applicationTypes: ['WEB'],
+        },
+      },
+    });
+
+    expect(updated.statusCode).toBe(200);
+    expect(updated.json().answers.workspaceName).toBe('TodoFlow');
+
+    const resumed = await server.inject({
+      method: 'GET',
+      url: `/api/v1/workspace-onboarding/sessions/${session.id}`,
+      headers: { authorization: `Bearer ${owner.accessToken}` },
+    });
+
+    expect(resumed.statusCode).toBe(200);
+    expect(resumed.json().answers.applicationTypes).toEqual(['WEB']);
+
+    const removed = await server.inject({
+      method: 'DELETE',
+      url: `/api/v1/workspace-onboarding/sessions/${session.id}`,
+      headers: { authorization: `Bearer ${owner.accessToken}` },
+    });
+
+    expect(removed.statusCode).toBe(204);
+  });
+  it('generates a deterministic schema-valid blueprint', async () => {
+    const owner = await registerUser(app, 'guided-generator@example.test');
+    const session = await createSession(app, owner.accessToken);
+
+    await updateAnswers(app, session.id, owner.accessToken, {
+      productIdea: 'A task management product',
+      workspaceName: 'TodoFlow',
+      productType: 'PRODUCTIVITY_SAAS',
+      targetUsers: ['CONSUMERS'],
+      applicationTypes: ['WEB'],
+      coreFeatures: ['TASKS'],
+      authentication: true,
+      repositories: 'CONNECT_LATER',
+      environments: ['DEVELOPMENT', 'PRODUCTION'],
+      qualityRequirements: ['CI_CD', 'MONITORING', 'SECURITY'],
+    });
+
+    const response = await generateBlueprint(app, session.id, owner.accessToken);
+
+    expect(response.statusCode).toBe(201);
+    expect(response.json()).toMatchObject({
+      status: 'BLUEPRINT_READY',
+      blueprint: {
+        schemaVersion: 1,
+        generator: { provider: 'rules', version: '1.0.0' },
+        workspace: { name: 'TodoFlow', slug: 'todoflow' },
+        applications: [
+          {
+            type: 'WEB',
+            platforms: ['WEB'],
+            stack: ['NEXT_JS', 'TYPESCRIPT'],
+          },
+        ],
+      },
+    });
+  });
+  it('does not expose a session to another user', async () => {
+    const owner = await registerUser(app, 'guided-owner@example.test');
+    const outsider = await registerUser(app, 'guided-outsider@example.test');
+    const session = await createSession(app, owner.accessToken);
+    const response = await getSession(app, session.id, outsider.accessToken);
+
+    expect(response.statusCode).toBe(404);
+  });
+});
+
+function registerUser(app: INestApplication<any>, arg1: string) {
+  throw new Error('Function not implemented.');
+}
+
+function createSession(app: INestApplication<any>, accessToken: any) {
+  throw new Error('Function not implemented.');
+}
+
+function updateAnswers(
+  app: INestApplication<any>,
+  id: any,
+  accessToken: any,
+  arg3: {
+    productIdea: string;
+    workspaceName: string;
+    productType: string;
+    targetUsers: string[];
+    applicationTypes: string[];
+    coreFeatures: string[];
+    authentication: boolean;
+    repositories: string;
+    environments: string[];
+    qualityRequirements: string[];
+  },
+) {
+  throw new Error('Function not implemented.');
+}
+
+function generateBlueprint(app: INestApplication<any>, id: any, accessToken: any) {
+  throw new Error('Function not implemented.');
+}
+
+
+==============================================================================================================
+FILE: packages/test-code/api/package.json
+==============================================================================================================
+{
+  "name": "@command-center/api-tests",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:unit": "node scripts/run-jest.mjs --config ../../packages/test-code/api/jest.config.cjs --runInBand",
+    "test:e2e": "node scripts/run-e2e-isolated.mjs",
+    "test": "pnpm run test:unit \u0026\u0026 pnpm run test:e2e",
+    "test:e2e:fast": "node scripts/run-jest.mjs --config ../../packages/test-code/api/jest-e2e.config.cjs --runInBand",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "devDependencies": {
+    "@command-center/eslint-config": "workspace:*",
+    "globals": "^17.11.0"
+  }
+}
+
+
+==============================================================================================================
+FILE: packages/test-code/api/unit/modules/workspace-onboarding/rule-based-generator.spec.ts
+==============================================================================================================
+import { RuleBasedWorkspaceBlueprintGenerator } from 'src/modules/workspace-onboarding/generators/rule-based-workspace-blueprint.generator';
+import { WorkspaceRuleEngine } from 'src/modules/workspace-onboarding/rules/rule-engine';
+
+describe('RuleBasedWorkspaceBlueprintGenerator', () => {
+  const generator = new RuleBasedWorkspaceBlueprintGenerator(new WorkspaceRuleEngine());
+
+  const answers = {
+    productIdea: 'A cross-platform task management product',
+    workspaceName: 'TodoFlow',
+    productType: 'PRODUCTIVITY_SAAS' as const,
+    targetUsers: ['CONSUMERS'],
+    applicationTypes: ['WEB', 'MOBILE', 'DESKTOP'] as const,
+    coreFeatures: ['TASKS', 'NOTIFICATIONS'],
+    authentication: true,
+    collaboration: false,
+    notifications: ['PUSH'],
+    mobilePlatforms: ['ANDROID', 'IOS'] as const,
+    desktopPlatforms: ['WINDOWS'] as const,
+    repositories: 'CONNECT_LATER' as const,
+    environments: ['DEVELOPMENT', 'STAGING', 'PRODUCTION'] as const,
+    qualityRequirements: ['CI_CD', 'MONITORING', 'SECURITY'] as const,
+  };
+
+  it('is deterministic for identical input and rule version', async () => {
+    const first = await generator.generate(answers);
+    const second = await generator.generate(answers);
+
+    expect(first).toEqual(second);
+  });
+
+  it('generates one application for each requested type', async () => {
+    const blueprint = await generator.generate(answers);
+
+    expect(blueprint.applications.map(({ type }) => type)).toEqual(['WEB', 'MOBILE', 'DESKTOP']);
+  });
+
+  it('adds an explanation for every applied rule', async () => {
+    const blueprint = await generator.generate(answers);
+
+    expect(blueprint.recommendations.length).toBeGreaterThan(0);
+    expect(blueprint.recommendations.every(({ ruleId, explanation }) => ruleId && explanation)).toBe(true);
+  });
+});
+
+describe('WorkspaceRuleEngine', () => {
+  it('rejects duplicate priorities', () => {
+    const engine = new WorkspaceRuleEngine();
+    const draft = {
+      schemaVersion: 1 as const,
+      generator: { provider: 'rules' as const, version: '1.0.0' },
+      workspace: {
+        name: 'Test',
+        slug: 'test',
+        description: 'Test product',
+        productType: 'OTHER' as const,
+      },
+      applications: [],
+      services: { backend: [], database: [], cache: [], authentication: [] },
+      features: [],
+      environments: ['DEVELOPMENT' as const],
+      engineeringSystems: [],
+      recommendations: [],
+    };
+
+    expect(() =>
+      engine.apply(draft, { answers: {} }, [
+        {
+          id: 'one',
+          version: '1',
+          priority: 10,
+          when: () => true,
+          apply: () => undefined,
+          explanation: 'one',
+        },
+        {
+          id: 'two',
+          version: '1',
+          priority: 10,
+          when: () => true,
+          apply: () => undefined,
+          explanation: 'two',
+        },
+      ]),
+    ).toThrow('Rule priority conflict');
+  });
+});
+
+
+==============================================================================================================
+FILE: packages/test-code/api/unit/modules/workspace-onboarding/workspace-onboarding.schemas.spec.ts
+==============================================================================================================
+import { completeWorkspaceOnboardingAnswersSchema, workspaceBlueprintSchema, workspaceOnboardingAnswersSchema } from '@command-center/validation';
+
+describe('workspace onboarding schemas', () => {
+  it('rejects duplicate application types', () => {
+    const result = workspaceOnboardingAnswersSchema.safeParse({
+      applicationTypes: ['WEB', 'WEB'],
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects mobile platforms without a mobile application', () => {
+    const result = workspaceOnboardingAnswersSchema.safeParse({
+      applicationTypes: ['WEB'],
+      mobilePlatforms: ['ANDROID'],
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it('requires complete answers before generation', () => {
+    expect(
+      completeWorkspaceOnboardingAnswersSchema.safeParse({
+        workspaceName: 'TodoFlow',
+      }).success,
+    ).toBe(false);
+  });
+
+  it('rejects an incompatible application platform', () => {
+    const result = workspaceBlueprintSchema.safeParse({
+      schemaVersion: 1,
+      generator: { provider: 'rules', version: '1.0.0' },
+      workspace: {
+        name: 'TodoFlow',
+        slug: 'todoflow',
+        description: 'Task management product',
+        productType: 'PRODUCTIVITY_SAAS',
+      },
+      applications: [
+        {
+          type: 'WEB',
+          name: 'TodoFlow Web',
+          platforms: ['ANDROID'],
+          stack: ['NEXT_JS'],
+        },
+      ],
+      services: {
+        backend: ['NEST_JS'],
+        database: ['POSTGRESQL'],
+        cache: [],
+        authentication: [],
+      },
+      features: ['TASKS'],
+      environments: ['DEVELOPMENT'],
+      engineeringSystems: [],
+      recommendations: [],
+    });
+
+    expect(result.success).toBe(false);
+  });
+});
+
+
+==============================================================================================================
+FILE: packages/test-code/web/package.json
+==============================================================================================================
+{
+  "name": "@command-center/web-tests",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test --config=playwright.config.ts",
+    "test:fullstack": "playwright test --config=playwright.fullstack.config.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "devDependencies": {
+    "@command-center/eslint-config": "workspace:*",
+    "globals": "^17.11.0"
+  }
+}
+
+
+==============================================================================================================
+FILE: packages/test-code/web/unit/app/(dashboard)/workspaces/new/new-workspace-client.test.tsx
+==============================================================================================================
+// @vitest-environment jsdom
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import NewWorkspacePage from '@/app/(dashboard)/workspaces/new/new-workspace-client';
+import { listImportableRepositories } from '@/features/workspaces/github-import/github-import-api';
+import { createWorkspace } from '@/features/workspaces/workspace-api';
+
+const { useSearchParamsMock } = vi.hoisted(() => ({
+  useSearchParamsMock: vi.fn(),
+}));
+
+vi.mock('next/navigation', () => ({
+  useSearchParams: useSearchParamsMock,
+}));
+
+vi.mock('@/features/workspaces/workspace-api', () => ({
+  createWorkspace: vi.fn(),
+}));
+
+vi.mock('@/features/workspaces/github-import/github-import-api', () => ({
+  listImportableRepositories: vi.fn(),
+  beginPersonalGithubConnect: vi.fn(),
+}));
+
+beforeEach(() => {
+  useSearchParamsMock.mockReturnValue(new URLSearchParams());
+  vi.mocked(createWorkspace).mockReset();
+  vi.mocked(listImportableRepositories).mockReset().mockResolvedValue({ installations: [], repositories: [] });
+});
+
+describe('NewWorkspacePage', () => {
+  it('shows the method selector by default, with manual workspace creation still available', () => {
+    render(<NewWorkspacePage />);
+
+    expect(screen.getByText('How would you like to create your workspace?')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Create Manually/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Import from GitHub/ })).toBeInTheDocument();
+  });
+
+  it('shows the manual workspace form after choosing Create Manually', async () => {
+    render(<NewWorkspacePage />);
+
+    await userEvent.click(screen.getByRole('button', { name: /Create Manually/ }));
+
+    expect(screen.getByRole('heading', { name: 'Create your workspace' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Workspace name')).toBeInTheDocument();
+  });
+
+  it('shows the GitHub import wizard after choosing Import from GitHub', async () => {
+    render(<NewWorkspacePage />);
+
+    await userEvent.click(screen.getByRole('button', { name: /Import from GitHub/ }));
+
+    expect(await screen.findByText('Import from GitHub')).toBeInTheDocument();
+  });
+
+  it('jumps straight into the GitHub wizard when returning with ?method=github', () => {
+    useSearchParamsMock.mockReturnValue(new URLSearchParams('method=github'));
+
+    render(<NewWorkspacePage />);
+
+    expect(screen.getByText('Import from GitHub')).toBeInTheDocument();
+    expect(screen.queryByText('How would you like to create your workspace?')).not.toBeInTheDocument();
+  });
+});
+
+
+==============================================================================================================
+FILE: packages/validation/src/workspace-onboarding/workspace-onboarding.schemas.ts
+==============================================================================================================
+import {
+    engineeringSystems,
+    workspaceApplicationTypes,
+    workspaceEnvironments,
+    workspacePlatforms,
+    workspaceProductTypes,
+    workspaceTechnologies,
+} from '@command-center/shared-types';
+import { z } from 'zod';
+
+const unique = <T>(values: T[]) => new Set(values).size === values.length;
+
+const uniqueArray = <T extends z.ZodTypeAny>(schema: T, maximum: number) =>
+    z
+        .array(schema)
+        .max(maximum)
+        .refine(unique, 'Duplicate values are not allowed');
+
+export const workspaceOnboardingAnswersSchema = z
+    .object({
+        productIdea: z.string().trim().min(3).max(500).optional(),
+        workspaceName: z.string().trim().min(2).max(80).optional(),
+        productType: z.enum(workspaceProductTypes).optional(),
+        targetUsers: uniqueArray(z.string().trim().min(1).max(80), 20).optional(),
+        applicationTypes: uniqueArray(z.enum(workspaceApplicationTypes), 3).optional(),
+        coreFeatures: uniqueArray(z.string().trim().min(1).max(80), 30).optional(),
+        authentication: z.boolean().optional(),
+        collaboration: z.boolean().optional(),
+        notifications: uniqueArray(z.string().trim().min(1).max(50), 10).optional(),
+        technologyPreference: z
+            .record(
+                z.enum(workspaceApplicationTypes),
+                uniqueArray(z.enum(workspaceTechnologies), 12),
+            )
+            .optional(),
+        mobilePlatforms: uniqueArray(
+            z.enum(['ANDROID', 'IOS'] as const),
+            2,
+        ).optional(),
+        desktopPlatforms: uniqueArray(
+            z.enum(['WINDOWS', 'MACOS', 'LINUX'] as const),
+            3,
+        ).optional(),
+        repositories: z.enum(['NONE', 'CONNECT_LATER', 'CONNECT_NOW']).optional(),
+        environments: uniqueArray(z.enum(workspaceEnvironments), 3).optional(),
+        qualityRequirements: uniqueArray(z.enum(engineeringSystems), 7).optional(),
+    })
+    .strict()
+    .superRefine((answers, context) => {
+        if (
+            answers.mobilePlatforms?.length &&
+            !answers.applicationTypes?.includes('MOBILE')
+        ) {
+            context.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['mobilePlatforms'],
+                message: 'Mobile platforms require the MOBILE application type',
+            });
+        }
+
+        if (
+            answers.desktopPlatforms?.length &&
+            !answers.applicationTypes?.includes('DESKTOP')
+        ) {
+            context.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['desktopPlatforms'],
+                message: 'Desktop platforms require the DESKTOP application type',
+            });
+        }
+    });
+
+const applicationSchema = z
+    .object({
+        type: z.enum(workspaceApplicationTypes),
+        name: z.string().trim().min(2).max(100),
+        platforms: uniqueArray(z.enum(workspacePlatforms), 6).min(1),
+        stack: uniqueArray(z.enum(workspaceTechnologies), 12).min(1),
+    })
+    .strict()
+    .superRefine((application, context) => {
+        const allowedPlatforms = {
+            WEB: ['WEB'],
+            MOBILE: ['ANDROID', 'IOS'],
+            DESKTOP: ['WINDOWS', 'MACOS', 'LINUX'],
+        } as const;
+
+        for (const platform of application.platforms) {
+            if (!(allowedPlatforms[application.type] as readonly string[]).includes(platform)) {
+                context.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ['platforms'],
+                    message: `${platform} is incompatible with ${application.type}`,
+                });
+            }
+        }
+    });
+
+export const workspaceBlueprintSchema = z
+    .object({
+        schemaVersion: z.literal(1),
+        generator: z.object({
+            provider: z.literal('rules'),
+            version: z.string().min(1).max(30),
+        }),
+        workspace: z.object({
+            name: z.string().trim().min(2).max(80),
+            slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(80),
+            description: z.string().trim().min(3).max(500),
+            productType: z.enum(workspaceProductTypes),
+        }),
+        applications: uniqueArray(applicationSchema, 3)
+            .min(1)
+            .refine(
+                (applications) => unique(applications.map(({ type }) => type)),
+                'Only one application blueprint per type is allowed',
+            ),
+        services: z.object({
+            backend: uniqueArray(z.enum(workspaceTechnologies), 8),
+            database: uniqueArray(z.enum(workspaceTechnologies), 4),
+            cache: uniqueArray(z.enum(workspaceTechnologies), 4),
+            authentication: uniqueArray(z.string().trim().min(1).max(50), 10),
+        }),
+        features: uniqueArray(z.string().trim().min(1).max(80), 30),
+        environments: uniqueArray(z.enum(workspaceEnvironments), 3).min(1),
+        engineeringSystems: uniqueArray(z.enum(engineeringSystems), 7),
+        recommendations: z.array(
+            z.object({
+                id: z.string().min(1),
+                ruleId: z.string().min(1),
+                title: z.string().min(1).max(120),
+                explanation: z.string().min(1).max(500),
+            }),
+        ),
+    })
+    .strict();
+    const repositoryBlueprintSchema = z
+  .object({
+    applicationType: z.enum(workspaceApplicationTypes),
+    strategy: z.enum(['NONE', 'CONNECT_LATER', 'CONNECT_NOW']),
+    repositoryId: z.string().cuid().optional(),
+    placeholderName: z.string().trim().min(1).max(100).optional(),
+  })
+  .strict()
+  .superRefine((repository, context) => {
+    if (repository.strategy === 'CONNECT_NOW' && !repository.repositoryId) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['repositoryId'],
+        message: 'CONNECT_NOW requires a verified repository ID',
+      });
+    }
+
+    if (
+      repository.strategy === 'CONNECT_LATER' &&
+      !repository.placeholderName
+    ) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['placeholderName'],
+        message: 'CONNECT_LATER requires a placeholder name',
+      });
+    }
+  });
+
+const engineeringConfigurationSchema = z
+  .object({
+    system: z.enum(engineeringSystems),
+    state: z.enum(['PROPOSED', 'ACTIVE', 'UNAVAILABLE']),
+    enabledByDefault: z.boolean(),
+    explanation: z.string().trim().min(1).max(500),
+  })
+  .strict()
+  .superRefine((configuration, context) => {
+    if (configuration.state !== 'ACTIVE' && configuration.enabledByDefault) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['enabledByDefault'],
+        message: 'Only verified active configurations may be enabled',
+      });
+    }
+  });
+
+// Add inside workspaceBlueprintSchema:
+repositories: uniqueArray(repositoryBlueprintSchema, 3),
+engineeringConfigurations: uniqueArray(
+  engineeringConfigurationSchema,
+  engineeringSystems.length,
+).refine(
+  (items) => unique(items.map(({ system }) => system)),
+  'Only one configuration per engineering system is allowed',
+),
+
+export const completeWorkspaceOnboardingAnswersSchema =
+    workspaceOnboardingAnswersSchema.superRefine((answers, context) => {
+        const required = [
+            'productIdea',
+            'workspaceName',
+            'productType',
+            'targetUsers',
+            'applicationTypes',
+            'coreFeatures',
+            'authentication',
+            'repositories',
+            'environments',
+            'qualityRequirements',
+        ] as const;
+
+        for (const key of required) {
+            const value = answers[key];
+
+            if (value === undefined || (Array.isArray(value) && value.length === 0)) {
+                context.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: [key],
+                    message: 'This answer is required before blueprint generation',
+                });
+            }
+        }
+    });
+
+==============================================================================================================
+FILE: pnpm-workspace.yaml
+==============================================================================================================
+packages:
+  - 'apps/*'
+  - 'packages/*'
+  - 'packages/test-code/*'
+
+allowBuilds:
+  '@prisma/engines': true
+  '@scarf/scarf': false
+  argon2: true
+  esbuild: true
+  prisma: true
+  sharp: false
+  unrs-resolver: false
+
+nodeLinker: hoisted
+sharedWorkspaceLockfile: true
+
+overrides:
+  'js-yaml@>=5.0.0 <=5.2.1': '5.2.3'
+  'dompurify@<=3.4.12': '3.4.13'
+

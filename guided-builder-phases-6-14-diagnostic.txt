@@ -1,0 +1,919 @@
+GUIDED WORKSPACE BUILDER — PHASES 6–14 STATIC DIAGNOSTIC
+DATE: 2026-08-27 00:43:33
+ROOT: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center
+SEARCHED FILES: 429
+
+STATUS MEANING
+EVIDENCE = every expected marker group has at least one match.
+PARTIAL = only some marker groups matched.
+MISSING = no expected marker group matched.
+REVIEW = markers exist, but transaction/security semantics require source review.
+Evidence is not proof that the implementation is correct.
+
+====================================================================================================
+RELEVANT FILE INVENTORY
+====================================================================================================
+apps/api/src/modules/workspace-onboarding/ai-blueprint-provider.client.ts
+apps/api/src/modules/workspace-onboarding/dto/confirm-workspace-blueprint.dto.ts
+apps/api/src/modules/workspace-onboarding/dto/update-onboarding-answers.dto.ts
+apps/api/src/modules/workspace-onboarding/dto/update-workspace-blueprint.dto.ts
+apps/api/src/modules/workspace-onboarding/generator-orchestrator.service.ts
+apps/api/src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts
+apps/api/src/modules/workspace-onboarding/generators/rule-based-workspace-blueprint.generator.ts
+apps/api/src/modules/workspace-onboarding/generators/workspace-blueprint-generator.interface.ts
+apps/api/src/modules/workspace-onboarding/observability/workspace-onboarding-observability.port.ts
+apps/api/src/modules/workspace-onboarding/questions/question-catalog.ts
+apps/api/src/modules/workspace-onboarding/questions/question-flow.service.ts
+apps/api/src/modules/workspace-onboarding/repository-connection.port.ts
+apps/api/src/modules/workspace-onboarding/rules/application-technology.rules.ts
+apps/api/src/modules/workspace-onboarding/rules/engineering-system.rules.ts
+apps/api/src/modules/workspace-onboarding/rules/foundation.rules.ts
+apps/api/src/modules/workspace-onboarding/rules/rule-engine.ts
+apps/api/src/modules/workspace-onboarding/security/guided-workspace-builder-enabled.guard.ts
+apps/api/src/modules/workspace-onboarding/security/workspace-onboarding-payload.service.ts
+apps/api/src/modules/workspace-onboarding/technology-compatibility.service.ts
+apps/api/src/modules/workspace-onboarding/workspace-ai-circuit-breaker.service.ts
+apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts
+apps/api/src/modules/workspace-onboarding/workspace-blueprint-hash.ts
+apps/api/src/modules/workspace-onboarding/workspace-creation.port.ts
+apps/api/src/modules/workspace-onboarding/workspace-onboarding.controller.ts
+apps/api/src/modules/workspace-onboarding/workspace-onboarding.repository.ts
+apps/api/src/modules/workspace-onboarding/workspace-onboarding.service.ts
+apps/api/src/modules/workspace-onboarding/workspace-onboarding-cleanup.service.ts
+apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts
+apps/api/src/modules/workspace-onboarding/workspace-onboarding-errors.ts
+apps/api/src/modules/workspace-onboarding/workspace-onboarding-feature.service.ts
+apps/api/src/modules/workspace-onboarding/workspace-onboarding-public.controller.ts
+apps/api/src/modules/workspace-onboarding/workspace-onboarding-telemetry.service.ts
+apps/web/src/app/(dashboard)/workspaces/new/loading.tsx
+apps/web/src/app/(dashboard)/workspaces/new/new-workspace-client.tsx
+apps/web/src/app/(dashboard)/workspaces/new/page.tsx
+apps/web/src/features/workspace-onboarding/api/workspace-onboarding-api.ts
+apps/web/src/features/workspace-onboarding/components/blueprint-application-editor.tsx
+apps/web/src/features/workspace-onboarding/components/blueprint-review.tsx
+apps/web/src/features/workspace-onboarding/components/blueprint-validation-summary.tsx
+apps/web/src/features/workspace-onboarding/components/generator-badge.tsx
+apps/web/src/features/workspace-onboarding/components/guided-builder-entry.tsx
+apps/web/src/features/workspace-onboarding/components/guided-builder-error.tsx
+apps/web/src/features/workspace-onboarding/components/guided-workspace-builder.tsx
+apps/web/src/features/workspace-onboarding/components/onboarding-question-card.tsx
+apps/web/src/features/workspace-onboarding/components/workspace-creation-progress.tsx
+packages/shared-types/src/workspace-onboarding/index.ts
+packages/shared-types/src/workspace-onboarding/workspace-onboarding.types.ts
+packages/test-code/api/e2e/fullstack-workspace-onboarding.spec.ts
+packages/test-code/api/e2e/guided-workspace-builder.ts
+packages/test-code/api/e2e/workspace-onboarding-sessions.e2e-spec.ts
+packages/test-code/api/unit/modules/workspace-onboarding/rule-based-generator.spec.ts
+packages/test-code/api/unit/modules/workspace-onboarding/workspace-onboarding.schemas.spec.ts
+packages/test-code/web/unit/app/(dashboard)/workspaces/new/new-workspace-client.test.tsx
+packages/validation/src/workspace-onboarding/workspace-onboarding.schemas.ts
+
+====================================================================================================
+6.5 — Phase 6 application and technology tests
+====================================================================================================
+MARKER GROUP 1
+REGEX: (describe|it|test)\s*\(.*(application|platform|technology|stack)
+  packages/test-code/api/e2e/activity.e2e-spec.ts:9: describe('Application Activity E2E', () => {
+  packages/test-code/api/e2e/activity.e2e-spec.ts:35: it('writes application create and update activities', async () => {
+  packages/test-code/api/e2e/activity.e2e-spec.ts:64: it('writes technology, link, archive, and restore activities', async () => {
+  packages/test-code/api/e2e/application-links.e2e-spec.ts:9: describe('Application Links E2E', () => {
+  packages/test-code/api/e2e/application-links.e2e-spec.ts:101: it('rejects link ID from another application', async () => {
+  packages/test-code/api/e2e/application-links.e2e-spec.ts:122: it('rejects link changes on archived application', async () => {
+  packages/test-code/api/e2e/application-roles.e2e-spec.ts:17: describe('Application Roles E2E', () => {
+  packages/test-code/api/e2e/application-roles.e2e-spec.ts:133: it('allows OWNER to permanently delete archived application', async () => {
+RESULT: FOUND 227 MATCH(ES)
+
+MARKER GROUP 2
+REGEX: (WEB|MOBILE|DESKTOP).*(ANDROID|IOS|WINDOWS|MACOS|LINUX|stack|technology)|multi[- ]platform
+  packages/test-code/api/e2e/desktop-alerts.e2e-spec.ts:81: platform: DesktopPlatform.WINDOWS,
+  packages/test-code/api/e2e/desktop-alerts.e2e-spec.ts:268: platform: DesktopPlatform.WINDOWS,
+  packages/test-code/api/e2e/desktop-alerts.e2e-spec.ts:309: type: DesktopSecurityCheckType.WINDOWS_SIGNING,
+  packages/test-code/api/e2e/desktop-foundation.e2e-spec.ts:109: platform: DesktopPlatform.WINDOWS,
+  packages/test-code/api/e2e/desktop-foundation.e2e-spec.ts:155: platform: DesktopPlatform.WINDOWS,
+  packages/test-code/api/e2e/desktop-foundation.e2e-spec.ts:168: platform: DesktopPlatform.WINDOWS,
+  packages/test-code/api/e2e/desktop-foundation.e2e-spec.ts:223: platform: DesktopPlatform.MACOS,
+  packages/test-code/api/e2e/desktop-foundation.e2e-spec.ts:225: framework: DesktopFramework.NATIVE_MACOS,
+RESULT: FOUND 82 MATCH(ES)
+
+MARKER GROUP 3
+REGEX: (reject|invalid|incompat|unsupported|missing required)
+  packages/test-code/api/e2e/activity.e2e-spec.ts:84: it('does not create activity for rejected operation', async () => {
+  packages/test-code/api/e2e/activity.e2e-spec.ts:89: const invalidResponse = await updateApplication(owner, application.id, {
+  packages/test-code/api/e2e/activity.e2e-spec.ts:93: expect(invalidResponse.status).toBe(400);
+  packages/test-code/api/e2e/activity.e2e-spec.ts:172: activityType: 'INVALID_ACTIVITY',
+  packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:313: it('rejects malformed aggregate queries and hides foreign websites', async () => {
+  packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:323: dimension: 'INVALID',
+  packages/test-code/api/e2e/analytics-engine-processing.e2e-spec.ts:115: for (const invalidValue of [0, -1, 1.5, 50_001, 'not-a-number']) {
+  packages/test-code/api/e2e/analytics-engine-processing.e2e-spec.ts:117: maxEvents: invalidValue,
+RESULT: FOUND 507 MATCH(ES)
+
+REQUIREMENT STATUS: EVIDENCE (3/3 marker groups)
+
+====================================================================================================
+7.1 — Blueprint persistence revision or hash fields
+====================================================================================================
+MARKER GROUP 1
+REGEX: (blueprintRevision|blueprintHash|revisionHash|confirmedRevision)
+  apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts:55: return this.validateBlueprint(session.blueprint, session.blueprintRevision);
+  apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts:65: if (session.blueprintRevision !== input.expectedRevision) {
+  apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts:69: const validation = this.validateBlueprint(input.blueprint, session.blueprintRevision + 1);
+  apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts:78: return this.repository.updateBlueprintRevision({
+  apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts:82: blueprintHash: validation.hash,
+  apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts:36: if (owned.blueprintRevision !== input.expectedRevision || owned.blueprintHash !== input.blueprintHash) {
+  apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts:40: const validation = this.blueprints.validateBlueprint(owned.blueprint, owned.blueprintRevision);
+  apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts:42: if (!validation.valid || validation.hash !== input.blueprintHash) {
+RESULT: FOUND 12 MATCH(ES)
+
+MARKER GROUP 2
+REGEX: (WorkspaceOnboardingSession|workspace_onboarding_sessions)
+  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql:5: CREATE TABLE "workspace_onboarding_sessions" (
+  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql:22: CONSTRAINT "workspace_onboarding_sessions_pkey" PRIMARY KEY ("id")
+  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql:26: CREATE UNIQUE INDEX "workspace_onboarding_sessions_workspaceId_key" ON "workspace_onboarding_sessions"("workspaceId");
+  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql:29: CREATE UNIQUE INDEX "workspace_onboarding_sessions_idempotencyKey_key" ON "workspace_onboarding_sessions"("idempotencyKey");
+  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql:32: CREATE INDEX "workspace_onboarding_sessions_userId_status_idx" ON "workspace_onboarding_sessions"("userId", "status");
+  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql:35: CREATE INDEX "workspace_onboarding_sessions_expiresAt_idx" ON "workspace_onboarding_sessions"("expiresAt");
+  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql:38: ALTER TABLE "workspace_onboarding_sessions" ADD CONSTRAINT "workspace_onboarding_sessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql:41: ALTER TABLE "workspace_onboarding_sessions" ADD CONSTRAINT "workspace_onboarding_sessions_workspaceId_fkey" FOREIGN KEY ("workspaceId") REFERENCES "workspaces"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+RESULT: FOUND 30 MATCH(ES)
+
+REQUIREMENT STATUS: EVIDENCE (2/2 marker groups)
+
+====================================================================================================
+7.2 — Atomic blueprint repository update
+====================================================================================================
+MARKER GROUP 1
+REGEX: (updateBlueprintAtomic|compareAndSet|expectedRevision|atomic.*blueprint|revision.*increment)
+  apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts:65: if (session.blueprintRevision !== input.expectedRevision) {
+  apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts:80: expectedRevision: input.expectedRevision,
+  apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts:36: if (owned.blueprintRevision !== input.expectedRevision || owned.blueprintHash !== input.blueprintHash) {
+  apps/api/src/modules/workspace-onboarding/dto/confirm-workspace-blueprint.dto.ts:7: expectedRevision: z.number().int().positive(),
+  apps/api/src/modules/workspace-onboarding/dto/update-workspace-blueprint.dto.ts:8: expectedRevision: z.number().int().nonnegative(),
+  packages/shared-types/src/workspace-onboarding/workspace-onboarding.types.ts:155: expectedRevision: number;
+  packages/shared-types/src/workspace-onboarding/workspace-onboarding.types.ts:160: expectedRevision: number;
+RESULT: FOUND 7 MATCH(ES)
+
+MARKER GROUP 2
+REGEX: (\$transaction|updateMany|FOR\s+UPDATE|SELECT.*FOR\s+UPDATE)
+  apps/api/src/modules/workspace-onboarding/workspace-onboarding-cleanup.service.ts:23: const expired = await this.prisma.workspaceOnboardingSession.updateMany({
+  apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts:51: return this.prisma.$transaction(
+  apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts:64: FOR UPDATE
+RESULT: FOUND 3 MATCH(ES)
+
+REQUIREMENT STATUS: EVIDENCE (2/2 marker groups)
+
+====================================================================================================
+7.5 — Blueprint retrieval, update and validation endpoints
+====================================================================================================
+MARKER GROUP 1
+REGEX: @Get\(\s*['"]:id/blueprint
+RESULT: NO MATCH
+
+MARKER GROUP 2
+REGEX: @Patch\(\s*['"]:id/blueprint
+RESULT: NO MATCH
+
+MARKER GROUP 3
+REGEX: @Post\(\s*['"]:id/validate
+RESULT: NO MATCH
+
+REQUIREMENT STATUS: MISSING (0/3 marker groups)
+
+====================================================================================================
+7.6 — Frontend blueprint API additions
+====================================================================================================
+MARKER GROUP 1
+REGEX: (getBlueprint|generateBlueprint)
+RESULT: NO MATCH
+
+MARKER GROUP 2
+REGEX: (updateBlueprint|saveBlueprint)
+  apps/web/src/features/workspace-onboarding/components/blueprint-review.tsx:18: const session = await workspaceOnboardingApi.updateBlueprint(initialSession.id, {
+RESULT: FOUND 1 MATCH(ES)
+
+MARKER GROUP 3
+REGEX: (validateBlueprint|blueprint.*validate)
+  apps/web/src/features/workspace-onboarding/components/blueprint-review.tsx:22: const validation = await workspaceOnboardingApi.validateBlueprint(initialSession.id);
+  apps/web/src/features/workspace-onboarding/components/workspace-creation-progress.tsx:16: setError('Blueprint must be validated before confirmation');
+RESULT: FOUND 2 MATCH(ES)
+
+REQUIREMENT STATUS: PARTIAL (2/3 marker groups)
+
+====================================================================================================
+8.4 — Confirmation endpoint and stale revision protection
+====================================================================================================
+MARKER GROUP 1
+REGEX: @Post\(\s*['"]:id/confirm
+RESULT: NO MATCH
+
+MARKER GROUP 2
+REGEX: (Idempotency-Key|idempotency-key|idempotencyKey)
+  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql:16: "idempotencyKey" TEXT,
+  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql:29: CREATE UNIQUE INDEX "workspace_onboarding_sessions_idempotencyKey_key" ON "workspace_onboarding_sessions"("idempotencyKey");
+  apps/api/prisma/models/WorkspaceOnboardingSession.prisma:12: idempotencyKey    String?                   @unique
+  apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts:23: if (owned.status === 'COMPLETED' && owned.idempotencyKey === input.idempotencyKey && owned.workspaceId) {
+  apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts:73: if (session.status === 'COMPLETED' && session.idempotency_key === input.idempotencyKey && session.workspace_id) {
+  apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts:90: idempotencyKey: input.idempotencyKey,
+  apps/api/src/modules/workspace-onboarding/dto/confirm-workspace-blueprint.dto.ts:9: idempotencyKey: z.string().uuid(),
+  packages/shared-types/src/workspace-onboarding/workspace-onboarding.types.ts:162: idempotencyKey: string;
+RESULT: FOUND 8 MATCH(ES)
+
+MARKER GROUP 3
+REGEX: (expectedRevision|blueprintRevision|blueprintHash|stale)
+  apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts:55: return this.validateBlueprint(session.blueprint, session.blueprintRevision);
+  apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts:65: if (session.blueprintRevision !== input.expectedRevision) {
+  apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts:66: throw new ConflictException('Blueprint revision is stale');
+  apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts:69: const validation = this.validateBlueprint(input.blueprint, session.blueprintRevision + 1);
+  apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts:78: return this.repository.updateBlueprintRevision({
+  apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts:80: expectedRevision: input.expectedRevision,
+  apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts:82: blueprintHash: validation.hash,
+  apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts:36: if (owned.blueprintRevision !== input.expectedRevision || owned.blueprintHash !== input.blueprintHash) {
+RESULT: FOUND 20 MATCH(ES)
+
+REQUIREMENT STATUS: PARTIAL (2/3 marker groups)
+
+====================================================================================================
+8.5 — Frontend confirmation and safe retry flow
+====================================================================================================
+MARKER GROUP 1
+REGEX: (confirmBlueprint|confirmWorkspace|confirmCreation)
+RESULT: NO MATCH
+
+MARKER GROUP 2
+REGEX: (ConfirmationDialog|WorkspaceCreationProgress|creation-progress)
+  apps/web/src/features/workspace-onboarding/components/workspace-creation-progress.tsx:8: export function WorkspaceCreationProgress({ session }: { session: WorkspaceOnboardingSessionResponse }) {
+RESULT: FOUND 1 MATCH(ES)
+
+MARKER GROUP 3
+REGEX: (idempotency|randomUUID|safe retry|retry)
+  apps/web/src/features/workspace-onboarding/components/guided-builder-error.tsx:3: export function GuidedBuilderErrorState({ error, onRetry }: { error: GuidedBuilderError; onRetry?: () => void }) {
+  apps/web/src/features/workspace-onboarding/components/guided-builder-error.tsx:8: {error.retryable && onRetry && (
+  apps/web/src/features/workspace-onboarding/components/guided-builder-error.tsx:9: <button className='mt-4 rounded-lg bg-red-950 px-4 py-2 text-white' onClick={onRetry} type='button'>
+  apps/web/src/features/workspace-onboarding/components/workspace-creation-progress.tsx:10: const idempotencyKey = useRef(crypto.randomUUID());
+  apps/web/src/features/workspace-onboarding/components/workspace-creation-progress.tsx:27: idempotencyKey: idempotencyKey.current,
+RESULT: FOUND 5 MATCH(ES)
+
+REQUIREMENT STATUS: PARTIAL (2/3 marker groups)
+
+====================================================================================================
+8.6 — Transaction, rollback, concurrency and idempotency tests
+====================================================================================================
+MARKER GROUP 1
+REGEX: (rollback|rolls back|partial workspace|inject.*failure)
+  packages/test-code/api/e2e/desktop-telemetry.e2e-spec.ts:104: expect(integration.lastError).toContain('Injected telemetry provider failure');
+  packages/test-code/api/e2e/phase16-releases-deployments.e2e-spec.ts:63: * `failureReason`. ROLLED_BACK requires `rollbackToDeploymentId`, which must reference a
+  packages/test-code/api/e2e/phase16-releases-deployments.e2e-spec.ts:68: * creation, STATUS_CHANGED or ROLLBACK_RECORDED on transition).
+  packages/test-code/api/e2e/phase16-releases-deployments.e2e-spec.ts:75: * is the rollback TARGET's release, while `status` in the response stays ROLLED_BACK.
+  packages/test-code/api/e2e/phase16-releases-deployments.e2e-spec.ts:624: const rollbackDeploymentResponse = await createDeployment(ownerAccessToken, releaseId);
+  packages/test-code/api/e2e/phase16-releases-deployments.e2e-spec.ts:625: const rollbackDeploymentId = body(rollbackDeploymentResponse).id as string;
+  packages/test-code/api/e2e/phase16-releases-deployments.e2e-spec.ts:627: await transition(ownerAccessToken, rollbackDeploymentId, {
+  packages/test-code/api/e2e/phase16-releases-deployments.e2e-spec.ts:630: await transition(ownerAccessToken, rollbackDeploymentId, {
+RESULT: FOUND 33 MATCH(ES)
+
+MARKER GROUP 2
+REGEX: (idempotent|idempotency|duplicate workspace|same key)
+  packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:249: it('rebuilds aggregates idempotently', async () => {
+  packages/test-code/api/e2e/analytics-reprocessing.e2e-spec.ts:100: it('is idempotent across repeated reprocessing of the same range', async () => {
+  packages/test-code/api/e2e/analytics-visitors.e2e-spec.ts:144: it('keeps visitor counts idempotent across repeated processing runs', async () => {
+  packages/test-code/api/e2e/auth.e2e-spec.ts:483: it('keeps logout idempotent when no refresh cookie exists', async () => {
+  packages/test-code/api/e2e/desktop-build-artifacts.e2e-spec.ts:65: it('is idempotent for duplicate provider artifact ID', async () => {
+  packages/test-code/api/e2e/desktop-builds.e2e-spec.ts:38: it('tracks queued -> building -> success idempotently', async () => {
+  packages/test-code/api/e2e/desktop-performance.e2e-spec.ts:66: it('is idempotent when the same provider snapshot is synced twice', async () => {
+  packages/test-code/api/e2e/desktop-releases.e2e-spec.ts:234: it('keeps repeated same-status updates idempotent', async () => {
+RESULT: FOUND 21 MATCH(ES)
+
+MARKER GROUP 3
+REGEX: (concurrent|Promise\.all|race condition|session lock)
+  packages/test-code/api/e2e/github-connect-intent-cleanup.e2e-spec.ts:124: const [foundUnconsumed, foundConsumed, foundValid] = await Promise.all([
+  packages/test-code/api/e2e/github-connect-intent-cleanup.e2e-spec.ts:135: it('is idempotent across repeated runs and safe to call concurrently', async () => {
+  packages/test-code/api/e2e/github-connect-intent-cleanup.e2e-spec.ts:146: await Promise.all([cleanupService.cleanup(), cleanupService.cleanup()]);
+  packages/test-code/api/e2e/phase17-team-operations.e2e-spec.ts:71: *     {id, tokenHash, status: PENDING, expiresAt: {gt: now}}})` guard, so a second concurrent
+  packages/test-code/api/e2e/webhook-delivery-worker.e2e-spec.ts:404: // 5. Claim protection â€” no double processing on concurrent calls for the same delivery
+  packages/test-code/api/e2e/webhook-delivery-worker.e2e-spec.ts:407: it('does not double-process the same due delivery when invoked twice concurrently', async () => {
+  packages/test-code/api/e2e/webhook-delivery-worker.e2e-spec.ts:412: // Give the second concurrent caller a real window to attempt (and fail) to claim
+  packages/test-code/api/e2e/webhook-delivery-worker.e2e-spec.ts:418: await Promise.all([runDeliveryDirectly(deliveryId), runDeliveryDirectly(deliveryId)]);
+RESULT: FOUND 21 MATCH(ES)
+
+REQUIREMENT STATUS: EVIDENCE (3/3 marker groups)
+
+====================================================================================================
+9.2 — Repository selection service
+====================================================================================================
+MARKER GROUP 1
+REGEX: (RepositorySelectionService|class .*Repository.*Selection)
+RESULT: NO MATCH
+
+MARKER GROUP 2
+REGEX: (NONE|CONNECT_LATER|CONNECT_NOW)
+  apps/api/src/config/env.validation.ts:5: export type CookieSameSite = 'lax' | 'strict' | 'none';
+  apps/api/src/config/env.validation.ts:157: if (sameSite === 'lax' || sameSite === 'strict' || sameSite === 'none') {
+  apps/api/src/config/env.validation.ts:161: throw new Error('COOKIE_SAME_SITE must be lax, strict, or none.');
+  apps/api/src/config/env.validation.ts:350: if (cookieSameSite === 'none' && !cookieSecure) {
+  apps/api/src/config/env.validation.ts:351: throw new Error('COOKIE_SECURE must be true when COOKIE_SAME_SITE is none.');
+  apps/api/src/modules/workspace-onboarding/questions/question-catalog.ts:126: { label: 'No repositories', value: 'NONE' },
+  apps/api/src/modules/workspace-onboarding/questions/question-catalog.ts:127: { label: 'Connect later', value: 'CONNECT_LATER' },
+  apps/api/src/modules/workspace-onboarding/questions/question-catalog.ts:128: { label: 'Connect now', value: 'CONNECT_NOW' },
+RESULT: FOUND 15 MATCH(ES)
+
+MARKER GROUP 3
+REGEX: (verify.*repository|repository.*access|map.*application)
+  apps/api/prisma/models/application-activity.prisma:4: applicationId   String?                 @map("application_id") @db.Uuid
+  apps/api/prisma/models/application-activity.prisma:5: applicationName String                  @map("application_name") @db.VarChar(160)
+  apps/api/prisma/models/application-activity.prisma:25: @@map("application_activities")
+  apps/api/prisma/models/application-delivery.prisma:3: applicationId   String          @map("application_id") @db.Uuid
+  apps/api/prisma/models/application-delivery.prisma:25: @@map("application_milestones")
+  apps/api/prisma/models/application-delivery.prisma:53: @@map("application_tasks")
+  apps/api/prisma/models/application-delivery.prisma:58: applicationId    String           @map("application_id") @db.Uuid
+  apps/api/prisma/models/application-delivery.prisma:85: @@map("application_blockers")
+RESULT: FOUND 26 MATCH(ES)
+
+REQUIREMENT STATUS: PARTIAL (2/3 marker groups)
+
+====================================================================================================
+9.3 — GitHub work kept outside the core database transaction
+====================================================================================================
+MARKER GROUP 1
+REGEX: (\$transaction|transaction\()
+  apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts:51: return this.prisma.$transaction(
+RESULT: FOUND 1 MATCH(ES)
+
+MARKER GROUP 2
+REGEX: (GitHub|Github|github)
+  apps/api/prisma/enums/repository.prisma:2: GITHUB
+  apps/api/prisma/migrations/20260812214000_repository_integrations/migration.sql:2: CREATE TYPE "RepositoryProvider" AS ENUM ('GITHUB');
+  apps/api/prisma/migrations/20260812214000_repository_integrations/migration.sql:25: "provider" "RepositoryProvider" NOT NULL DEFAULT 'GITHUB',
+  apps/api/prisma/migrations/20260812214000_repository_integrations/migration.sql:44: "provider" "RepositoryProvider" NOT NULL DEFAULT 'GITHUB',
+  apps/api/prisma/migrations/20260815220213_personal_github_connect_intents/migration.sql:2: CREATE TABLE "personal_github_connect_intents" (
+  apps/api/prisma/migrations/20260815220213_personal_github_connect_intents/migration.sql:14: CONSTRAINT "personal_github_connect_intents_pkey" PRIMARY KEY ("id")
+  apps/api/prisma/migrations/20260815220213_personal_github_connect_intents/migration.sql:18: CREATE UNIQUE INDEX "personal_github_connect_intents_install_state_hash_key" ON "personal_github_connect_intents"("install_state_hash");
+  apps/api/prisma/migrations/20260815220213_personal_github_connect_intents/migration.sql:21: CREATE UNIQUE INDEX "personal_github_connect_intents_oauth_state_hash_key" ON "personal_github_connect_intents"("oauth_state_hash");
+RESULT: FOUND 75 MATCH(ES)
+
+MARKER GROUP 3
+REGEX: (pending|retryable|outbox|afterCommit|external operation|external status)
+  apps/api/prisma/enums/collaboration.prisma:2: PENDING
+  apps/api/prisma/enums/webhooks.prisma:19: PENDING
+  apps/api/prisma/migrations/20260808231107_initial_schema/migration.sql:59: CREATE TYPE "WorkspaceInvitationStatus" AS ENUM ('PENDING', 'ACCEPTED', 'DECLINED', 'REVOKED', 'EXPIRED');
+  apps/api/prisma/migrations/20260808231107_initial_schema/migration.sql:92: CREATE TYPE "WebhookDeliveryStatus" AS ENUM ('PENDING', 'PROCESSING', 'RETRY_SCHEDULED', 'SUCCEEDED', 'DEAD_LETTERED', 'CANCELLED');
+  apps/api/prisma/migrations/20260808231107_initial_schema/migration.sql:320: "pending_events_at_start" INTEGER NOT NULL DEFAULT 0,
+  apps/api/prisma/migrations/20260808231107_initial_schema/migration.sql:518: "status" "WorkspaceInvitationStatus" NOT NULL DEFAULT 'PENDING',
+  apps/api/prisma/migrations/20260808231107_initial_schema/migration.sql:770: "status" "WebhookDeliveryStatus" NOT NULL DEFAULT 'PENDING',
+  apps/api/prisma/migrations/20260823062811_mobile_feature_completion/migration.sql:41: CREATE TYPE "MobileTestStatus" AS ENUM ('PENDING', 'RUNNING', 'PASSED', 'FAILED', 'SKIPPED', 'CANCELLED');
+RESULT: FOUND 31 MATCH(ES)
+
+REQUIREMENT STATUS: REVIEW (3/3 marker groups)
+
+====================================================================================================
+9.4 — Repository strategy endpoints
+====================================================================================================
+MARKER GROUP 1
+REGEX: @(Get|Post|Patch)\([^)]*(repositories|repository-selection|repository)
+RESULT: NO MATCH
+
+MARKER GROUP 2
+REGEX: (CONNECT_LATER|CONNECT_NOW|repositoryStrategy)
+  apps/api/src/modules/workspace-onboarding/questions/question-catalog.ts:127: { label: 'Connect later', value: 'CONNECT_LATER' },
+  apps/api/src/modules/workspace-onboarding/questions/question-catalog.ts:128: { label: 'Connect now', value: 'CONNECT_NOW' },
+  packages/shared-types/src/workspace-onboarding/workspace-onboarding.types.ts:22: export type RepositoryStrategy = 'NONE' | 'CONNECT_LATER' | 'CONNECT_NOW';
+  packages/shared-types/src/workspace-onboarding/workspace-onboarding.types.ts:37: repositories?: RepositoryStrategy;
+  packages/shared-types/src/workspace-onboarding/workspace-onboarding.types.ts:127: strategy: RepositoryStrategy;
+  packages/validation/src/workspace-onboarding/workspace-onboarding.schemas.ts:44: repositories: z.enum(['NONE', 'CONNECT_LATER', 'CONNECT_NOW']).optional(),
+  packages/validation/src/workspace-onboarding/workspace-onboarding.schemas.ts:140: strategy: z.enum(['NONE', 'CONNECT_LATER', 'CONNECT_NOW']),
+  packages/validation/src/workspace-onboarding/workspace-onboarding.schemas.ts:146: if (repository.strategy === 'CONNECT_NOW' && !repository.repositoryId) {
+RESULT: FOUND 11 MATCH(ES)
+
+REQUIREMENT STATUS: PARTIAL (1/2 marker groups)
+
+====================================================================================================
+9.5 — Frontend repository editor
+====================================================================================================
+MARKER GROUP 1
+REGEX: (RepositoryEditor|BlueprintRepository|RepositoryStrategy|repository editor)
+RESULT: NO MATCH
+
+MARKER GROUP 2
+REGEX: (CONNECT_LATER|CONNECT_NOW|Connect later|Connect now)
+RESULT: NO MATCH
+
+MARKER GROUP 3
+REGEX: (placeholder|selectedRepositories|repositoryIds)
+RESULT: NO MATCH
+
+REQUIREMENT STATUS: MISSING (0/3 marker groups)
+
+====================================================================================================
+9.6 — Phase 9 GitHub and repository tests
+====================================================================================================
+MARKER GROUP 1
+REGEX: (connected|disconnected|expired authorization|inaccessible repository)
+  packages/test-code/api/e2e/analytics-ingestion.e2e-spec.ts:151: expect(before.connected).toBe(false);
+  packages/test-code/api/e2e/analytics-ingestion.e2e-spec.ts:171: expect(after.connected).toBe(true);
+  packages/test-code/api/e2e/desktop-ai-analysis.e2e-spec.ts:94: status: 'CONNECTED',
+  packages/test-code/api/e2e/desktop-ai-analysis.e2e-spec.ts:119: status: 'CONNECTED',
+  packages/test-code/api/e2e/desktop-alerts.e2e-spec.ts:30: status: DesktopTelemetryIntegrationStatus.CONNECTED,
+  packages/test-code/api/e2e/desktop-full-flow.e2e-spec.ts:122: status: DesktopTelemetryIntegrationStatus.CONNECTED,
+  packages/test-code/api/e2e/desktop-security.e2e-spec.ts:132: status: 'CONNECTED',
+  packages/test-code/api/e2e/desktop-telemetry.e2e-spec.ts:43: status: 'CONNECTED',
+RESULT: FOUND 88 MATCH(ES)
+
+MARKER GROUP 2
+REGEX: (cross-workspace|foreign workspace|repository protection)
+  packages/test-code/api/e2e/applications.e2e-spec.ts:284: it('prevents cross-workspace access', async () => {
+  packages/test-code/api/e2e/desktop-alerts.e2e-spec.ts:327: it('prevents cross-workspace alert access', async () => {
+  packages/test-code/api/e2e/desktop-builds.e2e-spec.ts:203: it('rejects cross-workspace build reads', async () => {
+  packages/test-code/api/e2e/desktop-overview.e2e-spec.ts:44: it('rejects cross-workspace overview access', async () => {
+  packages/test-code/api/e2e/desktop-project-detection.e2e-spec.ts:153: it('rejects cross-workspace desktop application access', async () => {
+  packages/test-code/api/e2e/desktop-releases.e2e-spec.ts:270: it('rejects cross-workspace release lookup', async () => {
+  packages/test-code/api/e2e/desktop-security-health.e2e-spec.ts:179: it('rejects cross-workspace security access', async () => {
+  packages/test-code/api/e2e/desktop-telemetry.e2e-spec.ts:171: it('rejects cross-workspace telemetry access', async () => {
+RESULT: FOUND 16 MATCH(ES)
+
+MARKER GROUP 3
+REGEX: (CONNECT_LATER|CONNECT_NOW|repository placeholder|retry)
+  packages/test-code/api/e2e/phase14-analytics-processing.e2e-spec.ts:18: *   POST /api/v1/workspaces/:workspaceId/websites/:websiteId/analytics/processing/runs/:runId/retry
+  packages/test-code/api/e2e/phase14-analytics-processing.e2e-spec.ts:21: * enforcement for reprocess/retry is done in-service via
+  packages/test-code/api/e2e/phase14-analytics-processing.e2e-spec.ts:22: * AnalyticsProcessingAccessService.assertCanReprocess/assertCanRetry, which requires
+  packages/test-code/api/e2e/phase14-analytics-processing.e2e-spec.ts:47: * these assertions to a passing status would hide a Critical production bug. See the retry-related
+  packages/test-code/api/e2e/phase14-analytics-processing.e2e-spec.ts:97: function retryUrl(runId: string): string {
+  packages/test-code/api/e2e/phase14-analytics-processing.e2e-spec.ts:98: return `${API_PREFIX}/workspaces/${workspaceId}/websites/${websiteId}/analytics/processing/runs/${runId}/retry`;
+  packages/test-code/api/e2e/phase14-analytics-processing.e2e-spec.ts:144: retryCount: 4,
+  packages/test-code/api/e2e/phase14-analytics-processing.e2e-spec.ts:157: retryCount: 4,
+RESULT: FOUND 97 MATCH(ES)
+
+REQUIREMENT STATUS: EVIDENCE (3/3 marker groups)
+
+====================================================================================================
+10.3 — Frontend engineering-systems review
+====================================================================================================
+MARKER GROUP 1
+REGEX: (EngineeringSystemsReview|EngineeringSystem|engineering systems)
+RESULT: NO MATCH
+
+MARKER GROUP 2
+REGEX: (active configuration|proposed configuration|unavailable integration|ACTIVE|PROPOSED|UNAVAILABLE)
+RESULT: NO MATCH
+
+REQUIREMENT STATUS: MISSING (0/2 marker groups)
+
+====================================================================================================
+10.4 — Phase 10 engineering-system tests
+====================================================================================================
+MARKER GROUP 1
+REGEX: (engineering system|builds|releases|monitoring|analytics|performance|alerts|security)
+  packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:1: import { createRawAnalyticsEvent, findAggregate, getAnonymousAnalyticsAggregates, listAnalyticsAggregates, readAnalyticsAggregateList } from '../helpers/analytics-engine';
+  packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:2: import { createTrackedWebsite, uniqueTrackerId } from '../helpers/analytics-ingestion';
+  packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:8: import { AnalyticsAggregateDimension, RawAnalyticsEventType, WorkspaceRole } from 'src/generated/prisma/enums';
+  packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:9: import { AnalyticsProcessingService } from 'src/modules/analytics-engine/services/analytics-processing.service';
+  packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:31: describe('Analytics Aggregates E2E', () => {
+  packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:34: let processingService: AnalyticsProcessingService;
+  packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:41: processingService = app.get(AnalyticsProcessingService);
+  packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:52: it('builds correct hourly and daily overview totals', async () => {
+RESULT: FOUND 1492 MATCH(ES)
+
+MARKER GROUP 2
+REGEX: (credentials|verified|not.*active|proposed|unavailable)
+  packages/test-code/api/e2e/analytics-ingestion-security.e2e-spec.ts:38: it('rejects invalid, malformed, and mismatched tracking credentials', async () => {
+  packages/test-code/api/e2e/auth.e2e-spec.ts:161: it('logs in using valid credentials', async () => {
+  packages/test-code/api/e2e/desktop-ai-analysis.e2e-spec.ts:85: it('never sends telemetry credentials to the AI provider', async () => {
+  packages/test-code/api/e2e/desktop-repository-linking.e2e-spec.ts:311: it('rejects unavailable repository', async () => {
+  packages/test-code/api/e2e/desktop-repository-linking.e2e-spec.ts:323: * unavailable repositories may be hidden as 404
+  packages/test-code/api/e2e/development.e2e-spec.ts:160: title: 'Waiting for Credentials',
+  packages/test-code/api/e2e/development.e2e-spec.ts:165: title: 'Waiting for Production Credentials',
+  packages/test-code/api/e2e/development.e2e-spec.ts:170: expectDevelopmentSuccess(await resolveBlocker(owner, application.id, blocker.id, 'Production credentials received'));
+RESULT: FOUND 68 MATCH(ES)
+
+MARKER GROUP 3
+REGEX: (WEB|MOBILE|DESKTOP|production environment)
+  packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:2: import { createTrackedWebsite, uniqueTrackerId } from '../helpers/analytics-ingestion';
+  packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:54: const website = await createTrackedWebsite(owner);
+  packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:61: await createRawAnalyticsEvent(prisma, website, {
+  packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:65: pageUrl: `${website.origin}/home`,
+  packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:68: await createRawAnalyticsEvent(prisma, website, {
+  packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:76: await createRawAnalyticsEvent(prisma, website, {
+  packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:84: await processingService.processForWorkspace(owner.workspaceId, website.id, owner.userId, 100);
+  packages/test-code/api/e2e/analytics-aggregates.e2e-spec.ts:87: const response = await listAnalyticsAggregates(owner, owner.workspaceId, website.id, {
+RESULT: FOUND 3682 MATCH(ES)
+
+REQUIREMENT STATUS: EVIDENCE (3/3 marker groups)
+
+====================================================================================================
+11.1 — Configuration contract with hard numeric bounds
+====================================================================================================
+MARKER GROUP 1
+REGEX: (WORKSPACE_ONBOARDING|GUIDED_BUILDER).*(LIMIT|MAX|TTL|RATE|RETENTION)
+  apps/api/src/modules/workspace-onboarding/observability/workspace-onboarding-observability.port.ts:9: | 'guided_builder_blueprint_generated'
+RESULT: FOUND 1 MATCH(ES)
+
+MARKER GROUP 2
+REGEX: (z\.coerce\.number|IsInt|parseInt|getNumber|numberSchema)
+  apps/api/src/config/env.validation.ts:138: if (!Number.isInteger(parsedValue) || parsedValue <= 0) {
+  apps/api/src/config/runtime-config.ts:29: if (Number.isInteger(numericValue) && numericValue >= 0) {
+RESULT: FOUND 2 MATCH(ES)
+
+MARKER GROUP 3
+REGEX: (\.min\(|\.max\(|@Min\(|@Max\(|minimum|maximum)
+  apps/api/prisma/migrations/20260823224500_desktop_support_and_mobile_performance_reconcile/migration.sql:140: "minimum_os_version" VARCHAR(64),
+  apps/api/prisma/models/desktop-application.prisma:14: minimumOsVersion String? @map("minimum_os_version") @db.VarChar(64)
+  apps/api/src/config/env.validation.ts:313: const minimumInterval = getPositiveInteger(config, 'HEALTH_MIN_INTERVAL_SECONDS', 60);
+  apps/api/src/config/env.validation.ts:314: const maximumInterval = getPositiveInteger(config, 'HEALTH_MAX_INTERVAL_SECONDS', 86_400);
+  apps/api/src/config/env.validation.ts:316: if (maximumInterval < minimumInterval) {
+  apps/api/src/config/env.validation.ts:320: const minimumTimeout = getPositiveInteger(config, 'HEALTH_MIN_TIMEOUT_MS', 1_000);
+  apps/api/src/config/env.validation.ts:321: const maximumTimeout = getPositiveInteger(config, 'HEALTH_MAX_TIMEOUT_MS', 30_000);
+  apps/api/src/config/env.validation.ts:323: if (maximumTimeout < minimumTimeout) {
+RESULT: FOUND 44 MATCH(ES)
+
+REQUIREMENT STATUS: EVIDENCE (3/3 marker groups)
+
+====================================================================================================
+11.3 — Endpoint-specific creation, generation and confirmation rate limits
+====================================================================================================
+MARKER GROUP 1
+REGEX: @(SharedRateLimit|Throttle|RateLimit)\(
+RESULT: NO MATCH
+
+MARKER GROUP 2
+REGEX: (create.*session|sessions.*create|guided.*start)
+  apps/api/prisma/migrations/20260808231107_initial_schema/migration.sql:165: CREATE TABLE "analytics_sessions" (
+  apps/api/prisma/migrations/20260808231107_initial_schema/migration.sql:637: CREATE TABLE "auth_sessions" (
+  apps/api/prisma/migrations/20260808231107_initial_schema/migration.sql:879: CREATE INDEX "analytics_sessions_website_id_started_at_idx" ON "analytics_sessions"("website_id", "started_at");
+  apps/api/prisma/migrations/20260808231107_initial_schema/migration.sql:882: CREATE INDEX "analytics_sessions_website_id_ended_at_idx" ON "analytics_sessions"("website_id", "ended_at");
+  apps/api/prisma/migrations/20260808231107_initial_schema/migration.sql:885: CREATE INDEX "analytics_sessions_website_id_bounced_started_at_idx" ON "analytics_sessions"("website_id", "bounced", "started_at");
+  apps/api/prisma/migrations/20260808231107_initial_schema/migration.sql:888: CREATE INDEX "analytics_sessions_website_id_source_type_started_at_idx" ON "analytics_sessions"("website_id", "source_type", "started_at");
+  apps/api/prisma/migrations/20260808231107_initial_schema/migration.sql:891: CREATE INDEX "analytics_sessions_website_id_country_code_started_at_idx" ON "analytics_sessions"("website_id", "country_code", "started_at");
+  apps/api/prisma/migrations/20260808231107_initial_schema/migration.sql:894: CREATE INDEX "analytics_sessions_website_id_device_type_started_at_idx" ON "analytics_sessions"("website_id", "device_type", "started_at");
+RESULT: FOUND 28 MATCH(ES)
+
+MARKER GROUP 3
+REGEX: (generateBlueprint|blueprint.*generate)
+  apps/api/src/modules/workspace-onboarding/workspace-onboarding.service.ts:57: async generateBlueprint(id: string, userId: string) {
+  apps/api/src/modules/workspace-onboarding/workspace-onboarding.service.ts:60: const blueprint = await this.generator.generate(answers);
+  apps/api/src/modules/workspace-onboarding/generators/rule-based-workspace-blueprint.generator.ts:54: return workspaceBlueprintSchema.parse(generated);
+  apps/api/src/modules/workspace-onboarding/observability/workspace-onboarding-observability.port.ts:9: | 'guided_builder_blueprint_generated'
+RESULT: FOUND 4 MATCH(ES)
+
+MARKER GROUP 4
+REGEX: (confirmWorkspace|confirmBlueprint|:id/confirm)
+  apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts:1: import type { ConfirmWorkspaceBlueprintInput, WorkspaceCreationResult } from '@command-center/shared-types';
+  apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts:20: async confirm(sessionId: string, userId: string, input: ConfirmWorkspaceBlueprintInput): Promise<WorkspaceCreationResult> {
+  apps/api/src/modules/workspace-onboarding/dto/confirm-workspace-blueprint.dto.ts:1: import type { ConfirmWorkspaceBlueprintInput } from '@command-center/shared-types';
+  apps/api/src/modules/workspace-onboarding/dto/confirm-workspace-blueprint.dto.ts:13: export class ConfirmWorkspaceBlueprintDto {
+  apps/api/src/modules/workspace-onboarding/dto/confirm-workspace-blueprint.dto.ts:14: static parse(value: unknown): ConfirmWorkspaceBlueprintInput {
+  packages/shared-types/src/workspace-onboarding/workspace-onboarding.types.ts:159: export interface ConfirmWorkspaceBlueprintInput {
+RESULT: FOUND 6 MATCH(ES)
+
+REQUIREMENT STATUS: PARTIAL (3/4 marker groups)
+
+====================================================================================================
+11.5 — Safe confirmation and authorization audit events
+====================================================================================================
+MARKER GROUP 1
+REGEX: (audit|security event).*(confirmation|authorization)|(confirmation|authorization).*(audit|security event)
+RESULT: NO MATCH
+
+MARKER GROUP 2
+REGEX: (guided_builder_creation|workspace_onboarding|onboarding_confirmation)
+  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql:5: CREATE TABLE "workspace_onboarding_sessions" (
+  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql:22: CONSTRAINT "workspace_onboarding_sessions_pkey" PRIMARY KEY ("id")
+  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql:26: CREATE UNIQUE INDEX "workspace_onboarding_sessions_workspaceId_key" ON "workspace_onboarding_sessions"("workspaceId");
+  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql:29: CREATE UNIQUE INDEX "workspace_onboarding_sessions_idempotencyKey_key" ON "workspace_onboarding_sessions"("idempotencyKey");
+  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql:32: CREATE INDEX "workspace_onboarding_sessions_userId_status_idx" ON "workspace_onboarding_sessions"("userId", "status");
+  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql:35: CREATE INDEX "workspace_onboarding_sessions_expiresAt_idx" ON "workspace_onboarding_sessions"("expiresAt");
+  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql:38: ALTER TABLE "workspace_onboarding_sessions" ADD CONSTRAINT "workspace_onboarding_sessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql:41: ALTER TABLE "workspace_onboarding_sessions" ADD CONSTRAINT "workspace_onboarding_sessions_workspaceId_fkey" FOREIGN KEY ("workspaceId") REFERENCES "workspaces"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+RESULT: FOUND 16 MATCH(ES)
+
+MARKER GROUP 3
+REGEX: (sanitize|redact|omit|safe metadata|token|answer)
+  apps/api/prisma/migrations/20260808231107_initial_schema/migration.sql:517: "token_hash" TEXT NOT NULL,
+  apps/api/prisma/migrations/20260808231107_initial_schema/migration.sql:641: "refresh_token_hash" VARCHAR(128) NOT NULL,
+  apps/api/prisma/migrations/20260808231107_initial_schema/migration.sql:1080: CREATE UNIQUE INDEX "workspace_invitations_token_hash_key" ON "workspace_invitations"("token_hash");
+  apps/api/prisma/migrations/20260808231107_initial_schema/migration.sql:1143: CREATE UNIQUE INDEX "auth_sessions_refresh_token_hash_key" ON "auth_sessions"("refresh_token_hash");
+  apps/api/prisma/migrations/20260823062811_mobile_feature_completion/migration.sql:51: "answer" TEXT NOT NULL,
+  apps/api/prisma/migrations/20260823224500_desktop_support_and_mobile_performance_reconcile/migration.sql:81: "answer" TEXT NOT NULL,
+  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql:10: "answers" JSONB NOT NULL,
+  apps/api/prisma/models/collaboration.prisma:10: tokenHash String @unique @map("token_hash")
+RESULT: FOUND 131 MATCH(ES)
+
+REQUIREMENT STATUS: PARTIAL (2/3 marker groups)
+
+====================================================================================================
+11.7 — Phase 11 security and retention tests
+====================================================================================================
+MARKER GROUP 1
+REGEX: (oversized|payload too large|malformed JSON|XSS|script payload)
+  packages/test-code/api/e2e/analytics-ingestion-security.e2e-spec.ts:191: it('rejects invalid payload shapes, oversized batches, and oversized bodies', async () => {
+  packages/test-code/api/e2e/analytics-ingestion-security.e2e-spec.ts:211: const oversizedBody = buildCollectPayload(trackedWebsite, [buildTrackerEvent(trackedWebsite.origin)]) as unknown as Record<string, unknown>;
+  packages/test-code/api/e2e/analytics-ingestion-security.e2e-spec.ts:213: oversizedBody.padding = 'x'.repeat(70_000);
+  packages/test-code/api/e2e/analytics-ingestion-security.e2e-spec.ts:215: const oversizedResponse = await request(app.getHttpServer()).post(analyticsIngestionRoutes.collect()).set('Origin', trackedWebsite.origin).send(oversizedBody);
+  packages/test-code/api/e2e/analytics-ingestion-security.e2e-spec.ts:217: expect(oversizedResponse.status).toBe(413);
+  packages/test-code/api/e2e/analytics-reprocessing.e2e-spec.ts:157: it('rejects invalid and oversized date ranges', async () => {
+  packages/test-code/api/e2e/infrastructure.e2e-spec.ts:199: const oversizedPayload = {
+  packages/test-code/api/e2e/infrastructure.e2e-spec.ts:200: ...buildWorkspacePayload('Oversized Workspace'),
+RESULT: FOUND 12 MATCH(ES)
+
+MARKER GROUP 2
+REGEX: (unauthorized|expired session|rate limit|too many requests)
+  packages/test-code/api/e2e/analytics-ingestion-rate-limit.e2e-spec.ts:8: describe('Analytics Ingestion Rate Limit E2E', () => {
+  packages/test-code/api/e2e/analytics-ingestion-rate-limit.e2e-spec.ts:58: expect(JSON.stringify(rejected.body)).toContain('Tracking rate limit exceeded');
+  packages/test-code/api/e2e/analytics-retention.e2e-spec.ts:125: it('deletes expired sessions and removes only orphaned visitors', async () => {
+  packages/test-code/api/e2e/auth-rate-limit.e2e-spec.ts:9: describe('Auth Endpoint Rate Limiting E2E (SEC-01)', () => {
+  packages/test-code/api/e2e/phase17-team-operations.e2e-spec.ts:32: *     POST /                       (CreateWorkspaceInvitationDto: email, role) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â rate limited
+  packages/test-code/api/e2e/phase17-team-operations.e2e-spec.ts:34: *     POST /:invitationId/resend   ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â rate limited 5/15min (scope 'workspace-invitation-resend')
+  packages/test-code/api/e2e/phase17-team-operations.e2e-spec.ts:692: // E. Rate limiting (invitation create/resend)
+  packages/test-code/api/e2e/phase17-team-operations.e2e-spec.ts:695: it('enforces the invitation resend rate limit of 5 per 15 minutes', async () => {
+RESULT: FOUND 56 MATCH(ES)
+
+MARKER GROUP 3
+REGEX: (OWNER|ADMIN|MEMBER|VIEWER|non-member|outsider)
+  packages/test-code/api/e2e/activity.e2e-spec.ts:36: const owner = await registerWorkspaceTestUser(app, prisma);
+  packages/test-code/api/e2e/activity.e2e-spec.ts:37: const application = await createApplication(owner, {
+  packages/test-code/api/e2e/activity.e2e-spec.ts:40: const createActivityResponse = await listApplicationActivity(owner, application.id);
+  packages/test-code/api/e2e/activity.e2e-spec.ts:50: await updateApplication(owner, application.id, {
+  packages/test-code/api/e2e/activity.e2e-spec.ts:56: const updateActivityResponse = await listApplicationActivity(owner, application.id);
+  packages/test-code/api/e2e/activity.e2e-spec.ts:65: const owner = await registerWorkspaceTestUser(app, prisma);
+  packages/test-code/api/e2e/activity.e2e-spec.ts:66: const application = await createApplication(owner);
+  packages/test-code/api/e2e/activity.e2e-spec.ts:67: const initialResponse = await listApplicationActivity(owner, application.id);
+RESULT: FOUND 3283 MATCH(ES)
+
+MARKER GROUP 4
+REGEX: (retention|cleanup|expiresAt|expired draft)
+  packages/test-code/api/e2e/analytics-retention.e2e-spec.ts:1: import { createRawAnalyticsEvent, runAnalyticsRetention, runAnonymousAnalyticsRetention } from '../helpers/analytics-engine';
+  packages/test-code/api/e2e/analytics-retention.e2e-spec.ts:13: throw new Error('Expected a numeric retention result');
+  packages/test-code/api/e2e/analytics-retention.e2e-spec.ts:19: describe('Analytics Retention E2E', () => {
+  packages/test-code/api/e2e/analytics-retention.e2e-spec.ts:24: raw: process.env.ANALYTICS_RAW_RETENTION_DAYS,
+  packages/test-code/api/e2e/analytics-retention.e2e-spec.ts:25: normalized: process.env.ANALYTICS_NORMALIZED_RETENTION_DAYS,
+  packages/test-code/api/e2e/analytics-retention.e2e-spec.ts:26: aggregate: process.env.ANALYTICS_AGGREGATE_RETENTION_DAYS,
+  packages/test-code/api/e2e/analytics-retention.e2e-spec.ts:30: process.env.ANALYTICS_RAW_RETENTION_DAYS = '30';
+  packages/test-code/api/e2e/analytics-retention.e2e-spec.ts:31: process.env.ANALYTICS_NORMALIZED_RETENTION_DAYS = '400';
+RESULT: FOUND 73 MATCH(ES)
+
+REQUIREMENT STATUS: EVIDENCE (4/4 marker groups)
+
+====================================================================================================
+12.2 — Guided-builder start route
+====================================================================================================
+MARKER GROUP 1
+REGEX: (guided/page|/workspaces/new/guided|startGuided|Use guided builder)
+  apps/web/src/features/workspace-onboarding/components/guided-builder-entry.tsx:11: <Link className='mt-6 rounded-xl bg-slate-950 px-4 py-3 text-center font-medium text-white' href='/workspaces/new/guided'>
+RESULT: FOUND 1 MATCH(ES)
+
+MARKER GROUP 2
+REGEX: (createSession|workspaceOnboardingApi\.create|router\.push)
+RESULT: NO MATCH
+
+REQUIREMENT STATUS: PARTIAL (1/2 marker groups)
+
+====================================================================================================
+12.3 — Latest resumable session endpoint and client
+====================================================================================================
+MARKER GROUP 1
+REGEX: (@Get\(\s*['"]latest|latestResumable|getLatestResumable|sessions/latest)
+RESULT: NO MATCH
+
+MARKER GROUP 2
+REGEX: (ResumeDraftBanner|resume.*draft|resumable session)
+RESULT: NO MATCH
+
+REQUIREMENT STATUS: MISSING (0/2 marker groups)
+
+====================================================================================================
+13.5 — Frontend guided-builder feature gating
+====================================================================================================
+MARKER GROUP 1
+REGEX: (GUIDED_WORKSPACE_BUILDER_ENABLED|guidedBuilderEnabled|workspaceOnboardingEnabled|featureFlag)
+RESULT: NO MATCH
+
+MARKER GROUP 2
+REGEX: (Use guided builder|onSelectGuided|guided).*(enabled|flag|disabled)|enabled.*guided
+  apps/web/src/features/workspace-onboarding/components/guided-builder-entry.tsx:3: export function GuidedBuilderEntry({ enabled }: { enabled: boolean }) {
+RESULT: FOUND 1 MATCH(ES)
+
+REQUIREMENT STATUS: PARTIAL (1/2 marker groups)
+
+====================================================================================================
+13.6 — Phase 13 feature-flag and safe analytics tests
+====================================================================================================
+MARKER GROUP 1
+REGEX: (feature flag|flag disabled|flag enabled|guided builder.*disabled)
+RESULT: NO MATCH
+
+MARKER GROUP 2
+REGEX: (guided_builder_started|guided_builder_resumed|blueprint_generated)
+RESULT: NO MATCH
+
+MARKER GROUP 3
+REGEX: (exclude|does not contain|never.*render|not.*log).*(answer|description|secret|token)
+  packages/test-code/web/e2e/full-stack/fullstack-desktop-final.spec.ts:157: test('renders evidence-grounded AI analysis and never renders a secret', async ({ page, request }) => {
+  packages/test-code/web/e2e/phase18/webhook-integrations.spec.ts:656: test('the delivery-log viewer never renders a secret or ciphertext value', async ({ page }) => {
+RESULT: FOUND 2 MATCH(ES)
+
+REQUIREMENT STATUS: PARTIAL (1/3 marker groups)
+
+====================================================================================================
+14.8 — AI provider tests
+====================================================================================================
+MARKER GROUP 1
+REGEX: (Fake.*Blueprint.*Generator|fake provider|mock.*provider)
+  packages/test-code/api/e2e/mobile-telemetry.e2e-spec.ts:61: throw new Error('Fake provider failure');
+  packages/test-code/web/unit/components/layout/workspace-switcher.test.tsx:10: vi.mock('@/features/auth/auth-provider', () => ({
+  packages/test-code/web/unit/features/auth/auth-gates.test.tsx:11: vi.mock('@/features/auth/auth-provider', () => ({
+  packages/test-code/web/unit/features/auth/auth-provider.test.tsx:154: // directly, without mocking it away, in auth-provider-refresh-integration.test.tsx
+RESULT: FOUND 4 MATCH(ES)
+
+MARKER GROUP 2
+REGEX: (malformed output|timeout|provider failure|fallback|circuit breaker)
+  packages/test-code/api/e2e/analytics-late-events.e2e-spec.ts:269: await new Promise((resolve) => setTimeout(resolve, 10));
+  packages/test-code/api/e2e/desktop-ai-analysis.e2e-spec.ts:167: it('converts provider failure to a safe 502 response', async () => {
+  packages/test-code/api/e2e/desktop-telemetry.e2e-spec.ts:82: it('records provider failure without breaking the desktop app', async () => {
+  packages/test-code/api/e2e/desktop-telemetry.e2e-spec.ts:104: expect(integration.lastError).toContain('Injected telemetry provider failure');
+  packages/test-code/api/e2e/mobile-ai-analysis.e2e-spec.ts:232: it('provider failure returns safe error', async () => {
+  packages/test-code/api/e2e/mobile-telemetry.e2e-spec.ts:61: throw new Error('Fake provider failure');
+  packages/test-code/api/e2e/mobile-telemetry.e2e-spec.ts:286: it('retries transient provider failures', async () => {
+  packages/test-code/api/e2e/phase15-monitoring.e2e-spec.ts:52: *   timeoutMs: int 1000..30000, default 10000 (env HEALTH_MIN/MAX_TIMEOUT_MS, defaults 1000/30000)
+RESULT: FOUND 99 MATCH(ES)
+
+MARKER GROUP 3
+REGEX: (schema rejection|invalid.*schema|paid provider|network)
+  packages/test-code/api/e2e/mobile-ios-performance.e2e-spec.ts:29: networkLatencyMs: 180,
+  packages/test-code/api/e2e/mobile-performance.e2e-spec.ts:64: | 'NETWORK_LATENCY_MS'
+  packages/test-code/api/e2e/mobile-telemetry.e2e-spec.ts:43: networkLatencyMs: 230,
+  packages/test-code/api/e2e/mobile-telemetry.e2e-spec.ts:195: networkLatencyMs: 230,
+  packages/test-code/api/e2e/phase15-monitoring.e2e-spec.ts:70: * this codebase for it). To keep this suite deterministic and network-independent, "successful"
+  packages/test-code/api/e2e/phase15-monitoring.e2e-spec.ts:85: // REAL HealthCheckRunnerService failure path without depending on any external network service.
+  packages/test-code/api/e2e/phase18-webhook-integrations.e2e-spec.ts:77: * depending on network reachability.
+  packages/test-code/api/e2e/webhook-delivery-worker.e2e-spec.ts:32: * there is no local/network endpoint available in this test environment to receive a real
+RESULT: FOUND 28 MATCH(ES)
+
+REQUIREMENT STATUS: EVIDENCE (3/3 marker groups)
+
+====================================================================================================
+14.9 — Generator provider module wiring
+====================================================================================================
+MARKER GROUP 1
+REGEX: (WORKSPACE_BLUEPRINT_GENERATOR|WorkspaceBlueprintGenerator)
+  apps/api/src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts:4: import type { WorkspaceBlueprintGenerator } from '../generators/workspace-blueprint-generator.interface';
+  apps/api/src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts:18: export class AiWorkspaceBlueprintGenerator implements WorkspaceBlueprintGenerator {
+  apps/api/src/modules/workspace-onboarding/generators/rule-based-workspace-blueprint.generator.ts:4: import type { WorkspaceBlueprintGenerator } from './workspace-blueprint-generator.interface';
+  apps/api/src/modules/workspace-onboarding/generators/rule-based-workspace-blueprint.generator.ts:21: export class RuleBasedWorkspaceBlueprintGenerator implements WorkspaceBlueprintGenerator {
+  apps/api/src/modules/workspace-onboarding/generators/workspace-blueprint-generator.interface.ts:3: export const WORKSPACE_BLUEPRINT_GENERATOR = Symbol('WORKSPACE_BLUEPRINT_GENERATOR');
+  apps/api/src/modules/workspace-onboarding/generators/workspace-blueprint-generator.interface.ts:5: export interface WorkspaceBlueprintGenerator {
+RESULT: FOUND 6 MATCH(ES)
+
+MARKER GROUP 2
+REGEX: (useFactory|useExisting|useClass|providers\s*:)
+  apps/api/src/app.module.ts:76: providers: [
+  apps/api/src/app.module.ts:79: useClass: ThrottlerGuard,
+RESULT: FOUND 2 MATCH(ES)
+
+MARKER GROUP 3
+REGEX: (RuleBasedWorkspaceBlueprintGenerator|AiWorkspaceBlueprintGenerator)
+  apps/api/src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts:18: export class AiWorkspaceBlueprintGenerator implements WorkspaceBlueprintGenerator {
+  apps/api/src/modules/workspace-onboarding/generators/rule-based-workspace-blueprint.generator.ts:21: export class RuleBasedWorkspaceBlueprintGenerator implements WorkspaceBlueprintGenerator {
+RESULT: FOUND 2 MATCH(ES)
+
+MARKER GROUP 4
+REGEX: (WORKSPACE_GENERATOR_PROVIDER|generatorProvider)
+  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql:14: "generatorProvider" TEXT NOT NULL DEFAULT 'rules',
+  apps/api/prisma/models/WorkspaceOnboardingSession.prisma:10: generatorProvider String                    @default("rules")
+  apps/api/src/modules/workspace-onboarding/workspace-onboarding-telemetry.service.ts:10: 'generatorProvider',
+  apps/api/src/modules/workspace-onboarding/workspace-onboarding.service.ts:73: generatorProvider: string;
+  apps/api/src/modules/workspace-onboarding/workspace-onboarding.service.ts:87: generatorProvider: 'rules',
+  apps/api/src/modules/workspace-onboarding/observability/workspace-onboarding-observability.port.ts:21: generatorProvider?: 'rules' | 'ai';
+  packages/shared-types/src/workspace-onboarding/workspace-onboarding.types.ts:21: export type WorkspaceGeneratorProvider = 'rules';
+  packages/shared-types/src/workspace-onboarding/workspace-onboarding.types.ts:82: provider: WorkspaceGeneratorProvider;
+RESULT: FOUND 9 MATCH(ES)
+
+REQUIREMENT STATUS: EVIDENCE (4/4 marker groups)
+
+====================================================================================================
+SUMMARY
+====================================================================================================
+
+Requirement Status   Markers Title                                                              
+----------- ------   ------- -----                                                              
+6.5         EVIDENCE 3/3     Phase 6 application and technology tests                           
+7.1         EVIDENCE 2/2     Blueprint persistence revision or hash fields                      
+7.2         EVIDENCE 2/2     Atomic blueprint repository update                                 
+7.5         MISSING  0/3     Blueprint retrieval, update and validation endpoints               
+7.6         PARTIAL  2/3     Frontend blueprint API additions                                   
+8.4         PARTIAL  2/3     Confirmation endpoint and stale revision protection                
+8.5         PARTIAL  2/3     Frontend confirmation and safe retry flow                          
+8.6         EVIDENCE 3/3     Transaction, rollback, concurrency and idempotency tests           
+9.2         PARTIAL  2/3     Repository selection service                                       
+9.3         REVIEW   3/3     GitHub work kept outside the core database transaction             
+9.4         PARTIAL  1/2     Repository strategy endpoints                                      
+9.5         MISSING  0/3     Frontend repository editor                                         
+9.6         EVIDENCE 3/3     Phase 9 GitHub and repository tests                                
+10.3        MISSING  0/2     Frontend engineering-systems review                                
+10.4        EVIDENCE 3/3     Phase 10 engineering-system tests                                  
+11.1        EVIDENCE 3/3     Configuration contract with hard numeric bounds                    
+11.3        PARTIAL  3/4     Endpoint-specific creation, generation and confirmation rate limits
+11.5        PARTIAL  2/3     Safe confirmation and authorization audit events                   
+11.7        EVIDENCE 4/4     Phase 11 security and retention tests                              
+12.2        PARTIAL  1/2     Guided-builder start route                                         
+12.3        MISSING  0/2     Latest resumable session endpoint and client                       
+13.5        PARTIAL  1/2     Frontend guided-builder feature gating                             
+13.6        PARTIAL  1/3     Phase 13 feature-flag and safe analytics tests                     
+14.8        EVIDENCE 3/3     AI provider tests                                                  
+14.9        EVIDENCE 4/4     Generator provider module wiring                                   
+
+
+
+
+====================================================================================================
+WORKTREE STATUS
+====================================================================================================
+A  apps/api/prisma/enums/WorkspaceOnboardingStatus.prisma
+A  apps/api/prisma/migrations/20260826190454_workspace_onboarding_sessions/migration.sql
+A  apps/api/prisma/models/WorkspaceOnboardingSession.prisma
+M  apps/api/prisma/models/identity.prisma
+M  apps/api/prisma/models/workspace.prisma
+ M apps/api/src/bootstrap/configure-application.ts
+ M apps/api/src/modules/repositories/controllers/github-webhook.controller.ts
+AM apps/api/src/modules/workspace-onboarding/ai-blueprint-provider.client.ts
+AM apps/api/src/modules/workspace-onboarding/dto/confirm-workspace-blueprint.dto.ts
+AM apps/api/src/modules/workspace-onboarding/dto/update-onboarding-answers.dto.ts
+AM apps/api/src/modules/workspace-onboarding/dto/update-workspace-blueprint.dto.ts
+A  apps/api/src/modules/workspace-onboarding/generator-orchestrator.service.ts
+AM apps/api/src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts
+AM apps/api/src/modules/workspace-onboarding/generators/rule-based-workspace-blueprint.generator.ts
+AM apps/api/src/modules/workspace-onboarding/generators/workspace-blueprint-generator.interface.ts
+AM apps/api/src/modules/workspace-onboarding/observability/workspace-onboarding-observability.port.ts
+AM apps/api/src/modules/workspace-onboarding/questions/question-catalog.ts
+AM apps/api/src/modules/workspace-onboarding/questions/question-flow.service.ts
+AM apps/api/src/modules/workspace-onboarding/repository-connection.port.ts
+AM apps/api/src/modules/workspace-onboarding/rules/application-technology.rules.ts
+AM apps/api/src/modules/workspace-onboarding/rules/engineering-system.rules.ts
+AM apps/api/src/modules/workspace-onboarding/rules/foundation.rules.ts
+AM apps/api/src/modules/workspace-onboarding/rules/rule-engine.ts
+AM apps/api/src/modules/workspace-onboarding/security/guided-workspace-builder-enabled.guard.ts
+AM apps/api/src/modules/workspace-onboarding/security/workspace-onboarding-payload.service.ts
+AM apps/api/src/modules/workspace-onboarding/technology-compatibility.service.ts
+AM apps/api/src/modules/workspace-onboarding/workspace-ai-circuit-breaker.service.ts
+AM apps/api/src/modules/workspace-onboarding/workspace-blueprint-hash.ts
+AM apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts
+AM apps/api/src/modules/workspace-onboarding/workspace-creation.port.ts
+AM apps/api/src/modules/workspace-onboarding/workspace-onboarding-cleanup.service.ts
+AM apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts
+AM apps/api/src/modules/workspace-onboarding/workspace-onboarding-errors.ts
+AM apps/api/src/modules/workspace-onboarding/workspace-onboarding-feature.service.ts
+AM apps/api/src/modules/workspace-onboarding/workspace-onboarding-public.controller.ts
+AM apps/api/src/modules/workspace-onboarding/workspace-onboarding-telemetry.service.ts
+AM apps/api/src/modules/workspace-onboarding/workspace-onboarding.controller.ts
+AM apps/api/src/modules/workspace-onboarding/workspace-onboarding.repository.ts
+AM apps/api/src/modules/workspace-onboarding/workspace-onboarding.service.ts
+ M apps/web/next-env.d.ts
+M  apps/web/src/app/(dashboard)/workspaces/new/new-workspace-client.tsx
+AM apps/web/src/features/workspace-onboarding/api/workspace-onboarding-api.ts
+AM apps/web/src/features/workspace-onboarding/components/blueprint-application-editor.tsx
+AM apps/web/src/features/workspace-onboarding/components/blueprint-review.tsx
+AM apps/web/src/features/workspace-onboarding/components/blueprint-validation-summary.tsx
+AM apps/web/src/features/workspace-onboarding/components/generator-badge.tsx
+AM apps/web/src/features/workspace-onboarding/components/guided-builder-entry.tsx
+AM apps/web/src/features/workspace-onboarding/components/guided-builder-error.tsx
+AM apps/web/src/features/workspace-onboarding/components/guided-workspace-builder.tsx
+AM apps/web/src/features/workspace-onboarding/components/onboarding-question-card.tsx
+AM apps/web/src/features/workspace-onboarding/components/workspace-creation-progress.tsx
+M  apps/web/tsconfig.tsbuildinfo
+R  fastify-auth-regression.txt -> docs/fastify-auth-regression.txt
+R  fastify-body-limit-diagnostic.txt -> docs/fastify-body-limit-diagnostic.txt
+R  fastify-e2e-harness-diagnostic.txt -> docs/fastify-e2e-harness-diagnostic.txt
+R  fastify-final-failures-diagnostic.txt -> docs/fastify-final-failures-diagnostic.txt
+R  fastify-final-quality-gates.txt -> docs/fastify-final-quality-gates.txt
+R  fastify-full-api-e2e-rerun.txt -> docs/fastify-full-api-e2e-rerun.txt
+R  fastify-full-api-e2e.txt -> docs/fastify-full-api-e2e.txt
+R  fastify-jest-runner-diagnostic.txt -> docs/fastify-jest-runner-diagnostic.txt
+R  fastify-last-bootstrap-diagnostic.txt -> docs/fastify-last-bootstrap-diagnostic.txt
+R  fastify-phase-2-diagnostic.txt -> docs/fastify-phase-2-diagnostic.txt
+R  fastify-phase-3-remaining-work.txt -> docs/fastify-phase-3-remaining-work.txt
+R  fastify-phase-4-controller-diagnostic.txt -> docs/fastify-phase-4-controller-diagnostic.txt
+R  fastify-request-reply-diagnostic.txt -> docs/fastify-request-reply-diagnostic.txt
+R  fastify-test-script-diagnostic.txt -> docs/fastify-test-script-diagnostic.txt
+R  fastify-tracker-bootstrap-diagnostic.txt -> docs/fastify-tracker-bootstrap-diagnostic.txt
+R  fastify-unit-failure-diagnostic.txt -> docs/fastify-unit-failure-diagnostic.txt
+ M docs/guided-workspace-builder-phases-1-5-code-pack.md
+ M docs/guided-workspace-builder-phases-11-14-code-pack.md
+ M docs/guided-workspace-builder-phases-6-10-code-pack.md
+R  parallel-e2e-redis-safety.txt -> docs/parallel-e2e-redis-safety.txt
+R  parallel-e2e-runner-diagnostic.txt -> docs/parallel-e2e-runner-diagnostic.txt
+R  parallel-e2e-schema-safety.txt -> docs/parallel-e2e-schema-safety.txt
+R  phase-1-baseline.txt -> docs/phase-1-baseline.txt
+R  phase-1-db-performance-trace.txt -> docs/phase-1-db-performance-trace.txt
+R  phase-1-post-fix-runtime.txt -> docs/phase-1-post-fix-runtime.txt
+R  phase-1-production-build.txt -> docs/phase-1-production-build.txt
+R  phase-1-runtime-errors-2.txt -> docs/phase-1-runtime-errors-2.txt
+R  phase-1-runtime-errors.txt -> docs/phase-1-runtime-errors.txt
+R  phase-5-desktop-ai-diagnostic.txt -> docs/phase-5-desktop-ai-diagnostic.txt
+R  phase-5-web-build-error.txt -> docs/phase-5-web-build-error.txt
+A  guided-builder-phase-1-5-diagnostic.txt
+A  guided-builder-phase-1-audit.txt
+MM packages/shared-types/src/index.ts
+AM packages/shared-types/src/workspace-onboarding/index.ts
+AM packages/shared-types/src/workspace-onboarding/workspace-onboarding.types.ts
+AM packages/test-code/api/e2e/fullstack-workspace-onboarding.spec.ts
+AM packages/test-code/api/e2e/guided-workspace-builder.ts
+AM packages/test-code/api/e2e/workspace-onboarding-sessions.e2e-spec.ts
+AM packages/test-code/api/unit/modules/workspace-onboarding/rule-based-generator.spec.ts
+AM packages/test-code/api/unit/modules/workspace-onboarding/workspace-onboarding.schemas.spec.ts
+M  packages/test-code/web/tsconfig.tsbuildinfo
+AM packages/validation/src/workspace-onboarding/workspace-onboarding.schemas.ts
+GIT STATUS EXIT CODE: 0

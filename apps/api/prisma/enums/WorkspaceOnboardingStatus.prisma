@@ -1,0 +1,8 @@
+enum WorkspaceOnboardingStatus {
+  IN_PROGRESS
+  BLUEPRINT_READY
+  CREATING
+  COMPLETED
+  FAILED
+  EXPIRED
+}

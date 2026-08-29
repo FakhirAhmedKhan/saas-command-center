@@ -1,4 +1,4 @@
-﻿// @vitest-environment jsdom
+// @vitest-environment jsdom
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -6,12 +6,23 @@ import NewWorkspacePage from '@/app/(dashboard)/workspaces/new/new-workspace-cli
 import { listImportableRepositories } from '@/features/workspaces/github-import/github-import-api';
 import { createWorkspace } from '@/features/workspaces/workspace-api';
 
-const { useSearchParamsMock } = vi.hoisted(() => ({
+const { featureStateMock, routerPushMock, useSearchParamsMock } = vi.hoisted(() => ({
+  featureStateMock: vi.fn(),
+  routerPushMock: vi.fn(),
   useSearchParamsMock: vi.fn(),
 }));
 
 vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: routerPushMock,
+  }),
   useSearchParams: useSearchParamsMock,
+}));
+
+vi.mock('@/features/workspace-onboarding/api/workspace-onboarding-api', () => ({
+  workspaceOnboardingApi: {
+    featureState: featureStateMock,
+  },
 }));
 
 vi.mock('@/features/workspaces/workspace-api', () => ({
@@ -25,42 +36,79 @@ vi.mock('@/features/workspaces/github-import/github-import-api', () => ({
 
 beforeEach(() => {
   useSearchParamsMock.mockReturnValue(new URLSearchParams());
+  routerPushMock.mockReset();
+  featureStateMock.mockReset().mockResolvedValue({
+    guidedWorkspaceBuilderEnabled: false,
+  });
   vi.mocked(createWorkspace).mockReset();
-  vi.mocked(listImportableRepositories).mockReset().mockResolvedValue({ installations: [], repositories: [] });
+  vi.mocked(listImportableRepositories).mockReset().mockResolvedValue({
+    installations: [],
+    repositories: [],
+  });
 });
 
 describe('NewWorkspacePage', () => {
-  it('shows the method selector by default, with manual workspace creation still available', () => {
+  it('hides guided setup when the flag is disabled', async () => {
     render(<NewWorkspacePage />);
 
-    expect(screen.getByText('How would you like to create your workspace?')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Create Manually/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Import from GitHub/ })).toBeInTheDocument();
+    await vi.waitFor(() => {
+      expect(featureStateMock).toHaveBeenCalledTimes(1);
+    });
+
+    expect(
+      screen.queryByRole('link', {
+        name: /Start guided builder/,
+      }),
+    ).not.toBeInTheDocument();
   });
 
-  it('shows the manual workspace form after choosing Create Manually', async () => {
+  it('shows the guided route when enabled', async () => {
+    featureStateMock.mockResolvedValue({
+      guidedWorkspaceBuilderEnabled: true,
+    });
+
     render(<NewWorkspacePage />);
 
-    await userEvent.click(screen.getByRole('button', { name: /Create Manually/ }));
+    const link = await screen.findByRole('link', {
+      name: /Start guided builder/,
+    });
 
-    expect(screen.getByRole('heading', { name: 'Create your workspace' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Workspace name')).toBeInTheDocument();
+    expect(link).toHaveAttribute('href', '/workspaces/new/guided');
   });
 
-  it('shows the GitHub import wizard after choosing Import from GitHub', async () => {
+  it('shows the manual workspace form', async () => {
     render(<NewWorkspacePage />);
 
-    await userEvent.click(screen.getByRole('button', { name: /Import from GitHub/ }));
+    await userEvent.click(
+      screen.getByRole('button', {
+        name: /Create Manually/,
+      }),
+    );
+
+    expect(
+      screen.getByRole('heading', {
+        name: 'Create your workspace',
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it('shows the GitHub import wizard', async () => {
+    render(<NewWorkspacePage />);
+
+    await userEvent.click(
+      screen.getByRole('button', {
+        name: /Import from GitHub/,
+      }),
+    );
 
     expect(await screen.findByText('Import from GitHub')).toBeInTheDocument();
   });
 
-  it('jumps straight into the GitHub wizard when returning with ?method=github', () => {
+  it('opens GitHub from its query method', () => {
     useSearchParamsMock.mockReturnValue(new URLSearchParams('method=github'));
 
     render(<NewWorkspacePage />);
 
     expect(screen.getByText('Import from GitHub')).toBeInTheDocument();
-    expect(screen.queryByText('How would you like to create your workspace?')).not.toBeInTheDocument();
   });
 });

@@ -1,0 +1,200 @@
+﻿GUIDED BUILDER TYPECHECK
+
+=== API TYPECHECK ===
+$ tsc -p tsconfig.json --noEmit
+src/modules/workspace-onboarding/ai-blueprint-provider.client.ts(15,30): error TS2304: Cannot find name 'TypedConfigService'.
+src/modules/workspace-onboarding/dto/confirm-workspace-blueprint.dto.ts(1,15): error TS2305: Module '"@command-center/shared-types"' has no exported member 'ConfirmWorkspaceBlueprintInput'.
+src/modules/workspace-onboarding/dto/update-onboarding-answers.dto.ts(2,50): error TS2307: Cannot find module '@command-center/validation' or its corresponding type declarations.
+src/modules/workspace-onboarding/dto/update-workspace-blueprint.dto.ts(1,15): error TS2305: Module '"@command-center/shared-types"' has no exported member 'UpdateWorkspaceBlueprintInput'.
+src/modules/workspace-onboarding/dto/update-workspace-blueprint.dto.ts(2,42): error TS2307: Cannot find module '@command-center/validation' or its corresponding type declarations.
+src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts(2,84): error TS2307: Cannot find module '@command-center/validation' or its corresponding type declarations.
+src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts(5,48): error TS2307: Cannot find module '../rules/technology-compatibility.service' or its corresponding type declarations.
+src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts(6,43): error TS2307: Cannot find module './ai-blueprint-provider.client' or its corresponding type declarations.
+src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts(22,30): error TS2304: Cannot find name 'TypedConfigService'.
+src/modules/workspace-onboarding/generators/rule-based-workspace-blueprint.generator.ts(2,84): error TS2307: Cannot find module '@command-center/validation' or its corresponding type declarations.
+src/modules/workspace-onboarding/repository-connection.port.ts(1,41): error TS2305: Module '"@command-center/shared-types"' has no exported member 'WorkspaceBlueprintRepository'.
+src/modules/workspace-onboarding/rules/application-technology.rules.ts(31,9): error TS2353: Object literal may only specify known properties, and 'source' does not exist in type 'WorkspaceBlueprintApplication'.
+src/modules/workspace-onboarding/rules/application-technology.rules.ts(51,9): error TS2353: Object literal may only specify known properties, and 'source' does not exist in type 'WorkspaceBlueprintApplication'.
+src/modules/workspace-onboarding/rules/application-technology.rules.ts(68,9): error TS2353: Object literal may only specify known properties, and 'source' does not exist in type 'WorkspaceBlueprintApplication'.
+src/modules/workspace-onboarding/rules/engineering-system.rules.ts(1,34): error TS2305: Module '"@command-center/shared-types"' has no exported member 'WorkspaceBlueprintEngineeringConfiguration'.
+src/modules/workspace-onboarding/rules/engineering-system.rules.ts(30,13): error TS2339: Property 'engineeringConfigurations' does not exist on type 'WorkspaceBlueprint'.
+src/modules/workspace-onboarding/rules/engineering-system.rules.ts(41,20): error TS2339: Property 'engineeringConfigurations' does not exist on type 'WorkspaceBlueprint'.
+src/modules/workspace-onboarding/rules/engineering-system.rules.ts(41,52): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/modules/workspace-onboarding/rules/engineering-system.rules.ts(42,17): error TS2339: Property 'engineeringConfigurations' does not exist on type 'WorkspaceBlueprint'.
+src/modules/workspace-onboarding/workspace-ai-circuit-breaker.service.ts(8,40): error TS2304: Cannot find name 'TypedConfigService'.
+src/modules/workspace-onboarding/workspace-blueprint.service.ts(1,15): error TS2305: Module '"@command-center/shared-types"' has no exported member 'UpdateWorkspaceBlueprintInput'.
+src/modules/workspace-onboarding/workspace-blueprint.service.ts(1,66): error TS2724: '"@command-center/shared-types"' has no exported member named 'WorkspaceBlueprintValidationIssue'. Did you mean 'WorkspaceBlueprintApplication'?
+src/modules/workspace-onboarding/workspace-blueprint.service.ts(1,101): error TS2724: '"@command-center/shared-types"' has no exported member named 'WorkspaceBlueprintValidationResult'. Did you mean 'WorkspaceBlueprintApplication'?
+src/modules/workspace-onboarding/workspace-blueprint.service.ts(2,42): error TS2307: Cannot find module '@command-center/validation' or its corresponding type declarations.
+src/modules/workspace-onboarding/workspace-blueprint.service.ts(4,48): error TS2307: Cannot find module './rules/technology-compatibility.service' or its corresponding type declarations.
+src/modules/workspace-onboarding/workspace-blueprint.service.ts(55,62): error TS2339: Property 'blueprintRevision' does not exist on type '{ id: string; status: WorkspaceOnboardingStatus; currentStep: string | null; answers: JsonValue; blueprint: JsonValue; schemaVersion: number; ... 8 more ...; workspaceId: string | null; }'.
+src/modules/workspace-onboarding/workspace-blueprint.service.ts(65,17): error TS2339: Property 'blueprintRevision' does not exist on type '{ id: string; status: WorkspaceOnboardingStatus; currentStep: string | null; answers: JsonValue; blueprint: JsonValue; schemaVersion: number; ... 8 more ...; workspaceId: string | null; }'.
+src/modules/workspace-onboarding/workspace-blueprint.service.ts(69,72): error TS2339: Property 'blueprintRevision' does not exist on type '{ id: string; status: WorkspaceOnboardingStatus; currentStep: string | null; answers: JsonValue; blueprint: JsonValue; schemaVersion: number; ... 8 more ...; workspaceId: string | null; }'.
+src/modules/workspace-onboarding/workspace-blueprint.service.ts(78,28): error TS2339: Property 'updateBlueprintRevision' does not exist on type 'WorkspaceOnboardingRepository'.
+src/modules/workspace-onboarding/workspace-creation.port.ts(2,15): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
+src/modules/workspace-onboarding/workspace-onboarding-cleanup.service.ts(14,37): error TS2304: Cannot find name 'TypedConfigService'.
+src/modules/workspace-onboarding/workspace-onboarding-cleanup.service.ts(18,35): error TS2551: Property 'tryWithLock' does not exist on type 'PostgresAdvisoryLockService'. Did you mean 'withLock'?
+src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts(1,15): error TS2305: Module '"@command-center/shared-types"' has no exported member 'ConfirmWorkspaceBlueprintInput'.
+src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts(1,47): error TS2305: Module '"@command-center/shared-types"' has no exported member 'WorkspaceCreationResult'.
+src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts(2,42): error TS2307: Cannot find module '@command-center/validation' or its corresponding type declarations.
+src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts(3,10): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
+src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts(6,69): error TS2307: Cannot find module './ports/workspace-creation.port' or its corresponding type declarations.
+src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts(36,15): error TS2339: Property 'blueprintRevision' does not exist on type '{ id: string; status: WorkspaceOnboardingStatus; currentStep: string | null; answers: JsonValue; blueprint: JsonValue; schemaVersion: number; ... 8 more ...; workspaceId: string | null; }'.
+src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts(36,69): error TS2551: Property 'blueprintHash' does not exist on type '{ id: string; status: WorkspaceOnboardingStatus; currentStep: string | null; answers: JsonValue; blueprint: JsonValue; schemaVersion: number; ... 8 more ...; workspaceId: string | null; }'. Did you mean 'blueprint'?
+src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts(40,81): error TS2339: Property 'blueprintRevision' does not exist on type '{ id: string; status: WorkspaceOnboardingStatus; currentStep: string | null; answers: JsonValue; blueprint: JsonValue; schemaVersion: number; ... 8 more ...; workspaceId: string | null; }'.
+src/modules/workspace-onboarding/workspace-onboarding-feature.service.ts(5,40): error TS2304: Cannot find name 'TypedConfigService'.
+src/modules/workspace-onboarding/workspace-onboarding-telemetry.service.ts(1,107): error TS2307: Cannot find module './workspace-onboarding-observability.port' or its corresponding type declarations.
+src/modules/workspace-onboarding/workspace-onboarding-telemetry.service.ts(3,52): error TS2307: Cannot find module './workspace-onboarding-observability.port' or its corresponding type declarations.
+src/modules/workspace-onboarding/workspace-onboarding.repository.ts(1,15): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
+src/modules/workspace-onboarding/workspace-onboarding.repository.ts(1,23): error TS2305: Module '"@prisma/client"' has no exported member 'WorkspaceOnboardingStatus'.
+src/modules/workspace-onboarding/workspace-onboarding.repository.ts(31,20): error TS1361: 'Prisma' cannot be used as a value because it was imported using 'import type'.
+src/modules/workspace-onboarding/workspace-onboarding.service.ts(2,50): error TS2307: Cannot find module '@command-center/validation' or its corresponding type declarations.
+src/modules/workspace-onboarding/workspace-onboarding.service.ts(60,34): error TS2339: Property 'generator' does not exist on type 'WorkspaceOnboardingService'.
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @command-center/api@0.1.0 typecheck: `tsc -p tsconfig.json --noEmit`
+Exit status 2
+API TYPECHECK EXIT CODE: 2
+
+=== WEB TYPECHECK ===
+$ next typegen && tsc --noEmit
+Generating route types...
+✓ Types generated successfully
+src/app/(dashboard)/workspaces/new/new-workspace-client.tsx(21,47): error TS2304: Cannot find name 'sessionId'.
+src/app/(dashboard)/workspaces/new/new-workspace-client.tsx(23,7): error TS2367: This comparison appears to be unintentional because the types '"select"' and '"github"' have no overlap.
+src/features/workspace-onboarding/components/blueprint-application-editor.tsx(15,39): error TS2353: Object literal may only specify known properties, and 'source' does not exist in type 'WorkspaceBlueprintApplication'.
+src/features/workspace-onboarding/components/blueprint-review.tsx(3,35): error TS2724: '"@command-center/shared-types"' has no exported member named 'WorkspaceBlueprintValidationIssue'. Did you mean 'WorkspaceBlueprintApplication'?
+src/features/workspace-onboarding/components/blueprint-review.tsx(18,52): error TS2339: Property 'updateBlueprint' does not exist on type '{ create: () => Promise<WorkspaceOnboardingSessionResponse>; get: (id: string) => Promise<WorkspaceOnboardingSessionResponse>; questions: (id: string) => Promise<...>; updateAnswers: (id: string, answers: Partial<...>) => Promise<...>; }'.
+src/features/workspace-onboarding/components/blueprint-review.tsx(19,42): error TS2339: Property 'blueprintRevision' does not exist on type 'WorkspaceOnboardingSessionResponse'.
+src/features/workspace-onboarding/components/blueprint-review.tsx(22,55): error TS2339: Property 'validateBlueprint' does not exist on type '{ create: () => Promise<WorkspaceOnboardingSessionResponse>; get: (id: string) => Promise<WorkspaceOnboardingSessionResponse>; questions: (id: string) => Promise<...>; updateAnswers: (id: string, answers: Partial<...>) => Promise<...>; }'.
+src/features/workspace-onboarding/components/blueprint-review.tsx(59,72): error TS2339: Property 'blueprintRevision' does not exist on type 'WorkspaceOnboardingSessionResponse'.
+src/features/workspace-onboarding/components/blueprint-validation-summary.tsx(1,15): error TS2724: '"@command-center/shared-types"' has no exported member named 'WorkspaceBlueprintValidationIssue'. Did you mean 'WorkspaceBlueprintApplication'?
+src/features/workspace-onboarding/components/generator-badge.tsx(4,14): error TS2367: This comparison appears to be unintentional because the types '"rules"' and '"ai"' have no overlap.
+src/features/workspace-onboarding/components/guided-builder-error.tsx(1,41): error TS2307: Cannot find module '../workspace-onboarding-errors' or its corresponding type declarations.
+src/features/workspace-onboarding/components/workspace-creation-progress.tsx(15,18): error TS2551: Property 'blueprintHash' does not exist on type 'WorkspaceOnboardingSessionResponse'. Did you mean 'blueprint'?
+src/features/workspace-onboarding/components/workspace-creation-progress.tsx(24,51): error TS2339: Property 'confirm' does not exist on type '{ create: () => Promise<WorkspaceOnboardingSessionResponse>; get: (id: string) => Promise<WorkspaceOnboardingSessionResponse>; questions: (id: string) => Promise<...>; updateAnswers: (id: string, answers: Partial<...>) => Promise<...>; }'.
+src/features/workspace-onboarding/components/workspace-creation-progress.tsx(25,35): error TS2339: Property 'blueprintRevision' does not exist on type 'WorkspaceOnboardingSessionResponse'.
+src/features/workspace-onboarding/components/workspace-creation-progress.tsx(26,32): error TS2551: Property 'blueprintHash' does not exist on type 'WorkspaceOnboardingSessionResponse'. Did you mean 'blueprint'?
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @command-center/web@0.1.0 typecheck: `next typegen && tsc --noEmit`
+Exit status 2
+WEB TYPECHECK EXIT CODE: 2
+
+=== API TEST TYPECHECK ===
+$ tsc -p tsconfig.json --noEmit
+../../../apps/api/src/modules/workspace-onboarding/ai-blueprint-provider.client.ts(15,30): error TS2304: Cannot find name 'TypedConfigService'.
+../../../apps/api/src/modules/workspace-onboarding/dto/confirm-workspace-blueprint.dto.ts(1,15): error TS2305: Module '"@command-center/shared-types"' has no exported member 'ConfirmWorkspaceBlueprintInput'.
+../../../apps/api/src/modules/workspace-onboarding/dto/update-onboarding-answers.dto.ts(2,50): error TS2307: Cannot find module '@command-center/validation' or its corresponding type declarations.
+../../../apps/api/src/modules/workspace-onboarding/dto/update-workspace-blueprint.dto.ts(1,15): error TS2305: Module '"@command-center/shared-types"' has no exported member 'UpdateWorkspaceBlueprintInput'.
+../../../apps/api/src/modules/workspace-onboarding/dto/update-workspace-blueprint.dto.ts(2,42): error TS2307: Cannot find module '@command-center/validation' or its corresponding type declarations.
+../../../apps/api/src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts(2,84): error TS2307: Cannot find module '@command-center/validation' or its corresponding type declarations.
+../../../apps/api/src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts(5,48): error TS2307: Cannot find module '../rules/technology-compatibility.service' or its corresponding type declarations.
+../../../apps/api/src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts(6,43): error TS2307: Cannot find module './ai-blueprint-provider.client' or its corresponding type declarations.
+../../../apps/api/src/modules/workspace-onboarding/generators/ai-workspace-blueprint.generator.ts(22,30): error TS2304: Cannot find name 'TypedConfigService'.
+../../../apps/api/src/modules/workspace-onboarding/generators/rule-based-workspace-blueprint.generator.ts(2,84): error TS2307: Cannot find module '@command-center/validation' or its corresponding type declarations.
+../../../apps/api/src/modules/workspace-onboarding/repository-connection.port.ts(1,41): error TS2305: Module '"@command-center/shared-types"' has no exported member 'WorkspaceBlueprintRepository'.
+../../../apps/api/src/modules/workspace-onboarding/rules/application-technology.rules.ts(31,9): error TS2353: Object literal may only specify known properties, and 'source' does not exist in type 'WorkspaceBlueprintApplication'.
+../../../apps/api/src/modules/workspace-onboarding/rules/application-technology.rules.ts(51,9): error TS2353: Object literal may only specify known properties, and 'source' does not exist in type 'WorkspaceBlueprintApplication'.
+../../../apps/api/src/modules/workspace-onboarding/rules/application-technology.rules.ts(68,9): error TS2353: Object literal may only specify known properties, and 'source' does not exist in type 'WorkspaceBlueprintApplication'.
+../../../apps/api/src/modules/workspace-onboarding/rules/engineering-system.rules.ts(1,34): error TS2305: Module '"@command-center/shared-types"' has no exported member 'WorkspaceBlueprintEngineeringConfiguration'.
+../../../apps/api/src/modules/workspace-onboarding/rules/engineering-system.rules.ts(30,13): error TS2339: Property 'engineeringConfigurations' does not exist on type 'WorkspaceBlueprint'.
+../../../apps/api/src/modules/workspace-onboarding/rules/engineering-system.rules.ts(41,20): error TS2339: Property 'engineeringConfigurations' does not exist on type 'WorkspaceBlueprint'.
+../../../apps/api/src/modules/workspace-onboarding/rules/engineering-system.rules.ts(41,52): error TS7006: Parameter 'item' implicitly has an 'any' type.
+../../../apps/api/src/modules/workspace-onboarding/rules/engineering-system.rules.ts(42,17): error TS2339: Property 'engineeringConfigurations' does not exist on type 'WorkspaceBlueprint'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-ai-circuit-breaker.service.ts(8,40): error TS2304: Cannot find name 'TypedConfigService'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts(1,15): error TS2305: Module '"@command-center/shared-types"' has no exported member 'UpdateWorkspaceBlueprintInput'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts(1,66): error TS2724: '"@command-center/shared-types"' has no exported member named 'WorkspaceBlueprintValidationIssue'. Did you mean 'WorkspaceBlueprintApplication'?
+../../../apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts(1,101): error TS2724: '"@command-center/shared-types"' has no exported member named 'WorkspaceBlueprintValidationResult'. Did you mean 'WorkspaceBlueprintApplication'?
+../../../apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts(2,42): error TS2307: Cannot find module '@command-center/validation' or its corresponding type declarations.
+../../../apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts(4,48): error TS2307: Cannot find module './rules/technology-compatibility.service' or its corresponding type declarations.
+../../../apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts(55,62): error TS2339: Property 'blueprintRevision' does not exist on type '{ id: string; workspaceId: string | null; userId: string; createdAt: Date; updatedAt: Date; status: WorkspaceOnboardingStatus; completedAt: Date | null; ... 7 more ...; idempotencyKey: string | null; }'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts(65,17): error TS2339: Property 'blueprintRevision' does not exist on type '{ id: string; workspaceId: string | null; userId: string; createdAt: Date; updatedAt: Date; status: WorkspaceOnboardingStatus; completedAt: Date | null; ... 7 more ...; idempotencyKey: string | null; }'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts(69,72): error TS2339: Property 'blueprintRevision' does not exist on type '{ id: string; workspaceId: string | null; userId: string; createdAt: Date; updatedAt: Date; status: WorkspaceOnboardingStatus; completedAt: Date | null; ... 7 more ...; idempotencyKey: string | null; }'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-blueprint.service.ts(78,28): error TS2339: Property 'updateBlueprintRevision' does not exist on type 'WorkspaceOnboardingRepository'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-creation.port.ts(2,15): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding-cleanup.service.ts(14,37): error TS2304: Cannot find name 'TypedConfigService'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding-cleanup.service.ts(18,35): error TS2551: Property 'tryWithLock' does not exist on type 'PostgresAdvisoryLockService'. Did you mean 'withLock'?
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts(1,15): error TS2305: Module '"@command-center/shared-types"' has no exported member 'ConfirmWorkspaceBlueprintInput'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts(1,47): error TS2305: Module '"@command-center/shared-types"' has no exported member 'WorkspaceCreationResult'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts(2,42): error TS2307: Cannot find module '@command-center/validation' or its corresponding type declarations.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts(3,10): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts(6,69): error TS2307: Cannot find module './ports/workspace-creation.port' or its corresponding type declarations.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts(36,15): error TS2339: Property 'blueprintRevision' does not exist on type '{ id: string; workspaceId: string | null; userId: string; createdAt: Date; updatedAt: Date; status: WorkspaceOnboardingStatus; completedAt: Date | null; ... 7 more ...; idempotencyKey: string | null; }'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts(36,69): error TS2551: Property 'blueprintHash' does not exist on type '{ id: string; workspaceId: string | null; userId: string; createdAt: Date; updatedAt: Date; status: WorkspaceOnboardingStatus; completedAt: Date | null; ... 7 more ...; idempotencyKey: string | null; }'. Did you mean 'blueprint'?
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding-creation.service.ts(40,81): error TS2339: Property 'blueprintRevision' does not exist on type '{ id: string; workspaceId: string | null; userId: string; createdAt: Date; updatedAt: Date; status: WorkspaceOnboardingStatus; completedAt: Date | null; ... 7 more ...; idempotencyKey: string | null; }'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding-feature.service.ts(5,40): error TS2304: Cannot find name 'TypedConfigService'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding-telemetry.service.ts(1,107): error TS2307: Cannot find module './workspace-onboarding-observability.port' or its corresponding type declarations.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding-telemetry.service.ts(3,52): error TS2307: Cannot find module './workspace-onboarding-observability.port' or its corresponding type declarations.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding.repository.ts(1,15): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding.repository.ts(1,23): error TS2305: Module '"@prisma/client"' has no exported member 'WorkspaceOnboardingStatus'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding.repository.ts(31,20): error TS1361: 'Prisma' cannot be used as a value because it was imported using 'import type'.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding.service.ts(2,50): error TS2307: Cannot find module '@command-center/validation' or its corresponding type declarations.
+../../../apps/api/src/modules/workspace-onboarding/workspace-onboarding.service.ts(60,34): error TS2339: Property 'generator' does not exist on type 'WorkspaceOnboardingService'.
+e2e/fullstack-workspace-onboarding.spec.ts(4,9): error TS2304: Cannot find name 'loginAsOwner'.
+e2e/fullstack-workspace-onboarding.spec.ts(7,9): error TS2304: Cannot find name 'answerText'.
+e2e/fullstack-workspace-onboarding.spec.ts(8,9): error TS2304: Cannot find name 'answerText'.
+e2e/fullstack-workspace-onboarding.spec.ts(9,9): error TS2304: Cannot find name 'choose'.
+e2e/fullstack-workspace-onboarding.spec.ts(10,9): error TS2304: Cannot find name 'chooseMany'.
+e2e/fullstack-workspace-onboarding.spec.ts(11,9): error TS2304: Cannot find name 'chooseMany'.
+e2e/fullstack-workspace-onboarding.spec.ts(12,9): error TS2304: Cannot find name 'chooseMany'.
+e2e/fullstack-workspace-onboarding.spec.ts(13,9): error TS2304: Cannot find name 'chooseMany'.
+e2e/fullstack-workspace-onboarding.spec.ts(14,9): error TS2304: Cannot find name 'chooseMany'.
+e2e/fullstack-workspace-onboarding.spec.ts(15,9): error TS2304: Cannot find name 'chooseBoolean'.
+e2e/fullstack-workspace-onboarding.spec.ts(16,9): error TS2304: Cannot find name 'choose'.
+e2e/fullstack-workspace-onboarding.spec.ts(17,9): error TS2304: Cannot find name 'chooseMany'.
+e2e/fullstack-workspace-onboarding.spec.ts(18,9): error TS2304: Cannot find name 'chooseMany'.
+e2e/fullstack-workspace-onboarding.spec.ts(51,9): error TS2304: Cannot find name 'loginAsOwner'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(22,53): error TS2558: Expected 0 type arguments, but got 1.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(27,49): error TS2339: Property 'accessToken' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(36,49): error TS2339: Property 'accessToken' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(51,49): error TS2339: Property 'accessToken' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(60,49): error TS2339: Property 'accessToken' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(67,52): error TS2339: Property 'accessToken' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(69,38): error TS2339: Property 'id' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(69,48): error TS2339: Property 'accessToken' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(82,59): error TS2339: Property 'id' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(82,69): error TS2339: Property 'accessToken' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(84,21): error TS2339: Property 'statusCode' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(85,21): error TS2339: Property 'json' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(104,52): error TS2339: Property 'accessToken' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(105,28): error TS2304: Cannot find name 'getSession'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(105,52): error TS2339: Property 'id' does not exist on type 'void'.
+e2e/workspace-onboarding-sessions.e2e-spec.ts(105,65): error TS2339: Property 'accessToken' does not exist on type 'void'.
+unit/modules/workspace-onboarding/rule-based-generator.spec.ts(25,44): error TS2345: Argument of type '{ productIdea: string; workspaceName: string; productType: "PRODUCTIVITY_SAAS"; targetUsers: string[]; applicationTypes: readonly ["WEB", "MOBILE", "DESKTOP"]; coreFeatures: string[]; authentication: boolean; ... 6 more ...; qualityRequirements: readonly [...]; }' is not assignable to parameter of type 'WorkspaceOnboardingAnswers'.
+  Types of property 'applicationTypes' are incompatible.
+    The type 'readonly ["WEB", "MOBILE", "DESKTOP"]' is 'readonly' and cannot be assigned to the mutable type '("MOBILE" | "DESKTOP" | "WEB")[]'.
+unit/modules/workspace-onboarding/rule-based-generator.spec.ts(26,45): error TS2345: Argument of type '{ productIdea: string; workspaceName: string; productType: "PRODUCTIVITY_SAAS"; targetUsers: string[]; applicationTypes: readonly ["WEB", "MOBILE", "DESKTOP"]; coreFeatures: string[]; authentication: boolean; ... 6 more ...; qualityRequirements: readonly [...]; }' is not assignable to parameter of type 'WorkspaceOnboardingAnswers'.
+  Types of property 'applicationTypes' are incompatible.
+    The type 'readonly ["WEB", "MOBILE", "DESKTOP"]' is 'readonly' and cannot be assigned to the mutable type '("MOBILE" | "DESKTOP" | "WEB")[]'.
+unit/modules/workspace-onboarding/rule-based-generator.spec.ts(32,48): error TS2345: Argument of type '{ productIdea: string; workspaceName: string; productType: "PRODUCTIVITY_SAAS"; targetUsers: string[]; applicationTypes: readonly ["WEB", "MOBILE", "DESKTOP"]; coreFeatures: string[]; authentication: boolean; ... 6 more ...; qualityRequirements: readonly [...]; }' is not assignable to parameter of type 'WorkspaceOnboardingAnswers'.
+  Types of property 'applicationTypes' are incompatible.
+    The type 'readonly ["WEB", "MOBILE", "DESKTOP"]' is 'readonly' and cannot be assigned to the mutable type '("MOBILE" | "DESKTOP" | "WEB")[]'.
+unit/modules/workspace-onboarding/rule-based-generator.spec.ts(38,48): error TS2345: Argument of type '{ productIdea: string; workspaceName: string; productType: "PRODUCTIVITY_SAAS"; targetUsers: string[]; applicationTypes: readonly ["WEB", "MOBILE", "DESKTOP"]; coreFeatures: string[]; authentication: boolean; ... 6 more ...; qualityRequirements: readonly [...]; }' is not assignable to parameter of type 'WorkspaceOnboardingAnswers'.
+  Types of property 'applicationTypes' are incompatible.
+    The type 'readonly ["WEB", "MOBILE", "DESKTOP"]' is 'readonly' and cannot be assigned to the mutable type '("MOBILE" | "DESKTOP" | "WEB")[]'.
+unit/modules/workspace-onboarding/workspace-onboarding.schemas.spec.ts(1,118): error TS2307: Cannot find module '@command-center/validation' or its corresponding type declarations.
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\api:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @command-center/api-tests@0.1.0 typecheck: `tsc -p tsconfig.json --noEmit`
+Exit status 2
+API TEST TYPECHECK EXIT CODE: 2
+
+=== WEB TEST TYPECHECK ===
+$ tsc -p tsconfig.json --noEmit
+../../../apps/web/src/app/(dashboard)/workspaces/new/new-workspace-client.tsx(21,47): error TS2304: Cannot find name 'sessionId'.
+../../../apps/web/src/app/(dashboard)/workspaces/new/new-workspace-client.tsx(23,7): error TS2367: This comparison appears to be unintentional because the types '"select"' and '"github"' have no overlap.
+../../../apps/web/src/features/workspace-onboarding/components/blueprint-application-editor.tsx(15,39): error TS2353: Object literal may only specify known properties, and 'source' does not exist in type 'WorkspaceBlueprintApplication'.
+../../../apps/web/src/features/workspace-onboarding/components/blueprint-review.tsx(3,35): error TS2724: '"@command-center/shared-types"' has no exported member named 'WorkspaceBlueprintValidationIssue'. Did you mean 'WorkspaceBlueprintApplication'?
+../../../apps/web/src/features/workspace-onboarding/components/blueprint-review.tsx(18,52): error TS2339: Property 'updateBlueprint' does not exist on type '{ create: () => Promise<WorkspaceOnboardingSessionResponse>; get: (id: string) => Promise<WorkspaceOnboardingSessionResponse>; questions: (id: string) => Promise<...>; updateAnswers: (id: string, answers: Partial<...>) => Promise<...>; }'.
+../../../apps/web/src/features/workspace-onboarding/components/blueprint-review.tsx(19,42): error TS2339: Property 'blueprintRevision' does not exist on type 'WorkspaceOnboardingSessionResponse'.
+../../../apps/web/src/features/workspace-onboarding/components/blueprint-review.tsx(22,55): error TS2339: Property 'validateBlueprint' does not exist on type '{ create: () => Promise<WorkspaceOnboardingSessionResponse>; get: (id: string) => Promise<WorkspaceOnboardingSessionResponse>; questions: (id: string) => Promise<...>; updateAnswers: (id: string, answers: Partial<...>) => Promise<...>; }'.
+../../../apps/web/src/features/workspace-onboarding/components/blueprint-review.tsx(59,72): error TS2339: Property 'blueprintRevision' does not exist on type 'WorkspaceOnboardingSessionResponse'.
+../../../apps/web/src/features/workspace-onboarding/components/blueprint-validation-summary.tsx(1,15): error TS2724: '"@command-center/shared-types"' has no exported member named 'WorkspaceBlueprintValidationIssue'. Did you mean 'WorkspaceBlueprintApplication'?
+../../../apps/web/src/features/workspace-onboarding/components/generator-badge.tsx(4,14): error TS2367: This comparison appears to be unintentional because the types '"rules"' and '"ai"' have no overlap.
+../../../apps/web/src/features/workspace-onboarding/components/guided-builder-error.tsx(1,41): error TS2307: Cannot find module '../workspace-onboarding-errors' or its corresponding type declarations.
+../../../apps/web/src/features/workspace-onboarding/components/workspace-creation-progress.tsx(15,18): error TS2551: Property 'blueprintHash' does not exist on type 'WorkspaceOnboardingSessionResponse'. Did you mean 'blueprint'?
+../../../apps/web/src/features/workspace-onboarding/components/workspace-creation-progress.tsx(24,51): error TS2339: Property 'confirm' does not exist on type '{ create: () => Promise<WorkspaceOnboardingSessionResponse>; get: (id: string) => Promise<WorkspaceOnboardingSessionResponse>; questions: (id: string) => Promise<...>; updateAnswers: (id: string, answers: Partial<...>) => Promise<...>; }'.
+../../../apps/web/src/features/workspace-onboarding/components/workspace-creation-progress.tsx(25,35): error TS2339: Property 'blueprintRevision' does not exist on type 'WorkspaceOnboardingSessionResponse'.
+../../../apps/web/src/features/workspace-onboarding/components/workspace-creation-progress.tsx(26,32): error TS2551: Property 'blueprintHash' does not exist on type 'WorkspaceOnboardingSessionResponse'. Did you mean 'blueprint'?
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @command-center/web-tests@0.1.0 typecheck: `tsc -p tsconfig.json --noEmit`
+Exit status 2
+WEB TEST TYPECHECK EXIT CODE: 2

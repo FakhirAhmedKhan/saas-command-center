@@ -104,76 +104,19 @@ Validate numeric values with hard bounds:
 ```ts
 const workspaceOnboardingConfig: WorkspaceOnboardingRuntimeConfig = {
   enabled: getBoolean(config, 'GUIDED_WORKSPACE_BUILDER_ENABLED', false),
-  generatorProvider: getEnum(
-    config,
-    'WORKSPACE_GENERATOR_PROVIDER',
-    ['rules', 'ai'] as const,
-    'rules',
-  ),
+  generatorProvider: getEnum(config, 'WORKSPACE_GENERATOR_PROVIDER', ['rules', 'ai'] as const, 'rules'),
   schemaVersion: 1,
   ruleSetVersion: getString(config, 'WORKSPACE_RULE_SET_VERSION', '1.0.0'),
-  sessionTtlHours: getBoundedInteger(
-    config,
-    'WORKSPACE_ONBOARDING_SESSION_TTL_HOURS',
-    1,
-    720,
-    168,
-  ),
-  maxAnswerBytes: getBoundedInteger(
-    config,
-    'WORKSPACE_ONBOARDING_MAX_ANSWER_BYTES',
-    1024,
-    262144,
-    32768,
-  ),
-  maxBlueprintBytes: getBoundedInteger(
-    config,
-    'WORKSPACE_ONBOARDING_MAX_BLUEPRINT_BYTES',
-    4096,
-    1048576,
-    131072,
-  ),
-  retentionDays: getBoundedInteger(
-    config,
-    'WORKSPACE_ONBOARDING_RETENTION_DAYS',
-    1,
-    365,
-    30,
-  ),
-  cleanupBatchSize: getBoundedInteger(
-    config,
-    'WORKSPACE_ONBOARDING_CLEANUP_BATCH_SIZE',
-    1,
-    1000,
-    250,
-  ),
-  aiFallbackEnabled: getBoolean(
-    config,
-    'WORKSPACE_ONBOARDING_AI_FALLBACK_ENABLED',
-    true,
-  ),
-  aiRequestTimeoutMs: getBoundedInteger(
-    config,
-    'WORKSPACE_AI_REQUEST_TIMEOUT_MS',
-    1000,
-    60000,
-    15000,
-  ),
+  sessionTtlHours: getBoundedInteger(config, 'WORKSPACE_ONBOARDING_SESSION_TTL_HOURS', 1, 720, 168),
+  maxAnswerBytes: getBoundedInteger(config, 'WORKSPACE_ONBOARDING_MAX_ANSWER_BYTES', 1024, 262144, 32768),
+  maxBlueprintBytes: getBoundedInteger(config, 'WORKSPACE_ONBOARDING_MAX_BLUEPRINT_BYTES', 4096, 1048576, 131072),
+  retentionDays: getBoundedInteger(config, 'WORKSPACE_ONBOARDING_RETENTION_DAYS', 1, 365, 30),
+  cleanupBatchSize: getBoundedInteger(config, 'WORKSPACE_ONBOARDING_CLEANUP_BATCH_SIZE', 1, 1000, 250),
+  aiFallbackEnabled: getBoolean(config, 'WORKSPACE_ONBOARDING_AI_FALLBACK_ENABLED', true),
+  aiRequestTimeoutMs: getBoundedInteger(config, 'WORKSPACE_AI_REQUEST_TIMEOUT_MS', 1000, 60000, 15000),
   aiMaxRetries: getBoundedInteger(config, 'WORKSPACE_AI_MAX_RETRIES', 0, 2, 1),
-  aiCircuitFailureThreshold: getBoundedInteger(
-    config,
-    'WORKSPACE_AI_CIRCUIT_FAILURE_THRESHOLD',
-    1,
-    20,
-    3,
-  ),
-  aiCircuitResetMs: getBoundedInteger(
-    config,
-    'WORKSPACE_AI_CIRCUIT_RESET_MS',
-    1000,
-    600000,
-    60000,
-  ),
+  aiCircuitFailureThreshold: getBoundedInteger(config, 'WORKSPACE_AI_CIRCUIT_FAILURE_THRESHOLD', 1, 20, 3),
+  aiCircuitResetMs: getBoundedInteger(config, 'WORKSPACE_AI_CIRCUIT_RESET_MS', 1000, 600000, 60000),
 };
 ```
 
@@ -186,8 +129,7 @@ Create `security/workspace-onboarding-payload.service.ts`:
 ```ts
 import { PayloadTooLargeException, BadRequestException, Injectable } from '@nestjs/common';
 
-const forbiddenKeyPattern =
-  /^(?:access[_-]?token|refresh[_-]?token|client[_-]?secret|webhook[_-]?secret|private[_-]?key|password)$/i;
+const forbiddenKeyPattern = /^(?:access[_-]?token|refresh[_-]?token|client[_-]?secret|webhook[_-]?secret|private[_-]?key|password)$/i;
 
 @Injectable()
 export class WorkspaceOnboardingPayloadService {
@@ -199,9 +141,7 @@ export class WorkspaceOnboardingPayloadService {
     const bytes = this.byteLength(value);
 
     if (bytes > maximumBytes) {
-      throw new PayloadTooLargeException(
-        `${label} exceeds the ${maximumBytes}-byte limit`,
-      );
+      throw new PayloadTooLargeException(`${label} exceeds the ${maximumBytes}-byte limit`);
     }
   }
 
@@ -218,13 +158,9 @@ export class WorkspaceOnboardingPayloadService {
         continue;
       }
 
-      for (const [key, child] of Object.entries(
-        current as Record<string, unknown>,
-      )) {
+      for (const [key, child] of Object.entries(current as Record<string, unknown>)) {
         if (forbiddenKeyPattern.test(key)) {
-          throw new BadRequestException(
-            `Sensitive field "${key}" is not allowed in onboarding data`,
-          );
+          throw new BadRequestException(`Sensitive field "${key}" is not allowed in onboarding data`);
         }
 
         stack.push(child);
@@ -295,9 +231,7 @@ export class WorkspaceOnboardingCleanupService {
     const lock = await this.locks.tryWithLock(CLEANUP_LOCK_KEY, async () => {
       const config = this.runtimeConfig.workspaceOnboarding;
       const now = new Date();
-      const retentionCutoff = new Date(
-        now.getTime() - config.retentionDays * 24 * 60 * 60 * 1000,
-      );
+      const retentionCutoff = new Date(now.getTime() - config.retentionDays * 24 * 60 * 60 * 1000);
 
       const expired = await this.prisma.workspaceOnboardingSession.updateMany({
         where: {
@@ -347,22 +281,10 @@ If the advisory lock service uses a different method signature, adapt only the l
 Define an observability port now and implement it in Phase 13:
 
 ```ts
-export type WorkspaceOnboardingAuditEvent =
-  | 'SESSION_CREATED'
-  | 'SESSION_ACCESS_DENIED'
-  | 'BLUEPRINT_VALIDATION_FAILED'
-  | 'CONFIRMATION_STARTED'
-  | 'CONFIRMATION_SUCCEEDED'
-  | 'CONFIRMATION_FAILED';
+export type WorkspaceOnboardingAuditEvent = 'SESSION_CREATED' | 'SESSION_ACCESS_DENIED' | 'BLUEPRINT_VALIDATION_FAILED' | 'CONFIRMATION_STARTED' | 'CONFIRMATION_SUCCEEDED' | 'CONFIRMATION_FAILED';
 
 export interface WorkspaceOnboardingAuditPort {
-  record(input: {
-    event: WorkspaceOnboardingAuditEvent;
-    sessionId?: string;
-    userId?: string;
-    requestId?: string;
-    reasonCode?: string;
-  }): Promise<void>;
+  record(input: { event: WorkspaceOnboardingAuditEvent; sessionId?: string; userId?: string; requestId?: string; reasonCode?: string }): Promise<void>;
 }
 ```
 
@@ -373,14 +295,7 @@ Never pass answers, product descriptions, blueprints, repository names, tokens, 
 Create `workspace-onboarding-errors.ts`:
 
 ```ts
-export type GuidedBuilderErrorKind =
-  | 'EXPIRED'
-  | 'RATE_LIMITED'
-  | 'FORBIDDEN'
-  | 'STALE'
-  | 'VALIDATION'
-  | 'UNAVAILABLE'
-  | 'UNKNOWN';
+export type GuidedBuilderErrorKind = 'EXPIRED' | 'RATE_LIMITED' | 'FORBIDDEN' | 'STALE' | 'VALIDATION' | 'UNAVAILABLE' | 'UNKNOWN';
 
 export interface GuidedBuilderError {
   kind: GuidedBuilderErrorKind;
@@ -389,10 +304,7 @@ export interface GuidedBuilderError {
 }
 
 export function normalizeGuidedBuilderError(error: unknown): GuidedBuilderError {
-  const status =
-    typeof error === 'object' && error && 'status' in error
-      ? Number((error as { status: unknown }).status)
-      : 0;
+  const status = typeof error === 'object' && error && 'status' in error ? Number((error as { status: unknown }).status) : 0;
 
   if (status === 410) {
     return { kind: 'EXPIRED', message: 'This guided session expired.', retryable: false };
@@ -422,19 +334,13 @@ Create `guided-builder-error.tsx`:
 ```tsx
 import type { GuidedBuilderError } from '../workspace-onboarding-errors';
 
-export function GuidedBuilderErrorState({
-  error,
-  onRetry,
-}: {
-  error: GuidedBuilderError;
-  onRetry?: () => void;
-}) {
+export function GuidedBuilderErrorState({ error, onRetry }: { error: GuidedBuilderError; onRetry?: () => void }) {
   return (
-    <section className="rounded-2xl border border-red-200 bg-red-50 p-5" role="alert">
-      <h2 className="font-semibold text-red-950">Unable to continue</h2>
-      <p className="mt-2 text-sm text-red-800">{error.message}</p>
+    <section className='rounded-2xl border border-red-200 bg-red-50 p-5' role='alert'>
+      <h2 className='font-semibold text-red-950'>Unable to continue</h2>
+      <p className='mt-2 text-sm text-red-800'>{error.message}</p>
       {error.retryable && onRetry && (
-        <button className="mt-4 rounded-lg bg-red-950 px-4 py-2 text-white" onClick={onRetry} type="button">
+        <button className='mt-4 rounded-lg bg-red-950 px-4 py-2 text-white' onClick={onRetry} type='button'>
           Try again
         </button>
       )}
@@ -450,17 +356,12 @@ describe('WorkspaceOnboardingPayloadService', () => {
   const service = new WorkspaceOnboardingPayloadService();
 
   it('rejects oversized UTF-8 payloads by byte length', () => {
-    expect(() => service.validateAnswers({ productIdea: '🚀'.repeat(100) }, 100))
-      .toThrow('exceeds');
+    expect(() => service.validateAnswers({ productIdea: '🚀'.repeat(100) }, 100)).toThrow('exceeds');
   });
 
-  it.each(['accessToken', 'refresh_token', 'client-secret', 'privateKey'])(
-    'rejects forbidden key %s at any nesting level',
-    (key) => {
-      expect(() => service.validateBlueprint({ nested: { [key]: 'secret' } }, 10_000))
-        .toThrow('Sensitive field');
-    },
-  );
+  it.each(['accessToken', 'refresh_token', 'client-secret', 'privateKey'])('rejects forbidden key %s at any nesting level', (key) => {
+    expect(() => service.validateBlueprint({ nested: { [key]: 'secret' } }, 10_000)).toThrow('Sensitive field');
+  });
 });
 
 it('expires and later deletes eligible drafts without deleting completed sessions', async () => {
@@ -468,9 +369,11 @@ it('expires and later deletes eligible drafts without deleting completed session
   const result = await cleanup.run();
 
   expect(result.expired).toBeGreaterThan(0);
-  expect(await prisma.workspaceOnboardingSession.count({
-    where: { status: 'COMPLETED' },
-  })).toBe(1);
+  expect(
+    await prisma.workspaceOnboardingSession.count({
+      where: { status: 'COMPLETED' },
+    }),
+  ).toBe(1);
 });
 
 it('rate limits repeated blueprint generation', async () => {
@@ -504,15 +407,11 @@ export function GuidedBuilderEntry({ enabled }: { enabled: boolean }) {
   if (!enabled) return null;
 
   return (
-    <article className="flex h-full flex-col rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 to-white p-6">
-      <span className="w-fit rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-800">
-        Guided recommendations
-      </span>
-      <h2 className="mt-4 text-xl font-semibold">Build from your product idea</h2>
-      <p className="mt-2 flex-1 text-sm text-slate-600">
-        Answer focused questions, review a deterministic blueprint, and create web, mobile, and desktop applications together.
-      </p>
-      <Link className="mt-6 rounded-xl bg-slate-950 px-4 py-3 text-center font-medium text-white" href="/workspaces/new/guided">
+    <article className='flex h-full flex-col rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 to-white p-6'>
+      <span className='w-fit rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-800'>Guided recommendations</span>
+      <h2 className='mt-4 text-xl font-semibold'>Build from your product idea</h2>
+      <p className='mt-2 flex-1 text-sm text-slate-600'>Answer focused questions, review a deterministic blueprint, and create web, mobile, and desktop applications together.</p>
+      <Link className='mt-6 rounded-xl bg-slate-950 px-4 py-3 text-center font-medium text-white' href='/workspaces/new/guided'>
         Start guided builder
       </Link>
     </article>
@@ -537,14 +436,16 @@ export default function StartGuidedWorkspacePage() {
   const [error, setError] = useState<string | null>(null);
 
   return (
-    <main className="mx-auto max-w-2xl p-4 sm:p-8">
-      <h1 className="text-3xl font-bold">Guided workspace builder</h1>
-      <p className="mt-3 text-slate-600">
-        Your answers stay as a draft until you review and confirm the blueprint.
-      </p>
-      {error && <p className="mt-4 text-red-700" role="alert">{error}</p>}
+    <main className='mx-auto max-w-2xl p-4 sm:p-8'>
+      <h1 className='text-3xl font-bold'>Guided workspace builder</h1>
+      <p className='mt-3 text-slate-600'>Your answers stay as a draft until you review and confirm the blueprint.</p>
+      {error && (
+        <p className='mt-4 text-red-700' role='alert'>
+          {error}
+        </p>
+      )}
       <button
-        className="mt-6 rounded-xl bg-slate-950 px-5 py-3 text-white disabled:opacity-50"
+        className='mt-6 rounded-xl bg-slate-950 px-5 py-3 text-white disabled:opacity-50'
         disabled={starting}
         onClick={async () => {
           setStarting(true);
@@ -557,7 +458,7 @@ export default function StartGuidedWorkspacePage() {
             setStarting(false);
           }
         }}
-        type="button"
+        type='button'
       >
         {starting ? 'Starting…' : 'Start questions'}
       </button>
@@ -601,22 +502,16 @@ Frontend banner:
 import Link from 'next/link';
 import type { WorkspaceOnboardingSessionResponse } from '@command-center/shared-types';
 
-export function ResumeDraftBanner({ session }: {
-  session: WorkspaceOnboardingSessionResponse | null;
-}) {
+export function ResumeDraftBanner({ session }: { session: WorkspaceOnboardingSessionResponse | null }) {
   if (!session) return null;
 
-  const destination = session.status === 'BLUEPRINT_READY'
-    ? `/workspaces/new/guided/${session.id}/review`
-    : `/workspaces/new/guided/${session.id}`;
+  const destination = session.status === 'BLUEPRINT_READY' ? `/workspaces/new/guided/${session.id}/review` : `/workspaces/new/guided/${session.id}`;
 
   return (
-    <aside className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
-      <p className="font-medium text-blue-950">Continue your guided workspace</p>
-      <p className="mt-1 text-sm text-blue-800">
-        Last updated {new Date(session.updatedAt).toLocaleString()}.
-      </p>
-      <Link className="mt-3 inline-flex rounded-lg bg-blue-950 px-4 py-2 text-sm font-medium text-white" href={destination}>
+    <aside className='rounded-2xl border border-blue-200 bg-blue-50 p-4'>
+      <p className='font-medium text-blue-950'>Continue your guided workspace</p>
+      <p className='mt-1 text-sm text-blue-800'>Last updated {new Date(session.updatedAt).toLocaleString()}.</p>
+      <Link className='mt-3 inline-flex rounded-lg bg-blue-950 px-4 py-2 text-sm font-medium text-white' href={destination}>
         Resume draft
       </Link>
     </aside>
@@ -628,14 +523,14 @@ export function ResumeDraftBanner({ session }: {
 
 Use these server-enforced redirects after loading a session:
 
-| Session status | Route behavior |
-| --- | --- |
-| `IN_PROGRESS` | Question route |
-| `BLUEPRINT_READY` | Review route |
-| `CREATING` | Creating/status route |
-| `COMPLETED` | Redirect to workspace |
-| `FAILED` | Review route with recoverable error |
-| `EXPIRED` | Expired state with start-new action |
+| Session status    | Route behavior                      |
+| ----------------- | ----------------------------------- |
+| `IN_PROGRESS`     | Question route                      |
+| `BLUEPRINT_READY` | Review route                        |
+| `CREATING`        | Creating/status route               |
+| `COMPLETED`       | Redirect to workspace               |
+| `FAILED`          | Review route with recoverable error |
+| `EXPIRED`         | Expired state with start-new action |
 
 Do not rely only on client state for these transitions.
 
@@ -736,46 +631,31 @@ export async function answerGuidedFlow(page: Page, options: GuidedFlowOptions) {
   await choose(page, 'Which applications do you need?', options.applications);
 
   if (options.applications.includes('Mobile')) {
-    await choose(
-      page,
-      'Which mobile platforms do you need?',
-      options.mobilePlatforms ?? ['Android'],
-    );
+    await choose(page, 'Which mobile platforms do you need?', options.mobilePlatforms ?? ['Android']);
   }
 
   if (options.applications.includes('Desktop')) {
-    await choose(
-      page,
-      'Which desktop platforms do you need?',
-      options.desktopPlatforms ?? ['Windows'],
-    );
+    await choose(page, 'Which desktop platforms do you need?', options.desktopPlatforms ?? ['Windows']);
   }
 
   await choose(page, 'Which core features are required?', ['Dashboard']);
   await choose(page, 'Does the product require user accounts?', ['Yes']);
-  await choose(
-    page,
-    'Do repositories already exist?',
-    [options.repositories ?? 'Connect later'],
-  );
-  await choose(page, 'Which environments are required?', [
-    'Development',
-    'Production',
-  ]);
-  await choose(page, 'Which engineering systems are required?', [
-    'CI/CD',
-    'Monitoring',
-    'Security',
-  ]);
+  await choose(page, 'Do repositories already exist?', [options.repositories ?? 'Connect later']);
+  await choose(page, 'Which environments are required?', ['Development', 'Production']);
+  await choose(page, 'Which engineering systems are required?', ['CI/CD', 'Monitoring', 'Security']);
 }
 
 export async function generateAndConfirm(page: Page) {
-  await page.getByRole('button', {
-    name: 'Generate guided recommendations',
-  }).click();
-  await expect(page.getByRole('heading', {
-    name: 'Review guided recommendations',
-  })).toBeVisible();
+  await page
+    .getByRole('button', {
+      name: 'Generate guided recommendations',
+    })
+    .click();
+  await expect(
+    page.getByRole('heading', {
+      name: 'Review guided recommendations',
+    }),
+  ).toBeVisible();
   await page.getByRole('button', { name: 'Save and continue' }).click();
   await page.getByRole('button', { name: 'Confirm and create' }).click();
   await expect(page).toHaveURL(/\/workspaces\/[a-z0-9-]+$/);
@@ -786,18 +666,8 @@ Create independent tests in `fullstack-workspace-onboarding.spec.ts`:
 
 ```ts
 import { expect, test } from '@playwright/test';
-import {
-  answerGuidedFlow,
-  generateAndConfirm,
-  text,
-} from './helpers/guided-workspace-builder';
-import {
-  apiControl,
-  createOwnerSession,
-  database,
-  loginAsOwner,
-  loginAsUser,
-} from './fixtures/helpers';
+import { answerGuidedFlow, generateAndConfirm, text } from './helpers/guided-workspace-builder';
+import { apiControl, createOwnerSession, database, loginAsOwner, loginAsUser } from './fixtures/helpers';
 
 test.beforeEach(async ({ page }) => {
   await loginAsOwner(page);
@@ -838,11 +708,7 @@ test('creates web, mobile and desktop together', async ({ page }) => {
     applications: ['Web', 'Mobile', 'Desktop'],
   });
   await generateAndConfirm(page);
-  expect(await database.applicationTypes('EverywhereFlow')).toEqual([
-    'WEB',
-    'MOBILE',
-    'DESKTOP',
-  ]);
+  expect(await database.applicationTypes('EverywhereFlow')).toEqual(['WEB', 'MOBILE', 'DESKTOP']);
 });
 
 test('persists an edited generated stack', async ({ page }) => {
@@ -851,12 +717,8 @@ test('persists an edited generated stack', async ({ page }) => {
     applications: ['Desktop'],
   });
   await page.getByRole('button', { name: 'Generate guided recommendations' }).click();
-  await page.getByRole('group', { name: 'EditedFlow Desktop' })
-    .getByRole('button', { name: 'ELECTRON' })
-    .click();
-  await page.getByRole('group', { name: 'EditedFlow Desktop' })
-    .getByRole('button', { name: 'TAURI' })
-    .click();
+  await page.getByRole('group', { name: 'EditedFlow Desktop' }).getByRole('button', { name: 'ELECTRON' }).click();
+  await page.getByRole('group', { name: 'EditedFlow Desktop' }).getByRole('button', { name: 'TAURI' }).click();
   await page.getByRole('button', { name: 'Save and continue' }).click();
   await page.getByRole('button', { name: 'Confirm and create' }).click();
   expect(await database.desktopStack('EditedFlow')).toContain('ELECTRON');
@@ -865,9 +727,11 @@ test('persists an edited generated stack', async ({ page }) => {
 test('resumes an interrupted session after refresh', async ({ page }) => {
   await text(page, 'What are you building?', 'Resume product');
   await page.reload();
-  await expect(page.getByRole('heading', {
-    name: 'What should the workspace be called?',
-  })).toBeVisible();
+  await expect(
+    page.getByRole('heading', {
+      name: 'What should the workspace be called?',
+    }),
+  ).toBeVisible();
 });
 
 test('removes dependent answers after an earlier change', async ({ page }) => {
@@ -878,9 +742,7 @@ test('removes dependent answers after an earlier change', async ({ page }) => {
   await page.goto(`/workspaces/new/guided/${session.id}`);
   await apiControl.updateAnswers(session.id, { applicationTypes: ['WEB'] });
   await page.reload();
-  expect(await apiControl.session(session.id)).not.toHaveProperty(
-    'answers.mobilePlatforms',
-  );
+  expect(await apiControl.session(session.id)).not.toHaveProperty('answers.mobilePlatforms');
 });
 
 test('creates with a verified GitHub repository', async ({ page }) => {
@@ -891,8 +753,7 @@ test('creates with a verified GitHub repository', async ({ page }) => {
     repositories: 'Connect now',
   });
   await page.getByRole('button', { name: 'Generate guided recommendations' }).click();
-  await page.getByRole('combobox', { name: 'WEB' })
-    .selectOption({ label: 'owner/web-repo' });
+  await page.getByRole('combobox', { name: 'WEB' }).selectOption({ label: 'owner/web-repo' });
   await page.getByRole('button', { name: 'Save and continue' }).click();
   await page.getByRole('button', { name: 'Confirm and create' }).click();
   expect(await database.repositoryStatus('ConnectedFlow')).toBe('CONNECTED');
@@ -936,9 +797,7 @@ test('rejects cross-user session access', async ({ page }) => {
 });
 
 test('renders deterministic API error and empty states', async ({ page }) => {
-  await page.route('**/workspace-onboarding/sessions/*/questions', (route) =>
-    route.fulfill({ status: 503, json: { message: 'Unavailable' } }),
-  );
+  await page.route('**/workspace-onboarding/sessions/*/questions', (route) => route.fulfill({ status: 503, json: { message: 'Unavailable' } }));
   await page.reload();
   await expect(page.getByText('temporarily unavailable')).toBeVisible();
 });
@@ -947,9 +806,7 @@ test('completes the flow at 390x844 without horizontal overflow', async ({ page 
   await page.setViewportSize({ width: 390, height: 844 });
   await answerGuidedFlow(page, { name: 'PocketFlow', applications: ['Web'] });
   await generateAndConfirm(page);
-  const overflow = await page.evaluate(() =>
-    document.documentElement.scrollWidth > document.documentElement.clientWidth,
-  );
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
   expect(overflow).toBe(false);
 });
 
@@ -969,9 +826,7 @@ test('keeps manual and GitHub creation operational', async ({ page }) => {
 await page.setViewportSize({ width: 390, height: 844 });
 await page.goto(guidedUrl);
 
-const overflow = await page.evaluate(() =>
-  document.documentElement.scrollWidth > document.documentElement.clientWidth,
-);
+const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
 
 expect(overflow).toBe(false);
 await expect(page.getByRole('main')).toBeVisible();
@@ -1055,9 +910,7 @@ The endpoint exposes only a boolean—never provider, model, endpoint, API key s
 Create `observability/workspace-onboarding-observability.port.ts`:
 
 ```ts
-export const WORKSPACE_ONBOARDING_OBSERVABILITY = Symbol(
-  'WORKSPACE_ONBOARDING_OBSERVABILITY',
-);
+export const WORKSPACE_ONBOARDING_OBSERVABILITY = Symbol('WORKSPACE_ONBOARDING_OBSERVABILITY');
 
 export type GuidedBuilderEvent =
   | 'guided_builder_started'
@@ -1096,11 +949,7 @@ export interface WorkspaceOnboardingObservabilityPort {
 Create `workspace-onboarding-telemetry.service.ts`:
 
 ```ts
-import type {
-  GuidedBuilderEvent,
-  GuidedBuilderEventMetadata,
-  WorkspaceOnboardingObservabilityPort,
-} from './workspace-onboarding-observability.port';
+import type { GuidedBuilderEvent, GuidedBuilderEventMetadata, WorkspaceOnboardingObservabilityPort } from './workspace-onboarding-observability.port';
 import { Inject, Injectable } from '@nestjs/common';
 import { WORKSPACE_ONBOARDING_OBSERVABILITY } from './workspace-onboarding-observability.port';
 
@@ -1124,11 +973,7 @@ export class WorkspaceOnboardingTelemetryService {
   ) {}
 
   async event(name: GuidedBuilderEvent, metadata: GuidedBuilderEventMetadata) {
-    const sanitized = Object.fromEntries(
-      Object.entries(metadata).filter(([key]) =>
-        allowedMetadataKeys.has(key as keyof GuidedBuilderEventMetadata),
-      ),
-    ) as unknown as GuidedBuilderEventMetadata;
+    const sanitized = Object.fromEntries(Object.entries(metadata).filter(([key]) => allowedMetadataKeys.has(key as keyof GuidedBuilderEventMetadata))) as unknown as GuidedBuilderEventMetadata;
 
     await this.observability.event(name, sanitized);
   }
@@ -1151,7 +996,7 @@ Fetch public feature state on the workspace creation server page and render the 
 const feature = await api.features.guidedWorkspaceBuilder();
 
 return (
-  <div className="grid gap-4 md:grid-cols-3">
+  <div className='grid gap-4 md:grid-cols-3'>
     <ManualWorkspaceEntry />
     <GitHubWorkspaceEntry />
     <GuidedBuilderEntry enabled={feature.guidedWorkspaceBuilderEnabled} />
@@ -1275,10 +1120,7 @@ export class WorkspaceAiCircuitBreakerService {
   failure(now = Date.now()): void {
     this.failures += 1;
 
-    if (
-      this.failures >=
-      this.config.workspaceOnboarding.aiCircuitFailureThreshold
-    ) {
+    if (this.failures >= this.config.workspaceOnboarding.aiCircuitFailureThreshold) {
       this.openedAt = now;
     }
   }
@@ -1318,10 +1160,7 @@ export class AiBlueprintProviderClient {
 
     for (let attempt = 0; attempt < attempts; attempt += 1) {
       const controller = new AbortController();
-      const timeout = setTimeout(
-        () => controller.abort(),
-        this.config.workspaceOnboarding.aiRequestTimeoutMs,
-      );
+      const timeout = setTimeout(() => controller.abort(), this.config.workspaceOnboarding.aiRequestTimeoutMs);
 
       try {
         const response = await fetch(`${ai.baseUrl.replace(/\/$/, '')}/chat/completions`, {
@@ -1363,9 +1202,7 @@ export class AiBlueprintProviderClient {
       }
     }
 
-    throw new ServiceUnavailableException(
-      lastError instanceof Error ? lastError.message : 'AI provider failed',
-    );
+    throw new ServiceUnavailableException(lastError instanceof Error ? lastError.message : 'AI provider failed');
   }
 }
 ```
@@ -1377,14 +1214,8 @@ Do not include full provider response bodies in thrown errors or logs because th
 Create `ai-workspace-blueprint.generator.ts`:
 
 ```ts
-import type {
-  WorkspaceBlueprint,
-  WorkspaceOnboardingAnswers,
-} from '@command-center/shared-types';
-import {
-  completeWorkspaceOnboardingAnswersSchema,
-  workspaceBlueprintSchema,
-} from '@command-center/validation';
+import type { WorkspaceBlueprint, WorkspaceOnboardingAnswers } from '@command-center/shared-types';
+import { completeWorkspaceOnboardingAnswersSchema, workspaceBlueprintSchema } from '@command-center/validation';
 import { Injectable } from '@nestjs/common';
 import type { WorkspaceBlueprintGenerator } from '../generators/workspace-blueprint-generator.interface';
 import { TechnologyCompatibilityService } from '../rules/technology-compatibility.service';
@@ -1418,11 +1249,7 @@ export class AiWorkspaceBlueprintGenerator implements WorkspaceBlueprintGenerato
           supported: {
             applicationTypes: ['WEB', 'MOBILE', 'DESKTOP'],
             platforms: ['WEB', 'ANDROID', 'IOS', 'WINDOWS', 'MACOS', 'LINUX'],
-            technologies: [
-              'NEXT_JS', 'TYPESCRIPT', 'KOTLIN', 'JETPACK_COMPOSE',
-              'SWIFT', 'SWIFTUI', 'REACT_NATIVE', 'FLUTTER',
-              'TAURI', 'ELECTRON', 'NEST_JS', 'POSTGRESQL', 'REDIS',
-            ],
+            technologies: ['NEXT_JS', 'TYPESCRIPT', 'KOTLIN', 'JETPACK_COMPOSE', 'SWIFT', 'SWIFTUI', 'REACT_NATIVE', 'FLUTTER', 'TAURI', 'ELECTRON', 'NEST_JS', 'POSTGRESQL', 'REDIS'],
           },
         }),
       },
@@ -1438,11 +1265,7 @@ export class AiWorkspaceBlueprintGenerator implements WorkspaceBlueprintGenerato
     });
 
     for (const application of candidate.applications) {
-      this.compatibility.assertApplication(
-        application.type,
-        application.platforms,
-        application.stack,
-      );
+      this.compatibility.assertApplication(application.type, application.platforms, application.stack);
     }
 
     return candidate;
@@ -1465,10 +1288,7 @@ Provider/model metadata is allowed. Hidden reasoning, chain-of-thought, raw prom
 Create `generator-orchestrator.service.ts`:
 
 ```ts
-import type {
-  WorkspaceBlueprint,
-  WorkspaceOnboardingAnswers,
-} from '@command-center/shared-types';
+import type { WorkspaceBlueprint, WorkspaceOnboardingAnswers } from '@command-center/shared-types';
 import { Injectable, Logger } from '@nestjs/common';
 import type { WorkspaceBlueprintGenerator } from '../generators/workspace-blueprint-generator.interface';
 import { RuleBasedWorkspaceBlueprintGenerator } from '../generators/rule-based-workspace-blueprint.generator';
@@ -1524,11 +1344,7 @@ import type { WorkspaceGeneratorProvider } from '@command-center/shared-types';
 export function GeneratorBadge({ provider }: { provider: WorkspaceGeneratorProvider }) {
   const ai = provider === 'ai';
 
-  return (
-    <span className="inline-flex rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-800">
-      {ai ? 'AI-assisted recommendations' : 'Guided recommendations'}
-    </span>
-  );
+  return <span className='inline-flex rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-800'>{ai ? 'AI-assisted recommendations' : 'Guided recommendations'}</span>;
 }
 ```
 
@@ -1571,13 +1387,15 @@ describe('AiWorkspaceBlueprintGenerator', () => {
 
   it('rejects incompatible technology output', async () => {
     fake.response = validAiBlueprintFixture({
-      applications: [{
-        type: 'MOBILE',
-        name: 'Bad Mobile',
-        platforms: ['ANDROID'],
-        stack: ['SWIFT', 'SWIFTUI'],
-        source: 'RULE',
-      }],
+      applications: [
+        {
+          type: 'MOBILE',
+          name: 'Bad Mobile',
+          platforms: ['ANDROID'],
+          stack: ['SWIFT', 'SWIFTUI'],
+          source: 'RULE',
+        },
+      ],
     });
     await expect(generator.generate(completeAnswers)).rejects.toThrow('not compatible');
   });
@@ -1622,10 +1440,7 @@ The final module contains the established Phase 1–10 providers plus:
 
 ```ts
 @Module({
-  controllers: [
-    WorkspaceOnboardingController,
-    WorkspaceOnboardingPublicController,
-  ],
+  controllers: [WorkspaceOnboardingController, WorkspaceOnboardingPublicController],
   providers: [
     WorkspaceOnboardingFeatureService,
     GuidedWorkspaceBuilderEnabledGuard,

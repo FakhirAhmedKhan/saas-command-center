@@ -1,0 +1,54 @@
+$ pnpm -r --if-present lint
+Scope: 12 of 13 workspace projects
+apps/tracker lint$ eslint .
+packages/shared-types lint$ eslint .
+packages/test-code/tracker lint$ eslint .
+packages/test-code/web lint$ eslint .
+apps/tracker lint: Done
+packages/ui lint$ eslint .
+packages/shared-types lint: Done
+packages/test-code/tracker lint: Done
+packages/ui lint: Done
+packages/test-code/web lint: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\e2e\full-stack\fullstack-workspace-onboarding.spec.ts
+packages/test-code/web lint:   1:1  error  `./guided-workspace-builder` import should occur after import of `./fixtures/state`  import/order
+packages/test-code/web lint: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web\e2e\full-stack\guided-workspace-builder.ts
+packages/test-code/web lint:   1:27  error  'C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\@playwright\test\index.mjs' imported multiple times  import/no-duplicates
+packages/test-code/web lint:   2:24  error  'C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\@playwright\test\index.mjs' imported multiple times  import/no-duplicates
+packages/test-code/web lint: ✖ 3 problems (3 errors, 0 warnings)
+packages/test-code/web lint:   2 errors and 0 warnings potentially fixable with the `--fix` option.
+packages/test-code/web lint: Failed
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @command-center/web-tests@0.1.0 lint: `eslint .`
+Exit status 1
+[ELIFECYCLE] Command failed with exit code 1.
+
+LINT EXIT CODE: 1
+$ pnpm build:packages && pnpm -r --if-present typecheck
+$ pnpm --filter @command-center/shared-types build && pnpm --filter @command-center/validation build
+$ tsc -p tsconfig.json && tsc -p tsconfig.cjs.json && node ../../scripts/write-cjs-marker.mjs dist-cjs
+$ tsc -p tsconfig.json && tsc -p tsconfig.cjs.json && node ../../scripts/write-cjs-marker.mjs dist-cjs
+Scope: 12 of 13 workspace projects
+packages/test-code typecheck$ pnpm run typecheck:api && pnpm run typecheck:web
+packages/test-code typecheck: $ pnpm --filter @command-center/api-tests typecheck
+packages/test-code typecheck: $ tsc -p tsconfig.json --noEmit
+packages/test-code typecheck: $ pnpm --filter @command-center/web-tests typecheck
+packages/test-code typecheck: $ tsc -p tsconfig.json --noEmit
+packages/test-code typecheck: ../../../apps/web/src/app/(dashboard)/workspaces/new/new-workspace-client.tsx(21,47): error TS2304: Cannot find name 'sessionId'.
+packages/test-code typecheck: ../../../apps/web/src/app/(dashboard)/workspaces/new/new-workspace-client.tsx(23,7): error TS2367: This comparison appears to be unintentional because the types '"select"' and '"github"' have no overlap.
+packages/test-code typecheck: ../../../apps/web/src/features/workspace-onboarding/components/blueprint-review.tsx(17,52): error TS2339: Property 'updateBlueprint' does not exist on type '{ create: () => Promise<WorkspaceOnboardingSessionResponse>; get: (id: string) => Promise<WorkspaceOnboardingSessionResponse>; questions: (id: string) => Promise<...>; updateAnswers: (id: string, answers: Partial<...>) => Promise<...>; }'.
+packages/test-code typecheck: ../../../apps/web/src/features/workspace-onboarding/components/blueprint-review.tsx(21,55): error TS2339: Property 'validateBlueprint' does not exist on type '{ create: () => Promise<WorkspaceOnboardingSessionResponse>; get: (id: string) => Promise<WorkspaceOnboardingSessionResponse>; questions: (id: string) => Promise<...>; updateAnswers: (id: string, answers: Partial<...>) => Promise<...>; }'.
+packages/test-code typecheck: ../../../apps/web/src/features/workspace-onboarding/components/guided-builder-error.tsx(1,41): error TS2307: Cannot find module '../workspace-onboarding-errors' or its corresponding type declarations.
+packages/test-code typecheck: ../../../apps/web/src/features/workspace-onboarding/components/workspace-creation-progress.tsx(23,51): error TS2339: Property 'confirm' does not exist on type '{ create: () => Promise<WorkspaceOnboardingSessionResponse>; get: (id: string) => Promise<WorkspaceOnboardingSessionResponse>; questions: (id: string) => Promise<...>; updateAnswers: (id: string, answers: Partial<...>) => Promise<...>; }'.
+packages/test-code typecheck: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code\web:
+packages/test-code typecheck: [ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @command-center/web-tests@0.1.0 typecheck: `tsc -p tsconfig.json --noEmit`
+packages/test-code typecheck: Exit status 1
+packages/test-code typecheck: [ELIFECYCLE] Command failed with exit code 1.
+packages/test-code typecheck: [WARN]  Local package.json exists, but node_modules missing, did you mean to install?
+packages/test-code typecheck: Failed
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\packages\test-code:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @command-center/test-code@0.1.0 typecheck: `pnpm run typecheck:api && pnpm run typecheck:web`
+Exit status 1
+[WARN]  Local package.json exists, but node_modules missing, did you mean to install?
+[ELIFECYCLE] Command failed with exit code 1.
+
+TYPECHECK EXIT CODE: 1
