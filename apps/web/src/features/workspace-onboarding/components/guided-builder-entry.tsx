@@ -9,7 +9,7 @@ export function GuidedBuilderEntry({ enabled }: { enabled: boolean }) {
       <h2 className='mt-4 text-xl font-semibold'>Build from your product idea</h2>
       <p className='mt-2 flex-1 text-sm text-slate-600'>Answer focused questions, review a deterministic blueprint, and create web, mobile, and desktop applications together.</p>
       <Link className='mt-6 rounded-xl bg-slate-950 px-4 py-3 text-center font-medium text-white' href='/workspaces/new/guided'>
-        Start guided builder
+        <span className='text-white'>Start guided builder</span>
       </Link>
     </article>
   );

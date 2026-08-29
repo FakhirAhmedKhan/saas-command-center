@@ -15,77 +15,69 @@ function isRecoverableStoredSessionError(error: unknown): boolean {
   return error instanceof WorkspaceOnboardingApiError && (error.status === 404 || error.status === 410);
 }
 
+async function initializeGuidedWorkspaceBuilder(): Promise<StartState> {
+  const feature = await workspaceOnboardingApi.featureState();
+
+  if (!feature.guidedWorkspaceBuilderEnabled) {
+    return { kind: 'disabled' };
+  }
+
+  const storedSessionId = window.sessionStorage.getItem(guidedSessionStorageKey);
+
+  if (storedSessionId) {
+    try {
+      await workspaceOnboardingApi.get(storedSessionId);
+
+      return {
+        kind: 'ready',
+        sessionId: storedSessionId,
+      };
+    } catch (error) {
+      if (!isRecoverableStoredSessionError(error)) {
+        throw error;
+      }
+
+      window.sessionStorage.removeItem(guidedSessionStorageKey);
+    }
+  }
+
+  const session = await workspaceOnboardingApi.create();
+
+  window.sessionStorage.setItem(guidedSessionStorageKey, session.id);
+
+  return {
+    kind: 'ready',
+    sessionId: session.id,
+  };
+}
+
 export function GuidedWorkspaceBuilderStart() {
-  const started = useRef(false);
+  const initialization = useRef<Promise<StartState> | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [state, setState] = useState<StartState>({
     kind: 'loading',
   });
 
   useEffect(() => {
-    if (started.current) {
-      return;
-    }
-
-    started.current = true;
     let active = true;
+    const operation = initialization.current ?? initializeGuidedWorkspaceBuilder();
 
-    void (async () => {
-      try {
-        const feature = await workspaceOnboardingApi.featureState();
+    initialization.current = operation;
 
-        if (!active) {
-          return;
-        }
-
-        if (!feature.guidedWorkspaceBuilderEnabled) {
-          setState({ kind: 'disabled' });
-
-          return;
-        }
-
-        const storedSessionId = window.sessionStorage.getItem(guidedSessionStorageKey);
-
-        if (storedSessionId) {
-          try {
-            await workspaceOnboardingApi.get(storedSessionId);
-
-            if (active) {
-              setState({
-                kind: 'ready',
-                sessionId: storedSessionId,
-              });
-            }
-
-            return;
-          } catch (error) {
-            if (!isRecoverableStoredSessionError(error)) {
-              throw error;
-            }
-
-            window.sessionStorage.removeItem(guidedSessionStorageKey);
-          }
-        }
-
-        const session = await workspaceOnboardingApi.create();
-
-        window.sessionStorage.setItem(guidedSessionStorageKey, session.id);
-
+    void operation
+      .then((nextState) => {
         if (active) {
-          setState({
-            kind: 'ready',
-            sessionId: session.id,
-          });
+          setState(nextState);
         }
-      } catch (error) {
+      })
+      .catch((error: unknown) => {
         if (active) {
           setState({
             kind: 'error',
             error: normalizeGuidedBuilderError(error),
           });
         }
-      }
-    })();
+      });
 
     return () => {
       active = false;
@@ -93,7 +85,7 @@ export function GuidedWorkspaceBuilderStart() {
   }, [attempt]);
 
   const retry = () => {
-    started.current = false;
+    initialization.current = null;
     setState({ kind: 'loading' });
     setAttempt((current) => current + 1);
   };
@@ -113,8 +105,8 @@ export function GuidedWorkspaceBuilderStart() {
 
         <p className='mt-2 text-slate-600'>This workspace creation method is not currently enabled.</p>
 
-        <Link className='mt-6 inline-flex rounded-xl bg-slate-950 px-4 py-3 text-white' href='/workspaces/new'>
-          Choose another method
+        <Link className='mt-6 inline-flex rounded-xl bg-slate-950 px-4 py-3' href='/workspaces/new'>
+          <span className='text-white'>Choose another method</span>
         </Link>
       </main>
     );

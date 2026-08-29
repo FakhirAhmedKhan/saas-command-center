@@ -1,8 +1,4 @@
-// app/page.tsx
-
 'use client';
-
-// import { LandingPage } from './DynmicIndex';
 import { LandingPage } from './DynmicIndex';
 import { FullPageLoader } from '@/features/auth/auth-gates';
 import { useAuth } from '@/features/auth/auth-provider';

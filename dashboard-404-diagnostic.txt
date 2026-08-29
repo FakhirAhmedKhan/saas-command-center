@@ -1,0 +1,1495 @@
+DASHBOARD 404 DIAGNOSTIC
+DATE: 2026-08-28 20:40:26
+
+====================================================================================================
+DASHBOARD ROUTE INVENTORY
+====================================================================================================
+apps/web/src/app/layout.tsx
+apps/web/src/app/page.tsx
+apps/web/src/app/(auth)/layout.tsx
+apps/web/src/app/(auth)/login/page.tsx
+apps/web/src/app/(auth)/register/page.tsx
+apps/web/src/app/(dashboard)/layout.tsx
+apps/web/src/app/(dashboard)/dashboard/page.tsx
+apps/web/src/app/(dashboard)/github/callback/page.tsx
+apps/web/src/app/(dashboard)/github/setup/page.tsx
+apps/web/src/app/(dashboard)/notifications/page.tsx
+apps/web/src/app/(dashboard)/workspaces/new/page.tsx
+apps/web/src/app/(dashboard)/workspaces/new/guided/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/activities/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/activity/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/applications/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/applications/new/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/applications/[applicationId]/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/applications/[applicationId]/development/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/applications/[applicationId]/releases/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/applications/[applicationId]/settings/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/code/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/new/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/layout.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/alerts/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/builds/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/builds/[buildId]/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/code/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/crashes/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/dependencies/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/performance/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/releases/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/security/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/settings/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/tests/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/new/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/alerts/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/builds/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/builds/[buildId]/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/code/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/performance/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/tests/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/monitoring/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/repositories/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/repositories/[repositoryId]/code/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/settings/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/settings/integrations/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/settings/members/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/new/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/analytics/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/analytics/processing/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/analytics/reports/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/analytics-engine/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/edit/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/events/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/installation/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/settings/page.tsx
+apps/web/src/app/invitations/[token]/page.tsx
+
+====================================================================================================
+ROUTING CONTROL SEARCH
+====================================================================================================
+apps/web/src/app/page.tsx:14:router.replace('/dashboard');
+apps/web/src/app/(auth)/login/page.tsx:33:router.replace(nextPath && nextPath.startsWith('/') && !nextPath.startsWith('//') ? nextPath : '/dashboard');
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/activities/page.tsx:17:<Link href='/dashboard' className='inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-slate-900'>
+apps/web/src/app/invitations/[token]/page.tsx:65:router.replace('/dashboard');
+apps/web/src/app/invitations/[token]/page.tsx:89:<Link href='/dashboard' className='mt-5 inline-block font-medium underline'>
+apps/web/src/components/layout/sideBar.tsx:32:href='/dashboard'
+apps/web/src/components/layout/sideBar.tsx:49:href='/dashboard'
+apps/web/src/components/layout/sideBar.tsx:52:aria-current={pathname === '/dashboard' ? 'page' : undefined}
+apps/web/src/components/layout/sideBar.tsx:56:pathname === '/dashboard' ? 'bg-brand-50 text-brand-700' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+apps/web/src/features/auth/auth-gates.tsx:14:const authenticatedRedirect = pathname === '/register' && workspaces.length === 0 ? '/workspaces/new' : '/dashboard';
+apps/web/src/features/workspaces/components/workspace-creation-method.tsx:14:<Link href='/dashboard' className='inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-500 transition hover:text-slate-800'>
+
+====================================================================================================
+FILE: apps/web/next.config.ts
+====================================================================================================
+import type { NextConfig } from 'next';
+
+const requiredVercelPublicEnvironmentVariables = ['NEXT_PUBLIC_API_URL', 'NEXT_PUBLIC_TRACKER_SCRIPT_URL', 'NEXT_PUBLIC_INGESTION_URL'] as const;
+
+function validateVercelEnvironment(): void {
+  if (process.env.VERCEL !== '1') {
+    return;
+  }
+
+  for (const key of requiredVercelPublicEnvironmentVariables) {
+    const value = process.env[key]?.trim();
+
+    if (!value) {
+      throw new Error(`${key} must be configured for Vercel deployments.`);
+    }
+
+    let url: URL;
+
+    try {
+      url = new URL(value);
+    } catch {
+      throw new Error(`${key} must be a valid absolute URL.`);
+    }
+
+    if (url.protocol !== 'https:') {
+      throw new Error(`${key} must use HTTPS on Vercel.`);
+    }
+
+    if (url.hostname === 'localhost' || url.hostname === '127.0.0.1' || url.hostname === '::1') {
+      throw new Error(`${key} cannot point to localhost on Vercel.`);
+    }
+  }
+}
+
+validateVercelEnvironment();
+
+const nextConfig: NextConfig = {
+  reactStrictMode: true,
+  allowedDevOrigins: ['127.0.0.1'],
+  output: 'standalone',
+  transpilePackages: ['@command-center/ui', '@command-center/shared-types'],
+};
+
+export default nextConfig;
+
+
+====================================================================================================
+FILE: apps/web/src/app/(auth)/login/page.tsx
+====================================================================================================
+'use client';
+
+import { useSession } from '@/features/auth/use-session';
+import { getErrorMessage } from '@/features/lib/api/api-error';
+import { Button, Input } from '@command-center/ui';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, type FormEvent } from 'react';
+
+export default function LoginPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { login } = useSession();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
+    event.preventDefault();
+
+    setError(null);
+    setSubmitting(true);
+
+    try {
+      await login({
+        email,
+        password,
+      });
+
+      const nextPath = searchParams.get('next');
+
+      router.replace(nextPath && nextPath.startsWith('/') && !nextPath.startsWith('//') ? nextPath : '/dashboard');
+    } catch (caughtError) {
+      setError(getErrorMessage(caughtError));
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div>
+      <h1 className='text-xl font-semibold text-slate-950'>Welcome back</h1>
+
+      <p className='mt-1.5 text-sm text-slate-500'>Sign in to your command center.</p>
+
+      <form className='mt-6 space-y-4' onSubmit={handleSubmit}>
+        <Input id='email' type='email' label='Email' autoComplete='email' required value={email} onChange={(event) => setEmail(event.target.value)} />
+
+        <Input id='password' type='password' label='Password' autoComplete='current-password' required minLength={8} value={password} onChange={(event) => setPassword(event.target.value)} />
+
+        {error ? (
+          <div role='alert' className='rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800'>
+            {error}
+          </div>
+        ) : null}
+
+        <Button type='submit' size='lg' loading={submitting} className='w-full'>
+          Sign in
+        </Button>
+      </form>
+
+      <p className='mt-5 text-center text-sm text-slate-500'>
+        No account?{' '}
+        <Link href='/register' className='font-medium text-brand-700 hover:text-brand-800'>
+          Create one
+        </Link>
+      </p>
+    </div>
+  );
+}
+
+
+====================================================================================================
+FILE: apps/web/src/app/(dashboard)/dashboard/page.tsx
+====================================================================================================
+'use client';
+
+import { useAuth } from '@/features/auth/auth-provider';
+import { EmptyState } from '@command-center/ui';
+import { ArrowRight, Building2, Plus } from 'lucide-react';
+import Link from 'next/link';
+
+function getGreeting(): string {
+  const hour = new Date().getHours();
+
+  if (hour < 12) {
+    return 'Good morning';
+  }
+
+  if (hour < 18) {
+    return 'Good afternoon';
+  }
+
+  return 'Good evening';
+}
+
+export default function DashboardPage() {
+  const { user, workspaces } = useAuth();
+
+  return (
+    <div className='mx-auto w-full max-w-[1600px] space-y-6 p-4 sm:p-6 lg:p-8'>
+      <header className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
+        <div>
+          <h1 className='text-[26px] font-semibold tracking-tight text-slate-950 sm:text-[28px]'>
+            {getGreeting()}
+            {user?.displayName ? `, ${user.displayName}` : ''}
+          </h1>
+
+          <p className='mt-1 text-sm leading-6 text-slate-500'>Here&apos;s what needs your attention.</p>
+        </div>
+
+        <Link href='/workspaces/new' className='inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white transition hover:bg-brand-700'>
+          <Plus className='size-4' />
+          New workspace
+        </Link>
+      </header>
+
+      <section>
+        <h2 className='mb-3 text-[13px] font-semibold uppercase tracking-wide text-slate-400'>Your workspaces</h2>
+
+        {workspaces.length === 0 ? (
+          <EmptyState
+            icon={<Building2 className='size-5' />}
+            title='No workspace found'
+            description='Create a workspace to start tracking applications, websites, and team activity.'
+            action={
+              <Link href='/workspaces/new' className='inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3.5 text-sm font-semibold text-white transition hover:bg-brand-700'>
+                <Plus className='size-4' />
+                Create workspace
+              </Link>
+            }
+          />
+        ) : (
+          <div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>
+            {workspaces.map((workspace: { id: string; name: string; slug: string; members?: { role: string }[] }) => {
+              const role = workspace.members?.[0]?.role ?? 'VIEWER';
+
+              return (
+                <Link key={workspace.id} href={`/workspaces/${workspace.id}`} className='group flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-slate-300'>
+                  <div className='flex items-start justify-between gap-3'>
+                    <div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-sm font-bold text-brand-700'>{workspace.name.charAt(0).toUpperCase()}</div>
+
+                    <span className='rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600'>{role}</span>
+                  </div>
+
+                  <div>
+                    <h3 className='text-[15px] font-semibold text-slate-950'>{workspace.name}</h3>
+                    <p className='mt-0.5 text-xs text-slate-400'>/{workspace.slug}</p>
+                  </div>
+
+                  <span className='mt-1 inline-flex items-center gap-1 text-sm font-medium text-brand-700 transition group-hover:gap-1.5'>
+                    Open workspace
+                    <ArrowRight className='size-3.5' aria-hidden='true' />
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
+
+
+====================================================================================================
+FILE: apps/web/src/app/(dashboard)/layout.tsx
+====================================================================================================
+import { AppShell } from '@/components/layout/app-shell';
+import { ProtectedRoute } from '@/features/auth/protected-route';
+import type { ReactNode } from 'react';
+
+export default function DashboardLayout({
+  children,
+}: Readonly<{
+  children: ReactNode;
+}>) {
+  return (
+    <ProtectedRoute>
+      <AppShell>{children}</AppShell>
+    </ProtectedRoute>
+  );
+}
+
+
+====================================================================================================
+FILE: apps/web/src/app/(dashboard)/workspaces/[workspaceId]/activities/page.tsx
+====================================================================================================
+'use client';
+
+import { ActivityFeed } from '@/features/activity/components/activity-feed';
+import { Activity, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+
+export default function WorkspaceActivityPage() {
+  const params = useParams<{
+    workspaceId: string;
+  }>();
+  const workspaceId = params.workspaceId;
+
+  return (
+    <div className='space-y-6'>
+      <header>
+        <Link href='/dashboard' className='inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-slate-900'>
+          <ArrowLeft className='size-4' />
+          Back to dashboard
+        </Link>
+
+        <div className='mt-6 flex items-start gap-4'>
+          <div className='flex size-14 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-brand-600'>
+            <Activity className='size-6' />
+          </div>
+
+          <div>
+            <p className='text-sm font-semibold text-brand-600'>Workspace history</p>
+
+            <h1 className='mt-1 text-3xl font-bold tracking-tight text-slate-950'>Activity feed</h1>
+
+            <p className='mt-2 max-w-2xl text-sm leading-6 text-slate-500'>Review changes across every application in this workspace.</p>
+          </div>
+        </div>
+      </header>
+
+      <ActivityFeed workspaceId={workspaceId} showApplication title='Workspace activity' description='Application, technology and link changes across this workspace.' />
+    </div>
+  );
+}
+
+
+====================================================================================================
+FILE: apps/web/src/app/invitations/[token]/page.tsx
+====================================================================================================
+'use client';
+
+import { getErrorMessage } from '@/features/applications/application-utils';
+import { useSession } from '@/features/auth/use-session';
+import { acceptInvitation, declineInvitation, getInvitationPreview } from '@/features/team-operations/team-operations-api';
+import type { InvitationPreview } from '@/features/team-operations/team-operations.types';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+export default function InvitationPage() {
+  const params = useParams<{
+    token: string;
+  }>();
+  const router = useRouter();
+  const { status, user } = useSession();
+  const [invitation, setInvitation] = useState<InvitationPreview | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    void getInvitationPreview(params.token, controller.signal)
+      .then((result) => {
+        setInvitation(result);
+
+        setError(null);
+      })
+      .catch((caughtError) => {
+        setError(getErrorMessage(caughtError));
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, [params.token]);
+
+  async function accept(): Promise<void> {
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const result = await acceptInvitation(params.token);
+
+      router.replace(`/workspaces/${result.workspaceId}/applications`);
+    } catch (caughtError) {
+      setError(getErrorMessage(caughtError));
+
+      setSubmitting(false);
+    }
+  }
+
+  async function decline(): Promise<void> {
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      await declineInvitation(params.token);
+
+      router.replace('/dashboard');
+    } catch (caughtError) {
+      setError(getErrorMessage(caughtError));
+
+      setSubmitting(false);
+    }
+  }
+
+  if (loading || status === 'loading') {
+    return (
+      <main className='flex min-h-screen items-center justify-center p-6'>
+        <p>Loading invitation…</p>
+      </main>
+    );
+  }
+
+  if (error || !invitation) {
+    return (
+      <main className='flex min-h-screen items-center justify-center p-6'>
+        <section className='w-full max-w-lg rounded-2xl border border-red-200 bg-white p-7 shadow-sm'>
+          <h1 className='text-xl font-bold'>Invitation unavailable</h1>
+
+          <p className='mt-3 text-sm text-red-700'>{error ?? 'Invitation could not be loaded.'}</p>
+
+          <Link href='/dashboard' className='mt-5 inline-block font-medium underline'>
+            Return to dashboard
+          </Link>
+        </section>
+      </main>
+    );
+  }
+
+  const unavailable = invitation.status !== 'PENDING';
+
+  return (
+    <main className='flex min-h-screen items-center justify-center p-6'>
+      <section className='w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-7 shadow-sm'>
+        <p className='text-sm font-medium text-slate-500'>Workspace invitation</p>
+
+        <h1 className='mt-2 text-2xl font-bold text-slate-950'>Join {invitation.workspace.name}</h1>
+
+        <p className='mt-3 text-sm text-slate-600'>
+          {invitation.invitedBy.name ?? invitation.invitedBy.email} invited <strong>{invitation.email}</strong> as <strong>{invitation.role}</strong>.
+        </p>
+
+        {unavailable ? (
+          <div className='mt-5 rounded-xl bg-amber-50 p-4 text-sm text-amber-800'>This invitation is {invitation.status.toLowerCase()}.</div>
+        ) : status === 'unauthenticated' ? (
+          <div className='mt-6'>
+            <p className='text-sm text-slate-600'>Sign in using {invitation.email} before accepting.</p>
+
+            <Link href={`/login?next=${encodeURIComponent(`/invitations/${params.token}`)}`} className='mt-4 inline-block rounded-lg bg-slate-950 px-4 py-2.5 font-medium text-white'>
+              Sign in
+            </Link>
+          </div>
+        ) : (
+          <>
+            {user?.email.toLowerCase() !== invitation.email.toLowerCase() ? (
+              <div className='mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800'>
+                You are signed in as {user?.email}. This invitation belongs to {invitation.email}.
+              </div>
+            ) : null}
+
+            <div className='mt-6 flex gap-3'>
+              <button
+                type='button'
+                disabled={submitting || user?.email.toLowerCase() !== invitation.email.toLowerCase()}
+                onClick={() => {
+                  void accept();
+                }}
+                className='rounded-lg bg-slate-950 px-4 py-2.5 font-medium text-white disabled:opacity-50'
+              >
+                Accept invitation
+              </button>
+
+              <button
+                type='button'
+                disabled={submitting || user?.email.toLowerCase() !== invitation.email.toLowerCase()}
+                onClick={() => {
+                  void decline();
+                }}
+                className='rounded-lg border border-slate-300 px-4 py-2.5 font-medium'
+              >
+                Decline
+              </button>
+            </div>
+          </>
+        )}
+      </section>
+    </main>
+  );
+}
+
+
+====================================================================================================
+FILE: apps/web/src/app/layout.tsx
+====================================================================================================
+import { Providers } from './providers';
+import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
+
+import './globals.css';
+
+export const metadata: Metadata = {
+  title: 'SaaS Command Center',
+  description: 'Manage applications, analytics, releases, and operational health.',
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: ReactNode;
+}>) {
+  return (
+    <html lang='en'>
+      <body className='min-h-screen bg-slate-50 text-slate-950 antialiased'>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  );
+}
+
+
+====================================================================================================
+FILE: apps/web/src/app/page.tsx
+====================================================================================================
+'use client';
+import { LandingPage } from './DynmicIndex';
+import { FullPageLoader } from '@/features/auth/auth-gates';
+import { useAuth } from '@/features/auth/auth-provider';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
+export default function HomePage() {
+  const router = useRouter();
+  const { status } = useAuth();
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.replace('/dashboard');
+    }
+  }, [router, status]);
+
+  if (status === 'loading' || status === 'authenticated') {
+    return <FullPageLoader />;
+  }
+
+  return <LandingPage />;
+}
+
+
+====================================================================================================
+FILE: apps/web/src/components/layout/sideBar.tsx
+====================================================================================================
+import { WorkspaceSwitcher } from './workspace-switcher';
+import { NAV_GROUPS } from '@/app/DynmicIndex';
+import { LogoMark } from '@/components/brand/logo-mark';
+import { useAuth } from '@/features/auth/auth-provider';
+import { cn } from '@command-center/ui';
+import { LayoutDashboard, LogOut } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { memo, useMemo, useCallback } from 'react';
+
+interface SidebarProps {
+  collapsed: boolean;
+  onNavigate?: () => void;
+  pathname: string;
+  workspaceId: string;
+}
+
+export const Sidebar = memo(function Sidebar({ collapsed, onNavigate, pathname, workspaceId }: SidebarProps) {
+  const { logout, user } = useAuth();
+  const router = useRouter();
+  const activeItems = useMemo(() => new Set(NAV_GROUPS.flatMap((group) => group.items.filter((item) => item.isActive(pathname, workspaceId)).map((item) => item.label))), [pathname, workspaceId]);
+  const handleLogout = useCallback(async (): Promise<void> => {
+    await logout();
+    router.replace('/login');
+  }, [logout, router]);
+  const accountName = user?.displayName || 'Account owner';
+  const initial = (user?.displayName || user?.email || 'U').charAt(0).toUpperCase();
+
+  return (
+    <div className={cn('flex h-full min-h-0 flex-col px-3 py-4', collapsed && 'items-center px-2')}>
+      <Link
+        href='/dashboard'
+        onClick={onNavigate}
+        title={collapsed ? 'SaaS Command Center' : undefined}
+        className={cn('mb-4 flex h-9 items-center gap-2.5 rounded-lg px-2 text-slate-950 transition hover:bg-slate-100', collapsed && 'justify-center px-0')}
+      >
+        <LogoMark className='size-7 shrink-0 rounded-md' />
+        {!collapsed ? <span className='truncate text-[13px] font-bold'>SaaS Command Center</span> : null}
+      </Link>
+
+      {workspaceId && !collapsed ? (
+        <div className='mb-4'>
+          <WorkspaceSwitcher workspaceId={workspaceId} />
+        </div>
+      ) : null}
+
+      <nav className='min-h-0 flex-1 space-y-4 overflow-y-auto' aria-label='Primary navigation'>
+        <Link
+          href='/dashboard'
+          onClick={onNavigate}
+          title={collapsed ? 'Dashboard' : undefined}
+          aria-current={pathname === '/dashboard' ? 'page' : undefined}
+          className={cn(
+            'flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm font-medium transition',
+            collapsed && 'justify-center px-0',
+            pathname === '/dashboard' ? 'bg-brand-50 text-brand-700' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+          )}
+        >
+          <LayoutDashboard className='size-4.25 shrink-0' aria-hidden />
+          {!collapsed ? 'Dashboard' : null}
+        </Link>
+
+        {workspaceId
+          ? NAV_GROUPS.map((group) => (
+              <section key={group.label} aria-label={group.label}>
+                {!collapsed ? <p className='mb-1 px-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400'>{group.label}</p> : null}
+                <div className='space-y-0.5'>
+                  {group.items.map((item) => {
+                    const Icon = item.icon;
+                    const active = activeItems.has(item.label);
+                    return (
+                      <Link
+                        key={item.label}
+                        href={`/workspaces/${workspaceId}${item.href}`}
+                        onClick={onNavigate}
+                        title={collapsed ? item.label : undefined}
+                        aria-current={active ? 'page' : undefined}
+                        className={cn(
+                          'flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm font-medium transition',
+                          collapsed && 'justify-center px-0',
+                          active ? 'bg-brand-50 text-brand-700' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+                        )}
+                      >
+                        <Icon className='size-4.25 shrink-0' aria-hidden />
+                        {!collapsed ? item.label : null}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </section>
+            ))
+          : null}
+      </nav>
+
+      <div className={cn('mt-3 flex items-center gap-2.5 border-t border-slate-100 pt-3', collapsed && 'justify-center')}>
+        <div title={collapsed ? accountName : undefined} className='flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white'>
+          {initial}
+        </div>
+        {!collapsed ? (
+          <div className='min-w-0 flex-1'>
+            <p className='truncate text-[13px] font-semibold text-slate-900'>{accountName}</p>
+            <p className='truncate text-xs text-slate-400'>{user?.email}</p>
+          </div>
+        ) : null}
+        <button
+          type='button'
+          onClick={() => void handleLogout()}
+          aria-label='Sign out'
+          title={collapsed ? 'Sign out' : undefined}
+          className='flex size-8 shrink-0 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700'
+        >
+          <LogOut className='size-4' aria-hidden />
+        </button>
+      </div>
+    </div>
+  );
+});
+
+
+====================================================================================================
+FILE: apps/web/src/features/auth/auth.types.ts
+====================================================================================================
+import type { WorkspaceRole } from '@command-center/shared-types';
+
+export type { LoginInput, RegisterInput, WorkspaceRole } from '@command-center/shared-types';
+export interface User {
+  id: string;
+  email: string;
+  displayName: string | null;
+  isActive: boolean;
+  emailVerifiedAt: string | null;
+  lastLoginAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
+export interface WorkspaceMembership {
+  role: WorkspaceRole;
+}
+
+export interface Workspace {
+  id: string;
+  name: string;
+  slug: string;
+  ownerId: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+
+  members?: WorkspaceMembership[];
+
+  _count?: {
+    members: number;
+  };
+}
+
+export interface WorkspaceMember {
+  id: string;
+  workspaceId: string;
+  userId: string;
+  role: WorkspaceRole;
+  joinedAt: string;
+  createdAt: string;
+  updatedAt: string;
+
+  user: {
+    id: string;
+    email: string;
+    displayName: string | null;
+    isActive: boolean;
+  };
+}
+
+export interface AuthUser extends User {
+  workspaces?: Workspace[];
+  currentWorkspaceId?: string | null;
+}
+
+export interface AuthResponse {
+  accessToken: string;
+
+  tokenType: 'Bearer';
+
+  expiresIn: number;
+
+  user: User;
+
+  workspaces: Workspace[];
+}
+
+export interface CurrentUserResponse {
+  user: User;
+
+  workspaces: Workspace[];
+}
+
+export interface AuthSession {
+  accessToken: string;
+
+  tokenType: 'Bearer';
+
+  expiresIn: number;
+
+  user: AuthUser;
+}
+
+
+====================================================================================================
+FILE: apps/web/src/features/auth/auth-gates.tsx
+====================================================================================================
+'use client';
+import { useAuth } from '@/features/auth/auth-provider';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, type ReactNode } from 'react';
+
+interface GateProps {
+  children: ReactNode;
+}
+
+export function GuestOnly({ children }: GateProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { status, workspaces } = useAuth();
+  const authenticatedRedirect = pathname === '/register' && workspaces.length === 0 ? '/workspaces/new' : '/dashboard';
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.replace(authenticatedRedirect);
+    }
+  }, [authenticatedRedirect, router, status]);
+
+  if (status === 'loading') {
+    return <FullPageLoader />;
+  }
+  if (status === 'authenticated') {
+    return <FullPageLoader />;
+  }
+
+  return children;
+}
+
+export function AuthenticatedOnly({ children }: GateProps) {
+  const router = useRouter();
+  const { status } = useAuth();
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.replace('/login');
+    }
+  }, [router, status]);
+
+  if (status !== 'authenticated') {
+    return <FullPageLoader />;
+  }
+
+  return children;
+}
+
+export function FullPageLoader() {
+  return (
+    <div className='page-loader'>
+      <div className='spinner' />
+      <p>Loading your workspace…</p>
+    </div>
+  );
+}
+
+
+====================================================================================================
+FILE: apps/web/src/features/auth/auth-provider.tsx
+====================================================================================================
+/* eslint-disable react-hooks/set-state-in-effect */
+'use client';
+
+import type { AuthResponse, CurrentUserResponse, LoginInput, RegisterInput, User, Workspace } from './auth.types';
+import { apiRequest, refreshSession, setAccessToken, setUnauthorizedHandler } from '../lib/api/api-client';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type PropsWithChildren } from 'react';
+
+export type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
+
+export interface AuthContextValue {
+  status: AuthStatus;
+
+  user: User | null;
+
+  workspaces: Workspace[];
+
+  login(input: LoginInput): Promise<void>;
+
+  register(input: RegisterInput): Promise<void>;
+
+  logout(): Promise<void>;
+
+  logoutAll(): Promise<void>;
+
+  refresh(): Promise<void>;
+
+  refreshCurrentUser(): Promise<void>;
+
+  updateWorkspaceInState(workspace: Workspace): void;
+}
+
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+export function AuthProvider({ children }: PropsWithChildren) {
+  const existingContext = useContext(AuthContext);
+
+  if (existingContext) {
+    return children;
+  }
+
+  return <AuthProviderRoot>{children}</AuthProviderRoot>;
+}
+
+function AuthProviderRoot({ children }: PropsWithChildren) {
+  const [status, setStatus] = useState<AuthStatus>('loading');
+  const [user, setUser] = useState<User | null>(null);
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const applyAuthResponse = useCallback((response: AuthResponse) => {
+    setAccessToken(response.accessToken);
+
+    setUser(response.user);
+
+    setWorkspaces(response.workspaces ?? []);
+
+    setStatus('authenticated');
+  }, []);
+  const clearSession = useCallback(() => {
+    setAccessToken(null);
+
+    setUser(null);
+
+    setWorkspaces([]);
+
+    setStatus('unauthenticated');
+  }, []);
+  const refresh = useCallback(async () => {
+    /*
+     * Goes through the api-client's single-flight refreshSession() rather
+     * than a plain apiRequest() call. The refresh-token cookie is single-use
+     * and rotated on every call, so if this effect ever runs twice
+     * concurrently (React Strict Mode double-invokes mount effects in
+     * development), a second independent request would reuse an
+     * already-consumed cookie and get the whole session revoked as
+     * suspected token replay. Sharing one in-flight request keeps that from
+     * happening.
+     */
+    const response = await refreshSession<AuthResponse>();
+
+    if (!response) {
+      throw new Error('Unable to restore session.');
+    }
+
+    applyAuthResponse(response);
+  }, [applyAuthResponse]);
+
+  useEffect(() => {
+    let active = true;
+
+    setUnauthorizedHandler(clearSession);
+
+    void refresh().catch(() => {
+      if (active) {
+        clearSession();
+      }
+    });
+
+    return () => {
+      active = false;
+
+      setUnauthorizedHandler(null);
+    };
+  }, [clearSession, refresh]);
+
+  const login = useCallback(
+    async (input: LoginInput) => {
+      const response = await apiRequest<AuthResponse>('/auth/login', {
+        method: 'POST',
+        body: input,
+        skipAuthentication: true,
+        skipRefresh: true,
+      });
+
+      applyAuthResponse(response);
+    },
+    [applyAuthResponse],
+  );
+  const register = useCallback(
+    async (input: RegisterInput) => {
+      const response = await apiRequest<AuthResponse>('/auth/register', {
+        method: 'POST',
+        body: input,
+        skipAuthentication: true,
+        skipRefresh: true,
+      });
+
+      applyAuthResponse(response);
+    },
+    [applyAuthResponse],
+  );
+  const logout = useCallback(async () => {
+    try {
+      await apiRequest<{
+        success: true;
+      }>('/auth/logout', {
+        method: 'POST',
+        skipRefresh: true,
+      });
+    } finally {
+      clearSession();
+    }
+  }, [clearSession]);
+  const logoutAll = useCallback(async () => {
+    try {
+      await apiRequest<{
+        success: true;
+      }>('/auth/logout-all', {
+        method: 'POST',
+        skipRefresh: true,
+      });
+    } finally {
+      clearSession();
+    }
+  }, [clearSession]);
+  const refreshCurrentUser = useCallback(async () => {
+    const response = await apiRequest<CurrentUserResponse>('/auth/me');
+
+    setUser(response.user);
+
+    setWorkspaces(response.workspaces ?? []);
+  }, []);
+  const updateWorkspaceInState = useCallback((updatedWorkspace: Workspace) => {
+    setWorkspaces((current) => {
+      const exists = current.some((workspace) => workspace.id === updatedWorkspace.id);
+
+      if (!exists) {
+        return [...current, updatedWorkspace];
+      }
+
+      return current.map((workspace) =>
+        workspace.id === updatedWorkspace.id
+          ? {
+              ...workspace,
+              ...updatedWorkspace,
+            }
+          : workspace,
+      );
+    });
+  }, []);
+  const value = useMemo<AuthContextValue>(
+    () => ({
+      status,
+
+      user,
+
+      workspaces,
+
+      login,
+
+      register,
+
+      logout,
+
+      logoutAll,
+
+      refresh,
+
+      refreshCurrentUser,
+
+      updateWorkspaceInState,
+    }),
+    [status, user, workspaces, login, register, logout, logoutAll, refresh, refreshCurrentUser, updateWorkspaceInState],
+  );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAuth(): AuthContextValue {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error('useAuth must be used inside AuthProvider.');
+  }
+
+  return context;
+}
+
+
+====================================================================================================
+FILE: apps/web/src/features/auth/protected-route.tsx
+====================================================================================================
+'use client';
+
+import { ProtectedRoute as ProtectedRouteContent } from './protected-route-content';
+import { Suspense, type ComponentProps } from 'react';
+
+type ProtectedRouteProps = ComponentProps<typeof ProtectedRouteContent>;
+
+export function ProtectedRoute(props: ProtectedRouteProps) {
+  return (
+    <Suspense
+      fallback={
+        <div className='flex min-h-screen items-center justify-center'>
+          <p className='text-sm text-slate-500'>Loading...</p>
+        </div>
+      }
+    >
+      <ProtectedRouteContent {...props} />
+    </Suspense>
+  );
+}
+
+
+====================================================================================================
+FILE: apps/web/src/features/auth/protected-route-content.tsx
+====================================================================================================
+'use client';
+
+import { useSession } from './use-session';
+import { PageLoading } from '@/components/states/page-loading';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, type PropsWithChildren } from 'react';
+
+export function ProtectedRoute({ children }: PropsWithChildren) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const { status } = useSession();
+
+  useEffect(() => {
+    if (status !== 'unauthenticated') {
+      return;
+    }
+
+    const query = searchParams.toString();
+    const currentPath = query.length > 0 ? `${pathname}?${query}` : pathname;
+
+    router.replace(`/login?next=${encodeURIComponent(currentPath)}`);
+  }, [pathname, router, searchParams, status]);
+
+  if (status !== 'authenticated') {
+    return <PageLoading label={status === 'loading' ? 'Restoring your session…' : 'Redirecting to login…'} />;
+  }
+
+  return children;
+}
+
+
+====================================================================================================
+FILE: apps/web/src/features/auth/use-session.ts
+====================================================================================================
+'use client';
+
+export { useAuth as useSession } from './auth-provider';
+
+
+====================================================================================================
+FILE: apps/web/src/features/lib/api/api-client.ts
+====================================================================================================
+import { ApiError } from './api-error';
+
+const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api/v1';
+
+interface ApiErrorBody {
+  message?: string | string[];
+  error?: string;
+}
+
+interface RequestOptions extends Omit<RequestInit, 'body'> {
+  body?: unknown;
+  skipAuthentication?: boolean;
+  skipRefresh?: boolean;
+}
+
+interface RefreshPayload {
+  accessToken?: unknown;
+}
+
+let accessToken: string | null = null;
+let refreshPromise: Promise<RefreshPayload | null> | null = null;
+let unauthorizedHandler: (() => void) | null = null;
+
+export function setAccessToken(token: string | null): void {
+  accessToken = token;
+}
+
+export function getAccessToken(): string | null {
+  return accessToken;
+}
+
+export function setUnauthorizedHandler(handler: (() => void) | null): void {
+  unauthorizedHandler = handler;
+}
+
+function buildUrl(path: string): string {
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path;
+  }
+
+  const normalizedBaseUrl = API_URL.replace(/\/+$/, '');
+  const normalizedPath = path.replace(/^\/+/, '');
+
+  return `${normalizedBaseUrl}/${normalizedPath}`;
+}
+
+function serializeBody(body: unknown): BodyInit | undefined {
+  if (body === undefined) {
+    return undefined;
+  }
+
+  if (body instanceof FormData || body instanceof Blob || body instanceof URLSearchParams || typeof body === 'string') {
+    return body;
+  }
+
+  return JSON.stringify(body);
+}
+
+function buildHeaders(options: RequestOptions): Headers {
+  const headers = new Headers(options.headers);
+
+  headers.set('Accept', 'application/json');
+
+  if (options.body !== undefined && !(options.body instanceof FormData)) {
+    headers.set('Content-Type', 'application/json');
+  }
+
+  if (!options.skipAuthentication && accessToken) {
+    headers.set('Authorization', `Bearer ${accessToken}`);
+  }
+
+  return headers;
+}
+
+async function readResponseBody(response: Response): Promise<unknown> {
+  if (response.status === 204) {
+    return undefined;
+  }
+
+  const contentType = response.headers.get('content-type');
+
+  if (contentType?.includes('application/json')) {
+    return response.json();
+  }
+
+  const text = await response.text();
+
+  return text || undefined;
+}
+
+function resolveErrorMessage(body: unknown, fallback: string): string {
+  if (typeof body === 'object' && body !== null) {
+    const apiBody = body as ApiErrorBody;
+
+    if (Array.isArray(apiBody.message)) {
+      return apiBody.message.join(', ');
+    }
+
+    if (typeof apiBody.message === 'string') {
+      return apiBody.message;
+    }
+
+    if (typeof apiBody.error === 'string') {
+      return apiBody.error;
+    }
+  }
+
+  return fallback;
+}
+
+/**
+ * Calls POST /auth/refresh at most once for any set of overlapping callers.
+ *
+ * The refresh-token cookie is single-use and rotated server-side on every
+ * call; a second concurrent call with the same (already-consumed) cookie is
+ * indistinguishable from token replay and gets the whole session family
+ * revoked. Sharing one in-flight promise is what keeps concurrent callers
+ * (an apiRequest() 401 retry racing AuthProvider's mount-time restore, or
+ * React Strict Mode's double effect invocation in development) from ever
+ * sending two requests for the same refresh cycle.
+ */
+function performRefresh(): Promise<RefreshPayload | null> {
+  if (refreshPromise) {
+    return refreshPromise;
+  }
+
+  refreshPromise = (async () => {
+    try {
+      const response = await fetch(buildUrl('/auth/refresh'), {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        setAccessToken(null);
+
+        unauthorizedHandler?.();
+
+        return null;
+      }
+
+      const payload = (await response.json()) as RefreshPayload;
+
+      if (typeof payload.accessToken !== 'string' || payload.accessToken.length === 0) {
+        setAccessToken(null);
+
+        unauthorizedHandler?.();
+
+        return null;
+      }
+
+      setAccessToken(payload.accessToken);
+
+      return payload;
+    } catch {
+      setAccessToken(null);
+
+      unauthorizedHandler?.();
+
+      return null;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
+}
+
+async function refreshAccessToken(): Promise<string | null> {
+  const payload = await performRefresh();
+
+  return typeof payload?.accessToken === 'string' ? payload.accessToken : null;
+}
+
+/**
+ * Restores a session from the HTTP-only refresh cookie and returns the full
+ * response body (access token plus user/workspaces), not just the token.
+ * Used by AuthProvider to repopulate session state on mount -- routed
+ * through the same single-flight performRefresh() as the automatic 401
+ * retry above so the two never race each other's rotation.
+ */
+export async function refreshSession<T extends RefreshPayload>(): Promise<T | null> {
+  const payload = await performRefresh();
+
+  return payload as T | null;
+}
+
+export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const { body, skipAuthentication, skipRefresh, ...requestInit } = options;
+  const execute = (): Promise<Response> =>
+    fetch(buildUrl(path), {
+      ...requestInit,
+
+      body: serializeBody(body),
+      headers: buildHeaders({
+        ...options,
+        body,
+        skipAuthentication,
+        skipRefresh,
+      }),
+
+      credentials: 'include',
+    });
+  let response = await execute();
+
+  if (response.status === 401 && !skipAuthentication && !skipRefresh && path !== '/auth/refresh') {
+    const refreshedToken = await refreshAccessToken();
+
+    if (refreshedToken) {
+      response = await execute();
+    }
+  }
+
+  const responseBody = await readResponseBody(response);
+
+  if (!response.ok) {
+    throw new ApiError(resolveErrorMessage(responseBody, `Request failed with status ${response.status}.`), response.status, responseBody);
+  }
+
+  return responseBody as T;
+}
+
+function getDownloadFilename(response: Response, fallback: string): string {
+  const disposition = response.headers.get('content-disposition');
+  const match = disposition?.match(/filename="?([^"]+)"?/i);
+
+  return match?.[1] ?? fallback;
+}
+
+async function executeDownloadRequest(path: string): Promise<Response> {
+  const headers = new Headers({
+    Accept: 'text/csv',
+  });
+
+  if (accessToken) {
+    headers.set('Authorization', `Bearer ${accessToken}`);
+  }
+
+  return fetch(buildUrl(path), {
+    method: 'GET',
+    credentials: 'include',
+
+    headers,
+  });
+}
+
+export async function apiDownload(path: string, fallbackFilename: string): Promise<void> {
+  let response = await executeDownloadRequest(path);
+
+  if (response.status === 401) {
+    const refreshedToken = await refreshAccessToken();
+
+    if (refreshedToken) {
+      response = await executeDownloadRequest(path);
+    }
+  }
+
+  if (!response.ok) {
+    const responseBody = await readResponseBody(response);
+
+    throw new ApiError(resolveErrorMessage(responseBody, `Download failed with status ${response.status}.`), response.status, responseBody);
+  }
+
+  const blob = await response.blob();
+  const filename = getDownloadFilename(response, fallbackFilename);
+  const objectUrl = URL.createObjectURL(blob);
+
+  try {
+    const link = document.createElement('a');
+
+    link.href = objectUrl;
+
+    link.download = filename;
+
+    link.style.display = 'none';
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
+/**
+ * Backward-compatible alias used by existing feature APIs.
+ */
+export const apiClient = apiRequest;
+
+
+====================================================================================================
+FILE: apps/web/src/features/workspaces/components/workspace-creation-method.tsx
+====================================================================================================
+'use client';
+
+import { ArrowLeft, FolderGit2, Pencil } from 'lucide-react';
+import Link from 'next/link';
+
+interface WorkspaceCreationMethodProps {
+  onSelectManual: () => void;
+  onSelectGithub: () => void;
+}
+
+export function WorkspaceCreationMethod({ onSelectManual, onSelectGithub }: WorkspaceCreationMethodProps) {
+  return (
+    <div className='mx-auto w-full max-w-xl p-4 pt-16 sm:p-6 sm:pt-24'>
+      <Link href='/dashboard' className='inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-500 transition hover:text-slate-800'>
+        <ArrowLeft className='size-3.5' aria-hidden='true' />
+        Back to dashboard
+      </Link>
+
+      <h1 className='mt-5 text-2xl font-semibold tracking-tight text-slate-950'>Create Workspace</h1>
+
+      <p className='mt-1.5 text-sm leading-6 text-slate-500'>How would you like to create your workspace?</p>
+
+      <div className='mt-6 grid gap-4 sm:grid-cols-2'>
+        <button type='button' onClick={onSelectManual} className='flex flex-col items-start rounded-2xl border border-slate-200 bg-white p-5 text-left transition hover:border-brand-300 hover:shadow-sm'>
+          <div className='flex size-10 items-center justify-center rounded-xl bg-slate-100'>
+            <Pencil className='size-5 text-slate-700' />
+          </div>
+
+          <h2 className='mt-4 font-semibold text-slate-950'>Create Manually</h2>
+
+          <p className='mt-1.5 text-sm leading-6 text-slate-500'>Configure the workspace yourself.</p>
+        </button>
+
+        <button type='button' onClick={onSelectGithub} className='flex flex-col items-start rounded-2xl border border-slate-200 bg-white p-5 text-left transition hover:border-brand-300 hover:shadow-sm'>
+          <div className='flex size-10 items-center justify-center rounded-xl bg-slate-950'>
+            <FolderGit2 className='size-5 text-white' />
+          </div>
+
+          <h2 className='mt-4 font-semibold text-slate-950'>Import from GitHub</h2>
+
+          <p className='mt-1.5 text-sm leading-6 text-slate-500'>Analyze a repository and automatically configure your workspace.</p>
+        </button>
+      </div>
+    </div>
+  );
+}
+

@@ -21,9 +21,7 @@ import { Module } from '@nestjs/common';
 
 @Module({
   imports: [DatabaseModule, WorkspaceMembersModule, ActivityModule],
-
   controllers: [RepositoriesController, GithubConnectController, GithubWebhookController, CodeExplorerController, RepositoryImportController],
-
   providers: [
     GithubAppService,
     GithubCodeService,
@@ -37,7 +35,6 @@ import { Module } from '@nestjs/common';
     RepositoryImportService,
     GithubConnectIntentCleanupService,
   ],
-
-  exports: [RepositoriesService, GithubCodeService],
+  exports: [RepositoriesService, GithubCodeService, PersonalRepositoriesService],
 })
 export class RepositoriesModule {}

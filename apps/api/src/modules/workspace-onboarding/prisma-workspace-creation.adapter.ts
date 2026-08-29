@@ -27,13 +27,8 @@ const technologyTypes: Record<WorkspaceTechnology, TechnologyType> = {
 
 @Injectable()
 export class PrismaWorkspaceCreationAdapter implements WorkspaceCreationPort {
-  async createFromBlueprint(input: { transaction: Prisma.TransactionClient; ownerUserId: string; blueprint: WorkspaceBlueprint }): Promise<{ workspaceId: string }> {
+  async createFromBlueprint(input: { transaction: Prisma.TransactionClient; ownerUserId: string; blueprint: WorkspaceBlueprint }) {
     const { transaction, ownerUserId, blueprint } = input;
-
-    if (blueprint.repositories.some(({ strategy }) => strategy === 'CONNECT_NOW')) {
-      throw new ConflictException('CONNECT_NOW requires the verified post-creation GitHub linking flow');
-    }
-
     const user = await transaction.user.findFirst({
       where: {
         id: ownerUserId,
@@ -66,6 +61,8 @@ export class PrismaWorkspaceCreationAdapter implements WorkspaceCreationPort {
       },
     });
 
+    const applicationIds: Partial<Record<WorkspaceBlueprintApplication['type'], string>> = {};
+
     for (const application of blueprint.applications) {
       const createdApplication = await transaction.saasApplication.create({
         data: {
@@ -78,6 +75,8 @@ export class PrismaWorkspaceCreationAdapter implements WorkspaceCreationPort {
           longDescription: blueprint.workspace.description,
         },
       });
+
+      applicationIds[application.type] = createdApplication.id;
 
       if (application.stack.length > 0) {
         await transaction.applicationTechnology.createMany({
@@ -127,6 +126,7 @@ export class PrismaWorkspaceCreationAdapter implements WorkspaceCreationPort {
 
     return {
       workspaceId: workspace.id,
+      applicationIds,
     };
   }
 

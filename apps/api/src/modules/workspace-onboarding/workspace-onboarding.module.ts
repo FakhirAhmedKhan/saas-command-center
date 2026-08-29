@@ -2,8 +2,10 @@ import { AiBlueprintProviderClient } from './ai-blueprint-provider.client';
 import { AiWorkspaceBlueprintGenerator } from './generators/ai-workspace-blueprint.generator';
 import { RuleBasedWorkspaceBlueprintGenerator } from './generators/rule-based-workspace-blueprint.generator';
 import { WORKSPACE_BLUEPRINT_GENERATOR, type WorkspaceBlueprintGenerator } from './generators/workspace-blueprint-generator.interface';
+import { PrismaRepositoryConnectionAdapter } from './prisma-repository-connection.adapter';
 import { PrismaWorkspaceCreationAdapter } from './prisma-workspace-creation.adapter';
 import { QuestionFlowService } from './questions/question-flow.service';
+import { REPOSITORY_CONNECTION_PORT } from './repository-connection.port';
 import { WorkspaceRuleEngine } from './rules/rule-engine';
 import { GuidedWorkspaceBuilderEnabledGuard } from './security/guided-workspace-builder-enabled.guard';
 import { WorkspaceOnboardingPayloadService } from './security/workspace-onboarding-payload.service';
@@ -21,11 +23,12 @@ import { WorkspaceOnboardingService } from './workspace-onboarding.service';
 import { SharedRateLimitModule } from '../../common/rate-limit/shared-rate-limit.module';
 import type { TypedConfigService } from '../../config/runtime-config';
 import { PostgresAdvisoryLockService } from '../../infrastructure/database/postgres-advisory-lock.service';
+import { RepositoriesModule } from '../repositories/repositories.module';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 @Module({
-  imports: [SharedRateLimitModule],
+  imports: [SharedRateLimitModule, RepositoriesModule],
   controllers: [WorkspaceOnboardingController, WorkspaceOnboardingPublicController],
   providers: [
     WorkspaceOnboardingRepository,
@@ -45,9 +48,14 @@ import { ConfigService } from '@nestjs/config';
     WorkspaceAiCircuitBreakerService,
     PostgresAdvisoryLockService,
     PrismaWorkspaceCreationAdapter,
+    PrismaRepositoryConnectionAdapter,
     {
       provide: WORKSPACE_CREATION_PORT,
       useExisting: PrismaWorkspaceCreationAdapter,
+    },
+    {
+      provide: REPOSITORY_CONNECTION_PORT,
+      useExisting: PrismaRepositoryConnectionAdapter,
     },
     {
       provide: WORKSPACE_BLUEPRINT_GENERATOR,

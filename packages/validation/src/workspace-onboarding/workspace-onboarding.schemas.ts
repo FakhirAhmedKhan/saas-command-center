@@ -4,7 +4,7 @@ import { z } from 'zod';
 const unique = <T>(values: T[]): boolean => new Set(values).size === values.length;
 const uniqueArray = <T extends z.ZodTypeAny>(schema: T, maximum: number) => z.array(schema).max(maximum).refine(unique, 'Duplicate values are not allowed');
 
-export const workspaceOnboardingAnswersSchema = z
+export const workspaceOnboardingAnswersPatchSchema = z
   .object({
     productIdea: z.string().trim().min(3).max(500).optional(),
     workspaceName: z.string().trim().min(2).max(80).optional(),
@@ -23,24 +23,25 @@ export const workspaceOnboardingAnswersSchema = z
     environments: uniqueArray(z.enum(workspaceEnvironments), 3).optional(),
     qualityRequirements: uniqueArray(z.enum(engineeringSystems), engineeringSystems.length).optional(),
   })
-  .strict()
-  .superRefine((answers, context) => {
-    if (answers.mobilePlatforms?.length && !answers.applicationTypes?.includes('MOBILE')) {
-      context.addIssue({
-        code: 'custom',
-        path: ['mobilePlatforms'],
-        message: 'Mobile platforms require the MOBILE application type',
-      });
-    }
+  .strict();
 
-    if (answers.desktopPlatforms?.length && !answers.applicationTypes?.includes('DESKTOP')) {
-      context.addIssue({
-        code: 'custom',
-        path: ['desktopPlatforms'],
-        message: 'Desktop platforms require the DESKTOP application type',
-      });
-    }
-  });
+export const workspaceOnboardingAnswersSchema = workspaceOnboardingAnswersPatchSchema.superRefine((answers, context) => {
+  if (answers.mobilePlatforms?.length && !answers.applicationTypes?.includes('MOBILE')) {
+    context.addIssue({
+      code: 'custom',
+      path: ['mobilePlatforms'],
+      message: 'Mobile platforms require the MOBILE application type',
+    });
+  }
+
+  if (answers.desktopPlatforms?.length && !answers.applicationTypes?.includes('DESKTOP')) {
+    context.addIssue({
+      code: 'custom',
+      path: ['desktopPlatforms'],
+      message: 'Desktop platforms require the DESKTOP application type',
+    });
+  }
+});
 
 export const completeWorkspaceOnboardingAnswersSchema = workspaceOnboardingAnswersSchema.superRefine((answers, context) => {
   const required = ['productIdea', 'workspaceName', 'productType', 'targetUsers', 'applicationTypes', 'coreFeatures', 'authentication', 'repositories', 'environments', 'qualityRequirements'] as const;
@@ -104,7 +105,10 @@ const repositoryBlueprintSchema = z
   .object({
     applicationType: z.enum(workspaceApplicationTypes),
     strategy: z.enum(['NONE', 'CONNECT_LATER', 'CONNECT_NOW']),
-    repositoryId: z.string().uuid().optional(),
+    repositoryId: z
+      .string()
+      .regex(/^[1-9]\d{0,15}$/, 'Repository ID must be a positive GitHub repository ID')
+      .optional(),
     placeholderName: z.string().trim().min(1).max(100).optional(),
   })
   .strict()

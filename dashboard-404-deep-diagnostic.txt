@@ -1,0 +1,708 @@
+
+==============================================================================================================
+BASIC ENVIRONMENT
+==============================================================================================================
+Working directory: C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center
+PowerShell: 5.1.26100.9168
+Date: 2026-08-28 21:00:36
+NODE_ENV: 
+PORT: 
+NEXT_RUNTIME: 
+NEXT_PRIVATE_TEST_PROXY: 
+
+==============================================================================================================
+TOOL VERSIONS
+==============================================================================================================
+v24.13.1
+11.22.0
+Next.js v16.3.1
+
+==============================================================================================================
+FILE: package.json
+==============================================================================================================
+{
+  "name": "saas-command-center",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.22.0+sha512.1ff870c4c6133dfd88fb2afc46dd13d47f09c9794b438c6fdb47ca98caf3bc16381ee0be93a091b8e3824cf01f889f46d7d9e20910fb0be1ab0fb5baa80dd621",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=11.0.0"
+  },
+  "scripts": {
+    "build:packages": "pnpm --filter @command-center/shared-types build && pnpm --filter @command-center/validation build",
+    "build": "pnpm build:packages && pnpm -r --if-present build && pnpm size",
+    "lint": "pnpm -r --if-present lint",
+    "lint:fix": "pnpm -r --if-present lint:fix",
+    "typecheck": "pnpm build:packages && pnpm -r --if-present typecheck",
+    "test": "pnpm run test:all",
+    "test:api": "pnpm run test:api:unit && pnpm run test:api:e2e",
+    "test:tracker": "pnpm --filter @command-center/tracker-tests --fail-if-no-match test",
+    "test:web": "pnpm run test:web:unit && pnpm run test:web:e2e && pnpm run test:web:fullstack",
+    "test:web:fullstack": "pnpm --filter @command-center/web-tests --fail-if-no-match test:fullstack",
+    "test:all": "node packages/test-code/scripts/run-all.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:up": "docker compose -f infrastructure/docker-compose.yml up -d",
+    "db:down": "docker compose -f infrastructure/docker-compose.yml down",
+    "db:logs": "docker compose -f infrastructure/docker-compose.yml logs -f",
+    "db:status": "docker compose -f infrastructure/docker-compose.yml ps",
+    "dev": "concurrently -k --names API,WEB,TRACKER --prefix-colors cyan.bold,magenta.bold,yellow.bold --prefix \"[{name}]\" \"pnpm run dev:api\" \"pnpm run dev:web\" \"pnpm run dev:tracker\"",
+    "dev:api": "pnpm --filter @command-center/api start:dev",
+    "dev:web": "pnpm exec next dev apps/web --webpack",
+    "dev:tracker": "pnpm --filter @command-center/tracker dev",
+    "style:fix": "pnpm lint:fix && pnpm format",
+    "size": "node scripts/build-size-report.mjs",
+    "analyze:web": "pnpm --filter @command-center/web exec next experimental-analyze",
+    "build:tests": "pnpm --filter @command-center/test-code build",
+    "typecheck:tests": "pnpm --filter @command-center/test-code typecheck",
+    "test:api:unit": "pnpm --filter @command-center/api-tests --fail-if-no-match test:unit",
+    "test:api:e2e": "pnpm --filter @command-center/api-tests --fail-if-no-match test:e2e",
+    "test:web:unit": "pnpm --filter @command-center/web-tests --fail-if-no-match test:unit",
+    "test:web:e2e": "pnpm --filter @command-center/web-tests --fail-if-no-match test:e2e",
+    "verify:lint-config": "node scripts/verify-eslint-prettier-config.mjs",
+    "lint:all": "pnpm -r --if-present run lint",
+    "lint:fix:all": "pnpm -r --if-present run lint:fix"
+  },
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "concurrently": "^9.2.1",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2"
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/web/package.json
+==============================================================================================================
+{
+  "name": "@command-center/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "next typegen && tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "verify": "pnpm typecheck && pnpm build"
+  },
+  "dependencies": {
+    "@command-center/shared-types": "workspace:*",
+    "@command-center/ui": "workspace:*",
+    "@monaco-editor/react": "4.8.0-rc.3",
+    "lucide-react": "^1.28.0",
+    "monaco-editor": "^0.56.0",
+    "next": "16.3.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@command-center/eslint-config": "workspace:*",
+    "@eslint/js": "^9.34.0",
+    "@playwright/test": "^1.62.1",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@testing-library/jest-dom": "^6",
+    "@testing-library/react": "^16",
+    "@testing-library/user-event": "^14",
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^24.3.0",
+    "@types/pg": "^8.20.3",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.0.5",
+    "@vitest/coverage-v8": "^4.1.10",
+    "eslint": "^9.34.0",
+    "eslint-config-next": "16.3.1",
+    "jsdom": "^30.0.1",
+    "pg": "^8.22.0",
+    "postcss": "^8.5.26",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.67.0",
+    "vitest": "^4.1.10"
+  }
+}
+
+
+==============================================================================================================
+FILE: apps/web/next.config.ts
+==============================================================================================================
+import type { NextConfig } from 'next';
+
+const requiredVercelPublicEnvironmentVariables = ['NEXT_PUBLIC_API_URL', 'NEXT_PUBLIC_TRACKER_SCRIPT_URL', 'NEXT_PUBLIC_INGESTION_URL'] as const;
+
+function validateVercelEnvironment(): void {
+  if (process.env.VERCEL !== '1') {
+    return;
+  }
+
+  for (const key of requiredVercelPublicEnvironmentVariables) {
+    const value = process.env[key]?.trim();
+
+    if (!value) {
+      throw new Error(`${key} must be configured for Vercel deployments.`);
+    }
+
+    let url: URL;
+
+    try {
+      url = new URL(value);
+    } catch {
+      throw new Error(`${key} must be a valid absolute URL.`);
+    }
+
+    if (url.protocol !== 'https:') {
+      throw new Error(`${key} must use HTTPS on Vercel.`);
+    }
+
+    if (url.hostname === 'localhost' || url.hostname === '127.0.0.1' || url.hostname === '::1') {
+      throw new Error(`${key} cannot point to localhost on Vercel.`);
+    }
+  }
+}
+
+validateVercelEnvironment();
+
+const nextConfig: NextConfig = {
+  reactStrictMode: true,
+  allowedDevOrigins: ['127.0.0.1'],
+  output: 'standalone',
+  transpilePackages: ['@command-center/ui', '@command-center/shared-types'],
+};
+
+export default nextConfig;
+
+
+==============================================================================================================
+FILE: apps/web/tsconfig.json
+==============================================================================================================
+{
+  "extends": "../../packages/tsconfig/react.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "../../packages/test-code/web/unit/features/mobile-apps/mobile-builds.test.tsx",
+    "../../packages/test-code/api/e2e/desktop-build-artifacts.e2e-spec.ts"
+  ],
+  "exclude": ["node_modules", "../../packages/test-code/api/**/*", "../../packages/test-code/api/**"]
+}
+
+
+==============================================================================================================
+REQUIRED ROUTE FILE STATUS
+==============================================================================================================
+EXISTS | apps/web/src/app/layout.tsx | 577 bytes | 2026-08-20 17:51:47
+EXISTS | apps/web/src/app/page.tsx | 607 bytes | 2026-08-28 20:34:02
+MISSING | apps/web/src/app/not-found.tsx
+MISSING | apps/web/src/app/global-not-found.tsx
+MISSING | apps/web/src/app/proxy.ts
+MISSING | apps/web/src/middleware.ts
+MISSING | apps/web/src/proxy.ts
+EXISTS | apps/web/src/app/(auth)/login/page.tsx | 2369 bytes | 2026-08-25 01:39:05
+MISSING | apps/web/src/app/login/page.tsx
+EXISTS | apps/web/src/app/(dashboard)/layout.tsx | 361 bytes | 2026-08-10 09:41:32
+EXISTS | apps/web/src/app/(dashboard)/dashboard/page.tsx | 3605 bytes | 2026-08-25 00:05:12
+EXISTS | apps/web/src/app/(dashboard)/workspaces/new/page.tsx | 416 bytes | 2026-08-11 18:58:43
+EXISTS | apps/web/src/app/(dashboard)/workspaces/new/new-workspace-client.tsx | 2049 bytes | 2026-08-27 23:10:56
+
+==============================================================================================================
+APP ROUTE INVENTORY
+==============================================================================================================
+apps\web\src\app\(auth)\error.tsx
+apps\web\src\app\(auth)\layout.tsx
+apps\web\src\app\(auth)\login\page.tsx
+apps\web\src\app\(auth)\register\page.tsx
+apps\web\src\app\(dashboard)\dashboard\page.tsx
+apps\web\src\app\(dashboard)\error.tsx
+apps\web\src\app\(dashboard)\github\callback\page.tsx
+apps\web\src\app\(dashboard)\github\setup\page.tsx
+apps\web\src\app\(dashboard)\layout.tsx
+apps\web\src\app\(dashboard)\notifications\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\activities\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\activity\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\applications\[applicationId]\development\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\applications\[applicationId]\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\applications\[applicationId]\releases\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\applications\[applicationId]\settings\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\applications\new\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\applications\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\desktop-apps\[desktopAppId]\alerts\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\desktop-apps\[desktopAppId]\builds\[buildId]\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\desktop-apps\[desktopAppId]\builds\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\desktop-apps\[desktopAppId]\code\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\desktop-apps\[desktopAppId]\crashes\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\desktop-apps\[desktopAppId]\dependencies\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\desktop-apps\[desktopAppId]\layout.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\desktop-apps\[desktopAppId]\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\desktop-apps\[desktopAppId]\performance\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\desktop-apps\[desktopAppId]\releases\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\desktop-apps\[desktopAppId]\security\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\desktop-apps\[desktopAppId]\settings\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\desktop-apps\[desktopAppId]\tests\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\desktop-apps\code\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\desktop-apps\new\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\desktop-apps\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\mobile-apps\[mobileAppId]\alerts\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\mobile-apps\[mobileAppId]\builds\[buildId]\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\mobile-apps\[mobileAppId]\builds\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\mobile-apps\[mobileAppId]\code\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\mobile-apps\[mobileAppId]\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\mobile-apps\[mobileAppId]\performance\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\mobile-apps\[mobileAppId]\tests\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\mobile-apps\new\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\mobile-apps\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\monitoring\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\repositories\[repositoryId]\code\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\repositories\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\settings\integrations\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\settings\members\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\settings\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\analytics\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\analytics\processing\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\analytics\reports\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\analytics-engine\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\edit\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\events\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\installation\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\[websiteId]\settings\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\new\page.tsx
+apps\web\src\app\(dashboard)\workspaces\[workspaceId]\websites\page.tsx
+apps\web\src\app\(dashboard)\workspaces\new\guided\page.tsx
+apps\web\src\app\(dashboard)\workspaces\new\loading.tsx
+apps\web\src\app\(dashboard)\workspaces\new\page.tsx
+apps\web\src\app\invitations\[token]\page.tsx
+apps\web\src\app\layout.tsx
+apps\web\src\app\page.tsx
+
+==============================================================================================================
+ALL APP OR PAGES DIRECTORIES
+==============================================================================================================
+.repair-backup\guided-builder-web-20260827-222556\apps\web\src\app
+.repair-backup\guided-builder-web-20260827-223624\apps\web\src\app
+.repair-backup\guided-builder-web-20260827-223747\apps\web\src\app
+apps\web\app
+apps\web\src\app
+packages\test-code\web\unit\app
+
+==============================================================================================================
+404 REDIRECT AND ROUTING SYMBOLS
+==============================================================================================================
+apps\web\src\features\analytics-engine\analytics-engine-api.ts:12:function basePath(workspaceId: string, websiteId: string): string {
+apps\web\src\features\analytics-engine\analytics-engine-api.ts:17:return apiRequest<AnalyticsEngineStatus>(`${basePath(workspaceId, websiteId)}/status`);
+apps\web\src\features\analytics-engine\analytics-engine-api.ts:43:return apiRequest<AnalyticsAggregateResponse>(`${basePath(workspaceId, websiteId)}/aggregates?${parameters.toString()}`);
+apps\web\src\features\analytics-engine\analytics-engine-api.ts:51:}>(`${basePath(workspaceId, websiteId)}/process`, {
+apps\web\src\features\analytics-engine\analytics-engine-api.ts:64:}>(`${basePath(workspaceId, websiteId)}/reprocess`, {
+apps\web\src\features\analytics-engine\analytics-engine-api.ts:71:return apiRequest<AnalyticsRetentionResult>(`${basePath(workspaceId, websiteId)}/retention`, {
+apps\web\src\features\analytics-processing\analytics-processing-api.ts:4:function createBasePath(workspaceId: string, websiteId: string): string {
+apps\web\src\features\analytics-processing\analytics-processing-api.ts:14:return apiRequest<AnalyticsProcessingStatus>(`${createBasePath(workspaceId, websiteId)}/status`, {
+apps\web\src\features\analytics-processing\analytics-processing-api.ts:22:return apiRequest<ProcessingRun>(`${createBasePath(workspaceId, websiteId)}/reprocess`, {
+apps\web\src\features\analytics-processing\analytics-processing-api.ts:29:return apiRequest<ProcessingRun>(`${createBasePath(workspaceId, websiteId)}/runs/${runId}/retry`, {
+apps\web\src\features\analytics-reports\analytics-reports-api.ts:36:function createBasePath(request: AnalyticsReportRequest): string {
+apps\web\src\features\analytics-reports\analytics-reports-api.ts:41:const basePath = createBasePath(request);
+apps\web\src\features\analytics-reports\analytics-reports-api.ts:42:const prefix = exportMode ? `${basePath}/exports` : basePath;
+apps\web\src\features\development\development-api.ts:15:function basePath(workspaceId: string, applicationId: string): string {
+apps\web\src\features\development\development-api.ts:24:return apiRequest<DevelopmentSummary>(`${basePath(workspaceId, applicationId)}/summary`);
+apps\web\src\features\development\development-api.ts:28:return apiRequest<DevelopmentSummary>(`${basePath(workspaceId, applicationId)}/apply-template`, {
+apps\web\src\features\development\development-api.ts:38:return apiRequest<ApplicationMilestone>(`${basePath(workspaceId, applicationId)}/milestones`, {
+apps\web\src\features\development\development-api.ts:45:return apiRequest<ApplicationMilestone>(`${basePath(workspaceId, applicationId)}/milestones/${milestoneId}`, {
+apps\web\src\features\development\development-api.ts:52:return apiRequest<ApplicationMilestone>(`${basePath(workspaceId, applicationId)}/milestones/${milestoneId}/complete`, {
+apps\web\src\features\development\development-api.ts:58:return apiRequest<ApplicationMilestone>(`${basePath(workspaceId, applicationId)}/milestones/${milestoneId}/reopen`, {
+apps\web\src\features\development\development-api.ts:64:return apiRequest<ApplicationMilestone>(`${basePath(workspaceId, applicationId)}/milestones/${milestoneId}/skip`, {
+apps\web\src\features\development\development-api.ts:75:}>(`${basePath(workspaceId, applicationId)}/milestones/${milestoneId}`, {
+apps\web\src\features\development\development-api.ts:81:return apiRequest<ApplicationMilestone[]>(`${basePath(workspaceId, applicationId)}/milestones/reorder`, {
+apps\web\src\features\development\development-api.ts:90:return apiRequest<ApplicationTask>(`${basePath(workspaceId, applicationId)}/milestones/${milestoneId}/tasks`, {
+apps\web\src\features\development\development-api.ts:97:return apiRequest<ApplicationTask>(`${basePath(workspaceId, applicationId)}/tasks/${taskId}`, {
+apps\web\src\features\development\development-api.ts:104:return apiRequest<ApplicationTask>(`${basePath(workspaceId, applicationId)}/tasks/${taskId}/status`, {
+apps\web\src\features\development\development-api.ts:113:return apiRequest<ApplicationTask>(`${basePath(workspaceId, applicationId)}/tasks/${taskId}/complete`, {
+apps\web\src\features\development\development-api.ts:119:return apiRequest<ApplicationTask>(`${basePath(workspaceId, applicationId)}/tasks/${taskId}/reopen`, {
+apps\web\src\features\development\development-api.ts:125:return apiRequest<ApplicationTask>(`${basePath(workspaceId, applicationId)}/tasks/${taskId}/skip`, {
+apps\web\src\features\development\development-api.ts:134:return apiRequest<ApplicationTask>(`${basePath(workspaceId, applicationId)}/tasks/${taskId}/move`, {
+apps\web\src\features\development\development-api.ts:143:return apiRequest<ApplicationTask[]>(`${basePath(workspaceId, applicationId)}/milestones/${milestoneId}/tasks/reorder`, {
+apps\web\src\features\development\development-api.ts:154:}>(`${basePath(workspaceId, applicationId)}/tasks/${taskId}`, {
+apps\web\src\features\development\development-api.ts:160:return apiRequest<ApplicationBlocker>(`${basePath(workspaceId, applicationId)}/blockers`, {
+apps\web\src\features\development\development-api.ts:167:return apiRequest<ApplicationBlocker>(`${basePath(workspaceId, applicationId)}/blockers/${blockerId}`, {
+apps\web\src\features\development\development-api.ts:174:return apiRequest<ApplicationBlocker>(`${basePath(workspaceId, applicationId)}/blockers/${blockerId}/resolve`, {
+apps\web\src\features\development\development-api.ts:183:return apiRequest<ApplicationBlocker>(`${basePath(workspaceId, applicationId)}/blockers/${blockerId}/reopen`, {
+apps\web\src\features\development\development-api.ts:191:}>(`${basePath(workspaceId, applicationId)}/blockers/${blockerId}`, {
+apps\web\src\features\integrations\integrations-api.ts:4:function createBasePath(workspaceId: string): string {
+apps\web\src\features\integrations\integrations-api.ts:14:createBasePath(workspaceId),
+apps\web\src\features\integrations\integrations-api.ts:33:createBasePath(workspaceId),
+apps\web\src\features\integrations\integrations-api.ts:44:`${createBasePath(workspaceId)}/${endpointId}`,
+apps\web\src\features\integrations\integrations-api.ts:55:`${createBasePath(workspaceId)}/${endpointId}/disable`,
+apps\web\src\features\integrations\integrations-api.ts:70:`${createBasePath(workspaceId)}/${endpointId}/rotate-secret`,
+apps\web\src\features\integrations\integrations-api.ts:87:`${createBasePath(workspaceId)}/${endpointId}/test`,
+apps\web\src\features\integrations\integrations-api.ts:114:`${createBasePath(workspaceId)}/${endpointId}/deliveries?limit=50`,
+apps\web\src\features\monitoring\monitoring-api.ts:4:function createBasePath(workspaceId: string): string {
+apps\web\src\features\monitoring\monitoring-api.ts:14:`${createBasePath(workspaceId)}/summary`,
+apps\web\src\features\monitoring\monitoring-api.ts:30:`${createBasePath(workspaceId)}/targets`,
+apps\web\src\features\monitoring\monitoring-api.ts:46:`${createBasePath(workspaceId)}/checks`,
+apps\web\src\features\monitoring\monitoring-api.ts:63:`${createBasePath(workspaceId)}/checks/${checkId}/history`,
+apps\web\src\features\monitoring\monitoring-api.ts:79:`${createBasePath(workspaceId)}/incidents`,
+apps\web\src\features\monitoring\monitoring-api.ts:91:`${createBasePath(workspaceId)}/checks`,
+apps\web\src\features\monitoring\monitoring-api.ts:102:`${createBasePath(workspaceId)}/checks/${checkId}`,
+apps\web\src\features\monitoring\monitoring-api.ts:113:`${createBasePath(workspaceId)}/checks/${checkId}/run`,
+apps\web\src\features\tracking\tracking-api.ts:4:function basePath(workspaceId: string, websiteId: string): string {
+apps\web\src\features\tracking\tracking-api.ts:25:return apiRequest<TrackingStatus>(`${basePath(workspaceId, websiteId)}/status`);
+apps\web\src\features\tracking\tracking-api.ts:29:return apiRequest<RawEventsResponse>(`${basePath(workspaceId, websiteId)}/events${buildQuery(query)}`);
+apps\web\src\features\websites\website-api.ts:20:function basePath(workspaceId: string): string {
+apps\web\src\features\websites\website-api.ts:25:return apiRequest<WebsiteListResponse>(`${basePath(workspaceId)}${buildQuery(query)}`);
+apps\web\src\features\websites\website-api.ts:29:return apiRequest<Website>(`${basePath(workspaceId)}/${websiteId}`);
+apps\web\src\features\websites\website-api.ts:33:return apiRequest<WebsiteWithKeyResponse>(basePath(workspaceId), {
+apps\web\src\features\websites\website-api.ts:40:return apiRequest<Website>(`${basePath(workspaceId)}/${websiteId}`, {
+apps\web\src\features\websites\website-api.ts:47:return apiRequest<Website>(`${basePath(workspaceId)}/${websiteId}/enable`, {
+apps\web\src\features\websites\website-api.ts:53:return apiRequest<Website>(`${basePath(workspaceId)}/${websiteId}/disable`, {
+apps\web\src\features\websites\website-api.ts:59:return apiRequest<Website>(`${basePath(workspaceId)}/${websiteId}/archive`, {
+apps\web\src\features\websites\website-api.ts:65:return apiRequest<Website>(`${basePath(workspaceId)}/${websiteId}/restore`, {
+apps\web\src\features\websites\website-api.ts:71:return apiRequest<WebsiteWithKeyResponse>(`${basePath(workspaceId)}/${websiteId}/rotate-key`, {
+apps\web\src\features\websites\website-api.ts:77:return apiRequest<Website>(`${basePath(workspaceId)}/${websiteId}/connect`, {
+apps\web\src\features\websites\website-api.ts:86:return apiRequest<Website>(`${basePath(workspaceId)}/${websiteId}/disconnect`, {
+
+==============================================================================================================
+RELEVANT PROCESS TREE DATA
+==============================================================================================================
+PID: 2036
+PARENT PID: 8404
+NAME: node.exe
+COMMAND: node   "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\.bin\\..\@nestjs\cli\bin\nest.js" start --watch
+--------------------------------------------------------------------------------
+PID: 2504
+PARENT PID: 21112
+NAME: node.exe
+COMMAND: "C:\Program Files\nodejs\\node.exe"   "C:\Program Files\nodejs\\node_modules\corepack\dist\pnpm.js" run dev:web
+--------------------------------------------------------------------------------
+PID: 8496
+PARENT PID: 2036
+NAME: cmd.exe
+COMMAND: C:\WINDOWS\system32\cmd.exe /d /s /c "node --enable-source-maps C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\dist\main"
+--------------------------------------------------------------------------------
+PID: 11880
+PARENT PID: 15088
+NAME: node.exe
+COMMAND: node  scripts/dev.mjs
+--------------------------------------------------------------------------------
+PID: 12076
+PARENT PID: 5548
+NAME: cmd.exe
+COMMAND: C:\WINDOWS\system32\cmd.exe /d /s /c concurrently -k --names API,WEB,TRACKER --prefix-colors cyan.bold,magenta.bold,yellow.bold --prefix "[{name}]" "pnpm run dev:api" "pnpm run dev:web" "pnpm run dev:tracker"
+--------------------------------------------------------------------------------
+PID: 12648
+PARENT PID: 8496
+NAME: node.exe
+COMMAND: node  --enable-source-maps C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\dist\main
+--------------------------------------------------------------------------------
+PID: 15088
+PARENT PID: 21740
+NAME: cmd.exe
+COMMAND: C:\WINDOWS\system32\cmd.exe /d /s /c node scripts/dev.mjs
+--------------------------------------------------------------------------------
+PID: 19952
+PARENT PID: 23992
+NAME: node.exe
+COMMAND: "C:\Program Files\nodejs\node.exe" C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\next\dist\server\lib\start-server.js
+--------------------------------------------------------------------------------
+PID: 20676
+PARENT PID: 2504
+NAME: cmd.exe
+COMMAND: C:\WINDOWS\system32\cmd.exe /d /s /c pnpm exec next dev apps/web --webpack
+--------------------------------------------------------------------------------
+PID: 21112
+PARENT PID: 22188
+NAME: cmd.exe
+COMMAND: cmd.exe /s /c "pnpm run dev:web"
+--------------------------------------------------------------------------------
+PID: 22140
+PARENT PID: 20676
+NAME: node.exe
+COMMAND: "C:\Program Files\nodejs\\node.exe"   "C:\Program Files\nodejs\\node_modules\corepack\dist\pnpm.js" exec next dev apps/web --webpack
+--------------------------------------------------------------------------------
+PID: 22188
+PARENT PID: 12076
+NAME: node.exe
+COMMAND: node   "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\.bin\\..\concurrently\dist\bin\concurrently.js" -k --names API,WEB,TRACKER --prefix-colors cyan.bold,magenta.bold,yellow.bold --prefix "[{name}]" "pnpm run dev:api" "pnpm run dev:web" "pnpm run dev:tracker"
+--------------------------------------------------------------------------------
+PID: 22652
+PARENT PID: 22140
+NAME: cmd.exe
+COMMAND: C:\WINDOWS\system32\cmd.exe /q /d /s /c "next ^^^"dev^^^" ^^^"apps/web^^^" ^^^"--webpack^^^""
+--------------------------------------------------------------------------------
+PID: 23992
+PARENT PID: 22652
+NAME: node.exe
+COMMAND: node   "C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\.bin\\..\next\dist\bin\next" "dev" "apps/web" "--webpack"
+--------------------------------------------------------------------------------
+
+==============================================================================================================
+PORT LISTENERS
+==============================================================================================================
+PORT: 3000
+PID: 19952
+NAME: node.exe
+PARENT PID: 23992
+COMMAND: "C:\Program Files\nodejs\node.exe" C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\next\dist\server\lib\start-server.js
+--------------------------------------------------------------------------------
+PORT: 3002
+PID: 11880
+NAME: node.exe
+PARENT PID: 15088
+COMMAND: node  scripts/dev.mjs
+--------------------------------------------------------------------------------
+PORT: 4000
+PID: 12648
+NAME: node.exe
+PARENT PID: 8496
+COMMAND: node  --enable-source-maps C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\api\dist\main
+--------------------------------------------------------------------------------
+
+==============================================================================================================
+HTTP RESULT: /
+==============================================================================================================
+CURL EXIT CODE: 0
+HTTP/1.1 404 Not Found
+Cache-Control: no-cache, must-revalidate
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+X-Powered-By: Next.js
+Content-Type: text/html; charset=utf-8
+Date: Fri, 28 Aug 2026 17:00:44 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+
+BODY PREVIEW:
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/webpack.js?v=1787936444027"/><script src="/_next/static/chunks/main-app.js?v=1787936444027" async=""></script><script src="/_next/static/chunks/app-pages-internals.js" async=""></script><meta name="robots" content="noindex"/><title>404: This page could not be found.</title><script src="/_next/static/chunks/polyfills.js" noModule=""></script></head><body><div hidden=""><!--$--><!--/$--></div><div style="font-family:system-ui,&quot;Segoe UI&quot;,Roboto,Helvetica,Arial,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;;height:100vh;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center"><div><style>body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}</style><h1 class="next-error-h1" style="display:inline-block;margin:0 20px 0 0;padding:0 23px 0 0;font-size:24px;font-weight:500;vertical-align:top;line-height:49px">404</h1><div style="display:inline-block"><h2 style="font-size:14px;font-weight:400;line-height:49px;margin:0">This page could not be found.</h2></div></div></div><!--$--><!--/$--><script id="_R_">self.__next_r="uM3E5nSYgdVR_QN6ldAbu";if(document.cookie
+
+==============================================================================================================
+HTTP RESULT: /login
+==============================================================================================================
+CURL EXIT CODE: 0
+HTTP/1.1 404 Not Found
+Cache-Control: no-cache, must-revalidate
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+X-Powered-By: Next.js
+Content-Type: text/html; charset=utf-8
+Date: Fri, 28 Aug 2026 17:00:44 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+
+BODY PREVIEW:
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/webpack.js?v=1787936444115"/><script src="/_next/static/chunks/main-app.js?v=1787936444115" async=""></script><script src="/_next/static/chunks/app-pages-internals.js" async=""></script><meta name="robots" content="noindex"/><title>404: This page could not be found.</title><script src="/_next/static/chunks/polyfills.js" noModule=""></script></head><body><div hidden=""><!--$--><!--/$--></div><div style="font-family:system-ui,&quot;Segoe UI&quot;,Roboto,Helvetica,Arial,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;;height:100vh;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center"><div><style>body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}</style><h1 class="next-error-h1" style="display:inline-block;margin:0 20px 0 0;padding:0 23px 0 0;font-size:24px;font-weight:500;vertical-align:top;line-height:49px">404</h1><div style="display:inline-block"><h2 style="font-size:14px;font-weight:400;line-height:49px;margin:0">This page could not be found.</h2></div></div></div><!--$--><!--/$--><script id="_R_">self.__next_r="BHthZ15lDPu-86oSddgGt";if(document.cookie
+
+==============================================================================================================
+HTTP RESULT: /dashboard
+==============================================================================================================
+CURL EXIT CODE: 0
+HTTP/1.1 404 Not Found
+Cache-Control: no-cache, must-revalidate
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+X-Powered-By: Next.js
+Content-Type: text/html; charset=utf-8
+Date: Fri, 28 Aug 2026 17:00:44 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+
+BODY PREVIEW:
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/webpack.js?v=1787936444191"/><script src="/_next/static/chunks/main-app.js?v=1787936444191" async=""></script><script src="/_next/static/chunks/app-pages-internals.js" async=""></script><meta name="robots" content="noindex"/><title>404: This page could not be found.</title><script src="/_next/static/chunks/polyfills.js" noModule=""></script></head><body><div hidden=""><!--$--><!--/$--></div><div style="font-family:system-ui,&quot;Segoe UI&quot;,Roboto,Helvetica,Arial,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;;height:100vh;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center"><div><style>body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}</style><h1 class="next-error-h1" style="display:inline-block;margin:0 20px 0 0;padding:0 23px 0 0;font-size:24px;font-weight:500;vertical-align:top;line-height:49px">404</h1><div style="display:inline-block"><h2 style="font-size:14px;font-weight:400;line-height:49px;margin:0">This page could not be found.</h2></div></div></div><!--$--><!--/$--><script id="_R_">self.__next_r="mR3PiAqAPWhHuRgxygWb6";if(document.cookie
+
+==============================================================================================================
+HTTP RESULT: /workspaces/new
+==============================================================================================================
+CURL EXIT CODE: 0
+HTTP/1.1 404 Not Found
+Cache-Control: no-cache, must-revalidate
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+X-Powered-By: Next.js
+Content-Type: text/html; charset=utf-8
+Date: Fri, 28 Aug 2026 17:00:44 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+
+BODY PREVIEW:
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/webpack.js?v=1787936444266"/><script src="/_next/static/chunks/main-app.js?v=1787936444266" async=""></script><script src="/_next/static/chunks/app-pages-internals.js" async=""></script><meta name="robots" content="noindex"/><title>404: This page could not be found.</title><script src="/_next/static/chunks/polyfills.js" noModule=""></script></head><body><div hidden=""><!--$--><!--/$--></div><div style="font-family:system-ui,&quot;Segoe UI&quot;,Roboto,Helvetica,Arial,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;;height:100vh;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center"><div><style>body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}</style><h1 class="next-error-h1" style="display:inline-block;margin:0 20px 0 0;padding:0 23px 0 0;font-size:24px;font-weight:500;vertical-align:top;line-height:49px">404</h1><div style="display:inline-block"><h2 style="font-size:14px;font-weight:400;line-height:49px;margin:0">This page could not be found.</h2></div></div></div><!--$--><!--/$--><script id="_R_">self.__next_r="1dgqmgAIgfQVtWfFLSseS";if(document.cookie
+
+==============================================================================================================
+HTTP RESULT: /workspaces/new/guided
+==============================================================================================================
+CURL EXIT CODE: 0
+HTTP/1.1 404 Not Found
+Cache-Control: no-cache, must-revalidate
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+X-Powered-By: Next.js
+Content-Type: text/html; charset=utf-8
+Date: Fri, 28 Aug 2026 17:00:44 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+
+BODY PREVIEW:
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/webpack.js?v=1787936444346"/><script src="/_next/static/chunks/main-app.js?v=1787936444346" async=""></script><script src="/_next/static/chunks/app-pages-internals.js" async=""></script><meta name="robots" content="noindex"/><title>404: This page could not be found.</title><script src="/_next/static/chunks/polyfills.js" noModule=""></script></head><body><div hidden=""><!--$--><!--/$--></div><div style="font-family:system-ui,&quot;Segoe UI&quot;,Roboto,Helvetica,Arial,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;;height:100vh;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center"><div><style>body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}</style><h1 class="next-error-h1" style="display:inline-block;margin:0 20px 0 0;padding:0 23px 0 0;font-size:24px;font-weight:500;vertical-align:top;line-height:49px">404</h1><div style="display:inline-block"><h2 style="font-size:14px;font-weight:400;line-height:49px;margin:0">This page could not be found.</h2></div></div></div><!--$--><!--/$--><script id="_R_">self.__next_r="H-7FwSUkVaRPvnSK2gfXe";if(document.cookie
+
+==============================================================================================================
+HTTP RESULT: /this-route-must-not-exist
+==============================================================================================================
+CURL EXIT CODE: 0
+HTTP/1.1 404 Not Found
+Cache-Control: no-cache, must-revalidate
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+X-Powered-By: Next.js
+Content-Type: text/html; charset=utf-8
+Date: Fri, 28 Aug 2026 17:00:44 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+
+BODY PREVIEW:
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/webpack.js?v=1787936444445"/><script src="/_next/static/chunks/main-app.js?v=1787936444445" async=""></script><script src="/_next/static/chunks/app-pages-internals.js" async=""></script><meta name="robots" content="noindex"/><title>404: This page could not be found.</title><script src="/_next/static/chunks/polyfills.js" noModule=""></script></head><body><div hidden=""><!--$--><!--/$--></div><div style="font-family:system-ui,&quot;Segoe UI&quot;,Roboto,Helvetica,Arial,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;;height:100vh;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center"><div><style>body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}</style><h1 class="next-error-h1" style="display:inline-block;margin:0 20px 0 0;padding:0 23px 0 0;font-size:24px;font-weight:500;vertical-align:top;line-height:49px">404</h1><div style="display:inline-block"><h2 style="font-size:14px;font-weight:400;line-height:49px;margin:0">This page could not be found.</h2></div></div></div><!--$--><!--/$--><script id="_R_">self.__next_r="3ja4nfZ-GXlgrLMQ28D-i";if(document.cookie
+
+==============================================================================================================
+NEXT DIRECTORY: .next
+==============================================================================================================
+DIRECTORY NOT FOUND
+
+==============================================================================================================
+NEXT GENERATED FILES: apps/web/.next
+==============================================================================================================
+apps\web\.next\dev\build-manifest.json | 344 bytes | 2026-08-28 20:57:14
+apps\web\.next\dev\prerender-manifest.json | 354 bytes | 2026-08-28 20:57:02
+apps\web\.next\dev\react-loadable-manifest.json | 462 bytes | 2026-08-28 20:57:14
+apps\web\.next\dev\routes-manifest.json | 308 bytes | 2026-08-28 20:57:02
+apps\web\.next\dev\server\app\_not-found\page.js | 68337 bytes | 2026-08-28 20:57:11
+apps\web\.next\dev\server\app\_not-found\page_client-reference-manifest.js | 12556 bytes | 2026-08-28 20:57:14
+apps\web\.next\dev\server\app-paths-manifest.json | 50 bytes | 2026-08-28 20:57:11
+apps\web\.next\dev\server\interception-route-rewrite-manifest.js | 47 bytes | 2026-08-28 20:57:02
+apps\web\.next\dev\server\middleware-build-manifest.js | 376 bytes | 2026-08-28 20:57:14
+apps\web\.next\dev\server\middleware-manifest.json | 83 bytes | 2026-08-28 20:57:02
+apps\web\.next\dev\server\middleware-react-loadable-manifest.js | 509 bytes | 2026-08-28 20:57:14
+apps\web\.next\dev\server\next-font-manifest.js | 113 bytes | 2026-08-28 20:57:14
+apps\web\.next\dev\server\next-font-manifest.json | 77 bytes | 2026-08-28 20:57:14
+apps\web\.next\dev\server\pages-manifest.json | 2 bytes | 2026-08-28 20:57:11
+apps\web\.next\dev\server\server-reference-manifest.js | 140 bytes | 2026-08-28 20:57:11
+apps\web\.next\dev\server\server-reference-manifest.json | 97 bytes | 2026-08-28 20:57:11
+apps\web\.next\dev\static\development\_buildManifest.js | 238 bytes | 2026-08-28 20:57:14
+apps\web\.next\dev\static\development\_ssgManifest.js | 76 bytes | 2026-08-28 20:57:14
+apps\web\.next\dev\types\routes.d.ts | 1378 bytes | 2026-08-28 20:57:02
+
+==============================================================================================================
+MANIFEST CONTENT: apps\web\.next\dev\routes-manifest.json
+==============================================================================================================
+{"version":3,"caseSensitive":false,"basePath":"","rewrites":{"beforeFiles":[],"afterFiles":[],"fallback":[]},"redirects":[{"source":"/:path+/","destination":"/:path+","permanent":true,"internal":true,"priority":true,"regex":"^(?:\\/((?:[^\\/]+?)(?:\\/(?:[^\\/]+?))*))\\/$"}],"headers":[],"onMatchHeaders":[]}
+
+==============================================================================================================
+MANIFEST CONTENT: apps\web\.next\dev\server\app-paths-manifest.json
+==============================================================================================================
+{
+  "/_not-found/page": "app/_not-found/page.js"
+}
+
+==============================================================================================================
+GIT ROUTE STATUS
+==============================================================================================================
+A  apps/web/src/app/(dashboard)/workspaces/new/guided/page.tsx
+M  apps/web/src/app/(dashboard)/workspaces/new/new-workspace-client.tsx
+MM apps/web/src/app/page.tsx
+MM package.json
+
+==============================================================================================================
+TRACKED REQUIRED FILES
+==============================================================================================================
+apps/web/next.config.ts
+apps/web/src/app/(auth)/error.tsx
+apps/web/src/app/(auth)/layout.tsx
+apps/web/src/app/(auth)/login/page.tsx
+apps/web/src/app/(auth)/register/page.tsx
+apps/web/src/app/(dashboard)/dashboard/page.tsx
+apps/web/src/app/(dashboard)/error.tsx
+apps/web/src/app/(dashboard)/github/callback/github-callback-client.tsx
+apps/web/src/app/(dashboard)/github/callback/page.tsx
+apps/web/src/app/(dashboard)/github/setup/github-setup-client.tsx
+apps/web/src/app/(dashboard)/github/setup/page.tsx
+apps/web/src/app/(dashboard)/layout.tsx
+apps/web/src/app/(dashboard)/notifications/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/activities/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/activity/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/applications/[applicationId]/development/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/applications/[applicationId]/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/applications/[applicationId]/releases/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/applications/[applicationId]/settings/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/applications/new/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/applications/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/alerts/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/builds/[buildId]/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/builds/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/code/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/crashes/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/dependencies/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/layout.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/performance/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/releases/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/security/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/settings/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/[desktopAppId]/tests/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/code/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/new/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/desktop-apps/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/alerts/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/builds/[buildId]/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/builds/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/code/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/performance/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/[mobileAppId]/tests/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/new/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/mobile-apps/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/monitoring/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/repositories/[repositoryId]/code/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/repositories/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/settings/integrations/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/settings/members/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/settings/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/analytics-engine/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/analytics/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/analytics/processing/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/analytics/reports/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/edit/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/events/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/installation/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/[websiteId]/settings/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/new/page.tsx
+apps/web/src/app/(dashboard)/workspaces/[workspaceId]/websites/page.tsx
+apps/web/src/app/(dashboard)/workspaces/new/guided/page.tsx
+apps/web/src/app/(dashboard)/workspaces/new/loading.tsx
+apps/web/src/app/(dashboard)/workspaces/new/new-workspace-client.tsx
+apps/web/src/app/(dashboard)/workspaces/new/page.tsx
+apps/web/src/app/DynmicIndex.tsx
+apps/web/src/app/global-error.tsx
+apps/web/src/app/globals.css
+apps/web/src/app/icon.svg
+apps/web/src/app/invitations/[token]/page.tsx
+apps/web/src/app/layout.tsx
+apps/web/src/app/page.tsx
+apps/web/src/app/providers.tsx
+
+==============================================================================================================
+IGNORED ROUTE FILES
+==============================================================================================================

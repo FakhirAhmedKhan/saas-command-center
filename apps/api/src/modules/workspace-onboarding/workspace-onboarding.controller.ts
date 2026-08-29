@@ -7,6 +7,7 @@ import { WorkspaceOnboardingCreationService } from './workspace-onboarding-creat
 import { WorkspaceOnboardingService } from './workspace-onboarding.service';
 import { SharedRateLimit } from '../../common/rate-limit/shared-rate-limit.decorator';
 import { SharedRateLimitGuard } from '../../common/rate-limit/shared-rate-limit.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import type { RequestWithUser } from '../auth/interfaces/request-with-user.interface';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import type { FastifyRequest } from 'fastify';
@@ -14,7 +15,7 @@ import type { FastifyRequest } from 'fastify';
 type AuthenticatedRequest = FastifyRequest & RequestWithUser;
 
 @Controller('workspace-onboarding/sessions')
-@UseGuards(GuidedWorkspaceBuilderEnabledGuard, SharedRateLimitGuard)
+@UseGuards(JwtAuthGuard, GuidedWorkspaceBuilderEnabledGuard, SharedRateLimitGuard)
 export class WorkspaceOnboardingController {
   constructor(
     private readonly sessions: WorkspaceOnboardingService,

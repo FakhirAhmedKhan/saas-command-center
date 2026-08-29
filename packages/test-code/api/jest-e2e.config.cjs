@@ -1,3 +1,5 @@
+﻿// Jest configuration for e2e tests
+
 const path = require('node:path');
 
 const repoRoot = path.resolve(__dirname, '../../..');
@@ -25,9 +27,10 @@ module.exports = {
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/apps/api/src/$1',
   },
+  moduleDirectories: ['node_modules', '<rootDir>/apps/api/node_modules'],
 
-  setupFiles: [path.join(__dirname, 'setup-env.ts')],
-
+  // setupFiles: [path.join(repoRoot, 'apps/api/test-setup.cjs')],
+  setupFiles: [path.join(repoRoot, 'apps/api/test-setup.cjs')],
   collectCoverageFrom: ['apps/api/src/**/*.ts', '!apps/api/src/generated/**', '!apps/api/src/**/*.spec.ts', '!apps/api/src/**/*.test.ts'],
 
   coveragePathIgnorePatterns: ['/node_modules/', '/dist/', '/apps/api/src/generated/', '\\.spec\\.ts$', '\\.test\\.ts$'],
@@ -36,8 +39,7 @@ module.exports = {
 
   testTimeout: 30000,
 
-  maxWorkers: 1,
-
+  maxWorkers: Number(process.env.TEST_WORKERS ?? process.env.JEST_WORKERS ?? 5),
   detectOpenHandles: true,
 
   forceExit: false,

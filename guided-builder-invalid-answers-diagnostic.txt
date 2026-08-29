@@ -1,0 +1,1912 @@
+
+====================================================================================================
+FILE: packages/shared-types/src/workspace-onboarding/workspace-onboarding.types.ts
+====================================================================================================
+export const workspaceApplicationTypes = ['WEB', 'MOBILE', 'DESKTOP'] as const;
+export type WorkspaceApplicationType = (typeof workspaceApplicationTypes)[number];
+
+export const workspaceProductTypes = ['PRODUCTIVITY_SAAS', 'ECOMMERCE', 'MARKETPLACE', 'SOCIAL', 'INTERNAL_TOOL', 'OTHER'] as const;
+export type WorkspaceProductType = (typeof workspaceProductTypes)[number];
+
+export const workspacePlatforms = ['WEB', 'ANDROID', 'IOS', 'WINDOWS', 'MACOS', 'LINUX'] as const;
+export type WorkspacePlatform = (typeof workspacePlatforms)[number];
+
+export const workspaceTechnologies = ['NEXT_JS', 'TYPESCRIPT', 'KOTLIN', 'JETPACK_COMPOSE', 'SWIFT', 'SWIFTUI', 'REACT_NATIVE', 'FLUTTER', 'TAURI', 'ELECTRON', 'NEST_JS', 'POSTGRESQL', 'REDIS'] as const;
+export type WorkspaceTechnology = (typeof workspaceTechnologies)[number];
+
+export const workspaceEnvironments = ['DEVELOPMENT', 'STAGING', 'PRODUCTION'] as const;
+export type WorkspaceEnvironment = (typeof workspaceEnvironments)[number];
+
+export const engineeringSystems = ['CI_CD', 'MONITORING', 'ANALYTICS', 'PERFORMANCE', 'ALERTS', 'SECURITY', 'BACKUPS'] as const;
+export type EngineeringSystem = (typeof engineeringSystems)[number];
+
+export type WorkspaceQuestionType = 'TEXT' | 'SINGLE_SELECT' | 'MULTI_SELECT' | 'BOOLEAN' | 'TECHNOLOGY';
+
+export type WorkspaceGeneratorProvider = 'rules' | 'ai';
+export type RepositoryStrategy = 'NONE' | 'CONNECT_LATER' | 'CONNECT_NOW';
+
+export interface WorkspaceOnboardingAnswers {
+  productIdea?: string;
+  workspaceName?: string;
+  productType?: WorkspaceProductType;
+  targetUsers?: string[];
+  applicationTypes?: WorkspaceApplicationType[];
+  coreFeatures?: string[];
+  authentication?: boolean;
+  collaboration?: boolean;
+  notifications?: string[];
+  technologyPreference?: Partial<Record<WorkspaceApplicationType, WorkspaceTechnology[]>>;
+  mobilePlatforms?: Extract<WorkspacePlatform, 'ANDROID' | 'IOS'>[];
+  desktopPlatforms?: Extract<WorkspacePlatform, 'WINDOWS' | 'MACOS' | 'LINUX'>[];
+  repositories?: RepositoryStrategy;
+  environments?: WorkspaceEnvironment[];
+  qualityRequirements?: EngineeringSystem[];
+}
+
+export interface WorkspaceQuestionOption {
+  label: string;
+  value: string;
+  description?: string;
+}
+
+export interface WorkspaceQuestionDefinition {
+  key: keyof WorkspaceOnboardingAnswers;
+  prompt: string;
+  type: WorkspaceQuestionType;
+  required: boolean;
+  options?: WorkspaceQuestionOption[];
+}
+
+export interface WorkspaceQuestionFlowResponse {
+  questions: WorkspaceQuestionDefinition[];
+  currentQuestion: WorkspaceQuestionDefinition | null;
+  completed: number;
+  total: number;
+  percent: number;
+}
+
+export interface WorkspaceBlueprintRecommendation {
+  id: string;
+  ruleId: string;
+  title: string;
+  explanation: string;
+}
+
+export interface WorkspaceBlueprintApplication {
+  type: WorkspaceApplicationType;
+  name: string;
+  platforms: WorkspacePlatform[];
+  stack: WorkspaceTechnology[];
+  source: BlueprintValueSource;
+}
+
+export interface WorkspaceBlueprint {
+  schemaVersion: 1;
+  generator: {
+    provider: WorkspaceGeneratorProvider;
+    version: string;
+  };
+  workspace: {
+    name: string;
+    slug: string;
+    description: string;
+    productType: WorkspaceProductType;
+  };
+  applications: WorkspaceBlueprintApplication[];
+  services: {
+    backend: WorkspaceTechnology[];
+    database: WorkspaceTechnology[];
+    cache: WorkspaceTechnology[];
+    authentication: string[];
+  };
+  features: string[];
+  environments: WorkspaceEnvironment[];
+  engineeringSystems: EngineeringSystem[];
+  recommendations: WorkspaceBlueprintRecommendation[];
+  repositories: WorkspaceBlueprintRepository[];
+  engineeringConfigurations: WorkspaceBlueprintEngineeringConfiguration[];
+}
+
+export interface WorkspaceOnboardingSessionResponse {
+  id: string;
+  status: 'IN_PROGRESS' | 'BLUEPRINT_READY' | 'CREATING' | 'COMPLETED' | 'FAILED' | 'EXPIRED';
+  currentStep: string | null;
+  answers: WorkspaceOnboardingAnswers;
+  blueprint: WorkspaceBlueprint | null;
+  schemaVersion: number;
+  ruleSetVersion: string | null;
+  generatorProvider: WorkspaceGeneratorProvider;
+  workspaceId: string | null;
+  expiresAt: string;
+  createdAt: string;
+  blueprintRevision: number;
+  blueprintHash: string | null;
+  updatedAt: string;
+}
+
+export type BlueprintValueSource = 'USER' | 'RULE';
+
+export interface WorkspaceBlueprintRepository {
+  applicationType: WorkspaceApplicationType;
+  strategy: RepositoryStrategy;
+  repositoryId?: string;
+  placeholderName?: string;
+}
+
+export type EngineeringConfigurationState = 'PROPOSED' | 'ACTIVE' | 'UNAVAILABLE';
+
+export interface WorkspaceBlueprintEngineeringConfiguration {
+  system: EngineeringSystem;
+  state: EngineeringConfigurationState;
+  enabledByDefault: boolean;
+  explanation: string;
+}
+
+export interface WorkspaceBlueprintValidationIssue {
+  path: string;
+  code: string;
+  message: string;
+}
+
+export interface WorkspaceBlueprintValidationResult {
+  valid: boolean;
+  revision: number;
+  hash: string;
+  issues: WorkspaceBlueprintValidationIssue[];
+}
+
+export interface UpdateWorkspaceBlueprintInput {
+  expectedRevision: number;
+  blueprint: WorkspaceBlueprint;
+}
+
+export interface ConfirmWorkspaceBlueprintInput {
+  expectedRevision: number;
+  blueprintHash: string;
+  idempotencyKey: string;
+}
+
+export interface WorkspaceCreationResult {
+  sessionId: string;
+  workspaceId: string;
+  status: 'COMPLETED';
+  createdAt: string;
+}
+
+
+====================================================================================================
+FILE: packages/validation/src/workspace-onboarding/workspace-onboarding.schemas.ts
+====================================================================================================
+import { engineeringSystems, workspaceApplicationTypes, workspaceEnvironments, workspacePlatforms, workspaceProductTypes, workspaceTechnologies } from '@command-center/shared-types';
+import { z } from 'zod';
+
+const unique = <T>(values: T[]): boolean => new Set(values).size === values.length;
+const uniqueArray = <T extends z.ZodTypeAny>(schema: T, maximum: number) => z.array(schema).max(maximum).refine(unique, 'Duplicate values are not allowed');
+
+export const workspaceOnboardingAnswersSchema = z
+  .object({
+    productIdea: z.string().trim().min(3).max(500).optional(),
+    workspaceName: z.string().trim().min(2).max(80).optional(),
+    productType: z.enum(workspaceProductTypes).optional(),
+    targetUsers: uniqueArray(z.string().trim().min(1).max(80), 20).optional(),
+    applicationTypes: uniqueArray(z.enum(workspaceApplicationTypes), 3).optional(),
+    coreFeatures: uniqueArray(z.string().trim().min(1).max(80), 30).optional(),
+    authentication: z.boolean().optional(),
+    collaboration: z.boolean().optional(),
+    notifications: uniqueArray(z.string().trim().min(1).max(50), 10).optional(),
+    technologyPreference: z.record(z.enum(workspaceApplicationTypes), uniqueArray(z.enum(workspaceTechnologies), 12)).optional(),
+    mobilePlatforms: uniqueArray(z.enum(['ANDROID', 'IOS'] as const), 2).optional(),
+    desktopPlatforms: uniqueArray(z.enum(['WINDOWS', 'MACOS', 'LINUX'] as const), 3).optional(),
+    webPlatforms: uniqueArray(z.enum(['WEB'] as const), 1).optional(),
+    repositories: z.enum(['NONE', 'CONNECT_LATER', 'CONNECT_NOW']).optional(),
+    environments: uniqueArray(z.enum(workspaceEnvironments), 3).optional(),
+    qualityRequirements: uniqueArray(z.enum(engineeringSystems), engineeringSystems.length).optional(),
+  })
+  .strict()
+  .superRefine((answers, context) => {
+    if (answers.mobilePlatforms?.length && !answers.applicationTypes?.includes('MOBILE')) {
+      context.addIssue({
+        code: 'custom',
+        path: ['mobilePlatforms'],
+        message: 'Mobile platforms require the MOBILE application type',
+      });
+    }
+
+    if (answers.desktopPlatforms?.length && !answers.applicationTypes?.includes('DESKTOP')) {
+      context.addIssue({
+        code: 'custom',
+        path: ['desktopPlatforms'],
+        message: 'Desktop platforms require the DESKTOP application type',
+      });
+    }
+  });
+
+export const completeWorkspaceOnboardingAnswersSchema = workspaceOnboardingAnswersSchema.superRefine((answers, context) => {
+  const required = ['productIdea', 'workspaceName', 'productType', 'targetUsers', 'applicationTypes', 'coreFeatures', 'authentication', 'repositories', 'environments', 'qualityRequirements'] as const;
+
+  for (const key of required) {
+    const value = answers[key];
+
+    if (value === undefined || (Array.isArray(value) && value.length === 0)) {
+      context.addIssue({
+        code: 'custom',
+        path: [key],
+        message: 'This answer is required before blueprint generation',
+      });
+    }
+  }
+});
+
+const applicationSchema = z
+  .object({
+    type: z.enum(workspaceApplicationTypes),
+    name: z.string().trim().min(2).max(100),
+    platforms: uniqueArray(z.enum(workspacePlatforms), workspacePlatforms.length).min(1),
+    stack: uniqueArray(z.enum(workspaceTechnologies), 12).min(1),
+    source: z.enum(['USER', 'RULE']),
+  })
+  .strict()
+  .superRefine((application, context) => {
+    const allowedPlatforms = {
+      WEB: ['WEB'],
+      MOBILE: ['ANDROID', 'IOS'],
+      DESKTOP: ['WINDOWS', 'MACOS', 'LINUX'],
+    } as const;
+
+    for (const platform of application.platforms) {
+      if (!(allowedPlatforms[application.type] as readonly string[]).includes(platform)) {
+        context.addIssue({
+          code: 'custom',
+          path: ['platforms'],
+          message: `${platform} is incompatible with ${application.type}`,
+        });
+      }
+    }
+
+    if (application.stack.includes('JETPACK_COMPOSE') && !application.stack.includes('KOTLIN')) {
+      context.addIssue({
+        code: 'custom',
+        path: ['stack'],
+        message: 'JETPACK_COMPOSE requires KOTLIN',
+      });
+    }
+
+    if (application.stack.includes('SWIFTUI') && !application.stack.includes('SWIFT')) {
+      context.addIssue({
+        code: 'custom',
+        path: ['stack'],
+        message: 'SWIFTUI requires SWIFT',
+      });
+    }
+  });
+const repositoryBlueprintSchema = z
+  .object({
+    applicationType: z.enum(workspaceApplicationTypes),
+    strategy: z.enum(['NONE', 'CONNECT_LATER', 'CONNECT_NOW']),
+    repositoryId: z
+      .string()
+      .regex(/^[1-9]\d{0,15}$/, 'Repository ID must be a positive GitHub repository ID')
+      .optional(),
+    placeholderName: z.string().trim().min(1).max(100).optional(),
+  })
+  .strict()
+  .superRefine((repository, context) => {
+    if (repository.strategy === 'CONNECT_NOW' && !repository.repositoryId) {
+      context.addIssue({
+        code: 'custom',
+        path: ['repositoryId'],
+        message: 'CONNECT_NOW requires a verified repository ID',
+      });
+    }
+
+    if (repository.strategy === 'CONNECT_LATER' && !repository.placeholderName) {
+      context.addIssue({
+        code: 'custom',
+        path: ['placeholderName'],
+        message: 'CONNECT_LATER requires a placeholder name',
+      });
+    }
+  });
+const engineeringConfigurationSchema = z
+  .object({
+    system: z.enum(engineeringSystems),
+    state: z.enum(['PROPOSED', 'ACTIVE', 'UNAVAILABLE']),
+    enabledByDefault: z.boolean(),
+    explanation: z.string().trim().min(1).max(500),
+  })
+  .strict()
+  .superRefine((configuration, context) => {
+    if (configuration.state !== 'ACTIVE' && configuration.enabledByDefault) {
+      context.addIssue({
+        code: 'custom',
+        path: ['enabledByDefault'],
+        message: 'Only verified active configurations may be enabled',
+      });
+    }
+  });
+
+export const workspaceBlueprintSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    generator: z
+      .object({
+        provider: z.enum(['rules', 'ai']),
+        version: z.string().trim().min(1).max(80),
+      })
+      .strict(),
+    workspace: z
+      .object({
+        name: z.string().trim().min(2).max(80),
+        slug: z
+          .string()
+          .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+          .max(80),
+        description: z.string().trim().min(3).max(500),
+        productType: z.enum(workspaceProductTypes),
+      })
+      .strict(),
+    applications: uniqueArray(applicationSchema, 3)
+      .min(1)
+      .refine((applications) => unique(applications.map(({ type }) => type)), 'Only one application blueprint per type is allowed'),
+    services: z
+      .object({
+        backend: uniqueArray(z.enum(workspaceTechnologies), 8),
+        database: uniqueArray(z.enum(workspaceTechnologies), 4),
+        cache: uniqueArray(z.enum(workspaceTechnologies), 4),
+        authentication: uniqueArray(z.string().trim().min(1).max(50), 10),
+      })
+      .strict(),
+    features: uniqueArray(z.string().trim().min(1).max(80), 30),
+    environments: uniqueArray(z.enum(workspaceEnvironments), 3).min(1),
+    engineeringSystems: uniqueArray(z.enum(engineeringSystems), engineeringSystems.length),
+    recommendations: z
+      .array(
+        z
+          .object({
+            id: z.string().trim().min(1).max(120),
+            ruleId: z.string().trim().min(1).max(120),
+            title: z.string().trim().min(1).max(120),
+            explanation: z.string().trim().min(1).max(500),
+          })
+          .strict(),
+      )
+      .max(100),
+    repositories: uniqueArray(repositoryBlueprintSchema, 3),
+    engineeringConfigurations: uniqueArray(engineeringConfigurationSchema, engineeringSystems.length).refine(
+      (items) => unique(items.map(({ system }) => system)),
+      'Only one configuration per engineering system is allowed',
+    ),
+  })
+  .strict();
+
+
+====================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/dto/update-onboarding-answers.dto.ts
+====================================================================================================
+import type { WorkspaceOnboardingAnswers } from '@command-center/shared-types';
+import { workspaceOnboardingAnswersSchema } from '@command-center/validation';
+import { BadRequestException } from '@nestjs/common';
+
+export class UpdateOnboardingAnswersDto {
+  answers!: Partial<WorkspaceOnboardingAnswers>;
+
+  static parse(input: unknown): UpdateOnboardingAnswersDto {
+    const body = input as { answers?: unknown };
+    const result = workspaceOnboardingAnswersSchema.safeParse(body?.answers);
+
+    if (!result.success) {
+      throw new BadRequestException({
+        message: 'Invalid onboarding answers',
+        errors: result.error.flatten().fieldErrors,
+      });
+    }
+
+    return { answers: result.data };
+  }
+}
+
+
+====================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/workspace-onboarding.controller.ts
+====================================================================================================
+import { ConfirmWorkspaceBlueprintDto } from './dto/confirm-workspace-blueprint.dto';
+import { UpdateOnboardingAnswersDto } from './dto/update-onboarding-answers.dto';
+import { UpdateWorkspaceBlueprintDto } from './dto/update-workspace-blueprint.dto';
+import { GuidedWorkspaceBuilderEnabledGuard } from './security/guided-workspace-builder-enabled.guard';
+import { WorkspaceBlueprintService } from './workspace-blueprint.service';
+import { WorkspaceOnboardingCreationService } from './workspace-onboarding-creation.service';
+import { WorkspaceOnboardingService } from './workspace-onboarding.service';
+import { SharedRateLimit } from '../../common/rate-limit/shared-rate-limit.decorator';
+import { SharedRateLimitGuard } from '../../common/rate-limit/shared-rate-limit.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import type { RequestWithUser } from '../auth/interfaces/request-with-user.interface';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import type { FastifyRequest } from 'fastify';
+
+type AuthenticatedRequest = FastifyRequest & RequestWithUser;
+
+@Controller('workspace-onboarding/sessions')
+@UseGuards(JwtAuthGuard, GuidedWorkspaceBuilderEnabledGuard, SharedRateLimitGuard)
+export class WorkspaceOnboardingController {
+  constructor(
+    private readonly sessions: WorkspaceOnboardingService,
+    private readonly blueprints: WorkspaceBlueprintService,
+    private readonly creation: WorkspaceOnboardingCreationService,
+  ) {}
+
+  @Post()
+  @SharedRateLimit({
+    scope: 'workspace-onboarding-create',
+    limit: 10,
+    windowSeconds: 60,
+  })
+  create(@Req() request: AuthenticatedRequest) {
+    return this.sessions.create(request.user.id);
+  }
+
+  @Get(':id')
+  get(@Param('id', ParseUUIDPipe) id: string, @Req() request: AuthenticatedRequest) {
+    return this.sessions.get(id, request.user.id);
+  }
+
+  @Get(':id/questions')
+  questions(@Param('id', ParseUUIDPipe) id: string, @Req() request: AuthenticatedRequest) {
+    return this.sessions.questions(id, request.user.id);
+  }
+
+  @Patch(':id/answers')
+  @SharedRateLimit({
+    scope: 'workspace-onboarding-answers',
+    limit: 60,
+    windowSeconds: 60,
+  })
+  updateAnswers(@Param('id', ParseUUIDPipe) id: string, @Body() input: unknown, @Req() request: AuthenticatedRequest) {
+    const body = UpdateOnboardingAnswersDto.parse(input);
+
+    return this.sessions.updateAnswers(id, request.user.id, body.answers);
+  }
+
+  @Post(':id/blueprint')
+  @SharedRateLimit({
+    scope: 'workspace-onboarding-blueprint',
+    limit: 10,
+    windowSeconds: 60,
+  })
+  generateBlueprint(@Param('id', ParseUUIDPipe) id: string, @Req() request: AuthenticatedRequest) {
+    return this.sessions.generateBlueprint(id, request.user.id);
+  }
+
+  @Patch(':id/blueprint')
+  updateBlueprint(@Param('id', ParseUUIDPipe) id: string, @Body() input: unknown, @Req() request: AuthenticatedRequest) {
+    return this.blueprints.updateOwned(id, request.user.id, UpdateWorkspaceBlueprintDto.parse(input));
+  }
+
+  @Post(':id/validate')
+  @HttpCode(HttpStatus.OK)
+  validateBlueprint(@Param('id', ParseUUIDPipe) id: string, @Req() request: AuthenticatedRequest) {
+    return this.blueprints.validateOwned(id, request.user.id);
+  }
+
+  @Post(':id/confirm')
+  @SharedRateLimit({
+    scope: 'workspace-onboarding-confirm',
+    limit: 5,
+    windowSeconds: 60,
+  })
+  confirm(@Param('id', ParseUUIDPipe) id: string, @Body() input: unknown, @Req() request: AuthenticatedRequest) {
+    return this.creation.confirm(id, request.user.id, ConfirmWorkspaceBlueprintDto.parse(input));
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@Param('id', ParseUUIDPipe) id: string, @Req() request: AuthenticatedRequest) {
+    await this.sessions.delete(id, request.user.id);
+  }
+}
+
+
+====================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/workspace-onboarding.service.ts
+====================================================================================================
+import { WORKSPACE_BLUEPRINT_GENERATOR, type WorkspaceBlueprintGenerator } from './generators/workspace-blueprint-generator.interface';
+import { QuestionFlowService } from './questions/question-flow.service';
+import { WorkspaceOnboardingPayloadService } from './security/workspace-onboarding-payload.service';
+import { hashWorkspaceBlueprint } from './workspace-blueprint-hash';
+import { WorkspaceOnboardingRepository } from './workspace-onboarding.repository';
+import type { TypedConfigService } from '../../config/runtime-config';
+import type { WorkspaceOnboardingSession } from '../../generated/prisma/client';
+import type { WorkspaceGeneratorProvider, WorkspaceOnboardingAnswers, WorkspaceOnboardingSessionResponse } from '@command-center/shared-types';
+import { completeWorkspaceOnboardingAnswersSchema, workspaceBlueprintSchema, workspaceOnboardingAnswersSchema } from '@command-center/validation';
+import { ConflictException, GoneException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+
+@Injectable()
+export class WorkspaceOnboardingService {
+  constructor(
+    private readonly repository: WorkspaceOnboardingRepository,
+    private readonly questionFlow: QuestionFlowService,
+    private readonly payload: WorkspaceOnboardingPayloadService,
+    @Inject(WORKSPACE_BLUEPRINT_GENERATOR)
+    private readonly generator: WorkspaceBlueprintGenerator,
+    @Inject(ConfigService)
+    private readonly config: TypedConfigService,
+  ) {}
+
+  async create(userId: string): Promise<WorkspaceOnboardingSessionResponse> {
+    const ttlHours = this.config.get('WORKSPACE_ONBOARDING_SESSION_TTL_HOURS', {
+      infer: true,
+    });
+    const expiresAt = new Date(Date.now() + ttlHours * 60 * 60 * 1_000);
+
+    return this.toResponse(await this.repository.create(userId, expiresAt));
+  }
+
+  async getOwned(id: string, userId: string) {
+    const session = await this.repository.findOwned(id, userId);
+
+    if (!session) {
+      throw new NotFoundException('Onboarding session not found');
+    }
+
+    const expirableStatuses = new Set(['IN_PROGRESS', 'BLUEPRINT_READY', 'FAILED']);
+
+    if (expirableStatuses.has(session.status) && session.expiresAt.getTime() <= Date.now()) {
+      if (session.status !== 'EXPIRED') {
+        await this.repository.updateStatus(id, 'EXPIRED');
+      }
+
+      throw new GoneException('Onboarding session has expired');
+    }
+
+    return session;
+  }
+
+  async get(id: string, userId: string) {
+    return this.toResponse(await this.getOwned(id, userId));
+  }
+
+  async questions(id: string, userId: string) {
+    const session = await this.getOwned(id, userId);
+    const answers = workspaceOnboardingAnswersSchema.parse(session.answers);
+
+    return this.questionFlow.flow(answers);
+  }
+
+  async updateAnswers(id: string, userId: string, patch: Partial<WorkspaceOnboardingAnswers>) {
+    const session = await this.getOwned(id, userId);
+
+    if (session.status === 'CREATING' || session.status === 'COMPLETED') {
+      throw new ConflictException('Answers cannot be edited in this state');
+    }
+
+    const previous = workspaceOnboardingAnswersSchema.parse(session.answers);
+    const merged = this.questionFlow.removeInvalidDependents(previous, patch);
+    const answers = workspaceOnboardingAnswersSchema.parse(merged);
+
+    this.payload.validateAnswers(
+      answers,
+      this.config.get('WORKSPACE_ONBOARDING_MAX_ANSWER_BYTES', {
+        infer: true,
+      }),
+    );
+
+    const nextQuestion = this.questionFlow.flow(answers).currentQuestion?.key ?? null;
+
+    return this.toResponse(await this.repository.updateAnswers(id, answers, nextQuestion));
+  }
+
+  async generateBlueprint(id: string, userId: string) {
+    const session = await this.getOwned(id, userId);
+
+    if (session.status === 'CREATING' || session.status === 'COMPLETED') {
+      throw new ConflictException('A blueprint cannot be generated in this state');
+    }
+
+    const answers = completeWorkspaceOnboardingAnswersSchema.parse(session.answers);
+    const blueprint = await this.generator.generate(answers);
+
+    this.payload.validateBlueprint(
+      blueprint,
+      this.config.get('WORKSPACE_ONBOARDING_MAX_BLUEPRINT_BYTES', {
+        infer: true,
+      }),
+    );
+
+    const parsed = workspaceBlueprintSchema.parse(blueprint);
+    const blueprintHash = hashWorkspaceBlueprint(parsed);
+    const updated = await this.repository.saveBlueprint({
+      id,
+      blueprint: parsed,
+      blueprintHash,
+      generatorProvider: parsed.generator.provider,
+      generatorVersion: parsed.generator.version,
+    });
+
+    return this.toResponse(updated);
+  }
+
+  async delete(id: string, userId: string) {
+    const session = await this.getOwned(id, userId);
+
+    if (session.status === 'CREATING' || session.status === 'COMPLETED') {
+      throw new ConflictException('This session can no longer be discarded');
+    }
+
+    await this.repository.deleteOwned(id, userId);
+  }
+
+  toResponse(session: WorkspaceOnboardingSession): WorkspaceOnboardingSessionResponse {
+    const provider: WorkspaceGeneratorProvider = session.generatorProvider === 'ai' ? 'ai' : 'rules';
+
+    return {
+      id: session.id,
+      status: session.status,
+      currentStep: session.currentStep,
+      answers: workspaceOnboardingAnswersSchema.parse(session.answers),
+      blueprint: session.blueprint === null ? null : workspaceBlueprintSchema.parse(session.blueprint),
+      blueprintRevision: session.blueprintRevision,
+      blueprintHash: session.blueprintHash,
+      schemaVersion: session.schemaVersion,
+      ruleSetVersion: session.ruleSetVersion,
+      generatorProvider: provider,
+      workspaceId: session.workspaceId,
+      expiresAt: session.expiresAt.toISOString(),
+      createdAt: session.createdAt.toISOString(),
+      updatedAt: session.updatedAt.toISOString(),
+    };
+  }
+}
+
+
+====================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/workspace-onboarding.repository.ts
+====================================================================================================
+import { PrismaService } from '../../database/prisma.service';
+import { Prisma } from '../../generated/prisma/client';
+import type { WorkspaceOnboardingStatus } from '../../generated/prisma/enums';
+import type { WorkspaceBlueprint, WorkspaceGeneratorProvider, WorkspaceOnboardingAnswers } from '@command-center/shared-types';
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class WorkspaceOnboardingRepository {
+  constructor(private readonly prisma: PrismaService) {}
+
+  create(userId: string, expiresAt: Date) {
+    return this.prisma.workspaceOnboardingSession.create({
+      data: {
+        userId,
+        expiresAt,
+        answers: {},
+      },
+    });
+  }
+
+  findOwned(id: string, userId: string) {
+    return this.prisma.workspaceOnboardingSession.findFirst({
+      where: {
+        id,
+        userId,
+      },
+    });
+  }
+
+  updateAnswers(id: string, answers: WorkspaceOnboardingAnswers, currentStep: string | null) {
+    return this.prisma.workspaceOnboardingSession.update({
+      where: {
+        id,
+      },
+      data: {
+        answers: this.json(answers),
+        currentStep,
+        blueprint: Prisma.DbNull,
+        blueprintHash: null,
+        ruleSetVersion: null,
+        status: 'IN_PROGRESS',
+      },
+    });
+  }
+
+  updateStatus(id: string, status: WorkspaceOnboardingStatus) {
+    return this.prisma.workspaceOnboardingSession.update({
+      where: {
+        id,
+      },
+      data: {
+        status,
+      },
+    });
+  }
+
+  saveBlueprint(input: { id: string; blueprint: WorkspaceBlueprint; blueprintHash: string; generatorProvider: WorkspaceGeneratorProvider; generatorVersion: string }) {
+    return this.prisma.workspaceOnboardingSession.update({
+      where: {
+        id: input.id,
+      },
+      data: {
+        blueprint: this.json(input.blueprint),
+        blueprintHash: input.blueprintHash,
+        blueprintRevision: {
+          increment: 1,
+        },
+        schemaVersion: input.blueprint.schemaVersion,
+        ruleSetVersion: input.generatorVersion,
+        generatorProvider: input.generatorProvider,
+        status: 'BLUEPRINT_READY',
+      },
+    });
+  }
+
+  async updateBlueprintRevision(input: { id: string; expectedRevision: number; blueprint: WorkspaceBlueprint; blueprintHash: string }) {
+    const result = await this.prisma.workspaceOnboardingSession.updateMany({
+      where: {
+        id: input.id,
+        status: 'BLUEPRINT_READY',
+        blueprintRevision: input.expectedRevision,
+      },
+      data: {
+        blueprint: this.json(input.blueprint),
+        blueprintHash: input.blueprintHash,
+        blueprintRevision: {
+          increment: 1,
+        },
+      },
+    });
+
+    if (result.count !== 1) {
+      return null;
+    }
+
+    return this.prisma.workspaceOnboardingSession.findUniqueOrThrow({
+      where: {
+        id: input.id,
+      },
+    });
+  }
+
+  deleteOwned(id: string, userId: string) {
+    return this.prisma.workspaceOnboardingSession.deleteMany({
+      where: {
+        id,
+        userId,
+      },
+    });
+  }
+
+  private json(value: unknown): Prisma.InputJsonValue {
+    return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
+  }
+}
+
+
+====================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/questions/question-catalog.ts
+====================================================================================================
+import type { WorkspaceOnboardingAnswers, WorkspaceQuestionDefinition } from '@command-center/shared-types';
+
+interface CatalogQuestion extends WorkspaceQuestionDefinition {
+  visibleWhen?: (answers: WorkspaceOnboardingAnswers) => boolean;
+}
+
+export const QUESTION_CATALOG_VERSION = '1.0.0';
+
+export const questionCatalog: readonly CatalogQuestion[] = [
+  {
+    key: 'productIdea',
+    prompt: 'What are you building?',
+    type: 'TEXT',
+    required: true,
+  },
+  {
+    key: 'workspaceName',
+    prompt: 'What should the workspace be called?',
+    type: 'TEXT',
+    required: true,
+  },
+  {
+    key: 'productType',
+    prompt: 'What type of product is it?',
+    type: 'SINGLE_SELECT',
+    required: true,
+    options: [
+      { label: 'Productivity SaaS', value: 'PRODUCTIVITY_SAAS' },
+      { label: 'E-commerce', value: 'ECOMMERCE' },
+      { label: 'Marketplace', value: 'MARKETPLACE' },
+      { label: 'Social product', value: 'SOCIAL' },
+      { label: 'Internal tool', value: 'INTERNAL_TOOL' },
+      { label: 'Other', value: 'OTHER' },
+    ],
+  },
+  {
+    key: 'targetUsers',
+    prompt: 'Who will use the product?',
+    type: 'MULTI_SELECT',
+    required: true,
+    options: [
+      { label: 'Consumers', value: 'CONSUMERS' },
+      { label: 'Businesses', value: 'BUSINESSES' },
+      { label: 'Internal teams', value: 'INTERNAL_TEAMS' },
+      { label: 'Developers', value: 'DEVELOPERS' },
+    ],
+  },
+  {
+    key: 'applicationTypes',
+    prompt: 'Which applications do you need?',
+    type: 'MULTI_SELECT',
+    required: true,
+    options: [
+      { label: 'Web', value: 'WEB' },
+      { label: 'Mobile', value: 'MOBILE' },
+      { label: 'Desktop', value: 'DESKTOP' },
+    ],
+  },
+  {
+    key: 'mobilePlatforms',
+    prompt: 'Which mobile platforms do you need?',
+    type: 'MULTI_SELECT',
+    required: true,
+    options: [
+      { label: 'Android', value: 'ANDROID' },
+      { label: 'iOS', value: 'IOS' },
+    ],
+    visibleWhen: (answers) => answers.applicationTypes?.includes('MOBILE') === true,
+  },
+  {
+    key: 'desktopPlatforms',
+    prompt: 'Which desktop platforms do you need?',
+    type: 'MULTI_SELECT',
+    required: true,
+    options: [
+      { label: 'Windows', value: 'WINDOWS' },
+      { label: 'macOS', value: 'MACOS' },
+      { label: 'Linux', value: 'LINUX' },
+    ],
+    visibleWhen: (answers) => answers.applicationTypes?.includes('DESKTOP') === true,
+  },
+  {
+    key: 'coreFeatures',
+    prompt: 'Which core features are required?',
+    type: 'MULTI_SELECT',
+    required: true,
+    options: [
+      { label: 'Dashboard', value: 'DASHBOARD' },
+      { label: 'Search', value: 'SEARCH' },
+      { label: 'Payments', value: 'PAYMENTS' },
+      { label: 'Notifications', value: 'NOTIFICATIONS' },
+      { label: 'Real-time collaboration', value: 'COLLABORATION' },
+    ],
+  },
+  {
+    key: 'authentication',
+    prompt: 'Does the product require user accounts?',
+    type: 'BOOLEAN',
+    required: true,
+  },
+  {
+    key: 'collaboration',
+    prompt: 'Does it require real-time collaboration?',
+    type: 'BOOLEAN',
+    required: false,
+    visibleWhen: (answers) => answers.coreFeatures?.includes('COLLABORATION') === true,
+  },
+  {
+    key: 'notifications',
+    prompt: 'Which notification channels are required?',
+    type: 'MULTI_SELECT',
+    required: false,
+    options: [
+      { label: 'Email', value: 'EMAIL' },
+      { label: 'Push', value: 'PUSH' },
+      { label: 'In-app', value: 'IN_APP' },
+    ],
+    visibleWhen: (answers) => answers.coreFeatures?.includes('NOTIFICATIONS') === true,
+  },
+  {
+    key: 'repositories',
+    prompt: 'Do repositories already exist?',
+    type: 'SINGLE_SELECT',
+    required: true,
+    options: [
+      { label: 'No repositories', value: 'NONE' },
+      { label: 'Connect later', value: 'CONNECT_LATER' },
+      { label: 'Connect now', value: 'CONNECT_NOW' },
+    ],
+  },
+  {
+    key: 'environments',
+    prompt: 'Which environments are required?',
+    type: 'MULTI_SELECT',
+    required: true,
+    options: [
+      { label: 'Development', value: 'DEVELOPMENT' },
+      { label: 'Staging', value: 'STAGING' },
+      { label: 'Production', value: 'PRODUCTION' },
+    ],
+  },
+  {
+    key: 'qualityRequirements',
+    prompt: 'Which engineering systems are required?',
+    type: 'MULTI_SELECT',
+    required: true,
+    options: [
+      { label: 'CI/CD', value: 'CI_CD' },
+      { label: 'Monitoring', value: 'MONITORING' },
+      { label: 'Analytics', value: 'ANALYTICS' },
+      { label: 'Performance', value: 'PERFORMANCE' },
+      { label: 'Alerts', value: 'ALERTS' },
+      { label: 'Security', value: 'SECURITY' },
+      { label: 'Backups', value: 'BACKUPS' },
+    ],
+  },
+];
+
+
+====================================================================================================
+FILE: apps/api/src/modules/workspace-onboarding/questions/question-flow.service.ts
+====================================================================================================
+import { questionCatalog } from './question-catalog';
+import type { WorkspaceOnboardingAnswers, WorkspaceQuestionFlowResponse } from '@command-center/shared-types';
+import { Injectable } from '@nestjs/common';
+
+const dependentKeys: Partial<Record<keyof WorkspaceOnboardingAnswers, (keyof WorkspaceOnboardingAnswers)[]>> = {
+  applicationTypes: ['mobilePlatforms', 'desktopPlatforms', 'technologyPreference'],
+  coreFeatures: ['collaboration', 'notifications'],
+};
+
+@Injectable()
+export class QuestionFlowService {
+  applicable(answers: WorkspaceOnboardingAnswers) {
+    return questionCatalog
+      .filter((question) => !question.visibleWhen || question.visibleWhen(answers))
+      .map((question) => ({
+        key: question.key,
+        prompt: question.prompt,
+        type: question.type,
+        required: question.required,
+        ...(question.options ? { options: question.options } : {}),
+      }));
+  }
+
+  flow(answers: WorkspaceOnboardingAnswers): WorkspaceQuestionFlowResponse {
+    const questions = this.applicable(answers);
+    const answered = questions.filter(({ key }) => answers[key] !== undefined);
+    const currentQuestion = questions.find(({ key }) => answers[key] === undefined) ?? null;
+
+    return {
+      questions,
+      currentQuestion,
+      completed: answered.length,
+      total: questions.length,
+      percent: questions.length === 0 ? 100 : Math.round((answered.length / questions.length) * 100),
+    };
+  }
+
+  removeInvalidDependents(previous: WorkspaceOnboardingAnswers, patch: Partial<WorkspaceOnboardingAnswers>): WorkspaceOnboardingAnswers {
+    const next = { ...previous, ...patch };
+
+    for (const changedKey of Object.keys(patch) as (keyof WorkspaceOnboardingAnswers)[]) {
+      for (const dependentKey of dependentKeys[changedKey] ?? []) {
+        delete next[dependentKey];
+      }
+    }
+
+    const visibleKeys = new Set(this.applicable(next).map(({ key }) => key));
+
+    for (const key of Object.keys(next) as (keyof WorkspaceOnboardingAnswers)[]) {
+      if (!visibleKeys.has(key)) {
+        delete next[key];
+      }
+    }
+
+    return next;
+  }
+}
+
+
+====================================================================================================
+FILE: apps/web/src/features/workspace-onboarding/api/workspace-onboarding-api.ts
+====================================================================================================
+import { apiRequest } from '@/features/lib/api/api-client';
+import { ApiError } from '@/features/lib/api/api-error';
+import type {
+  ConfirmWorkspaceBlueprintInput,
+  UpdateWorkspaceBlueprintInput,
+  WorkspaceBlueprintValidationResult,
+  WorkspaceCreationResult,
+  WorkspaceOnboardingAnswers,
+  WorkspaceOnboardingSessionResponse,
+  WorkspaceQuestionFlowResponse,
+} from '@command-center/shared-types';
+
+interface ApiErrorBody {
+  message?: string;
+  issues?: unknown;
+}
+
+export interface WorkspaceOnboardingFeatureState {
+  guidedWorkspaceBuilderEnabled: boolean;
+}
+
+export class WorkspaceOnboardingApiError extends Error {
+  constructor(
+    public readonly status: number,
+    message: string,
+    public readonly body: ApiErrorBody | null,
+  ) {
+    super(message);
+    this.name = 'WorkspaceOnboardingApiError';
+  }
+}
+
+async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  try {
+    const response: unknown = await apiRequest<unknown>(path, {
+      ...init,
+      body: init.body,
+    });
+
+    if (typeof response === 'object' && response !== null && 'data' in response) {
+      return (response as { data: T }).data;
+    }
+
+    return response as T;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      const body = typeof error.details === 'object' && error.details !== null ? (error.details as ApiErrorBody) : null;
+
+      throw new WorkspaceOnboardingApiError(error.status, error.message, body);
+    }
+
+    throw error;
+  }
+}
+
+const sessionPath = (id: string): string => `/workspace-onboarding/sessions/${id}`;
+
+export const workspaceOnboardingApi = {
+  featureState: () => request<WorkspaceOnboardingFeatureState>('/features/guided-workspace-builder'),
+
+  create: () =>
+    request<WorkspaceOnboardingSessionResponse>('/workspace-onboarding/sessions', {
+      method: 'POST',
+    }),
+
+  get: (id: string) => request<WorkspaceOnboardingSessionResponse>(sessionPath(id)),
+
+  questions: (id: string) => request<WorkspaceQuestionFlowResponse>(`${sessionPath(id)}/questions`),
+
+  updateAnswers: (id: string, answers: Partial<WorkspaceOnboardingAnswers>) =>
+    request<WorkspaceOnboardingSessionResponse>(`${sessionPath(id)}/answers`, {
+      method: 'PATCH',
+      body: JSON.stringify({ answers }),
+    }),
+
+  generateBlueprint: (id: string) =>
+    request<WorkspaceOnboardingSessionResponse>(`${sessionPath(id)}/blueprint`, {
+      method: 'POST',
+    }),
+
+  updateBlueprint: (id: string, input: UpdateWorkspaceBlueprintInput) =>
+    request<WorkspaceOnboardingSessionResponse>(`${sessionPath(id)}/blueprint`, {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    }),
+
+  validateBlueprint: (id: string) =>
+    request<WorkspaceBlueprintValidationResult>(`${sessionPath(id)}/validate`, {
+      method: 'POST',
+    }),
+
+  confirm: (id: string, input: ConfirmWorkspaceBlueprintInput) =>
+    request<WorkspaceCreationResult>(`${sessionPath(id)}/confirm`, {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }),
+
+  remove: (id: string) =>
+    request<void>(sessionPath(id), {
+      method: 'DELETE',
+    }),
+};
+
+
+====================================================================================================
+FILE: apps/web/src/features/workspace-onboarding/components/guided-workspace-builder.tsx
+====================================================================================================
+'use client';
+
+import { workspaceOnboardingApi } from '../api/workspace-onboarding-api';
+import { normalizeGuidedBuilderError, type GuidedBuilderError } from '../workspace-onboarding-errors';
+import { BlueprintReview } from './blueprint-review';
+import { GuidedBuilderErrorState } from './guided-builder-error';
+import { OnboardingQuestionCard } from './onboarding-question-card';
+import { WorkspaceCreationProgress } from './workspace-creation-progress';
+import type { WorkspaceOnboardingSessionResponse, WorkspaceQuestionFlowResponse } from '@command-center/shared-types';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
+
+type WorkflowStage = 'questions' | 'review' | 'confirmation';
+
+interface GuidedWorkspaceBuilderProps {
+  sessionId: string;
+  onCompleted?: (workspaceId: string) => void;
+}
+
+export function GuidedWorkspaceBuilder({ sessionId, onCompleted }: GuidedWorkspaceBuilderProps) {
+  const router = useRouter();
+  const [session, setSession] = useState<WorkspaceOnboardingSessionResponse | null>(null);
+  const [flow, setFlow] = useState<WorkspaceQuestionFlowResponse | null>(null);
+  const [stage, setStage] = useState<WorkflowStage>('questions');
+  const [error, setError] = useState<GuidedBuilderError | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const load = useCallback(async () => {
+    try {
+      const [nextSession, nextFlow] = await Promise.all([workspaceOnboardingApi.get(sessionId), workspaceOnboardingApi.questions(sessionId)]);
+
+      setSession(nextSession);
+      setFlow(nextFlow);
+      setError(null);
+
+      if (nextSession.status === 'BLUEPRINT_READY' && nextSession.blueprint) {
+        setStage('review');
+      } else {
+        setStage('questions');
+      }
+    } catch (cause) {
+      setError(normalizeGuidedBuilderError(cause));
+    }
+  }, [sessionId]);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void load();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [load]);
+
+  useEffect(() => {
+    if (session?.status !== 'COMPLETED' || !session.workspaceId) {
+      return;
+    }
+
+    onCompleted?.(session.workspaceId);
+    router.replace(`/workspaces/${session.workspaceId}`);
+  }, [onCompleted, router, session]);
+
+  if (error) {
+    return (
+      <main className='mx-auto max-w-3xl p-4 sm:p-8'>
+        <GuidedBuilderErrorState
+          error={error}
+          onRetry={() => {
+            setError(null);
+            void load();
+          }}
+        />
+      </main>
+    );
+  }
+
+  if (!session || !flow) {
+    return (
+      <main aria-live='polite' className='mx-auto max-w-3xl p-4 sm:p-8'>
+        Loading guided builder…
+      </main>
+    );
+  }
+
+  if (session.status === 'COMPLETED' && session.workspaceId) {
+    return (
+      <main aria-live='polite' className='mx-auto max-w-3xl p-4 sm:p-8'>
+        Opening your workspace…
+      </main>
+    );
+  }
+
+  if (stage === 'confirmation' && session.blueprint) {
+    return <WorkspaceCreationProgress onCompleted={onCompleted} session={session} />;
+  }
+
+  if (stage === 'review' && session.blueprint) {
+    return (
+      <BlueprintReview
+        initialSession={session}
+        key={`${session.id}:${session.blueprintRevision}`}
+        onReady={(validatedSession) => {
+          setSession(validatedSession);
+          setStage('confirmation');
+        }}
+      />
+    );
+  }
+
+  if (!flow.currentQuestion) {
+    return (
+      <main className='mx-auto max-w-3xl p-4 sm:p-8'>
+        <section className='rounded-2xl border border-slate-200 bg-white p-6 shadow-sm'>
+          <h1 className='text-2xl font-semibold text-slate-950'>Your answers are complete</h1>
+
+          <p className='mt-2 text-sm text-slate-600'>Generate a workspace blueprint from the information you provided.</p>
+
+          <button
+            className='mt-6 rounded-xl bg-violet-600 px-5 py-3 font-medium text-white disabled:opacity-50'
+            disabled={generating}
+            onClick={() => {
+              setGenerating(true);
+              setError(null);
+
+              void workspaceOnboardingApi
+                .generateBlueprint(sessionId)
+                .then((generatedSession) => {
+                  setSession(generatedSession);
+                  setStage('review');
+                })
+                .catch((cause: unknown) => {
+                  setError(normalizeGuidedBuilderError(cause));
+                })
+                .finally(() => {
+                  setGenerating(false);
+                });
+            }}
+            type='button'
+          >
+            {generating ? 'Generating recommendations…' : 'Generate guided recommendations'}
+          </button>
+        </section>
+      </main>
+    );
+  }
+
+  return (
+    <main className='mx-auto w-full max-w-3xl p-4 sm:p-8'>
+      <header className='mb-6'>
+        <p className='text-sm text-slate-600'>
+          {flow.completed} of {flow.total} completed
+        </p>
+
+        <progress className='mt-2 w-full' max={100} value={flow.percent} />
+      </header>
+
+      <OnboardingQuestionCard
+        disabled={saving}
+        key={flow.currentQuestion.key}
+        onSubmit={async (value) => {
+          setSaving(true);
+          setError(null);
+
+          try {
+            await workspaceOnboardingApi.updateAnswers(sessionId, {
+              [flow.currentQuestion!.key]: value,
+            });
+
+            await load();
+          } catch (cause) {
+            setError(normalizeGuidedBuilderError(cause));
+          } finally {
+            setSaving(false);
+          }
+        }}
+        question={flow.currentQuestion}
+      />
+    </main>
+  );
+}
+
+
+====================================================================================================
+FILE: apps/web/src/features/workspace-onboarding/components/onboarding-question-card.tsx
+====================================================================================================
+'use client';
+
+import type { WorkspaceQuestionDefinition } from '@command-center/shared-types';
+import { useState } from 'react';
+
+interface Props {
+  question: WorkspaceQuestionDefinition;
+  disabled?: boolean;
+  onSubmit: (value: unknown) => Promise<void>;
+}
+
+export function OnboardingQuestionCard({ question, disabled = false, onSubmit }: Props) {
+  const [value, setValue] = useState<unknown>(question.type === 'MULTI_SELECT' ? [] : '');
+  const toggle = (option: string) => {
+    const selected = Array.isArray(value) ? (value as string[]) : [];
+    setValue(selected.includes(option) ? selected.filter((item) => item !== option) : [...selected, option]);
+  };
+
+  return (
+    <section aria-labelledby={`question-${question.key}`} className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+      <h2 id={`question-${question.key}`} className='text-lg font-semibold'>
+        {question.prompt}
+      </h2>
+
+      {question.type === 'TEXT' && (
+        <textarea aria-label={question.prompt} className='mt-4 min-h-28 w-full rounded-xl border p-3' disabled={disabled} maxLength={500} onChange={(event) => setValue(event.target.value)} value={String(value)} />
+      )}
+
+      {question.type === 'BOOLEAN' && (
+        <div className='mt-4 grid grid-cols-2 gap-3'>
+          {[true, false].map((option) => (
+            <button className='rounded-xl border p-3' disabled={disabled} key={String(option)} onClick={() => setValue(option)} type='button'>
+              {option ? 'Yes' : 'No'}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {(question.type === 'SINGLE_SELECT' || question.type === 'MULTI_SELECT') && (
+        <div className='mt-4 grid gap-3 sm:grid-cols-2'>
+          {question.options?.map((option) => {
+            const selected = Array.isArray(value) ? value.includes(option.value) : value === option.value;
+
+            return (
+              <button
+                aria-pressed={selected}
+                className='rounded-xl border p-3 text-left aria-pressed:border-slate-900 aria-pressed:bg-slate-50'
+                disabled={disabled}
+                key={option.value}
+                onClick={() => (question.type === 'MULTI_SELECT' ? toggle(option.value) : setValue(option.value))}
+                type='button'
+              >
+                <span className='block font-medium'>{option.label}</span>
+                {option.description && <span className='text-sm text-slate-600'>{option.description}</span>}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      <button
+        className='mt-5 rounded-xl bg-slate-950 px-5 py-3 font-medium text-white disabled:opacity-50'
+        disabled={disabled || value === '' || (Array.isArray(value) && value.length === 0)}
+        onClick={() => onSubmit(value)}
+        type='button'
+      >
+        Continue
+      </button>
+    </section>
+  );
+}
+
+
+====================================================================================================
+FILE: apps/web/src/features/workspace-onboarding/components/guided-builder-error.tsx
+====================================================================================================
+import type { GuidedBuilderError } from '../workspace-onboarding-errors';
+
+export function GuidedBuilderErrorState({ error, onRetry }: { error: GuidedBuilderError; onRetry?: () => void }) {
+  return (
+    <section className='rounded-2xl border border-red-200 bg-red-50 p-5' role='alert'>
+      <h2 className='font-semibold text-red-950'>Unable to continue</h2>
+      <p className='mt-2 text-sm text-red-800'>{error.message}</p>
+      {error.retryable && onRetry && (
+        <button className='mt-4 rounded-lg bg-red-950 px-4 py-2 text-white' onClick={onRetry} type='button'>
+          Try again
+        </button>
+      )}
+    </section>
+  );
+}
+
+
+====================================================================================================
+FILE: packages/test-code/api/e2e/workspace-onboarding-sessions.e2e-spec.ts
+====================================================================================================
+import { createAgent, createTestUser, registerUser, withBearer } from '../helpers/auth';
+import { createTestApp } from '../helpers/create-test-app';
+import { resetDatabase } from '../helpers/database';
+import { expectSuccessfulStatus, readAccessToken } from '../helpers/response';
+import type { WorkspaceOnboardingAnswers, WorkspaceOnboardingSessionResponse } from '@command-center/shared-types';
+import type { INestApplication } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import request, { type Response } from 'supertest';
+
+const sessionsRoute = '/api/v1/workspace-onboarding/sessions';
+const completeAnswers: WorkspaceOnboardingAnswers = {
+  productIdea: 'A cross-platform task management product',
+  workspaceName: 'TodoFlow',
+  productType: 'PRODUCTIVITY_SAAS',
+  targetUsers: ['CONSUMERS'],
+  applicationTypes: ['WEB', 'MOBILE', 'DESKTOP'],
+  coreFeatures: ['TASKS', 'NOTIFICATIONS'],
+  authentication: true,
+  collaboration: false,
+  notifications: ['PUSH'],
+  mobilePlatforms: ['ANDROID', 'IOS'],
+  desktopPlatforms: ['WINDOWS'],
+  repositories: 'CONNECT_LATER',
+  environments: ['DEVELOPMENT', 'PRODUCTION'],
+  qualityRequirements: ['CI_CD', 'MONITORING', 'SECURITY'],
+};
+
+function readSession(response: Response): WorkspaceOnboardingSessionResponse {
+  const body = response.body as {
+    data?: unknown;
+  };
+
+  return (body.data ?? response.body) as WorkspaceOnboardingSessionResponse;
+}
+
+async function registerAccessToken(app: INestApplication, email: string): Promise<string> {
+  const response = await registerUser(createAgent(app), createTestUser({ email }));
+
+  expectSuccessfulStatus(response);
+
+  return readAccessToken(response);
+}
+
+async function createSession(app: INestApplication, accessToken: string): Promise<Response> {
+  return request(app.getHttpServer()).post(sessionsRoute).set(withBearer(accessToken));
+}
+
+async function updateAnswers(app: INestApplication, sessionId: string, accessToken: string, answers: WorkspaceOnboardingAnswers): Promise<Response> {
+  return request(app.getHttpServer()).patch(`${sessionsRoute}/${sessionId}/answers`).set(withBearer(accessToken)).send({ answers });
+}
+
+describe('Workspace onboarding sessions E2E', () => {
+  let app: INestApplication;
+  let prisma: PrismaService;
+  let previousFeatureFlag: string | undefined;
+
+  beforeAll(() => {
+    previousFeatureFlag = process.env.GUIDED_WORKSPACE_BUILDER_ENABLED;
+
+    process.env.GUIDED_WORKSPACE_BUILDER_ENABLED = 'true';
+  });
+
+  beforeEach(async () => {
+    app = await createTestApp();
+    prisma = app.get(PrismaService);
+
+    await resetDatabase(prisma);
+  });
+
+  afterEach(async () => {
+    await app.close();
+  });
+
+  afterAll(() => {
+    if (previousFeatureFlag === undefined) {
+      delete process.env.GUIDED_WORKSPACE_BUILDER_ENABLED;
+    } else {
+      process.env.GUIDED_WORKSPACE_BUILDER_ENABLED = previousFeatureFlag;
+    }
+  });
+
+  it('creates, resumes, updates and deletes an owned session', async () => {
+    const accessToken = await registerAccessToken(app, 'guided-owner@example.test');
+    const created = await createSession(app, accessToken);
+
+    expect(created.status).toBe(201);
+
+    const session = readSession(created);
+    const updated = await updateAnswers(app, session.id, accessToken, {
+      workspaceName: 'TodoFlow',
+      applicationTypes: ['WEB'],
+    });
+
+    expect(updated.status).toBe(200);
+    expect(readSession(updated).answers.workspaceName).toBe('TodoFlow');
+
+    const resumed = await request(app.getHttpServer()).get(`${sessionsRoute}/${session.id}`).set(withBearer(accessToken));
+
+    expect(resumed.status).toBe(200);
+    expect(readSession(resumed).answers.applicationTypes).toEqual(['WEB']);
+
+    const removed = await request(app.getHttpServer()).delete(`${sessionsRoute}/${session.id}`).set(withBearer(accessToken));
+
+    expect(removed.status).toBe(204);
+  });
+
+  it('generates a deterministic persisted blueprint', async () => {
+    const accessToken = await registerAccessToken(app, 'guided-generator@example.test');
+    const created = await createSession(app, accessToken);
+    const session = readSession(created);
+    const updated = await updateAnswers(app, session.id, accessToken, completeAnswers);
+
+    expect(updated.status).toBe(200);
+
+    const firstGeneration = await request(app.getHttpServer()).post(`${sessionsRoute}/${session.id}/blueprint`).set(withBearer(accessToken));
+
+    expect(firstGeneration.status).toBe(201);
+
+    const first = readSession(firstGeneration);
+
+    expect(first).toMatchObject({
+      status: 'BLUEPRINT_READY',
+      blueprintRevision: 1,
+      blueprint: {
+        schemaVersion: 1,
+        generator: {
+          provider: 'rules',
+          version: expect.any(String),
+        },
+        workspace: {
+          name: 'TodoFlow',
+          slug: 'todoflow',
+        },
+      },
+    });
+
+    expect(first.blueprintHash).toEqual(expect.stringMatching(/^[a-f0-9]{64}$/));
+
+    const secondGeneration = await request(app.getHttpServer()).post(`${sessionsRoute}/${session.id}/blueprint`).set(withBearer(accessToken));
+
+    expect(secondGeneration.status).toBe(201);
+
+    const second = readSession(secondGeneration);
+
+    expect(second.blueprint).toEqual(first.blueprint);
+    expect(second.blueprintRevision).toBe(first.blueprintRevision + 1);
+
+    const persisted = await prisma.workspaceOnboardingSession.findUnique({
+      where: {
+        id: session.id,
+      },
+    });
+
+    expect(persisted?.blueprintRevision).toBe(second.blueprintRevision);
+    expect(persisted?.blueprintHash).toBe(second.blueprintHash);
+  });
+
+  it('does not expose a session to another user', async () => {
+    const ownerToken = await registerAccessToken(app, 'guided-private-owner@example.test');
+    const outsiderToken = await registerAccessToken(app, 'guided-outsider@example.test');
+    const created = await createSession(app, ownerToken);
+    const session = readSession(created);
+    const response = await request(app.getHttpServer()).get(`${sessionsRoute}/${session.id}`).set(withBearer(outsiderToken));
+
+    expect(response.status).toBe(404);
+  });
+});
+
+
+====================================================================================================
+FILE: packages/test-code/web/unit/features/workspace-onboarding/guided-workspace-builder.test.tsx
+====================================================================================================
+// @vitest-environment jsdom
+import type { WorkspaceBlueprint, WorkspaceOnboardingSessionResponse, WorkspaceQuestionFlowResponse } from '@command-center/shared-types';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { GuidedWorkspaceBuilder } from '@/features/workspace-onboarding/components/guided-workspace-builder';
+
+const { generateBlueprintMock, getMock, questionsMock, replaceMock, updateAnswersMock } = vi.hoisted(() => ({
+  generateBlueprintMock: vi.fn(),
+  getMock: vi.fn(),
+  questionsMock: vi.fn(),
+  replaceMock: vi.fn(),
+  updateAnswersMock: vi.fn(),
+}));
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    replace: replaceMock,
+  }),
+}));
+
+vi.mock('@/features/workspace-onboarding/api/workspace-onboarding-api', () => ({
+  workspaceOnboardingApi: {
+    generateBlueprint: generateBlueprintMock,
+    get: getMock,
+    questions: questionsMock,
+    updateAnswers: updateAnswersMock,
+  },
+}));
+
+vi.mock('@/features/workspace-onboarding/components/onboarding-question-card', () => ({
+  OnboardingQuestionCard: ({ onSubmit }: { onSubmit(value: unknown): Promise<void> }) => (
+    <button
+      onClick={() => {
+        void onSubmit('TodoFlow');
+      }}
+      type='button'
+    >
+      Submit mocked answer
+    </button>
+  ),
+}));
+
+vi.mock('@/features/workspace-onboarding/components/blueprint-review', () => ({
+  BlueprintReview: ({ initialSession, onReady }: { initialSession: WorkspaceOnboardingSessionResponse; onReady(session: WorkspaceOnboardingSessionResponse): void }) => (
+    <button data-testid='blueprint-review' onClick={() => onReady(initialSession)} type='button'>
+      Complete blueprint review
+    </button>
+  ),
+}));
+
+vi.mock('@/features/workspace-onboarding/components/workspace-creation-progress', () => ({
+  WorkspaceCreationProgress: () => <div data-testid='creation-progress'>Creation confirmation</div>,
+}));
+
+const blueprint: WorkspaceBlueprint = {
+  schemaVersion: 1,
+  generator: {
+    provider: 'rules',
+    version: 'test',
+  },
+  workspace: {
+    name: 'TodoFlow',
+    slug: 'todoflow',
+    description: 'Task management product',
+    productType: 'PRODUCTIVITY_SAAS',
+  },
+  applications: [],
+  services: {
+    backend: [],
+    database: [],
+    cache: [],
+    authentication: [],
+  },
+  features: [],
+  environments: ['DEVELOPMENT'],
+  engineeringSystems: [],
+  recommendations: [],
+  repositories: [],
+  engineeringConfigurations: [],
+};
+
+function session(overrides: Partial<WorkspaceOnboardingSessionResponse> = {}): WorkspaceOnboardingSessionResponse {
+  return {
+    id: '11111111-1111-4111-8111-111111111111',
+    status: 'IN_PROGRESS',
+    currentStep: null,
+    answers: {},
+    blueprint: null,
+    schemaVersion: 1,
+    ruleSetVersion: null,
+    generatorProvider: 'rules',
+    workspaceId: null,
+    expiresAt: '2099-01-01T00:00:00.000Z',
+    createdAt: '2026-08-28T00:00:00.000Z',
+    blueprintRevision: 0,
+    blueprintHash: null,
+    updatedAt: '2026-08-28T00:00:00.000Z',
+    ...overrides,
+  };
+}
+
+function flow(overrides: Partial<WorkspaceQuestionFlowResponse> = {}): WorkspaceQuestionFlowResponse {
+  return {
+    questions: [],
+    currentQuestion: null,
+    completed: 10,
+    total: 10,
+    percent: 100,
+    ...overrides,
+  };
+}
+
+describe('GuidedWorkspaceBuilder', () => {
+  beforeEach(() => {
+    getMock.mockReset();
+    questionsMock.mockReset();
+    updateAnswersMock.mockReset();
+    generateBlueprintMock.mockReset();
+    replaceMock.mockReset();
+  });
+
+  it('generates, reviews and advances to confirmation', async () => {
+    getMock.mockResolvedValue(session());
+    questionsMock.mockResolvedValue(flow());
+
+    generateBlueprintMock.mockResolvedValue(
+      session({
+        status: 'BLUEPRINT_READY',
+        blueprint,
+        blueprintRevision: 1,
+        blueprintHash: 'a'.repeat(64),
+      }),
+    );
+
+    render(<GuidedWorkspaceBuilder sessionId='session-1' />);
+
+    fireEvent.click(
+      await screen.findByRole('button', {
+        name: 'Generate guided recommendations',
+      }),
+    );
+
+    expect(await screen.findByTestId('blueprint-review')).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Complete blueprint review',
+      }),
+    );
+
+    expect(screen.getByTestId('creation-progress')).toBeInTheDocument();
+  });
+
+  it('submits a question answer and reloads the flow', async () => {
+    const currentQuestion = {
+      key: 'workspaceName' as const,
+      prompt: 'What should the workspace be called?',
+      type: 'TEXT' as const,
+      required: true,
+    };
+
+    getMock.mockResolvedValue(session());
+    questionsMock.mockResolvedValue(
+      flow({
+        questions: [currentQuestion],
+        currentQuestion,
+        completed: 0,
+        total: 1,
+        percent: 0,
+      }),
+    );
+    updateAnswersMock.mockResolvedValue(session());
+
+    render(<GuidedWorkspaceBuilder sessionId='session-1' />);
+
+    fireEvent.click(
+      await screen.findByRole('button', {
+        name: 'Submit mocked answer',
+      }),
+    );
+
+    await vi.waitFor(() => {
+      expect(updateAnswersMock).toHaveBeenCalledWith('session-1', {
+        workspaceName: 'TodoFlow',
+      });
+    });
+  });
+
+  it('redirects an already completed session', async () => {
+    const onCompleted = vi.fn();
+
+    getMock.mockResolvedValue(
+      session({
+        status: 'COMPLETED',
+        workspaceId: 'workspace-1',
+      }),
+    );
+    questionsMock.mockResolvedValue(flow());
+
+    render(<GuidedWorkspaceBuilder onCompleted={onCompleted} sessionId='session-1' />);
+
+    await vi.waitFor(() => {
+      expect(onCompleted).toHaveBeenCalledWith('workspace-1');
+      expect(replaceMock).toHaveBeenCalledWith('/workspaces/workspace-1');
+    });
+  });
+});
+
+
+====================================================================================================
+ANSWER AND VALIDATION SYMBOLS
+====================================================================================================
+apps\api\src\modules\workspace-onboarding\prisma-repository-connection.adapter.ts:4:import { PersonalRepositoriesService } from '../repositories/services/personal-repositories.service';
+apps\api\src\modules\workspace-onboarding\prisma-repository-connection.adapter.ts:10:constructor(private readonly personalRepositories: PersonalRepositoriesService) {}
+apps\api\src\modules\workspace-onboarding\prisma-repository-connection.adapter.ts:12:async verifySelection(userId: string, repositories: WorkspaceBlueprintRepository[]): Promise<VerifiedRepositorySelection[]> {
+apps\api\src\modules\workspace-onboarding\prisma-repository-connection.adapter.ts:13:const selections = repositories.filter(({ strategy }) => strategy === 'CONNECT_NOW');
+apps\api\src\modules\workspace-onboarding\prisma-repository-connection.adapter.ts:15:const applicationTypes = new Set<WorkspaceApplicationType>();
+apps\api\src\modules\workspace-onboarding\prisma-repository-connection.adapter.ts:32:if (applicationTypes.has(selection.applicationType)) {
+apps\api\src\modules\workspace-onboarding\prisma-repository-connection.adapter.ts:40:applicationTypes.add(selection.applicationType);
+apps\api\src\modules\workspace-onboarding\prisma-repository-connection.adapter.ts:59:const verified = await this.personalRepositories.findRepository(userId, numericRepositoryId);
+apps\api\src\modules\workspace-onboarding\prisma-repository-connection.adapter.ts:81:repositories: VerifiedRepositorySelection[];
+apps\api\src\modules\workspace-onboarding\prisma-repository-connection.adapter.ts:85:for (const repository of input.repositories) {
+apps\api\src\modules\workspace-onboarding\prisma-workspace-creation.adapter.ts:7:const applicationTypes: Record<WorkspaceBlueprintApplication['type'], ApplicationType> = {
+apps\api\src\modules\workspace-onboarding\prisma-workspace-creation.adapter.ts:72:type: applicationTypes[application.type],
+apps\api\src\modules\workspace-onboarding\prisma-workspace-creation.adapter.ts:237:const desktopPlatforms = platforms.filter((platform) => platform === 'WINDOWS' || platform === 'MACOS' || platform === 'LINUX');
+apps\api\src\modules\workspace-onboarding\prisma-workspace-creation.adapter.ts:239:if (desktopPlatforms.length !== 1) {
+apps\api\src\modules\workspace-onboarding\prisma-workspace-creation.adapter.ts:243:const platform = desktopPlatforms[0];
+apps\api\src\modules\workspace-onboarding\repository-connection.port.ts:19:verifySelection(userId: string, repositories: WorkspaceBlueprintRepository[]): Promise<VerifiedRepositorySelection[]>;
+apps\api\src\modules\workspace-onboarding\repository-connection.port.ts:26:repositories: VerifiedRepositorySelection[];
+apps\api\src\modules\workspace-onboarding\workspace-blueprint.service.ts:24:const parsed = workspaceBlueprintSchema.safeParse(blueprint);
+apps\api\src\modules\workspace-onboarding\workspace-onboarding-creation.service.ts:8:import { workspaceBlueprintSchema, workspaceOnboardingAnswersSchema } from '@command-center/validation';
+apps\api\src\modules\workspace-onboarding\workspace-onboarding-creation.service.ts:64:const answers = workspaceOnboardingAnswersSchema.parse(owned.answers);
+apps\api\src\modules\workspace-onboarding\workspace-onboarding-creation.service.ts:66:const verifiedRepositories = await this.verifyRepositorySelections(userId, answers.repositories, blueprint);
+apps\api\src\modules\workspace-onboarding\workspace-onboarding-creation.service.ts:124:if (verifiedRepositories.length > 0) {
+apps\api\src\modules\workspace-onboarding\workspace-onboarding-creation.service.ts:130:repositories: verifiedRepositories,
+apps\api\src\modules\workspace-onboarding\workspace-onboarding-creation.service.ts:163:const connectNowRepositories = blueprint.repositories.filter(({ strategy: repositoryStrategy }) => repositoryStrategy === 'CONNECT_NOW');
+apps\api\src\modules\workspace-onboarding\workspace-onboarding-creation.service.ts:166:if (connectNowRepositories.length > 0) {
+apps\api\src\modules\workspace-onboarding\workspace-onboarding-creation.service.ts:169:message: 'CONNECT_NOW repositories do not match the onboarding answers',
+apps\api\src\modules\workspace-onboarding\workspace-onboarding-creation.service.ts:176:const applicationTypes = new Set(blueprint.applications.map(({ type }) => type));
+apps\api\src\modules\workspace-onboarding\workspace-onboarding-creation.service.ts:177:const selectedApplicationTypes = new Set(connectNowRepositories.map(({ applicationType }) => applicationType));
+apps\api\src\modules\workspace-onboarding\workspace-onboarding-creation.service.ts:179:if (connectNowRepositories.length !== blueprint.applications.length || selectedApplicationTypes.size !== applicationTypes.size || [...applicationTypes].some((type) => !selectedApplicationTypes.has(type))) {
+apps\api\src\modules\workspace-onboarding\workspace-onboarding-creation.service.ts:186:return this.repositoryConnections.verifySelection(userId, connectNowRepositories);
+apps\api\src\modules\workspace-onboarding\workspace-onboarding.controller.ts:52:updateAnswers(@Param('id', ParseUUIDPipe) id: string, @Body() input: unknown, @Req() request: AuthenticatedRequest) {
+apps\api\src\modules\workspace-onboarding\workspace-onboarding.controller.ts:55:return this.sessions.updateAnswers(id, request.user.id, body.answers);
+apps\api\src\modules\workspace-onboarding\workspace-onboarding.module.ts:26:import { RepositoriesModule } from '../repositories/repositories.module';
+apps\api\src\modules\workspace-onboarding\workspace-onboarding.module.ts:31:imports: [SharedRateLimitModule, RepositoriesModule],
+apps\api\src\modules\workspace-onboarding\workspace-onboarding.repository.ts:30:updateAnswers(id: string, answers: WorkspaceOnboardingAnswers, currentStep: string | null) {
+apps\api\src\modules\workspace-onboarding\workspace-onboarding.service.ts:9:import { completeWorkspaceOnboardingAnswersSchema, workspaceBlueprintSchema, workspaceOnboardingAnswersSchema } from '@command-center/validation';
+apps\api\src\modules\workspace-onboarding\workspace-onboarding.service.ts:60:const answers = workspaceOnboardingAnswersSchema.parse(session.answers);
+apps\api\src\modules\workspace-onboarding\workspace-onboarding.service.ts:65:async updateAnswers(id: string, userId: string, patch: Partial<WorkspaceOnboardingAnswers>) {
+apps\api\src\modules\workspace-onboarding\workspace-onboarding.service.ts:72:const previous = workspaceOnboardingAnswersSchema.parse(session.answers);
+apps\api\src\modules\workspace-onboarding\workspace-onboarding.service.ts:74:const answers = workspaceOnboardingAnswersSchema.parse(merged);
+apps\api\src\modules\workspace-onboarding\workspace-onboarding.service.ts:85:return this.toResponse(await this.repository.updateAnswers(id, answers, nextQuestion));
+apps\api\src\modules\workspace-onboarding\workspace-onboarding.service.ts:95:const answers = completeWorkspaceOnboardingAnswersSchema.parse(session.answers);
+apps\api\src\modules\workspace-onboarding\workspace-onboarding.service.ts:135:answers: workspaceOnboardingAnswersSchema.parse(session.answers),
+apps\api\src\modules\workspace-onboarding\dto\confirm-workspace-blueprint.dto.ts:15:const result = schema.safeParse(value);
+apps\api\src\modules\workspace-onboarding\dto\update-onboarding-answers.dto.ts:2:import { workspaceOnboardingAnswersSchema } from '@command-center/validation';
+apps\api\src\modules\workspace-onboarding\dto\update-onboarding-answers.dto.ts:10:const result = workspaceOnboardingAnswersSchema.safeParse(body?.answers);
+apps\api\src\modules\workspace-onboarding\dto\update-onboarding-answers.dto.ts:14:message: 'Invalid onboarding answers',
+apps\api\src\modules\workspace-onboarding\dto\update-workspace-blueprint.dto.ts:15:const result = schema.safeParse(value);
+apps\api\src\modules\workspace-onboarding\generators\ai-workspace-blueprint.generator.ts:6:import { completeWorkspaceOnboardingAnswersSchema, workspaceBlueprintSchema } from '@command-center/validation';
+apps\api\src\modules\workspace-onboarding\generators\ai-workspace-blueprint.generator.ts:15:Never invent repository IDs. For CONNECT_NOW return an empty repositories array so the user can select verified repositories.
+apps\api\src\modules\workspace-onboarding\generators\ai-workspace-blueprint.generator.ts:30:const answers = completeWorkspaceOnboardingAnswersSchema.parse(input);
+apps\api\src\modules\workspace-onboarding\generators\ai-workspace-blueprint.generator.ts:41:applicationTypes: ['WEB', 'MOBILE', 'DESKTOP'],
+apps\api\src\modules\workspace-onboarding\generators\ai-workspace-blueprint.generator.ts:59:repositories: answers.repositories === 'CONNECT_NOW' ? [] : (raw as Record<string, unknown>).repositories,
+apps\api\src\modules\workspace-onboarding\generators\rule-based-workspace-blueprint.generator.ts:7:import { completeWorkspaceOnboardingAnswersSchema, workspaceBlueprintSchema } from '@command-center/validation';
+apps\api\src\modules\workspace-onboarding\generators\rule-based-workspace-blueprint.generator.ts:29:const answers = completeWorkspaceOnboardingAnswersSchema.parse(input);
+apps\api\src\modules\workspace-onboarding\generators\rule-based-workspace-blueprint.generator.ts:30:const repositories: WorkspaceBlueprintRepository[] = answers.applicationTypes!.flatMap<WorkspaceBlueprintRepository>((applicationType) => {
+apps\api\src\modules\workspace-onboarding\generators\rule-based-workspace-blueprint.generator.ts:31:if (answers.repositories === 'CONNECT_NOW') {
+apps\api\src\modules\workspace-onboarding\generators\rule-based-workspace-blueprint.generator.ts:35:if (answers.repositories === 'CONNECT_LATER') {
+apps\api\src\modules\workspace-onboarding\generators\rule-based-workspace-blueprint.generator.ts:73:engineeringSystems: answers.qualityRequirements!,
+apps\api\src\modules\workspace-onboarding\generators\rule-based-workspace-blueprint.generator.ts:75:repositories,
+apps\api\src\modules\workspace-onboarding\generators\rule-based-workspace-blueprint.generator.ts:86:if (answers.repositories === 'CONNECT_NOW') {
+apps\api\src\modules\workspace-onboarding\generators\rule-based-workspace-blueprint.generator.ts:90:title: 'Select verified repositories',
+apps\api\src\modules\workspace-onboarding\questions\question-catalog.ts:49:key: 'applicationTypes',
+apps\api\src\modules\workspace-onboarding\questions\question-catalog.ts:60:key: 'mobilePlatforms',
+apps\api\src\modules\workspace-onboarding\questions\question-catalog.ts:68:visibleWhen: (answers) => answers.applicationTypes?.includes('MOBILE') === true,
+apps\api\src\modules\workspace-onboarding\questions\question-catalog.ts:71:key: 'desktopPlatforms',
+apps\api\src\modules\workspace-onboarding\questions\question-catalog.ts:80:visibleWhen: (answers) => answers.applicationTypes?.includes('DESKTOP') === true,
+apps\api\src\modules\workspace-onboarding\questions\question-catalog.ts:121:key: 'repositories',
+apps\api\src\modules\workspace-onboarding\questions\question-catalog.ts:122:prompt: 'Do repositories already exist?',
+apps\api\src\modules\workspace-onboarding\questions\question-catalog.ts:126:{ label: 'No repositories', value: 'NONE' },
+apps\api\src\modules\workspace-onboarding\questions\question-catalog.ts:143:key: 'qualityRequirements',
+apps\api\src\modules\workspace-onboarding\questions\question-flow.service.ts:6:applicationTypes: ['mobilePlatforms', 'desktopPlatforms', 'technologyPreference'],
+apps\api\src\modules\workspace-onboarding\rules\application-technology.rules.ts:23:when: ({ answers }) => answers.applicationTypes?.includes('WEB') === true,
+apps\api\src\modules\workspace-onboarding\rules\application-technology.rules.ts:25:const preference = answers.technologyPreference?.WEB;
+apps\api\src\modules\workspace-onboarding\rules\application-technology.rules.ts:40:when: ({ answers }) => answers.applicationTypes?.includes('MOBILE') === true,
+apps\api\src\modules\workspace-onboarding\rules\application-technology.rules.ts:42:const platforms: WorkspacePlatform[] = answers.mobilePlatforms?.length ? [...answers.mobilePlatforms] : ['ANDROID', 'IOS'];
+apps\api\src\modules\workspace-onboarding\rules\application-technology.rules.ts:43:const preference = answers.technologyPreference?.MOBILE;
+apps\api\src\modules\workspace-onboarding\rules\application-technology.rules.ts:60:when: ({ answers }) => answers.applicationTypes?.includes('DESKTOP') === true,
+apps\api\src\modules\workspace-onboarding\rules\application-technology.rules.ts:62:const preference = answers.technologyPreference?.DESKTOP;
+apps\api\src\modules\workspace-onboarding\rules\application-technology.rules.ts:66:platforms: answers.desktopPlatforms?.length ? [...answers.desktopPlatforms] : ['WINDOWS'],
+apps\api\src\modules\workspace-onboarding\rules\engineering-system.rules.ts:28:when: ({ answers }) => (answers.qualityRequirements?.length ?? 0) > 0,
+apps\api\src\modules\workspace-onboarding\rules\engineering-system.rules.ts:30:draft.engineeringConfigurations = answers.qualityRequirements!.map(proposed);
+apps\web\src\features\workspace-onboarding\api\workspace-onboarding-api.ts:70:updateAnswers: (id: string, answers: Partial<WorkspaceOnboardingAnswers>) =>
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:5:import { listImportableRepositories } from '../../workspaces/github-import/github-import-api';
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:16:const requiresRepositorySelection = initialSession.answers.repositories === 'CONNECT_NOW';
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:19:const [repositories, setRepositories] = useState<ImportableGithubRepository[]>([]);
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:20:const [loadingRepositories, setLoadingRepositories] = useState(requiresRepositorySelection);
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:31:void listImportableRepositories()
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:34:setRepositories(response.repositories);
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:40:setRepositoryError(error instanceof Error ? error.message : 'Unable to load GitHub repositories');
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:45:setLoadingRepositories(false);
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:57:blueprint.repositories
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:65:blueprint.repositories.some((repository) => repository.applicationType === application.type && repository.strategy === 'CONNECT_NOW' && Boolean(repository.repositoryId)),
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:68:const remaining = blueprint.repositories.filter((repository) => repository.applicationType !== applicationType);
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:72:repositories: repositoryId
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:88:path: 'repositories',
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:153:disabled={saving || loadingRepositories}
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:157:value={blueprint.repositories.find((repository) => repository.applicationType === application.type && repository.strategy === 'CONNECT_NOW')?.repositoryId ?? ''}
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:159:<option value=''>{loadingRepositories ? 'Loading verified repositories…' : 'Select a verified repository'}</option>
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:161:{repositories.map((repository) => {
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:163:const selectedForThisApplication = blueprint.repositories.some((selection) => selection.applicationType === application.type && selection.repositoryId === id);
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:183:{requiresRepositorySelection && !loadingRepositories && !repositoryError && repositories.length === 0 ? (
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:184:<p className='rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900'>No verified GitHub repositories are available. Connect GitHub before confirming this workspace.</p>
+apps\web\src\features\workspace-onboarding\components\blueprint-review.tsx:193:disabled={saving || loadingRepositories || !repositorySelectionComplete}
+apps\web\src\features\workspace-onboarding\components\guided-workspace-builder.tsx:167:await workspaceOnboardingApi.updateAnswers(sessionId, {
+packages\shared-types\src\workspace-onboarding\workspace-onboarding.types.ts:1:export const workspaceApplicationTypes = ['WEB', 'MOBILE', 'DESKTOP'] as const;
+packages\shared-types\src\workspace-onboarding\workspace-onboarding.types.ts:2:export type WorkspaceApplicationType = (typeof workspaceApplicationTypes)[number];
+packages\shared-types\src\workspace-onboarding\workspace-onboarding.types.ts:29:applicationTypes?: WorkspaceApplicationType[];
+packages\shared-types\src\workspace-onboarding\workspace-onboarding.types.ts:34:technologyPreference?: Partial<Record<WorkspaceApplicationType, WorkspaceTechnology[]>>;
+packages\shared-types\src\workspace-onboarding\workspace-onboarding.types.ts:35:mobilePlatforms?: Extract<WorkspacePlatform, 'ANDROID' | 'IOS'>[];
+packages\shared-types\src\workspace-onboarding\workspace-onboarding.types.ts:36:desktopPlatforms?: Extract<WorkspacePlatform, 'WINDOWS' | 'MACOS' | 'LINUX'>[];
+packages\shared-types\src\workspace-onboarding\workspace-onboarding.types.ts:37:repositories?: RepositoryStrategy;
+packages\shared-types\src\workspace-onboarding\workspace-onboarding.types.ts:39:qualityRequirements?: EngineeringSystem[];
+packages\shared-types\src\workspace-onboarding\workspace-onboarding.types.ts:102:repositories: WorkspaceBlueprintRepository[];
+packages\validation\src\workspace-onboarding\workspace-onboarding.schemas.ts:1:import { engineeringSystems, workspaceApplicationTypes, workspaceEnvironments, workspacePlatforms, workspaceProductTypes, workspaceTechnologies } from '@command-center/shared-types';
+packages\validation\src\workspace-onboarding\workspace-onboarding.schemas.ts:7:export const workspaceOnboardingAnswersSchema = z
+packages\validation\src\workspace-onboarding\workspace-onboarding.schemas.ts:13:applicationTypes: uniqueArray(z.enum(workspaceApplicationTypes), 3).optional(),
+packages\validation\src\workspace-onboarding\workspace-onboarding.schemas.ts:18:technologyPreference: z.record(z.enum(workspaceApplicationTypes), uniqueArray(z.enum(workspaceTechnologies), 12)).optional(),
+packages\validation\src\workspace-onboarding\workspace-onboarding.schemas.ts:19:mobilePlatforms: uniqueArray(z.enum(['ANDROID', 'IOS'] as const), 2).optional(),
+packages\validation\src\workspace-onboarding\workspace-onboarding.schemas.ts:20:desktopPlatforms: uniqueArray(z.enum(['WINDOWS', 'MACOS', 'LINUX'] as const), 3).optional(),
+packages\validation\src\workspace-onboarding\workspace-onboarding.schemas.ts:22:repositories: z.enum(['NONE', 'CONNECT_LATER', 'CONNECT_NOW']).optional(),
+packages\validation\src\workspace-onboarding\workspace-onboarding.schemas.ts:24:qualityRequirements: uniqueArray(z.enum(engineeringSystems), engineeringSystems.length).optional(),
+packages\validation\src\workspace-onboarding\workspace-onboarding.schemas.ts:28:if (answers.mobilePlatforms?.length && !answers.applicationTypes?.includes('MOBILE')) {
+packages\validation\src\workspace-onboarding\workspace-onboarding.schemas.ts:31:path: ['mobilePlatforms'],
+packages\validation\src\workspace-onboarding\workspace-onboarding.schemas.ts:36:if (answers.desktopPlatforms?.length && !answers.applicationTypes?.includes('DESKTOP')) {
+packages\validation\src\workspace-onboarding\workspace-onboarding.schemas.ts:39:path: ['desktopPlatforms'],
+packages\validation\src\workspace-onboarding\workspace-onboarding.schemas.ts:45:export const completeWorkspaceOnboardingAnswersSchema = workspaceOnboardingAnswersSchema.superRefine((answers, context) => {
+packages\validation\src\workspace-onboarding\workspace-onboarding.schemas.ts:46:const required = ['productIdea', 'workspaceName', 'productType', 'targetUsers', 'applicationTypes', 'coreFeatures', 'authentication', 'repositories', 'environments', 'qualityRequirements'] as const;
+packages\validation\src\workspace-onboarding\workspace-onboarding.schemas.ts:63:type: z.enum(workspaceApplicationTypes),
+packages\validation\src\workspace-onboarding\workspace-onboarding.schemas.ts:105:applicationType: z.enum(workspaceApplicationTypes),
+packages\validation\src\workspace-onboarding\workspace-onboarding.schemas.ts:195:repositories: uniqueArray(repositoryBlueprintSchema, 3),

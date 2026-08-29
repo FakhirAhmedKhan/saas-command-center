@@ -1,4 +1,4 @@
-import { spawn } from 'node:child_process';
+﻿import { spawn } from 'node:child_process';
 import { readdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
@@ -48,11 +48,12 @@ if (files.length === 0) {
 }
 
 function readWorkerCount() {
-  const raw = process.env.E2E_WORKERS ?? '3';
+  const raw = process.env.TEST_WORKERS ?? process.env.JEST_WORKERS ?? process.env.E2E_WORKERS ?? '5';
+
   const value = Number(raw);
 
-  if (!Number.isInteger(value) || value < 1 || value > 4) {
-    throw new Error('E2E_WORKERS must be an integer from 1 to 4.');
+  if (!Number.isInteger(value) || value < 1 || value > 5) {
+    throw new Error('E2E_WORKERS must be an integer from 1 to 5.');
   }
 
   return Math.min(value, files.length);

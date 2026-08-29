@@ -1,5 +1,5 @@
 import type { WorkspaceOnboardingAnswers } from '@command-center/shared-types';
-import { workspaceOnboardingAnswersSchema } from '@command-center/validation';
+import { workspaceOnboardingAnswersPatchSchema } from '@command-center/validation';
 import { BadRequestException } from '@nestjs/common';
 
 export class UpdateOnboardingAnswersDto {
@@ -7,7 +7,7 @@ export class UpdateOnboardingAnswersDto {
 
   static parse(input: unknown): UpdateOnboardingAnswersDto {
     const body = input as { answers?: unknown };
-    const result = workspaceOnboardingAnswersSchema.safeParse(body?.answers);
+    const result = workspaceOnboardingAnswersPatchSchema.safeParse(body?.answers);
 
     if (!result.success) {
       throw new BadRequestException({

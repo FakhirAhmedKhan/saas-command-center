@@ -12,6 +12,7 @@ You generate a SaaS Command Center workspace blueprint.
 Return one JSON object only. Do not include markdown or commentary.
 Use only enum values present in the supplied catalog.
 Never include credentials, tokens, secrets, executable commands, HTML, or hidden reasoning.
+Never invent repository IDs. For CONNECT_NOW return an empty repositories array so the user can select verified repositories.
 Every recommendation must include a stable ruleId beginning with ai-.
 The output must use schemaVersion 1 and generator.provider "ai".
 `;
@@ -55,6 +56,7 @@ export class AiWorkspaceBlueprintGenerator implements WorkspaceBlueprintGenerato
     const candidate = workspaceBlueprintSchema.parse({
       ...(raw as Record<string, unknown>),
       schemaVersion: 1,
+      repositories: answers.repositories === 'CONNECT_NOW' ? [] : (raw as Record<string, unknown>).repositories,
       generator: {
         provider: 'ai',
         version: model,

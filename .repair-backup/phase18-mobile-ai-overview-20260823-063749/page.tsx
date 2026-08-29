@@ -8,7 +8,7 @@ import { MOBILE_FRAMEWORK_LABELS, MOBILE_PLATFORM_LABELS } from '@/features/mobi
 import { archiveMobileApp, getMobileAppOverview, updateMobileApp } from '@/features/mobile-apps/mobile-apps-api';
 import { MobileProjectDetectionPanel } from '@/features/mobile-apps/mobile-project-detection-panel';
 import { MobileRepositoryPanel } from '@/features/mobile-apps/mobile-repository-panel';
-import type { CreateMobileApplicationInput, MobileAppOverview } from '@command-center/shared-types';  
+import type { CreateMobileApplicationInput, MobileAppOverview } from '@command-center/shared-types';
 import { Archive, ArrowLeft, GitBranch, Smartphone } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';

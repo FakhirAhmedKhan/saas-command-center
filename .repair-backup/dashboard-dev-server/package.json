@@ -1,0 +1,51 @@
+{
+  "name": "saas-command-center",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.22.0+sha512.1ff870c4c6133dfd88fb2afc46dd13d47f09c9794b438c6fdb47ca98caf3bc16381ee0be93a091b8e3824cf01f889f46d7d9e20910fb0be1ab0fb5baa80dd621",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=11.0.0"
+  },
+  "scripts": {
+    "build:packages": "pnpm --filter @command-center/shared-types build && pnpm --filter @command-center/validation build",
+    "build": "pnpm build:packages && pnpm -r --if-present build && pnpm size",
+    "lint": "pnpm -r --if-present lint",
+    "lint:fix": "pnpm -r --if-present lint:fix",
+    "typecheck": "pnpm build:packages && pnpm -r --if-present typecheck",
+    "test": "pnpm run test:all",
+    "test:api": "pnpm run test:api:unit && pnpm run test:api:e2e",
+    "test:tracker": "pnpm --filter @command-center/tracker-tests --fail-if-no-match test",
+    "test:web": "pnpm run test:web:unit && pnpm run test:web:e2e && pnpm run test:web:fullstack",
+    "test:web:fullstack": "pnpm --filter @command-center/web-tests --fail-if-no-match test:fullstack",
+    "test:all": "node packages/test-code/scripts/run-all.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:up": "docker compose -f infrastructure/docker-compose.yml up -d",
+    "db:down": "docker compose -f infrastructure/docker-compose.yml down",
+    "db:logs": "docker compose -f infrastructure/docker-compose.yml logs -f",
+    "db:status": "docker compose -f infrastructure/docker-compose.yml ps",
+    "dev": "concurrently -k --names API,WEB,TRACKER --prefix-colors cyan.bold,magenta.bold,yellow.bold --prefix \"[{name}]\" \"pnpm run dev:api\" \"pnpm run dev:web\" \"pnpm run dev:tracker\"",
+    "dev:api": "pnpm --filter @command-center/api start:dev",
+    "dev:web": "pnpm --filter @command-center/web dev",
+    "dev:tracker": "pnpm --filter @command-center/tracker dev",
+    "style:fix": "pnpm lint:fix && pnpm format",
+    "size": "node scripts/build-size-report.mjs",
+    "analyze:web": "pnpm --filter @command-center/web exec next experimental-analyze",
+    "build:tests": "pnpm --filter @command-center/test-code build",
+    "typecheck:tests": "pnpm --filter @command-center/test-code typecheck",
+    "test:api:unit": "pnpm --filter @command-center/api-tests --fail-if-no-match test:unit",
+    "test:api:e2e": "pnpm --filter @command-center/api-tests --fail-if-no-match test:e2e",
+    "test:web:unit": "pnpm --filter @command-center/web-tests --fail-if-no-match test:unit",
+    "test:web:e2e": "pnpm --filter @command-center/web-tests --fail-if-no-match test:e2e",
+    "verify:lint-config": "node scripts/verify-eslint-prettier-config.mjs",
+    "lint:all": "pnpm -r --if-present run lint",
+    "lint:fix:all": "pnpm -r --if-present run lint:fix"
+  },
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "concurrently": "^9.2.1",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2"
+  }
+}

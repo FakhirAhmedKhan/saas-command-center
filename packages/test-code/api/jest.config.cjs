@@ -1,3 +1,5 @@
+// Jest configuration for unit tests
+
 const path = require('node:path');
 
 const testRoot = __dirname;
@@ -21,7 +23,7 @@ module.exports = {
       },
     ],
   },
-
+  moduleDirectories: ['node_modules', '<rootDir>/apps/api/node_modules'],
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/apps/api/src/$1',
   },

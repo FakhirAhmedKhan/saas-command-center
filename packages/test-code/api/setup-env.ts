@@ -23,11 +23,19 @@ try {
   throw new Error('TEST_DATABASE_URL must be a valid PostgreSQL URL');
 }
 
-const databaseName = parsedDatabaseUrl.pathname.replace(/^\//, '').toLowerCase();
-const safeTestDatabase = databaseName.includes('test');
+const databaseName = parsedDatabaseUrl.pathname
+  .replace(/^\/+/, '')
+  .toLowerCase();
 
-if (!safeTestDatabase) {
-  throw new Error(['E2E tests refused to start.', 'TEST_DATABASE_URL does not look like a test database.', `Database: ${databaseName}`, `Port: ${parsedDatabaseUrl.port}`].join(' '));
+if (!databaseName.includes('test')) {
+  throw new Error(
+    [
+      'E2E tests refused to start.',
+      'TEST_DATABASE_URL does not look like a test database.',
+      `Database: ${databaseName}`,
+      `Port: ${parsedDatabaseUrl.port}`,
+    ].join(' '),
+  );
 }
 
 process.env.DATABASE_URL = testDatabaseUrl;
@@ -46,14 +54,21 @@ try {
   throw new Error('TEST_REDIS_URL must be a valid Redis URL');
 }
 
-const redisDatabaseRaw = parsedRedisUrl.pathname.replace(/^\//, '');
+const redisDatabaseRaw = parsedRedisUrl.pathname.replace(/^\/+/, '');
 const redisDatabase = redisDatabaseRaw ? Number(redisDatabaseRaw) : 0;
 
 if (!Number.isInteger(redisDatabase) || redisDatabase <= 0) {
-  throw new Error(['E2E tests refused to start.', 'TEST_REDIS_URL must use a dedicated non-zero Redis database.', `Redis database: ${redisDatabase}`].join(' '));
+  throw new Error(
+    [
+      'E2E tests refused to start.',
+      'TEST_REDIS_URL must use a dedicated non-zero Redis database.',
+      `Redis database: ${redisDatabase}`,
+    ].join(' '),
+  );
 }
 
 process.env.REDIS_URL = testRedisUrl;
 
+process.env.GUIDED_WORKSPACE_BUILDER_ENABLED = 'true';
 process.env.ANALYTICS_PROCESSOR_ENABLED = 'false';
 process.env.ANALYTICS_ALLOW_ORIGINLESS = 'false';

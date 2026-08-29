@@ -1,0 +1,177 @@
+
+====================================================================================================
+WORKING DIRECTORY
+====================================================================================================
+C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center
+
+====================================================================================================
+WEB PACKAGE
+====================================================================================================
+{
+  "name": "@command-center/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "next typegen && tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "verify": "pnpm typecheck && pnpm build"
+  },
+  "dependencies": {
+    "@command-center/shared-types": "workspace:*",
+    "@command-center/ui": "workspace:*",
+    "@monaco-editor/react": "4.8.0-rc.3",
+    "lucide-react": "^1.28.0",
+    "monaco-editor": "^0.56.0",
+    "next": "16.3.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@command-center/eslint-config": "workspace:*",
+    "@eslint/js": "^9.34.0",
+    "@playwright/test": "^1.62.1",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@testing-library/jest-dom": "^6",
+    "@testing-library/react": "^16",
+    "@testing-library/user-event": "^14",
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^24.3.0",
+    "@types/pg": "^8.20.3",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.0.5",
+    "@vitest/coverage-v8": "^4.1.10",
+    "eslint": "^9.34.0",
+    "eslint-config-next": "16.3.1",
+    "jsdom": "^30.0.1",
+    "pg": "^8.22.0",
+    "postcss": "^8.5.26",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.67.0",
+    "vitest": "^4.1.10"
+  }
+}
+
+====================================================================================================
+DASHBOARD FILE
+====================================================================================================
+
+
+FullName      : C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\apps\web\src\app\(dashboard)\dashboard\page.tsx
+Length        : 3605
+LastWriteTime : 8/25/2026 12:05:12 AM
+Attributes    : Archive
+
+
+
+
+
+====================================================================================================
+LISTENING PORTS
+====================================================================================================
+
+LocalAddress LocalPort OwningProcess
+------------ --------- -------------
+::                3000         23268
+::                3002         22348
+
+
+
+
+====================================================================================================
+PROCESS FOR PORT 3002
+====================================================================================================
+PID: 22348
+NAME: node.exe
+COMMAND: node  scripts/dev.mjs
+EXECUTABLE: C:\Program Files\nodejs\node.exe
+
+====================================================================================================
+PROCESS FOR PORT 3000
+====================================================================================================
+PID: 23268
+NAME: node.exe
+COMMAND: "C:\Program Files\nodejs\node.exe" C:\Users\Dell\OneDrive\Desktop\Programs\saas-command-center\node_modules\next\dist\server\lib\start-server.js
+EXECUTABLE: C:\Program Files\nodejs\node.exe
+
+====================================================================================================
+HTTP /
+====================================================================================================
+HTTP/1.1 404 Not Found
+Cache-Control: no-cache, must-revalidate
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+X-Powered-By: Next.js
+Content-Type: text/html; charset=utf-8
+Date: Fri, 28 Aug 2026 16:45:24 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+
+BODY PREVIEW:
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"/><script src="/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js" async=""></script><script src="/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js" async=""></script><script src="/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js" async=""></script><script src="/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js" async=""></script><script src="/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js" async=""></script><script src="/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js" async=""></script><script src="/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js" async=""></script><scr
+
+====================================================================================================
+HTTP /dashboard
+====================================================================================================
+HTTP/1.1 404 Not Found
+Cache-Control: no-cache, must-revalidate
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+X-Powered-By: Next.js
+Content-Type: text/html; charset=utf-8
+Date: Fri, 28 Aug 2026 16:45:24 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+
+BODY PREVIEW:
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"/><script src="/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js" async=""></script><script src="/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js" async=""></script><script src="/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js" async=""></script><script src="/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js" async=""></script><script src="/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js" async=""></script><script src="/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js" async=""></script><script src="/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js" async=""></script><scr
+
+====================================================================================================
+HTTP /workspaces/new
+====================================================================================================
+HTTP/1.1 404 Not Found
+Cache-Control: no-cache, must-revalidate
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+X-Powered-By: Next.js
+Content-Type: text/html; charset=utf-8
+Date: Fri, 28 Aug 2026 16:45:24 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+
+BODY PREVIEW:
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"/><script src="/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js" async=""></script><script src="/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js" async=""></script><script src="/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js" async=""></script><script src="/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js" async=""></script><script src="/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js" async=""></script><script src="/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js" async=""></script><script src="/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js" async=""></script><scr
+
+====================================================================================================
+HTTP /login
+====================================================================================================
+HTTP/1.1 404 Not Found
+Cache-Control: no-cache, must-revalidate
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+X-Powered-By: Next.js
+Content-Type: text/html; charset=utf-8
+Date: Fri, 28 Aug 2026 16:45:24 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+
+BODY PREVIEW:
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"/><script src="/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js" async=""></script><script src="/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js" async=""></script><script src="/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js" async=""></script><script src="/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js" async=""></script><script src="/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js" async=""></script><script src="/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js" async=""></script><script src="/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js" async=""></script><scr
+
+====================================================================================================
+DASHBOARD MANIFEST MATCHES
+====================================================================================================
+
+====================================================================================================
+NEXT VERSION
+====================================================================================================
+Next.js v16.3.1

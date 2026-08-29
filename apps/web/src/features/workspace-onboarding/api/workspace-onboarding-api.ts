@@ -1,3 +1,5 @@
+import { apiRequest } from '@/features/lib/api/api-client';
+import { ApiError } from '@/features/lib/api/api-error';
 import type {
   ConfirmWorkspaceBlueprintInput,
   UpdateWorkspaceBlueprintInput,
@@ -7,8 +9,6 @@ import type {
   WorkspaceOnboardingSessionResponse,
   WorkspaceQuestionFlowResponse,
 } from '@command-center/shared-types';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api/v1';
 
 interface ApiErrorBody {
   message?: string;
@@ -30,27 +30,27 @@ export class WorkspaceOnboardingApiError extends Error {
   }
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_URL}${path}`, {
-    ...init,
-    credentials: 'include',
-    headers: {
-      'content-type': 'application/json',
-      ...init?.headers,
-    },
-  });
+async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  try {
+    const response: unknown = await apiRequest<unknown>(path, {
+      ...init,
+      body: init.body,
+    });
 
-  if (!response.ok) {
-    const body = (await response.json().catch(() => null)) as ApiErrorBody | null;
+    if (typeof response === 'object' && response !== null && 'data' in response) {
+      return (response as { data: T }).data;
+    }
 
-    throw new WorkspaceOnboardingApiError(response.status, body?.message ?? `Request failed with ${response.status}`, body);
+    return response as T;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      const body = typeof error.details === 'object' && error.details !== null ? (error.details as ApiErrorBody) : null;
+
+      throw new WorkspaceOnboardingApiError(error.status, error.message, body);
+    }
+
+    throw error;
   }
-
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  return response.json() as Promise<T>;
 }
 
 const sessionPath = (id: string): string => `/workspace-onboarding/sessions/${id}`;

@@ -1,9 +1,10 @@
+import { REPOSITORY_CONNECTION_PORT, type RepositoryConnectionPort, type VerifiedRepositorySelection } from './repository-connection.port';
 import { WorkspaceBlueprintService } from './workspace-blueprint.service';
 import { WORKSPACE_CREATION_PORT, type WorkspaceCreationPort } from './workspace-creation.port';
 import { WorkspaceOnboardingService } from './workspace-onboarding.service';
 import { PrismaService } from '../../database/prisma.service';
 import { Prisma } from '../../generated/prisma/client';
-import type { ConfirmWorkspaceBlueprintInput, WorkspaceCreationResult } from '@command-center/shared-types';
+import type { ConfirmWorkspaceBlueprintInput, RepositoryStrategy, WorkspaceBlueprint, WorkspaceCreationResult } from '@command-center/shared-types';
 import { workspaceBlueprintSchema, workspaceOnboardingAnswersSchema } from '@command-center/validation';
 import { ConflictException, Inject, Injectable, UnprocessableEntityException } from '@nestjs/common';
 
@@ -23,8 +24,12 @@ export class WorkspaceOnboardingCreationService {
     private readonly prisma: PrismaService,
     private readonly sessions: WorkspaceOnboardingService,
     private readonly blueprints: WorkspaceBlueprintService,
+
     @Inject(WORKSPACE_CREATION_PORT)
     private readonly creationPort: WorkspaceCreationPort,
+
+    @Inject(REPOSITORY_CONNECTION_PORT)
+    private readonly repositoryConnections: RepositoryConnectionPort,
   ) {}
 
   async confirm(sessionId: string, userId: string, input: ConfirmWorkspaceBlueprintInput): Promise<WorkspaceCreationResult> {
@@ -57,33 +62,26 @@ export class WorkspaceOnboardingCreationService {
     }
 
     const answers = workspaceOnboardingAnswersSchema.parse(owned.answers);
-
-    if (answers.repositories === 'CONNECT_NOW') {
-      throw new UnprocessableEntityException({
-        message: 'Select verified repositories before using CONNECT_NOW',
-        code: 'REPOSITORY_SELECTION_REQUIRED',
-      });
-    }
-
     const blueprint = workspaceBlueprintSchema.parse(owned.blueprint);
+    const verifiedRepositories = await this.verifyRepositorySelections(userId, answers.repositories, blueprint);
 
     return this.prisma.$transaction(
       async (transaction) => {
         const locked = await transaction.$queryRaw<LockedOnboardingSession[]>(Prisma.sql`
-          SELECT
-            "id",
-            "status",
-            "workspaceId",
-            "idempotencyKey",
-            "blueprintRevision",
-            "blueprintHash",
-            "completedAt"
-          FROM "workspace_onboarding_sessions"
-          WHERE
-            "id" = ${sessionId}
-            AND "userId" = ${userId}
-          FOR UPDATE
-        `);
+            SELECT
+              "id",
+              "status",
+              "workspaceId",
+              "idempotencyKey",
+              "blueprintRevision",
+              "blueprintHash",
+              "completedAt"
+            FROM "workspace_onboarding_sessions"
+            WHERE
+              "id" = ${sessionId}
+              AND "userId" = ${userId}
+            FOR UPDATE
+          `);
         const session = locked[0];
 
         if (!session) {
@@ -122,6 +120,17 @@ export class WorkspaceOnboardingCreationService {
           ownerUserId: userId,
           blueprint,
         });
+
+        if (verifiedRepositories.length > 0) {
+          await this.repositoryConnections.connectVerified({
+            transaction,
+            userId,
+            workspaceId: created.workspaceId,
+            applicationIds: created.applicationIds,
+            repositories: verifiedRepositories,
+          });
+        }
+
         const completedAt = new Date();
 
         await transaction.workspaceOnboardingSession.update({
@@ -148,5 +157,32 @@ export class WorkspaceOnboardingCreationService {
         timeout: 30_000,
       },
     );
+  }
+
+  private async verifyRepositorySelections(userId: string, strategy: RepositoryStrategy | undefined, blueprint: WorkspaceBlueprint): Promise<VerifiedRepositorySelection[]> {
+    const connectNowRepositories = blueprint.repositories.filter(({ strategy: repositoryStrategy }) => repositoryStrategy === 'CONNECT_NOW');
+
+    if (strategy !== 'CONNECT_NOW') {
+      if (connectNowRepositories.length > 0) {
+        throw new UnprocessableEntityException({
+          code: 'REPOSITORY_STRATEGYY_MISMATCH',
+          message: 'CONNECT_NOW repositories do not match the onboarding answers',
+        });
+      }
+
+      return [];
+    }
+
+    const applicationTypes = new Set(blueprint.applications.map(({ type }) => type));
+    const selectedApplicationTypes = new Set(connectNowRepositories.map(({ applicationType }) => applicationType));
+
+    if (connectNowRepositories.length !== blueprint.applications.length || selectedApplicationTypes.size !== applicationTypes.size || [...applicationTypes].some((type) => !selectedApplicationTypes.has(type))) {
+      throw new UnprocessableEntityException({
+        code: 'REPOSITORY_SELECTION_REQUIRED',
+        message: 'Select one verified repository for every application',
+      });
+    }
+
+    return this.repositoryConnections.verifySelection(userId, connectNowRepositories);
   }
 }

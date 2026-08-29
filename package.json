@@ -27,7 +27,7 @@
     "db:status": "docker compose -f infrastructure/docker-compose.yml ps",
     "dev": "concurrently -k --names API,WEB,TRACKER --prefix-colors cyan.bold,magenta.bold,yellow.bold --prefix \"[{name}]\" \"pnpm run dev:api\" \"pnpm run dev:web\" \"pnpm run dev:tracker\"",
     "dev:api": "pnpm --filter @command-center/api start:dev",
-    "dev:web": "pnpm --filter @command-center/web dev",
+    "dev:web": "pnpm exec next dev apps/web --webpack",
     "dev:tracker": "pnpm --filter @command-center/tracker dev",
     "style:fix": "pnpm lint:fix && pnpm format",
     "size": "node scripts/build-size-report.mjs",
@@ -40,7 +40,12 @@
     "test:web:e2e": "pnpm --filter @command-center/web-tests --fail-if-no-match test:e2e",
     "verify:lint-config": "node scripts/verify-eslint-prettier-config.mjs",
     "lint:all": "pnpm -r --if-present run lint",
-    "lint:fix:all": "pnpm -r --if-present run lint:fix"
+    "lint:fix:all": "pnpm -r --if-present run lint:fix",
+    "verify:all": "pnpm prisma:check && pnpm web:verify && pnpm api:verify && pnpm tracker:verify",
+    "prisma:check": "pnpm --filter @command-center/api exec prisma validate && pnpm --filter @command-center/api exec prisma generate && pnpm --filter @command-center/api exec prisma migrate status",
+    "web:verify": "pnpm --filter @command-center/web typecheck && pnpm --filter @command-center/web lint && pnpm --filter @command-center/web build",
+    "api:verify": "pnpm --filter @command-center/api typecheck && pnpm --filter @command-center/api lint && pnpm --filter @command-center/api build",
+    "tracker:verify": "pnpm --filter @command-center/tracker typecheck && pnpm --filter @command-center/tracker lint && pnpm --filter @command-center/tracker build"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.10.0",
